@@ -1,0 +1,42 @@
+apply plugin: 'android'
+
+repositories {
+    maven {
+        url "http://JRAF.org/static/maven/2"
+    }
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.1"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 19
+        versionCode 1
+        versionName "0.1"
+    }
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.0.1'
+    compile 'com.android.support:appcompat-v7:19.0.1'
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.0'
+    compile 'org.jraf:android-switch-backport:1.3.1'
+    compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':dependencies:facebook')
+}

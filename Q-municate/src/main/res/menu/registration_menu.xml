@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:support="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_login"
+        android:showAsAction="ifRoom"
+        android:title="@string/lgn_login"
+        support:showAsAction="ifRoom" />
+</menu>

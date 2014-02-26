@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:support="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_audio_call"
+        android:icon="@drawable/ic_friends_call"
+        android:showAsAction="ifRoom"
+        android:title="@string/frd_audio_call"
+        support:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_video_call"
+        android:icon="@drawable/ic_video"
+        android:showAsAction="ifRoom"
+        android:title="@string/frd_video_call"
+        support:showAsAction="ifRoom" />
+</menu>

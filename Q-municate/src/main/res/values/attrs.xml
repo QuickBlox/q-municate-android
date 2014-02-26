@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImageIconButton">
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="src" format="integer" />
+    </declare-styleable>
+</resources>
