@@ -32,12 +32,12 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 public class LoginActivity extends FacebookActivity implements QBLoginTask.Callback {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private static final String DEFAULT_LOGIN = "qweqweqwe";
+    private static final String DEFAULT_EMAIL = "shaforenko.igor@injoit.com";
     private static final String DEFAULT_PASSWORD = "qweqweqwe";
 
     private Button loginButton;
     private View loginFacebokButton;
-    private EditText login;
+    private EditText email;
     private EditText password;
     private TextView forgotPassword;
     private CheckBox rememberMe;
@@ -54,14 +54,14 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         useDoubleBackPressed = true;
         facebookStatusCallback = new FacebookSessionStatusCallback();
 
-        login = (EditText) findViewById(R.id.login);
+        email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
         loginButton = (Button) findViewById(R.id.loginButton);
         loginFacebokButton = findViewById(R.id.connectFacebookButton);
         forgotPassword = (TextView) findViewById(R.id.forgotPassword);
         rememberMe = (CheckBox) findViewById(R.id.rememberMe);
 
-        login.setText(DEFAULT_LOGIN);
+        email.setText(DEFAULT_EMAIL);
         password.setText(DEFAULT_PASSWORD);
 
         initListeners();
@@ -120,7 +120,7 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     private void login() {
-        String userEmail = login.getText().toString();
+        String userEmail = email.getText().toString();
         String userPassword = password.getText().toString();
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
@@ -136,7 +136,7 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     private void resetPassword() {
-        String userEmail = login.getText().toString();
+        String userEmail = email.getText().toString();
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
 

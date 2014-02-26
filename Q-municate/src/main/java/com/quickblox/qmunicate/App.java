@@ -18,9 +18,9 @@ public class App extends Application {
 
     public static final int MAX_BITMAP_SIZE = 2000000;
 
-    private static final String APP_ID = "6724";
-    private static final String AUTH_KEY = "e582BS8JtAYU-Fv";
-    private static final String AUTH_SECRET = "uFWsyaqmpGhuURh";
+    private static final String APP_ID = "7232";
+    private static final String AUTH_KEY = "MpOecRZy-5WsFva";
+    private static final String AUTH_SECRET = "dTSLaxDsFKqegD7";
 
     private static App instance;
 
@@ -34,7 +34,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         initAppication();
-        QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
     }
 
     public void initImageLoader(Context context) {
@@ -71,6 +70,7 @@ public class App extends Application {
     private void initAppication() {
         instance = this;
         initImageLoader(this);
+        QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
     }
 
     private class ScaleBitmapPreProcessor implements BitmapProcessor {

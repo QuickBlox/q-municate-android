@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.qb;
 
 import android.support.v4.app.FragmentActivity;
 
+import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
@@ -17,6 +18,7 @@ public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
     public Void performInBackground(String... params) throws Exception {
         String email = params[0];
 
+        QBAuth.createSession();
         QBUsers.resetPassword(email);
         return null;
     }
