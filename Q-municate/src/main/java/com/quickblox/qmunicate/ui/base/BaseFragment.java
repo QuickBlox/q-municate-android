@@ -9,7 +9,6 @@ import com.quickblox.qmunicate.App;
 
 public abstract class BaseFragment extends Fragment {
 
-    protected static final int FRIEND_LIST_LOADER_ID = 1;
     protected static final String ARG_TITLE = "title";
     protected App app;
     private String title;

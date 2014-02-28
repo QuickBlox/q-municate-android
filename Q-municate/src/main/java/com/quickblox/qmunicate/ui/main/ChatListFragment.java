@@ -69,7 +69,7 @@ public class ChatListFragment extends BaseFragment {
         groupChat.setName("My group");
         chats.add(groupChat);
 
-        ChatListAdapter adapter = new ChatListAdapter(getActivity(), 0, 0, chats);
+        ChatListAdapter adapter = new ChatListAdapter(getActivity(), chats);
         chatList.setAdapter(adapter);
 
         chatList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

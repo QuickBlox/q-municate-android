@@ -13,8 +13,11 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 
 public class FriendDetailsActivity extends BaseActivity {
 
-    public static void startActivity(Context context) {
+    public static final String PARAM_FRIEND_ID = "Friend ID";
+
+    public static void startActivity(Context context, int friendId) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
+        intent.putExtra(PARAM_FRIEND_ID, friendId);
         context.startActivity(intent);
     }
 

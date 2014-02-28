@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,8 @@ import java.util.List;
 
 public class FriendListAdapter extends BaseListAdapter<Friend> {
 
-    public FriendListAdapter(Context context, int resource, int textViewResourceId, List<Friend> objects) {
-        super(context, resource, textViewResourceId, objects);
+    public FriendListAdapter(FragmentActivity activity, List<Friend> objects) {
+        super(activity, objects);
     }
 
     @Override
@@ -32,8 +33,10 @@ public class FriendListAdapter extends BaseListAdapter<Friend> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        // TODO add image loading
-        // holder.avatarImageView.setImageBitmap();
+
+        if (null != friend.getFileId()) {
+            displayImage(friend.getFileId(), holder.avatarImageView);
+        }
         holder.fullnameTextView.setText(friend.getFullname());
         holder.statusTextView.setText(friend.getStatus());
         if (friend.isOnline()) {

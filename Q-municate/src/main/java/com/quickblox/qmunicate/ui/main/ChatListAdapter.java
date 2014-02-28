@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,8 @@ import java.util.List;
 
 public class ChatListAdapter extends BaseListAdapter<Chat> {
 
-    public ChatListAdapter(Context context, int resource, int textViewResourceId, List<Chat> objects) {
-        super(context, resource, textViewResourceId, objects);
+    public ChatListAdapter(FragmentActivity activity, List<Chat> objects) {
+        super(activity, objects);
     }
 
     @Override

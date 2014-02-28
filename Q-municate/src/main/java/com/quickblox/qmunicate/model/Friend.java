@@ -1,9 +1,11 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.ui.utils.OnlineStatusHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Friend implements Serializable {
@@ -14,6 +16,7 @@ public class Friend implements Serializable {
     private String phone;
     private Integer fileId;
     private String status;
+    private Date lastRequestAt;
     private boolean online;
 
     public Friend(QBUser user) {
@@ -22,7 +25,7 @@ public class Friend implements Serializable {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
-        this.online = false;
+        this.lastRequestAt = user.getLastRequestAt();
     }
 
     public static List<Friend> toFriends(List<QBUser> users) {
@@ -65,16 +68,16 @@ public class Friend implements Serializable {
         this.phone = phone;
     }
 
-    public int getFileId() {
+    public Integer getFileId() {
         return fileId;
     }
 
-    public void setFileId(int fileId) {
+    public void setFileId(Integer fileId) {
         this.fileId = fileId;
     }
 
     public boolean isOnline() {
-        return online;
+        return OnlineStatusHelper.isOnline(lastRequestAt);
     }
 
     public void setOnline(boolean online) {
@@ -87,5 +90,13 @@ public class Friend implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getLastRequestAt() {
+        return lastRequestAt;
+    }
+
+    public void setLastRequestAt(Date lastRequestAt) {
+        this.lastRequestAt = lastRequestAt;
     }
 }
