@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.Loader;
 
-/**
- * TODO create common generic error handler and remove concrete implementations from MB and MW
- */
 public abstract class LoaderHelper<T> implements LoaderManager<T> {
 
     private static final String TAG = LoaderHelper.class.getName();

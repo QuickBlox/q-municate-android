@@ -44,13 +44,13 @@ public class ChatListAdapter extends BaseListAdapter<Chat> {
         return convertView;
     }
 
-    private ViewHolder createViewHolder(View v) {
+    private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) v.findViewById(R.id.avatarImageView);
-        holder.userCountTextView = (TextView) v.findViewById(R.id.userCountTextView);
-        holder.nameTextView = (TextView) v.findViewById(R.id.nameTextView);
-        holder.lastMessageTextView = (TextView) v.findViewById(R.id.lastMessageTextView);
-        holder.unreadMessagesTextView = (TextView) v.findViewById(R.id.unreadMessagesTextView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
+        holder.userCountTextView = (TextView) view.findViewById(R.id.userCountTextView);
+        holder.nameTextView = (TextView) view.findViewById(R.id.nameTextView);
+        holder.lastMessageTextView = (TextView) view.findViewById(R.id.lastMessageTextView);
+        holder.unreadMessagesTextView = (TextView) view.findViewById(R.id.unreadMessagesTextView);
         return holder;
     }
 

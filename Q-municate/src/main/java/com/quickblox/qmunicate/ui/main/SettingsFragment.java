@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +12,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 import org.jraf.android.backport.switchwidget.Switch;
 
@@ -34,17 +33,17 @@ public class SettingsFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        profile = (Button) v.findViewById(R.id.profile);
-        pushNotification = (Switch) v.findViewById(R.id.pushNotification);
-        changePassword = (Button) v.findViewById(R.id.changePassword);
-        logout = (Button) v.findViewById(R.id.logout);
+        profile = (Button) rootView.findViewById(R.id.profile);
+        pushNotification = (Switch) rootView.findViewById(R.id.pushNotification);
+        changePassword = (Button) rootView.findViewById(R.id.changePassword);
+        logout = (Button) rootView.findViewById(R.id.logout);
 
         pushNotification.setChecked(getPushNotifications());
 
         initListeners();
-        return v;
+        return rootView;
     }
 
     @Override
@@ -92,14 +91,10 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void savePushNotification(boolean value) {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(Consts.PREF_PUSH_NOTIFICATIONS, value);
-        editor.commit();
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, value);
     }
 
     private boolean getPushNotifications() {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        return prefs.getBoolean(Consts.PREF_PUSH_NOTIFICATIONS, false);
+        return App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
     }
 }

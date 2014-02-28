@@ -2,7 +2,6 @@ package com.quickblox.qmunicate;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -13,6 +12,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.process.BitmapProcessor;
 import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class App extends Application {
 
@@ -24,6 +24,7 @@ public class App extends Application {
 
     private static App instance;
 
+    private PrefsHelper prefsHelper;
     private QBUser user;
 
     public static App getInstance() {
@@ -55,8 +56,8 @@ public class App extends Application {
         ImageLoader.getInstance().init(config);
     }
 
-    public SharedPreferences getSharedPreferences() {
-        return getSharedPreferences(App.class.getSimpleName(), Context.MODE_PRIVATE);
+    public PrefsHelper getPrefsHelper() {
+        return prefsHelper;
     }
 
     public QBUser getUser() {
@@ -71,6 +72,7 @@ public class App extends Application {
         instance = this;
         initImageLoader(this);
         QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
+        prefsHelper = new PrefsHelper(this);
     }
 
     private class ScaleBitmapPreProcessor implements BitmapProcessor {

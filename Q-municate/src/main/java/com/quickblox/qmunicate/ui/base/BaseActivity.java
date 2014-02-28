@@ -10,9 +10,9 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public abstract class BaseActivity extends ActionBarActivity {
+    public static final int DOUBLE_BACK_DELAY = 2000;
 
     private static final String TAG = BaseActivity.class.getSimpleName();
-
     protected App app;
     protected ActionBar actionBar;
 
@@ -40,6 +40,11 @@ public abstract class BaseActivity extends ActionBarActivity {
             public void run() {
                 doubleBackToExitPressedOnce = false;
             }
-        }, 2000);
+        }, DOUBLE_BACK_DELAY);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <T> T _findViewById(int viewId) {
+        return (T) findViewById(viewId);
     }
 }

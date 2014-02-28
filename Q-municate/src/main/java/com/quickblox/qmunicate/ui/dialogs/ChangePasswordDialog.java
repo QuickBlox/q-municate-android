@@ -29,23 +29,23 @@ public class ChangePasswordDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        View v = getActivity().getLayoutInflater().inflate(R.layout.dialog_change_password, null);
+        View rootView = getActivity().getLayoutInflater().inflate(R.layout.dialog_change_password, null);
 
-        oldPassword = (EditText) v.findViewById(R.id.oldPassword);
-        newPassword = (EditText) v.findViewById(R.id.newPassword);
-        confirmPassword = (EditText) v.findViewById(R.id.confirmPassword);
+        oldPassword = (EditText) rootView.findViewById(R.id.oldPassword);
+        newPassword = (EditText) rootView.findViewById(R.id.newPassword);
+        confirmPassword = (EditText) rootView.findViewById(R.id.confirmPassword);
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.cpd_title);
-        builder.setView(v);
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+        builder.setView(rootView);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 changePassword();
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 

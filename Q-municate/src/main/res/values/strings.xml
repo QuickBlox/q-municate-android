@@ -82,6 +82,9 @@
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
+    <string name="prefs_name">QMmunicate</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 
 </resources>

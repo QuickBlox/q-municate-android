@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.login;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -26,8 +25,8 @@ import com.quickblox.qmunicate.qb.QBSocialLoginTask;
 import com.quickblox.qmunicate.ui.base.FacebookActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.registration.RegistrationActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class LoginActivity extends FacebookActivity implements QBLoginTask.Callback {
 
@@ -54,12 +53,12 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         useDoubleBackPressed = true;
         facebookStatusCallback = new FacebookSessionStatusCallback();
 
-        email = (EditText) findViewById(R.id.email);
-        password = (EditText) findViewById(R.id.password);
-        loginButton = (Button) findViewById(R.id.loginButton);
-        loginFacebokButton = findViewById(R.id.connectFacebookButton);
-        forgotPassword = (TextView) findViewById(R.id.forgotPassword);
-        rememberMe = (CheckBox) findViewById(R.id.rememberMe);
+        email = _findViewById(R.id.email);
+        password = _findViewById(R.id.password);
+        loginButton = _findViewById(R.id.loginButton);
+        loginFacebokButton = _findViewById(R.id.connectFacebookButton);
+        forgotPassword = _findViewById(R.id.forgotPassword);
+        rememberMe = _findViewById(R.id.rememberMe);
 
         email.setText(DEFAULT_EMAIL);
         password.setText(DEFAULT_PASSWORD);
@@ -148,18 +147,13 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     private void saveRememberMe(boolean value) {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(Consts.PREF_REMEMBER_ME, value);
-        editor.commit();
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
     }
 
     private void saveUserCredentials(QBUser user) {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Consts.PREF_USER_EMAIL, user.getEmail());
-        editor.putString(Consts.PREF_USER_PASSWORD, user.getPassword());
-        editor.commit();
+        PrefsHelper helper = App.getInstance().getPrefsHelper();
+        helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
+        helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

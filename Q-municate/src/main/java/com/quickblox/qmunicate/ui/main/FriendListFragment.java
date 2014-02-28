@@ -6,18 +6,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class FriendListFragment extends BaseFragment {
 
@@ -40,38 +33,7 @@ public class FriendListFragment extends BaseFragment {
     }
 
     private void initListView() {
-        List<Friend> friends = new ArrayList<Friend>();
 
-        QBUser user = new QBUser();
-        user.setId(1);
-        user.setEmail("dsads@@dsad.com");
-        user.setFullName("Leonor Cantley");
-        user.setFileId(1);
-        Friend friend = new Friend(user);
-        friend.setOnline(true);
-        friend.setStatus("Online");
-        friends.add(friend);
-
-        user = new QBUser();
-        user.setId(2);
-        user.setEmail("asdasd@@dsasdasad.com");
-        user.setFullName("James Cobs");
-        user.setFileId(2);
-        friend = new Friend(user);
-        friend.setOnline(false);
-        friend.setStatus("Last seen yesterday at 21:20");
-        friends.add(friend);
-
-        FriendListAdapter adapter = new FriendListAdapter(getActivity(), 0, 0, friends);
-
-        friendList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                FriendDetailsActivity.startActivity(getActivity());
-            }
-        });
-
-        friendList.setAdapter(adapter);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.base;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import com.facebook.LoggingBehavior;
@@ -9,9 +8,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.quickblox.module.auth.model.QBProvider;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
-import com.quickblox.qmunicate.ui.utils.Consts;
 
 public abstract class FacebookActivity extends BaseActivity {
 
@@ -74,11 +71,6 @@ public abstract class FacebookActivity extends BaseActivity {
         } else {
             Session.openActiveSession(this, true, facebookStatusCallback);
         }
-    }
-
-    protected boolean isRememberMe() {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        return prefs.getBoolean(Consts.PREF_REMEMBER_ME, false);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
