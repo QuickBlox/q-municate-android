@@ -14,4 +14,9 @@
     <color name="login_button_pressed">#00851c</color>
     <color name="icon_button_pressed">#e4f4ff</color>
     <color name="gray">#999999</color>
+
+    <color name="activity_friend_call_bg">#333333</color>
+    <color name="activity_friend_call_timer_text">#999999</color>
+    <color name="activity_friend_button_default">#ff0000</color>
+    <color name="activity_friend_button_pressed">#e4f4ff</color>
 </resources>
