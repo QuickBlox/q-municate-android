@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.ui.base;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
@@ -10,9 +10,9 @@ import java.util.List;
 
 public abstract class BaseListAdapter<T> extends ArrayAdapter<T> {
 
-    FragmentActivity activity;
+    Activity activity;
 
-    public BaseListAdapter(FragmentActivity activity, List<T> objects) {
+    public BaseListAdapter(Activity activity, List<T> objects) {
         super(activity, 0, 0, objects);
         this.activity = activity;
     }

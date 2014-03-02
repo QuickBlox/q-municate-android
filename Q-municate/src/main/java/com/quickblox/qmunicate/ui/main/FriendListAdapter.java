@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.app.Activity;
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FriendListAdapter extends BaseListAdapter<Friend> {
 
-    public FriendListAdapter(FragmentActivity activity, List<Friend> objects) {
+    public FriendListAdapter(Activity activity, List<Friend> objects) {
         super(activity, objects);
     }
 

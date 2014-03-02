@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -13,7 +13,7 @@ public class QBLoadImageTask extends BaseErrorAsyncTask<Object, Void, QBFile> {
 
     private ImageView imageView;
 
-    public QBLoadImageTask(FragmentActivity activity) {
+    public QBLoadImageTask(Activity activity) {
         super(activity);
     }
 

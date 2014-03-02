@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,7 +73,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
     }
 
     @Override
-    public Loader<LoaderResult<com.quickblox.qmunicate.ui.main.FriendListLoader.Result>> onLoaderCreate(int id, Bundle args) {
+    public Loader<LoaderResult<FriendListLoader.Result>> onLoaderCreate(int id, Bundle args) {
         return new com.quickblox.qmunicate.ui.main.FriendListLoader(getActivity());
     }
 
