@@ -22,13 +22,14 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoginTask;
 import com.quickblox.qmunicate.qb.QBResetPasswordTask;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
-import com.quickblox.qmunicate.ui.base.FacebookActivity;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.registration.RegistrationActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class LoginActivity extends FacebookActivity implements QBLoginTask.Callback {
+public class LoginActivity extends BaseActivity implements QBLoginTask.Callback {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -38,6 +39,8 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     private EditText password;
     private TextView forgotPassword;
     private CheckBox rememberMe;
+
+    private FacebookHelper facebookHelper;
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -49,7 +52,6 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         useDoubleBackPressed = true;
-        facebookStatusCallback = new FacebookSessionStatusCallback();
 
         email = _findViewById(R.id.email);
         password = _findViewById(R.id.password);
@@ -57,6 +59,8 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         loginFacebokButton = _findViewById(R.id.connectFacebookButton);
         forgotPassword = _findViewById(R.id.forgotPassword);
         rememberMe = _findViewById(R.id.rememberMe);
+
+        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initListeners();
     }
@@ -81,6 +85,30 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onSuccess(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBLoginTask.PARAM_QBUSER);
         if (rememberMe.isChecked()) {
@@ -101,7 +129,7 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         loginFacebokButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginWithFacebook();
+                facebookHelper.loginWithFacebook();
             }
         });
 
