@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.qb;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.QBUsers;
@@ -15,7 +15,7 @@ public class QBLoginTask extends BaseProgressTask<Object, Void, Bundle> {
 
     private Callback callback;
 
-    public QBLoginTask(FragmentActivity activity) {
+    public QBLoginTask(Activity activity) {
         super(activity);
     }
 

@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.core.ui;
 
+import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 
 public interface LoaderManager<T> {
 

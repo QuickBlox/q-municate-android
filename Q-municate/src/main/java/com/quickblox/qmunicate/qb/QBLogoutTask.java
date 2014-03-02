@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.facebook.Session;
 import com.quickblox.module.auth.QBAuth;
@@ -9,7 +9,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 
 public class QBLogoutTask extends BaseProgressTask<Void, Void, Void> {
 
-    public QBLogoutTask(FragmentActivity activity) {
+    public QBLogoutTask(Activity activity) {
         super(activity);
     }
 
@@ -24,7 +24,7 @@ public class QBLogoutTask extends BaseProgressTask<Void, Void, Void> {
     @Override
     public void onResult(Void aVoid) {
         super.onResult(aVoid);
-        final FragmentActivity activity = activityRef.get();
+        final Activity activity = activityRef.get();
         if (isActivityAlive()) {
             LoginActivity.startActivity(activity);
             activity.finish();

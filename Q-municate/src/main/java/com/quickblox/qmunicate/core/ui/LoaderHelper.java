@@ -1,17 +1,17 @@
 package com.quickblox.qmunicate.core.ui;
 
+import android.app.Activity;
+import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.Loader;
 
 public abstract class LoaderHelper<T> implements LoaderManager<T> {
 
     private static final String TAG = LoaderHelper.class.getName();
 
     protected final GenericCallback<T> callback;
-    protected final FragmentActivity activity;
+    protected final Activity activity;
 
-    public LoaderHelper(FragmentActivity activity, OnLoadFinishedListener<T> loadFinishedListener, LoaderManager<T> loaderManager) {
+    public LoaderHelper(Activity activity, OnLoadFinishedListener<T> loadFinishedListener, LoaderManager<T> loaderManager) {
         this.activity = activity;
         callback = new GenericCallback<T>(loadFinishedListener, loaderManager);
     }
@@ -37,7 +37,7 @@ public abstract class LoaderHelper<T> implements LoaderManager<T> {
         if (loader != null) {
             loader.reset();
         } else {
-            loader = (BaseLoader<T>) activity.getSupportLoaderManager().initLoader(id, null, callback);
+            loader = (BaseLoader<T>) activity.getLoaderManager().initLoader(id, null, callback);
         }
         if (args != null) {
             loader.setArgs(args);
@@ -46,10 +46,9 @@ public abstract class LoaderHelper<T> implements LoaderManager<T> {
         return loader;
     }
 
-
     @Override
     @SuppressWarnings("unchecked")
     public <L extends Loader<?>> L getLoader(int id) {
-        return (L) activity.getSupportLoaderManager().getLoader(id);
+        return (L) activity.getLoaderManager().getLoader(id);
     }
 }

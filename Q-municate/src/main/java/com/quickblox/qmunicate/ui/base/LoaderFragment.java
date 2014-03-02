@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.ui.base;
 
+import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 
 import com.quickblox.qmunicate.core.ui.BaseLoader;
 import com.quickblox.qmunicate.core.ui.LoaderHelper;

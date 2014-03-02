@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -13,8 +14,6 @@ import com.quickblox.qmunicate.qb.QBLogoutTask;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-
-import org.jraf.android.backport.switchwidget.Switch;
 
 public class SettingsFragment extends BaseFragment {
 

@@ -1,13 +1,12 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -184,7 +183,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
 
-        public QMActionBarDrawlerToggle(FragmentActivity activity, DrawerLayout drawerLayout, int drawlerImageRes,
+        public QMActionBarDrawlerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
                                         int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
             super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes, closeDrawlerContentDescRes);
         }
@@ -196,7 +195,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 return;
             }
 
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
 
         @Override
@@ -211,7 +210,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawler();
             }
 
-            getActivity().supportInvalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
         }
     }
 }

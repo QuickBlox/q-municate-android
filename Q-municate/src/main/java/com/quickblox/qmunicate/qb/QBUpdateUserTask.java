@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
+import android.app.Activity;
 import android.support.v4.app.FragmentActivity;
 
 import com.quickblox.module.users.QBUsers;
@@ -27,7 +28,7 @@ public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
     @Override
     public void onResult(Void aVoid) {
         super.onResult(aVoid);
-        final FragmentActivity activity = activityRef.get();
+        final Activity activity = activityRef.get();
         if (isActivityAlive()) {
             MainActivity.startActivity(activity);
             activity.finish();
