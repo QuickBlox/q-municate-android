@@ -48,12 +48,12 @@ public class FriendListAdapter extends BaseListAdapter<Friend> {
         return convertView;
     }
 
-    private ViewHolder createViewHolder(View v) {
+    private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) v.findViewById(R.id.avatarImageView);
-        holder.fullnameTextView = (TextView) v.findViewById(R.id.nameTextView);
-        holder.statusTextView = (TextView) v.findViewById(R.id.statusTextView);
-        holder.onlineImageView = (ImageView) v.findViewById(R.id.onlineImageView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
+        holder.fullnameTextView = (TextView) view.findViewById(R.id.nameTextView);
+        holder.statusTextView = (TextView) view.findViewById(R.id.statusTextView);
+        holder.onlineImageView = (ImageView) view.findViewById(R.id.onlineImageView);
         return holder;
     }
 

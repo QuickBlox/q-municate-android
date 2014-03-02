@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.core.concurrency;
 
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
@@ -14,17 +14,17 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
 
     private static final String TAG = BaseErrorAsyncTask.class.getName();
 
-    protected WeakReference<FragmentActivity> activityRef;
+    protected WeakReference<Activity> activityRef;
 
-    protected BaseErrorAsyncTask(FragmentActivity activity) {
-        this.activityRef = new WeakReference<FragmentActivity>(activity);
+    protected BaseErrorAsyncTask(Activity activity) {
+        this.activityRef = new WeakReference<Activity>(activity);
     }
 
     @Override
     public void onException(Exception e) {
         Log.e(TAG, "Cannot perform async task ", e);
 
-        FragmentActivity parentActivity = activityRef.get();
+        Activity parentActivity = activityRef.get();
 
         if (e instanceof QBResponseException) {
             ErrorUtils.showError(parentActivity, e);
@@ -38,7 +38,7 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
 
     protected void showDialog(DialogFragment dialog, String tag) {
         if (activityRef.get() != null) {
-            dialog.show(activityRef.get().getSupportFragmentManager(), tag);
+            dialog.show(activityRef.get().getFragmentManager(), tag);
         }
     }
 
@@ -49,7 +49,7 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
     }
 
     protected boolean isActivityAlive() {
-        FragmentActivity activity = activityRef.get();
+        Activity activity = activityRef.get();
         return activity != null && !activity.isFinishing();
     }
 }

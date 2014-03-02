@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.login;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -23,17 +22,16 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoginTask;
 import com.quickblox.qmunicate.qb.QBResetPasswordTask;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
-import com.quickblox.qmunicate.ui.base.FacebookActivity;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.registration.RegistrationActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.FacebookHelper;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class LoginActivity extends FacebookActivity implements QBLoginTask.Callback {
+public class LoginActivity extends BaseActivity implements QBLoginTask.Callback {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private static final String DEFAULT_EMAIL = "shaforenko.igor@injoit.com";
-    private static final String DEFAULT_PASSWORD = "qweqweqwe";
 
     private Button loginButton;
     private View loginFacebokButton;
@@ -41,6 +39,8 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     private EditText password;
     private TextView forgotPassword;
     private CheckBox rememberMe;
+
+    private FacebookHelper facebookHelper;
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -52,17 +52,15 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         useDoubleBackPressed = true;
-        facebookStatusCallback = new FacebookSessionStatusCallback();
 
-        email = (EditText) findViewById(R.id.email);
-        password = (EditText) findViewById(R.id.password);
-        loginButton = (Button) findViewById(R.id.loginButton);
-        loginFacebokButton = findViewById(R.id.connectFacebookButton);
-        forgotPassword = (TextView) findViewById(R.id.forgotPassword);
-        rememberMe = (CheckBox) findViewById(R.id.rememberMe);
+        email = _findViewById(R.id.email);
+        password = _findViewById(R.id.password);
+        loginButton = _findViewById(R.id.loginButton);
+        loginFacebokButton = _findViewById(R.id.connectFacebookButton);
+        forgotPassword = _findViewById(R.id.forgotPassword);
+        rememberMe = _findViewById(R.id.rememberMe);
 
-        email.setText(DEFAULT_EMAIL);
-        password.setText(DEFAULT_PASSWORD);
+        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initListeners();
     }
@@ -87,6 +85,30 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onSuccess(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBLoginTask.PARAM_QBUSER);
         if (rememberMe.isChecked()) {
@@ -107,7 +129,7 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         loginFacebokButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginWithFacebook();
+                facebookHelper.loginWithFacebook();
             }
         });
 
@@ -148,18 +170,13 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
     }
 
     private void saveRememberMe(boolean value) {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(Consts.PREF_REMEMBER_ME, value);
-        editor.commit();
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
     }
 
     private void saveUserCredentials(QBUser user) {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Consts.PREF_USER_EMAIL, user.getEmail());
-        editor.putString(Consts.PREF_USER_PASSWORD, user.getPassword());
-        editor.commit();
+        PrefsHelper helper = App.getInstance().getPrefsHelper();
+        helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
+        helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

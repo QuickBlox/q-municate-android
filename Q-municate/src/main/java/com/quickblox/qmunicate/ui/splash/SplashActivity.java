@@ -1,48 +1,82 @@
 package com.quickblox.qmunicate.ui.splash;
 
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.facebook.Session;
+import com.facebook.SessionState;
+import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoginTask;
-import com.quickblox.qmunicate.ui.base.FacebookActivity;
+import com.quickblox.qmunicate.qb.QBSocialLoginTask;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.FacebookHelper;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 import com.quickblox.qmunicate.ui.wellcome.WellcomeActivity;
 
-public class SplashActivity extends FacebookActivity implements QBLoginTask.Callback {
+public class SplashActivity extends BaseActivity implements QBLoginTask.Callback {
 
-    private static final String TAG = FacebookActivity.class.getSimpleName();
+    private static final String TAG = SplashActivity.class.getSimpleName();
+    private FacebookHelper facebookHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        String userEmail = getUserEmail();
-        String userPassword = getUserPassword();
+        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-
-        if (Session.getActiveSession().isOpened()) {
+        if (facebookHelper.isSessionOpened()) {
             return;
         }
 
-        if (isRememberMe() && isEmailEntered && isPasswordEntered) {
+        String userEmail = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
+        String userPassword = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
+
+        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
+        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+
+        boolean isWellcomeShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_WELLCOME_SHOWN, false);
+
+        if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
-        } else if (isWellcomeShown()) {
+        } else if (isWellcomeShown) {
             LoginActivity.startActivity(SplashActivity.this);
             finish();
         } else {
             WellcomeActivity.startAtivity(SplashActivity.this);
             finish();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        facebookHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
     }
 
     @Override
@@ -56,18 +90,12 @@ public class SplashActivity extends FacebookActivity implements QBLoginTask.Call
         new QBLoginTask(this).execute(user, this);
     }
 
-    private String getUserEmail() {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        return prefs.getString(Consts.PREF_USER_EMAIL, null);
-    }
-
-    private String getUserPassword() {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        return prefs.getString(Consts.PREF_USER_PASSWORD, null);
-    }
-
-    private boolean isWellcomeShown() {
-        SharedPreferences prefs = App.getInstance().getSharedPreferences();
-        return prefs.getBoolean(Consts.PREF_WELLCOME_SHOWN, false);
+    private class FacebookSessionStatusCallback implements Session.StatusCallback {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            if (session.isOpened()) {
+                new QBSocialLoginTask(SplashActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+            }
+        }
     }
 }

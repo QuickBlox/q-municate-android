@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.QBUsers;
@@ -11,7 +11,7 @@ import com.quickblox.qmunicate.ui.main.MainActivity;
 
 public class QBSocialLoginTask extends BaseProgressTask<String, Void, Void> {
 
-    public QBSocialLoginTask(FragmentActivity activity) {
+    public QBSocialLoginTask(Activity activity) {
         super(activity);
     }
 
@@ -32,7 +32,7 @@ public class QBSocialLoginTask extends BaseProgressTask<String, Void, Void> {
     @Override
     public void onResult(Void aVoid) {
         super.onResult(aVoid);
-        final FragmentActivity activity = activityRef.get();
+        final Activity activity = activityRef.get();
         if (isActivityAlive()) {
             MainActivity.startActivity(activity);
             activity.finish();

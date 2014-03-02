@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.core.concurrency;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
@@ -9,11 +9,11 @@ public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErr
 
     protected final ProgressDialog progress;
 
-    protected BaseProgressTask(FragmentActivity activity) {
+    protected BaseProgressTask(Activity activity) {
         this(activity, R.string.dlg_wait_please);
     }
 
-    protected BaseProgressTask(FragmentActivity activity, int messageId) {
+    protected BaseProgressTask(Activity activity, int messageId) {
         super(activity);
         progress = ProgressDialog.newInstance(messageId);
     }

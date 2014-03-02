@@ -1,11 +1,11 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 
 import com.quickblox.qmunicate.R;
@@ -27,7 +27,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         useDoubleBackPressed = true;
 
         navigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         // Set up the drawer.
         navigationDrawerFragment.setUp(
@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     }
 
     public void setCurrentFragment(Fragment fragment) {
-        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction ft = buildTransaction();
         ft.replace(R.id.container, fragment, null);
         ft.commit();
@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     }
 
     protected FragmentTransaction buildTransaction() {
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return ft;
     }
