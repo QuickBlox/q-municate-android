@@ -1,11 +1,9 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.android.tools.build:gradle:0.8.+'
     }
 }
 
@@ -14,3 +12,16 @@ allprojects {
         mavenCentral()
     }
 }
+
+ext.compileSdkVersion = 19
+ext.buildToolsVersion = '19.0.2'
+
+ext.versionName = '0.1'
+ext.versionCode = 1
+
+ext.prodDebug = true
+ext.devDebug = true
+
+// Dependencies versions
+ext.universalImageLoaderVersion = '1.9.0'
+

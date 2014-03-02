@@ -1,20 +1,55 @@
 apply plugin: 'android'
 
+dependencies {
+    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile project(':dependencies:facebook')
+}
+
 android {
-    compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        versionCode 1
-        versionName "0.1"
+        versionCode rootProject.versionCode
+        versionName rootProject.versionName
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("../cert/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+
+        release {
+            storeFile file("../cert/release.keystore")
+            storePassword ""
+            keyAlias ""
+            keyPassword ""
+        }
     }
 
     buildTypes {
+        debug {
+            debuggable rootProject.devDebug
+            signingConfig signingConfigs.debug
+            zipAlign true
+            packageNameSuffix ".dev"
+            resValue "string", "lgn_default_user_email", "shaforenko.igor@injoit.com"
+            resValue "string", "lgn_default_user_password", "qweqweqwe"
+        }
         release {
+            debuggable rootProject.prodDebug
+            signingConfig signingConfigs.release
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFile 'proguard.cfg'
+            proguardFile getDefaultProguardFile('proguard-rules.txt')
+            resValue "string", "lgn_default_user_email", ""
+            resValue "string", "lgn_default_user_password", ""
         }
     }
 
@@ -26,10 +61,4 @@ android {
     lintOptions {
         abortOnError false
     }
-}
-
-dependencies {
-    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.0'
-    compile fileTree(dir: 'libs', include: '*.jar')
-    compile project(':dependencies:facebook')
 }

@@ -70,6 +70,8 @@
     <string name="dlg_check_email">Check your email</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
     <string name="dlg_empty_email">Email can\'t be empty</string>
+    <string name="dlg_ok">OK</string>
+    <string name="dlg_cancel">Cancel</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -83,8 +85,5 @@
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
-
 
 </resources>

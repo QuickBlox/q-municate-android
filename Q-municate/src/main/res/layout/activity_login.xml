@@ -10,15 +10,16 @@
         android:layout_height="wrap_content"
         android:digits="@string/lgn_restriction_text_numbers"
         android:hint="@string/lgn_email_hint"
+        android:text="@string/lgn_default_user_email"
         android:maxLength="128" />
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:layout_marginTop="30dp"
         android:hint="@string/lgn_password_hint"
+        android:text="@string/lgn_default_user_password"
         android:inputType="textPassword"
         android:maxLength="256" />
 

@@ -31,8 +31,6 @@ import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 public class LoginActivity extends FacebookActivity implements QBLoginTask.Callback {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private static final String DEFAULT_EMAIL = "shaforenko.igor@injoit.com";
-    private static final String DEFAULT_PASSWORD = "qweqweqwe";
 
     private Button loginButton;
     private View loginFacebokButton;
@@ -59,9 +57,6 @@ public class LoginActivity extends FacebookActivity implements QBLoginTask.Callb
         loginFacebokButton = _findViewById(R.id.connectFacebookButton);
         forgotPassword = _findViewById(R.id.forgotPassword);
         rememberMe = _findViewById(R.id.rememberMe);
-
-        email.setText(DEFAULT_EMAIL);
-        password.setText(DEFAULT_PASSWORD);
 
         initListeners();
     }
