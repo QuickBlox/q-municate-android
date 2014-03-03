@@ -2,7 +2,7 @@
     xmlns:support="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_audio_call"
-        android:icon="@drawable/ic_friends_call"
+        android:icon="@drawable/ic_call"
         android:showAsAction="ifRoom"
         android:title="@string/frd_audio_call"
         support:showAsAction="ifRoom" />

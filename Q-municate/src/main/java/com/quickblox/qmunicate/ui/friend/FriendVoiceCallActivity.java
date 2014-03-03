@@ -28,7 +28,7 @@ public class FriendVoiceCallActivity extends BaseActivity {
         findViewById(this);
 
         actionBar.hide();
-        imageButtonEndVoiceCall.setOnClickListener(viewEndCallOnClickListener);
+        imageButtonEndVoiceCall.setOnClickListener(imageButtonEndVoiceCallOnClickListener);
     }
 
     private void findViewById(Activity activity) {
@@ -37,7 +37,7 @@ public class FriendVoiceCallActivity extends BaseActivity {
         imageButtonMuteVoiceCall = (ImageButton) activity.findViewById(R.id.imageButtonMuteVoiceCall);
     }
 
-    View.OnClickListener viewEndCallOnClickListener = new View.OnClickListener() {
+    View.OnClickListener imageButtonEndVoiceCallOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             //

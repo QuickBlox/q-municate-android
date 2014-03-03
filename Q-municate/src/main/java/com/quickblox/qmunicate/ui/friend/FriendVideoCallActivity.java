@@ -26,14 +26,14 @@ public class FriendVideoCallActivity extends BaseActivity {
         findViewById(this);
 
         actionBar.hide();
-        imageButtonEndVideoCall.setOnClickListener(viewEndCallOnClickListener);
+        imageButtonEndVideoCall.setOnClickListener(imageButtonEndCallOnClickListener);
     }
 
     private void findViewById(Activity activity) {
         imageButtonEndVideoCall = (ImageButton) activity.findViewById(R.id.imageButtonEndVideoCall);
     }
 
-    View.OnClickListener viewEndCallOnClickListener = new View.OnClickListener() {
+    View.OnClickListener imageButtonEndCallOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             //
