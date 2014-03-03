@@ -22,14 +22,13 @@ import android.widget.TextView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class ProfileActivity extends BaseActivity {
-    private static final int REQUEST_CODE = 1;
-
     private LinearLayout linearLayoutChangeAvatar;
     private ImageView imageViewAvatar;
     private EditText editTextFullName;
@@ -41,6 +40,7 @@ public class ProfileActivity extends BaseActivity {
 
     private Bitmap bitmap;
     private String pathToImage;
+    private ImageHelper imageHelper;
 
     public static void startActivity(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -59,7 +59,7 @@ public class ProfileActivity extends BaseActivity {
         textViewChangeEmail.setOnClickListener(textViewChangeEmailOnClickListener);
         textViewChangeStatusMessage.setOnClickListener(textViewChangeStatusMessageOnClickListener);
 
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        imageHelper = new ImageHelper(this);
     }
 
     private void findViewById(Activity activity) {
@@ -76,7 +76,7 @@ public class ProfileActivity extends BaseActivity {
     View.OnClickListener linearLayoutChangeAvatarOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            getImage();
+            imageHelper.getImage();
         }
     };
 
@@ -107,34 +107,11 @@ public class ProfileActivity extends BaseActivity {
         editText.requestFocus();
     }
 
-    private void getImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, REQUEST_CODE);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.private_chat_menu, menu);
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(this);
-                return true;
-            case R.id.action_audio_call:
-                // TODO add audio call
-                DialogUtils.show(this, getString(R.string.comming_soon));
-                return true;
-            case R.id.action_video_call:
-                // TODO add video call
-                DialogUtils.show(this, getString(R.string.comming_soon));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -142,9 +119,9 @@ public class ProfileActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
+        if (requestCode == ImageHelper.REQUEST_CODE && resultCode == Activity.RESULT_OK)
             try {
-                pathToImage = getPath(data.getData());
+                pathToImage = imageHelper.getPath(data.getData());
                 if (bitmap != null) {
                     bitmap.recycle();
                 }
@@ -158,17 +135,5 @@ public class ProfileActivity extends BaseActivity {
                 e.printStackTrace();
             }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private String getPath(Uri uri) {
-        String res = null;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            res = cursor.getString(column_index);
-        }
-        cursor.close();
-        return res;
     }
 }
