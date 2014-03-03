@@ -42,53 +42,29 @@
             android:name=".ui.friend.FriendDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/frd_title"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
-        </activity>
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
             android:name=".ui.newchat.NewChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
-        </activity>
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
             android:name=".ui.privatechat.PrivateChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
-        </activity>
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
             android:name=".ui.groupchat.GroupChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.MainActivity" />
-        </activity>
+            android:parentActivityName=".ui.main.MainActivity" />
         <activity
             android:name=".ui.groupchat.GroupChatDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/gcd_title"
-            android:parentActivityName=".ui.groupchat.GroupChatActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.groupchat.GroupChatActivity" />
-        </activity>
+            android:parentActivityName=".ui.groupchat.GroupChatActivity" />
         <activity
             android:name=".ui.profile.ProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/prf_title"
-            android:parentActivityName=".ui.main.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.main.MainActivity" />
-        </activity>
+            android:parentActivityName=".ui.main.MainActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
