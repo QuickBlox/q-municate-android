@@ -1,17 +1,17 @@
 package com.quickblox.qmunicate.qb;
 
 import android.app.Activity;
-import android.support.v4.app.FragmentActivity;
 
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
-import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
 
-    public QBUpdateUserTask(FragmentActivity activity) {
+    public QBUpdateUserTask(Activity activity) {
         super(activity);
     }
 
@@ -19,7 +19,10 @@ public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
     public Void performInBackground(Object... params) throws Exception {
         QBUser user = (QBUser) params[0];
 
+        String password = user.getPassword();
+
         user = QBUsers.updateUser(user);
+        user.setPassword(password);
         App.getInstance().setUser(user);
 
         return null;
@@ -30,8 +33,7 @@ public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            MainActivity.startActivity(activity);
-            activity.finish();
+            DialogUtils.show(activity, activity.getString(R.string.dlg_user_updated));
         }
     }
 }

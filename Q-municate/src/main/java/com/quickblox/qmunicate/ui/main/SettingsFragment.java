@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
@@ -21,6 +22,7 @@ public class SettingsFragment extends BaseFragment {
     private Switch pushNotification;
     private Button changePassword;
     private Button logout;
+    private ChangePasswordDialog dialog;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
@@ -49,6 +51,7 @@ public class SettingsFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        dialog = ChangePasswordDialog.newInstance();
     }
 
     private void initListeners() {
@@ -82,7 +85,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void changePassword() {
-
+        dialog.show(getFragmentManager(), null);
     }
 
     private void logout() {

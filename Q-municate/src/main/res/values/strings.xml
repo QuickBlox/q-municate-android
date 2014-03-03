@@ -72,6 +72,7 @@
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_user_updated">User saved</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
