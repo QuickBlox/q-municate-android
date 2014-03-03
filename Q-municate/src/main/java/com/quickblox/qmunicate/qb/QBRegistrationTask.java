@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
@@ -14,7 +14,7 @@ import java.io.File;
 
 public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
 
-    public QBRegistrationTask(FragmentActivity activity) {
+    public QBRegistrationTask(Activity activity) {
         super(activity);
     }
 
@@ -38,7 +38,7 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
     @Override
     public void onResult(Void aVoid) {
         super.onResult(aVoid);
-        final FragmentActivity activity = activityRef.get();
+        final Activity activity = activityRef.get();
         if (isActivityAlive()) {
             MainActivity.startActivity(activity);
             activity.finish();

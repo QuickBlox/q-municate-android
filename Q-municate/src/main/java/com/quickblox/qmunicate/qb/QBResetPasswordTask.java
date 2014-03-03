@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.qb;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.QBUsers;
@@ -10,7 +10,7 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
 
-    public QBResetPasswordTask(FragmentActivity activity) {
+    public QBResetPasswordTask(Activity activity) {
         super(activity);
     }
 
@@ -26,7 +26,7 @@ public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
     @Override
     public void onResult(Void aVoid) {
         super.onResult(aVoid);
-        final FragmentActivity activity = activityRef.get();
+        final Activity activity = activityRef.get();
         if (isActivityAlive()) {
             DialogUtils.show(activity, activity.getString(R.string.dlg_check_email));
         }

@@ -2,9 +2,6 @@ package com.quickblox.qmunicate.core.concurrency;
 
 import android.os.AsyncTask;
 
-/**
- * TODO create common error handling and move BaseErrorAsyncTask and BaseProgressAsyncTask
- */
 public abstract class BaseAsyncTask<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
     private Exception exception;

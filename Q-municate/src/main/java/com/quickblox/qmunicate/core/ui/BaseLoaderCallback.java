@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.core.ui;
 
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
+import android.app.LoaderManager;
+import android.content.Loader;
 
 import java.lang.ref.WeakReference;
 

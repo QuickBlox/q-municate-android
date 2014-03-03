@@ -56,13 +56,13 @@ public class RegistrationActivity extends BaseActivity {
         setContentView(R.layout.activity_registration);
         useDoubleBackPressed = true;
 
-        fullname = (EditText) findViewById(R.id.fullnameEdit);
-        avatarLayout = findViewById(R.id.avatarLayout);
-        email = (EditText) findViewById(R.id.emailEdit);
-        password = (EditText) findViewById(R.id.password);
-        avatarImageView = (ImageView) findViewById(R.id.avatarImageView);
+        fullname = _findViewById(R.id.fullnameEdit);
+        avatarLayout = _findViewById(R.id.avatarLayout);
+        email = _findViewById(R.id.emailEdit);
+        password = _findViewById(R.id.password);
+        avatarImageView = _findViewById(R.id.avatarImageView);
 
-        registerButton = (Button) findViewById(R.id.signUpButton);
+        registerButton = _findViewById(R.id.signUpButton);
 
         initListeners();
     }

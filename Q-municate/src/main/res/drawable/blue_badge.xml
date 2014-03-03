@@ -2,7 +2,7 @@
     <solid android:color="@color/participants_badge" />
     <stroke
         android:width="2dp"
-        android:color="@android:color/white" />
+        android:color="@color/white" />
     <corners
         android:bottomLeftRadius="10dp"
         android:bottomRightRadius="10dp"
