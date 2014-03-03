@@ -18,8 +18,13 @@ import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> {
+
+    private static final int START_DELAY = 0;
+    private static final int UPDATE_DATA_PERIOD = 20000; // 300000 5 minutes
 
     private ListView friendList;
     private List<Friend> friends;
@@ -43,8 +48,17 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        runLoaderWithTimer();
+    }
 
-        runLoader(com.quickblox.qmunicate.ui.main.FriendListLoader.ID);
+    private void runLoaderWithTimer() {
+        Timer loaderTimer = new Timer();
+        loaderTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(1, 50));
+            }
+        }, START_DELAY, UPDATE_DATA_PERIOD);
     }
 
     private void initListView() {
@@ -74,7 +88,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
 
     @Override
     public Loader<LoaderResult<FriendListLoader.Result>> onLoaderCreate(int id, Bundle args) {
-        return new com.quickblox.qmunicate.ui.main.FriendListLoader(getActivity());
+        return new FriendListLoader(getActivity());
     }
 
     @Override

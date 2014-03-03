@@ -28,13 +28,22 @@ public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
         super(context);
     }
 
+    public static Arguments newArguments(int page, int perPage) {
+        Arguments arguments = new Arguments();
+        arguments.page = page;
+        arguments.perPage = perPage;
+        return arguments;
+    }
+
     @Override
     public Result performInBackground() throws QBResponseException {
-        Result result = new Result();
+        Arguments arguments = (Arguments) args;
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
         builder.eq(FIELD_USER_ID, App.getInstance().getUser().getId());
-        builder.setPagesLimit(2);
+        builder.setPagesLimit(arguments.perPage);
+        int pagesSkip = arguments.perPage * (arguments.page - 1);
+        builder.setPagesSkip(pagesSkip);
 
         List<QBCustomObject> objects = QBCustomObjects.getObjects(CLASS_NAME, builder);
         List<Integer> userIds = new ArrayList<Integer>();
@@ -42,15 +51,20 @@ public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
             userIds.add(Integer.parseInt((String) o.getFields().get(FIELD_FRIEND_ID)));
         }
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(1);
-        requestBuilder.setPerPage(10);
+        requestBuilder.setPage(arguments.page);
+        requestBuilder.setPerPage(arguments.perPage);
 
         Bundle params = new Bundle();
         List<QBUser> users = QBUsers.getUsersByIDs(userIds, requestBuilder, params);
 
+        Result result = new Result();
         result.friends = Friend.toFriends(users);
-
         return result;
+    }
+
+    private static class Arguments extends BaseLoader.Args {
+        int page;
+        int perPage;
     }
 
     public static class Result {
