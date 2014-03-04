@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.friend;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
@@ -9,9 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.core.ui.LoaderResult;
+import com.quickblox.qmunicate.ui.base.LoaderActivity;
 
-public class FriendDetailsActivity extends BaseActivity {
+public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Result> {
 
     public static final String PARAM_FRIEND_ID = "Friend ID";
 
@@ -44,7 +46,18 @@ public class FriendDetailsActivity extends BaseActivity {
             case R.id.action_delete:
                 // TODO delete user from friendlist
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<LoaderResult<FriendDetailsLoader.Result>> onLoaderCreate(int id, Bundle args) {
+        return new FriendDetailsLoader(this);
+    }
+
+    @Override
+    public void onLoaderResult(int id, FriendDetailsLoader.Result data) {
+
     }
 }

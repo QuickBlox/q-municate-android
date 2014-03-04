@@ -9,10 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 public class Friend implements Serializable {
-
-    private static final String ONLINE = "Online";
-    private static final String OFFLINE = "Offline";
-
     private Integer id;
     private String fullname;
     private String email;
@@ -37,6 +33,21 @@ public class Friend implements Serializable {
             friends.add(new Friend(user));
         }
         return friends;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Friend)) return false;
+
+        Friend friend = (Friend) o;
+
+        return id.equals(friend.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     public int getId() {
@@ -104,9 +115,6 @@ public class Friend implements Serializable {
     }
 
     public String getOnlineStatus() {
-        if (isOnline())
-            return ONLINE;
-        else
-            return OFFLINE;
+        return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
     }
 }

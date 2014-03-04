@@ -13,16 +13,13 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.ui.BaseLoader;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.ui.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
     public static final int ID = 0;
-
-    private static final String CLASS_NAME = "Friend";
-    private static final String FIELD_USER_ID = "user_id";
-    private static final String FIELD_FRIEND_ID = "FriendID";
 
     public FriendListLoader(Context context) {
         super(context);
@@ -40,15 +37,15 @@ public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
         Arguments arguments = (Arguments) args;
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
-        builder.eq(FIELD_USER_ID, App.getInstance().getUser().getId());
+        builder.eq(Consts.FRIEND_FIELD_USER_ID, App.getInstance().getUser().getId());
         builder.setPagesLimit(arguments.perPage);
         int pagesSkip = arguments.perPage * (arguments.page - 1);
         builder.setPagesSkip(pagesSkip);
 
-        List<QBCustomObject> objects = QBCustomObjects.getObjects(CLASS_NAME, builder);
+        List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.FRIEND_CLASS_NAME, builder);
         List<Integer> userIds = new ArrayList<Integer>();
         for (QBCustomObject o : objects) {
-            userIds.add(Integer.parseInt((String) o.getFields().get(FIELD_FRIEND_ID)));
+            userIds.add(Integer.parseInt((String) o.getFields().get(Consts.FRIEND_FIELD_FRIEND_ID)));
         }
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(arguments.page);
