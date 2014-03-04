@@ -10,6 +10,9 @@ import java.util.List;
 
 public class Friend implements Serializable {
 
+    private static final String ONLINE = "Online";
+    private static final String OFFLINE = "Offline";
+
     private Integer id;
     private String fullname;
     private String email;
@@ -98,5 +101,12 @@ public class Friend implements Serializable {
 
     public void setLastRequestAt(Date lastRequestAt) {
         this.lastRequestAt = lastRequestAt;
+    }
+
+    public String getOnlineStatus() {
+        if (isOnline())
+            return ONLINE;
+        else
+            return OFFLINE;
     }
 }

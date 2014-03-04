@@ -23,8 +23,8 @@ public class ChatListAdapter extends BaseListAdapter<Chat> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Chat chat = getItem(position);
-        LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        Chat chat = objects.get(position);
+        LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
             convertView = vi.inflate(R.layout.list_item_chat, null);
