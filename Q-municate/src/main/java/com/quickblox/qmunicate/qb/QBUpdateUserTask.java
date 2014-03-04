@@ -40,7 +40,7 @@ public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            MainActivity.startActivity(activity);
+            MainActivity.start(activity);
             activity.finish();
         }
     }

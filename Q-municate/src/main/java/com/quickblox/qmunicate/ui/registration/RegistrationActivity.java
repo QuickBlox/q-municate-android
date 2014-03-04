@@ -3,14 +3,10 @@ package com.quickblox.qmunicate.ui.registration;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,9 +25,6 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class RegistrationActivity extends BaseActivity {
 
@@ -48,7 +41,7 @@ public class RegistrationActivity extends BaseActivity {
     private String pathToImage;
     private ImageHelper imageHelper;
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, RegistrationActivity.class);
         context.startActivity(intent);
     }
@@ -83,7 +76,7 @@ public class RegistrationActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_login:
-                LoginActivity.startActivity(this);
+                LoginActivity.start(this);
                 finish();
                 return true;
             default:
@@ -94,44 +87,28 @@ public class RegistrationActivity extends BaseActivity {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            if (resultCode == RESULT_OK) {
-                Uri originalUri = data.getData();
-                InputStream stream = getContentResolver().openInputStream(originalUri);
-                if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
-                    pathToImage = imageHelper.getPath(originalUri, data.getFlags());
-                } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
-                    pathToImage = imageHelper.getPath(originalUri);
-                }
-                setSelectedAvatar(stream);
-                stream.close();
+        if (resultCode == RESULT_OK) {
+            Uri originalUri = data.getData();
+            if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
+                pathToImage = imageHelper.getPath(originalUri, data.getFlags());
+            } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
+                pathToImage = imageHelper.getPath(originalUri);
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            avatarImageView.setImageURI(originalUri);
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void setSelectedAvatar(InputStream stream) {
-        if (bitmap != null) {
-            bitmap.recycle();
-        }
-        bitmap = BitmapFactory.decodeStream(stream);
-        avatarImageView.setImageBitmap(bitmap);
     }
 
     private void initListeners() {
         avatarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 imageHelper.getImage();
             }
         });
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 register();
             }
         });

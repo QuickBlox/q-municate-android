@@ -53,8 +53,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.activities.MainActivity" />
         </activity>
-
-        <!-- FriendVideoCallActivity -->
         <activity
             android:name=".ui.friend.FriendVideoCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -64,8 +62,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.activities.MainActivity" />
         </activity>
-
-        <!-- FriendVoiceCallActivity -->
         <activity
             android:name=".ui.friend.FriendVoiceCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

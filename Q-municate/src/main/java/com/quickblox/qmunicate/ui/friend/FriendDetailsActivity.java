@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.friend;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ public class FriendDetailsActivity extends BaseActivity {
     private ImageView imageViewFriendVideoCall;
     private ImageView imageViewFriendVoiceCall;
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
         context.startActivity(intent);
     }
@@ -26,33 +25,22 @@ public class FriendDetailsActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int thisView = R.layout.activity_friend_details;
-        setContentView(thisView);
-        findViewById(this);
-
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        imageViewFriendVideoCall.setOnClickListener(imageViewFriendVideoCallOnClickListener);
-        imageViewFriendVoiceCall.setOnClickListener(imageViewFriendVoiceCallOnClickListener);
+        setContentView(R.layout.activity_friend_details);
+        initUI();
     }
 
-    private void findViewById(Activity activity) {
-        imageViewFriendVideoCall = (ImageView) activity.findViewById(R.id.imageViewFriendVideoCall);
-        imageViewFriendVoiceCall = (ImageView) activity.findViewById(R.id.imageViewFriendVoiceCall);
+    private void initUI() {
+        imageViewFriendVideoCall = (ImageView) findViewById(R.id.imageViewFriendVideoCall);
+        imageViewFriendVoiceCall = (ImageView) findViewById(R.id.imageViewFriendVoiceCall);
     }
 
-    View.OnClickListener imageViewFriendVideoCallOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            FriendVideoCallActivity.startActivity(FriendDetailsActivity.this);
-        }
-    };
+    public void onClickStartFriendVideoCallActivity(View view) {
+        FriendVideoCallActivity.start(FriendDetailsActivity.this);
+    }
 
-    View.OnClickListener imageViewFriendVoiceCallOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            FriendVoiceCallActivity.startActivity(FriendDetailsActivity.this);
-        }
-    };
+    public void onClickStartFriendVoiceCallActivity(View view) {
+        FriendVoiceCallActivity.start(FriendDetailsActivity.this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

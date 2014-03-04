@@ -33,7 +33,6 @@ public class FriendListFragment extends BaseFragment {
     }
 
     private void initListView() {
-
     }
 
     @Override

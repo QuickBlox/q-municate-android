@@ -42,7 +42,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
 
     private FacebookHelper facebookHelper;
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
         context.startActivity(intent);
     }
@@ -76,7 +76,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_register:
-                RegistrationActivity.startActivity(LoginActivity.this);
+                RegistrationActivity.start(LoginActivity.this);
                 finish();
                 return true;
             default:
@@ -114,7 +114,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
         if (rememberMe.isChecked()) {
             saveUserCredentials(user);
         }
-        MainActivity.startActivity(LoginActivity.this);
+        MainActivity.start(LoginActivity.this);
         finish();
     }
 

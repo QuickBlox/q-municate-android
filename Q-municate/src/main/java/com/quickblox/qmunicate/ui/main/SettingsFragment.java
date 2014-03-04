@@ -55,7 +55,7 @@ public class SettingsFragment extends BaseFragment {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileActivity.startActivity(getActivity());
+                ProfileActivity.start(getActivity());
             }
         });
 

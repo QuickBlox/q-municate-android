@@ -15,7 +15,8 @@
         android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:background="@drawable/item_pressed">
+        android:background="@drawable/item_pressed"
+        android:onClick="onClickChangeAvatar">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
             android:id="@+id/imageViewAvatar"
@@ -67,7 +68,8 @@
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"/>
+            android:background="@drawable/item_pressed"
+            android:onClick="onClickChangeFullName"/>
 
     </RelativeLayout>
 
@@ -103,7 +105,8 @@
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"/>
+            android:background="@drawable/item_pressed"
+            android:onClick="onClickChangeEmail"/>
 
     </RelativeLayout>
 
@@ -135,7 +138,8 @@
             android:text="@string/prf_edit_status"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"/>
+            android:background="@drawable/item_pressed"
+            android:onClick="onClickChangeStatusMessage"/>
 
     </LinearLayout>
 </LinearLayout>
