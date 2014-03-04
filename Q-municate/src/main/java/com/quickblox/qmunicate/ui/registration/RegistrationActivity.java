@@ -1,12 +1,14 @@
 package com.quickblox.qmunicate.ui.registration;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -89,24 +91,35 @@ public class RegistrationActivity extends BaseActivity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageHelper.REQUEST_CODE && resultCode == Activity.RESULT_OK)
-            try {
-                pathToImage = imageHelper.getPath(data.getData());
-                if (bitmap != null) {
-                    bitmap.recycle();
+        try {
+            if (resultCode == RESULT_OK) {
+                Uri originalUri = data.getData();
+                InputStream stream = getContentResolver().openInputStream(originalUri);
+                if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
+                    pathToImage = imageHelper.getPath(originalUri, data.getFlags());
+                } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
+                    pathToImage = imageHelper.getPath(originalUri);
                 }
-                InputStream stream = getContentResolver().openInputStream(data.getData());
-                bitmap = BitmapFactory.decodeStream(stream);
+                setSelectedAvatar(stream);
                 stream.close();
-                avatarImageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setSelectedAvatar(InputStream stream) {
+        if (bitmap != null) {
+            bitmap.recycle();
+        }
+        bitmap = BitmapFactory.decodeStream(stream);
+        avatarImageView.setImageBitmap(bitmap);
     }
 
     private void initListeners() {

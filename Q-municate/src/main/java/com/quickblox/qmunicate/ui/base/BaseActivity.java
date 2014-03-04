@@ -17,7 +17,7 @@ public abstract class BaseActivity extends Activity {
     protected ActionBar actionBar;
 
     protected boolean useDoubleBackPressed;
-    private boolean doubleBackToExitPressedOnce;
+    protected boolean doubleBackToExitPressedOnce;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
