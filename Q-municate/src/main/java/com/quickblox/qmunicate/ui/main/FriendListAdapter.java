@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +17,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FriendListAdapter extends BaseListAdapter<Friend> implements Filterable {
+
+    private final LayoutInflater inflater;
     private List<Friend> originalObjects;
+    private FriendListAdapter.FriendListFilter filter;
 
     public FriendListAdapter(Activity activity, List<Friend> objects) {
         super(activity, objects);
+        inflater = LayoutInflater.from(activity);
+        filter = new FriendListFilter();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         Friend friend = objects.get(position);
-        LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            convertView = vi.inflate(R.layout.list_item_friend, null);
+            convertView = inflater.inflate(R.layout.list_item_friend, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {
@@ -63,7 +66,7 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
 
     @Override
     public Filter getFilter() {
-        return new FriendListFilter();
+        return filter;
     }
 
     private static class ViewHolder {
@@ -84,25 +87,24 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
-            List<Friend> FilteredArrList = new ArrayList<Friend>();
+            List<Friend> filteredList = new ArrayList<Friend>();
 
             if (originalObjects == null) {
                 originalObjects = new ArrayList<Friend>(objects);
             }
 
             if (constraint == null || constraint.length() == 0) {
-                // set the Original result to return
                 results.count = originalObjects.size();
                 results.values = originalObjects;
             } else {
                 constraint = constraint.toString().toLowerCase();
                 for (Friend data : originalObjects) {
                     if (data.getFullname().toLowerCase().startsWith(constraint.toString())) {
-                        FilteredArrList.add(data);
+                        filteredList.add(data);
                     }
                 }
-                results.count = FilteredArrList.size();
-                results.values = FilteredArrList;
+                results.count = filteredList.size();
+                results.values = filteredList;
             }
             return results;
         }

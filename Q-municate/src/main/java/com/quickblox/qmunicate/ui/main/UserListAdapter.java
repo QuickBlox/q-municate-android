@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import java.util.List;
 
 public class UserListAdapter extends BaseListAdapter<Friend> {
 
+    private final LayoutInflater inflater;
     private UserListListener listener;
     private List<Friend> friends;
 
@@ -24,16 +24,16 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
         super(activity, users);
         this.friends = friends;
         this.listener = listener;
+        inflater = LayoutInflater.from(activity);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         Friend user = objects.get(position);
-        LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            convertView = vi.inflate(R.layout.list_item_user, null);
+            convertView = inflater.inflate(R.layout.list_item_user, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {

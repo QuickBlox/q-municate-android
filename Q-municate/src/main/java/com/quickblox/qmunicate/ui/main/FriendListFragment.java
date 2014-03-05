@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -35,20 +34,17 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
 
-    private static final int GLOBAL_SEARCH_MARGIN = 15;
-
     private ListView listView;
     private List<Friend> friends;
     private List<Friend> users;
     private FriendListAdapter friendListAdapter;
     private UserListAdapter userListAdapter;
-    private SearchView searchView;
     private LinearLayout globalLayout;
 
     private State state;
 
     private Timer friendListUpdateTimer;
-    private String searchString;
+    private String constraint;
 
     public static FriendListFragment newInstance() {
         FriendListFragment fragment = new FriendListFragment();
@@ -63,7 +59,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
         initFriendList();
-        initGlobalSearchButton();
+        initGlobalSearchButton(inflater);
         return listView;
     }
 
@@ -110,7 +106,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
                 return true;
             }
         });
-        searchView = (SearchView) searchItem.getActionView();
+        SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
 
@@ -159,7 +155,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        searchString = newText;
+        constraint = newText;
         if (state == State.FRIEND_LIST) {
             friendListAdapter.getFilter().filter(newText);
         } else {
@@ -210,7 +206,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
         });
         listView.setAdapter(userListAdapter);
         listView.setOnItemClickListener(null);
-        startUserListLoader(searchString);
+        startUserListLoader(constraint);
     }
 
     private void addToFriendList(final Friend friend) {
@@ -223,26 +219,14 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
         });
     }
 
-    private void initGlobalSearchButton() {
-        globalLayout = new LinearLayout(getActivity());
-        globalLayout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-        layoutParams.setMargins(GLOBAL_SEARCH_MARGIN, GLOBAL_SEARCH_MARGIN, GLOBAL_SEARCH_MARGIN, GLOBAL_SEARCH_MARGIN);
-
-        Button globalSearch = new Button(getActivity());
-        globalSearch.setText(getString(R.string.frl_global_search));
-        globalSearch.setTextColor(getResources().getColor(R.color.white));
-        globalSearch.setBackgroundResource(R.drawable.global_search_button);
-        globalSearch.setOnClickListener(new View.OnClickListener() {
+    private void initGlobalSearchButton(LayoutInflater inflater) {
+        globalLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
+        globalLayout.findViewById(R.id.globalSearchButton).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 startGlobalSearch();
             }
         });
-        globalLayout.addView(globalSearch, layoutParams);
     }
 
     private void showGlobalSearchButton() {

@@ -7,16 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-    private NavigationDrawerFragment navigationDrawerFragment;
-
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
     private final int ID_CHAT_LIST_FRAGMENT = 1;
     private final int ID_SETTINGS_FRAGMENT = 2;
+    private NavigationDrawerFragment navigationDrawerFragment;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -73,5 +73,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return ft;
+    }
+
+    public void sadadsfasd(View view) {
+
     }
 }

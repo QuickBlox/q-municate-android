@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,30 +15,28 @@ import java.util.List;
 
 public class ChatListAdapter extends BaseListAdapter<Chat> {
 
+    private final LayoutInflater inflater;
+
     public ChatListAdapter(FragmentActivity activity, List<Chat> objects) {
         super(activity, objects);
+        inflater = LayoutInflater.from(activity);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         Chat chat = objects.get(position);
-        LayoutInflater vi = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         if (convertView == null) {
-            convertView = vi.inflate(R.layout.list_item_chat, null);
+            convertView = inflater.inflate(R.layout.list_item_chat, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         // TODO add image loading
-        // holder.avatarImageView.setImageBitmap();
         holder.nameTextView.setText(chat.getName());
-        // holder.lastMessageTextView.setText(chat.getLastMessage().getText());
-
         // TODO add badges
-
         // TODO set placeholders
 
         return convertView;

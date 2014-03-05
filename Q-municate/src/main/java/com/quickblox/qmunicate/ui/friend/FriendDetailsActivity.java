@@ -23,9 +23,9 @@ import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Result> {
+public class FriendDetailsActivity extends LoaderActivity<Friend> {
 
-    public static final String PARAM_FRIEND = "Friend";
+    public static final String EXTRA_FRIEND = "Friend";
 
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
@@ -41,7 +41,7 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
 
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
-        intent.putExtra(PARAM_FRIEND, friend);
+        intent.putExtra(EXTRA_FRIEND, friend);
         context.startActivity(intent);
     }
 
@@ -56,7 +56,7 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
         onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
         photeTextView = _findViewById(R.id.photeTextView);
 
-        friend = (Friend) getIntent().getExtras().getSerializable(PARAM_FRIEND);
+        friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
         fillUI(friend);
     }
@@ -95,13 +95,13 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
     }
 
     @Override
-    public Loader<LoaderResult<FriendDetailsLoader.Result>> onLoaderCreate(int id, Bundle args) {
+    public Loader<LoaderResult<Friend>> onLoaderCreate(int id, Bundle args) {
         return new FriendDetailsLoader(this);
     }
 
     @Override
-    public void onLoaderResult(int id, FriendDetailsLoader.Result data) {
-        fillUI(data.friend);
+    public void onLoaderResult(int id, Friend data) {
+        fillUI(data);
     }
 
     public void onClickStartFriendVideoCallActivity(View view) {
