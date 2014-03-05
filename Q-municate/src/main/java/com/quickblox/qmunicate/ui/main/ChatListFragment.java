@@ -53,7 +53,7 @@ public class ChatListFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                NewChatActivity.startActivity(getActivity());
+                NewChatActivity.start(getActivity());
                 break;
         }
         return true;

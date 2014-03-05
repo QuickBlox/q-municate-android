@@ -1,14 +1,12 @@
 package com.quickblox.qmunicate.ui.registration;
 
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,16 +22,13 @@ import com.quickblox.qmunicate.qb.QBRegistrationTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class RegistrationActivity extends BaseActivity {
 
     private static final String TAG = RegistrationActivity.class.getSimpleName();
-    private static final int REQUEST_CODE = 1;
 
     private Button registerButton;
     private View avatarLayout;
@@ -44,8 +39,9 @@ public class RegistrationActivity extends BaseActivity {
 
     private Bitmap bitmap;
     private String pathToImage;
+    private ImageHelper imageHelper;
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, RegistrationActivity.class);
         context.startActivity(intent);
     }
@@ -64,6 +60,8 @@ public class RegistrationActivity extends BaseActivity {
 
         registerButton = _findViewById(R.id.signUpButton);
 
+        imageHelper = new ImageHelper(this);
+
         initListeners();
     }
 
@@ -78,7 +76,7 @@ public class RegistrationActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_login:
-                LoginActivity.startActivity(this);
+                LoginActivity.start(this);
                 finish();
                 return true;
             default:
@@ -86,36 +84,31 @@ public class RegistrationActivity extends BaseActivity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK)
-            try {
-                pathToImage = getPath(data.getData());
-                if (bitmap != null) {
-                    bitmap.recycle();
-                }
-                InputStream stream = getContentResolver().openInputStream(data.getData());
-                bitmap = BitmapFactory.decodeStream(stream);
-                stream.close();
-                avatarImageView.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (resultCode == RESULT_OK) {
+            Uri originalUri = data.getData();
+            if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
+                pathToImage = imageHelper.getPath(originalUri, data.getFlags());
+            } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
+                pathToImage = imageHelper.getPath(originalUri);
             }
+            avatarImageView.setImageURI(originalUri);
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void initListeners() {
         avatarLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                getImage();
+            public void onClick(View view) {
+                imageHelper.getImage();
             }
         });
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 register();
             }
         });
@@ -142,25 +135,5 @@ public class RegistrationActivity extends BaseActivity {
         } else {
             DialogUtils.show(RegistrationActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
-    }
-
-    private void getImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(intent, REQUEST_CODE);
-    }
-
-    private String getPath(Uri uri) {
-        String res = null;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            res = cursor.getString(column_index);
-        }
-        cursor.close();
-        return res;
     }
 }

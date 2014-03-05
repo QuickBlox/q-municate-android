@@ -22,7 +22,7 @@
         android:layout_height="@dimen/divider_height"
         android:background="@android:color/darker_gray" />
 
-    <org.jraf.android.backport.switchwidget.Switch
+    <Switch
         android:id="@+id/pushNotification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -64,4 +64,3 @@
         android:textSize="@dimen/text_size" />
 
 </LinearLayout>
-
