@@ -21,15 +21,14 @@ public class FriendVoiceCallActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int thisView = R.layout.activity_friend_voice_call;
-        setContentView(thisView);
+        setContentView(R.layout.activity_friend_voice_call);
         initUI();
     }
 
     private void initUI() {
-        imageButtonEndVoiceCall = (ImageButton) findViewById(R.id.imageButtonEndVoiceCall);
-        imageButtonDynamicVoiceCall = (ImageButton) findViewById(R.id.imageButtonDynamicVoiceCall);
-        imageButtonMuteVoiceCall = (ImageButton) findViewById(R.id.imageButtonMuteVoiceCall);
+        imageButtonEndVoiceCall = _findViewById(R.id.imageButtonEndVoiceCall);
+        imageButtonDynamicVoiceCall = _findViewById(R.id.imageButtonDynamicVoiceCall);
+        imageButtonMuteVoiceCall = _findViewById(R.id.imageButtonMuteVoiceCall);
         actionBar.hide();
     }
 }

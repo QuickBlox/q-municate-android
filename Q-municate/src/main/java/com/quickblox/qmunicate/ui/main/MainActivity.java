@@ -52,6 +52,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
+            case ID_INVITE_FRIENDS_FRAGMENT:
+                fragment = InviteFriendsFragment.newInstance();
+                break;
         }
         setCurrentFragment(fragment);
     }

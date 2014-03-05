@@ -19,13 +19,12 @@ public class FriendVideoCallActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int thisView = R.layout.activity_friend_video_call;
-        setContentView(thisView);
+        setContentView(R.layout.activity_friend_video_call);
         initUI();
     }
 
     private void initUI() {
-        imageButtonEndVideoCall = (ImageButton) findViewById(R.id.imageButtonEndVideoCall);
+        imageButtonEndVideoCall = _findViewById(R.id.imageButtonEndVideoCall);
         actionBar.hide();
     }
 }

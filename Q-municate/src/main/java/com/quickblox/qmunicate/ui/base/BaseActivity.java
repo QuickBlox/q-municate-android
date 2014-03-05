@@ -17,13 +17,13 @@ public abstract class BaseActivity extends Activity {
     protected ActionBar actionBar;
 
     protected boolean useDoubleBackPressed;
-    protected boolean doubleBackToExitPressedOnce;
+    private boolean doubleBackToExitPressedOnce;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
-        actionBar = this.getActionBar();
+        actionBar = getActionBar();
     }
 
     @Override

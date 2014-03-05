@@ -41,8 +41,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <!-- FriendDetailsActivity -->
         <activity
             android:name=".ui.friend.FriendDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

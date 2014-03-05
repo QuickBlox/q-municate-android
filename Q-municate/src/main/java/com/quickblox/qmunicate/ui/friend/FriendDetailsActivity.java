@@ -30,8 +30,8 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void initUI() {
-        imageViewFriendVideoCall = (ImageView) findViewById(R.id.imageViewFriendVideoCall);
-        imageViewFriendVoiceCall = (ImageView) findViewById(R.id.imageViewFriendVoiceCall);
+        imageViewFriendVideoCall = _findViewById(R.id.imageViewFriendVideoCall);
+        imageViewFriendVoiceCall = _findViewById(R.id.imageViewFriendVoiceCall);
     }
 
     public void onClickStartFriendVideoCallActivity(View view) {

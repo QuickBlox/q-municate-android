@@ -38,7 +38,6 @@ public class ProfileActivity extends BaseActivity {
     private Bitmap bitmapAvatarOld;
     private String fullnameOld;
     private String emailOld;
-    private Activity thisActivity;
     private QBUser qbUser;
     private boolean useDoubleBackPressed;
     private boolean doubleBackToExitPressedOnce;
@@ -55,8 +54,6 @@ public class ProfileActivity extends BaseActivity {
         setContentView(R.layout.activity_profile);
 
         initUI();
-
-        thisActivity = this;
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
         useDoubleBackPressed = true;
@@ -84,10 +81,10 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void initUI() {
-        imageViewAvatar = (ImageView) findViewById(R.id.imageViewAvatar);
-        editTextFullName = (EditText) findViewById(R.id.editTextFullName);
-        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
-        editTextStatusMessage = (EditText) findViewById(R.id.editTextStatusMessage);
+        imageViewAvatar = _findViewById(R.id.imageViewAvatar);
+        editTextFullName = _findViewById(R.id.editTextFullName);
+        editTextEmail = _findViewById(R.id.editTextEmail);
+        editTextStatusMessage = _findViewById(R.id.editTextStatusMessage);
     }
 
     public void onClickChangeAvatar(View view) {
@@ -173,6 +170,6 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void displayAvatar(Integer fileId, ImageView imageView) {
-        new QBLoadImageTask(thisActivity).execute(fileId, imageView);
+        new QBLoadImageTask(this).execute(fileId, imageView);
     }
 }

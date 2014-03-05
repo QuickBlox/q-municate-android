@@ -16,11 +16,11 @@ import java.util.Arrays;
 public class ImageHelper {
     public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
     public static final int GALLERY_INTENT_CALLED = 1;
-    private Activity thisActivity;
+    private Activity activity;
     private String pathToImage;
 
     public ImageHelper(Activity activity) {
-        thisActivity = activity;
+        this.activity = activity;
     }
 
     public void getImage() {
@@ -28,7 +28,7 @@ public class ImageHelper {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            thisActivity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
+            activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
         } else {
             showKitKatGallery();
         }
@@ -38,7 +38,7 @@ public class ImageHelper {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        thisActivity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
+        activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
     }
 
     public String getPath(Uri uri) {
@@ -46,7 +46,7 @@ public class ImageHelper {
             return null;
         }
         String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = thisActivity.getContentResolver().query(uri, projection, null, null, null);
+        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
         if (cursor != null) {
             int column_index = cursor
                     .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
@@ -59,12 +59,12 @@ public class ImageHelper {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public String getPath(Uri originalUri, int flags) {
         final int takeFlags = flags & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        thisActivity.getContentResolver().takePersistableUriPermission(originalUri, takeFlags);
+        activity.getContentResolver().takePersistableUriPermission(originalUri, takeFlags);
         String id = originalUri.getLastPathSegment().split(":")[1];
         final String[] imageColumns = {MediaStore.Images.Media.DATA};
         final String imageOrderBy = null;
         Uri uri = getUri();
-        Cursor imageCursor = thisActivity.managedQuery(uri, imageColumns,
+        Cursor imageCursor = activity.managedQuery(uri, imageColumns,
                 MediaStore.Images.Media._ID + "=" + id, null, imageOrderBy);
         if (imageCursor.moveToFirst()) {
             pathToImage = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
