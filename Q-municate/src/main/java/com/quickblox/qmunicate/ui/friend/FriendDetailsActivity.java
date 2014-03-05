@@ -20,19 +20,24 @@ import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Result> {
 
     public static final String PARAM_FRIEND = "Friend";
+
+    private static final int START_DELAY = 0;
+    private static final int UPDATE_DATA_PERIOD = 300000;
 
     private ImageView avatarImageView;
     private TextView nameTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
     private TextView photeTextView;
-    private ImageView imageViewFriendVideoCall;
-    private ImageView imageViewFriendVoiceCall;
-    
+
     private Friend friend;
+    private Timer friendUpdateTimer;
 
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
@@ -50,25 +55,22 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
         onlineImageView = _findViewById(R.id.onlineImageView);
         onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
         photeTextView = _findViewById(R.id.photeTextView);
-        imageViewFriendVideoCall = _findViewById(R.id.imageViewFriendVideoCall);
-        imageViewFriendVoiceCall = _findViewById(R.id.imageViewFriendVoiceCall);
 
         friend = (Friend) getIntent().getExtras().getSerializable(PARAM_FRIEND);
 
         fillUI(friend);
-        runLoader(FriendDetailsLoader.ID, FriendDetailsLoader.newArguments(friend.getId()));
     }
 
-    private void fillUI(Friend friend) {
-        new QBLoadImageTask(this).execute(friend.getFileId(), avatarImageView);
-        nameTextView.setText(friend.getFullname());
-        if (friend.isOnline()) {
-            onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            onlineImageView.setVisibility(View.INVISIBLE);
-        }
-        onlineStatusTextView.setText(friend.getOnlineStatus());
-        photeTextView.setText(friend.getPhone());
+    @Override
+    public void onStart() {
+        super.onStart();
+        startLoaderWithTimer();
+    }
+
+    @Override
+    public void onStop() {
+        friendUpdateTimer.cancel();
+        super.onStop();
     }
 
     @Override
@@ -92,16 +94,6 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
         }
     }
 
-    private void removeFriend() {
-        new QBRemoveFriendTask(this).execute(friend, new QBRemoveFriendTask.Callback() {
-            @Override
-            public void onSuccess() {
-                App.getInstance().getFriends().remove(friend);
-                finish();
-            }
-        });
-    }
-
     @Override
     public Loader<LoaderResult<FriendDetailsLoader.Result>> onLoaderCreate(int id, Bundle args) {
         return new FriendDetailsLoader(this);
@@ -118,5 +110,37 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
 
     public void onClickStartFriendVoiceCallActivity(View view) {
         FriendVoiceCallActivity.start(FriendDetailsActivity.this);
+    }
+
+    private void fillUI(Friend friend) {
+        new QBLoadImageTask(this).execute(friend.getFileId(), avatarImageView);
+        nameTextView.setText(friend.getFullname());
+        if (friend.isOnline()) {
+            onlineImageView.setVisibility(View.VISIBLE);
+        } else {
+            onlineImageView.setVisibility(View.INVISIBLE);
+        }
+        onlineStatusTextView.setText(friend.getOnlineStatus());
+        photeTextView.setText(friend.getPhone());
+    }
+
+    private void startLoaderWithTimer() {
+        friendUpdateTimer = new Timer();
+        friendUpdateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runLoader(FriendDetailsLoader.ID, FriendDetailsLoader.newArguments(friend.getId()));
+            }
+        }, START_DELAY, UPDATE_DATA_PERIOD);
+    }
+
+    private void removeFriend() {
+        new QBRemoveFriendTask(this).execute(friend, new QBRemoveFriendTask.Callback() {
+            @Override
+            public void onSuccess() {
+                App.getInstance().getFriends().remove(friend);
+                finish();
+            }
+        });
     }
 }

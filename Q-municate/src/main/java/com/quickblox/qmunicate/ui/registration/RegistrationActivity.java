@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.ui.registration;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,7 +36,6 @@ public class RegistrationActivity extends BaseActivity {
     private EditText fullname;
     private EditText email;
 
-    private Bitmap bitmap;
     private String pathToImage;
     private ImageHelper imageHelper;
 

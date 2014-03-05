@@ -31,8 +31,10 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
 
     public static final int PAGE_NUM = 1;
     public static final int PER_PAGE = 100;
+
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
+
     private static final int GLOBAL_SEARCH_MARGIN = 15;
 
     private ListView listView;

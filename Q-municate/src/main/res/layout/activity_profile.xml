@@ -2,21 +2,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical"
     android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:paddingRight="20dp">
 
     <LinearLayout
         android:id="@+id/linearLayoutChangeAvatar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
         android:background="@drawable/item_pressed"
-        android:onClick="onClickChangeAvatar">
+        android:gravity="center_horizontal"
+        android:onClick="onClickChangeAvatar"
+        android:orientation="horizontal">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
             android:id="@+id/imageViewAvatar"
@@ -55,21 +55,22 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/textViewChangeFullName"
+            android:enabled="false"
             android:text="Dmitriy Valets"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"
-            android:enabled="false" />
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/textViewChangeFullName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:background="@drawable/item_pressed"
+            android:clickable="true"
+            android:onClick="onClickChangeFullName"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeFullName"/>
+            android:textSize="@dimen/text_size" />
 
     </RelativeLayout>
 
@@ -92,21 +93,22 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/textViewChangeEmail"
+            android:enabled="false"
             android:text="cobs@gmail.com"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"
-            android:enabled="false" />
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/textViewChangeEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:background="@drawable/item_pressed"
+            android:clickable="true"
+            android:onClick="onClickChangeEmail"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeEmail"/>
+            android:textSize="@dimen/text_size" />
 
     </RelativeLayout>
 
@@ -126,20 +128,21 @@
             android:id="@+id/editTextStatusMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:enabled="false"
             android:text="You could be laughing 65 percent more of the time"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"
-            android:enabled="false"/>
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/textViewChangeStatusMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/item_pressed"
+            android:clickable="true"
+            android:onClick="onClickChangeStatusMessage"
             android:text="@string/prf_edit_status"
             android:textColor="@color/link_color"
-            android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeStatusMessage"/>
+            android:textSize="@dimen/text_size" />
 
     </LinearLayout>
 </LinearLayout>

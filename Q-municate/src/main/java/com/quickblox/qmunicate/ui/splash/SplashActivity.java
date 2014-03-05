@@ -17,7 +17,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.wellcome.WellcomeActivity;
+import com.quickblox.qmunicate.ui.welcome.WelcomeActivity;
 
 public class SplashActivity extends BaseActivity implements QBLoginTask.Callback {
 
@@ -50,7 +50,7 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
             LoginActivity.start(SplashActivity.this);
             finish();
         } else {
-            WellcomeActivity.start(SplashActivity.this);
+            WelcomeActivity.start(SplashActivity.this);
             finish();
         }
     }

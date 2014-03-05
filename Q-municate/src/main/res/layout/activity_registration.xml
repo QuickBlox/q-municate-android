@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
         android:orientation="horizontal"
+        android:onClick=""
         android:background="@drawable/item_pressed">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
