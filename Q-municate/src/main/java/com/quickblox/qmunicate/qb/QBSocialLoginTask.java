@@ -34,7 +34,7 @@ public class QBSocialLoginTask extends BaseProgressTask<String, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            MainActivity.startActivity(activity);
+            MainActivity.start(activity);
             activity.finish();
         }
     }

@@ -47,10 +47,10 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
         } else if (isWellcomeShown) {
-            LoginActivity.startActivity(SplashActivity.this);
+            LoginActivity.start(SplashActivity.this);
             finish();
         } else {
-            WellcomeActivity.startAtivity(SplashActivity.this);
+            WellcomeActivity.start(SplashActivity.this);
             finish();
         }
     }
@@ -81,7 +81,7 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
 
     @Override
     public void onSuccess(Bundle bundle) {
-        MainActivity.startActivity(SplashActivity.this);
+        MainActivity.start(SplashActivity.this);
         finish();
     }
 

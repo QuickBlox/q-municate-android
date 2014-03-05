@@ -11,7 +11,7 @@ import android.widget.EditText;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBUpdateUserTask;
+import com.quickblox.qmunicate.qb.QBChangePasswordTask;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class ChangePasswordDialog extends DialogFragment {
@@ -62,6 +62,6 @@ public class ChangePasswordDialog extends DialogFragment {
         QBUser user = App.getInstance().getUser();
         user.setOldPassword(oldPasswordText);
         user.setPassword(newPasswordText);
-        new QBUpdateUserTask(getActivity()).execute(user);
+        new QBChangePasswordTask(getActivity()).execute(user);
     }
 }

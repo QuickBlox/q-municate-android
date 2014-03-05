@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.qb;
 
 import android.app.Activity;
 
+import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
@@ -22,12 +23,14 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
     public Void performInBackground(Object... params) throws Exception {
         QBUser user = (QBUser) params[0];
         File file = (File) params[1];
-
         String password = user.getPassword();
 
+        QBAuth.createSession();
+
         user = QBUsers.signUpSignInTask(user);
+
         if (file != null) {
-            QBFile qbFile = QBContent.uploadFileTask(file, false, (String) null);
+            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
             user.setFileId(qbFile.getId());
             user = QBUsers.updateUser(user);
         }
@@ -42,7 +45,7 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            MainActivity.startActivity(activity);
+            MainActivity.start(activity);
             activity.finish();
         }
     }

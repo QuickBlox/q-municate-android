@@ -30,7 +30,7 @@ public class WellcomeActivity extends BaseActivity {
 
     private FacebookHelper facebookHelper;
 
-    public static void startAtivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, WellcomeActivity.class);
         context.startActivity(intent);
     }
@@ -80,7 +80,7 @@ public class WellcomeActivity extends BaseActivity {
         registrationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RegistrationActivity.startActivity(WellcomeActivity.this);
+                RegistrationActivity.start(WellcomeActivity.this);
                 finish();
             }
         });
@@ -93,7 +93,7 @@ public class WellcomeActivity extends BaseActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginActivity.startActivity(WellcomeActivity.this);
+                LoginActivity.start(WellcomeActivity.this);
                 finish();
             }
         });
