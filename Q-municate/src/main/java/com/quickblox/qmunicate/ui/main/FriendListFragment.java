@@ -192,8 +192,8 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int friendId = friendListAdapter.getItem(position).getId();
-                FriendDetailsActivity.startActivity(getActivity(), friendId);
+                Friend friend = friendListAdapter.getItem(position);
+                FriendDetailsActivity.start(getActivity(), friend);
             }
         });
     }

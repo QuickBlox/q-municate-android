@@ -32,6 +32,8 @@
 
     // Friend List
     <string name="frl_global_search">Global Search</string>
+    <string name="frl_online">Online</string>
+    <string name="frl_offline">Offline</string>
 
     // Friend Details
     <string name="frd_title">Details</string>

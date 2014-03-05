@@ -20,7 +20,6 @@ public class NewChatActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
-        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
