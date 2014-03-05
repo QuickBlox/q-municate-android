@@ -13,13 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:background="@drawable/item_pressed"
-        android:onClick="onClickChangeAvatar">
+        android:onClick="changeAvatarOnClick">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
-            android:id="@+id/imageViewAvatar"
+            android:id="@+id/avatarImageView"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:src="@drawable/placeholder_user" />
@@ -47,29 +48,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
-        android:paddingTop="10dp">
+        android:paddingTop="10dp"
+        android:clickable="true"
+        android:background="@drawable/item_pressed"
+        android:onClick="changeFullNameOnClick">
 
         <EditText
-            android:id="@+id/editTextFullName"
+            android:id="@+id/fullNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/textViewChangeFullName"
+            android:layout_toLeftOf="@+id/changeFullNameTextView"
             android:text="Dmitriy Valets"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
-            android:enabled="false" />
+            android:enabled="false"
+            android:singleLine="true"
+            android:clickable="false"
+            android:focusableInTouchMode="true"
+            android:background="@null" />
 
         <TextView
-            android:id="@+id/textViewChangeFullName"
+            android:id="@+id/changeFullNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeFullName"/>
+            android:clickable="false"/>
 
     </RelativeLayout>
 
@@ -84,29 +91,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="10dp"
-        android:paddingTop="10dp">
+        android:paddingTop="10dp"
+        android:clickable="true"
+        android:background="@drawable/item_pressed"
+        android:onClick="changeEmailOnClick">
 
         <EditText
-            android:id="@+id/editTextEmail"
+            android:id="@+id/emailEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/textViewChangeEmail"
+            android:layout_toLeftOf="@+id/changeEmailTextView"
             android:text="cobs@gmail.com"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
-            android:enabled="false" />
+            android:enabled="false"
+            android:singleLine="true"
+            android:clickable="false"
+            android:background="@null" />
 
         <TextView
-            android:id="@+id/textViewChangeEmail"
+            android:id="@+id/changeEmailTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeEmail"/>
+            android:clickable="false"/>
 
     </RelativeLayout>
 
@@ -120,26 +132,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:clickable="true"
+        android:background="@drawable/item_pressed"
+        android:onClick="changeStatusMessageOnClick">
 
         <EditText
-            android:id="@+id/editTextStatusMessage"
+            android:id="@+id/statusMessageEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="You could be laughing 65 percent more of the time"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
-            android:enabled="false"/>
+            android:enabled="false"
+            android:clickable="false"
+            android:background="@null" />
 
         <TextView
-            android:id="@+id/textViewChangeStatusMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/prf_edit_status"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
-            android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeStatusMessage"/>
+            android:clickable="false" />
 
     </LinearLayout>
 </LinearLayout>

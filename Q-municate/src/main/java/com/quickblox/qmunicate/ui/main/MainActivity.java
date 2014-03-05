@@ -17,7 +17,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
     private final int ID_CHAT_LIST_FRAGMENT = 1;
     private final int ID_SETTINGS_FRAGMENT = 2;
-    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -51,9 +50,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 break;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
-                break;
-            case ID_INVITE_FRIENDS_FRAGMENT:
-                fragment = InviteFriendsFragment.newInstance();
                 break;
         }
         setCurrentFragment(fragment);

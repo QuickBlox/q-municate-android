@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.profile;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,12 +9,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.ActionMode;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -28,20 +29,22 @@ import com.quickblox.qmunicate.ui.utils.ImageHelper;
 import java.io.File;
 
 public class ProfileActivity extends BaseActivity {
-    private ImageView imageViewAvatar;
-    private EditText editTextFullName;
-    private EditText editTextEmail;
-    private EditText editTextStatusMessage;
+    private ImageView avatarImageView;
+    private EditText fullNameEditText;
+    private EditText emailEditText;
+    private EditText statusMessageEditText;
 
     private String pathToImage;
     private ImageHelper imageHelper;
-    private Bitmap bitmapAvatarOld;
+    private Bitmap avatarCurrentBitmap;
+    private String fullnameCurrent;
+    private String emailCurrent;
+    private Bitmap avatarOldBitmap;
     private String fullnameOld;
     private String emailOld;
     private QBUser qbUser;
-    private boolean useDoubleBackPressed;
-    private boolean doubleBackToExitPressedOnce;
     private boolean isNeedUpdateAvatar;
+    private Object actionMode;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -56,67 +59,85 @@ public class ProfileActivity extends BaseActivity {
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
-        useDoubleBackPressed = true;
 
         initUsersData();
+        initTextChangedListeners();
     }
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            return;
-        }
-        doubleBackToExitPressedOnce = true;
-
-        Bitmap avatar = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
-        String fullname = editTextFullName.getText().toString();
-        String email = editTextEmail.getText().toString();
-
-        if (isUserDataChanges(fullname, email)) {
-            saveChanges(avatar, fullname, email);
+        updateUsersData();
+        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+            saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
         } else {
             super.onBackPressed();
         }
     }
 
     private void initUI() {
-        imageViewAvatar = _findViewById(R.id.imageViewAvatar);
-        editTextFullName = _findViewById(R.id.editTextFullName);
-        editTextEmail = _findViewById(R.id.editTextEmail);
-        editTextStatusMessage = _findViewById(R.id.editTextStatusMessage);
+        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        emailEditText = _findViewById(R.id.emailEditText);
+        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    public void onClickChangeAvatar(View view) {
+    private TextWatcher textChangedListener = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            if (actionMode != null) {
+                return;
+            }
+            actionMode = ProfileActivity.this.startActionMode(actionModeCallback);
+        }
+
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
+    private void initTextChangedListeners() {
+        fullNameEditText.addTextChangedListener(textChangedListener);
+        emailEditText.addTextChangedListener(textChangedListener);
+    }
+
+    public void changeAvatarOnClick(View view) {
         imageHelper.getImage();
     }
 
-    public void onClickChangeFullName(View view) {
-        initChangingEditText(editTextFullName);
+    public void changeFullNameOnClick(View view) {
+        initChangingEditText(fullNameEditText);
     }
 
-    public void onClickChangeEmail(View view) {
-        initChangingEditText(editTextEmail);
+    public void changeEmailOnClick(View view) {
+        initChangingEditText(emailEditText);
     }
 
-    public void onClickChangeStatusMessage(View view) {
-        initChangingEditText(editTextStatusMessage);
+    public void changeStatusMessageOnClick(View view) {
+        initChangingEditText(statusMessageEditText);
     }
 
     private void initChangingEditText(EditText editText) {
-        editText.setText("");
         editText.setEnabled(true);
         editText.requestFocus();
     }
 
     private void initUsersData() {
-        displayAvatar(qbUser.getFileId(), imageViewAvatar);
-        editTextFullName.setText(qbUser.getFullName());
-        editTextEmail.setText(qbUser.getEmail());
+        displayAvatar(qbUser.getFileId(), avatarImageView);
+        fullNameEditText.setText(qbUser.getFullName());
+        emailEditText.setText(qbUser.getEmail());
 
-        bitmapAvatarOld = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
-        fullnameOld = editTextFullName.getText().toString();
-        emailOld = editTextEmail.getText().toString();
+        avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+    }
+
+    private void updateUsersData() {
+        avatarCurrentBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        fullnameCurrent = fullNameEditText.getText().toString();
+        emailCurrent = emailEditText.getText().toString();
     }
 
     @Override
@@ -134,14 +155,14 @@ public class ProfileActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
-            bitmapAvatarOld = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
+            avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
             Uri originalUri = data.getData();
             if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
                 pathToImage = imageHelper.getPath(originalUri, data.getFlags());
             } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
                 pathToImage = imageHelper.getPath(originalUri);
             }
-            imageViewAvatar.setImageURI(originalUri);
+            avatarImageView.setImageURI(originalUri);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -162,7 +183,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private boolean isAvatarChanges(Bitmap avatar) {
-        return !imageHelper.equalsBitmaps(bitmapAvatarOld, avatar);
+        return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
     }
 
     private boolean isUserDataChanges(String fullname, String email) {
@@ -172,4 +193,30 @@ public class ProfileActivity extends BaseActivity {
     private void displayAvatar(Integer fileId, ImageView imageView) {
         new QBLoadImageTask(this).execute(fileId, imageView);
     }
+
+    private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.setTitle(getResources().getText(R.string.stg_done));
+            return true;
+        }
+
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return true;
+        }
+
+        public void onDestroyActionMode(ActionMode mode) {
+            updateUsersData();
+            if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+                saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+            } else {
+                finish();
+            }
+            actionMode = null;
+        }
+    };
 }

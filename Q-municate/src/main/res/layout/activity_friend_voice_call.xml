@@ -36,7 +36,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageViewAvatar"
+            android:id="@+id/avatarImageView"
             android:layout_width="@dimen/activity_friend_call_avatar_size"
             android:layout_height="@dimen/activity_friend_call_avatar_size"
             android:src="@drawable/placeholder_user"
