@@ -60,6 +60,9 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
         forgotPassword = _findViewById(R.id.forgotPassword);
         rememberMe = _findViewById(R.id.rememberMe);
 
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        rememberMe.setChecked(isRememberMe);
+
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initListeners();
@@ -112,6 +115,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
     public void onSuccess(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBLoginTask.PARAM_QBUSER);
         if (rememberMe.isChecked()) {
+            saveRememberMe(true);
             saveUserCredentials(user);
         }
         MainActivity.start(LoginActivity.this);
@@ -149,7 +153,6 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
 
         if (isEmailEntered && isPasswordEntered) {
-            saveRememberMe(rememberMe.isChecked());
             final QBUser user = new QBUser(null, userPassword, userEmail);
             new QBLoginTask(LoginActivity.this).execute(user, this);
         } else {

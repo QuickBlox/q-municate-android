@@ -23,6 +23,7 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
     public Void performInBackground(Object... params) throws Exception {
         QBUser user = (QBUser) params[0];
         File file = (File) params[1];
+        String password = user.getPassword();
 
         QBAuth.createSession();
 
@@ -33,7 +34,7 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
             user.setFileId(qbFile.getId());
             user = QBUsers.updateUser(user);
         }
-
+        user.setPassword(password);
         App.getInstance().setUser(user);
 
         return null;
