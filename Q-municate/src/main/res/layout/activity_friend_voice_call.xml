@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/activity_friend_call_bg"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_friend_call_margin_top"
+                android:text="Dmitriy Malets"
+                android:textSize="@dimen/activity_friend_call_name_size"
+                android:textColor="@android:color/white"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/textViewTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="20:20"
+                android:textSize="@dimen/activity_friend_call_name_size"
+                android:textColor="@color/activity_friend_call_timer_text"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageViewAvatar"
+            android:layout_width="@dimen/activity_friend_call_avatar_size"
+            android:layout_height="@dimen/activity_friend_call_avatar_size"
+            android:src="@drawable/placeholder_user"
+            android:layout_marginTop="@dimen/activity_friend_call_margin_top"
+            android:layout_gravity="center"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="true" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/imageButtonDynamicVoiceCall"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:background="@drawable/item_pressed"
+                android:src="@drawable/ic_dynamic"
+                android:layout_gravity="center|left"
+                android:layout_centerInParent="true"
+                android:layout_alignParentLeft="true"
+                android:padding="5dp" />
+
+            <ImageButton
+                android:id="@+id/imageButtonEndVoiceCall"
+                android:layout_width="@dimen/activity_friend_call_end_button_width"
+                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:background="@drawable/btn_end_call"
+                android:src="@drawable/ic_encall"
+                android:layout_centerInParent="true" />
+
+            <ImageButton
+                android:id="@+id/imageButtonMuteVoiceCall"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:background="@drawable/item_pressed"
+                android:src="@drawable/ic_call_mute_a"
+                android:layout_gravity="center|right"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:padding="5dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</LinearLayout>

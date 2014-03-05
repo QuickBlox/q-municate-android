@@ -14,7 +14,7 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class PrivateChatActivity extends BaseActivity {
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
         context.startActivity(intent);
     }

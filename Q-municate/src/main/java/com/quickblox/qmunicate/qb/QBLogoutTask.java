@@ -25,7 +25,7 @@ public class QBLogoutTask extends BaseProgressTask<Void, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            LoginActivity.startActivity(activity);
+            LoginActivity.start(activity);
             activity.finish();
         }
     }

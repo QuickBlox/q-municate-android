@@ -29,7 +29,9 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
     private TextView photeTextView;
-
+    private ImageView imageViewFriendVideoCall;
+    private ImageView imageViewFriendVoiceCall;
+    
     private Friend friend;
 
     public static void start(Context context, Friend friend) {
@@ -48,6 +50,8 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
         onlineImageView = _findViewById(R.id.onlineImageView);
         onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
         photeTextView = _findViewById(R.id.photeTextView);
+        imageViewFriendVideoCall = _findViewById(R.id.imageViewFriendVideoCall);
+        imageViewFriendVoiceCall = _findViewById(R.id.imageViewFriendVoiceCall);
 
         friend = (Friend) getIntent().getExtras().getSerializable(PARAM_FRIEND);
 
@@ -106,5 +110,13 @@ public class FriendDetailsActivity extends LoaderActivity<FriendDetailsLoader.Re
     @Override
     public void onLoaderResult(int id, FriendDetailsLoader.Result data) {
         fillUI(data.friend);
+    }
+
+    public void onClickStartFriendVideoCallActivity(View view) {
+        FriendVideoCallActivity.start(FriendDetailsActivity.this);
+    }
+
+    public void onClickStartFriendVoiceCallActivity(View view) {
+        FriendVoiceCallActivity.start(FriendDetailsActivity.this);
     }
 }
