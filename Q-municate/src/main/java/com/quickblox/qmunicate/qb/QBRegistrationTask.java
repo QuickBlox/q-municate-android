@@ -23,13 +23,15 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
         QBUser user = (QBUser) params[0];
         File file = (File) params[1];
 
+        String password = user.getPassword();
+
         user = QBUsers.signUpSignInTask(user);
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, false, (String) null);
             user.setFileId(qbFile.getId());
             user = QBUsers.updateUser(user);
         }
-        // QBChatService.getInstance().loginWithUser(user);
+        user.setPassword(password);
         App.getInstance().setUser(user);
 
         return null;
