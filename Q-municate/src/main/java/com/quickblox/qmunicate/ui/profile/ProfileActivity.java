@@ -63,12 +63,6 @@ public class ProfileActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            return;
-        }
-        doubleBackToExitPressedOnce = true;
-
         Bitmap avatar = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
         String fullname = editTextFullName.getText().toString();
         String email = editTextEmail.getText().toString();

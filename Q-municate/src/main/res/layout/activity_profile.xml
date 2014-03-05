@@ -69,7 +69,8 @@
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
             android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeFullName"/>
+            android:onClick="onClickChangeFullName"
+            android:clickable="true"/>
 
     </RelativeLayout>
 
@@ -106,7 +107,8 @@
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
             android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeEmail"/>
+            android:onClick="onClickChangeEmail"
+            android:clickable="true"/>
 
     </RelativeLayout>
 
@@ -139,7 +141,8 @@
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
             android:background="@drawable/item_pressed"
-            android:onClick="onClickChangeStatusMessage"/>
+            android:onClick="onClickChangeStatusMessage"
+            android:clickable="true"/>
 
     </LinearLayout>
 </LinearLayout>
