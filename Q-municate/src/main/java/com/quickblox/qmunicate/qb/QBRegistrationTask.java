@@ -32,7 +32,6 @@ public class QBRegistrationTask extends BaseProgressTask<Object, Void, Void> {
             user = QBUsers.updateUser(user);
         }
         user.setPassword(password);
-        // QBChatService.getInstance().loginWithUser(user);
         App.getInstance().setUser(user);
 
         return null;
