@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stg_invite_friends_header_label"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:textSize="@dimen/text_size"
+        android:textColor="@color/gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clickable="true" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:orientation="horizontal"
+            android:divider="@drawable/divider">
+
+            <ImageView
+                android:id="@+id/imageViewIconFacebook"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:layout_width="?android:attr/listPreferredItemHeight"
+                android:scaleType="centerCrop"
+                android:src="@drawable/blue_badge"/>
+
+            <TextView
+                android:id="@+id/textViewFromFacebook"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="left|center_vertical"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@android:color/black"
+                android:text="@string/stg_invite_friends_select_from_facebook"/>
+        </LinearLayout>
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/gray" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:clickable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageViewIconContact"
+                android:layout_height="?android:attr/listPreferredItemHeight"
+                android:layout_width="?android:attr/listPreferredItemHeight"
+                android:scaleType="centerCrop"
+                android:src="@drawable/blue_badge"/>
+
+            <TextView
+                android:id="@+id/textViewFromContact"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="left|center_vertical"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@android:color/black"
+                android:text="@string/stg_invite_friends_select_from_contacts"/>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/gray" />
+    </LinearLayout>
+</LinearLayout>
