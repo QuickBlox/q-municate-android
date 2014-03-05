@@ -15,8 +15,7 @@ public class ProgressDialog extends DialogFragment {
     }
 
     public static ProgressDialog newInstance(int messageId) {
-        ProgressDialog dialog = new ProgressDialog(messageId);
-        return dialog;
+        return new ProgressDialog(messageId);
     }
 
     @Override

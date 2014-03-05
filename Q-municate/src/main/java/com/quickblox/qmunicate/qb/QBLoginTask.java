@@ -24,8 +24,11 @@ public class QBLoginTask extends BaseProgressTask<Object, Void, Bundle> {
         QBUser user = (QBUser) params[0];
         callback = (Callback) params[1];
 
+        String password = user.getPassword();
+
         QBAuth.createSession();
         user = QBUsers.signIn(user);
+        user.setPassword(password);
         // QBChatService.getInstance().loginWithUser(user);
 
         App.getInstance().setUser(user);
