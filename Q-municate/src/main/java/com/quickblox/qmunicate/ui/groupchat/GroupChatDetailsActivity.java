@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.ui.groupchat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,7 +35,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                navigateToParent();
                 return true;
             case R.id.action_leave_group:
                 // TODO leave group

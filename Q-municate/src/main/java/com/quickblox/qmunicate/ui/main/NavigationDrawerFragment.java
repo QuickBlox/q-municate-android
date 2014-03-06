@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -20,11 +21,10 @@ import android.widget.TextView;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
-import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class NavigationDrawerFragment extends BaseFragment {
+public class NavigationDrawerFragment extends Fragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
@@ -75,7 +75,7 @@ public class NavigationDrawerFragment extends BaseFragment {
             }
         });
         drawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
+                getActivity().getActionBar().getThemedContext(),
                 R.layout.list_item_navigation_drawler,
                 R.id.textView,
                 new String[]{
@@ -153,7 +153,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 

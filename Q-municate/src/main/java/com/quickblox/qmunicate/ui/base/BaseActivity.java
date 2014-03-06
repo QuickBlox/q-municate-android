@@ -2,17 +2,19 @@ package com.quickblox.qmunicate.ui.base;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NavUtils;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public abstract class BaseActivity extends Activity {
+
     public static final int DOUBLE_BACK_DELAY = 2000;
 
-    private static final String TAG = BaseActivity.class.getSimpleName();
     protected App app;
     protected ActionBar actionBar;
 
@@ -40,6 +42,12 @@ public abstract class BaseActivity extends Activity {
                 doubleBackToExitPressedOnce = false;
             }
         }, DOUBLE_BACK_DELAY);
+    }
+
+    protected void navigateToParent() {
+        Intent intent = NavUtils.getParentActivityIntent(this);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        NavUtils.navigateUpTo(this, intent);
     }
 
     @SuppressWarnings("unchecked")

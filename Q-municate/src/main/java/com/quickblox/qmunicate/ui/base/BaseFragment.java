@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.base;
 
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,10 +36,6 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        getActionBar().setTitle(title);
-    }
-
-    protected ActionBar getActionBar() {
-        return getActivity().getActionBar();
+        getActivity().getActionBar().setTitle(title);
     }
 }
