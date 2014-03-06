@@ -21,6 +21,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class NavigationDrawerFragment extends BaseFragment {
@@ -90,11 +91,27 @@ public class NavigationDrawerFragment extends BaseFragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new QBLogoutTask(getActivity()).execute();
+                logout();
             }
         });
 
         return rootView;
+    }
+
+    private void logout() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
+        dialog.setOnConfirmDialogClickListener(new ConfirmDialog.OnConfirmDialogClickListener() {
+            @Override
+            public void onOkButtonClick() {
+                new QBLogoutTask(getActivity()).execute();
+            }
+
+            @Override
+            public void onCancelButtonClick() {
+
+            }
+        });
+        dialog.show(getFragmentManager(), null);
     }
 
     @Override

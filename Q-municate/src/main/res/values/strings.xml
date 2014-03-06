@@ -86,5 +86,7 @@
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
+    <string name="dlg_logout">Logout</string>
+    <string name="dlg_confirm">Are you sure?</string>
 
 </resources>

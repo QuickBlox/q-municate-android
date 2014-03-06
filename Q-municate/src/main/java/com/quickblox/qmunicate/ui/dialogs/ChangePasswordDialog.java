@@ -23,8 +23,7 @@ public class ChangePasswordDialog extends DialogFragment {
     private EditText confirmPassword;
 
     public static ChangePasswordDialog newInstance() {
-        ChangePasswordDialog dialog = new ChangePasswordDialog();
-        return dialog;
+        return new ChangePasswordDialog();
     }
 
     @Override
