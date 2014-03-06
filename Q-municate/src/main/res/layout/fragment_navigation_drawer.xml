@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:padding="10dp"
-            android:background="@drawable/icon_button"
+            android:background="@drawable/button_general_selector"
             android:src="@drawable/ic_logout" />
     </LinearLayout>
 

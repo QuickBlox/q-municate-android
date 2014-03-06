@@ -32,7 +32,7 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/connect_facebook_button">
+        android:background="@drawable/button_connect_facebook_selector">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -85,7 +85,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:background="@drawable/sign_up_email_button"
+            android:background="@drawable/button_sign_up_selector"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -119,7 +119,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:background="@drawable/log_in_button"
+            android:background="@drawable/button_log_in_selector"
             android:orientation="horizontal">
 
             <LinearLayout

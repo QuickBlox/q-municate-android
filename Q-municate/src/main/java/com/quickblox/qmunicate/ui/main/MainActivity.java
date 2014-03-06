@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -48,25 +49,21 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case 2:
                 fragment = SettingsFragment.newInstance();
                 break;
+            case 3:
+                DialogUtils.show(this, getString(R.string.comming_soon));
+                return;
         }
         setCurrentFragment(fragment);
     }
 
-    public void setCurrentFragment(Fragment fragment) {
+    private void setCurrentFragment(Fragment fragment) {
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction ft = buildTransaction();
         ft.replace(R.id.container, fragment, null);
         ft.commit();
     }
 
-    public void addFragment(Fragment fragment) {
-        FragmentTransaction ft = buildTransaction();
-        ft.addToBackStack(((Object) fragment).getClass().getName());
-        ft.replace(R.id.container, fragment, null);
-        ft.commit();
-    }
-
-    protected FragmentTransaction buildTransaction() {
+    private FragmentTransaction buildTransaction() {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return ft;
