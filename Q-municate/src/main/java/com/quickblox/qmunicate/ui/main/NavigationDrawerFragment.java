@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.main;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -100,15 +101,10 @@ public class NavigationDrawerFragment extends Fragment {
 
     private void logout() {
         ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
-        dialog.setOnConfirmDialogClickListener(new ConfirmDialog.OnConfirmDialogClickListener() {
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
-            public void onOkButtonClick() {
+            public void onClick(DialogInterface dialog, int which) {
                 new QBLogoutTask(getActivity()).execute();
-            }
-
-            @Override
-            public void onCancelButtonClick() {
-
             }
         });
         dialog.show(getFragmentManager(), null);

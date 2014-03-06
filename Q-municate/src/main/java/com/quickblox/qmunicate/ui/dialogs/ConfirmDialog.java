@@ -1,18 +1,18 @@
 package com.quickblox.qmunicate.ui.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class ConfirmDialog extends DialogFragment {
 
     private int titleId;
     private int messageId;
-    private OnConfirmDialogClickListener onConfirmDialogClickListener;
+    private DialogInterface.OnClickListener positiveButtonListener;
+    private DialogInterface.OnClickListener negativeButtonListener;
 
     public static ConfirmDialog newInstance(int titleId, int messageId) {
         return new ConfirmDialog(titleId, messageId);
@@ -25,33 +25,22 @@ public class ConfirmDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(titleId);
-        builder.setMessage(messageId);
-        builder.setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onConfirmDialogClickListener.onOkButtonClick();
-            }
-        });
-        builder.setNegativeButton(R.string.dlg_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                onConfirmDialogClickListener.onCancelButtonClick();
-            }
-        });
-
-        return builder.create();
+        return DialogUtils.createDialog(getActivity(), titleId, messageId, positiveButtonListener, negativeButtonListener);
     }
 
-    public void setOnConfirmDialogClickListener(OnConfirmDialogClickListener onConfirmDialogClickListener) {
-        this.onConfirmDialogClickListener = onConfirmDialogClickListener;
+    public void setTitleId(int titleId) {
+        this.titleId = titleId;
     }
 
-    public interface OnConfirmDialogClickListener {
+    public void setMessageId(int messageId) {
+        this.messageId = messageId;
+    }
 
-        public void onOkButtonClick();
+    public void setPositiveButton(final DialogInterface.OnClickListener listener) {
+        positiveButtonListener = listener;
+    }
 
-        public void onCancelButtonClick();
+    public void setNegativeButton(final DialogInterface.OnClickListener listener) {
+        negativeButtonListener = listener;
     }
 }
