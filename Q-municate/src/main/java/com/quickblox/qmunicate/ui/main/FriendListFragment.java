@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> implements SearchView.OnQueryTextListener {
+public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
 
     public static final int PAGE_NUM = 1;
     public static final int PER_PAGE = 100;
@@ -121,7 +121,7 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
     }
 
     @Override
-    public Loader<LoaderResult<FriendListLoader.Result>> onLoaderCreate(int id, Bundle args) {
+    public Loader<LoaderResult<List<Friend>>> onLoaderCreate(int id, Bundle args) {
         switch (id) {
             case FriendListLoader.ID:
                 return new FriendListLoader(getActivity());
@@ -133,16 +133,16 @@ public class FriendListFragment extends LoaderFragment<FriendListLoader.Result> 
     }
 
     @Override
-    public void onLoaderResult(int id, com.quickblox.qmunicate.ui.main.FriendListLoader.Result data) {
+    public void onLoaderResult(int id, List<Friend> data) {
         switch (id) {
             case FriendListLoader.ID:
                 friends.clear();
-                friends.addAll(data.friends);
+                friends.addAll(data);
                 friendListAdapter.notifyDataSetChanged();
                 break;
             case UserListLoader.ID:
                 users.clear();
-                users.addAll(data.friends);
+                users.addAll(data);
                 userListAdapter.notifyDataSetChanged();
                 break;
         }

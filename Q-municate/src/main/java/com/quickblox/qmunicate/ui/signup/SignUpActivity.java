@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.registration;
+package com.quickblox.qmunicate.ui.signup;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -25,12 +25,10 @@ import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
 
-public class RegistrationActivity extends BaseActivity {
+public class SignUpActivity extends BaseActivity {
 
-    private static final String TAG = RegistrationActivity.class.getSimpleName();
+    private static final String TAG = SignUpActivity.class.getSimpleName();
 
-    private Button registerButton;
-    private View avatarLayout;
     private EditText password;
     private ImageView avatarImageView;
     private EditText fullname;
@@ -40,27 +38,22 @@ public class RegistrationActivity extends BaseActivity {
     private ImageHelper imageHelper;
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, RegistrationActivity.class);
+        Intent intent = new Intent(context, SignUpActivity.class);
         context.startActivity(intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration);
+        setContentView(R.layout.activity_signup);
         useDoubleBackPressed = true;
 
         fullname = _findViewById(R.id.fullnameEdit);
-        avatarLayout = _findViewById(R.id.avatarLayout);
         email = _findViewById(R.id.emailEdit);
         password = _findViewById(R.id.password);
         avatarImageView = _findViewById(R.id.avatarImageView);
 
-        registerButton = _findViewById(R.id.signUpButton);
-
         imageHelper = new ImageHelper(this);
-
-        initListeners();
     }
 
     @Override
@@ -97,22 +90,11 @@ public class RegistrationActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void initListeners() {
-        avatarLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imageHelper.getImage();
-            }
-        });
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                register();
-            }
-        });
+    public void changeAvatarOnClickListener(View view) {
+        imageHelper.getImage();
     }
 
-    private void register() {
+    public void signUpOnClickListener(View view) {
         String fullNameText = fullname.getText().toString();
         String emailText = email.getText().toString();
         String passwordText = password.getText().toString();
@@ -129,9 +111,9 @@ public class RegistrationActivity extends BaseActivity {
 
             final File image = new File(pathToImage);
 
-            new QBRegistrationTask(RegistrationActivity.this).execute(user, image);
+            new QBRegistrationTask(SignUpActivity.this).execute(user, image);
         } else {
-            DialogUtils.show(RegistrationActivity.this, getString(R.string.dlg_not_all_fields_entered));
+            DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
     }
 }

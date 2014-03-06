@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:orientation="vertical">
 
     <ImageView
         android:id="@+id/headerImageView"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:scaleType="fitXY"
-        android:src="@drawable/bg" />
+        android:src="@drawable/bg"/>
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -22,7 +22,7 @@
         android:layout_centerHorizontal="true"
         android:padding="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/title" />
+        android:src="@drawable/title"/>
 
     <RelativeLayout
         android:id="@+id/connectFacebookButton"
@@ -32,7 +32,9 @@
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/connect_facebook_button">
+        android:background="@drawable/connect_facebook_button"
+        android:clickable="true"
+        android:onClick="connectFacebookOnClickListener">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -44,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="5dp"
-                android:src="@drawable/ic_fb" />
+                android:src="@drawable/ic_fb"/>
 
             <TextView
                 android:id="@+id/connectFacebook"
@@ -53,7 +55,7 @@
                 android:layout_gravity="center"
                 android:text="@string/wlc_connect_with_facebook"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/button_text_size" />
+                android:textSize="@dimen/button_text_size"/>
 
         </LinearLayout>
 
@@ -68,7 +70,7 @@
         android:layout_marginTop="8dp"
         android:text="or"
         android:textColor="@color/gray"
-        android:textSize="18sp" />
+        android:textSize="18sp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -86,6 +88,8 @@
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:background="@drawable/sign_up_email_button"
+            android:clickable="true"
+            android:onClick="signUpOnClickListener"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -99,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_qb" />
+                    android:src="@drawable/ic_qb"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -108,7 +112,7 @@
                     android:layout_weight="1"
                     android:text="@string/wlc_sign_up"
                     android:textColor="@android:color/white"
-                    android:textSize="@dimen/button_text_size" />
+                    android:textSize="@dimen/button_text_size"/>
             </LinearLayout>
 
         </RelativeLayout>
@@ -120,6 +124,8 @@
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:background="@drawable/log_in_button"
+            android:clickable="true"
+            android:onClick="loginOnClickListener"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -133,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="5dp"
-                    android:src="@drawable/ic_qb" />
+                    android:src="@drawable/ic_qb"/>
 
                 <TextView
                     android:layout_width="0dp"
@@ -142,7 +148,7 @@
                     android:layout_weight="1"
                     android:text="@string/wlc_log_in"
                     android:textColor="@android:color/white"
-                    android:textSize="@dimen/button_text_size" />
+                    android:textSize="@dimen/button_text_size"/>
             </LinearLayout>
 
         </RelativeLayout>
@@ -156,6 +162,6 @@
         android:layout_centerHorizontal="true"
         android:paddingBottom="10dp"
         android:textColor="@color/gray"
-        android:textSize="8sp" />
+        android:textSize="8sp"/>
 
 </RelativeLayout>

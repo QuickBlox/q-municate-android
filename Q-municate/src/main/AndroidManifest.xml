@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.welcome.WelcomeActivity"
+            android:name=".ui.landing.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -34,7 +34,7 @@
             android:label="@string/lgn_login"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.registration.RegistrationActivity"
+            android:name=".ui.signup.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/wlc_sign_up"
             android:screenOrientation="portrait" />

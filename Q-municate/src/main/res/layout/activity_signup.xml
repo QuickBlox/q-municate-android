@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="20dp">
 
     <EditText
         android:id="@+id/fullnameEdit"
@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:digits="@string/lgn_restriction_text_numbers"
         android:hint="@string/reg_fullname_hint"
-        android:maxLength="128" />
+        android:maxLength="128"/>
 
     <EditText
         android:id="@+id/emailEdit"
@@ -19,7 +19,7 @@
         android:layout_marginTop="10dp"
         android:hint="@string/reg_email_hint"
         android:inputType="textEmailAddress"
-        android:maxLength="128" />
+        android:maxLength="128"/>
 
     <EditText
         android:id="@+id/password"
@@ -28,21 +28,23 @@
         android:layout_marginTop="10dp"
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
-        android:maxLength="256" />
+        android:maxLength="256"/>
 
     <LinearLayout
         android:id="@+id/avatarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:orientation="horizontal"
-        android:background="@drawable/item_pressed">
+        android:background="@drawable/item_pressed"
+        android:clickable="true"
+        android:onClick="changeAvatarOnClickListener"
+        android:orientation="horizontal">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
             android:id="@+id/avatarImageView"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:src="@drawable/placeholder_user" />
+            android:src="@drawable/placeholder_user"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +54,7 @@
             android:layout_marginTop="5dp"
             android:text="@string/reg_choose_user_picture"
             android:textColor="@android:color/darker_gray"
-            android:textSize="18sp" />
+            android:textSize="18sp"/>
     </LinearLayout>
 
     <Button
@@ -60,8 +62,9 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:background="@drawable/sign_up_email_button"
+        android:onClick="signUpOnClickListener"
         android:text="@string/wlc_sign_up"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/button_text_size" />
+        android:textSize="@dimen/button_text_size"/>
 </LinearLayout>
 

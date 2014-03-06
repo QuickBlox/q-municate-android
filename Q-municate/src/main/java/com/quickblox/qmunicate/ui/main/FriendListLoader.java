@@ -18,7 +18,7 @@ import com.quickblox.qmunicate.ui.utils.Consts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
+public class FriendListLoader extends BaseLoader<List<Friend>> {
     public static final int ID = 0;
 
     public FriendListLoader(Context context) {
@@ -33,7 +33,7 @@ public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
     }
 
     @Override
-    public Result performInBackground() throws QBResponseException {
+    public List<Friend> performInBackground() throws QBResponseException {
         Arguments arguments = (Arguments) args;
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
@@ -54,17 +54,11 @@ public class FriendListLoader extends BaseLoader<FriendListLoader.Result> {
         Bundle params = new Bundle();
         List<QBUser> users = QBUsers.getUsersByIDs(userIds, requestBuilder, params);
 
-        Result result = new Result();
-        result.friends = Friend.toFriends(users);
-        return result;
+        return Friend.toFriends(users);
     }
 
     private static class Arguments extends BaseLoader.Args {
         int page;
         int perPage;
-    }
-
-    public static class Result {
-        List<Friend> friends;
     }
 }
