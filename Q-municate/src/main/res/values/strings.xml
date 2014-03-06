@@ -62,7 +62,7 @@
     <string name="prf_email">Email</string>
     <string name="prf_status_message">Status Message</string>
     <string name="prf_edit_status">Edit Status</string>
-    <string name="stg_done">DONE</string>
+    <string name="stg_done">Done</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>

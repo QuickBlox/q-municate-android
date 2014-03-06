@@ -88,10 +88,7 @@ public class ProfileActivity extends BaseActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (actionMode != null) {
-                return;
-            }
-            actionMode = ProfileActivity.this.startActionMode(actionModeCallback);
+            startAction();
         }
 
         public void afterTextChanged(Editable editable) {
@@ -134,6 +131,13 @@ public class ProfileActivity extends BaseActivity {
         emailOld = emailEditText.getText().toString();
     }
 
+    private void startAction() {
+        if (actionMode != null) {
+            return;
+        }
+        actionMode = startActionMode(actionModeCallback);
+    }
+
     private void updateUsersData() {
         avatarCurrentBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
         fullnameCurrent = fullNameEditText.getText().toString();
@@ -163,6 +167,7 @@ public class ProfileActivity extends BaseActivity {
                 pathToImage = imageHelper.getPath(originalUri);
             }
             avatarImageView.setImageURI(originalUri);
+            startAction();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

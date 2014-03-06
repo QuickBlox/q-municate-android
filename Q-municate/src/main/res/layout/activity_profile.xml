@@ -59,14 +59,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/changeFullNameTextView"
-            android:text="Dmitriy Valets"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
-            android:enabled="false"
             android:singleLine="true"
             android:clickable="false"
             android:focusableInTouchMode="true"
-            android:background="@null" />
+            android:background="@null"
+            android:inputType="text" />
 
         <TextView
             android:id="@+id/changeFullNameTextView"
@@ -102,13 +101,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/changeEmailTextView"
-            android:text="cobs@gmail.com"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
-            android:enabled="false"
             android:singleLine="true"
             android:clickable="false"
-            android:background="@null" />
+            android:focusableInTouchMode="true"
+            android:background="@null"
+            android:inputType="textEmailAddress" />
 
         <TextView
             android:id="@+id/changeEmailTextView"
@@ -133,20 +132,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clickable="true"
-        android:background="@drawable/item_pressed"
-        android:onClick="changeStatusMessageOnClick">
+        android:clickable="false" >
 
         <EditText
             android:id="@+id/statusMessageEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="You could be laughing 65 percent more of the time"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size"
             android:enabled="false"
             android:clickable="false"
-            android:background="@null" />
+            android:background="@null"
+            android:inputType="textMultiLine"
+            android:text="IMMATURE: A word boring people use to describe fun people." />
 
         <TextView
             android:layout_width="wrap_content"

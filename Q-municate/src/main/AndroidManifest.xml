@@ -52,7 +52,7 @@
                 android:value=".ui.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.friend.FriendVideoCallActivity"
+            android:name=".ui.videocall.VideoCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait">
@@ -61,7 +61,7 @@
                 android:value=".ui.activities.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.friend.FriendVoiceCallActivity"
+            android:name=".ui.voicecall.VoiceCallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait">

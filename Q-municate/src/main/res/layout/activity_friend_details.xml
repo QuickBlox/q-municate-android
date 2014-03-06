@@ -93,7 +93,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/photeTextView"
+                android:id="@+id/phoneTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="(650) 555-5555"
@@ -144,14 +144,14 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
-                android:id="@+id/imageViewFriendVideoCall"
+                android:id="@+id/friendVideoCallImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/item_pressed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:src="@drawable/ic_friends_video"
-                android:onClick="onClickStartFriendVideoCallActivity"/>
+                android:onClick="startFriendVideoCallActivityOnClick"/>
         </LinearLayout>
     </RelativeLayout>
 
@@ -189,7 +189,7 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
-                android:id="@+id/imageViewFriendVoiceCall"
+                android:id="@+id/friendVoiceCallImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/item_pressed"
@@ -197,7 +197,7 @@
                 android:paddingRight="5dp"
                 android:src="@drawable/ic_friends_call"
                 android:layout_gravity="center"
-                android:onClick="onClickStartFriendVoiceCallActivity"/>
+                android:onClick="startFriendVoiceCallActivityOnClick"/>
         </LinearLayout>
     </RelativeLayout>
 

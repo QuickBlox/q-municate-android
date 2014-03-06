@@ -8,15 +8,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
+import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
 
 public class FriendDetailsActivity extends BaseActivity {
-    private ImageView imageViewFriendVideoCall;
-    private ImageView imageViewFriendVoiceCall;
-
     public static void start(Context context) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
         context.startActivity(intent);
@@ -30,16 +28,14 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void initUI() {
-        imageViewFriendVideoCall = _findViewById(R.id.imageViewFriendVideoCall);
-        imageViewFriendVoiceCall = _findViewById(R.id.imageViewFriendVoiceCall);
     }
 
-    public void onClickStartFriendVideoCallActivity(View view) {
-        FriendVideoCallActivity.start(FriendDetailsActivity.this);
+    public void startFriendVideoCallActivityOnClick(View view) {
+        VideoCallActivity.start(FriendDetailsActivity.this);
     }
 
-    public void onClickStartFriendVoiceCallActivity(View view) {
-        FriendVoiceCallActivity.start(FriendDetailsActivity.this);
+    public void startFriendVoiceCallActivityOnClick(View view) {
+        VoiceCallActivity.start(FriendDetailsActivity.this);
     }
 
     @Override
