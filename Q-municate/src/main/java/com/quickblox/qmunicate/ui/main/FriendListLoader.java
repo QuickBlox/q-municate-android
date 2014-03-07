@@ -54,7 +54,7 @@ public class FriendListLoader extends BaseLoader<List<Friend>> {
         Bundle params = new Bundle();
         List<QBUser> users = QBUsers.getUsersByIDs(userIds, requestBuilder, params);
 
-        return Friend.toFriends(users);
+        return Friend.createFriends(users);
     }
 
     private static class Arguments extends BaseLoader.Args {

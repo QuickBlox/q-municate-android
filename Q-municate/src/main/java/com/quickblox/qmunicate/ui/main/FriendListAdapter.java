@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,7 +94,7 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
                 originalObjects = new ArrayList<Friend>(objects);
             }
 
-            if (constraint == null || constraint.length() == 0) {
+            if (TextUtils.isEmpty(constraint)) {
                 results.count = originalObjects.size();
                 results.values = originalObjects;
             } else {

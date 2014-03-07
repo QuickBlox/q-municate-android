@@ -18,6 +18,14 @@ public class Friend implements Serializable {
     private Date lastRequestAt;
     private boolean online;
 
+    public static List<Friend> createFriends(List<QBUser> users) {
+        List<Friend> friends = new ArrayList<Friend>();
+        for (QBUser user : users) {
+            friends.add(new Friend(user));
+        }
+        return friends;
+    }
+
     public Friend(QBUser user) {
         this.id = user.getId();
         this.fullname = user.getFullName();
@@ -27,20 +35,16 @@ public class Friend implements Serializable {
         this.lastRequestAt = user.getLastRequestAt();
     }
 
-    public static List<Friend> toFriends(List<QBUser> users) {
-        List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : users) {
-            friends.add(new Friend(user));
-        }
-        return friends;
-    }
-
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Friend)) return false;
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Friend)) {
+            return false;
+        }
 
-        Friend friend = (Friend) o;
+        Friend friend = (Friend) object;
 
         return id.equals(friend.id);
     }

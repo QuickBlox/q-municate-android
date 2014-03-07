@@ -89,23 +89,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         inflater.inflate(R.menu.friend_list_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                showGlobalSearchButton();
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                hideGlobalSearchButton();
-                if (state == State.GLOBAL_LIST) {
-                    state = State.FRIEND_LIST;
-                    initFriendList();
-                }
-                return true;
-            }
-        });
+        searchItem.setOnActionExpandListener(new SearchOnActionExpandListener());
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
@@ -244,4 +228,22 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private enum State {FRIEND_LIST, GLOBAL_LIST}
+
+    private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
+        @Override
+        public boolean onMenuItemActionExpand(MenuItem item) {
+            showGlobalSearchButton();
+            return true;
+        }
+
+        @Override
+        public boolean onMenuItemActionCollapse(MenuItem item) {
+            hideGlobalSearchButton();
+            if (state == State.GLOBAL_LIST) {
+                state = State.FRIEND_LIST;
+                initFriendList();
+            }
+            return true;
+        }
+    }
 }

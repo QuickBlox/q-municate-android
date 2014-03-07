@@ -34,10 +34,10 @@ public class ChatListAdapter extends BaseListAdapter<Chat> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        // TODO add image loading
+        // TODO IS add image loading
         holder.nameTextView.setText(chat.getName());
-        // TODO add badges
-        // TODO set placeholders
+        // TODO IS add badges
+        // TODO IS set placeholders
 
         return convertView;
     }
