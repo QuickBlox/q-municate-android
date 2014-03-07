@@ -24,6 +24,8 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBUpdateUserTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
@@ -81,23 +83,10 @@ public class ProfileActivity extends BaseActivity {
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    private TextWatcher textChangedListener = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            startAction();
-        }
-
-        public void afterTextChanged(Editable editable) {
-        }
-    };
-
     private void initTextChangedListeners() {
-        fullNameEditText.addTextChangedListener(textChangedListener);
-        emailEditText.addTextChangedListener(textChangedListener);
+        TextWatcher textWatcherListener = new TextWatcherListener();
+        fullNameEditText.addTextChangedListener(textWatcherListener);
+        emailEditText.addTextChangedListener(textWatcherListener);
     }
 
     public void changeAvatarOnClick(View view) {
@@ -135,7 +124,7 @@ public class ProfileActivity extends BaseActivity {
         if (actionMode != null) {
             return;
         }
-        actionMode = startActionMode(actionModeCallback);
+        actionMode = startActionMode(new ActionModeCallback());
     }
 
     private void updateUsersData() {
@@ -199,21 +188,21 @@ public class ProfileActivity extends BaseActivity {
         new QBLoadImageTask(this).execute(fileId, imageView);
     }
 
-    private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+    private class TextWatcherListener extends SimpleTextWatcher {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            startAction();
+        }
+    }
 
+    private class ActionModeCallback extends SimpleActionModeCallback{
+        @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             mode.setTitle(getResources().getText(R.string.stg_done));
             return true;
         }
 
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return true;
-        }
-
+        @Override
         public void onDestroyActionMode(ActionMode mode) {
             updateUsersData();
             if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
@@ -223,5 +212,5 @@ public class ProfileActivity extends BaseActivity {
             }
             actionMode = null;
         }
-    };
+    }
 }

@@ -30,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="5dp"
-                android:text="Friend fullname"
                 android:textSize="20sp" />
 
             <TextView
@@ -38,7 +37,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="status"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="15sp" />
 
@@ -69,7 +67,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Online"
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -96,14 +93,12 @@
                 android:id="@+id/phoneTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="(650) 555-5555"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/descriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MOBILE"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="13sp" />
 
