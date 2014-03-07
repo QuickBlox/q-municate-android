@@ -30,6 +30,11 @@
     <string name="reg_email_hint">Email</string>
     <string name="reg_choose_user_picture">Choose user picture</string>
 
+    // Friend List
+    <string name="frl_global_search">Global Search</string>
+    <string name="frl_online">Online</string>
+    <string name="frl_offline">Offline</string>
+
     // Friend Details
     <string name="frd_title">Details</string>
     <string name="frd_video_call">Video Call</string>
@@ -86,5 +91,6 @@
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
+    <string name="search_hint">Search</string>
 
 </resources>

@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.profile;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,8 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -39,8 +36,6 @@ public class ProfileActivity extends BaseActivity {
     private String fullnameOld;
     private String emailOld;
     private QBUser qbUser;
-    private boolean useDoubleBackPressed;
-    private boolean doubleBackToExitPressedOnce;
     private boolean isNeedUpdateAvatar;
 
     public static void start(Context context) {
@@ -52,23 +47,17 @@ public class ProfileActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        useDoubleBackPressed = false;
 
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
-        useDoubleBackPressed = true;
 
         initUsersData();
     }
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            return;
-        }
-        doubleBackToExitPressedOnce = true;
-
         Bitmap avatar = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
         String fullname = editTextFullName.getText().toString();
         String email = editTextEmail.getText().toString();
