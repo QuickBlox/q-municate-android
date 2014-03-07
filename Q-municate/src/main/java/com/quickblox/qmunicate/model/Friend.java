@@ -1,20 +1,30 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.ui.utils.OnlineStatusHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Friend implements Serializable {
-
     private Integer id;
     private String fullname;
     private String email;
     private String phone;
     private Integer fileId;
     private String status;
+    private Date lastRequestAt;
     private boolean online;
+
+    public static List<Friend> createFriends(List<QBUser> users) {
+        List<Friend> friends = new ArrayList<Friend>();
+        for (QBUser user : users) {
+            friends.add(new Friend(user));
+        }
+        return friends;
+    }
 
     public Friend(QBUser user) {
         this.id = user.getId();
@@ -22,15 +32,26 @@ public class Friend implements Serializable {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
-        this.online = false;
+        this.lastRequestAt = user.getLastRequestAt();
     }
 
-    public static List<Friend> toFriends(List<QBUser> users) {
-        List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : users) {
-            friends.add(new Friend(user));
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
         }
-        return friends;
+        if (!(object instanceof Friend)) {
+            return false;
+        }
+
+        Friend friend = (Friend) object;
+
+        return id.equals(friend.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
     public int getId() {
@@ -65,16 +86,16 @@ public class Friend implements Serializable {
         this.phone = phone;
     }
 
-    public int getFileId() {
+    public Integer getFileId() {
         return fileId;
     }
 
-    public void setFileId(int fileId) {
+    public void setFileId(Integer fileId) {
         this.fileId = fileId;
     }
 
     public boolean isOnline() {
-        return online;
+        return OnlineStatusHelper.isOnline(lastRequestAt);
     }
 
     public void setOnline(boolean online) {
@@ -87,5 +108,17 @@ public class Friend implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getLastRequestAt() {
+        return lastRequestAt;
+    }
+
+    public void setLastRequestAt(Date lastRequestAt) {
+        this.lastRequestAt = lastRequestAt;
+    }
+
+    public String getOnlineStatus() {
+        return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
     }
 }

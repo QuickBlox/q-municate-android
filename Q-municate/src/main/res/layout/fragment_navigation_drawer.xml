@@ -25,7 +25,7 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/email"
+            android:id="@+id/fullname"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:padding="10dp"
-            android:background="@drawable/icon_button"
+            android:background="@drawable/button_general_selector"
             android:src="@drawable/ic_logout" />
     </LinearLayout>
 

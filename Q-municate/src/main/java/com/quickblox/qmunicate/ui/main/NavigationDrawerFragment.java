@@ -2,6 +2,8 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -20,10 +22,10 @@ import android.widget.TextView;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
-import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class NavigationDrawerFragment extends BaseFragment {
+public class NavigationDrawerFragment extends Fragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
@@ -34,7 +36,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
-    private TextView email;
+    private TextView fullName;
     private ImageButton logoutButton;
 
     private int currentSelectedPosition = 0;
@@ -74,26 +76,39 @@ public class NavigationDrawerFragment extends BaseFragment {
             }
         });
         drawerListView.setAdapter(new ArrayAdapter<String>(
-                getActionBar().getThemedContext(),
+                getActivity().getActionBar().getThemedContext(),
                 R.layout.list_item_navigation_drawler,
                 R.id.textView,
                 new String[]{
                         getString(R.string.nvd_title_friends),
                         getString(R.string.nvd_title_chats),
                         getString(R.string.nvd_title_settings),
-                }));
+                        getString(R.string.nvd_title_invite),
+                }
+        ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        email = (TextView) rootView.findViewById(R.id.email);
-        email.setText(App.getInstance().getUser().getEmail());
+        fullName = (TextView) rootView.findViewById(R.id.fullname);
+        fullName.setText(App.getInstance().getUser().getFullName());
         logoutButton = (ImageButton) rootView.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new QBLogoutTask(getActivity()).execute();
+                logout();
             }
         });
 
         return rootView;
+    }
+
+    private void logout() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new QBLogoutTask(getActivity()).execute();
+            }
+        });
+        dialog.show(getFragmentManager(), null);
     }
 
     @Override
@@ -133,31 +148,31 @@ public class NavigationDrawerFragment extends BaseFragment {
         fragmentContainerView = getActivity().findViewById(fragmentId);
         this.drawerLayout = drawerLayout;
 
-        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
         drawerToggle = new QMActionBarDrawlerToggle(getActivity(),
-                NavigationDrawerFragment.this.drawerLayout,
+                drawerLayout,
                 R.drawable.ic_drawer,
                 R.string.nvd_open,
                 R.string.nvd_close
         );
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
-            this.drawerLayout.openDrawer(fragmentContainerView);
+            drawerLayout.openDrawer(fragmentContainerView);
         }
 
-        this.drawerLayout.post(new Runnable() {
+        drawerLayout.post(new Runnable() {
             @Override
             public void run() {
                 drawerToggle.syncState();
             }
         });
 
-        this.drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerListener(drawerToggle);
     }
 
     private void saveUserLearnedDrawler() {
@@ -210,7 +225,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawler();
             }
 
-            getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            getActivity().invalidateOptionsMenu();
         }
     }
 }

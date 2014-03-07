@@ -10,12 +10,12 @@ public class ProgressDialog extends DialogFragment {
 
     private int messageId;
 
-    public ProgressDialog(int messageId) {
-        this.messageId = messageId;
-    }
-
     public static ProgressDialog newInstance(int messageId) {
         return new ProgressDialog(messageId);
+    }
+
+    private ProgressDialog(int messageId) {
+        this.messageId = messageId;
     }
 
     @Override
@@ -26,7 +26,6 @@ public class ProgressDialog extends DialogFragment {
         dialog.setCancelable(true);
         dialog.setCanceledOnTouchOutside(false);
 
-        // Disable the back button
         DialogInterface.OnKeyListener keyListener = new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {

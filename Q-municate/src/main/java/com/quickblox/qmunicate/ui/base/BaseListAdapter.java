@@ -1,21 +1,39 @@
 package com.quickblox.qmunicate.ui.base;
 
-import android.content.Context;
-import android.widget.ArrayAdapter;
+import android.app.Activity;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.qmunicate.qb.QBLoadImageTask;
 
 import java.util.List;
 
-public abstract class BaseListAdapter<T> extends ArrayAdapter<T> {
+public abstract class BaseListAdapter<T> extends BaseAdapter {
 
-    public BaseListAdapter(Context context, int resource, int textViewResourceId, List<T> objects) {
-        super(context, resource, textViewResourceId, objects);
+    protected List<T> objects;
+    protected Activity activity;
+
+    public BaseListAdapter(Activity activity, List<T> objects) {
+        this.activity = activity;
+        this.objects = objects;
     }
 
-    protected void displayImage(ImageView imageView, String url) {
-        ImageLoader.getInstance().displayImage(url, imageView);
+    @Override
+    public int getCount() {
+        return objects.size();
     }
 
+    @Override
+    public T getItem(int position) {
+        return objects.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    protected void displayImage(Integer fileId, ImageView imageView) {
+        new QBLoadImageTask(activity).execute(fileId, imageView);
+    }
 }

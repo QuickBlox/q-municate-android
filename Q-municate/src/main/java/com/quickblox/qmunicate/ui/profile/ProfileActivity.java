@@ -57,6 +57,7 @@ public class ProfileActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        useDoubleBackPressed = false;
 
         initUI();
         qbUser = App.getInstance().getUser();
@@ -137,7 +138,7 @@ public class ProfileActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                navigateToParent();
                 return true;
         }
         return super.onOptionsItemSelected(item);
