@@ -81,6 +81,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                         getString(R.string.nvd_title_friends),
                         getString(R.string.nvd_title_chats),
                         getString(R.string.nvd_title_settings),
+                        getString(R.string.nvd_title_invite_friends),
                 }));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         email = (TextView) rootView.findViewById(R.id.email);

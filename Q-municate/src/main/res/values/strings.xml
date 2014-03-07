@@ -88,6 +88,7 @@
 
     // Facebook
     <string name="facebook_app_id">295887340521629</string>
+    <string name="facebook_exception">Facebook exception: %1$s</string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>

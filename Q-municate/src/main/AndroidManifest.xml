@@ -121,6 +121,17 @@
             android:name=".service.ChatService"
             android:enabled="true"
             android:exported="false"></service>
-    </application>
 
+        <activity android:name=".ui.invitefriends.FriendPickerSampleActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.invitefriends.PickFriendsActivity"
+            android:label="Pick Friends">
+        </activity>
+    </application>
 </manifest>

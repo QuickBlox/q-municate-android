@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private NavigationDrawerFragment navigationDrawerFragment;
