@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="action_bar_color">#0D70B3</color>
+    <color name="action_bar_color">#0d70b3</color>
     <color name="link_color">#0d70b3</color>
-    <color name="selection_color">#1cba48</color>
-    <color name="participants_badge">#0D70B3</color>
-    <color name="unread_messages_badge">#D20000</color>
+    <color name="participants_badge">#0d70b3</color>
+    <color name="unread_messages_badge">#d20000</color>
     <color name="online_status">#1cba48</color>
     <color name="sign_up_button_normal">#0077cb</color>
     <color name="sign_up_button_pressed">#00538e</color>
@@ -14,6 +13,9 @@
     <color name="login_button_pressed">#00851c</color>
     <color name="icon_button_pressed">#e4f4ff</color>
     <color name="gray">#999999</color>
+    <color name="menu_item_background_pressed">#1cba48</color>
+    <color name="menu_item_background_activated">#1cba48</color>
+    <color name="list_item_background_pressed">#dddddd</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
 
