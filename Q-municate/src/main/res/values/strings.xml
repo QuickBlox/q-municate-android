@@ -76,7 +76,7 @@
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Not all required fields entered</string>
-    <string name="dlg_check_email">Check your email</string>
+    <string name="dlg_check_email">Mail was sent to %1$s</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>

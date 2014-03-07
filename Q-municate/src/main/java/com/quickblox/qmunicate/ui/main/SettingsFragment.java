@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLogoutTask;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
+import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
@@ -89,7 +91,14 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void logout() {
-        new QBLogoutTask(getActivity()).execute();
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new QBLogoutTask(getActivity()).execute();
+            }
+        });
+        dialog.show(getFragmentManager(), null);
     }
 
     private void savePushNotification(boolean value) {

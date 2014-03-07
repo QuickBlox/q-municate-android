@@ -9,6 +9,7 @@ import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
+    private String email;
 
     public QBResetPasswordTask(Activity activity) {
         super(activity);
@@ -16,7 +17,7 @@ public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
 
     @Override
     public Void performInBackground(String... params) throws Exception {
-        String email = params[0];
+        email = params[0];
 
         QBAuth.createSession();
         QBUsers.resetPassword(email);
@@ -28,7 +29,7 @@ public class QBResetPasswordTask extends BaseProgressTask<String, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            DialogUtils.show(activity, activity.getString(R.string.dlg_check_email));
+            DialogUtils.show(activity, activity.getString(R.string.dlg_check_email, email));
         }
     }
 }
