@@ -16,4 +16,9 @@
     <color name="gray">#999999</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+
+    <color name="activity_friend_call_bg">#333333</color>
+    <color name="activity_friend_call_timer_text">#999999</color>
+    <color name="activity_friend_button_default">#ff0000</color>
+    <color name="activity_friend_button_pressed">#e4f4ff</color>
 </resources>

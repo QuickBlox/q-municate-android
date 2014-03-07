@@ -14,7 +14,7 @@ public class ProgressDialog extends DialogFragment {
         return new ProgressDialog(messageId);
     }
 
-    public ProgressDialog(int messageId) {
+    private ProgressDialog(int messageId) {
         this.messageId = messageId;
     }
 

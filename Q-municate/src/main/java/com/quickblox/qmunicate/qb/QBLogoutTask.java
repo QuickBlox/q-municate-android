@@ -17,7 +17,6 @@ public class QBLogoutTask extends BaseProgressTask<Void, Void, Void> {
     public Void performInBackground(Void... params) throws Exception {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-        // QBChatService.getInstance().logout();
         return null;
     }
 
@@ -26,7 +25,7 @@ public class QBLogoutTask extends BaseProgressTask<Void, Void, Void> {
         super.onResult(aVoid);
         final Activity activity = activityRef.get();
         if (isActivityAlive()) {
-            LoginActivity.startActivity(activity);
+            LoginActivity.start(activity);
             activity.finish();
         }
     }

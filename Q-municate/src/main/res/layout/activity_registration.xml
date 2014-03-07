@@ -35,7 +35,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/item_pressed">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
             android:id="@+id/avatarImageView"
@@ -52,7 +53,6 @@
             android:text="@string/reg_choose_user_picture"
             android:textColor="@android:color/darker_gray"
             android:textSize="18sp" />
-
     </LinearLayout>
 
     <Button
@@ -63,6 +63,5 @@
         android:text="@string/wlc_sign_up"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size" />
-
 </LinearLayout>
 

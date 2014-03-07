@@ -12,7 +12,7 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 
 public class GroupChatDetailsActivity extends BaseActivity {
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, GroupChatDetailsActivity.class);
         context.startActivity(intent);
     }

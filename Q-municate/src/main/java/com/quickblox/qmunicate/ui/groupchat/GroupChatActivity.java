@@ -12,7 +12,7 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 
 public class GroupChatActivity extends BaseActivity {
 
-    public static void startActivity(Context context) {
+    public static void start(Context context) {
         Intent intent = new Intent(context, GroupChatActivity.class);
         context.startActivity(intent);
     }
@@ -38,7 +38,7 @@ public class GroupChatActivity extends BaseActivity {
                 navigateToParent();
                 return true;
             case R.id.action_group_details:
-                GroupChatDetailsActivity.startActivity(this);
+                GroupChatDetailsActivity.start(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

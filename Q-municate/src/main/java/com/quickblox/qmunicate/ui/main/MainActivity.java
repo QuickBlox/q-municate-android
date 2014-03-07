@@ -13,10 +13,14 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
     private NavigationDrawerFragment navigationDrawerFragment;
 
-    public static void startActivity(Context context) {
+    private final int ID_FRIEND_LIST_FRAGMENT = 0;
+    private final int ID_CHAT_LIST_FRAGMENT = 1;
+    private final int ID_SETTINGS_FRAGMENT = 2;
+    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+
+    public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
@@ -40,14 +44,17 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public void onNavigationDrawerItemSelected(int position) {
         Fragment fragment = null;
         switch (position) {
-            case 0:
+            case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendListFragment.newInstance();
                 break;
-            case 1:
+            case ID_CHAT_LIST_FRAGMENT:
                 fragment = ChatListFragment.newInstance();
                 break;
-            case 2:
+            case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
+                break;
+            case ID_INVITE_FRIENDS_FRAGMENT:
+                fragment = InviteFriendsFragment.newInstance();
                 break;
             case 3:
                 DialogUtils.show(this, getString(R.string.comming_soon));

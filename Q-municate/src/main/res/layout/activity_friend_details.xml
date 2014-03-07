@@ -144,12 +144,14 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
+                android:id="@+id/imageViewFriendVideoCall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
+                android:background="@drawable/item_pressed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:src="@drawable/ic_friends_video" />
+                android:src="@drawable/ic_friends_video"
+                android:onClick="onClickStartFriendVideoCallActivity"/>
         </LinearLayout>
     </RelativeLayout>
 
@@ -187,12 +189,15 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
+                android:id="@+id/imageViewFriendVoiceCall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@null"
+                android:background="@drawable/item_pressed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:src="@drawable/ic_friends_call" />
+                android:src="@drawable/ic_friends_call"
+                android:layout_gravity="center"
+                android:onClick="onClickStartFriendVoiceCallActivity"/>
         </LinearLayout>
     </RelativeLayout>
 
