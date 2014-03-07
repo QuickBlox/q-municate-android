@@ -18,6 +18,8 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
+import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,7 +55,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         nameTextView = _findViewById(R.id.nameTextView);
         onlineImageView = _findViewById(R.id.onlineImageView);
         onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
-        photeTextView = _findViewById(R.id.photeTextView);
+        photeTextView = _findViewById(R.id.phoneTextView);
 
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
@@ -103,12 +105,12 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         fillUI(data);
     }
 
-    public void onClickStartFriendVideoCallActivity(View view) {
-        FriendVideoCallActivity.start(FriendDetailsActivity.this);
+    public void startFriendVideoCallActivityOnClick(View view) {
+        VideoCallActivity.start(FriendDetailsActivity.this);
     }
 
-    public void onClickStartFriendVoiceCallActivity(View view) {
-        FriendVoiceCallActivity.start(FriendDetailsActivity.this);
+    public void startFriendVoiceCallActivityOnClick(View view) {
+        VoiceCallActivity.start(FriendDetailsActivity.this);
     }
 
     private void fillUI(Friend friend) {

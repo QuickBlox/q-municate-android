@@ -9,42 +9,40 @@
         android:layout_height="match_parent">
 
         <View
-            android:id="@+id/imageViewOwnVideoScreen"
+            android:id="@+id/ownVideoScreenImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/activity_friend_call_margin_top"
+            android:layout_marginTop="@dimen/activity_call_margin_top"
             android:layout_gravity="center"
             android:layout_centerInParent="true"
             android:background="@android:color/white"
-            android:layout_above="@+id/relativeLayoutControlPanel"
+            android:layout_above="@+id/controlPanelRelativeLayout"
             android:layout_marginBottom="30dp"/>
 
         <View
-            android:id="@+id/imageViewOpponentVideoScreen"
-            android:layout_width="@dimen/activity_friend_call_video_screen_opponent_width"
-            android:layout_height="@dimen/activity_friend_call_video_screen_opponent_height"
+            android:id="@+id/opponentVideoScreenImageView"
+            android:layout_width="@dimen/activity_call_video_screen_opponent_width"
+            android:layout_height="@dimen/activity_call_video_screen_opponent_height"
             android:layout_gravity="center"
             android:background="@android:color/holo_orange_light"
-            android:layout_above="@+id/relativeLayoutControlPanel"
+            android:layout_above="@+id/controlPanelRelativeLayout"
             android:layout_centerVertical="true"
             android:layout_marginBottom="50dp"
             android:layout_marginLeft="20dp" />
 
         <RelativeLayout
-            android:id="@+id/relativeLayoutControlPanel"
+            android:id="@+id/controlPanelRelativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentStart="false"
             android:layout_centerHorizontal="true"
             android:gravity="center"
             android:background="@color/activity_friend_call_bg">
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:layout_height="@dimen/activity_call_end_button_height"
                 android:background="@drawable/item_pressed"
                 android:src="@drawable/ic_call_switch"
                 android:layout_gravity="center|left"
@@ -53,16 +51,16 @@
                 android:padding="5dp" />
 
             <ImageButton
-                android:id="@+id/imageButtonEndVideoCall"
-                android:layout_width="@dimen/activity_friend_call_end_button_width"
-                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:id="@+id/endVideoCallImageButton"
+                android:layout_width="@dimen/activity_call_end_button_width"
+                android:layout_height="@dimen/activity_call_end_button_height"
                 android:background="@drawable/item_pressed"
                 android:src="@drawable/ic_call_mute"
                 android:layout_centerInParent="true" />
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/activity_friend_call_end_button_height"
+                android:layout_height="@dimen/activity_call_end_button_height"
                 android:background="@drawable/item_pressed"
                 android:src="@drawable/ic_call_mute_a"
                 android:layout_gravity="center|right"

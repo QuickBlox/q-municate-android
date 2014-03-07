@@ -27,6 +27,7 @@ public class QBUpdateUserTask extends BaseProgressTask<Object, Void, Void> {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
             user.setFileId(qbFile.getId());
         }
+
         user.setOldPassword(password);
         user = QBUsers.updateUser(user);
         user.setPassword(password);
