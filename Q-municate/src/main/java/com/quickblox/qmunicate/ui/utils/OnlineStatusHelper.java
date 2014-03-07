@@ -11,8 +11,11 @@ public class OnlineStatusHelper {
     private static final int ONLINE_TIMEOUT = 15;
 
     public static boolean isOnline(Date lastRequestAt) {
-        long timeout = new Date().getTime() - lastRequestAt.getTime();
-        return TimeUnit.MILLISECONDS.toMinutes(timeout) < ONLINE_TIMEOUT;
+        if (lastRequestAt != null) {
+            long timeout = new Date().getTime() - lastRequestAt.getTime();
+            return TimeUnit.MILLISECONDS.toMinutes(timeout) < ONLINE_TIMEOUT;
+        }
+        return false;
     }
 
     public static String getOnlineStatus(Date lastRequestAt) {

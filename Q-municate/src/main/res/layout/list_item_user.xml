@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:padding="10dp">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="10dp">
 
     <com.quickblox.qmunicate.ui.views.CircularImageView
         android:id="@+id/avatarImageView"
@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
-        android:src="@drawable/placeholder_user" />
+        android:src="@drawable/placeholder_user"/>
 
     <TextView
         android:id="@+id/nameTextView"
@@ -23,7 +23,7 @@
         android:layout_toLeftOf="@+id/addFriendButton"
         android:layout_toRightOf="@id/avatarImageView"
         android:text="Friend fullname"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
     <ImageButton
         android:id="@id/addFriendButton"
@@ -31,7 +31,6 @@
         android:layout_height="53dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/icon_button"
-        android:src="@drawable/ic_add_friend" />
-
+        android:background="@drawable/button_general_selector"
+        android:src="@drawable/ic_add_friend"/>
 </RelativeLayout>
