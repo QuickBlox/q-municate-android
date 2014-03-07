@@ -233,6 +233,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
+            getActivity().getActionBar().setIcon(android.R.color.transparent);
             return true;
         }
 
@@ -243,6 +244,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 state = State.FRIEND_LIST;
                 initFriendList();
             }
+            getActivity().getActionBar().setDisplayShowHomeEnabled(true);
             return true;
         }
     }
