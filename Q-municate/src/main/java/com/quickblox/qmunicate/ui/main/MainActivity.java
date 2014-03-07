@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -46,8 +45,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendListFragment.newInstance();
                 break;
             case ID_CHAT_LIST_FRAGMENT:
-                fragment = ChatListFragment.newInstance();
-                break;
+                DialogUtils.show(this, getString(R.string.comming_soon));
+                return;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
