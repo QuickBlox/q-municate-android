@@ -84,7 +84,8 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.nvd_title_chats),
                         getString(R.string.nvd_title_settings),
                         getString(R.string.nvd_title_invite),
-                }));
+                }
+        ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         email = (TextView) rootView.findViewById(R.id.email);
         email.setText(App.getInstance().getUser().getEmail());
@@ -147,31 +148,31 @@ public class NavigationDrawerFragment extends Fragment {
         fragmentContainerView = getActivity().findViewById(fragmentId);
         this.drawerLayout = drawerLayout;
 
-        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
         drawerToggle = new QMActionBarDrawlerToggle(getActivity(),
-                NavigationDrawerFragment.this.drawerLayout,
+                drawerLayout,
                 R.drawable.ic_drawer,
                 R.string.nvd_open,
                 R.string.nvd_close
         );
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
-            this.drawerLayout.openDrawer(fragmentContainerView);
+            drawerLayout.openDrawer(fragmentContainerView);
         }
 
-        this.drawerLayout.post(new Runnable() {
+        drawerLayout.post(new Runnable() {
             @Override
             public void run() {
                 drawerToggle.syncState();
             }
         });
 
-        this.drawerLayout.setDrawerListener(drawerToggle);
+        drawerLayout.setDrawerListener(drawerToggle);
     }
 
     private void saveUserLearnedDrawler() {
@@ -224,7 +225,7 @@ public class NavigationDrawerFragment extends Fragment {
                 saveUserLearnedDrawler();
             }
 
-            getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+            getActivity().invalidateOptionsMenu();
         }
     }
 }

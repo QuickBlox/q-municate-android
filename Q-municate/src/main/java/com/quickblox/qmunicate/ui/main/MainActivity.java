@@ -13,12 +13,10 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-    private NavigationDrawerFragment navigationDrawerFragment;
-
-    private final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private final int ID_CHAT_LIST_FRAGMENT = 1;
-    private final int ID_SETTINGS_FRAGMENT = 2;
-    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+    private static final int ID_FRIEND_LIST_FRAGMENT = 0;
+    private static final int ID_CHAT_LIST_FRAGMENT = 1;
+    private static final int ID_SETTINGS_FRAGMENT = 2;
+    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -31,10 +29,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         setContentView(R.layout.activity_main);
         useDoubleBackPressed = true;
 
-        navigationDrawerFragment = (NavigationDrawerFragment)
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        // Set up the drawer.
         navigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
@@ -54,9 +51,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = SettingsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
-                fragment = InviteFriendsFragment.newInstance();
-                break;
-            case 3:
                 DialogUtils.show(this, getString(R.string.comming_soon));
                 return;
         }
@@ -65,14 +59,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private void setCurrentFragment(Fragment fragment) {
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = buildTransaction();
-        ft.replace(R.id.container, fragment, null);
-        ft.commit();
+        FragmentTransaction transaction = buildTransaction();
+        transaction.replace(R.id.container, fragment, null);
+        transaction.commit();
     }
 
     private FragmentTransaction buildTransaction() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        return ft;
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        return transaction;
     }
 }
