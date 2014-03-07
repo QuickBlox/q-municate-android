@@ -37,6 +37,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private ListView listView;
     private TextView listTitle;
+    private View listTitleView;
     private List<Friend> friends;
     private List<Friend> users;
 
@@ -49,6 +50,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     private Timer friendListUpdateTimer;
     private String constraint;
 
+
     public static FriendListFragment newInstance() {
         FriendListFragment fragment = new FriendListFragment();
         Bundle args = new Bundle();
@@ -59,13 +61,14 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
-        listView = (ListView) rootView.findViewById(R.id.friendList);
-        listTitle = (TextView) rootView.findViewById(R.id.listTitle);
+        listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
+
+        listTitleView = inflater.inflate(R.layout.view_section_title, null);
+        listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
 
         initFriendList();
         initGlobalSearchButton(inflater);
-        return rootView;
+        return listView;
     }
 
     @Override
@@ -242,7 +245,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
             getActivity().getActionBar().setIcon(android.R.color.transparent);
-            listTitle.setVisibility(View.VISIBLE);
+            // listTitle.setVisibility(View.VISIBLE);
+            listView.addHeaderView(listTitleView);
             listTitle.setText(R.string.frl_friends);
             return true;
         }
@@ -255,7 +259,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 initFriendList();
             }
             getActivity().getActionBar().setDisplayShowHomeEnabled(true);
-            listTitle.setVisibility(View.GONE);
+            listView.removeHeaderView(listTitleView);
             return true;
         }
     }
