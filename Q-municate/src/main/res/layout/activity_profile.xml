@@ -16,7 +16,7 @@
         android:layout_marginBottom="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:onClick="changeAvatarOnClick">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
@@ -50,7 +50,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:clickable="true"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:onClick="changeFullNameOnClick">
 
         <EditText
@@ -72,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@drawable/item_pressed"
+            android:background="@drawable/button_general_selector"
             android:clickable="false"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
@@ -93,7 +93,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:clickable="true"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:onClick="changeEmailOnClick">
 
         <EditText
@@ -115,7 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@drawable/item_pressed"
+            android:background="@drawable/button_general_selector"
             android:text="@string/prf_change"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
@@ -151,7 +151,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/item_pressed"
+            android:background="@drawable/button_general_selector"
             android:text="@string/prf_edit_status"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size"
