@@ -36,7 +36,7 @@ public class NavigationDrawerFragment extends Fragment {
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
-    private TextView email;
+    private TextView fullName;
     private ImageButton logoutButton;
 
     private int currentSelectedPosition = 0;
@@ -87,8 +87,8 @@ public class NavigationDrawerFragment extends Fragment {
                 }
         ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        email = (TextView) rootView.findViewById(R.id.email);
-        email.setText(App.getInstance().getUser().getEmail());
+        fullName = (TextView) rootView.findViewById(R.id.fullname);
+        fullName.setText(App.getInstance().getUser().getFullName());
         logoutButton = (ImageButton) rootView.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,31 +15,29 @@ import java.util.List;
 
 public class ChatListAdapter extends BaseListAdapter<Chat> {
 
-    public ChatListAdapter(Context context, int resource, int textViewResourceId, List<Chat> objects) {
-        super(context, resource, textViewResourceId, objects);
+    private final LayoutInflater inflater;
+
+    public ChatListAdapter(FragmentActivity activity, List<Chat> objects) {
+        super(activity, objects);
+        inflater = LayoutInflater.from(activity);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Chat chat = getItem(position);
-        LayoutInflater vi = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        Chat chat = objects.get(position);
 
         if (convertView == null) {
-            convertView = vi.inflate(R.layout.list_item_chat, null);
+            convertView = inflater.inflate(R.layout.list_item_chat, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        // TODO add image loading
-        // holder.avatarImageView.setImageBitmap();
+        // TODO IS add image loading
         holder.nameTextView.setText(chat.getName());
-        // holder.lastMessageTextView.setText(chat.getLastMessage().getText());
-
-        // TODO add badges
-
-        // TODO set placeholders
+        // TODO IS add badges
+        // TODO IS set placeholders
 
         return convertView;
     }
