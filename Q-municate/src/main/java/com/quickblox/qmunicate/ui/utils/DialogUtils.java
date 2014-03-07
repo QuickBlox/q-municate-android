@@ -39,6 +39,17 @@ public class DialogUtils {
         }
     }
 
+    public static Dialog createDialog(Context context, int titleId, int messageId, DialogInterface.OnClickListener positiveButtonListener,
+                                      DialogInterface.OnClickListener negativeButtonListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(titleId);
+        builder.setMessage(messageId);
+        builder.setPositiveButton(R.string.dlg_ok, positiveButtonListener);
+        builder.setNegativeButton(R.string.dlg_cancel, negativeButtonListener);
+
+        return builder.create();
+    }
+
     public static Dialog createDialog(Context context, int titleId, View view, DialogInterface.OnClickListener positiveClickListener,
                                       DialogInterface.OnClickListener negativeClickListener) {
 

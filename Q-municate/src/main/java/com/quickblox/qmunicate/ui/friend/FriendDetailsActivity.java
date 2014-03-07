@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -84,7 +83,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                navigateToParent();
                 return true;
             case R.id.action_delete:
                 removeFriend();

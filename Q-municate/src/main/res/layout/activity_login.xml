@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="25dp"
-        android:background="@drawable/log_in_button"
+        android:background="@drawable/button_log_in_selector"
         android:onClick="loginOnClickListener"
         android:text="@string/wlc_log_in"
         android:textColor="@android:color/white"
@@ -48,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="15dp"
-        android:background="@drawable/connect_facebook_button"
+        android:background="@drawable/button_connect_facebook_selector"
         android:clickable="true"
         android:onClick="loginFacebookOnClickListener">
 

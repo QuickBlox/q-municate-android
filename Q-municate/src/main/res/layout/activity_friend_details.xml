@@ -120,7 +120,7 @@
         android:id="@+id/videoCallButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -165,7 +165,7 @@
         android:id="@+id/audioCallButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -211,7 +211,7 @@
         android:id="@+id/chatButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
