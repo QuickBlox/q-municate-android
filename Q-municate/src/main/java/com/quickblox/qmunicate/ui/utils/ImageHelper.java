@@ -1,15 +1,16 @@
 package com.quickblox.qmunicate.ui.utils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.MediaStore;
+import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -17,7 +18,6 @@ public class ImageHelper {
     public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
     public static final int GALLERY_INTENT_CALLED = 1;
     private Activity activity;
-    private String pathToImage;
 
     public ImageHelper(Activity activity) {
         this.activity = activity;
@@ -41,42 +41,31 @@ public class ImageHelper {
         activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
     }
 
-    public String getPath(Uri uri) {
-        if (uri == null) {
-            return null;
-        }
-        String[] projection = {MediaStore.Images.Media.DATA};
-        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor != null) {
-            int column_index = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        }
-        return uri.getPath();
+    public File getFileFromImageView(ImageView imageView) throws IOException {
+        Bitmap origBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        int origWidth = origBitmap.getWidth();
+        int origHeight = origBitmap.getHeight();
+
+        int destWidth = 300;
+        int destHeight = origHeight/( origWidth / destWidth ) ;
+
+        File tempFile = new File(activity.getCacheDir(), "temp.png");
+        tempFile.createNewFile();
+
+        Bitmap bitmap = resizeBitmap(origBitmap, destWidth, destHeight);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+        byte[] bitmapData = bos.toByteArray();
+
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        fos.write(bitmapData);
+        fos.close();
+
+        return tempFile;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public String getPath(Uri originalUri, int flags) {
-        final int takeFlags = flags & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        activity.getContentResolver().takePersistableUriPermission(originalUri, takeFlags);
-        String id = originalUri.getLastPathSegment().split(":")[1];
-        final String[] imageColumns = {MediaStore.Images.Media.DATA};
-        final String imageOrderBy = null;
-        Uri uri = getUri();
-        Cursor imageCursor = activity.managedQuery(uri, imageColumns,
-                MediaStore.Images.Media._ID + "=" + id, null, imageOrderBy);
-        if (imageCursor.moveToFirst()) {
-            pathToImage = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
-        }
-        return pathToImage;
-    }
-
-    public Uri getUri() {
-        String state = Environment.getExternalStorageState();
-        if (!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
-            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
-        return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
+        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
     }
 
     public boolean equalsBitmaps(Bitmap bitmap1, Bitmap bitmap2) {
