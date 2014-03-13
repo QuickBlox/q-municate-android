@@ -9,10 +9,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -25,7 +23,7 @@ import com.quickblox.qmunicate.qb.QBResetPasswordTask;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.registration.RegistrationActivity;
+import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
@@ -34,11 +32,8 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-    private Button loginButton;
-    private View loginFacebokButton;
     private EditText email;
     private EditText password;
-    private TextView forgotPassword;
     private CheckBox rememberMe;
 
     private FacebookHelper facebookHelper;
@@ -56,17 +51,12 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
 
         email = _findViewById(R.id.email);
         password = _findViewById(R.id.password);
-        loginButton = _findViewById(R.id.loginButton);
-        loginFacebokButton = _findViewById(R.id.connectFacebookButton);
-        forgotPassword = _findViewById(R.id.forgotPassword);
         rememberMe = _findViewById(R.id.rememberMe);
 
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-
-        initListeners();
     }
 
     @Override
@@ -80,7 +70,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_register:
-                RegistrationActivity.start(LoginActivity.this);
+                SignUpActivity.start(LoginActivity.this);
                 finish();
                 return true;
             default:
@@ -124,30 +114,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
         finish();
     }
 
-    private void initListeners() {
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                login();
-            }
-        });
-
-        loginFacebokButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                facebookHelper.loginWithFacebook();
-            }
-        });
-
-        forgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetPassword();
-            }
-        });
-    }
-
-    private void login() {
+    public void loginOnClickListener(View view) {
         String userEmail = email.getText().toString();
         String userPassword = password.getText().toString();
 
@@ -162,7 +129,11 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
         }
     }
 
-    private void resetPassword() {
+    public void loginFacebookOnClickListener(View view) {
+        facebookHelper.loginWithFacebook();
+    }
+
+    public void forgotPasswordOnClickListener(View view) {
         String userEmail = email.getText().toString();
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);

@@ -30,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="5dp"
-                android:text="Friend fullname"
                 android:textSize="20sp" />
 
             <TextView
@@ -38,7 +37,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="status"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="15sp" />
 
@@ -67,9 +65,9 @@
             android:src="@drawable/online_mark" />
 
         <TextView
+            android:id="@+id/onlineStatusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Online"
             android:textSize="18sp" />
 
     </LinearLayout>
@@ -93,17 +91,15 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/photeTextView"
+                android:id="@+id/phoneTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="(650) 555-5555"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/descriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MOBILE"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="13sp" />
 
@@ -119,7 +115,7 @@
         android:id="@+id/videoCallButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -144,14 +140,14 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
-                android:id="@+id/imageViewFriendVideoCall"
+                android:id="@+id/friendVideoCallImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/item_pressed"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
                 android:src="@drawable/ic_friends_video"
-                android:onClick="onClickStartFriendVideoCallActivity"/>
+                android:onClick="startFriendVideoCallActivityOnClick"/>
         </LinearLayout>
     </RelativeLayout>
 
@@ -164,7 +160,7 @@
         android:id="@+id/audioCallButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -189,7 +185,7 @@
                 android:background="@android:color/darker_gray" />
 
             <ImageView
-                android:id="@+id/imageViewFriendVoiceCall"
+                android:id="@+id/friendVoiceCallImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/item_pressed"
@@ -197,7 +193,7 @@
                 android:paddingRight="5dp"
                 android:src="@drawable/ic_friends_call"
                 android:layout_gravity="center"
-                android:onClick="onClickStartFriendVoiceCallActivity"/>
+                android:onClick="startFriendVoiceCallActivityOnClick"/>
         </LinearLayout>
     </RelativeLayout>
 
@@ -210,7 +206,7 @@
         android:id="@+id/chatButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_button"
+        android:background="@drawable/button_general_selector"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 

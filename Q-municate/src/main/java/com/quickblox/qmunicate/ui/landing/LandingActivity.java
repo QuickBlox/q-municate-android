@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.wellcome;
+package com.quickblox.qmunicate.ui.landing;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,40 +16,31 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
-import com.quickblox.qmunicate.ui.registration.RegistrationActivity;
+import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class WellcomeActivity extends BaseActivity {
+public class LandingActivity extends BaseActivity {
 
-    private static final String TAG = WellcomeActivity.class.getSimpleName();
-
-    private View registrationButton;
-    private View registrationFacebookButton;
-    private View loginButton;
+    private static final String TAG = LandingActivity.class.getSimpleName();
 
     private FacebookHelper facebookHelper;
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, WellcomeActivity.class);
+        Intent intent = new Intent(context, LandingActivity.class);
         context.startActivity(intent);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wellcome);
+        setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
-
-        registrationButton = _findViewById(R.id.signUpEmailButton);
-        registrationFacebookButton = _findViewById(R.id.connectFacebookButton);
-        loginButton = _findViewById(R.id.loginButton);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        initListeners();
         initVersionName();
-        saveWellcomeShown();
+        saveLandingShown();
     }
 
     @Override
@@ -76,27 +67,18 @@ public class WellcomeActivity extends BaseActivity {
         facebookHelper.onSaveInstanceState(outState);
     }
 
-    private void initListeners() {
-        registrationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RegistrationActivity.start(WellcomeActivity.this);
-                finish();
-            }
-        });
-        registrationFacebookButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                facebookHelper.loginWithFacebook();
-            }
-        });
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginActivity.start(WellcomeActivity.this);
-                finish();
-            }
-        });
+    public void signUpOnClickListener(View view) {
+        SignUpActivity.start(LandingActivity.this);
+        finish();
+    }
+
+    public void connectFacebookOnClickListener(View view) {
+        facebookHelper.loginWithFacebook();
+    }
+
+    public void loginOnClickListener(View view) {
+        LoginActivity.start(LandingActivity.this);
+        finish();
     }
 
     private void initVersionName() {
@@ -109,15 +91,15 @@ public class WellcomeActivity extends BaseActivity {
         }
     }
 
-    private void saveWellcomeShown() {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_WELLCOME_SHOWN, true);
+    private void saveLandingShown() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new QBSocialLoginTask(WellcomeActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+                new QBSocialLoginTask(LandingActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }
     }

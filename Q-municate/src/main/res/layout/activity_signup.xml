@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="20dp">
 
     <EditText
         android:id="@+id/fullnameEdit"
@@ -35,8 +35,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:orientation="horizontal"
-        android:background="@drawable/item_pressed">
+        android:background="@drawable/item_pressed"
+        android:clickable="true"
+        android:onClick="changeAvatarOnClickListener"
+        android:orientation="horizontal">
 
         <com.quickblox.qmunicate.ui.views.CircularImageView
             android:id="@+id/avatarImageView"
@@ -59,7 +61,8 @@
         android:id="@+id/signUpButton"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
-        android:background="@drawable/sign_up_email_button"
+        android:background="@drawable/button_sign_up_selector"
+        android:onClick="signUpOnClickListener"
         android:text="@string/wlc_sign_up"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size" />

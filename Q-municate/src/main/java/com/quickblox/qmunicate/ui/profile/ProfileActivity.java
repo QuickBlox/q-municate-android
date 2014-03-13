@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.profile;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,12 +9,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.ActionMode;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -23,25 +24,29 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBUpdateUserTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
 
 public class ProfileActivity extends BaseActivity {
-    private ImageView imageViewAvatar;
-    private EditText editTextFullName;
-    private EditText editTextEmail;
-    private EditText editTextStatusMessage;
+    private ImageView avatarImageView;
+    private EditText fullNameEditText;
+    private EditText emailEditText;
+    private EditText statusMessageEditText;
 
     private String pathToImage;
     private ImageHelper imageHelper;
-    private Bitmap bitmapAvatarOld;
+    private Bitmap avatarCurrentBitmap;
+    private String fullnameCurrent;
+    private String emailCurrent;
+    private Bitmap avatarOldBitmap;
     private String fullnameOld;
     private String emailOld;
     private QBUser qbUser;
-    private boolean useDoubleBackPressed;
-    private boolean doubleBackToExitPressedOnce;
     private boolean isNeedUpdateAvatar;
+    private Object actionMode;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -52,72 +57,88 @@ public class ProfileActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        useDoubleBackPressed = false;
 
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
-        useDoubleBackPressed = true;
 
         initUsersData();
+        initTextChangedListeners();
     }
 
     @Override
     public void onBackPressed() {
-        Bitmap avatar = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
-        String fullname = editTextFullName.getText().toString();
-        String email = editTextEmail.getText().toString();
-
-        if (isUserDataChanges(fullname, email)) {
-            saveChanges(avatar, fullname, email);
+        updateUsersData();
+        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+            saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
         } else {
             super.onBackPressed();
         }
     }
 
     private void initUI() {
-        imageViewAvatar = _findViewById(R.id.imageViewAvatar);
-        editTextFullName = _findViewById(R.id.editTextFullName);
-        editTextEmail = _findViewById(R.id.editTextEmail);
-        editTextStatusMessage = _findViewById(R.id.editTextStatusMessage);
+        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        emailEditText = _findViewById(R.id.emailEditText);
+        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    public void onClickChangeAvatar(View view) {
+    private void initTextChangedListeners() {
+        TextWatcher textWatcherListener = new TextWatcherListener();
+        fullNameEditText.addTextChangedListener(textWatcherListener);
+        emailEditText.addTextChangedListener(textWatcherListener);
+    }
+
+    public void changeAvatarOnClick(View view) {
         imageHelper.getImage();
     }
 
-    public void onClickChangeFullName(View view) {
-        initChangingEditText(editTextFullName);
+    public void changeFullNameOnClick(View view) {
+        initChangingEditText(fullNameEditText);
     }
 
-    public void onClickChangeEmail(View view) {
-        initChangingEditText(editTextEmail);
+    public void changeEmailOnClick(View view) {
+        initChangingEditText(emailEditText);
     }
 
-    public void onClickChangeStatusMessage(View view) {
-        initChangingEditText(editTextStatusMessage);
+    public void changeStatusMessageOnClick(View view) {
+        initChangingEditText(statusMessageEditText);
     }
 
     private void initChangingEditText(EditText editText) {
-        editText.setText("");
         editText.setEnabled(true);
         editText.requestFocus();
     }
 
     private void initUsersData() {
-        displayAvatar(qbUser.getFileId(), imageViewAvatar);
-        editTextFullName.setText(qbUser.getFullName());
-        editTextEmail.setText(qbUser.getEmail());
+        displayAvatar(qbUser.getFileId(), avatarImageView);
+        fullNameEditText.setText(qbUser.getFullName());
+        emailEditText.setText(qbUser.getEmail());
 
-        bitmapAvatarOld = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
-        fullnameOld = editTextFullName.getText().toString();
-        emailOld = editTextEmail.getText().toString();
+        avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+    }
+
+    private void startAction() {
+        if (actionMode != null) {
+            return;
+        }
+        actionMode = startActionMode(new ActionModeCallback());
+    }
+
+    private void updateUsersData() {
+        avatarCurrentBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        fullnameCurrent = fullNameEditText.getText().toString();
+        emailCurrent = emailEditText.getText().toString();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+                navigateToParent();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -128,14 +149,15 @@ public class ProfileActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
-            bitmapAvatarOld = ((BitmapDrawable) imageViewAvatar.getDrawable()).getBitmap();
+            avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
             Uri originalUri = data.getData();
             if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
                 pathToImage = imageHelper.getPath(originalUri, data.getFlags());
             } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
                 pathToImage = imageHelper.getPath(originalUri);
             }
-            imageViewAvatar.setImageURI(originalUri);
+            avatarImageView.setImageURI(originalUri);
+            startAction();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -156,7 +178,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private boolean isAvatarChanges(Bitmap avatar) {
-        return !imageHelper.equalsBitmaps(bitmapAvatarOld, avatar);
+        return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
     }
 
     private boolean isUserDataChanges(String fullname, String email) {
@@ -165,5 +187,31 @@ public class ProfileActivity extends BaseActivity {
 
     private void displayAvatar(Integer fileId, ImageView imageView) {
         new QBLoadImageTask(this).execute(fileId, imageView);
+    }
+
+    private class TextWatcherListener extends SimpleTextWatcher {
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            startAction();
+        }
+    }
+
+    private class ActionModeCallback extends SimpleActionModeCallback{
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.setTitle(getResources().getText(R.string.stg_done));
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            updateUsersData();
+            if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+                saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+            } else {
+                finish();
+            }
+            actionMode = null;
+        }
     }
 }

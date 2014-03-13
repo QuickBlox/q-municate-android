@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -44,10 +45,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         setContentView(R.layout.activity_main);
         useDoubleBackPressed = true;
 
-        navigationDrawerFragment = (NavigationDrawerFragment)
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        // Set up the drawer.
         navigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
@@ -67,8 +67,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = SettingsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
-                fragment = InviteFriendsFragment.newInstance();
-                break;
+                DialogUtils.show(this, getString(R.string.comming_soon));
+                return;
         }
         setCurrentFragment(fragment);
     }
@@ -76,21 +76,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public void setCurrentFragment(Fragment fragment) {
         currentFragment = fragment;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction ft = buildTransaction();
-        ft.replace(R.id.container, fragment, null);
-        ft.commit();
+        FragmentTransaction transaction = buildTransaction();
+        transaction.replace(R.id.container, fragment, null);
+        transaction.commit();
     }
 
-    public void addFragment(Fragment fragment) {
-        FragmentTransaction ft = buildTransaction();
-        ft.addToBackStack(((Object) fragment).getClass().getName());
-        ft.replace(R.id.container, fragment, null);
-        ft.commit();
-    }
-
-    protected FragmentTransaction buildTransaction() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        return ft;
+    private FragmentTransaction buildTransaction() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        return transaction;
     }
 }

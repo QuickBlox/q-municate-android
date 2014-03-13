@@ -13,11 +13,11 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBLoginTask;
 import com.quickblox.qmunicate.qb.QBSocialLoginTask;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.wellcome.WellcomeActivity;
 
 public class SplashActivity extends BaseActivity implements QBLoginTask.Callback {
 
@@ -42,7 +42,7 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
 
-        boolean isWellcomeShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_WELLCOME_SHOWN, false);
+        boolean isWellcomeShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LANDING_SHOWN, false);
 
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
@@ -50,7 +50,7 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
             LoginActivity.start(SplashActivity.this);
             finish();
         } else {
-            WellcomeActivity.start(SplashActivity.this);
+            LandingActivity.start(SplashActivity.this);
             finish();
         }
     }

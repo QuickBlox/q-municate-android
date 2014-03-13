@@ -12,7 +12,11 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.process.BitmapProcessor;
 import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class App extends Application {
 
@@ -26,6 +30,7 @@ public class App extends Application {
 
     private PrefsHelper prefsHelper;
     private QBUser user;
+    private List<Friend> friends;
 
     public static App getInstance() {
         return instance;
@@ -68,10 +73,19 @@ public class App extends Application {
         this.user = user;
     }
 
+    public List<Friend> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<Friend> friends) {
+        this.friends = friends;
+    }
+
     private void initAppication() {
         instance = this;
         initImageLoader(this);
         QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
+        friends = new ArrayList<Friend>();
         prefsHelper = new PrefsHelper(this);
     }
 
