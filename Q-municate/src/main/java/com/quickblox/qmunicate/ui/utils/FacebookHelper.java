@@ -9,7 +9,12 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class FacebookHelper {
+    public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
+
     private Activity activity;
     private Session.StatusCallback facebookStatusCallback;
 

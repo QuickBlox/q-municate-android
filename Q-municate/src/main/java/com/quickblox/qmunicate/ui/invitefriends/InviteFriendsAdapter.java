@@ -12,20 +12,18 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private Context context;
-    private ArrayList<InviteFriend> stateList;
     private CounterChangedListener counterChangedListener;
     private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;
     private int counterFacebook = 0;
 
-    public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> stateList) {
-        super(context, textViewResourceId, stateList);
+    public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> list) {
+        super(context, textViewResourceId, list);
         this.context = context;
-        this.stateList = new ArrayList<InviteFriend>();
-        this.stateList.addAll(stateList);
         selectedFriendFromFacebook = context.getResources().getString(R.string.stg_invite_friends_from_facebook);
         selectedFriendFromContacts = context.getResources().getString(R.string.stg_invite_friends_from_contacts);
     }

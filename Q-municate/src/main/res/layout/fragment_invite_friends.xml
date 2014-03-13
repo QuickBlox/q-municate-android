@@ -68,7 +68,8 @@
                 android:textSize="@dimen/text_size"
                 android:layout_toLeftOf="@+id/checkAllFacebookFriendsCheckBox"
                 android:layout_centerInParent="true"
-                android:text="0" />
+                android:visibility="gone"
+                android:text="0"/>
 
             <CheckBox
                 android:id="@+id/checkAllFacebookFriendsCheckBox"
@@ -76,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
-                android:enabled="false"/>
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
@@ -136,14 +137,16 @@
                 android:textSize="@dimen/text_size"
                 android:layout_toLeftOf="@+id/selectAllContactsUsersCheckBox"
                 android:layout_centerInParent="true"
-                android:text="0" />
+                android:text="0"
+                android:visibility="gone" />
 
             <CheckBox
                 android:id="@+id/selectAllContactsUsersCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+                android:visibility="gone" />
 
         </RelativeLayout>
 

@@ -76,6 +76,7 @@
     <string name="stg_invite_friends_select_from_contacts">From Contacts</string>
     <string name="stg_invite_friends_from_facebook">(invite via Facebook)</string>
     <string name="stg_invite_friends_from_contacts">(invite via Email)</string>
+    <string name="stg_invite_friends_next">Next</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
@@ -89,6 +90,9 @@
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
+    <string name="dlg_no_facebook_friends">No facebook friends</string>
+    <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
+    <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -98,7 +102,7 @@
 
     // Facebook
     <string name="facebook_app_id">295887340521629</string>
-    <string name="facebook_exception">Facebook exception: %1$s</string>
+    <string name="facebook_exception">Facebook exception: </string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
