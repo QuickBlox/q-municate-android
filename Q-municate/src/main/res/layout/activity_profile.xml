@@ -128,13 +128,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_status_message"
-        android:textColor="@android:color/darker_gray" />
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clickable="false" >
+        android:clickable="false"
+        android:visibility="gone" >
 
         <EditText
             android:id="@+id/statusMessageEditText"

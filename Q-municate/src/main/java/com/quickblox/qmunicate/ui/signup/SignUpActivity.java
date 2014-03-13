@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -24,6 +23,7 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 public class SignUpActivity extends BaseActivity {
 
@@ -34,8 +34,8 @@ public class SignUpActivity extends BaseActivity {
     private EditText fullname;
     private EditText email;
 
-    private String pathToImage;
     private ImageHelper imageHelper;
+    private boolean isNeedUpdateAvatar;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
@@ -80,11 +80,7 @@ public class SignUpActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Uri originalUri = data.getData();
-            if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
-                pathToImage = imageHelper.getPath(originalUri, data.getFlags());
-            } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
-                pathToImage = imageHelper.getPath(originalUri);
-            }
+            isNeedUpdateAvatar = true;
             avatarImageView.setImageURI(originalUri);
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -94,7 +90,7 @@ public class SignUpActivity extends BaseActivity {
         imageHelper.getImage();
     }
 
-    public void signUpOnClickListener(View view) {
+    public void signUpOnClickListener(View view) throws IOException {
         String fullNameText = fullname.getText().toString();
         String emailText = email.getText().toString();
         String passwordText = password.getText().toString();
@@ -104,14 +100,23 @@ public class SignUpActivity extends BaseActivity {
         boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
 
         if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
-            final QBUser user = new QBUser();
-            user.setFullName(fullname.getText().toString());
-            user.setEmail(email.getText().toString());
-            user.setPassword(password.getText().toString());
-
-            final File image = new File(pathToImage);
-
-            new QBRegistrationTask(SignUpActivity.this).execute(user, image);
+            new Thread(new Runnable() {
+                public void run() {
+                    final QBUser user = new QBUser();
+                    user.setFullName(fullname.getText().toString());
+                    user.setEmail(email.getText().toString());
+                    user.setPassword(password.getText().toString());
+                    File image = null;
+                    if (isNeedUpdateAvatar) {
+                        try {
+                            image = imageHelper.getFileFromImageView(avatarImageView);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    new QBRegistrationTask(SignUpActivity.this).execute(user, image);
+                }
+            }).start();
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }

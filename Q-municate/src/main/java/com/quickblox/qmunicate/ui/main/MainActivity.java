@@ -12,9 +12,9 @@ import android.view.View;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-    private NavigationDrawerFragment navigationDrawerFragment;
     private Fragment currentFragment;
 
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
@@ -48,9 +48,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        navigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
     @Override
@@ -67,8 +65,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = SettingsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
-                DialogUtils.show(this, getString(R.string.comming_soon));
-                return;
+                fragment = InviteFriendsFragment.newInstance();
+                break;
         }
         setCurrentFragment(fragment);
     }
