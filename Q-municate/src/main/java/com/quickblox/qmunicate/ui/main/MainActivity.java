@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private NavigationDrawerFragment navigationDrawerFragment;
+    private Fragment currentFragment;
 
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
     private final int ID_CHAT_LIST_FRAGMENT = 1;
@@ -23,6 +24,18 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            default:
+                if (currentFragment instanceof InviteFriendsFragment) {
+                    currentFragment.onActivityResult(requestCode, resultCode, data);
+                }
+                break;
+        }
     }
 
     @Override
@@ -61,6 +74,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     }
 
     public void setCurrentFragment(Fragment fragment) {
+        currentFragment = fragment;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction ft = buildTransaction();
         ft.replace(R.id.container, fragment, null);

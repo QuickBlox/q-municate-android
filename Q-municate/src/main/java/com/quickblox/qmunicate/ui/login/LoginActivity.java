@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -102,6 +103,7 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.i("fb123", "--- 91 ---");
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -185,7 +187,9 @@ public class LoginActivity extends BaseActivity implements QBLoginTask.Callback 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
+            Log.i("fb123", "--- 71 ---");
             if (session.isOpened()) {
+                Log.i("fb123", "--- 81 ---");
                 new QBSocialLoginTask(LoginActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }

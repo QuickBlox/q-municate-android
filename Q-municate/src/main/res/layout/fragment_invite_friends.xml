@@ -16,12 +16,11 @@
         android:textColor="@color/gray" />
 
     <LinearLayout
+        android:id="@+id/fromFacebookButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:background="@drawable/item_pressed">
 
         <View
@@ -30,31 +29,56 @@
             android:layout_height="1px"
             android:background="@color/gray" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
             android:orientation="horizontal"
-            android:divider="@drawable/divider">
+            android:layout_margin="5dp">
 
             <ImageView
                 android:id="@+id/iconFacebookImageView"
-                android:layout_height="?android:attr/listPreferredItemHeight"
                 android:layout_width="?android:attr/listPreferredItemHeight"
+                android:layout_height="?android:attr/listPreferredItemHeight"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_fb_blue"/>
+                android:src="@drawable/ic_fb_blue"
+                android:layout_alignParentLeft="true" />
 
             <TextView
                 android:id="@+id/fromFacebookTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:gravity="left|center_vertical"
                 android:clickable="false"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@android:color/black"
-                android:text="@string/stg_invite_friends_select_from_facebook"/>
-        </LinearLayout>
+                android:text="@string/stg_invite_friends_select_from_facebook"
+                android:layout_toRightOf="@+id/iconFacebookImageView"
+                android:textSize="@dimen/text_size" />
+
+            <TextView
+                android:id="@+id/counterFacebookTextView"
+                android:layout_width="?android:attr/listPreferredItemHeight"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:textColor="@android:color/white"
+                android:background="@drawable/invite_friends_counter_badge"
+                android:layout_gravity="center|right"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:layout_toLeftOf="@+id/checkAllFacebookFriendsCheckBox"
+                android:layout_centerInParent="true"
+                android:text="0" />
+
+            <CheckBox
+                android:id="@+id/checkAllFacebookFriendsCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:enabled="false"/>
+
+        </RelativeLayout>
 
         <View
             android:id="@+id/divider2"
@@ -73,30 +97,55 @@
         android:focusableInTouchMode="true"
         android:background="@drawable/item_pressed">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="?android:attr/listPreferredItemHeight"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="5dp">
 
             <ImageView
                 android:id="@+id/iconContactImageView"
-                android:layout_height="?android:attr/listPreferredItemHeight"
                 android:layout_width="?android:attr/listPreferredItemHeight"
+                android:layout_height="?android:attr/listPreferredItemHeight"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_contacts"/>
+                android:src="@drawable/ic_contacts"
+                android:layout_alignParentLeft="true" />
 
             <TextView
                 android:id="@+id/fromContactTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:gravity="left|center_vertical"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@android:color/black"
                 android:clickable="false"
-                android:text="@string/stg_invite_friends_select_from_contacts"/>
-        </LinearLayout>
+                android:textColor="@android:color/black"
+                android:text="@string/stg_invite_friends_select_from_contacts"
+                android:layout_toRightOf="@+id/iconContactImageView"
+                android:textSize="@dimen/text_size" />
+
+            <TextView
+                android:id="@+id/counterContactsTextView"
+                android:layout_width="?android:attr/listPreferredItemHeight"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:textColor="@android:color/white"
+                android:background="@drawable/invite_friends_counter_badge"
+                android:layout_gravity="center|right"
+                android:gravity="center"
+                android:textSize="@dimen/text_size"
+                android:layout_toLeftOf="@+id/selectAllContactsUsersCheckBox"
+                android:layout_centerInParent="true"
+                android:text="0" />
+
+            <CheckBox
+                android:id="@+id/selectAllContactsUsersCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
 
         <View
             android:id="@+id/divider3"
@@ -105,33 +154,14 @@
             android:background="@color/gray" />
     </LinearLayout>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#FFFFFF">
-
-        <include layout="@layout/com_facebook_picker_title_bar_stub"/>
-
-        <ListView
-            android:id="@+id/com_facebook_picker_list_view"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:divider="@drawable/com_facebook_list_divider"
-            android:fastScrollEnabled="true"
-            android:scrollbars="vertical"
-            android:listSelector="@drawable/com_facebook_picker_list_selector"
-            android:cacheColorHint="#FFFFFF"
-            />
-
-        <ProgressBar android:indeterminate="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/com_facebook_picker_activity_circle"
-            style="@android:style/Widget.ProgressBar"
-            android:layout_centerInParent="true"
-            android:visibility="invisible"
-            />
-    </RelativeLayout>
-
+    <ListView
+        android:id="@+id/usersListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@drawable/com_facebook_list_divider"
+        android:fastScrollEnabled="true"
+        android:scrollbars="vertical"
+        android:listSelector="@drawable/com_facebook_picker_list_selector"
+        android:cacheColorHint="#FFFFFF" />
 
 </LinearLayout>
