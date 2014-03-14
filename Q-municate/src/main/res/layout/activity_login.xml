@@ -8,8 +8,8 @@
         android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:digits="@string/lgn_restriction_text_numbers"
         android:hint="@string/lgn_email_hint"
+        android:inputType="textEmailAddress"
         android:maxLength="128"
         android:text="@string/lgn_default_user_email"/>
 
