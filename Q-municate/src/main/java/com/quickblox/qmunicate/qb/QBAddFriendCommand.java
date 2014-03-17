@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb.command;
+package com.quickblox.qmunicate.qb;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,13 +6,13 @@ import android.os.Bundle;
 
 import com.quickblox.module.custom.QBCustomObjects;
 import com.quickblox.module.custom.model.QBCustomObject;
-import com.quickblox.qmunicate.core.command.BaseCommand;
+import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.utils.Consts;
 
-public class QBAddFriendCommand extends BaseCommand {
+public class QBAddFriendCommand extends ServiceCommand {
 
     private static final String TAG = QBAddFriendCommand.class.getSimpleName();
 
@@ -22,8 +22,8 @@ public class QBAddFriendCommand extends BaseCommand {
         context.startService(intent);
     }
 
-    public QBAddFriendCommand(Context context, String resultAction) {
-        super(context, resultAction);
+    public QBAddFriendCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,11 +17,12 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.command.QBAddFriendCommand;
+import com.quickblox.qmunicate.qb.QBAddFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 
@@ -34,6 +36,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public static final int PAGE_NUM = 1;
     public static final int PER_PAGE = 100;
 
+    private static final String TAG = FriendListFragment.class.getSimpleName();
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
 
@@ -83,7 +86,10 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getBaseActivity().registerReceiver(new AddFriendBroadcastReceiver(), QBServiceConsts.ADD_FRIEND_RESULT);
+
+        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
+        getBaseActivity().updateBroadcastActionList();
     }
 
     @Override
@@ -267,14 +273,15 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         }
     }
 
-    private class AddFriendBroadcastReceiver extends BaseBroadcastReceiver {
+    private class AddFriendSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
             friends.add(friend);
             userListAdapter.notifyDataSetChanged();
             getBaseActivity().hideProgress();
+            Log.d(TAG, "AddFriendSuccessAction");
         }
     }
 }

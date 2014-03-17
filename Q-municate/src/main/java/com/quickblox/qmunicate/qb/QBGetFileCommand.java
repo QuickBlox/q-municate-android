@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb.command;
+package com.quickblox.qmunicate.qb;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.qmunicate.core.command.BaseCommand;
+import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-public class QBGetFileCommand extends BaseCommand {
+public class QBGetFileCommand extends ServiceCommand {
 
     private static final String TAG = QBGetFileCommand.class.getSimpleName();
 
@@ -20,8 +20,8 @@ public class QBGetFileCommand extends BaseCommand {
         context.startService(intent);
     }
 
-    public QBGetFileCommand(Context context, String resultAction) {
-        super(context, resultAction);
+    public QBGetFileCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
     }
 
     @Override

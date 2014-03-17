@@ -17,10 +17,10 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.QBSocialLoginTask;
-import com.quickblox.qmunicate.qb.command.QBLoginCommand;
-import com.quickblox.qmunicate.qb.command.QBResetPasswordCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
+import com.quickblox.qmunicate.qb.QBLoginCommand;
+import com.quickblox.qmunicate.qb.QBResetPasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
@@ -57,8 +57,12 @@ public class LoginActivity extends BaseActivity {
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
-        registerReceiver(new LoginBroadcastReceiver(), QBServiceConsts.LOGIN_RESULT);
-        registerReceiver(new ResetPasswordBroadcastReceiver(), QBServiceConsts.RESET_PASSWORD_RESULT);
+        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
+
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
     }
 
@@ -158,15 +162,15 @@ public class LoginActivity extends BaseActivity {
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                new QBSocialLoginTask(LoginActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+                QBSocialLoginCommand.start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }
     }
 
-    private class LoginBroadcastReceiver extends BaseBroadcastReceiver {
+    private class LoginSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             if (rememberMe.isChecked()) {
@@ -177,27 +181,15 @@ public class LoginActivity extends BaseActivity {
             MainActivity.start(LoginActivity.this);
             finish();
         }
-
-        @Override
-        public void onException(Exception e) {
-            super.onException(e);
-            hideProgress();
-        }
     }
 
-    private class ResetPasswordBroadcastReceiver extends BaseBroadcastReceiver {
+    private class ResetPasswordSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             hideProgress();
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
             DialogUtils.show(LoginActivity.this, getString(R.string.dlg_check_email, emailText));
-        }
-
-        @Override
-        public void onException(Exception e) {
-            super.onException(e);
-            hideProgress();
         }
     }
 }

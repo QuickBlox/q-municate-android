@@ -12,16 +12,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.command.QBRemoveFriendCommand;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
 
@@ -63,7 +66,12 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         phoneTextView = _findViewById(R.id.phoneTextView);
         phoneView = _findViewById(R.id.phoneView);
 
-        registerReceiver(new RemoveFriendBroadcastReceiver(), QBServiceConsts.REMOVE_FRIEND_RESULT);
+        addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
+        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
+        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
+
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
         fillUI(friend);
@@ -125,7 +133,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void fillUI(Friend friend) {
-        new QBLoadImageTask(this).execute(friend.getFileId(), avatarImageView);
+        QBGetFileCommand.start(this, friend.getFileId());
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
@@ -163,13 +171,22 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         dialog.show(getFragmentManager(), null);
     }
 
-    private class RemoveFriendBroadcastReceiver extends BaseBroadcastReceiver {
+    private class RemoveFriendSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             App.getInstance().getFriends().remove(friend);
-            hideProgress();
+            DialogUtils.show(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
             finish();
+        }
+    }
+
+    private class GetFileSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
+            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
         }
     }
 }

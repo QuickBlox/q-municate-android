@@ -11,9 +11,10 @@ import android.widget.Switch;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.command.QBLogoutCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
@@ -63,8 +64,12 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getBaseActivity().registerReceiver(new LogoutBroadcastReceiver(), QBServiceConsts.LOGOUT_RESULT);
-        getBaseActivity().registerReceiver(new ChangePasswordBroadcastReceiver(), QBServiceConsts.CHANGE_PASSWORD_RESULT);
+
+        getBaseActivity().addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        getBaseActivity().addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
+        getBaseActivity().addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
+        getBaseActivity().addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
+        getBaseActivity().updateBroadcastActionList();
     }
 
     private void initListeners() {
@@ -121,18 +126,17 @@ public class SettingsFragment extends BaseFragment {
         return App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
     }
 
-    private class LogoutBroadcastReceiver extends BaseBroadcastReceiver {
-
+    private class LogoutSuccessAction implements Command {
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             LoginActivity.start(getActivity());
             getActivity().finish();
         }
     }
 
-    private class ChangePasswordBroadcastReceiver extends BaseBroadcastReceiver {
+    private class ChangePasswordSuccessAction implements Command {
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             getBaseActivity().hideProgress();
             DialogUtils.show(getBaseActivity(), getString(R.string.dlg_password_changed));
         }

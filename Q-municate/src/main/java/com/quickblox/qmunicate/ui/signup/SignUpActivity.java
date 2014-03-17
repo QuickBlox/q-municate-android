@@ -17,8 +17,8 @@ import android.widget.ImageView;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.command.QBSignUpCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBSignUpCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -58,7 +58,9 @@ public class SignUpActivity extends BaseActivity {
 
         imageHelper = new ImageHelper(this);
 
-        registerReceiver(new SignUpBroadcastReceiver(), QBServiceConsts.SIGNUP_RESULT);
+        addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
+        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
     }
 
     @Override
@@ -126,10 +128,9 @@ public class SignUpActivity extends BaseActivity {
         }
     }
 
-    private class SignUpBroadcastReceiver extends BaseBroadcastReceiver {
-
+    private class SignUpSuccessAction implements Command {
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             hideProgress();

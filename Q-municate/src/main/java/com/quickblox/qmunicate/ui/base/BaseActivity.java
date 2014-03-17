@@ -3,29 +3,39 @@ package com.quickblox.qmunicate.ui.base;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
     protected final ProgressDialog progress;
+    protected BroadcastReceiver broadcastReceiver;
 
     protected App app;
     protected ActionBar actionBar;
 
     protected boolean useDoubleBackPressed;
     private boolean doubleBackToExitPressedOnce;
+    private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -36,6 +46,7 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
+        registerBroadcastReceiver();
     }
 
     @Override
@@ -63,11 +74,22 @@ public abstract class BaseActivity extends Activity {
         progress.dismissAllowingStateLoss();
     }
 
-    public void registerReceiver(BroadcastReceiver receiver, String action) {
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(action));
+    public void addAction(String action, Command command) {
+        broadcastCommandMap.put(action, command);
     }
 
+    public void removeAction(String action) {
+        broadcastCommandMap.remove(action);
+    }
 
+    public void updateBroadcastActionList() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        IntentFilter intentFilter = new IntentFilter();
+        for (String commandName : broadcastCommandMap.keySet()) {
+            intentFilter.addAction(commandName);
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+    }
 
     protected void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
@@ -78,5 +100,37 @@ public abstract class BaseActivity extends Activity {
     @SuppressWarnings("unchecked")
     protected <T> T _findViewById(int viewId) {
         return (T) findViewById(viewId);
+    }
+
+    private void registerBroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (intent != null && (action) != null) {
+                    Command command = broadcastCommandMap.get(action);
+                    if (command != null) {
+                        Log.d("STEPS", "executing " + action);
+                        command.execute(intent.getExtras());
+                    }
+                }
+            }
+        };
+    }
+
+    public static class FailAction implements Command {
+
+        private BaseActivity activity;
+
+        public FailAction(BaseActivity activity) {
+            this.activity = activity;
+        }
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            ErrorUtils.showError(activity, e);
+            activity.hideProgress();
+        }
     }
 }

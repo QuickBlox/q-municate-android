@@ -10,9 +10,9 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.command.QBLoginCommand;
-import com.quickblox.qmunicate.qb.command.QBSocialLoginCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBLoginCommand;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
@@ -31,7 +31,9 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        registerReceiver(new LoginBroadcastReceiver(), QBServiceConsts.LOGIN_RESULT);
+        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        updateBroadcastActionList();
+
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         if (facebookHelper.isSessionOpened()) {
@@ -96,10 +98,10 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private class LoginBroadcastReceiver extends BaseBroadcastReceiver {
+    private class LoginSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             MainActivity.start(SplashActivity.this);

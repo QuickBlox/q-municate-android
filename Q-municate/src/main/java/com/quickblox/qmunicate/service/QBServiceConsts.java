@@ -12,24 +12,33 @@ public class QBServiceConsts {
     public static final String SOCIAL_LOGIN_ACTION = "social login action";
     public static final String UPDATE_USER_ACTION = "update user action";
 
-    public static final String ADD_FRIEND_RESULT = "add friend result";
-    public static final String CHANGE_PASSWORD_RESULT = "change password result";
-    public static final String GET_FILE_RESULT = "get file result";
-    public static final String LOGIN_RESULT = "login result";
-    public static final String LOGOUT_RESULT = "logout result";
-    public static final String REMOVE_FRIEND_RESULT = "remove friend result";
-    public static final String RESET_PASSWORD_RESULT = "reset password result";
-    public static final String SIGNUP_RESULT = "signup result";
-    public static final String UPDATE_USER_RESULT = "update user result";
+    public static final String ADD_FRIEND_SUCCESS_ACTION = "add friend success action";
+    public static final String ADD_FRIEND_FAIL_ACTION = "add friend fail action";
+    public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change password success action";
+    public static final String CHANGE_PASSWORD_FAIL_ACTION = "change password fail action";
+    public static final String GET_FILE_SUCCESS_ACTION = "get file success action";
+    public static final String GET_FILE_FAIL_ACTION = "get file fail action";
+    public static final String LOGIN_SUCESS_ACTION = "login success action";
+    public static final String LOGIN_FAIL_ACTION = "login fail action";
+    public static final String LOGOUT_SUCCESS_ACTION = "logout success action";
+    public static final String LOGOUT_FAIL_ACTION = "logout fail action";
+    public static final String REMOVE_FRIEND_SUCCESS_ACTION = "remove friend success action";
+    public static final String REMOVE_FRIEND_FAIL_ACTION = "remove friend fail action";
+    public static final String RESET_PASSWORD_SUCCESS_ACTION = "reset password success action";
+    public static final String RESET_PASSWORD_FAIL_ACTION = "reset password fail action";
+    public static final String SIGNUP_SUCCESS_ACTION = "signup success action";
+    public static final String SIGNUP_FAIL_ACTION = "signup fail action";
+    public static final String UPDATE_USER_SUCCESS_ACTION = "update user success action";
+    public static final String UPDATE_USER_FAIL_ACTION = "update user fail action";
 
     public static final String EXTRA_USER = "qb user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
-    public static final String EXTRA_SUCCESS = "success";
     public static final String EXTRA_FILE = "file";
     public static final String EXTRA_SOCIAL_PROVIDER = "social provider";
     public static final String EXTRA_ACCESS_TOKEN = "access token";
     public static final String EXTRA_ACCESS_TOKEN_SECRET = "access token secret";
     public static final String EXTRA_EMAIL = "email";
     public static final String EXTRA_FILE_ID = "file id";
+    public static final String EXTRA_PASSWORD = "password";
 }

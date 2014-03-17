@@ -16,12 +16,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.command.QBUpdateUserCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
@@ -62,7 +64,12 @@ public class ProfileActivity extends BaseActivity {
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
-        registerReceiver(new UpdateUserBroadcastReceiver(), QBServiceConsts.UPDATE_USER_RESULT);
+
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
+        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
 
         initUsersData();
         initTextChangedListeners();
@@ -113,7 +120,7 @@ public class ProfileActivity extends BaseActivity {
     }
 
     private void initUsersData() {
-        displayAvatar(qbUser.getFileId(), avatarImageView);
+        QBGetFileCommand.start(this, qbUser.getFileId());
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
 
@@ -187,10 +194,6 @@ public class ProfileActivity extends BaseActivity {
         return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
-    private void displayAvatar(Integer fileId, ImageView imageView) {
-        new QBLoadImageTask(this).execute(fileId, imageView);
-    }
-
     private class TextWatcherListener extends SimpleTextWatcher {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -217,13 +220,22 @@ public class ProfileActivity extends BaseActivity {
         }
     }
 
-    private class UpdateUserBroadcastReceiver extends BaseBroadcastReceiver {
+    private class UpdateUserSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             hideProgress();
+        }
+    }
+
+    private class GetFileSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
+            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
         }
     }
 }

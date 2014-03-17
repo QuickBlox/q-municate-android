@@ -14,8 +14,8 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.command.QBSocialLoginCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -41,7 +41,10 @@ public class LandingActivity extends BaseActivity {
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
-        registerReceiver(new SocialLoginBroadcastReceiver(), QBServiceConsts.LOGIN_RESULT);
+        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new SocialLoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
+
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initVersionName();
@@ -110,10 +113,9 @@ public class LandingActivity extends BaseActivity {
         }
     }
 
-    private class SocialLoginBroadcastReceiver extends BaseBroadcastReceiver {
-
+    private class SocialLoginSuccessAction implements Command {
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             hideProgress();

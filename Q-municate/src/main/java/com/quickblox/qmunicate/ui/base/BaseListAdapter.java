@@ -7,8 +7,8 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
-import com.quickblox.qmunicate.qb.command.QBGetFileCommand;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 import java.util.List;
@@ -23,7 +23,8 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     public BaseListAdapter(BaseActivity activity, List<T> objects) {
         this.activity = activity;
         this.objects = objects;
-        activity.registerReceiver(new GetFileBroadcastReceiver(), QBServiceConsts.GET_FILE_RESULT);
+        activity.addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
+        activity.updateBroadcastActionList();
     }
 
     @Override
@@ -46,10 +47,10 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         QBGetFileCommand.start(activity, fileId);
     }
 
-    private class GetFileBroadcastReceiver extends BaseBroadcastReceiver {
+    private class GetFileSuccessAction implements Command {
 
         @Override
-        public void onResult(Bundle bundle) {
+        public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             ImageLoader.getInstance().displayImage(file.getPublicUrl(), imageViewArray.get(file.getId()));
         }

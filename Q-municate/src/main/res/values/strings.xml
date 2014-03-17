@@ -100,4 +100,5 @@
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
+    <string name="dlg_friend_removed">Friend is removed</string>
 </resources>

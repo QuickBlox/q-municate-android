@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb.command;
+package com.quickblox.qmunicate.qb;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,12 +7,12 @@ import android.os.Bundle;
 import com.facebook.Session;
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.core.command.BaseCommand;
+import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class QBLogoutCommand extends BaseCommand {
+public class QBLogoutCommand extends ServiceCommand {
 
     private static final String TAG = QBLogoutCommand.class.getSimpleName();
 
@@ -21,8 +21,8 @@ public class QBLogoutCommand extends BaseCommand {
         context.startService(intent);
     }
 
-    public QBLogoutCommand(Context context, String resultAction) {
-        super(context, resultAction);
+    public QBLogoutCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb.command;
+package com.quickblox.qmunicate.qb;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,7 @@ import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder
 import com.quickblox.module.custom.QBCustomObjects;
 import com.quickblox.module.custom.model.QBCustomObject;
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.core.command.BaseCommand;
+import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -16,7 +16,7 @@ import com.quickblox.qmunicate.ui.utils.Consts;
 
 import java.util.List;
 
-public class QBRemoveFriendCommand extends BaseCommand {
+public class QBRemoveFriendCommand extends ServiceCommand {
 
     private static final String TAG = QBRemoveFriendCommand.class.getSimpleName();
 
@@ -26,8 +26,8 @@ public class QBRemoveFriendCommand extends BaseCommand {
         context.startService(intent);
     }
 
-    public QBRemoveFriendCommand(Context context, String resultAction) {
-        super(context, resultAction);
+    public QBRemoveFriendCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
     }
 
     @Override

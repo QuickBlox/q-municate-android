@@ -7,26 +7,32 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-public abstract class BaseCommand {
+public abstract class ServiceCommand implements Command {
 
     protected final Context context;
-    protected final String resultAction;
+    protected final String successAction;
+    protected final String failAction;
 
-    public BaseCommand(Context context, String resultAction) {
+    public ServiceCommand(Context context, String successAction, String failAction) {
         this.context = context;
-        this.resultAction = resultAction;
+        this.successAction = successAction;
+        this.failAction = failAction;
     }
 
-    public void execute(Bundle extras) {
+    public void execute(Bundle bundle) {
         Bundle result;
         try {
-            result = perform(extras);
+            result = perform(bundle);
+            sendResult(result, successAction);
         } catch (Exception e) {
             result = new Bundle();
             result.putSerializable(QBServiceConsts.EXTRA_ERROR, e);
+            sendResult(result, failAction);
         }
+    }
 
-        Intent intent = new Intent(resultAction);
+    protected void sendResult(Bundle result, String action) {
+        Intent intent = new Intent(action);
         if (null != result) {
             intent.putExtras(result);
         }
