@@ -49,14 +49,9 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     private class GetFileBroadcastReceiver extends BaseBroadcastReceiver {
 
         @Override
-        public void onResult(String action, Bundle bundle) {
+        public void onResult(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             ImageLoader.getInstance().displayImage(file.getPublicUrl(), imageViewArray.get(file.getId()));
-        }
-
-        @Override
-        public void onException(String action, Exception e) {
-
         }
     }
 }
