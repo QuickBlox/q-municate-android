@@ -11,10 +11,14 @@ import android.widget.EditText;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBChangePasswordTask;
+import com.quickblox.qmunicate.qb.command.QBChangePasswordCommand;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class ChangePasswordDialog extends DialogFragment {
+
+    private BaseActivity activity;
+
     private EditText oldPassword;
     private EditText newPassword;
     private EditText confirmPassword;
@@ -31,13 +35,16 @@ public class ChangePasswordDialog extends DialogFragment {
         newPassword = (EditText) rootView.findViewById(R.id.newPassword);
         confirmPassword = (EditText) rootView.findViewById(R.id.confirmPassword);
 
+        activity = (BaseActivity) getActivity();
+
         return DialogUtils.createDialog(getActivity(), R.string.cpd_title, rootView,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         changePassword();
                     }
-                }, null);
+                }, null
+        );
     }
 
     private void changePassword() {
@@ -62,6 +69,7 @@ public class ChangePasswordDialog extends DialogFragment {
         QBUser user = App.getInstance().getUser();
         user.setOldPassword(oldPasswordText);
         user.setPassword(newPasswordText);
-        new QBChangePasswordTask(getActivity()).execute(user);
+        activity.showProgress();
+        QBChangePasswordCommand.start(activity, user);
     }
 }

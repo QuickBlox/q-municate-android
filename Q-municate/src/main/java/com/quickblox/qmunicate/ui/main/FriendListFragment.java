@@ -16,9 +16,11 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBAddFriendTask;
+import com.quickblox.qmunicate.qb.command.QBAddFriendCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 
@@ -76,6 +78,12 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         state = State.FRIEND_LIST;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getBaseActivity().registerReceiver(new AddFriendBroadcastReceiver(), QBServiceConsts.ADD_FRIEND_RESULT);
     }
 
     @Override
@@ -176,7 +184,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void initFriendList() {
         friends = App.getInstance().getFriends();
-        friendListAdapter = new FriendListAdapter(getActivity(), friends);
+        friendListAdapter = new FriendListAdapter(getBaseActivity(), friends);
         listView.setAdapter(friendListAdapter);
         listView.setSelector(R.drawable.list_item_background_selector);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -190,7 +198,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void initUserList() {
         users = new ArrayList<Friend>();
-        userListAdapter = new UserListAdapter(getActivity(), friends, users, new UserListAdapter.UserListListener() {
+        userListAdapter = new UserListAdapter(getBaseActivity(), friends, users, new UserListAdapter.UserListListener() {
             @Override
             public void onUserSelected(int position) {
                 addToFriendList(users.get(position));
@@ -204,13 +212,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void addToFriendList(final Friend friend) {
-        new QBAddFriendTask(getActivity()).execute(friend, new QBAddFriendTask.Callback() {
-            @Override
-            public void onSuccess() {
-                friends.add(friend);
-                userListAdapter.notifyDataSetChanged();
-            }
-        });
+        getBaseActivity().showProgress();
+        QBAddFriendCommand.start(getActivity(), friend);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
@@ -261,6 +264,17 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
             getActivity().getActionBar().setDisplayShowHomeEnabled(true);
             listView.removeHeaderView(listTitleView);
             return true;
+        }
+    }
+
+    private class AddFriendBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
+            friends.add(friend);
+            userListAdapter.notifyDataSetChanged();
+            getBaseActivity().hideProgress();
         }
     }
 }

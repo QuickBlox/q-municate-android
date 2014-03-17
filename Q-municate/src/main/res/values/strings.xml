@@ -21,7 +21,6 @@
     <string name="lgn_forgot_password">Forgot password?</string>
     <string name="lgn_password_hint">Password</string>
     <string name="lgn_log_in_with_facebook">Log in with Facebook</string>
-    <string name="lgn_restriction_text_numbers">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
     <string name="lgn_login">Log In</string>
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
@@ -43,6 +42,7 @@
     <string name="frd_video_call">Video Call</string>
     <string name="frd_audio_call">Audio Call</string>
     <string name="frd_chat">Chat</string>
+    <string name="frd_mobile">MOBILE</string>
 
     // Chat
     <string name="cht_message">Message</string>
@@ -84,6 +84,8 @@
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
+    <string name="dlg_remove_user">Remove user</string>
+    <string name="dlg_password_changed">Password changed</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -98,7 +100,4 @@
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
-    <string name="frd_mobile">MOBILE</string>
-    <string name="dlg_remove_user">Remove user</string>
-
 </resources>

@@ -2,24 +2,34 @@ package com.quickblox.qmunicate.ui.base;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
+    protected final ProgressDialog progress;
+
     protected App app;
     protected ActionBar actionBar;
 
     protected boolean useDoubleBackPressed;
     private boolean doubleBackToExitPressedOnce;
+
+    public BaseActivity() {
+        progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +54,20 @@ public abstract class BaseActivity extends Activity {
             }
         }, DOUBLE_BACK_DELAY);
     }
+
+    public void showProgress() {
+        progress.show(getFragmentManager(), null);
+    }
+
+    public void hideProgress() {
+        progress.dismissAllowingStateLoss();
+    }
+
+    public void registerReceiver(BroadcastReceiver receiver, String action) {
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(action));
+    }
+
+
 
     protected void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);

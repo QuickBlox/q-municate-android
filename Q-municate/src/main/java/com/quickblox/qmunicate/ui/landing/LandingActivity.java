@@ -11,11 +11,15 @@ import android.widget.TextView;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBSocialLoginTask;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.qb.command.QBSocialLoginCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
@@ -37,6 +41,7 @@ public class LandingActivity extends BaseActivity {
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
+        registerReceiver(new SocialLoginBroadcastReceiver(), QBServiceConsts.LOGIN_RESULT);
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initVersionName();
@@ -99,8 +104,21 @@ public class LandingActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new QBSocialLoginTask(LandingActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+                showProgress();
+                QBSocialLoginCommand.start(LandingActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
+        }
+    }
+
+    private class SocialLoginBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            hideProgress();
+            MainActivity.start(LandingActivity.this);
+            finish();
         }
     }
 }

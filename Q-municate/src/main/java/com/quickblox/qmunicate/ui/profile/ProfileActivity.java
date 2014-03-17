@@ -8,8 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -21,8 +19,10 @@ import android.widget.ImageView;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.QBUpdateUserTask;
+import com.quickblox.qmunicate.qb.command.QBUpdateUserCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
@@ -62,6 +62,7 @@ public class ProfileActivity extends BaseActivity {
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
+        registerReceiver(new UpdateUserBroadcastReceiver(), QBServiceConsts.UPDATE_USER_RESULT);
 
         initUsersData();
         initTextChangedListeners();
@@ -173,7 +174,8 @@ public class ProfileActivity extends BaseActivity {
                 image = new File(pathToImage);
             }
 
-            new QBUpdateUserTask(ProfileActivity.this).execute(qbUser, image);
+            showProgress();
+            QBUpdateUserCommand.start(this, qbUser, image);
         }
     }
 
@@ -212,6 +214,16 @@ public class ProfileActivity extends BaseActivity {
                 finish();
             }
             actionMode = null;
+        }
+    }
+
+    private class UpdateUserBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            hideProgress();
         }
     }
 }

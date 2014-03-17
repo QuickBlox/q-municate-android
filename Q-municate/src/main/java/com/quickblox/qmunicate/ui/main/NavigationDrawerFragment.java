@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,11 +20,15 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBLogoutTask;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.qb.command.QBLogoutCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
@@ -61,6 +64,7 @@ public class NavigationDrawerFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+        getBaseActivity().registerReceiver(new LogoutBroadcastReceiver(), QBServiceConsts.LOGOUT_RESULT);
     }
 
     @Override
@@ -105,7 +109,8 @@ public class NavigationDrawerFragment extends Fragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new QBLogoutTask(getActivity()).execute();
+                getBaseActivity().showProgress();
+                QBLogoutCommand.start(getActivity());
             }
         });
         dialog.show(getFragmentManager(), null);
@@ -226,6 +231,15 @@ public class NavigationDrawerFragment extends Fragment {
             }
 
             getActivity().invalidateOptionsMenu();
+        }
+    }
+
+    private class LogoutBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            LoginActivity.start(getActivity());
+            getActivity().finish();
         }
     }
 }

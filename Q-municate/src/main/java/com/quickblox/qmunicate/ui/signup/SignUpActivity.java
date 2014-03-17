@@ -11,15 +11,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBRegistrationTask;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.qb.command.QBSignUpCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
@@ -54,6 +57,8 @@ public class SignUpActivity extends BaseActivity {
         avatarImageView = _findViewById(R.id.avatarImageView);
 
         imageHelper = new ImageHelper(this);
+
+        registerReceiver(new SignUpBroadcastReceiver(), QBServiceConsts.SIGNUP_RESULT);
     }
 
     @Override
@@ -109,11 +114,27 @@ public class SignUpActivity extends BaseActivity {
             user.setEmail(email.getText().toString());
             user.setPassword(password.getText().toString());
 
-            final File image = new File(pathToImage);
+            File image = null;
+            if (TextUtils.isEmpty(pathToImage)) {
+                image = new File(pathToImage);
+            }
 
-            new QBRegistrationTask(SignUpActivity.this).execute(user, image);
+            showProgress();
+            QBSignUpCommand.start(this, user, image);
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
+        }
+    }
+
+    private class SignUpBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            hideProgress();
+            MainActivity.start(SignUpActivity.this);
+            finish();
         }
     }
 }

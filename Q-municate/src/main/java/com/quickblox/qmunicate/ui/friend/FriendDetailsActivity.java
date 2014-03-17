@@ -14,10 +14,12 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
+import com.quickblox.qmunicate.qb.command.QBRemoveFriendCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
@@ -61,6 +63,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         phoneTextView = _findViewById(R.id.phoneTextView);
         phoneView = _findViewById(R.id.phoneView);
 
+        registerReceiver(new RemoveFriendBroadcastReceiver(), QBServiceConsts.REMOVE_FRIEND_RESULT);
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
         fillUI(friend);
@@ -153,19 +156,20 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                removeFriend();
+                showProgress();
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
             }
         });
         dialog.show(getFragmentManager(), null);
     }
 
-    private void removeFriend() {
-        new QBRemoveFriendTask(this).execute(friend, new QBRemoveFriendTask.Callback() {
-            @Override
-            public void onSuccess() {
-                App.getInstance().getFriends().remove(friend);
-                finish();
-            }
-        });
+    private class RemoveFriendBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            App.getInstance().getFriends().remove(friend);
+            hideProgress();
+            finish();
+        }
     }
 }

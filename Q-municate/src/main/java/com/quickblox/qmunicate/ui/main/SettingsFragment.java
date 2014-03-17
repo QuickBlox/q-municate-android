@@ -11,11 +11,15 @@ import android.widget.Switch;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBLogoutTask;
+import com.quickblox.qmunicate.core.receiver.BaseBroadcastReceiver;
+import com.quickblox.qmunicate.qb.command.QBLogoutCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class SettingsFragment extends BaseFragment {
@@ -24,7 +28,7 @@ public class SettingsFragment extends BaseFragment {
     private Switch pushNotification;
     private Button changePassword;
     private Button logout;
-    private ChangePasswordDialog dialog;
+    private ChangePasswordDialog changePasswordDialog;
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
@@ -53,7 +57,14 @@ public class SettingsFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        dialog = ChangePasswordDialog.newInstance();
+        changePasswordDialog = ChangePasswordDialog.newInstance();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getBaseActivity().registerReceiver(new LogoutBroadcastReceiver(), QBServiceConsts.LOGOUT_RESULT);
+        getBaseActivity().registerReceiver(new ChangePasswordBroadcastReceiver(), QBServiceConsts.CHANGE_PASSWORD_RESULT);
     }
 
     private void initListeners() {
@@ -87,7 +98,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void changePassword() {
-        dialog.show(getFragmentManager(), null);
+        changePasswordDialog.show(getFragmentManager(), null);
     }
 
     private void logout() {
@@ -95,7 +106,8 @@ public class SettingsFragment extends BaseFragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new QBLogoutTask(getActivity()).execute();
+                getBaseActivity().showProgress();
+                QBLogoutCommand.start(getActivity());
             }
         });
         dialog.show(getFragmentManager(), null);
@@ -107,5 +119,22 @@ public class SettingsFragment extends BaseFragment {
 
     private boolean getPushNotifications() {
         return App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
+    }
+
+    private class LogoutBroadcastReceiver extends BaseBroadcastReceiver {
+
+        @Override
+        public void onResult(Bundle bundle) {
+            LoginActivity.start(getActivity());
+            getActivity().finish();
+        }
+    }
+
+    private class ChangePasswordBroadcastReceiver extends BaseBroadcastReceiver {
+        @Override
+        public void onResult(Bundle bundle) {
+            getBaseActivity().hideProgress();
+            DialogUtils.show(getBaseActivity(), getString(R.string.dlg_password_changed));
+        }
     }
 }

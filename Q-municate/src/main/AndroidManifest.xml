@@ -95,9 +95,8 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name=".service.ChatService"
-            android:enabled="true"
-            android:exported="false"></service>
+            android:name=".service.QBService"
+            android:icon="@drawable/ic_launcher"/>
     </application>
 
 </manifest>
