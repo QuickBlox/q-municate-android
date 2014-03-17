@@ -90,12 +90,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/fromContactsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:clickable="true"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:background="@drawable/item_pressed">
 
         <RelativeLayout
@@ -135,13 +134,13 @@
                 android:layout_gravity="center|right"
                 android:gravity="center"
                 android:textSize="@dimen/text_size"
-                android:layout_toLeftOf="@+id/selectAllContactsUsersCheckBox"
+                android:layout_toLeftOf="@+id/checkAllContactsFriendsCheckBox"
                 android:layout_centerInParent="true"
-                android:text="0"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:text="0" />
 
             <CheckBox
-                android:id="@+id/selectAllContactsUsersCheckBox"
+                android:id="@+id/checkAllContactsFriendsCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -158,7 +157,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/usersListView"
+        android:id="@+id/friendsListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="@drawable/com_facebook_list_divider"

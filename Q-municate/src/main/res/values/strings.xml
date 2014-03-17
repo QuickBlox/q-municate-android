@@ -77,6 +77,10 @@
     <string name="stg_invite_friends_from_facebook">(invite via Facebook)</string>
     <string name="stg_invite_friends_from_contacts">(invite via Email)</string>
     <string name="stg_invite_friends_next">Next</string>
+    <string name="stg_invite_friends_choose_email_provider">Choose an email provider :</string>
+    <string name="stg_invite_friends_subject_of_invitation">Qmunicate app</string>
+    <string name="stg_invite_friends_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
+    <string name="stg_invite_friends_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
@@ -90,7 +94,9 @@
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
-    <string name="dlg_no_facebook_friends">No facebook friends</string>
+    <string name="dlg_no_facebook_friends">No Facebook friends</string>
+    <string name="dlg_no_contacts_friends">No Contacts friends</string>
+    <string name="dlg_no_friends">No friends</string>
     <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
 

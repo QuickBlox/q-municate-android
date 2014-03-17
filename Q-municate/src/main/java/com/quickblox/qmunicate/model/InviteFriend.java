@@ -1,5 +1,7 @@
 package com.quickblox.qmunicate.model;
 
+import android.net.Uri;
+
 public class InviteFriend {
     public static final int VIA_FACEBOOK_TYPE = 0;
     public static final int VIA_CONTACTS_TYPE = 1;
@@ -8,13 +10,15 @@ public class InviteFriend {
     private String name;
     private String link;
     private int viaLabelType;
+    private Uri uri;
     private boolean selected;
 
-    public InviteFriend(String id, String name, String link, int viaLabelType, boolean selected) {
+    public InviteFriend(String id, String name, String link, int viaLabelType, Uri uri, boolean selected) {
         this.id = id;
         this.name = name;
         this.link = link;
         this.viaLabelType = viaLabelType;
+        this.uri = uri;
         this.selected = selected;
     }
 
@@ -48,6 +52,14 @@ public class InviteFriend {
 
     public void setViaLabelType(int viaLabelType) {
         this.viaLabelType = viaLabelType;
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public boolean isSelected() {

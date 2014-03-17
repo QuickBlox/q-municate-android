@@ -6,13 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private Context context;
@@ -20,6 +21,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;
     private int counterFacebook = 0;
+    private int counterContacts = 0;
 
     public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> list) {
         super(context, textViewResourceId, list);
@@ -47,6 +49,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
             convertView = vi.inflate(R.layout.list_item_invite_friend, null);
             holder = new ViewHolder();
 
+            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
             holder.nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
             holder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
@@ -70,15 +73,27 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         holder.checkBox.setChecked(data.isSelected());
         holder.checkBox.setTag(data);
 
-        return convertView;
-    }
+        if (data.getViaLabelType() == InviteFriend.VIA_CONTACTS_TYPE) {
+            Picasso.with(context)
+                    .load(data.getUri())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(holder.avatarImageView);
+        } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
+            Picasso.with(context)
+                    .load( String.format(context.getResources().getString(R.string.stg_invite_friends_url_to_facebook_avatar), data.getId()))
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(holder.avatarImageView);
+        }
 
-    public int getCounterFacebook() {
-        return counterFacebook;
+        return convertView;
     }
 
     public void setCounterFacebook(int counterFacebook) {
         this.counterFacebook = counterFacebook;
+    }
+
+    public void setCounterContacts(int counterContacts) {
+        this.counterContacts = counterContacts;
     }
 
     private void notifyCounterChanged(boolean isIncrease, int type) {
@@ -88,13 +103,14 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
                 counterChangedListener.onCounterFacebookChanged(counterFacebook);
                 break;
             case InviteFriend.VIA_CONTACTS_TYPE:
-                counterChangedListener.onCounterContactsChanged(0);
+                counterContacts = getChangedCounter(isIncrease, counterContacts);
+                counterChangedListener.onCounterContactsChanged(counterContacts);
                 break;
         }
     }
 
     private int getChangedCounter(boolean isIncrease, int counter) {
-        if(isIncrease) {
+        if (isIncrease) {
             counter++;
         } else {
             counter--;
@@ -116,6 +132,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     }
 
     private class ViewHolder {
+        ImageView avatarImageView;
         TextView nameTextView;
         TextView viaTextView;
         CheckBox checkBox;

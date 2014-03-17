@@ -31,7 +31,7 @@ public class InviteViaFacebook {
         this.activity = activity;
     }
 
-    public void postToFacebookWall(String[] selectedFriends) {
+    public void postInviteToFacebookWall(String[] selectedFriends) {
         Session session = Session.getActiveSession();
 
         if (session != null) {
