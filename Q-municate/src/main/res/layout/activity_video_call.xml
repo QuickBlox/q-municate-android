@@ -43,7 +43,7 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/activity_call_end_button_height"
-                android:background="@drawable/item_pressed"
+                android:background="@drawable/button_general_selector"
                 android:src="@drawable/ic_call_switch"
                 android:layout_gravity="center|left"
                 android:layout_centerInParent="true"
@@ -54,14 +54,14 @@
                 android:id="@+id/endVideoCallImageButton"
                 android:layout_width="@dimen/activity_call_end_button_width"
                 android:layout_height="@dimen/activity_call_end_button_height"
-                android:background="@drawable/item_pressed"
+                android:background="@drawable/button_general_selector"
                 android:src="@drawable/ic_call_mute"
                 android:layout_centerInParent="true" />
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/activity_call_end_button_height"
-                android:background="@drawable/item_pressed"
+                android:background="@drawable/button_general_selector"
                 android:src="@drawable/ic_call_mute_a"
                 android:layout_gravity="center|right"
                 android:layout_alignParentRight="true"
