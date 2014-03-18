@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OnlineStatusHelper {
 
-    private static final int ONLINE_TIMEOUT = 15;
+    private static final int ONLINE_TIMEOUT = 5;
 
     public static boolean isOnline(Date lastRequestAt) {
         if (lastRequestAt != null) {

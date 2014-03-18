@@ -53,8 +53,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendListFragment.newInstance();
                 break;
             case ID_CHAT_LIST_FRAGMENT:
-                fragment = ChatListFragment.newInstance();
-                break;
+                DialogUtils.show(this, getString(R.string.comming_soon));
+                return;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;

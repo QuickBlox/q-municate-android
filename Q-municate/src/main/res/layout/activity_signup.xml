@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:clickable="true"
         android:onClick="changeAvatarOnClickListener"
         android:orientation="horizontal">

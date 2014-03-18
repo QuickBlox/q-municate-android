@@ -13,7 +13,7 @@
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
-        android:listSelector="@color/selection_color"
+        android:listSelector="@color/menu_item_background_pressed"
         tools:context="com.sample.app.NavigationDrawerFragment" />
 
     <LinearLayout

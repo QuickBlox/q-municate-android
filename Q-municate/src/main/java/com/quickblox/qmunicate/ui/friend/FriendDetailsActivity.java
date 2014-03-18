@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.friend;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
 
@@ -35,7 +37,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     private TextView nameTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
-    private TextView photeTextView;
+    private TextView phoneTextView;
+    private View phoneView;
 
     private Friend friend;
     private Timer friendUpdateTimer;
@@ -55,7 +58,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         nameTextView = _findViewById(R.id.nameTextView);
         onlineImageView = _findViewById(R.id.onlineImageView);
         onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
-        photeTextView = _findViewById(R.id.phoneTextView);
+        phoneTextView = _findViewById(R.id.phoneTextView);
+        phoneView = _findViewById(R.id.phoneView);
 
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
@@ -88,7 +92,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
                 navigateToParent();
                 return true;
             case R.id.action_delete:
-                removeFriend();
+                showRemoveUserDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -105,12 +109,16 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         fillUI(data);
     }
 
-    public void startFriendVideoCallActivityOnClick(View view) {
+    public void videoCallClickListener(View view) {
         VideoCallActivity.start(FriendDetailsActivity.this);
     }
 
-    public void startFriendVoiceCallActivityOnClick(View view) {
+    public void voiceCallClickListener(View view) {
         VoiceCallActivity.start(FriendDetailsActivity.this);
+    }
+
+    public void chatClickListener(View view) {
+        // TODO IS start chat with user
     }
 
     private void fillUI(Friend friend) {
@@ -119,10 +127,15 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
         } else {
-            onlineImageView.setVisibility(View.INVISIBLE);
+            onlineImageView.setVisibility(View.GONE);
+        }
+        if (friend.getPhone() != null) {
+            phoneView.setVisibility(View.VISIBLE);
+        } else {
+            phoneView.setVisibility(View.GONE);
         }
         onlineStatusTextView.setText(friend.getOnlineStatus());
-        photeTextView.setText(friend.getPhone());
+        phoneTextView.setText(friend.getPhone());
     }
 
     private void startLoaderWithTimer() {
@@ -133,6 +146,17 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
                 runLoader(FriendDetailsLoader.ID, FriendDetailsLoader.newArguments(friend.getId()));
             }
         }, START_DELAY, UPDATE_DATA_PERIOD);
+    }
+
+    private void showRemoveUserDialog() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                removeFriend();
+            }
+        });
+        dialog.show(getFragmentManager(), null);
     }
 
     private void removeFriend() {

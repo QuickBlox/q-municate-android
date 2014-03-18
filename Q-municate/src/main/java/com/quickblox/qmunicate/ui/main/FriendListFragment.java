@@ -12,6 +12,7 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -35,8 +36,11 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     private static final int UPDATE_DATA_PERIOD = 300000;
 
     private ListView listView;
+    private TextView listTitle;
+    private View listTitleView;
     private List<Friend> friends;
     private List<Friend> users;
+
     private FriendListAdapter friendListAdapter;
     private UserListAdapter userListAdapter;
     private LinearLayout globalLayout;
@@ -45,6 +49,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private Timer friendListUpdateTimer;
     private String constraint;
+
 
     public static FriendListFragment newInstance() {
         FriendListFragment fragment = new FriendListFragment();
@@ -57,6 +62,9 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
+
+        listTitleView = inflater.inflate(R.layout.view_section_title, null);
+        listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
 
         initFriendList();
         initGlobalSearchButton(inflater);
@@ -170,7 +178,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         friends = App.getInstance().getFriends();
         friendListAdapter = new FriendListAdapter(getActivity(), friends);
         listView.setAdapter(friendListAdapter);
-
+        listView.setSelector(R.drawable.list_item_background_selector);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -188,8 +196,10 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 addToFriendList(users.get(position));
             }
         });
+        listView.setSelector(android.R.color.transparent);
         listView.setAdapter(userListAdapter);
         listView.setOnItemClickListener(null);
+
         startUserListLoader(constraint);
     }
 
@@ -223,6 +233,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void startGlobalSearch() {
         state = State.GLOBAL_LIST;
+        listTitle.setText(R.string.frl_all_users);
         hideGlobalSearchButton();
         initUserList();
     }
@@ -233,6 +244,10 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
+            getActivity().getActionBar().setIcon(android.R.color.transparent);
+            // listTitle.setVisibility(View.VISIBLE);
+            listView.addHeaderView(listTitleView);
+            listTitle.setText(R.string.frl_friends);
             return true;
         }
 
@@ -243,6 +258,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 state = State.FRIEND_LIST;
                 initFriendList();
             }
+            getActivity().getActionBar().setDisplayShowHomeEnabled(true);
+            listView.removeHeaderView(listTitleView);
             return true;
         }
     }
