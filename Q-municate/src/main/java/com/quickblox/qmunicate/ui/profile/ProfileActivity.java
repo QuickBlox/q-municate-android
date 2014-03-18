@@ -104,10 +104,6 @@ public class ProfileActivity extends BaseActivity {
         initChangingEditText(emailEditText);
     }
 
-    public void changeStatusMessageOnClick(View view) {
-        initChangingEditText(statusMessageEditText);
-    }
-
     private void initChangingEditText(EditText editText) {
         editText.setEnabled(true);
         editText.requestFocus();

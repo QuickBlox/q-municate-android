@@ -7,7 +7,7 @@
     <string name="nvd_title_friends">Friends</string>
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
-    <string name="nvd_title_invite">Invite Friends</string>
+    <string name="nvd_title_invite_friends">Invite Friends</string>
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
 
@@ -72,6 +72,18 @@
     <string name="prf_edit_status">Edit Status</string>
     <string name="stg_done">Done</string>
 
+    // Invite Friends
+    <string name="stg_invite_friends_header_label">Let your other friends know about \n Q-munication by sending them private invitations</string>
+    <string name="stg_invite_friends_select_from_facebook">From Facebook</string>
+    <string name="stg_invite_friends_select_from_contacts">From Contacts</string>
+    <string name="stg_invite_friends_from_facebook">(invite via Facebook)</string>
+    <string name="stg_invite_friends_from_contacts">(invite via Email)</string>
+    <string name="stg_invite_friends_next">Next</string>
+    <string name="stg_invite_friends_choose_email_provider">Choose an email provider :</string>
+    <string name="stg_invite_friends_subject_of_invitation">Qmunicate app</string>
+    <string name="stg_invite_friends_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
+    <string name="stg_invite_friends_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
+
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
@@ -84,6 +96,11 @@
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
+    <string name="dlg_no_facebook_friends">No Facebook friends</string>
+    <string name="dlg_no_contacts_friends">No Contacts friends</string>
+    <string name="dlg_no_friends">No friends</string>
+    <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
+    <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -92,7 +109,7 @@
     <string name="cpd_confirm_password">Confirm Password</string>
 
     // Facebook
-    <string name="facebook_app_id">295887340521629</string>
+    <string name="facebook_exception">Facebook exception: </string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>

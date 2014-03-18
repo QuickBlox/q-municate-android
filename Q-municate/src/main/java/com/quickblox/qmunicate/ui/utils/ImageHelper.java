@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -42,12 +43,20 @@ public class ImageHelper {
     }
 
     public File getFileFromImageView(ImageView imageView) throws IOException {
+        int preferredWidth = 300;
         Bitmap origBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
         int origWidth = origBitmap.getWidth();
         int origHeight = origBitmap.getHeight();
 
-        int destWidth = 300;
-        int destHeight = origHeight/( origWidth / destWidth ) ;
+        int destHeight, destWidth;
+
+        if(origWidth <= preferredWidth || origHeight <= preferredWidth) {
+            destWidth = origWidth;
+            destHeight = origHeight;
+        } else {
+            destWidth = 300;
+            destHeight = origHeight / (origWidth / destWidth);
+        }
 
         File tempFile = new File(activity.getCacheDir(), "temp.png");
         tempFile.createNewFile();
