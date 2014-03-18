@@ -7,30 +7,39 @@ import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 
 public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErrorAsyncTask<Params, Progress, Result> {
 
-    protected final ProgressDialog progress;
+    protected ProgressDialog progress;
 
     protected BaseProgressTask(Activity activity) {
         this(activity, R.string.dlg_wait_please);
     }
 
+
     protected BaseProgressTask(Activity activity, int messageId) {
         super(activity);
-        progress = ProgressDialog.newInstance(messageId);
+        if(messageId != -1) {
+            progress = ProgressDialog.newInstance(messageId);
+        }
     }
 
     @Override
     protected void onPreExecute() {
-        showDialog(progress);
+        if(progress != null) {
+            showDialog(progress);
+        }
     }
 
     @Override
     public void onResult(Result result) {
-        hideDialog(progress);
+        if(progress != null) {
+            hideDialog(progress);
+        }
     }
 
     @Override
     public void onException(Exception e) {
-        hideDialog(progress);
+        if(progress != null) {
+            hideDialog(progress);
+        }
         super.onException(e);
     }
 }

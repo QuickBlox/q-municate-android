@@ -100,5 +100,6 @@
     <string name="search_hint">Search</string>
     <string name="frd_mobile">MOBILE</string>
     <string name="dlg_remove_user">Remove user</string>
+    <string name="push_title">call from user</string>
 
 </resources>
