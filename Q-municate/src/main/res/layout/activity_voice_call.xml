@@ -18,74 +18,74 @@
                 android:id="@+id/nameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_call_margin_top"
+                android:layout_marginTop="@dimen/act_call_margin_top"
+                android:gravity="center"
                 android:text="Dmitriy Malets"
-                android:textSize="@dimen/activity_call_name_size"
                 android:textColor="@android:color/white"
-                android:gravity="center" />
+                android:textSize="@dimen/act_call_name_size" />
 
             <TextView
                 android:id="@+id/timerTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="20:20"
-                android:textSize="@dimen/activity_call_name_size"
                 android:textColor="@color/activity_friend_call_timer_text"
-                android:gravity="center" />
+                android:textSize="@dimen/act_call_name_size" />
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/avatarImageView"
-            android:layout_width="@dimen/activity_call_avatar_size"
-            android:layout_height="@dimen/activity_call_avatar_size"
-            android:src="@drawable/placeholder_user"
-            android:layout_marginTop="@dimen/activity_call_margin_top"
-            android:layout_gravity="center"
-            android:layout_alignWithParentIfMissing="false"
+            android:layout_width="@dimen/act_call_avatar_size"
+            android:layout_height="@dimen/act_call_avatar_size"
             android:layout_alignParentTop="false"
-            android:layout_centerInParent="true" />
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/act_call_margin_top"
+            android:src="@drawable/placeholder_user" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="false"
             android:layout_alignParentStart="false"
-            android:layout_marginTop="15dp"
             android:layout_centerHorizontal="true"
-            android:gravity="center">
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/dynamicVoiceCallImageButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/activity_call_end_button_height"
-                android:background="@drawable/button_general_selector"
-                android:src="@drawable/ic_dynamic"
-                android:layout_gravity="center|left"
-                android:layout_centerInParent="true"
+                android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_alignParentLeft="true"
-                android:padding="5dp" />
+                android:layout_centerInParent="true"
+                android:layout_gravity="center|left"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_dynamic" />
 
             <ImageButton
                 android:id="@+id/endVoiceCallImageButton"
-                android:layout_width="@dimen/activity_call_end_button_width"
-                android:layout_height="@dimen/activity_call_end_button_height"
+                android:layout_width="@dimen/act_call_end_button_width"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_centerInParent="true"
                 android:background="@drawable/button_end_call"
-                android:src="@drawable/ic_encall"
-                android:layout_centerInParent="true" />
+                android:src="@drawable/ic_encall" />
 
             <ImageButton
                 android:id="@+id/muteVoiceCallImageButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/activity_call_end_button_height"
-                android:background="@drawable/button_general_selector"
-                android:src="@drawable/ic_call_mute_a"
-                android:layout_gravity="center|right"
+                android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
-                android:padding="5dp" />
+                android:layout_gravity="center|right"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_call_mute_a" />
         </RelativeLayout>
     </RelativeLayout>
 

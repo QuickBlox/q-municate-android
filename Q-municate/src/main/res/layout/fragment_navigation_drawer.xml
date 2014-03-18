@@ -29,8 +29,8 @@
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
             android:layout_marginLeft="10dp"
+            android:layout_weight="1"
             android:textColor="@color/link_color"
             android:textSize="@dimen/text_size" />
 
@@ -39,8 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:padding="10dp"
             android:background="@drawable/button_general_selector"
+            android:padding="10dp"
             android:src="@drawable/ic_logout" />
     </LinearLayout>
 
