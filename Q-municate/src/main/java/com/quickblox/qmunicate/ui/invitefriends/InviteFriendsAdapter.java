@@ -17,15 +17,18 @@ import java.util.ArrayList;
 
 public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private Context context;
+    private LayoutInflater layoutInflater;
+
     private CounterChangedListener counterChangedListener;
     private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;
-    private int counterFacebook = 0;
-    private int counterContacts = 0;
+    private int counterFacebook;
+    private int counterContacts;
 
     public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> list) {
         super(context, textViewResourceId, list);
         this.context = context;
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         selectedFriendFromFacebook = context.getResources().getString(R.string.stg_invite_friends_from_facebook);
         selectedFriendFromContacts = context.getResources().getString(R.string.stg_invite_friends_from_contacts);
     }
@@ -35,18 +38,12 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     }
 
     @Override
-    public int getCount() {
-        return super.getCount();
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
         final InviteFriend data = getItem(position);
 
         if (convertView == null) {
-            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = vi.inflate(R.layout.list_item_invite_friend, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
             holder = new ViewHolder();
 
             holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
@@ -80,7 +77,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
                     .into(holder.avatarImageView);
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             Picasso.with(context)
-                    .load( String.format(context.getResources().getString(R.string.stg_invite_friends_url_to_facebook_avatar), data.getId()))
+                    .load(String.format(context.getResources().getString(R.string.stg_invite_friends_url_to_facebook_avatar), data.getId()))
                     .placeholder(R.drawable.placeholder_user)
                     .into(holder.avatarImageView);
         }
@@ -131,7 +128,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         return viaLabel;
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         ImageView avatarImageView;
         TextView nameTextView;
         TextView viaTextView;

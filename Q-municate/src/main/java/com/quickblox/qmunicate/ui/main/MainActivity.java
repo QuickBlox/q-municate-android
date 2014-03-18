@@ -7,12 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private Fragment currentFragment;
@@ -30,12 +28,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            default:
-                if (currentFragment instanceof InviteFriendsFragment) {
-                    currentFragment.onActivityResult(requestCode, resultCode, data);
-                }
-                break;
+        if (currentFragment instanceof InviteFriendsFragment) {
+            currentFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 

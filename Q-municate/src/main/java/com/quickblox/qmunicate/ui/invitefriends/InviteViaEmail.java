@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InviteViaEmail {
+    public final static int SEND_EMAIL_CODE = 1;
     private final String TYPE_OF_EMAIL = "message/rfc822";
     private Activity activity;
 
@@ -46,7 +47,6 @@ public class InviteViaEmail {
                     }
 
                     if (email != null) {
-                        // Log.d("fb123", "uri = " + uri + ", name = " + name);
                         friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_CONTACTS_TYPE, uri, false));
                     }
                 }

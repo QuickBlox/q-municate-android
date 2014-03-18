@@ -16,22 +16,21 @@
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        >
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
     <Button
-            android:id="@+id/pickFriendsButton"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Pick Friends"
-            />
+        android:id="@+id/pickFriendsButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Pick Friends" />
+
     <TextView
-            android:id="@+id/resultsTextView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            />
+        android:id="@+id/resultsTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout>
 

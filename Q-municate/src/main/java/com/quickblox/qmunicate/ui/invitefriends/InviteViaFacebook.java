@@ -33,18 +33,7 @@ public class InviteViaFacebook {
 
     public void postInviteToFacebookWall(String[] selectedFriends) {
         Session session = Session.getActiveSession();
-
         if (session != null) {
-
-            // Check for publish permissions
-            List<String> permissions = session.getPermissions();
-            if (!isSubsetOf(FacebookHelper.PERMISSIONS, permissions)) {
-                Session.NewPermissionsRequest newPermissionsRequest = new Session
-                        .NewPermissionsRequest(activity, FacebookHelper.PERMISSIONS);
-                session.requestNewPublishPermissions(newPermissionsRequest);
-                return;
-            }
-
             Bundle postParams = new Bundle();
             postParams.putString(PARAMS_NAME, "Quickblox");
             postParams.putString(PARAMS_DESCRIPTION, "This is QuickBlox, BABY!");
@@ -74,6 +63,18 @@ public class InviteViaFacebook {
             if (!superset.contains(string)) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    public boolean checkPermissions() {
+        Session session = Session.getActiveSession();
+        List<String> permissions = session.getPermissions();
+        if (!isSubsetOf(FacebookHelper.PERMISSIONS, permissions)) {
+            Session.NewPermissionsRequest newPermissionsRequest = new Session
+                    .NewPermissionsRequest(activity, FacebookHelper.PERMISSIONS);
+            session.requestNewPublishPermissions(newPermissionsRequest);
+            return false;
         }
         return true;
     }
