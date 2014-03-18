@@ -109,7 +109,6 @@
     <string name="cpd_confirm_password">Confirm Password</string>
 
     // Facebook
-    <!--<string name="facebook_app_id">295887340521629</string>-->
     <string name="facebook_exception">Facebook exception: </string>
 
     // Other
