@@ -39,7 +39,6 @@ public class ProfileActivity extends BaseActivity {
     private EditText emailEditText;
     private EditText statusMessageEditText;
 
-    private String pathToImage;
     private ImageHelper imageHelper;
     private Bitmap avatarCurrentBitmap;
     private String fullnameCurrent;

@@ -104,7 +104,8 @@
     <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
-    
+    <string name="dlg_get_file_failed">Failed to get file from gallery</string>
+
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
     <string name="cpd_old_password">Old Password</string>
@@ -118,5 +119,4 @@
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
-    <string name="dlg_get_file_failed">Failed to get file from gallery</string>
 </resources>
