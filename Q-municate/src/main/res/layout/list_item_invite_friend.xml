@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/onlineImageView"
         android:layout_toRightOf="@id/avatarImageView"
         android:orientation="vertical">
 
@@ -28,25 +27,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Friend fullname"
-            android:textSize="20sp" />
+            android:textSize="@dimen/text_size" />
 
         <TextView
-            android:id="@+id/statusTextView"
+            android:id="@+id/viaTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="status"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="15sp" />
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_small" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@id/onlineImageView"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+    <CheckBox
+        android:id="@+id/selectUserCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/badge_online" />
+        android:layout_marginRight="10dp" />
 
 </RelativeLayout>

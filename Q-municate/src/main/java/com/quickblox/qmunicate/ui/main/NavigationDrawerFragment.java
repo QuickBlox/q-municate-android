@@ -90,9 +90,8 @@ public class NavigationDrawerFragment extends BaseFragment {
                         getString(R.string.nvd_title_friends),
                         getString(R.string.nvd_title_chats),
                         getString(R.string.nvd_title_settings),
-                        getString(R.string.nvd_title_invite),
-                }
-        ));
+                        getString(R.string.nvd_title_invite_friends),
+                }));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         fullName = (TextView) rootView.findViewById(R.id.fullname);
         fullName.setText(App.getInstance().getUser().getFullName());

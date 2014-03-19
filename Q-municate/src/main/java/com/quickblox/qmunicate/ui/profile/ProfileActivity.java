@@ -31,6 +31,7 @@ import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity {
     private ImageView avatarImageView;
@@ -79,7 +80,11 @@ public class ProfileActivity extends BaseActivity {
     public void onBackPressed() {
         updateUsersData();
         if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-            saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+            try {
+                saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else {
             super.onBackPressed();
         }
@@ -108,10 +113,6 @@ public class ProfileActivity extends BaseActivity {
 
     public void changeEmailOnClick(View view) {
         initChangingEditText(emailEditText);
-    }
-
-    public void changeStatusMessageOnClick(View view) {
-        initChangingEditText(statusMessageEditText);
     }
 
     private void initChangingEditText(EditText editText) {
@@ -159,30 +160,32 @@ public class ProfileActivity extends BaseActivity {
             isNeedUpdateAvatar = true;
             avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
             Uri originalUri = data.getData();
-            if (requestCode == imageHelper.GALLERY_KITKAT_INTENT_CALLED) {
-                pathToImage = imageHelper.getPath(originalUri, data.getFlags());
-            } else if (requestCode == imageHelper.GALLERY_INTENT_CALLED) {
-                pathToImage = imageHelper.getPath(originalUri);
-            }
             avatarImageView.setImageURI(originalUri);
             startAction();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void saveChanges(Bitmap avatar, String fullname, String email) {
+    // TODO SF refactor
+    private void saveChanges(final Bitmap avatar, final String fullname, final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
-            File image = null;
-
-            qbUser.setFullName(fullname);
-            qbUser.setEmail(email);
-
-            if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
-                image = new File(pathToImage);
-            }
-
-            showProgress();
-            QBUpdateUserCommand.start(this, qbUser, image);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final File[] image = {null};
+                    qbUser.setFullName(fullname);
+                    qbUser.setEmail(email);
+                    if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
+                        try {
+                            image[0] = imageHelper.getFileFromImageView(avatarImageView);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        showProgress();
+                        QBUpdateUserCommand.start(ProfileActivity.this, qbUser, image[0]);
+                    }
+                }
+            }).start();
         }
     }
 
@@ -201,10 +204,10 @@ public class ProfileActivity extends BaseActivity {
         }
     }
 
-    private class ActionModeCallback extends SimpleActionModeCallback{
+    private class ActionModeCallback extends SimpleActionModeCallback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.setTitle(getResources().getText(R.string.stg_done));
+            mode.setTitle(getResources().getText(R.string.prf_done));
             return true;
         }
 
@@ -212,7 +215,11 @@ public class ProfileActivity extends BaseActivity {
         public void onDestroyActionMode(ActionMode mode) {
             updateUsersData();
             if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-                saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+                try {
+                    saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
                 finish();
             }

@@ -7,15 +7,15 @@
     <string name="nvd_title_friends">Friends</string>
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
-    <string name="nvd_title_invite">Invite Friends</string>
+    <string name="nvd_title_invite_friends">Invite Friends</string>
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
 
-    // Wellcome
-    <string name="wlc_connect_with_facebook">Connect with Facebook</string>
-    <string name="wlc_log_in">Log In</string>
-    <string name="wlc_sign_up">Sign Up</string>
-    <string name="wlc_no_app_version">Couldn\'t get app version</string>
+    // Landing
+    <string name="lnd_connect_with_facebook">Connect with Facebook</string>
+    <string name="lnd_log_in">Log In</string>
+    <string name="lnd_sign_up">Sign Up</string>
+    <string name="lnd_no_app_version">Couldn\'t get app version</string>
 
     // Login
     <string name="lgn_forgot_password">Forgot password?</string>
@@ -26,9 +26,9 @@
     <string name="lgn_remember_me">Remember Me</string>
 
     // Registration
-    <string name="reg_fullname_hint">Full Name</string>
-    <string name="reg_email_hint">Email</string>
-    <string name="reg_choose_user_picture">Choose user picture</string>
+    <string name="rgs_fullname_hint">Full Name</string>
+    <string name="rgs_email_hint">Email</string>
+    <string name="rgs_choose_user_picture">Choose user picture</string>
 
     // Friend List
     <string name="frl_global_search">Global Search</string>
@@ -58,10 +58,10 @@
     <string name="pref_title_media">Media</string>
 
     // Settings
-    <string name="stg_profile">Profile</string>
-    <string name="stg_logout">Log Out</string>
-    <string name="stg_change_password">Change Password</string>
-    <string name="stg_push_notifivation">Push Notification</string>
+    <string name="stn_profile">Profile</string>
+    <string name="stn_logout">Log Out</string>
+    <string name="stn_change_password">Change Password</string>
+    <string name="stn_push_notifivation">Push Notification</string>
 
     // Profile
     <string name="prf_full_name">Full Name</string>
@@ -70,7 +70,19 @@
     <string name="prf_email">Email</string>
     <string name="prf_status_message">Status Message</string>
     <string name="prf_edit_status">Edit Status</string>
-    <string name="stg_done">Done</string>
+    <string name="prf_done">Done</string>
+
+    // Invite Friends
+    <string name="inf_header_label">Let your other friends know about \n Q-munication by sending them private invitations</string>
+    <string name="inf_select_from_facebook">From Facebook</string>
+    <string name="inf_select_from_contacts">From Contacts</string>
+    <string name="inf_from_facebook">(invite via Facebook)</string>
+    <string name="inf_from_contacts">(invite via Email)</string>
+    <string name="inf_next">Next</string>
+    <string name="inf_choose_email_provider">Choose an email provider :</string>
+    <string name="inf_subject_of_invitation">Qmunicate app</string>
+    <string name="inf_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
@@ -86,7 +98,13 @@
     <string name="dlg_confirm">Are you sure?</string>
     <string name="dlg_remove_user">Remove user</string>
     <string name="dlg_password_changed">Password changed</string>
-
+    <string name="dlg_no_facebook_friends">No Facebook friends</string>
+    <string name="dlg_no_contacts_friends">No Contacts friends</string>
+    <string name="dlg_no_friends">No friends</string>
+    <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
+    <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
+    <string name="dlg_friend_removed">Friend is removed</string>
+    
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
     <string name="cpd_old_password">Old Password</string>
@@ -94,11 +112,11 @@
     <string name="cpd_confirm_password">Confirm Password</string>
 
     // Facebook
-    <string name="facebook_app_id">295887340521629</string>
+    <string name="facebook_exception">Facebook exception: </string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
-    <string name="dlg_friend_removed">Friend is removed</string>
+    <string name="dlg_get_file_failed">Failed to get file from gallery</string>
 </resources>

@@ -39,7 +39,7 @@
         android:layout_marginTop="25dp"
         android:background="@drawable/button_log_in_selector"
         android:onClick="loginOnClickListener"
-        android:text="@string/wlc_log_in"
+        android:text="@string/lnd_log_in"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"/>
 
@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/wlc_connect_with_facebook"
+                android:text="@string/lnd_connect_with_facebook"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/button_text_size"/>
         </LinearLayout>

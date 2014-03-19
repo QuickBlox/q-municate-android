@@ -8,7 +8,7 @@
         android:id="@+id/fullnameEdit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/reg_fullname_hint"
+        android:hint="@string/rgs_fullname_hint"
         android:inputType="textPersonName"
         android:maxLength="128"/>
 
@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:hint="@string/reg_email_hint"
+        android:hint="@string/rgs_email_hint"
         android:inputType="textEmailAddress"
         android:maxLength="128"/>
 
@@ -52,7 +52,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
-            android:text="@string/reg_choose_user_picture"
+            android:text="@string/rgs_choose_user_picture"
             android:textColor="@android:color/darker_gray"
             android:textSize="18sp"/>
     </LinearLayout>
@@ -63,7 +63,7 @@
         android:layout_height="@dimen/button_height"
         android:background="@drawable/button_sign_up_selector"
         android:onClick="signUpOnClickListener"
-        android:text="@string/wlc_sign_up"
+        android:text="@string/lnd_sign_up"
         android:textColor="@android:color/white"
         android:textSize="@dimen/button_text_size"/>
 </LinearLayout>
