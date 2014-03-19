@@ -37,7 +37,7 @@
         <activity
             android:name=".ui.signup.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/wlc_sign_up"
+            android:label="@string/lnd_sign_up"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.main.MainActivity"
@@ -96,9 +96,8 @@
             android:value="@string/facebook_app_id" />
 
         <service
-            android:name=".service.ChatService"
-            android:enabled="true"
-            android:exported="false"></service>
-
+            android:name=".service.QBService"
+            android:icon="@drawable/ic_launcher"/>
     </application>
+
 </manifest>

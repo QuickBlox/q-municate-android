@@ -10,8 +10,10 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBLoginTask;
-import com.quickblox.qmunicate.qb.QBSocialLoginTask;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBLoginCommand;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -19,7 +21,7 @@ import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class SplashActivity extends BaseActivity implements QBLoginTask.Callback {
+public class SplashActivity extends BaseActivity {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
     private FacebookHelper facebookHelper;
@@ -28,6 +30,9 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -79,23 +84,28 @@ public class SplashActivity extends BaseActivity implements QBLoginTask.Callback
         facebookHelper.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onSuccess(Bundle bundle) {
-        MainActivity.start(SplashActivity.this);
-        finish();
-    }
-
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
-        new QBLoginTask(this).execute(user, this);
+        QBLoginCommand.start(this, user);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new QBSocialLoginTask(SplashActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+                QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
+        }
+    }
+
+    private class LoginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            MainActivity.start(SplashActivity.this);
+            finish();
         }
     }
 }

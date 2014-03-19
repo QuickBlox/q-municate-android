@@ -14,7 +14,7 @@
         android:gravity="left"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
-        android:text="@string/stg_profile"
+        android:text="@string/stn_profile"
         android:textSize="@dimen/text_size"/>
 
     <View
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
-        android:text="@string/stg_push_notifivation"
+        android:text="@string/stn_push_notifivation"
         android:textSize="@dimen/text_size"/>
 
     <View
@@ -44,7 +44,7 @@
         android:gravity="left"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
-        android:text="@string/stg_change_password"
+        android:text="@string/stn_change_password"
         android:textSize="@dimen/text_size"/>
 
     <View
@@ -60,7 +60,7 @@
         android:gravity="left"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
-        android:text="@string/stg_logout"
+        android:text="@string/stn_logout"
         android:textSize="@dimen/text_size"/>
 
 </LinearLayout>

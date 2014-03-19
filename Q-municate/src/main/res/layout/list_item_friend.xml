@@ -47,6 +47,6 @@
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/online_mark" />
+        android:src="@drawable/badge_online" />
 
 </RelativeLayout>

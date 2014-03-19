@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +8,7 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Chat;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public class ChatListAdapter extends BaseListAdapter<Chat> {
 
     private final LayoutInflater inflater;
 
-    public ChatListAdapter(FragmentActivity activity, List<Chat> objects) {
+    public ChatListAdapter(BaseActivity activity, List<Chat> objects) {
         super(activity, objects);
         inflater = LayoutInflater.from(activity);
     }

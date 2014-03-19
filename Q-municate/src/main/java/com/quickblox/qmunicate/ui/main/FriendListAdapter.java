@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.app.Activity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
     private List<Friend> originalObjects;
     private FriendListAdapter.FriendListFilter filter;
 
-    public FriendListAdapter(Activity activity, List<Friend> objects) {
+    public FriendListAdapter(BaseActivity activity, List<Friend> objects) {
         super(activity, objects);
         inflater = LayoutInflater.from(activity);
         filter = new FriendListFilter();

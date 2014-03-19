@@ -31,7 +31,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
-            android:text="@string/reg_choose_user_picture"
+            android:text="@string/rgs_choose_user_picture"
             android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/text_size"/>
 
