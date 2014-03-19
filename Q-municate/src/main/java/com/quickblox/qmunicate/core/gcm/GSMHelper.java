@@ -20,16 +20,14 @@ import com.quickblox.qmunicate.ui.utils.Utils;
 public class GSMHelper {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-
-    private static final String TAG = GSMHelper.class.getSimpleName();
+    private final static String TAG = GSMHelper.class.getSimpleName();
     private GoogleCloudMessaging gcm;
     private SharedPreferences prefs;
     private Context context;
     private String regid;
     private Activity activity;
 
-    public GSMHelper(Activity activity){
+    public GSMHelper(Activity activity) {
         this.activity = activity;
         gcm = GoogleCloudMessaging.getInstance(activity);
     }
@@ -61,11 +59,10 @@ public class GSMHelper {
      * shared preferences.
      */
     public void registerInBackground() {
-
         new QBGCMRegistrationTask(activity).execute(gcm);
     }
 
-    public int getSubscriptionId(){
+    public int getSubscriptionId() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         int subscriptionId = prefsHelper.getPref(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE);
         return subscriptionId;

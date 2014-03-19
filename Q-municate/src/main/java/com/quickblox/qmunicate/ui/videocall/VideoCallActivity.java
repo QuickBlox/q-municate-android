@@ -34,7 +34,6 @@ public class VideoCallActivity extends BaseMediaCallActivity {
 
     private void initUI() {
         actionBar.hide();
-        _findViewById(R.id.action_audio_call);
     }
 
 }
