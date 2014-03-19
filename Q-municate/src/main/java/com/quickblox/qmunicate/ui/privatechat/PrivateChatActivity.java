@@ -21,7 +21,7 @@ public class PrivateChatActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_group_chat);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 

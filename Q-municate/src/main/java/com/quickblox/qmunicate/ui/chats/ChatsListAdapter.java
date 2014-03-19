@@ -1,41 +1,42 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.chats;
 
-import android.support.v4.app.FragmentActivity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Chat;
-import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 
 import java.util.List;
 
-public class ChatListAdapter extends BaseListAdapter<Chat> {
+public class ChatsListAdapter extends ArrayAdapter<Chat> {
+    private Context context;
+    private LayoutInflater layoutInflater;
 
-    private final LayoutInflater inflater;
-
-    public ChatListAdapter(FragmentActivity activity, List<Chat> objects) {
-        super(activity, objects);
-        inflater = LayoutInflater.from(activity);
+    public ChatsListAdapter(Context context, int textViewResourceId, List<Chat> list) {
+        super(context, textViewResourceId, list);
+        this.context = context;
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Chat chat = objects.get(position);
+        Chat data = getItem(position);
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.list_item_chat, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_chat, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
         // TODO IS add image loading
-        holder.nameTextView.setText(chat.getName());
+        holder.nameTextView.setText(data.getName());
         // TODO IS add badges
         // TODO IS set placeholders
 

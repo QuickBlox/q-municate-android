@@ -6,8 +6,9 @@ import java.util.Date;
 
 public class GroupChat extends Chat {
 
-    public GroupChat() {
-
+    public GroupChat(String name, Integer avatarId) {
+        this.name = name;
+        this.avatarId = avatarId;
     }
 
     @Override

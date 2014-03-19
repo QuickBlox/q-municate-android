@@ -46,10 +46,21 @@
 
     // Chat
     <string name="cht_message">Message</string>
+    <string name="cht_hint_message">Type a message</string>
+
+    // Group Chat
+    <string name="gch_ctx_menu_reply">Reply</string>
+    <string name="gch_ctx_menu_prv_message">Private Message</string>
+    <string name="gch_ctx_menu_video_call">Video Call</string>
+    <string name="gch_ctx_menu_profile">View Profile</string>
 
     // Group Chat Details
     <string name="gcd_title">Group Details</string>
     <string name="gcd_leave_group">Leave group</string>
+
+    // New Chat
+    <string name="nch_title">New Chat</string>
+    <string name="nch_ac_mode_title">Create Group Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -70,7 +81,6 @@
     <string name="prf_email">Email</string>
     <string name="prf_status_message">Status Message</string>
     <string name="prf_edit_status">Edit Status</string>
-    <string name="stg_done">Done</string>
 
     // Invite Friends
     <string name="stg_invite_friends_header_label">Let your other friends know about \n Q-munication by sending them private invitations</string>
@@ -117,5 +127,6 @@
     <string name="search_hint">Search</string>
     <string name="frd_mobile">MOBILE</string>
     <string name="dlg_remove_user">Remove user</string>
+    <string name="label_done">Done</string>
 
 </resources>

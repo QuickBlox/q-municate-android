@@ -197,7 +197,6 @@ public class ProfileActivity extends BaseActivity {
     private class ActionModeCallback extends SimpleActionModeCallback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.setTitle(getResources().getText(R.string.stg_done));
             return true;
         }
 

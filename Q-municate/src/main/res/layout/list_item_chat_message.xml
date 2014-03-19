@@ -16,38 +16,42 @@
         android:src="@drawable/placeholder_user" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/onlineImageView"
         android:layout_toRightOf="@id/avatarImageView"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_toLeftOf="@+id/timeTextView">
 
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Friend fullname"
-            android:textSize="20sp" />
+            android:textSize="@dimen/text_size"
+            android:textColor="@color/chat_message_name_color"
+            android:singleLine="true"
+            android:text="Dima Bilan"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/statusTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="status"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="15sp" />
+            <TextView
+                android:id="@+id/messageTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_small"
+                android:text="How are you?" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@id/onlineImageView"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+    <TextView
+        android:id="@+id/timeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/online_mark" />
+        android:layout_marginRight="10dp"
+        android:textColor="@color/gray"
+        android:text="10:00"/>
 
 </RelativeLayout>
