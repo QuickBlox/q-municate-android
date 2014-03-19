@@ -20,9 +20,10 @@ import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 
 
 public class GCMIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
-    private static final String TAG = GCMIntentService.class.getSimpleName();
-    public static final long VIBRATOR_DURATION = 300;
+    public final static int NOTIFICATION_ID = 1;
+    public final static long VIBRATOR_DURATION = 300;
+
+    private final static String TAG = GCMIntentService.class.getSimpleName();
 
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder builder;

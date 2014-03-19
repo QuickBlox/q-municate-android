@@ -31,36 +31,32 @@ public abstract class BaseMediaCallActivity extends BaseActivity implements ISig
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "onReceive"+intent.getExtras().toString());
-            if(NotificationHelper.ACTION_VIDEO_CALL.equals(intent.getAction())){
+            Log.i(TAG, "onReceive" + intent.getExtras().toString());
+            if (NotificationHelper.ACTION_VIDEO_CALL.equals(intent.getAction())) {
                 Toast.makeText(BaseMediaCallActivity.this, "mesg from", Toast.LENGTH_LONG).show();
             }
         }
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initChat(getIntent().getIntExtra(Consts.FRIEND_FIELD_FRIEND_ID, Consts.NOT_INITIALIZED_VALUE));
-    }
-
-    private void initChat(int userID) {
-        MediaConstraints mediaConstraints = getMediaConstraints();
-        SignalingChannel signalingChannel = new SignalingChannel(QBChatService.getInstance().getPrivateChatInstance());
-        VideoStreamsView videoView = _findViewById(R.id.ownVideoScreenImageView);
-        qbVideoChat = new QBVideoChat(this, mediaConstraints, signalingChannel, videoView);
-        signalingChannel.addMessageObserver(this);
-        if(userID != -1) {
-            qbVideoChat.call(userID);
-            initCallUI();
-        }
-    }
-
-    private void initCallUI() {
+    public void onCall(String s) {
 
     }
 
-    abstract public MediaConstraints getMediaConstraints();
+    @Override
+    public void onAccepted(String s) {
+
+    }
+
+    @Override
+    public void onStop(String s) {
+
+    }
+
+    @Override
+    public void onRejected(String s) {
+
+    }
 
     @Override
     public void onPause() {
@@ -89,30 +85,34 @@ public abstract class BaseMediaCallActivity extends BaseActivity implements ISig
         super.onDestroy();
     }
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initChat(getIntent().getIntExtra(Consts.FRIEND_FIELD_FRIEND_ID, Consts.NOT_INITIALIZED_VALUE));
+    }
+
+    private void initChat(int userID) {
+        MediaConstraints mediaConstraints = getMediaConstraints();
+        SignalingChannel signalingChannel = new SignalingChannel(QBChatService.getInstance().getPrivateChatInstance());
+        VideoStreamsView videoView = _findViewById(R.id.ownVideoScreenImageView);
+        qbVideoChat = new QBVideoChat(this, mediaConstraints, signalingChannel, videoView);
+        signalingChannel.addMessageObserver(this);
+        if (userID != Consts.NOT_INITIALIZED_VALUE) {
+            qbVideoChat.call(userID);
+            initCallUI();
+        }
+    }
+
+    private void initCallUI() {
+
+    }
+
     private void disconnectAndExit() {
         if (qbVideoChat != null) {
             qbVideoChat.dispose();
         }
     }
 
+    abstract public MediaConstraints getMediaConstraints();
 
-    @Override
-    public void onCall(String s) {
-
-    }
-
-    @Override
-    public void onAccepted(String s) {
-
-    }
-
-    @Override
-    public void onStop(String s) {
-
-    }
-
-    @Override
-    public void onRejected(String s) {
-
-    }
 }

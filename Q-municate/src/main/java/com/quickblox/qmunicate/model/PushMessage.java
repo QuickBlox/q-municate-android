@@ -6,7 +6,7 @@ package com.quickblox.qmunicate.model;
 public class PushMessage {
 
     private String message;
-    private int user_id;
+    private int userId;
     private String type;
 
     public String getMessage() {
@@ -18,11 +18,11 @@ public class PushMessage {
     }
 
     public int getUserId() {
-        return user_id;
+        return userId;
     }
 
     public void setUserId(int user_id) {
-        this.user_id = user_id;
+        this.userId = user_id;
     }
 
     public String getType() {

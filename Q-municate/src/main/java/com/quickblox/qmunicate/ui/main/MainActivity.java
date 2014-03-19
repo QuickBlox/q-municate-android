@@ -12,16 +12,12 @@ import android.util.Log;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private Fragment currentFragment;
-    private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private static final int ID_CHAT_LIST_FRAGMENT = 1;
-    private static final int ID_SETTINGS_FRAGMENT = 2;
-    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
@@ -60,12 +56,12 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         gsmHelper = new GSMHelper(this);
         if (gsmHelper.checkPlayServices()) {
             String registrationId = gsmHelper.getRegistrationId();
-            Log.i(TAG, "registrationId="+registrationId);
+            Log.i(TAG, "registrationId=" + registrationId);
             if (registrationId.isEmpty()) {
                 gsmHelper.registerInBackground();
             }
             int subscriptionId = gsmHelper.getSubscriptionId();
-            if(Consts.NOT_INITIALIZED_VALUE != subscriptionId){
+            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
                 gsmHelper.subscribeToPushNotifications(registrationId);
             }
         } else {
@@ -77,7 +73,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
-        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
     @Override

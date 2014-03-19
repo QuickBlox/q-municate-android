@@ -18,7 +18,6 @@ import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 import com.quickblox.qmunicate.ui.utils.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -36,7 +35,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     @Override
     public void onResult(Bundle bundle) {
         super.onResult(bundle);
-        if (bundle.size() > 0 ) {
+        if (!bundle.isEmpty()) {
             storeRegistration(activityRef.get(), bundle);
         }
     }
@@ -45,27 +44,19 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     public Bundle performInBackground(GoogleCloudMessaging... params) throws Exception {
         GoogleCloudMessaging gcm = params[0];
         Bundle registration = new Bundle();
-        try {
-            String regid = gcm.register(Consts.SENDER_ID);
-            registration.putString(Consts.PROPERTY_REG_ID, regid);
-            //msg = "Device registered, registration ID=" + regid;
+        String regid = gcm.register(Consts.SENDER_ID);
+        registration.putString(Consts.PROPERTY_REG_ID, regid);
+        //msg = "Device registered, registration ID=" + regid;
 
-            // You should send the registration ID to your server over HTTP, so it
-            // can use GCM/HTTP or CCS to send messages to your app.
-            QBSubscription qbSubscription = subscribeToPushNotifications(regid);
-            if(qbSubscription != null) {
-                registration.putInt(Consts.SUBSCRIPTION_ID, qbSubscription.getId());
-            }
-            // For this demo: we don't need to send it because the device will send
-            // upstream messages to a server that echo back the message using the
-            // 'from' address in the message.
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            //msg = "Error :" + ex.getMessage();
-            // If there is an error, don't just keep trying to register.
-            // Require the user to click a button again, or perform
-            // exponential back-off.
+        // You should send the registration ID to your server over HTTP, so it
+        // can use GCM/HTTP or CCS to send messages to your app.
+        QBSubscription qbSubscription = subscribeToPushNotifications(regid);
+        if (qbSubscription != null) {
+            registration.putInt(Consts.SUBSCRIPTION_ID, qbSubscription.getId());
         }
+        // For this demo: we don't need to send it because the device will send
+        // upstream messages to a server that echo back the message using the
+        // 'from' address in the message.
         return registration;
     }
 
@@ -75,29 +66,23 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
      *
      * @param regId registration ID
      */
-    private QBSubscription subscribeToPushNotifications(String regId) {
+    private QBSubscription subscribeToPushNotifications(String regId) throws QBResponseException {
         //Create push token with  Registration Id for Android
         //
         Log.d(TAG, "subscribing...");
 
-        // String deviceId = ((TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-        String deviceId = "";//Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        String deviceId;
 
         final TelephonyManager mTelephony = (TelephonyManager) activityRef.get().getSystemService(Context.TELEPHONY_SERVICE);
-        if (mTelephony.getDeviceId() != null){
+        if (mTelephony.getDeviceId() != null) {
             deviceId = mTelephony.getDeviceId(); //*** use for mobiles
-        }
-        else{
+        } else {
             deviceId = Settings.Secure.getString(activityRef.get().getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID); //*** use for tablets
         }
         QBSubscription qbSubscription = null;
-        try {
-            ArrayList<QBSubscription> qbSubscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId, QBEnvironment.DEVELOPMENT);
-            if(qbSubscriptions.size() > 0 ) {
-                qbSubscription = qbSubscriptions.get(0);
-            }
-        } catch (QBResponseException e) {
-            e.printStackTrace();
+        ArrayList<QBSubscription> qbSubscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId, QBEnvironment.DEVELOPMENT);
+        if (!qbSubscriptions.isEmpty()) {
+            qbSubscription = qbSubscriptions.get(0);
         }
         return qbSubscription;
     }
@@ -106,8 +91,8 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
      * Stores the registration ID and app versionCode in the application's
      * {@code SharedPreferences}.
      *
-     * @param context application's context.
-     * @param registration   registration bundle
+     * @param context      application's context.
+     * @param registration registration bundle
      */
     private void storeRegistration(Context context, Bundle registration) {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();

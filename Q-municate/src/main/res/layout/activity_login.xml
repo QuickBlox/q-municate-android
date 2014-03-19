@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
     android:baselineAligned="true">
 
     <EditText
@@ -12,7 +12,7 @@
         android:hint="@string/lgn_email_hint"
         android:inputType="textEmailAddress"
         android:maxLength="128"
-        android:text="@string/lgn_default_user_email"/>
+        android:text="@string/lgn_default_user_email" />
 
     <EditText
         android:id="@+id/password"
@@ -22,7 +22,7 @@
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
         android:maxLength="256"
-        android:text="@string/lgn_default_user_password"/>
+        android:text="@string/lgn_default_user_password" />
 
     <CheckBox
         android:id="@+id/rememberMe"
@@ -31,7 +31,7 @@
         android:layout_marginTop="25dp"
         android:text="@string/lgn_remember_me"
         android:textColor="@color/gray"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/loginButton"
@@ -42,7 +42,7 @@
         android:onClick="loginOnClickListener"
         android:text="@string/lnd_log_in"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/button_text_size"/>
+        android:textSize="@dimen/button_text_size" />
 
     <RelativeLayout
         android:id="@+id/connectFacebookButton"
@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/button_icon_margin"
-                android:src="@drawable/ic_fb"/>
+                android:src="@drawable/ic_fb" />
 
             <TextView
                 android:id="@+id/connectFacebook"
@@ -72,7 +72,7 @@
                 android:layout_gravity="center"
                 android:text="@string/lnd_connect_with_facebook"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/button_text_size"/>
+                android:textSize="@dimen/button_text_size" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -86,6 +86,6 @@
         android:onClick="forgotPasswordOnClickListener"
         android:text="@string/lgn_forgot_password"
         android:textColor="@color/gray"
-        android:textSize="18sp"/>
+        android:textSize="18sp" />
 </LinearLayout>
 
