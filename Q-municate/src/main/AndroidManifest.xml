@@ -19,6 +19,7 @@
         android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- 5. Add the following permissions: -->
     <!-- App receives GCM messages. -->
@@ -54,7 +55,7 @@
         <activity
             android:name=".ui.signup.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/wlc_sign_up"
+            android:label="@string/lnd_sign_up"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.main.MainActivity"
@@ -134,11 +135,8 @@
         <service android:name=".GCMIntentService" />
 
         <service
-            android:name=".service.ChatService"
-            android:enabled="true"
-            android:exported="false"></service>
-
-        <uses-sdk android:minSdkVersion="9" />
+            android:name=".service.QBService"
+            android:icon="@drawable/ic_launcher"/>
     </application>
 
 </manifest>

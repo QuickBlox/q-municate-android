@@ -13,20 +13,35 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+    private Fragment currentFragment;
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
     private static final int ID_CHAT_LIST_FRAGMENT = 1;
     private static final int ID_SETTINGS_FRAGMENT = 2;
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private final int ID_FRIEND_LIST_FRAGMENT = 0;
+    private final int ID_CHAT_LIST_FRAGMENT = 1;
+    private final int ID_SETTINGS_FRAGMENT = 2;
+    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+
     GSMHelper gsmHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (currentFragment instanceof InviteFriendsFragment) {
+            currentFragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -62,6 +77,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
+        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
     @Override
@@ -78,13 +94,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = SettingsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
-                DialogUtils.show(this, getString(R.string.comming_soon));
-                return;
+                fragment = InviteFriendsFragment.newInstance();
+                break;
         }
         setCurrentFragment(fragment);
     }
 
-    private void setCurrentFragment(Fragment fragment) {
+    public void setCurrentFragment(Fragment fragment) {
+        currentFragment = fragment;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);

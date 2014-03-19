@@ -38,4 +38,8 @@ public abstract class BaseFragment extends Fragment {
         super.onStart();
         getActivity().getActionBar().setTitle(title);
     }
+
+    public BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
 }

@@ -6,8 +6,8 @@
               android:paddingTop="15dp">
 
     <TextView
-        android:id="@+id/listTitle"
         style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/listTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"

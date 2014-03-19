@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -21,11 +20,16 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBLogoutTask;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBLogoutCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
-public class NavigationDrawerFragment extends Fragment {
+public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
@@ -61,6 +65,9 @@ public class NavigationDrawerFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+        getBaseActivity().addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        getBaseActivity().addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
+        getBaseActivity().updateBroadcastActionList();
     }
 
     @Override
@@ -83,9 +90,8 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.nvd_title_friends),
                         getString(R.string.nvd_title_chats),
                         getString(R.string.nvd_title_settings),
-                        getString(R.string.nvd_title_invite),
-                }
-        ));
+                        getString(R.string.nvd_title_invite_friends),
+                }));
         drawerListView.setItemChecked(currentSelectedPosition, true);
         fullName = (TextView) rootView.findViewById(R.id.fullname);
         fullName.setText(App.getInstance().getUser().getFullName());
@@ -105,7 +111,8 @@ public class NavigationDrawerFragment extends Fragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                new QBLogoutTask(getActivity()).execute();
+                getBaseActivity().showProgress();
+                QBLogoutCommand.start(getActivity());
             }
         });
         dialog.show(getFragmentManager(), null);
@@ -226,6 +233,14 @@ public class NavigationDrawerFragment extends Fragment {
             }
 
             getActivity().invalidateOptionsMenu();
+        }
+    }
+
+    private class LogoutSuccessAction implements Command {
+        @Override
+        public void execute(Bundle bundle) {
+            LoginActivity.start(getActivity());
+            getActivity().finish();
         }
     }
 }

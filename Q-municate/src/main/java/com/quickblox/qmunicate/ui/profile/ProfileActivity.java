@@ -16,11 +16,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.QBUpdateUserTask;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
@@ -60,6 +64,12 @@ public class ProfileActivity extends BaseActivity {
         initUI();
         qbUser = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
+
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
+        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
 
         initUsersData();
         initTextChangedListeners();
@@ -104,17 +114,13 @@ public class ProfileActivity extends BaseActivity {
         initChangingEditText(emailEditText);
     }
 
-    public void changeStatusMessageOnClick(View view) {
-        initChangingEditText(statusMessageEditText);
-    }
-
     private void initChangingEditText(EditText editText) {
         editText.setEnabled(true);
         editText.requestFocus();
     }
 
     private void initUsersData() {
-        displayAvatar(qbUser.getFileId(), avatarImageView);
+        QBGetFileCommand.start(this, qbUser.getFileId());
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
 
@@ -159,9 +165,11 @@ public class ProfileActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // TODO SF refactor
     private void saveChanges(final Bitmap avatar, final String fullname, final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
             new Thread(new Runnable() {
+                @Override
                 public void run() {
                     final File[] image = {null};
                     qbUser.setFullName(fullname);
@@ -172,8 +180,9 @@ public class ProfileActivity extends BaseActivity {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        showProgress();
+                        QBUpdateUserCommand.start(ProfileActivity.this, qbUser, image[0]);
                     }
-                    new QBUpdateUserTask(ProfileActivity.this).execute(qbUser, image[0]);
                 }
             }).start();
         }
@@ -187,10 +196,6 @@ public class ProfileActivity extends BaseActivity {
         return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
-    private void displayAvatar(Integer fileId, ImageView imageView) {
-        new QBLoadImageTask(this).execute(fileId, imageView);
-    }
-
     private class TextWatcherListener extends SimpleTextWatcher {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -201,7 +206,7 @@ public class ProfileActivity extends BaseActivity {
     private class ActionModeCallback extends SimpleActionModeCallback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.setTitle(getResources().getText(R.string.stg_done));
+            mode.setTitle(getResources().getText(R.string.prf_done));
             return true;
         }
 
@@ -218,6 +223,25 @@ public class ProfileActivity extends BaseActivity {
                 finish();
             }
             actionMode = null;
+        }
+    }
+
+    private class UpdateUserSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            hideProgress();
+        }
+    }
+
+    private class GetFileSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
+            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
         }
     }
 }
