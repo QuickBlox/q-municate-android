@@ -25,7 +25,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private final int ID_SETTINGS_FRAGMENT = 2;
     private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
-    GSMHelper gsmHelper;
+    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
