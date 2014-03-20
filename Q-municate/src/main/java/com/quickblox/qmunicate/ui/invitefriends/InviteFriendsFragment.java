@@ -24,6 +24,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 
@@ -258,8 +259,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             friend.setSelected(false);
         }
         friendsAdapter.notifyDataSetChanged();
-        onCounterFacebookChanged(0);
-        onCounterContactsChanged(0);
+        onCounterFacebookChanged(Consts.ZERO_VALUE);
+        onCounterContactsChanged(Consts.ZERO_VALUE);
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {
