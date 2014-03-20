@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,19 +29,21 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
+import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity {
+public class ProfileActivity extends BaseActivity implements GettingImageFileListener {
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
 
     private ImageHelper imageHelper;
-    private Bitmap avatarCurrentBitmap;
+    private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
     private String emailCurrent;
     private Bitmap avatarOldBitmap;
@@ -49,6 +52,7 @@ public class ProfileActivity extends BaseActivity {
     private QBUser qbUser;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
+    private boolean closeActionMode;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -75,20 +79,6 @@ public class ProfileActivity extends BaseActivity {
         initTextChangedListeners();
     }
 
-    @Override
-    public void onBackPressed() {
-        updateUsersData();
-        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-            try {
-                saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            super.onBackPressed();
-        }
-    }
-
     private void initUI() {
         avatarImageView = _findViewById(R.id.avatarImageView);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
@@ -100,6 +90,33 @@ public class ProfileActivity extends BaseActivity {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
         emailEditText.addTextChangedListener(textWatcherListener);
+    }
+
+    private void initChangingEditText(EditText editText) {
+        editText.setEnabled(true);
+        editText.requestFocus();
+    }
+
+    private void initUsersData() {
+        if (qbUser.getFileId() != null) {
+            QBGetFileCommand.start(this, qbUser.getFileId());
+        }
+        fullNameEditText.setText(qbUser.getFullName());
+        emailEditText.setText(qbUser.getEmail());
+
+        avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            closeActionMode = true;
+            ((ActionMode) actionMode).finish();
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     public void changeAvatarOnClick(View view) {
@@ -114,21 +131,6 @@ public class ProfileActivity extends BaseActivity {
         initChangingEditText(emailEditText);
     }
 
-    private void initChangingEditText(EditText editText) {
-        editText.setEnabled(true);
-        editText.requestFocus();
-    }
-
-    private void initUsersData() {
-        QBGetFileCommand.start(this, qbUser.getFileId());
-        fullNameEditText.setText(qbUser.getFullName());
-        emailEditText.setText(qbUser.getEmail());
-
-        avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
-        fullnameOld = fullNameEditText.getText().toString();
-        emailOld = emailEditText.getText().toString();
-    }
-
     private void startAction() {
         if (actionMode != null) {
             return;
@@ -136,10 +138,20 @@ public class ProfileActivity extends BaseActivity {
         actionMode = startActionMode(new ActionModeCallback());
     }
 
-    private void updateUsersData() {
-        avatarCurrentBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+    private void updateCurrentUserData() {
+        avatarBitmapCurrent = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
         fullnameCurrent = fullNameEditText.getText().toString();
         emailCurrent = emailEditText.getText().toString();
+    }
+
+    private void updateUserData() {
+        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+            try {
+                saveChanges(avatarBitmapCurrent, fullnameCurrent, emailCurrent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -165,26 +177,17 @@ public class ProfileActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // TODO SF refactor
     private void saveChanges(final Bitmap avatar, final String fullname, final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final File[] image = {null};
-                    qbUser.setFullName(fullname);
-                    qbUser.setEmail(email);
-                    if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
-                        try {
-                            image[0] = imageHelper.getFileFromImageView(avatarImageView);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        showProgress();
-                        QBUpdateUserCommand.start(ProfileActivity.this, qbUser, image[0]);
-                    }
-                }
-            }).start();
+            showProgress();
+            qbUser.setFullName(fullname);
+            qbUser.setEmail(email);
+
+            if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
+                new GetImageFileTask(this).execute(imageHelper, avatarImageView);
+            } else {
+                QBUpdateUserCommand.start(this, qbUser, null);
+            }
         }
     }
 
@@ -194,6 +197,11 @@ public class ProfileActivity extends BaseActivity {
 
     private boolean isUserDataChanges(String fullname, String email) {
         return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
+    }
+
+    @Override
+    public void onGotImageFile(File imageFile) {
+        QBUpdateUserCommand.start(this, qbUser, imageFile);
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {
@@ -206,21 +214,14 @@ public class ProfileActivity extends BaseActivity {
     private class ActionModeCallback extends SimpleActionModeCallback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.setTitle(getResources().getText(R.string.prf_done));
             return true;
         }
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            updateUsersData();
-            if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-                try {
-                    saveChanges(avatarCurrentBitmap, fullnameCurrent, emailCurrent);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                finish();
+            if (!closeActionMode) {
+                updateCurrentUserData();
+                updateUserData();
             }
             actionMode = null;
         }

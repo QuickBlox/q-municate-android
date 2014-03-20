@@ -15,12 +15,12 @@
     <color name="gray">#999999</color>
     <color name="menu_item_background_pressed">#1cba48</color>
     <color name="menu_item_background_activated">#1cba48</color>
-    <color name="list_item_background_pressed">#dddddd</color>
+    <color name="list_item_background_pressed">#e4f4ff</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
 
-    <color name="activity_friend_call_bg">#333333</color>
-    <color name="activity_friend_call_timer_text">#999999</color>
-    <color name="activity_friend_button_default">#ff0000</color>
-    <color name="activity_friend_button_pressed">#e4f4ff</color>
+    <color name="act_friend_call_bg">#333333</color>
+    <color name="act_friend_call_timer_text">#999999</color>
+    <color name="act_friend_button_default">#ff0000</color>
+    <color name="act_friend_button_pressed">#e4f4ff</color>
 </resources>

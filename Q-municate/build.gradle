@@ -2,6 +2,7 @@ apply plugin: 'android'
 
 dependencies {
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+    compile 'com.squareup.picasso:picasso:2.2.0'
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':dependencies:facebook')
 }

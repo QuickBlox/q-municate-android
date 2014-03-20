@@ -118,7 +118,6 @@ public class LandingActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-            hideProgress();
             MainActivity.start(LandingActivity.this);
             finish();
         }
