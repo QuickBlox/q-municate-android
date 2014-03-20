@@ -15,10 +15,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBRegistrationTask;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBSignUpCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
@@ -54,6 +58,10 @@ public class SignUpActivity extends BaseActivity {
         avatarImageView = _findViewById(R.id.avatarImageView);
 
         imageHelper = new ImageHelper(this);
+
+        addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
+        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
     }
 
     @Override
@@ -90,7 +98,8 @@ public class SignUpActivity extends BaseActivity {
         imageHelper.getImage();
     }
 
-    public void signUpOnClickListener(View view) throws IOException {
+    // TODO SF refactor
+    public void signUpOnClickListener(View view) {
         String fullNameText = fullname.getText().toString();
         String emailText = email.getText().toString();
         String passwordText = password.getText().toString();
@@ -106,6 +115,7 @@ public class SignUpActivity extends BaseActivity {
                     user.setFullName(fullname.getText().toString());
                     user.setEmail(email.getText().toString());
                     user.setPassword(password.getText().toString());
+
                     File image = null;
                     if (isNeedUpdateAvatar) {
                         try {
@@ -114,11 +124,23 @@ public class SignUpActivity extends BaseActivity {
                             e.printStackTrace();
                         }
                     }
-                    new QBRegistrationTask(SignUpActivity.this).execute(user, image);
+                    showProgress();
+                    QBSignUpCommand.start(SignUpActivity.this, user, image);
                 }
             }).start();
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
+        }
+    }
+
+    private class SignUpSuccessAction implements Command {
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            hideProgress();
+            MainActivity.start(SignUpActivity.this);
+            finish();
         }
     }
 }

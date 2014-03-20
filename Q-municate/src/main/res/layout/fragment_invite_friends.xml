@@ -11,7 +11,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="@string/stg_invite_friends_header_label"
+        android:text="@string/inf_header_label"
         android:textColor="@color/gray"
         android:textSize="@dimen/text_size" />
 
@@ -19,7 +19,7 @@
         android:id="@+id/fromFacebookButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:clickable="true"
         android:orientation="vertical">
 
@@ -52,7 +52,7 @@
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="@string/stg_invite_friends_select_from_facebook"
+                android:text="@string/inf_select_from_facebook"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
@@ -63,7 +63,7 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
                 android:layout_toLeftOf="@+id/checkAllFacebookFriendsCheckBox"
-                android:background="@drawable/invite_friends_counter_badge"
+                android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
                 android:text="0"
@@ -93,7 +93,7 @@
         android:id="@+id/fromContactsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/item_pressed"
+        android:background="@drawable/button_general_selector"
         android:clickable="true"
         android:orientation="vertical">
 
@@ -120,7 +120,7 @@
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="@string/stg_invite_friends_select_from_contacts"
+                android:text="@string/inf_select_from_contacts"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
@@ -131,7 +131,7 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
                 android:layout_toLeftOf="@+id/checkAllContactsFriendsCheckBox"
-                android:background="@drawable/invite_friends_counter_badge"
+                android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
                 android:text="0"

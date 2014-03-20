@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
-import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -50,7 +49,7 @@ public class ImageHelper {
 
         int destHeight, destWidth;
 
-        if(origWidth <= preferredWidth || origHeight <= preferredWidth) {
+        if (origWidth <= preferredWidth || origHeight <= preferredWidth) {
             destWidth = origWidth;
             destHeight = origHeight;
         } else {
