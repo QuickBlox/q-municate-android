@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <TextView
         android:layout_width="match_parent"
@@ -26,7 +27,7 @@
         <View
             android:id="@+id/divider1"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
 
         <RelativeLayout
@@ -84,7 +85,7 @@
         <View
             android:id="@+id/divider2"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
 
     </LinearLayout>
@@ -152,7 +153,7 @@
         <View
             android:id="@+id/divider3"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
     </LinearLayout>
 
@@ -160,10 +161,6 @@
         android:id="@+id/friendsListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:cacheColorHint="#FFFFFF"
-        android:divider="@drawable/com_facebook_list_divider"
-        android:fastScrollEnabled="true"
-        android:listSelector="@drawable/com_facebook_picker_list_selector"
         android:scrollbars="vertical" />
 
 </LinearLayout>

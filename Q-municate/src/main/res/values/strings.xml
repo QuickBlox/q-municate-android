@@ -78,11 +78,16 @@
     <string name="inf_select_from_contacts">From Contacts</string>
     <string name="inf_from_facebook">(invite via Facebook)</string>
     <string name="inf_from_contacts">(invite via Email)</string>
-    <string name="inf_next">Next</string>
+    <string name="inf_send">Send</string>
     <string name="inf_choose_email_provider">Choose an email provider :</string>
     <string name="inf_subject_of_invitation">Qmunicate app</string>
     <string name="inf_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
     <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
+    <string name="inf_fb_wall_param_name">QuickBlox</string>
+    <string name="inf_fb_wall_param_description">This is QuickBlox, BABY!</string>
+    <string name="inf_fb_wall_param_link">http://quickblox.com/</string>
+    <string name="inf_fb_wall_param_picture">http://www.apps-world.net/europe/images/stories/Quickblox.jpg</string>
+    <string name="inf_fb_wall_param_place">155021662189</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>

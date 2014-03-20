@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InviteViaEmail {
-    public final static int SEND_EMAIL_CODE = 1;
     private final String TYPE_OF_EMAIL = "message/rfc822";
     private Activity activity;
 
