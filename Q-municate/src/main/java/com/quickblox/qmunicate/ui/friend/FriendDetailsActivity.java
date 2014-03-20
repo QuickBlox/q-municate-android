@@ -19,6 +19,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBLoadImageTask;
 import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
@@ -118,7 +119,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void chatClickListener(View view) {
-        // TODO IS start chat with user
+        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void fillUI(Friend friend) {

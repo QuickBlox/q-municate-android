@@ -15,7 +15,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Chat;
 import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.newchat.NewChatActivity;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,38 +1,42 @@
-package com.quickblox.qmunicate.ui.groupchat;
+package com.quickblox.qmunicate.ui.chats;
 
+import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class GroupChatActivity extends BaseActivity {
+public class PrivateChatActivity extends BaseActivity {
     private ListView messagesListView;
 
     private List<ChatMessage> messagesArrayList;
     private ChatMessagesAdapter messagesAdapter;
+    private static String nameOpponent;
 
-    public static void start(Context context) {
-        Intent intent = new Intent(context, GroupChatActivity.class);
+    public static void start(Context context, String name) {
+        Intent intent = new Intent(context, PrivateChatActivity.class);
         context.startActivity(intent);
+        nameOpponent = name;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_chat);
+        setContentView(R.layout.activity_private_chat);
 
         initUI();
 
@@ -46,6 +50,7 @@ public class GroupChatActivity extends BaseActivity {
 
     private void initUI() {
         messagesListView = _findViewById(R.id.messagesListView);
+        actionBarSetup();
     }
 
     private void initListeners() {
@@ -66,6 +71,15 @@ public class GroupChatActivity extends BaseActivity {
         updateFriendListAdapter();
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void actionBarSetup() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            ActionBar ab = getActionBar();
+            ab.setTitle(nameOpponent);
+            ab.setSubtitle("some information");
+        }
+    }
+
     private void updateFriendListAdapter() {
         messagesAdapter.notifyDataSetChanged();
     }
@@ -73,7 +87,7 @@ public class GroupChatActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_chat_menu, menu);
+        inflater.inflate(R.menu.private_chat_menu, menu);
         return true;
     }
 
@@ -83,17 +97,15 @@ public class GroupChatActivity extends BaseActivity {
             case android.R.id.home:
                 navigateToParent();
                 return true;
-            case R.id.action_group_details:
-                GroupChatDetailsActivity.start(this);
+            case R.id.action_audio_call:
+                // TODO add audio call
+                DialogUtils.show(this, getString(R.string.comming_soon));
+                return true;
+            case R.id.action_video_call:
+                // TODO add video call
+                DialogUtils.show(this, getString(R.string.comming_soon));
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater m = getMenuInflater();
-        m.inflate(R.menu.group_chat_ctx_menu, menu);
     }
 }

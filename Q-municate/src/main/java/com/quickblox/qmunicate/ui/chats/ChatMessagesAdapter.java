@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.groupchat;
+package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.view.LayoutInflater;

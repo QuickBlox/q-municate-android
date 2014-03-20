@@ -64,26 +64,26 @@
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.newchat.NewChatActivity"
+            android:name=".ui.chats.NewChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/nch_title"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.privatechat.PrivateChatActivity"
+            android:name=".ui.chats.GroupChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.groupchat.GroupChatActivity"
+            android:name=".ui.chats.PrivateChatActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.groupchat.GroupChatDetailsActivity"
+            android:name=".ui.chats.GroupChatDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/gcd_title"
-            android:parentActivityName=".ui.groupchat.GroupChatActivity"
+            android:parentActivityName=".ui.chats.GroupChatActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.profile.ProfileActivity"
