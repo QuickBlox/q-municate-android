@@ -136,7 +136,7 @@
 
         <service
             android:name=".service.QBService"
-            android:icon="@drawable/ic_launcher"/>
+            android:icon="@drawable/ic_launcher" />
     </application>
 
 </manifest>

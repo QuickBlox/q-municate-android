@@ -7,13 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -53,26 +51,28 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
-//        gsmHelper = new GSMHelper(this);
-//        if (gsmHelper.checkPlayServices()) {
-//            String registrationId = gsmHelper.getRegistrationId();
-//            Log.i(TAG, "registrationId=" + registrationId);
-//            if (registrationId.isEmpty()) {
-//                gsmHelper.registerInBackground();
-//            }
-//            int subscriptionId = gsmHelper.getSubscriptionId();
-//            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
-//                gsmHelper.subscribeToPushNotifications(registrationId);
-//            }
-//        } else {
-//            Log.i(TAG, "No valid Google Play Services APK found.");
-//        }
+        /*
+        gsmHelper = new GSMHelper(this);
+        if (gsmHelper.checkPlayServices()) {
+            String registrationId = gsmHelper.getRegistrationId();
+            Log.i(TAG, "registrationId=" + registrationId);
+            if (registrationId.isEmpty()) {
+                gsmHelper.registerInBackground();
+            }
+            int subscriptionId = gsmHelper.getSubscriptionId();
+            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
+                gsmHelper.subscribeToPushNotifications(registrationId);
+            }
+        } else {
+            Log.i(TAG, "No valid Google Play Services APK found.");
+        }
+        */
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        gsmHelper.checkPlayServices();
+        // gsmHelper.checkPlayServices();
     }
 
     @Override

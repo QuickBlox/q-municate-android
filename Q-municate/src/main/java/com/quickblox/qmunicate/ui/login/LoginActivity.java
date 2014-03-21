@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,9 +18,10 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
 import com.quickblox.qmunicate.qb.QBResetPasswordCommand;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
@@ -127,6 +127,7 @@ public class LoginActivity extends BaseActivity {
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         showProgress();
+        saveLoginType(LoginType.EMAIL);
         QBLoginCommand.start(this, user);
     }
 
@@ -157,13 +158,19 @@ public class LoginActivity extends BaseActivity {
         helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
+    private void saveLoginType(LoginType type) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
+    }
+
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                QBSocialLoginCommand.start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+                saveLoginType(LoginType.FACEBOOK);
+                QBSocialLoginCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
+                                           session.getAccessToken(), null);
             }
         }
     }

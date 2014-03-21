@@ -35,6 +35,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
 
         QBAuth.createSession();
         QBUser user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+        user.setPassword(accessToken);
         // QBChatService.getInstance().loginWithUser(user);
 
         Bundle result = new Bundle();

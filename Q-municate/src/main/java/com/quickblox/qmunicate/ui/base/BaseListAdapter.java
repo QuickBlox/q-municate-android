@@ -5,11 +5,12 @@ import android.util.SparseArray;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.content.model.QBFile;
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -52,7 +53,9 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            ImageLoader.getInstance().displayImage(file.getPublicUrl(), imageViewArray.get(file.getId()));
+            ImageView imageView = imageViewArray.get(file.getId());
+            Picasso.with(activity).load(file.getPublicUrl()).fit().centerCrop()
+                    .placeholder(R.drawable.placeholder_user).into(imageView);
         }
     }
 }
