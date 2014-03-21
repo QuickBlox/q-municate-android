@@ -1,10 +1,8 @@
 package com.quickblox.qmunicate.ui.chats;
 
-import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -71,16 +69,14 @@ public class PrivateChatActivity extends BaseActivity {
         updateFriendListAdapter();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void actionBarSetup() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            ActionBar ab = getActionBar();
-            ab.setTitle(nameOpponent);
-            ab.setSubtitle("some information");
-        }
+        ActionBar ab = getActionBar();
+        ab.setTitle(nameOpponent);
+        ab.setSubtitle("some information");
     }
 
     private void updateFriendListAdapter() {
+        // TODO sort list
         messagesAdapter.notifyDataSetChanged();
     }
 
