@@ -148,7 +148,9 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void fillUI(Friend friend) {
-        QBGetFileCommand.start(this, friend.getFileId());
+        if(friend.getFileId() != null) {
+            QBGetFileCommand.start(this, friend.getFileId());
+        }
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);

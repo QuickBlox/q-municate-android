@@ -9,15 +9,19 @@ public class Consts {
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";
     public static final String SUBSCRIPTION_ID = "subscription_id";
     public static final String USER = "user";
-    // In GCM, the Sender ID is a project ID that you acquire from the API console
+
     public static String GSM_SENDER = "761750217637";
-    //
-    // In GCM, the Sender ID is a project ID that you acquire from the API console
     public static String SENDER_ID = "291727224931";
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
 
-/*    "AIzaSyDaGZ4vjqDfR2qoOi8crh3AewjG5MKU7WA"
+    public static final String FB_WALL_PARAM_NAME = "name";
+    public static final String FB_WALL_PARAM_DESCRIPTION = "description";
+    public static final String FB_WALL_PARAM_LINK = "link";
+    public static final String FB_WALL_PARAM_PICTURE = "picture";
+    public static final String FB_WALL_PARAM_PLACE = "place";
+    public static final String FB_WALL_PARAM_TAGS = "tags";
+    public static final String FB_WALL_PARAM_FEED = "me/feed";
 
-    "AIzaSyDaGZ4vjqDfR2qoOi8crh3AewjG5MKU7WA"*/
+    public static final String INVITE_TYPE_OF_EMAIL = "message/rfc822";
 }

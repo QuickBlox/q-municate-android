@@ -27,6 +27,7 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
+import com.quickblox.qmunicate.ui.utils.FriendsUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
     private InviteFriendsAdapter friendsAdapter;
-    private InviteViaFacebook inviteViaFacebook;
+    private FriendsUtils friendsUtils;
     private boolean isUpdateFacebookFriendsList = true;
     private String[] selectedFacebookFriends;
     private String[] selectedContactsFriends;
@@ -70,6 +71,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
         facebookSessionStatusCallback = new FacebookSessionStatusCallback();
         facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
+        friendsUtils = new FriendsUtils(getActivity());
 
         friendsList = new ArrayList<InviteFriend>();
         friendsFacebookList = new ArrayList<InviteFriend>();
@@ -277,11 +279,11 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void sendInviteToFacebook() {
-        inviteViaFacebook.postInviteToFacebookWall(getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE));
+        facebookHelper.postInviteToWall(new FacebookSendInviteCallback(), getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE));
     }
 
     private void sendInviteToContacts() {
-        new InviteViaEmail(getActivity()).sendEmail(selectedContactsFriends);
+        friendsUtils.sendEmail(selectedContactsFriends);
     }
 
     private String[] getSelectedFriendsForInvite(int type) {
@@ -336,7 +338,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         @Override
         protected Void doInBackground(Void... params) {
             getBaseActivity().showProgress();
-            friendsContactsList = new InviteViaEmail(getActivity()).getContacts();
+            friendsContactsList = friendsUtils.getContactsWithEmail();
             friendsList.addAll(friendsContactsList);
             return null;
         }
@@ -353,8 +355,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private class GettingFacebookFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            inviteViaFacebook = new InviteViaFacebook(getActivity(), new FacebookSendInviteCallback());
-            inviteViaFacebook.checkPermissions();
+            facebookHelper.checkPermissions();
             return null;
         }
 

@@ -17,7 +17,7 @@ public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErr
 
     protected BaseProgressTask(Activity activity, int messageId) {
         super(activity);
-        if (messageId == Consts.NOT_INITIALIZED_VALUE) {
+        if (messageId != Consts.NOT_INITIALIZED_VALUE) {
             progress = ProgressDialog.newInstance(messageId);
         }
     }
