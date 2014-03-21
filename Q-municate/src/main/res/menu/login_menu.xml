@@ -2,5 +2,5 @@
     <item
         android:id="@+id/action_register"
         android:showAsAction="ifRoom"
-        android:title="@string/lnd_sign_up" />
+        android:title="@string/sup_sign_up" />
 </menu>

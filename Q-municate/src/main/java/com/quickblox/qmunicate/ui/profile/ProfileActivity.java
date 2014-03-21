@@ -117,6 +117,8 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
+        } else {
+            closeActionMode = false;
         }
         return super.dispatchKeyEvent(event);
     }

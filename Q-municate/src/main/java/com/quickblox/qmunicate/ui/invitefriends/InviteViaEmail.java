@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
@@ -57,11 +57,12 @@ public class InviteViaEmail {
     }
 
     public void sendEmail(String[] selectedFriends) {
+        Resources resources = activity.getResources();
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
         intentEmail.putExtra(Intent.EXTRA_EMAIL, selectedFriends);
-        intentEmail.putExtra(Intent.EXTRA_SUBJECT, activity.getResources().getText(R.string.inf_subject_of_invitation));
-        intentEmail.putExtra(Intent.EXTRA_TEXT, activity.getResources().getText(R.string.inf_body_of_invitation));
+        intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.inf_subject_of_invitation));
+        intentEmail.putExtra(Intent.EXTRA_TEXT, resources.getText(R.string.inf_body_of_invitation));
         intentEmail.setType(TYPE_OF_EMAIL);
-        activity.startActivity(Intent.createChooser(intentEmail, activity.getResources().getText(R.string.inf_choose_email_provider)));
+        activity.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.inf_choose_email_provider)));
     }
 }
