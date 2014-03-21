@@ -334,8 +334,13 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private class GettingContactsFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected void onPreExecute() {
+            super.onPreExecute();
             getBaseActivity().showProgress();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
             friendsContactsList = new InviteViaEmail(getActivity()).getContacts();
             friendsList.addAll(friendsContactsList);
             return null;

@@ -13,8 +13,8 @@
 
     // Landing
     <string name="lnd_connect_with_facebook">Connect with Facebook</string>
-    <string name="lnd_log_in">Log In</string>
-    <string name="lnd_sign_up">Sign Up</string>
+    <string name="lnd_have_account">Already have an account?</string>
+    <string name="lnd_sign_up">Sign Up with Email</string>
     <string name="lnd_no_app_version">Couldn\'t get app version</string>
 
     // Login
@@ -25,10 +25,11 @@
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
 
-    // Registration
-    <string name="rgs_fullname_hint">Full Name</string>
-    <string name="rgs_email_hint">Email</string>
-    <string name="rgs_choose_user_picture">Choose user picture</string>
+    // Sing Up
+    <string name="sup_fullname_hint">Full Name</string>
+    <string name="sup_email_hint">Email</string>
+    <string name="sup_choose_user_picture">Choose user picture</string>
+    <string name="sup_sign_up">Sign Up</string>
 
     // Friend List
     <string name="frl_global_search">Global Search</string>

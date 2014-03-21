@@ -11,8 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg"/>
+        android:scaleType="fitCenter"
+        android:src="@drawable/bg"
+        android:paddingTop="20dp" />
 
     <ImageView
         android:id="@+id/logoImageView"
@@ -24,12 +25,32 @@
         android:scaleType="fitCenter"
         android:src="@drawable/title"/>
 
+    <ImageView
+        android:id="@+id/sloganImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/logoImageView"
+        android:layout_centerHorizontal="true"
+        android:padding="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/slogan"/>
+
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logoImageView"
+        android:layout_below="@+id/sloganImageView"
         android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id="@+id/copyrightImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/powerf_by_qb"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="20dp" />
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.invitefriends;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class InviteViaFacebook {
     private Activity activity;
+    private Resources resources;
     private final String PARAMS_NAME = "name";
     private final String PARAMS_DESCRIPTION = "description";
     private final String PARAMS_LINK = "link";
@@ -29,17 +31,18 @@ public class InviteViaFacebook {
     public InviteViaFacebook(Activity activity, Request.Callback requestCallback) {
         this.activity = activity;
         this.requestCallback = requestCallback;
+        resources = activity.getResources();
     }
 
     public void postInviteToFacebookWall(String[] selectedFriends) {
         Session session = Session.getActiveSession();
         if (session != null) {
             Bundle postParams = new Bundle();
-            postParams.putString(PARAMS_NAME, activity.getResources().getString(R.string.inf_fb_wall_param_name));
-            postParams.putString(PARAMS_DESCRIPTION, activity.getResources().getString(R.string.inf_fb_wall_param_description));
-            postParams.putString(PARAMS_LINK, activity.getResources().getString(R.string.inf_fb_wall_param_link));
-            postParams.putString(PARAMS_PICTURE, activity.getResources().getString(R.string.inf_fb_wall_param_picture));
-            postParams.putString(PARAMS_PLACE, activity.getResources().getString(R.string.inf_fb_wall_param_place));
+            postParams.putString(PARAMS_NAME, resources.getString(R.string.inf_fb_wall_param_name));
+            postParams.putString(PARAMS_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));
+            postParams.putString(PARAMS_LINK, resources.getString(R.string.inf_fb_wall_param_link));
+            postParams.putString(PARAMS_PICTURE, resources.getString(R.string.inf_fb_wall_param_picture));
+            postParams.putString(PARAMS_PLACE, resources.getString(R.string.inf_fb_wall_param_place));
             postParams.putString(PARAMS_TAGS, TextUtils.join(",", selectedFriends));
             Request request = new Request(session, PARAMS_FEED, postParams, HttpMethod.POST, requestCallback);
             RequestAsyncTask task = new RequestAsyncTask(request);

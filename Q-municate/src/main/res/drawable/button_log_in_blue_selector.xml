@@ -1,12 +1,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/facebook_button_normal" />
+            <solid android:color="@color/login_button_blue_normal" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/facebook_button_pressed" />
+            <solid android:color="@color/login_button_blue_pressed" />
         </shape>
     </item>
 </selector>
