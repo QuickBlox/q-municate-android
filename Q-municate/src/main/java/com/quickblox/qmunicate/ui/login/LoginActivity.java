@@ -18,6 +18,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
 import com.quickblox.qmunicate.qb.QBResetPasswordCommand;
 import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
@@ -159,10 +160,6 @@ public class LoginActivity extends BaseActivity {
 
     private void saveLoginType(LoginType type) {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
-    }
-
-    public static enum LoginType {
-        EMAIL, FACEBOOK
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
