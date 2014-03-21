@@ -17,7 +17,7 @@ import java.util.List;
 
 public class InviteViaFacebook {
     private Activity activity;
-    private Resources resources;
+
     private final String PARAMS_NAME = "name";
     private final String PARAMS_DESCRIPTION = "description";
     private final String PARAMS_LINK = "link";
@@ -31,12 +31,12 @@ public class InviteViaFacebook {
     public InviteViaFacebook(Activity activity, Request.Callback requestCallback) {
         this.activity = activity;
         this.requestCallback = requestCallback;
-        resources = activity.getResources();
     }
 
     public void postInviteToFacebookWall(String[] selectedFriends) {
         Session session = Session.getActiveSession();
         if (session != null) {
+            Resources resources = activity.getResources();
             Bundle postParams = new Bundle();
             postParams.putString(PARAMS_NAME, resources.getString(R.string.inf_fb_wall_param_name));
             postParams.putString(PARAMS_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));

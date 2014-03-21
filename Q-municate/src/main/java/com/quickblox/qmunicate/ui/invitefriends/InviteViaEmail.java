@@ -18,13 +18,11 @@ import java.util.List;
 public class InviteViaEmail {
     private final String TYPE_OF_EMAIL = "message/rfc822";
     private Activity activity;
-    private Resources resources;
 
     private List<InviteFriend> friendsContactsList;
 
     public InviteViaEmail(Activity activity) {
         this.activity = activity;
-        resources = activity.getResources();
     }
 
     public List<InviteFriend> getContacts() {
@@ -59,6 +57,7 @@ public class InviteViaEmail {
     }
 
     public void sendEmail(String[] selectedFriends) {
+        Resources resources = activity.getResources();
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
         intentEmail.putExtra(Intent.EXTRA_EMAIL, selectedFriends);
         intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.inf_subject_of_invitation));
