@@ -36,7 +36,7 @@ public class SplashActivity extends BaseActivity {
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        if (facebookHelper.isSessionOpened()) {
+        if (facebookHelper.isSessionOpened() && getLoginType() == LoginActivity.LoginType.FACEBOOK) {
             return;
         }
 
@@ -89,10 +89,17 @@ public class SplashActivity extends BaseActivity {
         QBLoginCommand.start(this, user);
     }
 
+    private LoginActivity.LoginType getLoginType() {
+        int defValue = LoginActivity.LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginActivity.LoginType.values()[value];
+    }
+
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
+
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened()) {
+            if (session.isOpened() && getLoginType() == LoginActivity.LoginType.FACEBOOK) {
                 QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }
