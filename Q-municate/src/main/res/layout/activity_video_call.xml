@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.quickblox.module.videochat_webrtc.VideoStreamsView
             android:id="@+id/ownVideoScreenImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
