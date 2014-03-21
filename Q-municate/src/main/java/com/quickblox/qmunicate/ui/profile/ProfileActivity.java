@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -32,11 +31,13 @@ import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
 import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements GettingImageFileListener {
+
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
@@ -98,8 +99,9 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
     }
 
     private void initUsersData() {
-        if (qbUser.getFileId() != null) {
-            QBGetFileCommand.start(this, qbUser.getFileId());
+        Integer fileId = qbUser.getFileId();
+        if (fileId != null) {
+            QBGetFileCommand.start(this, fileId);
         }
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
@@ -177,7 +179,8 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void saveChanges(final Bitmap avatar, final String fullname, final String email) throws IOException {
+    private void saveChanges(final Bitmap avatar, final String fullname,
+                             final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
             showProgress();
             qbUser.setFullName(fullname);
@@ -205,6 +208,7 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {
+
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             startAction();
@@ -212,6 +216,7 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
     }
 
     private class ActionModeCallback extends SimpleActionModeCallback {
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             return true;
@@ -242,7 +247,8 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
+            Picasso.with(ProfileActivity.this).load(file.getPublicUrl()).fit().centerCrop()
+                    .placeholder(R.drawable.placeholder_user).into(avatarImageView);
         }
     }
 }
