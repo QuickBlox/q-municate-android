@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.qb.QBSendMessageTask;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
@@ -145,7 +147,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void chatClickListener(View view) {
-        // TODO IS start chat with user
+        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void fillUI(Friend friend) {
@@ -206,8 +208,10 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            Picasso.with(FriendDetailsActivity.this).load(file.getPublicUrl()).fit().centerCrop()
-                    .placeholder(R.drawable.placeholder_user).into(avatarImageView);
+            Picasso.with(FriendDetailsActivity.this)
+                    .load(file.getPublicUrl())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(avatarImageView);
         }
     }
 }

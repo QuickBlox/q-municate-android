@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -106,7 +107,7 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
 
-        avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
         fullnameOld = fullNameEditText.getText().toString();
         emailOld = emailEditText.getText().toString();
     }
@@ -143,7 +144,7 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
     }
 
     private void updateCurrentUserData() {
-        avatarBitmapCurrent = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+        avatarBitmapCurrent = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
         fullnameCurrent = fullNameEditText.getText().toString();
         emailCurrent = emailEditText.getText().toString();
     }
@@ -173,7 +174,7 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
-            avatarOldBitmap = ((BitmapDrawable) avatarImageView.getDrawable()).getBitmap();
+            avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
             Uri originalUri = data.getData();
             avatarImageView.setImageURI(originalUri);
             startAction();
@@ -249,8 +250,10 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            Picasso.with(ProfileActivity.this).load(file.getPublicUrl()).fit().centerCrop()
-                    .placeholder(R.drawable.placeholder_user).into(avatarImageView);
+            Picasso.with(ProfileActivity.this)
+                    .load(file.getPublicUrl())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(avatarImageView);
         }
     }
 }

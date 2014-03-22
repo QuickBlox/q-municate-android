@@ -18,6 +18,7 @@
     <color name="login_link_button_pressed">#e4f4ff</color>
     <color name="icon_button_pressed">#e4f4ff</color>
     <color name="gray">#999999</color>
+    <color name="light_gray">#ffefefef</color>
     <color name="menu_item_background_pressed">#1cba48</color>
     <color name="menu_item_background_activated">#1cba48</color>
     <color name="list_item_background_pressed">#e4f4ff</color>
@@ -28,4 +29,6 @@
     <color name="screen_call_timer_text">#999999</color>
     <color name="screen_button_default">#ff0000</color>
     <color name="screen_button_pressed">#e4f4ff</color>
+
+    <color name="chat_message_name_color">#0d70b3</color>
 </resources>

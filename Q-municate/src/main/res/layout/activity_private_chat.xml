@@ -2,56 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@color/light_gray">
 
     <ListView
-        android:id="@+id/messagesContainer"
+        android:id="@+id/messagesListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/messageLayout"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="20dp"
-        android:listSelector="@android:color/transparent"
+        android:paddingBottom="20dp"
         android:transcriptMode="alwaysScroll" />
 
     <RelativeLayout
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true">
+        android:layout_height="@dimen/chat_input_message_height"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white">
 
         <EditText
             android:id="@+id/messageEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_alignParentBottom="false"
             android:layout_toRightOf="@+id/attachButton"
             android:autoText="true"
-            android:hint="@string/cht_message" />
-
-        <ImageButton
-            android:id="@+id/smileButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@null"
-            android:src="@drawable/ic_smile" />
+            android:hint="@string/cht_hint_message"
+            android:layout_centerInParent="true"
+            android:layout_toLeftOf="@+id/smileButton"
+            android:background="@null" />
 
         <ImageButton
             android:id="@+id/attachButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:background="@null"
             android:src="@drawable/ic_photo" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_height"
-            android:layout_above="@id/messageEdit"
-            android:background="@android:color/darker_gray" />
+        <ImageButton
+            android:id="@+id/smileButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:src="@drawable/ic_smile" />
 
     </RelativeLayout>
 </RelativeLayout>
