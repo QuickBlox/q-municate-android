@@ -11,11 +11,15 @@ import android.widget.TextView;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.qb.QBSocialLoginTask;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
@@ -36,6 +40,10 @@ public class LandingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
+
+        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new SocialLoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -99,8 +107,19 @@ public class LandingActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new QBSocialLoginTask(LandingActivity.this).execute(QBProvider.FACEBOOK, session.getAccessToken(), null);
+                showProgress();
+                QBSocialLoginCommand.start(LandingActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
+        }
+    }
+
+    private class SocialLoginSuccessAction implements Command {
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().setUser(user);
+            MainActivity.start(LandingActivity.this);
+            finish();
         }
     }
 }

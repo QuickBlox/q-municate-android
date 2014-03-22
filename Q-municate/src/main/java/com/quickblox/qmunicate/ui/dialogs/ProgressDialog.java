@@ -36,4 +36,9 @@ public class ProgressDialog extends DialogFragment {
 
         return dialog;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putInt("das", messageId);
+    }
 }

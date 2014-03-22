@@ -21,8 +21,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@id/avatarImageView"
-        android:orientation="vertical"
-        android:layout_toLeftOf="@+id/timeTextView">
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/nameTextView"
@@ -42,7 +41,7 @@
                 android:id="@id/onlineImageView"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/online_mark" />
+                android:src="@drawable/badge_online" />
 
             <TextView
                 android:id="@+id/statusMessageTextView"

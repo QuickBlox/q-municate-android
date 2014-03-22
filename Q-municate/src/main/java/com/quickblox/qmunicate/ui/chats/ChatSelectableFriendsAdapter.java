@@ -37,7 +37,7 @@ public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
         Friend data = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_chat_selectable_friend, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_chat_friend_selectable, null);
             holder = new ViewHolder();
 
             holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);

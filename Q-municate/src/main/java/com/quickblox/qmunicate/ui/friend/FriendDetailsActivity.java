@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,17 +13,27 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.content.model.QBFile;
+import com.quickblox.module.users.model.QBUser;
+import com.quickblox.module.videochat_webrtc.SignalingChannel;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBLoadImageTask;
-import com.quickblox.qmunicate.qb.QBRemoveFriendTask;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
+import com.quickblox.qmunicate.qb.QBSendMessageTask;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -62,9 +73,22 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         phoneTextView = _findViewById(R.id.phoneTextView);
         phoneView = _findViewById(R.id.phoneView);
 
+        addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
+        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
+        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
+        updateBroadcastActionList();
+
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
         fillUI(friend);
+    }
+
+    private void initChat() {
+        if (QBChatService.getInstance().isLoggedIn()) {
+            SignalingChannel signalingChannel = new SignalingChannel(
+                    QBChatService.getInstance().getPrivateChatInstance());
+        }
     }
 
     @Override
@@ -111,6 +135,10 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void videoCallClickListener(View view) {
+        QBSendMessageTask qbSendMessageTask = new QBSendMessageTask(this);
+        QBUser qbUser = new QBUser();
+        qbUser.setId(friend.getId());
+        qbSendMessageTask.execute(qbUser, "Hello", NotificationHelper.CALL_TYPE);
         VideoCallActivity.start(FriendDetailsActivity.this);
     }
 
@@ -123,7 +151,10 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void fillUI(Friend friend) {
-        new QBLoadImageTask(this).execute(friend.getFileId(), avatarImageView);
+        Integer fileId = friend.getFileId();
+        if (fileId != null) {
+            QBGetFileCommand.start(this, fileId);
+        }
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
@@ -150,23 +181,37 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
+        ConfirmDialog dialog = ConfirmDialog
+                .newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                removeFriend();
+                showProgress();
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
             }
         });
         dialog.show(getFragmentManager(), null);
     }
 
-    private void removeFriend() {
-        new QBRemoveFriendTask(this).execute(friend, new QBRemoveFriendTask.Callback() {
-            @Override
-            public void onSuccess() {
-                App.getInstance().getFriends().remove(friend);
-                finish();
-            }
-        });
+    private class RemoveFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            App.getInstance().getFriends().remove(friend);
+            DialogUtils.show(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
+            finish();
+        }
+    }
+
+    private class GetFileSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
+            Picasso.with(FriendDetailsActivity.this)
+                    .load(file.getPublicUrl())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(avatarImageView);
+        }
     }
 }

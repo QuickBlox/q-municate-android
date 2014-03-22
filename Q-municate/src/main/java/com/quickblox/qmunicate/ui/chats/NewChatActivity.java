@@ -48,7 +48,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         initUI();
 
         friendsArrayList = new ArrayList<Friend>();
-        friendsAdapter = new ChatSelectableFriendsAdapter(this, R.layout.list_item_chat_selectable_friend, friendsArrayList);
+        friendsAdapter = new ChatSelectableFriendsAdapter(this, R.layout.list_item_chat_friend_selectable, friendsArrayList);
         friendsListView.setAdapter(friendsAdapter);
         friendsAdapter.setCounterChangedListener(this);
 

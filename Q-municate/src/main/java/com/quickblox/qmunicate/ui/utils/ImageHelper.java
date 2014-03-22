@@ -3,9 +3,10 @@ package com.quickblox.qmunicate.ui.utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -44,13 +45,13 @@ public class ImageHelper {
 
     public File getFileFromImageView(ImageView imageView) throws IOException {
         int preferredWidth = 300;
-        Bitmap origBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        Bitmap origBitmap = drawableToBitmap(imageView.getDrawable());
         int origWidth = origBitmap.getWidth();
         int origHeight = origBitmap.getHeight();
 
         int destHeight, destWidth;
 
-        if(origWidth <= preferredWidth || origHeight <= preferredWidth) {
+        if (origWidth <= preferredWidth || origHeight <= preferredWidth) {
             destWidth = origWidth;
             destHeight = origHeight;
         } else {
@@ -71,6 +72,28 @@ public class ImageHelper {
         fos.close();
 
         return tempFile;
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if(drawable == null) {
+            return null;
+        }
+
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        int width = drawable.getIntrinsicWidth();
+        width = width > 0 ? width : 1;
+        int height = drawable.getIntrinsicHeight();
+        height = height > 0 ? height : 1;
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {

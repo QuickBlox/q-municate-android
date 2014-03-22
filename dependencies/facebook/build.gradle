@@ -2,14 +2,15 @@ apply plugin: 'android-library'
 
 dependencies {
     compile 'com.android.support:support-v4:13.0.+'
+    compile 'com.google.android.gms:play-services:+'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19"
+    buildToolsVersion '19'
 
     defaultConfig {
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 19
     }
 
@@ -20,4 +21,8 @@ android {
             res.srcDirs = ['res']
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+
 }

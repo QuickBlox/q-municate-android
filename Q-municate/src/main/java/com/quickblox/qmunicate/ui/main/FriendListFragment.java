@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,9 +17,12 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBAddFriendTask;
+import com.quickblox.qmunicate.qb.QBAddFriendCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 
@@ -32,6 +36,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public static final int PAGE_NUM = 1;
     public static final int PER_PAGE = 100;
 
+    private static final String TAG = FriendListFragment.class.getSimpleName();
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
 
@@ -76,6 +81,15 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         state = State.FRIEND_LIST;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
+        getBaseActivity().updateBroadcastActionList();
     }
 
     @Override
@@ -176,7 +190,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void initFriendList() {
         friends = App.getInstance().getFriends();
-        friendListAdapter = new FriendListAdapter(getActivity(), friends);
+        friendListAdapter = new FriendListAdapter(getBaseActivity(), friends);
         listView.setAdapter(friendListAdapter);
         listView.setSelector(R.drawable.list_item_background_selector);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -190,7 +204,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void initUserList() {
         users = new ArrayList<Friend>();
-        userListAdapter = new UserListAdapter(getActivity(), friends, users, new UserListAdapter.UserListListener() {
+        userListAdapter = new UserListAdapter(getBaseActivity(), friends, users, new UserListAdapter.UserListListener() {
             @Override
             public void onUserSelected(int position) {
                 addToFriendList(users.get(position));
@@ -204,13 +218,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void addToFriendList(final Friend friend) {
-        new QBAddFriendTask(getActivity()).execute(friend, new QBAddFriendTask.Callback() {
-            @Override
-            public void onSuccess() {
-                friends.add(friend);
-                userListAdapter.notifyDataSetChanged();
-            }
-        });
+        getBaseActivity().showProgress();
+        QBAddFriendCommand.start(getActivity(), friend);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
@@ -261,6 +270,18 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
             getActivity().getActionBar().setDisplayShowHomeEnabled(true);
             listView.removeHeaderView(listTitleView);
             return true;
+        }
+    }
+
+    private class AddFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
+            friends.add(friend);
+            userListAdapter.notifyDataSetChanged();
+            getBaseActivity().hideProgress();
+            Log.d(TAG, "AddFriendSuccessAction");
         }
     }
 }

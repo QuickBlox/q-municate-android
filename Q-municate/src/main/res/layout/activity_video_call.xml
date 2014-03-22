@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.quickblox.module.videochat_webrtc.VideoStreamsView
             android:id="@+id/ownVideoScreenImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/activity_friend_call_bg"
+            android:background="@color/screen_call_bg"
             android:gravity="center"
             android:orientation="horizontal">
 

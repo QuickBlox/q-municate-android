@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,7 +12,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="@string/stg_invite_friends_header_label"
+        android:text="@string/inf_header_label"
         android:textColor="@color/gray"
         android:textSize="@dimen/text_size" />
 
@@ -26,7 +27,7 @@
         <View
             android:id="@+id/divider1"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
 
         <RelativeLayout
@@ -52,7 +53,7 @@
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="@string/stg_invite_friends_select_from_facebook"
+                android:text="@string/inf_select_from_facebook"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
@@ -63,7 +64,7 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
                 android:layout_toLeftOf="@+id/checkAllFacebookFriendsCheckBox"
-                android:background="@drawable/invite_friends_counter_badge"
+                android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
                 android:text="0"
@@ -84,7 +85,7 @@
         <View
             android:id="@+id/divider2"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
 
     </LinearLayout>
@@ -120,7 +121,7 @@
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="@string/stg_invite_friends_select_from_contacts"
+                android:text="@string/inf_select_from_contacts"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/text_size" />
 
@@ -131,7 +132,7 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
                 android:layout_toLeftOf="@+id/checkAllContactsFriendsCheckBox"
-                android:background="@drawable/invite_friends_counter_badge"
+                android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
                 android:text="0"
@@ -152,7 +153,7 @@
         <View
             android:id="@+id/divider3"
             android:layout_width="fill_parent"
-            android:layout_height="1px"
+            android:layout_height="@dimen/divider_height"
             android:background="@color/gray" />
     </LinearLayout>
 
@@ -160,10 +161,6 @@
         android:id="@+id/friendsListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:cacheColorHint="#FFFFFF"
-        android:divider="@drawable/com_facebook_list_divider"
-        android:fastScrollEnabled="true"
-        android:listSelector="@drawable/com_facebook_picker_list_selector"
         android:scrollbars="vertical" />
 
 </LinearLayout>

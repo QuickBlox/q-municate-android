@@ -29,12 +29,20 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         super(context, textViewResourceId, list);
         this.context = context;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        selectedFriendFromFacebook = context.getResources().getString(R.string.stg_invite_friends_from_facebook);
-        selectedFriendFromContacts = context.getResources().getString(R.string.stg_invite_friends_from_contacts);
+        selectedFriendFromFacebook = context.getResources().getString(R.string.inf_from_facebook);
+        selectedFriendFromContacts = context.getResources().getString(R.string.inf_from_contacts);
     }
 
     public void setCounterChangedListener(CounterChangedListener listener) {
         counterChangedListener = listener;
+    }
+
+    public void setCounterFacebook(int counterFacebook) {
+        this.counterFacebook = counterFacebook;
+    }
+
+    public void setCounterContacts(int counterContacts) {
+        this.counterContacts = counterContacts;
     }
 
     @Override
@@ -77,20 +85,12 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
                     .into(holder.avatarImageView);
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             Picasso.with(context)
-                    .load(String.format(context.getResources().getString(R.string.stg_invite_friends_url_to_facebook_avatar), data.getId()))
+                    .load(String.format(context.getResources().getString(R.string.inf_url_to_facebook_avatar), data.getId()))
                     .placeholder(R.drawable.placeholder_user)
                     .into(holder.avatarImageView);
         }
 
         return convertView;
-    }
-
-    public void setCounterFacebook(int counterFacebook) {
-        this.counterFacebook = counterFacebook;
-    }
-
-    public void setCounterContacts(int counterContacts) {
-        this.counterContacts = counterContacts;
     }
 
     private void notifyCounterChanged(boolean isIncrease, int type) {
