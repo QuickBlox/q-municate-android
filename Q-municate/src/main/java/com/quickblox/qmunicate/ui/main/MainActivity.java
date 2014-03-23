@@ -15,6 +15,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
@@ -23,7 +24,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private final int ID_CHAT_LIST_FRAGMENT = 1;
+    private final int ID_CHATS_LIST_FRAGMENT = 1;
     private final int ID_SETTINGS_FRAGMENT = 2;
     private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
@@ -60,8 +61,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         if (!isImportInitialized) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
         }
+        */
     }
 
     private void initNavigationDrawer() {
@@ -76,9 +77,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendListFragment.newInstance();
                 break;
-            case ID_CHAT_LIST_FRAGMENT:
-                DialogUtils.show(this, getString(R.string.comming_soon));
-                return;
+            case ID_CHATS_LIST_FRAGMENT:
+                fragment = ChatsListFragment.newInstance();
+                break;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;

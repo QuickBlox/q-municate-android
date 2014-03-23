@@ -14,7 +14,6 @@ public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErr
         this(activity, R.string.dlg_wait_please);
     }
 
-
     protected BaseProgressTask(Activity activity, int messageId) {
         super(activity);
         if (messageId != Consts.NOT_INITIALIZED_VALUE) {

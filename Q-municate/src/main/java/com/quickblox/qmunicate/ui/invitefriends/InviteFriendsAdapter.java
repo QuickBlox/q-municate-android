@@ -40,6 +40,14 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         counterChangedListener = listener;
     }
 
+    public void setCounterFacebook(int counterFacebook) {
+        this.counterFacebook = counterFacebook;
+    }
+
+    public void setCounterContacts(int counterContacts) {
+        this.counterContacts = counterContacts;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
@@ -86,14 +94,6 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         }
 
         return convertView;
-    }
-
-    public void setCounterFacebook(int counterFacebook) {
-        this.counterFacebook = counterFacebook;
-    }
-
-    public void setCounterContacts(int counterContacts) {
-        this.counterContacts = counterContacts;
     }
 
     private void notifyCounterChanged(boolean isIncrease, int type) {

@@ -18,6 +18,8 @@ public class Friend implements Serializable {
     private Date lastRequestAt;
     private boolean online;
 
+    private boolean selected;
+
     public static List<Friend> createFriends(List<QBUser> users) {
         List<Friend> friends = new ArrayList<Friend>();
         for (QBUser user : users) {
@@ -120,5 +122,13 @@ public class Friend implements Serializable {
 
     public String getOnlineStatus() {
         return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

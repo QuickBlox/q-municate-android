@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,7 +13,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
@@ -28,10 +28,12 @@ import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.qb.QBSendMessageTask;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
+import com.squareup.picasso.Picasso;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -84,7 +86,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
 
     private void initChat() {
         if (QBChatService.getInstance().isLoggedIn()) {
-            SignalingChannel signalingChannel = new SignalingChannel(QBChatService.getInstance().getPrivateChatInstance());
+            SignalingChannel signalingChannel = new SignalingChannel(
+                    QBChatService.getInstance().getPrivateChatInstance());
         }
     }
 
@@ -144,12 +147,13 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void chatClickListener(View view) {
-        // TODO IS start chat with user
+        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void fillUI(Friend friend) {
-        if(friend.getFileId() != null) {
-            QBGetFileCommand.start(this, friend.getFileId());
+        Integer fileId = friend.getFileId();
+        if (fileId != null) {
+            QBGetFileCommand.start(this, fileId);
         }
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
@@ -177,7 +181,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
+        ConfirmDialog dialog = ConfirmDialog
+                .newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -203,7 +208,10 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         @Override
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
+            Picasso.with(FriendDetailsActivity.this)
+                    .load(file.getPublicUrl())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(avatarImageView);
         }
     }
 }
