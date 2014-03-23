@@ -61,8 +61,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         if (!isImportInitialized) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
         }
-        */
     }
 
     private void initNavigationDrawer() {

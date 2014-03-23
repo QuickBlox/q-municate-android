@@ -4,12 +4,10 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -30,14 +28,14 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
+import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity implements GettingImageFileListener {
+public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
 
     private ImageView avatarImageView;
     private EditText fullNameEditText;

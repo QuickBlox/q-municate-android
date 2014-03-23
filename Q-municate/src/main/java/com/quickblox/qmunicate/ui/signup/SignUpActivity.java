@@ -25,12 +25,12 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
+import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 
 import java.io.File;
 
-public class SignUpActivity extends BaseActivity implements GettingImageFileListener {
+public class SignUpActivity extends BaseActivity implements OnGetImageFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
 

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.quickblox.qmunicate.R;
 
 public class PrefsHelper {
-
     public static final String PREF_REMEMBER_ME = "Remember Me";
     public static final String PREF_LOGIN_TYPE = "Login type";
     public static final String PREF_USER_EMAIL = "Email";
