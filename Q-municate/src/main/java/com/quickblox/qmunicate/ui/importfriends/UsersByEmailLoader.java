@@ -12,12 +12,12 @@ import com.quickblox.qmunicate.core.ui.BaseLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBGetUsersByFBLoader extends BaseLoader<List<QBUser>> {
-    public static final int ID = 4;
+public class UsersByEmailLoader extends BaseLoader<List<QBUser>> {
+    public static final int ID = 5;
 
     private static ArrayList<String> idsList;
 
-    public QBGetUsersByFBLoader(Context context) {
+    public UsersByEmailLoader(Context context) {
         super(context);
     }
 
@@ -41,7 +41,7 @@ public class QBGetUsersByFBLoader extends BaseLoader<List<QBUser>> {
 
         Bundle params = new Bundle();
 
-        List<QBUser> users = QBUsers.getUsersByFacebookId(idsList, requestBuilder, params);
+        List<QBUser> users = QBUsers.getUsersByEmails(idsList, requestBuilder, params);
 
         return users;
     }

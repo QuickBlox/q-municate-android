@@ -56,19 +56,19 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
 
     private void startUserListLoader(boolean isFacebookFriends, List<InviteFriend> friends) {
         if (isFacebookFriends) {
-            runLoader(QBGetUsersByFBLoader.ID, QBGetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
         } else {
-            runLoader(QBGetUsersByEmailLoader.ID, QBGetUsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
         }
     }
 
     @Override
     public Loader<LoaderResult<List<QBUser>>> onLoaderCreate(int id, Bundle args) {
         switch (id) {
-            case QBGetUsersByFBLoader.ID:
-                return new QBGetUsersByFBLoader(activity);
-            case QBGetUsersByEmailLoader.ID:
-                return new QBGetUsersByEmailLoader(activity);
+            case GetUsersByFBLoader.ID:
+                return new GetUsersByFBLoader(activity);
+            case UsersByEmailLoader.ID:
+                return new UsersByEmailLoader(activity);
             default:
                 return null;
         }
@@ -77,11 +77,11 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     @Override
     public void onLoaderResult(int id, List<QBUser> data) {
         switch (id) {
-            case QBGetUsersByFBLoader.ID:
+            case GetUsersByFBLoader.ID:
                 users.addAll(data);
                 fiendsReceived();
                 break;
-            case QBGetUsersByEmailLoader.ID:
+            case UsersByEmailLoader.ID:
                 users.addAll(data);
                 fiendsReceived();
                 break;

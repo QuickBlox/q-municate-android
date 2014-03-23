@@ -264,6 +264,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
         startFriendListLoaderWithTimer();
+        getBaseActivity().hideProgress();
     }
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {

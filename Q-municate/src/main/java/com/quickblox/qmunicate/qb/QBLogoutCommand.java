@@ -48,5 +48,6 @@ public class QBLogoutCommand extends ServiceCommand {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         helper.delete(PrefsHelper.PREF_USER_EMAIL);
         helper.delete(PrefsHelper.PREF_USER_PASSWORD);
+        helper.delete(PrefsHelper.PREF_IMPORT_INITIALIZED);
     }
 }

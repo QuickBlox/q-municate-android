@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         initNavigationDrawer();
 
         if (!isImportInitialized) {
+            showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
             importFriends = new ImportFriends(MainActivity.this, facebookHelper);
         }
@@ -110,6 +111,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 importFriends.startGetFriendsListTask(true);
             } else if (!(!session.isOpened() && !session.isClosed())) {
                 importFriends.startGetFriendsListTask(false);
+                hideProgress();
             }
         }
     }
