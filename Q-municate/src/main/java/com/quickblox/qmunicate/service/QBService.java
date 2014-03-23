@@ -8,6 +8,7 @@ import android.util.Log;
 import com.quickblox.module.chat.smack.SmackAndroid;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.QBAddFriendCommand;
+import com.quickblox.qmunicate.qb.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
@@ -51,12 +52,14 @@ public class QBService extends Service {
 
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, new QBAddFriendsCommand(this,
+                QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, QBServiceConsts.ADD_FRIENDS_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.CHANGE_PASSWORD_ACTION, new QBChangePasswordCommand(this,
                 QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION, QBServiceConsts.GET_FILE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this,
-                QBServiceConsts.LOGIN_SUCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this,
                 QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, new QBRemoveFriendCommand(this,
@@ -66,7 +69,7 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SIGNUP_ACTION, new QBSignUpCommand(this,
                 QBServiceConsts.SIGNUP_SUCCESS_ACTION, QBServiceConsts.SIGNUP_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, new QBSocialLoginCommand(this,
-                QBServiceConsts.LOGIN_SUCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
     }

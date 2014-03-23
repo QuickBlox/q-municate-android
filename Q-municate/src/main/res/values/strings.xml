@@ -110,6 +110,7 @@
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
+    <string name="dlg_import_friends_filed">Failed to import friends</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

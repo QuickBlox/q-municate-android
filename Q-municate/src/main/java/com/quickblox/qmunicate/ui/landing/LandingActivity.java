@@ -41,7 +41,7 @@ public class LandingActivity extends BaseActivity {
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new SocialLoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
         updateBroadcastActionList();
 

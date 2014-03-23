@@ -216,7 +216,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void getContactsFriendsList() {
-        new GettingContactsFriendsListTask().execute();
+        new GetContactsFriendsListTask().execute();
     }
 
     private void updateFriendsList() {
@@ -311,7 +311,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new GettingFacebookFriendsListTask().execute();
+                new GetFacebookFriendsListTask().execute();
             }
         }
     }
@@ -334,7 +334,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         }
     };
 
-    private class GettingContactsFriendsListTask extends AsyncTask<Void, Void, Void> {
+    private class GetContactsFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             getBaseActivity().showProgress();
@@ -352,7 +352,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         }
     }
 
-    private class GettingFacebookFriendsListTask extends AsyncTask<Void, Void, Void> {
+    private class GetFacebookFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             facebookHelper.checkPermissions();

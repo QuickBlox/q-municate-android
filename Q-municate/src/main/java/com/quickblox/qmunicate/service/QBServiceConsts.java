@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.service;
 
 public class QBServiceConsts {
     public static final String ADD_FRIEND_ACTION = "add friend action";
+    public static final String ADD_FRIENDS_ACTION = "add friends action";
     public static final String CHANGE_PASSWORD_ACTION = "change password action";
     public static final String GET_FILE_ACTION = "get file action";
     public static final String LOGIN_ACTION = "login action";
@@ -13,12 +14,14 @@ public class QBServiceConsts {
     public static final String UPDATE_USER_ACTION = "update user action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add friend success action";
+    public static final String ADD_FRIENDS_SUCCESS_ACTION = "add friends success action";
     public static final String ADD_FRIEND_FAIL_ACTION = "add friend fail action";
+    public static final String ADD_FRIENDS_FAIL_ACTION = "add friends fail action";
     public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change password success action";
     public static final String CHANGE_PASSWORD_FAIL_ACTION = "change password fail action";
     public static final String GET_FILE_SUCCESS_ACTION = "get file success action";
     public static final String GET_FILE_FAIL_ACTION = "get file fail action";
-    public static final String LOGIN_SUCESS_ACTION = "login success action";
+    public static final String LOGIN_SUCCESS_ACTION = "login success action";
     public static final String LOGIN_FAIL_ACTION = "login fail action";
     public static final String LOGOUT_SUCCESS_ACTION = "logout success action";
     public static final String LOGOUT_FAIL_ACTION = "logout fail action";

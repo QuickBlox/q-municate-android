@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,9 +18,9 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
 import com.quickblox.qmunicate.qb.QBResetPasswordCommand;
+import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
@@ -58,7 +57,7 @@ public class LoginActivity extends BaseActivity {
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
@@ -178,7 +177,6 @@ public class LoginActivity extends BaseActivity {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }
-            hideProgress();
             MainActivity.start(LoginActivity.this);
             finish();
         }

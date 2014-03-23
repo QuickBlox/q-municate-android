@@ -23,13 +23,11 @@ public class FacebookHelper {
     public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
 
     private Activity activity;
-    private Resources resources;
 
     private Session.StatusCallback facebookStatusCallback;
 
     public FacebookHelper(Activity activity, Bundle savedInstanceState, Session.StatusCallback facebookStatusCallback) {
         this.activity = activity;
-        resources = activity.getResources();
         this.facebookStatusCallback = facebookStatusCallback;
         initFacebook(savedInstanceState);
     }
@@ -85,6 +83,7 @@ public class FacebookHelper {
     public void postInviteToWall(Request.Callback requestCallback, String[] selectedFriends) {
         Session session = Session.getActiveSession();
         if (session != null) {
+            Resources resources = activity.getResources();
             Bundle postParams = new Bundle();
             postParams.putString(Consts.FB_WALL_PARAM_NAME, resources.getString(R.string.inf_fb_wall_param_name));
             postParams.putString(Consts.FB_WALL_PARAM_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));
@@ -98,15 +97,6 @@ public class FacebookHelper {
         }
     }
 
-    private boolean isSubsetOf(Collection<String> subset, Collection<String> superset) {
-        for (String string : subset) {
-            if (!superset.contains(string)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public boolean checkPermissions() {
         Session session = Session.getActiveSession();
         List<String> permissions = session.getPermissions();
@@ -115,6 +105,15 @@ public class FacebookHelper {
                     .NewPermissionsRequest(activity, FacebookHelper.PERMISSIONS);
             session.requestNewPublishPermissions(newPermissionsRequest);
             return false;
+        }
+        return true;
+    }
+
+    private boolean isSubsetOf(Collection<String> subset, Collection<String> superset) {
+        for (String string : subset) {
+            if (!superset.contains(string)) {
+                return false;
+            }
         }
         return true;
     }

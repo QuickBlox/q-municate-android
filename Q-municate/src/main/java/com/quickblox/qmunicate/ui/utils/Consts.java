@@ -2,8 +2,11 @@ package com.quickblox.qmunicate.ui.utils;
 
 public class Consts {
     public static final int ZERO_VALUE = 0;
-
     public static final int NOT_INITIALIZED_VALUE = -1;
+
+    public static final int LOAD_PAGE_NUM = 1;
+    public static final int LOAD_PER_PAGE = 100;
+
     public static final String FRIEND_CLASS_NAME = "Friend";
     public static final String FRIEND_FIELD_USER_ID = "user_id";
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";

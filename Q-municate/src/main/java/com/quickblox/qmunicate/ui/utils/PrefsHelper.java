@@ -12,6 +12,7 @@ public class PrefsHelper {
     public static final String PREF_USER_PASSWORD = "Password";
     public static final String PREF_PUSH_NOTIFICATIONS = "Push Notifications";
     public static final String PREF_LANDING_SHOWN = "Landing screen was shown";
+    public static final String PREF_IMPORT_INITIALIZED = "Import initialized";
     public static final String PREF_USER_LEARNED_DRAWER = "Navigation Drawer learned";
 
     private final SharedPreferences sharedPreferences;

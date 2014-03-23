@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.invitefriends;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private Context context;
+    private Resources resources;
     private LayoutInflater layoutInflater;
 
     private CounterChangedListener counterChangedListener;
@@ -28,9 +30,10 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> list) {
         super(context, textViewResourceId, list);
         this.context = context;
+        resources = context.getResources();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        selectedFriendFromFacebook = context.getResources().getString(R.string.inf_from_facebook);
-        selectedFriendFromContacts = context.getResources().getString(R.string.inf_from_contacts);
+        selectedFriendFromFacebook = resources.getString(R.string.inf_from_facebook);
+        selectedFriendFromContacts = resources.getString(R.string.inf_from_contacts);
     }
 
     public void setCounterChangedListener(CounterChangedListener listener) {
@@ -77,7 +80,7 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
                     .into(holder.avatarImageView);
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             Picasso.with(context)
-                    .load(String.format(context.getResources().getString(R.string.inf_url_to_facebook_avatar), data.getId()))
+                    .load(String.format(resources.getString(R.string.inf_url_to_facebook_avatar), data.getId()))
                     .placeholder(R.drawable.placeholder_user)
                     .into(holder.avatarImageView);
         }
