@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Chat;
 import com.quickblox.qmunicate.model.GroupChat;
@@ -20,17 +19,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChatsListFragment extends BaseFragment {
+
     private ListView chatsListView;
 
     private List<Chat> chatsArrayList;
     private ChatsListAdapter chatsListAdapter;
 
     public static ChatsListFragment newInstance() {
-        ChatsListFragment fragment = new ChatsListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_TITLE, App.getInstance().getString(R.string.nvd_title_chats));
-        fragment.setArguments(args);
-        return fragment;
+        return new ChatsListFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        title = getString(R.string.nvd_title_chats);
     }
 
     @Override
@@ -47,26 +49,6 @@ public class ChatsListFragment extends BaseFragment {
         return chatsListView;
     }
 
-    private void initListView() {
-        chatsArrayList.add(new GroupChat("Aaa", 1));
-        chatsArrayList.add(new GroupChat("Bbb", 2));
-        chatsArrayList.add(new GroupChat("Ccc", 3));
-        chatsListAdapter.notifyDataSetChanged();
-    }
-
-    private void initListeners() {
-        chatsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-            }
-        });
-    }
-
-    private void initUI() {
-        setHasOptionsMenu(true);
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.chats_list_menu, menu);
@@ -80,5 +62,25 @@ public class ChatsListFragment extends BaseFragment {
                 break;
         }
         return true;
+    }
+
+    private void initUI() {
+        setHasOptionsMenu(true);
+    }
+
+    private void initListeners() {
+        chatsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+            }
+        });
+    }
+
+    private void initListView() {
+        chatsArrayList.add(new GroupChat("Aaa", 1));
+        chatsArrayList.add(new GroupChat("Bbb", 2));
+        chatsArrayList.add(new GroupChat("Ccc", 3));
+        chatsListAdapter.notifyDataSetChanged();
     }
 }

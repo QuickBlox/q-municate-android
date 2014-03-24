@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:background="@drawable/button_global_search"
-        android:onClick=""
         android:text="@string/frl_global_search"
         android:textColor="@color/white" />
-
 </LinearLayout>

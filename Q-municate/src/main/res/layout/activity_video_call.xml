@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/screen_call_bg"
+            android:background="@color/screen_call_background_color"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -69,5 +69,4 @@
                 android:src="@drawable/ic_call_mute_a" />
         </RelativeLayout>
     </RelativeLayout>
-
 </LinearLayout>

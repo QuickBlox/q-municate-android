@@ -102,7 +102,8 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <receiver
@@ -117,10 +118,8 @@
         </receiver>
 
         <service android:name=".GCMIntentService" />
-
         <service
             android:name=".service.QBService"
             android:icon="@drawable/ic_launcher" />
     </application>
-
 </manifest>
