@@ -34,11 +34,9 @@ import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-
     private EditText email;
     private EditText password;
     private CheckBox rememberMe;
-
     private FacebookHelper facebookHelper;
 
     public static void start(Context context) {
@@ -60,7 +58,7 @@ public class LoginActivity extends BaseActivity {
                 .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
@@ -187,7 +185,6 @@ public class LoginActivity extends BaseActivity {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }
-            hideProgress();
             MainActivity.start(LoginActivity.this);
             finish();
         }

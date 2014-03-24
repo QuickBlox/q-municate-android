@@ -25,6 +25,9 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
+import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +35,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
-
-    public static final int PAGE_NUM = 1;
-    public static final int PER_PAGE = 100;
-
+   
     private static final String TAG = FriendListFragment.class.getSimpleName();
     private static final int START_DELAY = 0;
     private static final int UPDATE_DATA_PERIOD = 300000;
@@ -54,6 +54,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private Timer friendListUpdateTimer;
     private String constraint;
+    private boolean isImportInitialized;
+    private boolean isStopFriendListLoader;
 
     public static FriendListFragment newInstance() {
         return new FriendListFragment();
@@ -68,8 +70,11 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         listTitle.setVisibility(View.GONE);
         listView.addHeaderView(listTitleView);
 
-        initFriendList();
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+
         initGlobalSearchButton(inflater);
+        initFriendList();
+
         return listView;
     }
 
@@ -78,7 +83,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         title = getString(R.string.nvd_title_friends);
-        state = State.FRIEND_SEARCH;
+        state = State.FRIEND_LIST;
     }
 
     @Override
@@ -94,15 +99,23 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     @Override
     public void onStart() {
         super.onStart();
-        if (state == State.FRIEND_SEARCH) {
-            startFriendListLoaderWithTimer();
+        if (!isImportInitialized) {
+            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
+            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+            baseActivity.updateBroadcastActionList();
+        } else {
+            if (state == State.FRIEND_LIST) {
+                startFriendListLoaderWithTimer();
+            }
         }
     }
 
     @Override
     public void onStop() {
-        stopFriendListLoader();
         super.onStop();
+        if (isStopFriendListLoader) {
+            stopFriendListLoader();
+        }
     }
 
     @Override
@@ -161,7 +174,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     @Override
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
-        if (state == State.FRIEND_SEARCH) {
+        if (state == State.FRIEND_LIST) {
             friendListAdapter.getFilter().filter(newText);
         } else {
             startUserListLoader(newText);
@@ -170,20 +183,22 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, PAGE_NUM, PER_PAGE));
+        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE));
     }
 
     private void startFriendListLoaderWithTimer() {
+        isStopFriendListLoader = true;
         friendListUpdateTimer = new Timer();
         friendListUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(PAGE_NUM, PER_PAGE));
+                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE));
             }
         }, START_DELAY, UPDATE_DATA_PERIOD);
     }
 
     private void stopFriendListLoader() {
+        isStopFriendListLoader = false;
         friendListUpdateTimer.cancel();
     }
 
@@ -245,20 +260,25 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void startGlobalSearch() {
-        state = State.GLOBAL_SEARCH;
+        state = State.GLOBAL_LIST;
         listTitle.setText(R.string.frl_all_users);
         hideGlobalSearchButton();
         initUserList();
     }
 
-    private enum State {FRIEND_SEARCH, GLOBAL_SEARCH}
+    private enum State {FRIEND_LIST, GLOBAL_LIST}
+
+    private void importFriendsFinished() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        startFriendListLoaderWithTimer();
+        baseActivity.hideProgress();
+    }
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            state = State.FRIEND_SEARCH;
             baseActivity.getActionBar().setIcon(android.R.color.transparent);
             listTitle.setVisibility(View.VISIBLE);
             listTitle.setText(R.string.frl_friends);
@@ -268,6 +288,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
+            state = State.FRIEND_LIST;
             listTitle.setVisibility(View.GONE);
             initFriendList();
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
@@ -283,7 +304,23 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
             friends.add(friend);
             userListAdapter.notifyDataSetChanged();
             baseActivity.hideProgress();
-            Log.d(TAG, "AddFriendSuccessAction");
+        }
+    }
+
+    private class AddFriendsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
+        }
+    }
+
+    private class AddFriendsFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
+            DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_import_friends_filed));
         }
     }
 }

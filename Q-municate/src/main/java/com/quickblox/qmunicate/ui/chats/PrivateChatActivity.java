@@ -19,11 +19,11 @@ import java.util.Date;
 import java.util.List;
 
 public class PrivateChatActivity extends BaseActivity {
+    private static String nameOpponent;
     private ListView messagesListView;
 
     private List<ChatMessage> messagesArrayList;
     private ChatMessagesAdapter messagesAdapter;
-    private static String nameOpponent;
 
     public static void start(Context context, String name) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
@@ -46,15 +46,6 @@ public class PrivateChatActivity extends BaseActivity {
         initListView();
     }
 
-    private void initUI() {
-        messagesListView = _findViewById(R.id.messagesListView);
-        actionBarSetup();
-    }
-
-    private void initListeners() {
-        registerForContextMenu(messagesListView);
-    }
-
     private void initListView() {
         // TODO temp list.
         messagesArrayList.add(new ChatMessage("", new Date(), true));
@@ -69,15 +60,24 @@ public class PrivateChatActivity extends BaseActivity {
         updateFriendListAdapter();
     }
 
+    private void updateFriendListAdapter() {
+        // TODO sort list
+        messagesAdapter.notifyDataSetChanged();
+    }
+
+    private void initListeners() {
+        registerForContextMenu(messagesListView);
+    }
+
+    private void initUI() {
+        messagesListView = _findViewById(R.id.messagesListView);
+        actionBarSetup();
+    }
+
     private void actionBarSetup() {
         ActionBar ab = getActionBar();
         ab.setTitle(nameOpponent);
         ab.setSubtitle("some information");
-    }
-
-    private void updateFriendListAdapter() {
-        // TODO sort list
-        messagesAdapter.notifyDataSetChanged();
     }
 
     @Override

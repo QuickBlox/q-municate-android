@@ -8,10 +8,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
+import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.utils.FacebookHelper;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -23,7 +29,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
     private Fragment currentFragment;
-
+    private FacebookHelper facebookHelper;
+    private ImportFriends importFriends;
+    private boolean isImportInitialized;
+    
     //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
@@ -36,6 +45,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onActivityResult(requestCode, resultCode, data);
         if (currentFragment instanceof InviteFriendsFragment) {
             currentFragment.onActivityResult(requestCode, resultCode, data);
+        } else if (facebookHelper != null) {
+            facebookHelper.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -43,14 +54,18 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         useDoubleBackPressed = true;
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
 
-        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
-                .findFragmentById(R.id.navigation_drawer);
+        initNavigationDrawer();
 
-        navigationDrawerFragment
-                .setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-
+        if (!isImportInitialized) {
+            showProgress();
+            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
+        }
+        
         /*
         gsmHelper = new GSMHelper(this);
         if (gsmHelper.checkPlayServices()) {
@@ -69,6 +84,11 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         */
     }
 
+    private void initNavigationDrawer() {
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -107,5 +127,18 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
+    }
+
+    private class FacebookSessionStatusCallback implements Session.StatusCallback {
+
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            if (session.isOpened()) {
+                importFriends.startGetFriendsListTask(true);
+            } else if (!(!session.isOpened() && !session.isClosed())) {
+                importFriends.startGetFriendsListTask(false);
+                hideProgress();
+            }
+        }
     }
 }

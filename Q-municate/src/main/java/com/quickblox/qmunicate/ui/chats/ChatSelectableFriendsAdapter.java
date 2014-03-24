@@ -17,7 +17,6 @@ import java.util.List;
 public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
     private Context context;
     private LayoutInflater layoutInflater;
-
     private NewChatCounterFriendsListener counterChangedListener;
     private int counterFriends;
 

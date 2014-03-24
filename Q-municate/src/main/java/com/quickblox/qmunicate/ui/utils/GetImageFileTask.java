@@ -8,9 +8,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class GetImageFileTask extends BaseAsyncTask {
-    GettingImageFileListener listener;
+    private OnGetImageFileListener listener;
 
-    public GetImageFileTask(GettingImageFileListener listener) {
+    public GetImageFileTask(OnGetImageFileListener listener) {
         this.listener = listener;
     }
 

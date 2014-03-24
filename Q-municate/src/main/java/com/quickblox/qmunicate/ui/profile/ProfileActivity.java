@@ -4,12 +4,10 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -30,20 +28,19 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
+import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity implements GettingImageFileListener {
+public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
 
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
-
     private ImageHelper imageHelper;
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
@@ -81,24 +78,6 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         initTextChangedListeners();
     }
 
-    private void initUI() {
-        avatarImageView = _findViewById(R.id.avatarImageView);
-        fullNameEditText = _findViewById(R.id.fullNameEditText);
-        emailEditText = _findViewById(R.id.emailEditText);
-        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
-    }
-
-    private void initTextChangedListeners() {
-        TextWatcher textWatcherListener = new TextWatcherListener();
-        fullNameEditText.addTextChangedListener(textWatcherListener);
-        emailEditText.addTextChangedListener(textWatcherListener);
-    }
-
-    private void initChangingEditText(EditText editText) {
-        editText.setEnabled(true);
-        editText.requestFocus();
-    }
-
     private void initUsersData() {
         Integer fileId = qbUser.getFileId();
         if (fileId != null) {
@@ -112,6 +91,19 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         emailOld = emailEditText.getText().toString();
     }
 
+    private void initTextChangedListeners() {
+        TextWatcher textWatcherListener = new TextWatcherListener();
+        fullNameEditText.addTextChangedListener(textWatcherListener);
+        emailEditText.addTextChangedListener(textWatcherListener);
+    }
+
+    private void initUI() {
+        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        emailEditText = _findViewById(R.id.emailEditText);
+        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
@@ -122,41 +114,6 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
             closeActionMode = false;
         }
         return super.dispatchKeyEvent(event);
-    }
-
-    public void changeAvatarOnClick(View view) {
-        imageHelper.getImage();
-    }
-
-    public void changeFullNameOnClick(View view) {
-        initChangingEditText(fullNameEditText);
-    }
-
-    public void changeEmailOnClick(View view) {
-        initChangingEditText(emailEditText);
-    }
-
-    private void startAction() {
-        if (actionMode != null) {
-            return;
-        }
-        actionMode = startActionMode(new ActionModeCallback());
-    }
-
-    private void updateCurrentUserData() {
-        avatarBitmapCurrent = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
-        fullnameCurrent = fullNameEditText.getText().toString();
-        emailCurrent = emailEditText.getText().toString();
-    }
-
-    private void updateUserData() {
-        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-            try {
-                saveChanges(avatarBitmapCurrent, fullnameCurrent, emailCurrent);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -182,6 +139,50 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void startAction() {
+        if (actionMode != null) {
+            return;
+        }
+        actionMode = startActionMode(new ActionModeCallback());
+    }
+
+    public void changeAvatarOnClick(View view) {
+        imageHelper.getImage();
+    }
+
+    public void changeFullNameOnClick(View view) {
+        initChangingEditText(fullNameEditText);
+    }
+
+    private void initChangingEditText(EditText editText) {
+        editText.setEnabled(true);
+        editText.requestFocus();
+    }
+
+    public void changeEmailOnClick(View view) {
+        initChangingEditText(emailEditText);
+    }
+
+    private void updateCurrentUserData() {
+        avatarBitmapCurrent = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
+        fullnameCurrent = fullNameEditText.getText().toString();
+        emailCurrent = emailEditText.getText().toString();
+    }
+
+    private void updateUserData() {
+        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
+            try {
+                saveChanges(avatarBitmapCurrent, fullnameCurrent, emailCurrent);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean isUserDataChanges(String fullname, String email) {
+        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
+    }
+
     private void saveChanges(final Bitmap avatar, final String fullname,
                              final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
@@ -199,10 +200,6 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
 
     private boolean isAvatarChanges(Bitmap avatar) {
         return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
-    }
-
-    private boolean isUserDataChanges(String fullname, String email) {
-        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
     @Override

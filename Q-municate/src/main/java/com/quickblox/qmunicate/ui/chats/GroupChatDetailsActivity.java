@@ -62,7 +62,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     }
 
     private void updateFriendListAdapter() {
-        Collections.sort(friendsArrayList, comparatorSort);
+        Collections.sort(friendsArrayList, new SimpleComparator());
         friendsAdapter.notifyDataSetChanged();
     }
 
@@ -83,10 +83,10 @@ public class GroupChatDetailsActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private static Comparator<Friend> comparatorSort = new Comparator<Friend>() {
+    private class SimpleComparator implements Comparator<Friend> {
         public int compare(Friend friend1, Friend friend2) {
             // TODO getEmail() is wrong
             return (friend1.getEmail()).compareTo(friend2.getEmail());
         }
-    };
+    }
 }

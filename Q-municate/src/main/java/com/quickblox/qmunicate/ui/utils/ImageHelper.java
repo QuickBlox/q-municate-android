@@ -74,6 +74,10 @@ public class ImageHelper {
         return tempFile;
     }
 
+    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
+        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
+    }
+
     public static Bitmap drawableToBitmap (Drawable drawable) {
         if(drawable == null) {
             return null;
@@ -94,10 +98,6 @@ public class ImageHelper {
         drawable.draw(canvas);
 
         return bitmap;
-    }
-
-    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
-        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
     }
 
     public boolean equalsBitmaps(Bitmap bitmap1, Bitmap bitmap2) {

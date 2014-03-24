@@ -47,15 +47,6 @@ public class GroupChatActivity extends BaseActivity {
         initListView();
     }
 
-    private void initUI() {
-        messagesListView = _findViewById(R.id.messagesListView);
-        actionBarSetup();
-    }
-
-    private void initListeners() {
-        registerForContextMenu(messagesListView);
-    }
-
     private void initListView() {
         // TODO temp list.
         messagesArrayList.add(new ChatMessage("", new Date(), true));
@@ -70,6 +61,19 @@ public class GroupChatActivity extends BaseActivity {
         updateFriendListAdapter();
     }
 
+    private void updateFriendListAdapter() {
+        messagesAdapter.notifyDataSetChanged();
+    }
+
+    private void initListeners() {
+        registerForContextMenu(messagesListView);
+    }
+
+    private void initUI() {
+        messagesListView = _findViewById(R.id.messagesListView);
+        actionBarSetup();
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void actionBarSetup() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -77,10 +81,6 @@ public class GroupChatActivity extends BaseActivity {
             ab.setTitle("Name of Chat");
             ab.setSubtitle("some information");
         }
-    }
-
-    private void updateFriendListAdapter() {
-        messagesAdapter.notifyDataSetChanged();
     }
 
     @Override
