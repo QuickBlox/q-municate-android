@@ -181,7 +181,6 @@ public class LoginActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             if (rememberMe.isChecked()) {

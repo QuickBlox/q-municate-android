@@ -136,7 +136,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
     private class SignUpSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
-            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             MainActivity.start(SignUpActivity.this);
