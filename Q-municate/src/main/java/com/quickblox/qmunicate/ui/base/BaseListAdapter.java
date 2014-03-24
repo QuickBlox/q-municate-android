@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.base;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -55,10 +54,10 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             ImageView imageView = imageViewArray.get(file.getId());
-            Picasso.with(activity)
-                    .load(file.getPublicUrl())
-                    .placeholder(R.drawable.placeholder_user)
-                    .into(imageView);
+            if (imageView != null) {
+                Picasso.with(activity).load(file.getPublicUrl()).placeholder(R.drawable.placeholder_user)
+                        .into(imageView);
+            }
         }
     }
 }

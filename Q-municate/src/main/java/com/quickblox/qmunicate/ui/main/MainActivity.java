@@ -7,15 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-    private Fragment currentFragment;
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
@@ -23,9 +23,12 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private final int ID_SETTINGS_FRAGMENT = 2;
     private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
-//    private GSMHelper gsmHelper;
+    private Fragment currentFragment;
+
+    //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
+        Log.d(TAG, "start MainActivity");
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
@@ -44,12 +47,11 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         setContentView(R.layout.activity_main);
         useDoubleBackPressed = true;
 
-        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
+                .findFragmentById(R.id.navigation_drawer);
 
-        navigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
+        navigationDrawerFragment
+                .setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
 
         /*
         gsmHelper = new GSMHelper(this);

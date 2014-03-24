@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -135,6 +136,7 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
     private class SignUpSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             MainActivity.start(SignUpActivity.this);

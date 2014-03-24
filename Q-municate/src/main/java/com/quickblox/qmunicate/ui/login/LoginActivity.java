@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,16 +56,35 @@ public class LoginActivity extends BaseActivity {
         password = _findViewById(R.id.password);
         rememberMe = _findViewById(R.id.rememberMe);
 
-        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        boolean isRememberMe = App.getInstance().getPrefsHelper()
+                .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
         addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
+        //updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
     }
 
     @Override
@@ -87,27 +107,9 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        facebookHelper.onActivityStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        facebookHelper.onActivityStop();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         facebookHelper.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
     }
 
     public void loginOnClickListener(View view) {
@@ -129,6 +131,10 @@ public class LoginActivity extends BaseActivity {
         showProgress();
         saveLoginType(LoginType.EMAIL);
         QBLoginCommand.start(this, user);
+    }
+
+    private void saveLoginType(LoginType type) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
     }
 
     public void loginFacebookOnClickListener(View view) {
@@ -158,10 +164,6 @@ public class LoginActivity extends BaseActivity {
         helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
-    }
-
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
@@ -169,8 +171,8 @@ public class LoginActivity extends BaseActivity {
             if (session.isOpened()) {
                 showProgress();
                 saveLoginType(LoginType.FACEBOOK);
-                QBSocialLoginCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
-                                           session.getAccessToken(), null);
+                QBSocialLoginCommand
+                        .start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }
     }
@@ -179,6 +181,7 @@ public class LoginActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             if (rememberMe.isChecked()) {

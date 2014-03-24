@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_call_bg"
+    android:background="@color/screen_call_background_color"
     android:orientation="vertical"
     android:padding="15dp">
 
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="20:20"
-                android:textColor="@color/screen_call_timer_text"
+                android:textColor="@color/screen_call_timer_text_color"
                 android:textSize="@dimen/act_call_name_size" />
 
         </LinearLayout>
@@ -73,7 +73,7 @@
                 android:layout_width="@dimen/act_call_end_button_width"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_centerInParent="true"
-                android:background="@drawable/button_end_call"
+                android:background="@drawable/button_end_call_selector"
                 android:src="@drawable/ic_encall" />
 
             <ImageButton
@@ -88,5 +88,4 @@
                 android:src="@drawable/ic_call_mute_a" />
         </RelativeLayout>
     </RelativeLayout>
-
 </LinearLayout>

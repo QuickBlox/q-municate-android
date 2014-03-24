@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.splash;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -33,7 +34,6 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
 
         addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
-        updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState,
                                             new FacebookSessionStatusCallback());
@@ -73,8 +73,8 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     public void onStop() {
-        super.onStop();
         facebookHelper.onActivityStop();
+        super.onStop();
     }
 
     @Override
@@ -117,6 +117,7 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             MainActivity.start(SplashActivity.this);

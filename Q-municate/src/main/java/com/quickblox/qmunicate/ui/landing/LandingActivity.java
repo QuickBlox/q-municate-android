@@ -116,6 +116,7 @@ public class LandingActivity extends BaseActivity {
     private class SocialLoginSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
+            Log.d(TAG, "LoginSuccessAction");
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             MainActivity.start(LandingActivity.this);

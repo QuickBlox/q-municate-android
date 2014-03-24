@@ -37,7 +37,8 @@ public class FriendListLoader extends BaseLoader<List<Friend>> {
         Arguments arguments = (Arguments) args;
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
-        builder.eq(Consts.FRIEND_FIELD_USER_ID, App.getInstance().getUser().getId());
+        QBUser user = App.getInstance().getUser();
+        builder.eq(Consts.FRIEND_FIELD_USER_ID, user.getId());
         builder.setPagesLimit(arguments.perPage);
         int pagesSkip = arguments.perPage * (arguments.page - 1);
         builder.setPagesSkip(pagesSkip);

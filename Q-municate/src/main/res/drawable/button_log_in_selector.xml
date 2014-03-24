@@ -1,12 +1,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/login_button_blue_normal" />
+            <solid android:color="@color/button_log_in_normal_color" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/login_button_blue_pressed" />
+            <solid android:color="@color/button_log_in_pressed_color" />
         </shape>
     </item>
 </selector>

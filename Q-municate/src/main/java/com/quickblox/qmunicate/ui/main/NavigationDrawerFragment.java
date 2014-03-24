@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -51,7 +52,8 @@ public class NavigationDrawerFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        userLearnedDrawer = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+        userLearnedDrawer = App.getInstance().getPrefsHelper()
+                .getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
             currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
@@ -65,16 +67,14 @@ public class NavigationDrawerFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
-        getBaseActivity().addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        getBaseActivity().addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
-        getBaseActivity().updateBroadcastActionList();
+        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.updateBroadcastActionList();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(
-                R.layout.fragment_navigation_drawer, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         drawerListView = (ListView) rootView.findViewById(R.id.navigationList);
         drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -82,19 +82,13 @@ public class NavigationDrawerFragment extends BaseFragment {
                 selectItem(position);
             }
         });
-        drawerListView.setAdapter(new ArrayAdapter<String>(
-                getActivity().getActionBar().getThemedContext(),
-                R.layout.list_item_navigation_drawler,
-                R.id.textView,
-                new String[]{
-                        getString(R.string.nvd_title_friends),
-                        getString(R.string.nvd_title_chats),
-                        getString(R.string.nvd_title_settings),
-                        getString(R.string.nvd_title_invite_friends),
-                }));
+        drawerListView.setAdapter(new ArrayAdapter<String>(baseActivity.getActionBar().getThemedContext(),
+                R.layout.list_item_navigation_drawler, R.id.textView,
+                new String[]{getString(R.string.nvd_title_friends), getString(
+                        R.string.nvd_title_chats), getString(R.string.nvd_title_settings), getString(
+                        R.string.nvd_title_invite_friends),}
+        ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        fullName = (TextView) rootView.findViewById(R.id.fullname);
-        fullName.setText(App.getInstance().getUser().getFullName());
         logoutButton = (ImageButton) rootView.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,6 +96,11 @@ public class NavigationDrawerFragment extends BaseFragment {
                 logout();
             }
         });
+        fullName = (TextView) rootView.findViewById(R.id.fullname);
+        QBUser user = App.getInstance().getUser();
+        if (user != null) {
+            fullName.setText(user.getFullName());
+        }
 
         return rootView;
     }
@@ -111,8 +110,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                getBaseActivity().showProgress();
-                QBLogoutCommand.start(getActivity());
+                baseActivity.showProgress();
+                QBLogoutCommand.start(baseActivity);
             }
         });
         dialog.show(getFragmentManager(), null);
@@ -152,21 +151,17 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout) {
-        fragmentContainerView = getActivity().findViewById(fragmentId);
+        fragmentContainerView = baseActivity.findViewById(fragmentId);
         this.drawerLayout = drawerLayout;
 
         drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        ActionBar actionBar = getActivity().getActionBar();
+        ActionBar actionBar = baseActivity.getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        drawerToggle = new QMActionBarDrawlerToggle(getActivity(),
-                drawerLayout,
-                R.drawable.ic_drawer,
-                R.string.nvd_open,
-                R.string.nvd_close
-        );
+        drawerToggle = new QMActionBarDrawlerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
+                R.string.nvd_open, R.string.nvd_close);
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
             drawerLayout.openDrawer(fragmentContainerView);
@@ -200,14 +195,16 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     public interface NavigationDrawerCallbacks {
+
         void onNavigationDrawerItemSelected(int position);
     }
 
     private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
 
         public QMActionBarDrawlerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
-                                        int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
-            super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes, closeDrawlerContentDescRes);
+                int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
+            super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes,
+                    closeDrawlerContentDescRes);
         }
 
         @Override
@@ -217,7 +214,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 return;
             }
 
-            getActivity().invalidateOptionsMenu();
+            baseActivity.invalidateOptionsMenu();
         }
 
         @Override
@@ -232,15 +229,16 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawler();
             }
 
-            getActivity().invalidateOptionsMenu();
+            baseActivity.invalidateOptionsMenu();
         }
     }
 
     private class LogoutSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
-            LoginActivity.start(getActivity());
-            getActivity().finish();
+            LoginActivity.start(baseActivity);
+            baseActivity.finish();
         }
     }
 }

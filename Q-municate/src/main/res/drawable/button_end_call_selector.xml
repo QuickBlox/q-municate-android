@@ -1,13 +1,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/screen_button_default" />
+            <solid android:color="@color/button_end_call_normal_color" />
             <corners android:bottomLeftRadius="3dp" android:bottomRightRadius="3dp" android:topLeftRadius="3dp" android:topRightRadius="3dp" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/screen_button_pressed" />
+            <solid android:color="@color/button_end_call_pressed_color" />
             <corners android:bottomLeftRadius="3dp" android:bottomRightRadius="3dp" android:topLeftRadius="3dp" android:topRightRadius="3dp" />
         </shape>
     </item>
