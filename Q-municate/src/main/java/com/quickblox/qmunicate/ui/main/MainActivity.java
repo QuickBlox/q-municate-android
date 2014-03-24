@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -18,17 +17,16 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private final int ID_CHATS_LIST_FRAGMENT = 1;
-    private final int ID_SETTINGS_FRAGMENT = 2;
-    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+    private static final int ID_FRIEND_LIST_FRAGMENT = 0;
+    private static final int ID_CHATS_LIST_FRAGMENT = 1;
+    private static final int ID_SETTINGS_FRAGMENT = 2;
+    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
     private Fragment currentFragment;
 
     //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
-        Log.d(TAG, "start MainActivity");
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
