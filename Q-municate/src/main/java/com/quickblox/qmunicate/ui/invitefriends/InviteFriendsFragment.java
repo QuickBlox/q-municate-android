@@ -27,6 +27,7 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
+import com.quickblox.qmunicate.ui.utils.FriendsUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +50,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
     private InviteFriendsAdapter friendsAdapter;
-    private InviteViaFacebook inviteViaFacebook;
+    private FriendsUtils friendsUtils;
     private boolean isUpdateFacebookFriendsList = true;
     private String[] selectedFacebookFriends;
     private String[] selectedContactsFriends;
@@ -70,6 +71,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
         facebookSessionStatusCallback = new FacebookSessionStatusCallback();
         facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
+        friendsUtils = new FriendsUtils(getActivity());
 
         friendsList = new ArrayList<InviteFriend>();
         friendsFacebookList = new ArrayList<InviteFriend>();
@@ -83,6 +85,12 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         initListeners();
 
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
     }
 
     private void initUI() {
@@ -126,16 +134,58 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        facebookHelper.onActivityStart();
+    private void facebookFriendsOnClick() {
+        facebookHelper.loginWithFacebook();
+    }
+
+    private void contactsFriendsOnClick() {
+        getContactsFriendsList();
+    }
+
+    private void getContactsFriendsList() {
+        new GetContactsFriendsListTask().execute();
+    }
+
+    private void initCheckAllFriends(boolean isFacebookFriends, boolean isCheck) {
+        if (isFacebookFriends) {
+            friendsAdapter.setCounterFacebook(getCheckedFriends(true, friendsFacebookList, isCheck));
+        } else {
+            friendsAdapter.setCounterContacts(getCheckedFriends(false, friendsContactsList, isCheck));
+        }
+        friendsAdapter.notifyDataSetChanged();
+    }
+
+    private int getCheckedFriends(boolean isFacebook, List<InviteFriend> friends, boolean isCheck) {
+        int newCounter;
+        if (isCheck) {
+            for (InviteFriend friend : friends) {
+                friend.setSelected(true);
+            }
+            newCounter = friends.size();
+        } else {
+            for (InviteFriend friend : friends) {
+                friend.setSelected(false);
+            }
+            newCounter = 0;
+        }
+
+        if (isFacebook) {
+            onCounterFacebookChanged(newCounter);
+        } else {
+            onCounterContactsChanged(newCounter);
+        }
+
+        return newCounter;
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        facebookHelper.onActivityStop();
+    public void onCounterFacebookChanged(int valueCounterFacebook) {
+        counterFacebookTextView.setText(valueCounterFacebook + "");
+    }
+
+    @Override
+    public void onCounterContactsChanged(int valueCounterContacts) {
+        counterContactsTextView.setText(valueCounterContacts + "");
     }
 
     @Override
@@ -147,6 +197,12 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
     }
 
     @Override
@@ -188,12 +244,27 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         clearCheckedFriends();
     }
 
-    private void facebookFriendsOnClick() {
-        facebookHelper.loginWithFacebook();
+    private void clearCheckedFriends() {
+        for (InviteFriend friend : friendsList) {
+            friend.setSelected(false);
+        }
+        friendsAdapter.notifyDataSetChanged();
+        onCounterFacebookChanged(Consts.ZERO_VALUE);
+        onCounterContactsChanged(Consts.ZERO_VALUE);
     }
 
-    private void contactsFriendsOnClick() {
-        getContactsFriendsList();
+    private void sendInviteToFacebook() {
+        facebookHelper.postInviteToWall(new FacebookSendInviteCallback(), getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE));
+    }
+
+    private String[] getSelectedFriendsForInvite(int type) {
+        List<String> arrayList = new ArrayList<String>();
+        for (InviteFriend friend: friendsList) {
+            if (friend.isSelected() && friend.getViaLabelType() == type) {
+                arrayList.add(friend.getId());
+            }
+        }
+        return arrayList.toArray(new String[arrayList.size()]);
     }
 
     private void getFacebookFriendsList() {
@@ -213,54 +284,9 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         });
     }
 
-    private void getContactsFriendsList() {
-        new GettingContactsFriendsListTask().execute();
-    }
-
     private void updateFriendsList() {
-        Collections.sort(friendsList, comparatorSort);
+        Collections.sort(friendsList, new SimpleComparator());
         friendsAdapter.notifyDataSetChanged();
-    }
-
-    private void initCheckAllFriends(boolean isFacebookFriends, boolean isCheck) {
-        if (isFacebookFriends) {
-            friendsAdapter.setCounterFacebook(getCheckedFriends(true, friendsFacebookList, isCheck));
-        } else {
-            friendsAdapter.setCounterContacts(getCheckedFriends(false, friendsContactsList, isCheck));
-        }
-        friendsAdapter.notifyDataSetChanged();
-    }
-
-    private int getCheckedFriends(boolean isFacebook, List<InviteFriend> friends, boolean isCheck) {
-        int newCounter;
-        if (isCheck) {
-            for (InviteFriend friend : friends) {
-                friend.setSelected(true);
-            }
-            newCounter = friends.size();
-        } else {
-            for (InviteFriend friend : friends) {
-                friend.setSelected(false);
-            }
-            newCounter = 0;
-        }
-
-        if (isFacebook) {
-            onCounterFacebookChanged(newCounter);
-        } else {
-            onCounterContactsChanged(newCounter);
-        }
-
-        return newCounter;
-    }
-
-    private void clearCheckedFriends() {
-        for (InviteFriend friend : friendsList) {
-            friend.setSelected(false);
-        }
-        friendsAdapter.notifyDataSetChanged();
-        onCounterFacebookChanged(Consts.ZERO_VALUE);
-        onCounterContactsChanged(Consts.ZERO_VALUE);
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {
@@ -276,40 +302,15 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         }
     }
 
-    private void sendInviteToFacebook() {
-        inviteViaFacebook.postInviteToFacebookWall(getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE));
-    }
-
     private void sendInviteToContacts() {
-        new InviteViaEmail(getActivity()).sendEmail(selectedContactsFriends);
-    }
-
-    private String[] getSelectedFriendsForInvite(int type) {
-        ArrayList<String> arrayList = new ArrayList<String>();
-        for (int i = 0; i < friendsAdapter.getCount(); i++) {
-            InviteFriend friend = friendsAdapter.getItem(i);
-            if (friend.isSelected() && friend.getViaLabelType() == type) {
-                arrayList.add(friend.getId());
-            }
-        }
-        return arrayList.toArray(new String[arrayList.size()]);
-    }
-
-    @Override
-    public void onCounterFacebookChanged(int valueCounterFacebook) {
-        counterFacebookTextView.setText(valueCounterFacebook + "");
-    }
-
-    @Override
-    public void onCounterContactsChanged(int valueCounterContacts) {
-        counterContactsTextView.setText(valueCounterContacts + "");
+        friendsUtils.sendEmail(selectedContactsFriends);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                new GettingFacebookFriendsListTask().execute();
+                new GetFacebookFriendsListTask().execute();
             }
         }
     }
@@ -326,22 +327,17 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         }
     }
 
-    private static Comparator<InviteFriend> comparatorSort = new Comparator<InviteFriend>() {
+    private class SimpleComparator implements Comparator<InviteFriend> {
         public int compare(InviteFriend inviteFriend1, InviteFriend inviteFriend2) {
             return (inviteFriend1.getName()).compareTo(inviteFriend2.getName());
         }
-    };
+    }
 
-    private class GettingContactsFriendsListTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            getBaseActivity().showProgress();
-        }
-
+    private class GetContactsFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            friendsContactsList = new InviteViaEmail(getActivity()).getContacts();
+            getBaseActivity().showProgress();
+            friendsContactsList = friendsUtils.getContactsWithEmail();
             friendsList.addAll(friendsContactsList);
             return null;
         }
@@ -355,11 +351,10 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         }
     }
 
-    private class GettingFacebookFriendsListTask extends AsyncTask<Void, Void, Void> {
+    private class GetFacebookFriendsListTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            inviteViaFacebook = new InviteViaFacebook(getActivity(), new FacebookSendInviteCallback());
-            inviteViaFacebook.checkPermissions();
+            facebookHelper.checkPermissions();
             return null;
         }
 

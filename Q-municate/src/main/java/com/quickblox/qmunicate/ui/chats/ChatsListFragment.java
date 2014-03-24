@@ -47,8 +47,11 @@ public class ChatsListFragment extends BaseFragment {
         return chatsListView;
     }
 
-    private void initUI() {
-        setHasOptionsMenu(true);
+    private void initListView() {
+        chatsArrayList.add(new GroupChat("Aaa", 1));
+        chatsArrayList.add(new GroupChat("Bbb", 2));
+        chatsArrayList.add(new GroupChat("Ccc", 3));
+        chatsListAdapter.notifyDataSetChanged();
     }
 
     private void initListeners() {
@@ -60,11 +63,8 @@ public class ChatsListFragment extends BaseFragment {
         });
     }
 
-    private void initListView() {
-        chatsArrayList.add(new GroupChat("Aaa", 1));
-        chatsArrayList.add(new GroupChat("Bbb", 2));
-        chatsArrayList.add(new GroupChat("Ccc", 3));
-        chatsListAdapter.notifyDataSetChanged();
+    private void initUI() {
+        setHasOptionsMenu(true);
     }
 
     @Override

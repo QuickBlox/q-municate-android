@@ -7,24 +7,12 @@
     <uses-permission android:name="android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <!-- Keeps the processor from sleeping when a message is received. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Access to  device info-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <!-- 4. Declare and use a custom permission so only this application can receive GCM messages.
-     This permission must be called my_app_package.permission.C2D_MESSAGE
-     (where my_app_package is the package name of your app as defined by the manifest tag),
-     otherwise it will not work. -->
-    <permission
-        android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
     <uses-permission android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
-    <!-- 5. Add the following permissions: -->
-    <!-- App receives GCM messages. -->
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-
+    <permission android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE" android:protectionLevel="signature" />
 
     <application
         android:name="com.quickblox.qmunicate.App"
@@ -117,10 +105,6 @@
         <meta-data android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!-- GCM (Push Notifications) setup: http://developer.android.com/google/gcm/gs.html#android-app -->
-
-        <!-- 1. Add the following broadcast receiver.
-        Notice that android:name in the category tag must be replaced by your application's package name -->
         <receiver
             android:name=".GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
@@ -132,7 +116,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- 2. Add the following intent service: -->
         <service android:name=".GCMIntentService" />
 
         <service

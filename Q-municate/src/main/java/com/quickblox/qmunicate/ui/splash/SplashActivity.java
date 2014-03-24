@@ -32,7 +32,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState,
