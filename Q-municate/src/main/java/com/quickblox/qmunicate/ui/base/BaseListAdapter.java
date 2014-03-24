@@ -55,7 +55,9 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             ImageView imageView = imageViewArray.get(file.getId());
             if (imageView != null) {
-                Picasso.with(activity).load(file.getPublicUrl()).placeholder(R.drawable.placeholder_user)
+                Picasso.with(activity)
+                        .load(file.getPublicUrl())
+                        .placeholder(R.drawable.placeholder_user)
                         .into(imageView);
             }
         }

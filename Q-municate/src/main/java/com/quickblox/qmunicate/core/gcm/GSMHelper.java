@@ -31,16 +31,15 @@ public class GSMHelper {
 
     public boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
-            }
-            return false;
+        if (resultCode == ConnectionResult.SUCCESS) {
+            return true;
         }
-        return true;
+        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+            GooglePlayServicesUtil.getErrorDialog(resultCode, activity, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+        } else {
+            Log.i(TAG, "This device is not supported.");
+        }
+        return false;
     }
 
     public void registerInBackground() {

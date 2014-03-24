@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -181,8 +180,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog
-                .newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

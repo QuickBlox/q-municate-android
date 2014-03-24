@@ -46,7 +46,7 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
-        initBroadcastReceiver();
+        broadcastReceiver = new BaseBroadcastReceiver();
     }
 
     @Override
@@ -91,22 +91,6 @@ public abstract class BaseActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
-    private void initBroadcastReceiver() {
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (intent != null && (action) != null) {
-                    Command command = broadcastCommandMap.get(action);
-                    if (command != null) {
-                        Log.d("STEPS", "executing " + action);
-                        command.execute(intent.getExtras());
-                    }
-                }
-            }
-        };
-    }
-
     public void showProgress() {
         progress.show(getFragmentManager(), null);
     }
@@ -147,6 +131,21 @@ public abstract class BaseActivity extends Activity {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(activity, e);
             activity.hideProgress();
+        }
+    }
+
+    private class BaseBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (intent != null && (action) != null) {
+                Command command = broadcastCommandMap.get(action);
+                if (command != null) {
+                    Log.d("STEPS", "executing " + action);
+                    command.execute(intent.getExtras());
+                }
+            }
         }
     }
 }
