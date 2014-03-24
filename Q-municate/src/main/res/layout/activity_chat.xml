@@ -20,14 +20,22 @@
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true">
 
-        <EditText
+        <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
             android:id="@+id/messageEdit"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/attachButton"
-            android:autoText="true"
-            android:hint="@string/cht_message" />
+            android:layout_marginLeft="10dip"
+            android:autoLink="all"
+            android:background="@android:color/holo_green_light"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical|right|left"
+            android:maxEms="13"
+            android:maxWidth="250dip"
+            android:padding="-5dip"
+            android:paddingBottom="-20dp"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
 
         <ImageButton
             android:id="@+id/smileButton"

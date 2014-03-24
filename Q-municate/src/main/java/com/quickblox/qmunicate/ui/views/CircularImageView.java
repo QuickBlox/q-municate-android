@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -30,6 +29,28 @@ public class CircularImageView extends ImageView {
 
     public CircularImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        Drawable drawable = getDrawable();
+
+        if (drawable == null) {
+            return;
+        }
+
+        if (getWidth() == 0 || getHeight() == 0) {
+            return;
+        }
+
+        Bitmap sourceBitmap = ImageHelper.drawableToBitmap(drawable);
+        Bitmap bitmap = sourceBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+        int width = getWidth();
+        int height = getHeight();
+
+        Bitmap roundBitmap = getCroppedBitmap(bitmap, width);
+        canvas.drawBitmap(roundBitmap, 0, 0, null);
     }
 
     public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
@@ -82,27 +103,5 @@ public class CircularImageView extends ImageView {
             );
         }
         return destinationBitmap;
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        Drawable drawable = getDrawable();
-
-        if (drawable == null) {
-            return;
-        }
-
-        if (getWidth() == 0 || getHeight() == 0) {
-            return;
-        }
-
-        Bitmap sourceBitmap = ImageHelper.drawableToBitmap(drawable);
-        Bitmap bitmap = sourceBitmap.copy(Bitmap.Config.ARGB_8888, true);
-
-        int width = getWidth();
-        int height = getHeight();
-
-        Bitmap roundBitmap = getCroppedBitmap(bitmap, width);
-        canvas.drawBitmap(roundBitmap, 0, 0, null);
     }
 }

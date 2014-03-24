@@ -137,5 +137,6 @@
     <string name="search_hint">Search</string>
     <string name="push_title">call from user</string>
     <string name="label_done">Done</string>
+    <string name="ignore_content_description">ignored</string>
     
 </resources>
