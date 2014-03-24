@@ -258,9 +258,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private String[] getSelectedFriendsForInvite(int type) {
-        ArrayList<String> arrayList = new ArrayList<String>();
-        for (int i = 0; i < friendsAdapter.getCount(); i++) {
-            InviteFriend friend = friendsAdapter.getItem(i);
+        List<String> arrayList = new ArrayList<String>();
+        for (InviteFriend friend: friendsList) {
             if (friend.isSelected() && friend.getViaLabelType() == type) {
                 arrayList.add(friend.getId());
             }

@@ -79,8 +79,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
 
     private String[] getSelectedUsers() {
         ArrayList<String> arrayList = new ArrayList<String>();
-        for (int i = 0; i < users.size(); i++) {
-            QBUser user = users.get(i);
+        for(QBUser user: users) {
             arrayList.add(user.getId().toString());
         }
         return arrayList.toArray(new String[arrayList.size()]);
@@ -145,8 +144,8 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         }
     }
 
-    private ArrayList<String> getIDs(List<InviteFriend> friends) {
-        ArrayList<String> idsList = new ArrayList<String>();
+    private List<String> getIDs(List<InviteFriend> friends) {
+        List<String> idsList = new ArrayList<String>();
         for (InviteFriend friend : friends) {
             idsList.add(friend.getId());
         }

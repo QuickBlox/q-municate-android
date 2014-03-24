@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.utils.Consts;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QBAddFriendsCommand extends ServiceCommand {
     private static final String TAG = QBAddFriendsCommand.class.getSimpleName();
@@ -30,7 +31,7 @@ public class QBAddFriendsCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         String[] users = (String[]) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
-        ArrayList<QBCustomObject> customObjects = convertArray(users);
+        List<QBCustomObject> customObjects = convertArray(users);
         QBCustomObjects.createObjects(customObjects);
 
         Bundle result = new Bundle();
@@ -39,7 +40,7 @@ public class QBAddFriendsCommand extends ServiceCommand {
         return result;
     }
 
-    private ArrayList<QBCustomObject> convertArray(String[] friends) {
+    private List<QBCustomObject> convertArray(String[] friends) {
         ArrayList<QBCustomObject> customObjects = new ArrayList<QBCustomObject>();
         QBCustomObject newObject;
         for (int i = 0; i < friends.length; i++) {

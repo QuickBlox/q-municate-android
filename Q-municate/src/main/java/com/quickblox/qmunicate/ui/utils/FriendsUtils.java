@@ -25,7 +25,6 @@ public class FriendsUtils {
     public List<InviteFriend> getContactsWithEmail() {
         List<InviteFriend> friendsContactsList = new ArrayList<InviteFriend>();
         Uri uri = null;
-        String id, name, email;
 
         ContentResolver contentResolver = context.getContentResolver();
 
@@ -50,6 +49,9 @@ public class FriendsUtils {
         Cursor cursor = contentResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, PROJECTION, filter, null, order);
 
         if (cursor.moveToFirst()) {
+            String id;
+            String name;
+            String email;
             do {
                 name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 email = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
