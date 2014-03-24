@@ -16,14 +16,14 @@ import java.util.ArrayList;
 public class QBAddFriendsCommand extends ServiceCommand {
     private static final String TAG = QBAddFriendsCommand.class.getSimpleName();
 
+    public QBAddFriendsCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, String[] users) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, users);
         context.startService(intent);
-    }
-
-    public QBAddFriendsCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.util.List;
 
 public class UsersByEmailLoader extends BaseLoader<List<QBUser>> {
     public static final int ID = 5;
-
     private static ArrayList<String> idsList;
 
     public UsersByEmailLoader(Context context) {

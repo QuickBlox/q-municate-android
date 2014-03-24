@@ -26,7 +26,6 @@ import java.util.List;
 
 public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, LoaderManager<List<QBUser>> {
     public Activity activity;
-
     private LoaderHelper<List<QBUser>> loaderHelper;
     private FacebookHelper facebookHelper;
     private FriendsUtils friendsUtils;
@@ -54,12 +53,47 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         new GetFriendsListTask().execute();
     }
 
-    private void startUserListLoader(boolean isFacebookFriends, List<InviteFriend> friends) {
-        if (isFacebookFriends) {
-            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
-        } else {
-            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+    @Override
+    public void onLoaderResult(int id, List<QBUser> data) {
+        switch (id) {
+            case GetUsersByFBLoader.ID:
+                users.addAll(data);
+                fiendsReceived();
+                break;
+            case UsersByEmailLoader.ID:
+                users.addAll(data);
+                fiendsReceived();
+                break;
         }
+    }
+
+    public void fiendsReceived() {
+        realFriendsCallbacks++;
+        if (realFriendsCallbacks == expectedFriendsCallbacks) {
+            String[] users = getSelectedUsers();
+            if(users.length > 0) {
+                QBAddFriendsCommand.start(activity, users);
+            }
+        }
+    }
+
+    private String[] getSelectedUsers() {
+        ArrayList<String> arrayList = new ArrayList<String>();
+        for (int i = 0; i < users.size(); i++) {
+            QBUser user = users.get(i);
+            arrayList.add(user.getId().toString());
+        }
+        return arrayList.toArray(new String[arrayList.size()]);
+    }
+
+    @Override
+    public void onLoaderException(int id, Exception e) {
+        loaderHelper.onLoaderException(id, e);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<LoaderResult<List<QBUser>>> loader) {
+        loaderHelper.onLoaderReset(loader);
     }
 
     @Override
@@ -75,35 +109,6 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     }
 
     @Override
-    public void onLoaderResult(int id, List<QBUser> data) {
-        switch (id) {
-            case GetUsersByFBLoader.ID:
-                users.addAll(data);
-                fiendsReceived();
-                break;
-            case UsersByEmailLoader.ID:
-                users.addAll(data);
-                fiendsReceived();
-                break;
-        }
-    }
-
-    @Override
-    public void onLoaderException(int id, Exception e) {
-        loaderHelper.onLoaderException(id, e);
-    }
-
-    @Override
-    public <L extends Loader<?>> L getLoader(int id) {
-        return loaderHelper.getLoader(id);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<LoaderResult<List<QBUser>>> loader) {
-        loaderHelper.onLoaderReset(loader);
-    }
-
-    @Override
     public BaseLoader<List<QBUser>> runLoader(int id) {
         return loaderHelper.runLoader(id);
     }
@@ -113,21 +118,9 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         return loaderHelper.runLoader(id, args);
     }
 
-    private String[] getSelectedUsers() {
-        ArrayList<String> arrayList = new ArrayList<String>();
-        for (int i = 0; i < users.size(); i++) {
-            QBUser user = users.get(i);
-            arrayList.add(user.getId().toString());
-        }
-        return arrayList.toArray(new String[arrayList.size()]);
-    }
-
-    private ArrayList<String> getIDs(List<InviteFriend> friends) {
-        ArrayList<String> idsList = new ArrayList<String>();
-        for (InviteFriend friend : friends) {
-            idsList.add(friend.getId());
-        }
-        return idsList;
+    @Override
+    public <L extends Loader<?>> L getLoader(int id) {
+        return loaderHelper.getLoader(id);
     }
 
     private void getFacebookFriendsList() {
@@ -144,17 +137,31 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         });
     }
 
-    public void fiendsReceived() {
-        realFriendsCallbacks++;
-        if (realFriendsCallbacks == expectedFriendsCallbacks) {
-            String[] users = getSelectedUsers();
-            if(users.length > 0) {
-                QBAddFriendsCommand.start(activity, users);
-            }
+    private void startUserListLoader(boolean isFacebookFriends, List<InviteFriend> friends) {
+        if (isFacebookFriends) {
+            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+        } else {
+            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
         }
     }
 
+    private ArrayList<String> getIDs(List<InviteFriend> friends) {
+        ArrayList<String> idsList = new ArrayList<String>();
+        for (InviteFriend friend : friends) {
+            idsList.add(friend.getId());
+        }
+        return idsList;
+    }
+
     private class GetFriendsListTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            expectedFriendsCallbacks++;
+            friendsContactsList = friendsUtils.getContactsWithEmail();
+            startUserListLoader(false, friendsContactsList);
+            return null;
+        }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -162,14 +169,6 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
                 expectedFriendsCallbacks++;
                 getFacebookFriendsList();
             }
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            expectedFriendsCallbacks++;
-            friendsContactsList = friendsUtils.getContactsWithEmail();
-            startUserListLoader(false, friendsContactsList);
-            return null;
         }
     }
 }

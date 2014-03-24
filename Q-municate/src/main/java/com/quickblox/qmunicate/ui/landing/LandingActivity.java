@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 public class LandingActivity extends BaseActivity {
 
     private static final String TAG = LandingActivity.class.getSimpleName();
-
     private FacebookHelper facebookHelper;
 
     public static void start(Context context) {
@@ -51,10 +50,30 @@ public class LandingActivity extends BaseActivity {
         saveLandingShown();
     }
 
+    private void saveLandingShown() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
+    }
+
+    private void initVersionName() {
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            TextView versionView = _findViewById(R.id.version);
+            versionView.setText("v. " + versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Cannot obtain version number from Manifest", e);
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
         facebookHelper.onActivityStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
     }
 
     @Override
@@ -69,12 +88,6 @@ public class LandingActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
-    }
-
     public void signUpOnClickListener(View view) {
         SignUpActivity.start(LandingActivity.this);
         finish();
@@ -87,20 +100,6 @@ public class LandingActivity extends BaseActivity {
     public void loginOnClickListener(View view) {
         LoginActivity.start(LandingActivity.this);
         finish();
-    }
-
-    private void initVersionName() {
-        try {
-            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            TextView versionView = _findViewById(R.id.version);
-            versionView.setText("v. " + versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot obtain version number from Manifest", e);
-        }
-    }
-
-    private void saveLandingShown() {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

@@ -21,15 +21,31 @@ import java.util.List;
 
 public class FacebookHelper {
     public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
-
     private Activity activity;
-
     private Session.StatusCallback facebookStatusCallback;
 
     public FacebookHelper(Activity activity, Bundle savedInstanceState, Session.StatusCallback facebookStatusCallback) {
         this.activity = activity;
         this.facebookStatusCallback = facebookStatusCallback;
         initFacebook(savedInstanceState);
+    }
+
+    private void initFacebook(Bundle savedInstanceState) {
+        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+
+        Session session = Session.getActiveSession();
+        if (session == null) {
+            if (savedInstanceState != null) {
+                session = Session.restoreSession(activity, null, facebookStatusCallback, savedInstanceState);
+            }
+            if (session == null) {
+                session = new Session(activity);
+            }
+            Session.setActiveSession(session);
+            if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+                session.openForRead(new Session.OpenRequest(activity).setCallback(facebookStatusCallback));
+            }
+        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -56,24 +72,6 @@ public class FacebookHelper {
 
     public void onActivityStop() {
         Session.getActiveSession().removeCallback(facebookStatusCallback);
-    }
-
-    private void initFacebook(Bundle savedInstanceState) {
-        Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
-
-        Session session = Session.getActiveSession();
-        if (session == null) {
-            if (savedInstanceState != null) {
-                session = Session.restoreSession(activity, null, facebookStatusCallback, savedInstanceState);
-            }
-            if (session == null) {
-                session = new Session(activity);
-            }
-            Session.setActiveSession(session);
-            if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
-                session.openForRead(new Session.OpenRequest(activity).setCallback(facebookStatusCallback));
-            }
-        }
     }
 
     public boolean isSessionOpened() {

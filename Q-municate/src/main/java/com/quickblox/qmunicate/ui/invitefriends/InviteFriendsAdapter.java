@@ -20,7 +20,6 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private Context context;
     private Resources resources;
     private LayoutInflater layoutInflater;
-
     private CounterChangedListener counterChangedListener;
     private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;

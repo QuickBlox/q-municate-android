@@ -14,7 +14,6 @@ import java.util.List;
 
 public class GetUsersByFBLoader extends BaseLoader<List<QBUser>> {
     public static final int ID = 4;
-
     private static ArrayList<String> idsList;
 
     public GetUsersByFBLoader(Context context) {

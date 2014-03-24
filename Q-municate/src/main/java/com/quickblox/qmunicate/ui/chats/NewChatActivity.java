@@ -56,14 +56,6 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         initListView();
     }
 
-    private void initUI() {
-        friendsListView = _findViewById(R.id.chatFriendsListView);
-    }
-
-    private void initListeners() {
-        friendsListView.setOnItemClickListener(this);
-    }
-
     private void initListView() {
         // TODO temp friends list.
         friendsArrayList.add(new Friend(new QBUser("serik", "11111111", "Sergey Fedunets")));
@@ -75,8 +67,16 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
     }
 
     private void updateFriendListAdapter() {
-        Collections.sort(friendsArrayList, comparatorSort);
+        Collections.sort(friendsArrayList, new SimpleComparator());
         friendsAdapter.notifyDataSetChanged();
+    }
+
+    private void initListeners() {
+        friendsListView.setOnItemClickListener(this);
+    }
+
+    private void initUI() {
+        friendsListView = _findViewById(R.id.chatFriendsListView);
     }
 
     @Override
@@ -88,20 +88,6 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private void startAction() {
-        actionMode = startActionMode(new ActionModeCallback());
-        View view = getLayoutInflater().inflate(R.layout.action_mode_new_chat, null);
-        countSelectedFriendsTextView = (TextView) view.findViewById(R.id.countSelectedFriendsTextView);
-        actionMode.setCustomView(view);
-    }
-
-    private static Comparator<Friend> comparatorSort = new Comparator<Friend>() {
-        public int compare(Friend friend1, Friend friend2) {
-            // TODO getEmail() is wrong
-            return (friend1.getEmail()).compareTo(friend2.getEmail());
-        }
-    };
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -121,6 +107,13 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         countSelectedFriendsTextView.setText(valueCounter + "");
     }
 
+    private void startAction() {
+        actionMode = startActionMode(new ActionModeCallback());
+        View view = getLayoutInflater().inflate(R.layout.action_mode_new_chat, null);
+        countSelectedFriendsTextView = (TextView) view.findViewById(R.id.countSelectedFriendsTextView);
+        actionMode.setCustomView(view);
+    }
+
     private class ActionModeCallback extends SimpleActionModeCallback {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -137,6 +130,13 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
                 actionMode = null;
                 closeWithoutRedirect = false;
             }
+        }
+    }
+
+    private class SimpleComparator implements Comparator<Friend> {
+        public int compare(Friend friend1, Friend friend2) {
+            // TODO getEmail() is wrong
+            return (friend1.getEmail()).compareTo(friend2.getEmail());
         }
     }
 }

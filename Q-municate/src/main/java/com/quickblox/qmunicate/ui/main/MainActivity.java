@@ -13,21 +13,18 @@ import com.facebook.SessionState;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private final int ID_FRIEND_LIST_FRAGMENT = 0;
     private final int ID_CHATS_LIST_FRAGMENT = 1;
     private final int ID_SETTINGS_FRAGMENT = 2;
     private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
-
     private Fragment currentFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
