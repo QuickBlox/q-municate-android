@@ -3,14 +3,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/login_button_normal" />
-            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp" />
+            <solid android:color="@color/button_log_in_normal_color"/>
+            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp"/>
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/login_button_pressed" />
-            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp" />
+            <solid android:color="@color/button_log_in_pressed_color"/>
+            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp"/>
         </shape>
     </item>
 </selector>

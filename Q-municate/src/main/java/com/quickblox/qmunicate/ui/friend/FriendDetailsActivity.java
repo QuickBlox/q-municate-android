@@ -13,20 +13,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.content.model.QBFile;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
+import com.quickblox.module.videochat_webrtc.SignalingChannel;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
-import com.quickblox.qmunicate.qb.QBSendMessageTask;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
@@ -34,8 +31,8 @@ import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
-import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
+import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.ui.utils.UriCreator;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,7 +74,6 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
 
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, new FailAction(this));
-        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
         updateBroadcastActionList();
 

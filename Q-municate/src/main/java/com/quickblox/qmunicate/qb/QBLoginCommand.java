@@ -18,18 +18,15 @@ public class QBLoginCommand extends ServiceCommand {
     private static final String TAG = QBLoginCommand.class.getSimpleName();
     private QBChatHelper qbChatHelper;
 
-    public QBLoginCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
-    }
-
     public static void start(Context context, QBUser user) {
         Intent intent = new Intent(QBServiceConsts.LOGIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         context.startService(intent);
     }
 
-    public QBLoginCommand(Context context, String successAction, String failAction) {
+    public QBLoginCommand(Context context, QBChatHelper qbChatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
+        this.qbChatHelper = qbChatHelper;
     }
 
     @Override

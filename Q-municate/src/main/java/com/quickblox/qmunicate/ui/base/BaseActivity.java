@@ -89,15 +89,6 @@ public abstract class BaseActivity extends Activity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
-    public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        IntentFilter intentFilter = new IntentFilter();
-        for (String commandName : broadcastCommandMap.keySet()) {
-            intentFilter.addAction(commandName);
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-    }
-
     public void showProgress() {
         progress.show(getFragmentManager(), null);
     }

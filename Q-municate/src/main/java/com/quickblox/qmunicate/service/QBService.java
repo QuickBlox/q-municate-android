@@ -2,9 +2,11 @@ package com.quickblox.qmunicate.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.smack.SmackAndroid;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.QBAddFriendCommand;
@@ -52,6 +54,7 @@ public class QBService extends Service {
                 KEEP_ALIVE_TIME_UNIT,
                 threadQueue);
 
+        qbChatHelper = new QBChatHelper();
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, new QBAddFriendsCommand(this,
@@ -61,7 +64,7 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION, QBServiceConsts.GET_FILE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this, qbChatHelper,
-                QBServiceConsts.LOGIN_SUCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this,
                 QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, new QBRemoveFriendCommand(this,
@@ -71,7 +74,7 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SIGNUP_ACTION, new QBSignUpCommand(this,
                 QBServiceConsts.SIGNUP_SUCCESS_ACTION, QBServiceConsts.SIGNUP_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, new QBSocialLoginCommand(this,
-                QBServiceConsts.LOGIN_SUCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
     }
@@ -79,7 +82,7 @@ public class QBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        smackAndroid = SmackAndroid.init(this);
+        QBChatService.init(this);
     }
 
     @Override
@@ -98,6 +101,7 @@ public class QBService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        QBChatService.getInstance().destroy();
     }
 
     @Override

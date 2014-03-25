@@ -3,14 +3,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/act_friend_button_default" />
-            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp" />
+            <solid android:color="@color/button_end_call_normal_color"/>
+            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="10dp" android:topLeftRadius="10dp" android:topRightRadius="10dp"/>
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/act_friend_button_pressed" />
-            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="3dp" android:topLeftRadius="10dp" android:topRightRadius="10dp" />
+            <solid android:color="@color/button_end_call_pressed_color"/>
+            <corners android:bottomLeftRadius="10dp" android:bottomRightRadius="3dp" android:topLeftRadius="10dp" android:topRightRadius="10dp"/>
         </shape>
     </item>
 </selector>
