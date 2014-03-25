@@ -2,10 +2,11 @@ package com.quickblox.qmunicate.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.quickblox.module.chat.smack.SmackAndroid;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.QBChangePasswordCommand;
@@ -33,12 +34,12 @@ public class QBService extends Service {
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
+    private IBinder binder = new QBServiceBinder();
     private final BlockingQueue<Runnable> threadQueue;
 
     private Map<String, ServiceCommand> serviceCommandMap = new HashMap<String, ServiceCommand>();
     private ThreadPoolExecutor threadPool;
-
-    private SmackAndroid smackAndroid;
+    private QBChatHelper qbChatHelper;
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -48,14 +49,14 @@ public class QBService extends Service {
                 KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT,
                 threadQueue);
-
+        qbChatHelper = new QBChatHelper();
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.CHANGE_PASSWORD_ACTION, new QBChangePasswordCommand(this,
                 QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION, QBServiceConsts.GET_FILE_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this,
+        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this, qbChatHelper,
                 QBServiceConsts.LOGIN_SUCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this,
                 QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
@@ -74,7 +75,7 @@ public class QBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        smackAndroid = SmackAndroid.init(this);
+        QBChatService.init(this);
     }
 
     @Override
@@ -92,14 +93,22 @@ public class QBService extends Service {
 
     @Override
     public void onDestroy() {
-        smackAndroid.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return binder;
+    }
+
+    public QBChatHelper getQbChatHelper() {
+        return qbChatHelper;
+    }
+
+    public class QBServiceBinder extends Binder {
+        public QBService getService() {
+            return QBService.this;
+        }
     }
 
     private void startAsync(final ServiceCommand command, final Intent intent) {

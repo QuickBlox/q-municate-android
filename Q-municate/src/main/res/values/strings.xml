@@ -120,10 +120,15 @@
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
 
+    //Calls
+    <string name="cll_incoming_call_audio">Incoming Call</string>
+    <string name="cll_incoming_call_video">Incoming Video Call</string>
+
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
     <string name="push_title">call from user</string>
+    <string name="frd_offline_user">User must be online</string>
 
 </resources>

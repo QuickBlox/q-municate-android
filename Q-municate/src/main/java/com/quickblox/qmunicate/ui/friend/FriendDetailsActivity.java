@@ -13,25 +13,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.SignalingChannel;
+import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
-import com.quickblox.qmunicate.qb.QBSendMessageTask;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
-import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
+import com.quickblox.qmunicate.ui.utils.ErrorUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -82,12 +78,6 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         fillUI(friend);
     }
 
-    private void initChat() {
-        if (QBChatService.getInstance().isLoggedIn()) {
-            SignalingChannel signalingChannel = new SignalingChannel(QBChatService.getInstance().getPrivateChatInstance());
-        }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -132,23 +122,30 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void videoCallClickListener(View view) {
-        QBSendMessageTask qbSendMessageTask = new QBSendMessageTask(this);
-        QBUser qbUser = new QBUser();
-        qbUser.setId(friend.getId());
-        qbSendMessageTask.execute(qbUser, "Hello", NotificationHelper.CALL_TYPE);
-        VideoCallActivity.start(FriendDetailsActivity.this);
+        callToUser(friend, CallType.VIDEO_AUDIO);
     }
 
     public void voiceCallClickListener(View view) {
-        VoiceCallActivity.start(FriendDetailsActivity.this);
+
+        callToUser(friend, CallType.AUDIO);
     }
 
     public void chatClickListener(View view) {
         // TODO IS start chat with user
     }
 
+    private void callToUser(Friend friend, CallType callType) {
+        if (friend.isOnline()) {
+            QBUser qbUser = new QBUser(friend.getId());
+            qbUser.setFullName(friend.getFullname());
+            CallActivity.start(FriendDetailsActivity.this, qbUser, callType);
+        } else {
+            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        }
+    }
+
     private void fillUI(Friend friend) {
-        QBGetFileCommand.start(this, friend.getFileId());
+        //QBGetFileCommand.start(this, friend.getFileId());
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);

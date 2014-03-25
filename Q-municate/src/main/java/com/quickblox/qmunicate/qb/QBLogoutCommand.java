@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.facebook.Session;
 import com.quickblox.module.auth.QBAuth;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
@@ -29,7 +30,7 @@ public class QBLogoutCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-
+        QBChatService.getInstance().logout();
         resetFrienList();
         resetRememberMe();
         resetUserCredentials();
