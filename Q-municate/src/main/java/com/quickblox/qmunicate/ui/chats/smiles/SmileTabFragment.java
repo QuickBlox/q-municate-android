@@ -21,7 +21,7 @@ public class SmileTabFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_invite_friends, container, false);
+        view = inflater.inflate(R.layout.smiles_grid, container, false);
         smilesGrid = (GridView) view.findViewById(R.id.smiles_grid);
         initGrid();
         return view;

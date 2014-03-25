@@ -4,13 +4,14 @@
     android:id="@+id/smiles_layout"
     android:layout_width="match_parent"
     android:layout_height="0dip"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/black">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/smiles_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="13dip"
+        android:paddingTop="10dip"
         android:layout_weight="1"
         android:paddingLeft="5dip"
         android:paddingRight="5dip" />
@@ -19,6 +20,6 @@
         android:id="@+id/smiles_pager_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
+        android:paddingTop="10dip"
         android:paddingBottom="10dp" />
 </LinearLayout>

@@ -24,4 +24,5 @@ ext.devDebug = true
 
 // Dependencies versions
 ext.picassoVersion = '2.2.0'
+ext.nineoldandroidsVersion = '2.4.0'
 

@@ -2,6 +2,7 @@ apply plugin: 'android'
 
 dependencies {
     compile "com.squareup.picasso:picasso:${rootProject.picassoVersion}"
+    compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':dependencies:facebook')
     compile 'com.google.android.gms:play-services:4.+'
