@@ -7,32 +7,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private static final int ID_CHATS_LIST_FRAGMENT = 1;
-    private static final int ID_SETTINGS_FRAGMENT = 2;
-    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+    private final int ID_FRIEND_LIST_FRAGMENT = 0;
+    private final int ID_CHAT_LIST_FRAGMENT = 1;
+    private final int ID_SETTINGS_FRAGMENT = 2;
+    private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
     private Fragment currentFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private boolean isImportInitialized;
-    
+    private GSMHelper gsmHelper;
+
     //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
@@ -54,44 +55,30 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         useDoubleBackPressed = true;
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
 
-        initNavigationDrawer();
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
+                getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         if (!isImportInitialized) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
             importFriends = new ImportFriends(MainActivity.this, facebookHelper);
         }
-        
-        /*
-        gsmHelper = new GSMHelper(this);
-        if (gsmHelper.checkPlayServices()) {
-            String registrationId = gsmHelper.getRegistrationId();
-            Log.i(TAG, "registrationId=" + registrationId);
-            if (registrationId.isEmpty()) {
-                gsmHelper.registerInBackground();
-            }
-            int subscriptionId = gsmHelper.getSubscriptionId();
-            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
-                gsmHelper.subscribeToPushNotifications(registrationId);
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }
-        */
+
+        //TODO VF Uncomment when Push woild be needed
+        //checkGCMRegistration();
     }
 
     private void initNavigationDrawer() {
         NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
         navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
+        //TODO VF Uncomment when Push woild be needed
         // gsmHelper.checkPlayServices();
     }
 
@@ -102,7 +89,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendListFragment.newInstance();
                 break;
-            case ID_CHATS_LIST_FRAGMENT:
+            case ID_CHAT_LIST_FRAGMENT:
                 fragment = ChatsListFragment.newInstance();
                 break;
             case ID_SETTINGS_FRAGMENT:
@@ -139,6 +126,22 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
+        }
+    }
+
+    private void checkGCMRegistration() {
+        if (gsmHelper.checkPlayServices()) {
+            String registrationId = gsmHelper.getRegistrationId();
+            Log.i(TAG, "registrationId=" + registrationId);
+            if (registrationId.isEmpty()) {
+                gsmHelper.registerInBackground();
+            }
+            int subscriptionId = gsmHelper.getSubscriptionId();
+            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
+                gsmHelper.subscribeToPushNotifications(registrationId);
+            }
+        } else {
+            Log.i(TAG, "No valid Google Play Services APK found.");
         }
     }
 }

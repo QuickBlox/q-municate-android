@@ -20,9 +20,6 @@ import com.quickblox.qmunicate.ui.utils.Utils;
 
 import java.util.ArrayList;
 
-/**
- * Created by vadim on 14.03.14.
- */
 public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging, Void, Bundle> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
@@ -44,19 +41,12 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     public Bundle performInBackground(GoogleCloudMessaging... params) throws Exception {
         GoogleCloudMessaging gcm = params[0];
         Bundle registration = new Bundle();
-        String regid = gcm.register(Consts.SENDER_ID);
+        String regid = gcm.register(Consts.GCM_SENDER_ID);
         registration.putString(Consts.PROPERTY_REG_ID, regid);
-        //msg = "Device registered, registration ID=" + regid;
-
-        // You should send the registration ID to your server over HTTP, so it
-        // can use GCM/HTTP or CCS to send messages to your app.
         QBSubscription qbSubscription = subscribeToPushNotifications(regid);
         if (qbSubscription != null) {
             registration.putInt(Consts.SUBSCRIPTION_ID, qbSubscription.getId());
         }
-        // For this demo: we don't need to send it because the device will send
-        // upstream messages to a server that echo back the message using the
-        // 'from' address in the message.
         return registration;
     }
 
@@ -67,8 +57,6 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
      * @param regId registration ID
      */
     private QBSubscription subscribeToPushNotifications(String regId) throws QBResponseException {
-        //Create push token with  Registration Id for Android
-        //
         Log.d(TAG, "subscribing...");
 
         String deviceId;
@@ -87,19 +75,12 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         return qbSubscription;
     }
 
-    /**
-     * Stores the registration ID and app versionCode in the application's
-     * {@code SharedPreferences}.
-     *
-     * @param context      application's context.
-     * @param registration registration bundle
-     */
     private void storeRegistration(Context context, Bundle registration) {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         int appVersion = Utils.getAppVersion(context);
         Log.i(TAG, "Saving regId on app version " + appVersion);
         prefsHelper.savePref(Consts.PROPERTY_REG_ID, registration.getString(Consts.PROPERTY_REG_ID));
-        prefsHelper.savePref(Consts.PROPERTY_REG_ID, registration.getInt(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE));
+        prefsHelper.savePref(Consts.SUBSCRIPTION_ID, registration.getInt(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE));
         prefsHelper.savePref(Consts.PROPERTY_APP_VERSION, appVersion);
     }
 

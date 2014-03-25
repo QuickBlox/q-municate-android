@@ -31,15 +31,16 @@ public class GSMHelper {
 
     public boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
-        if (resultCode == ConnectionResult.SUCCESS) {
-            return true;
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+            }
+            return false;
         }
-        if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-            GooglePlayServicesUtil.getErrorDialog(resultCode, activity, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-        } else {
-            Log.i(TAG, "This device is not supported.");
-        }
-        return false;
+        return true;
     }
 
     public void registerInBackground() {
@@ -71,7 +72,8 @@ public class GSMHelper {
         return registrationId;
     }
 
-    // TODO VF will be defined throw core qb
+
+    //TODO VF will be defined throw core qb
     public void subscribeToPushNotifications(String registrationId) {
         new QBGCMRegistrationTask(activity).execute(gcm);
     }
