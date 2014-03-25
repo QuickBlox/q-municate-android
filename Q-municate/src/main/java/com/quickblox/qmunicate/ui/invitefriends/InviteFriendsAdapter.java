@@ -1,24 +1,22 @@
 package com.quickblox.qmunicate.ui.invitefriends;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
-import com.squareup.picasso.Picasso;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
-    private Context context;
-    private Resources resources;
+public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
+
     private LayoutInflater layoutInflater;
     private CounterChangedListener counterChangedListener;
     private String selectedFriendFromFacebook;
@@ -26,13 +24,11 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
     private int counterFacebook;
     private int counterContacts;
 
-    public InviteFriendsAdapter(Context context, int textViewResourceId, ArrayList<InviteFriend> list) {
-        super(context, textViewResourceId, list);
-        this.context = context;
-        resources = context.getResources();
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        selectedFriendFromFacebook = resources.getString(R.string.inf_from_facebook);
-        selectedFriendFromContacts = resources.getString(R.string.inf_from_contacts);
+    public InviteFriendsAdapter(BaseActivity activity, List<InviteFriend> objects) {
+        super(activity, objects);
+        layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        selectedFriendFromFacebook = activity.getString(R.string.inf_from_facebook);
+        selectedFriendFromContacts = activity.getString(R.string.inf_from_contacts);
     }
 
     public void setCounterChangedListener(CounterChangedListener listener) {
@@ -80,17 +76,13 @@ public class InviteFriendsAdapter extends ArrayAdapter<InviteFriend> {
         holder.checkBox.setChecked(data.isSelected());
         holder.checkBox.setTag(data);
 
+        String uri = "";
         if (data.getViaLabelType() == InviteFriend.VIA_CONTACTS_TYPE) {
-            Picasso.with(context)
-                    .load(data.getUri())
-                    .placeholder(R.drawable.placeholder_user)
-                    .into(holder.avatarImageView);
+            uri = data.getLink();
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
-            Picasso.with(context)
-                    .load(String.format(resources.getString(R.string.inf_url_to_facebook_avatar), data.getId()))
-                    .placeholder(R.drawable.placeholder_user)
-                    .into(holder.avatarImageView);
+            uri = String.format(activity.getString(R.string.inf_url_to_facebook_avatar), data.getId());
         }
+        displayImage(uri, holder.avatarImageView);
 
         return convertView;
     }

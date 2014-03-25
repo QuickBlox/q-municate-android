@@ -23,5 +23,5 @@ ext.prodDebug = true
 ext.devDebug = true
 
 // Dependencies versions
-ext.picassoVersion = '2.2.0'
+ext.universalImageLoaderVersion = '1.9.0'
 

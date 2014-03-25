@@ -1,20 +1,22 @@
 package com.quickblox.qmunicate;
 
 import android.app.Application;
+import android.content.Context;
 
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application {
-
-    private static final String APP_ID = "7232";
-    private static final String AUTH_KEY = "MpOecRZy-5WsFva";
-    private static final String AUTH_SECRET = "dTSLaxDsFKqegD7";
 
     private static App instance;
 
@@ -30,6 +32,19 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         initAppication();
+    }
+
+    public void initImageLoader(Context context) {
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                .defaultDisplayImageOptions(Consts.defaultDisplayOptions)
+                .threadPriority(Thread.NORM_PRIORITY - 2)
+                .denyCacheImageMultipleSizesInMemory()
+                .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithOutToken())
+                .tasksProcessingOrder(QueueProcessingType.LIFO)
+                // TODO IS Remove for release app
+                .writeDebugLogs()
+                .build();
+        ImageLoader.getInstance().init(config);
     }
 
     public PrefsHelper getPrefsHelper() {
@@ -54,8 +69,24 @@ public class App extends Application {
 
     private void initAppication() {
         instance = this;
-        QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
+        initImageLoader(this);
+        QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY, Consts.QB_AUTH_SECRET);
         friends = new ArrayList<Friend>();
         prefsHelper = new PrefsHelper(this);
+    }
+
+    private class HashCodeFileNameGeneratorWithOutToken extends HashCodeFileNameGenerator {
+
+        private static final String FACEBOOK_PATTERN = "https://graph.facebook.com/";
+        private static final String TOKEN_PATTERN = "\\?token+=+.*";
+
+        @Override
+        public String generate(String imageUri) {
+            if (imageUri.contains(FACEBOOK_PATTERN)) {
+                return imageUri;
+            }
+            String replace = imageUri.replaceAll(TOKEN_PATTERN, "");
+            return super.generate(replace);
+        }
     }
 }
