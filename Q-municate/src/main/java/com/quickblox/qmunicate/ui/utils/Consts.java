@@ -1,6 +1,9 @@
 package com.quickblox.qmunicate.ui.utils;
 
+import android.graphics.Bitmap;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.quickblox.qmunicate.R;
 
 public class Consts {
@@ -40,10 +43,15 @@ public class Consts {
 
     // Universal Image Loader
     public static final int UIL_MAX_BITMAP_SIZE = 2000000;
+    public static DisplayImageOptions defaultDisplayOptions = new DisplayImageOptions.Builder()
+            .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+            .bitmapConfig(Bitmap.Config.RGB_565)
+            .cacheOnDisc(true)
+            .cacheInMemory(true)
+            .build();
     public static DisplayImageOptions avatarDisplayOptions = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.placeholder_user)
             .showImageForEmptyUri(R.drawable.placeholder_user)
             .showImageOnFail(R.drawable.placeholder_user)
-            .cacheOnDisc(true)
             .build();
 }

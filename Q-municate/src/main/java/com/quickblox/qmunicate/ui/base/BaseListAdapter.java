@@ -3,9 +3,7 @@ package com.quickblox.qmunicate.ui.base;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.utils.Consts;
 
 import java.util.List;
@@ -35,7 +33,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         return position;
     }
 
-    protected void displayImage(String url, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(url, imageView, Consts.avatarDisplayOptions);
+    protected void displayImage(String uri, ImageView imageView) {
+        ImageLoader.getInstance().displayImage(uri, imageView, Consts.avatarDisplayOptions);
     }
 }

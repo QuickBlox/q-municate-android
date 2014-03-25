@@ -150,8 +150,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
 
     private void fillUI(Friend friend) {
         try {
-            String url = UriCreator.getUri(friend.getAvatarUid());
-            ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.avatarDisplayOptions);
+            String uri = UriCreator.getUri(friend.getAvatarUid());
+            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }
