@@ -32,7 +32,7 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -45,15 +45,15 @@ public class SplashActivity extends BaseActivity {
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-        boolean isRememberMe = App.getInstance().getPrefsHelper()
-                .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
+                false);
 
-        boolean isWellcomeShown = App.getInstance().getPrefsHelper()
-                .getPref(PrefsHelper.PREF_LANDING_SHOWN, false);
+        boolean isLandingShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LANDING_SHOWN,
+                false);
 
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
-        } else if (isWellcomeShown) {
+        } else if (isLandingShown) {
             LoginActivity.start(SplashActivity.this);
             finish();
         } else {
@@ -102,8 +102,8 @@ public class SplashActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened() && getLoginType() == LoginType.FACEBOOK) {
-                QBSocialLoginCommand
-                        .start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+                QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(),
+                        null);
             }
         }
     }

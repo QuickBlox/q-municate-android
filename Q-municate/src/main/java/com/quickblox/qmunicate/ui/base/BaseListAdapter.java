@@ -1,16 +1,12 @@
 package com.quickblox.qmunicate.ui.base;
 
-import android.os.Bundle;
-import android.util.SparseArray;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.quickblox.module.content.model.QBFile;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBGetFileCommand;
-import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.squareup.picasso.Picasso;
+import com.quickblox.qmunicate.ui.utils.Consts;
 
 import java.util.List;
 
@@ -19,13 +15,9 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     protected List<T> objects;
     protected BaseActivity activity;
 
-    private SparseArray<ImageView> imageViewArray = new SparseArray<ImageView>();
-
     public BaseListAdapter(BaseActivity activity, List<T> objects) {
         this.activity = activity;
         this.objects = objects;
-        activity.addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
-        activity.updateBroadcastActionList();
     }
 
     @Override
@@ -43,23 +35,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         return position;
     }
 
-    protected void displayImage(Integer fileId, ImageView imageView) {
-        imageViewArray.put(fileId, imageView);
-        QBGetFileCommand.start(activity, fileId);
-    }
-
-    private class GetFileSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            ImageView imageView = imageViewArray.get(file.getId());
-            if (imageView != null) {
-                Picasso.with(activity)
-                        .load(file.getPublicUrl())
-                        .placeholder(R.drawable.placeholder_user)
-                        .into(imageView);
-            }
-        }
+    protected void displayImage(String url, ImageView imageView) {
+        ImageLoader.getInstance().displayImage(url, imageView, Consts.avatarDisplayOptions);
     }
 }

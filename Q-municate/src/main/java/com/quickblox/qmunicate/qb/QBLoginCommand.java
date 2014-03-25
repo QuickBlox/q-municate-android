@@ -16,14 +16,14 @@ public class QBLoginCommand extends ServiceCommand {
 
     private static final String TAG = QBLoginCommand.class.getSimpleName();
 
+    public QBLoginCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, QBUser user) {
         Intent intent = new Intent(QBServiceConsts.LOGIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         context.startService(intent);
-    }
-
-    public QBLoginCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

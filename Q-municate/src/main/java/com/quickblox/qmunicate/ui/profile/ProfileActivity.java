@@ -16,21 +16,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.quickblox.module.content.model.QBFile;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.ErrorUtils;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
-import com.squareup.picasso.Picasso;
+import com.quickblox.qmunicate.ui.utils.UriCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,18 +72,17 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
 
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
         addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new FailAction(this));
-        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
-        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
 
         initUsersData();
         initTextChangedListeners();
     }
 
     private void initUsersData() {
-        Integer fileId = qbUser.getFileId();
-        if (fileId != null) {
-            QBGetFileCommand.start(this, fileId);
+        try {
+            String url = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
+            ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.avatarDisplayOptions);
+        } catch (BaseServiceException e) {
+            ErrorUtils.showError(this, e);
         }
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
@@ -239,18 +240,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             hideProgress();
-        }
-    }
-
-    private class GetFileSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            Picasso.with(ProfileActivity.this)
-                    .load(file.getPublicUrl())
-                    .placeholder(R.drawable.placeholder_user)
-                    .into(avatarImageView);
         }
     }
 }

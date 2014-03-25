@@ -42,7 +42,6 @@ public class LandingActivity extends BaseActivity {
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 

@@ -19,15 +19,15 @@ public class QBSignUpCommand extends ServiceCommand {
 
     private static final String TAG = QBSignUpCommand.class.getSimpleName();
 
+    public QBSignUpCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, QBUser user, File image) {
         Intent intent = new Intent(QBServiceConsts.SIGNUP_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
-    }
-
-    public QBSignUpCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class QBSignUpCommand extends ServiceCommand {
         user = QBUsers.signUpSignInTask(user);
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            user.setFileId(qbFile.getId());
+            user.setWebsite(qbFile.getUid());
             user = QBUsers.updateUser(user);
         }
 

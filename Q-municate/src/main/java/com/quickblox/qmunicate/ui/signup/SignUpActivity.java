@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,7 +62,6 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
 
         addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
         addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
     }
 
     @Override
@@ -121,7 +119,6 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
-
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
@@ -132,6 +129,7 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
     }
 
     private class SignUpSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);

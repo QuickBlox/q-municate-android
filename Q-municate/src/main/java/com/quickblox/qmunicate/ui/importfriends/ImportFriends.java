@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, LoaderManager<List<QBUser>> {
+
     public Activity activity;
     private LoaderHelper<List<QBUser>> loaderHelper;
     private FacebookHelper facebookHelper;
@@ -67,27 +68,25 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         }
     }
 
+    @Override
+    public void onLoaderException(int id, Exception e) {
+        loaderHelper.onLoaderException(id, e);
+    }
+
     public void fiendsReceived() {
         realFriendsCallbacks++;
         if (realFriendsCallbacks == expectedFriendsCallbacks) {
             String[] users = getSelectedUsers();
-            if(users.length > 0) {
-                QBAddFriendsCommand.start(activity, users);
-            }
+            QBAddFriendsCommand.start(activity, users);
         }
     }
 
     private String[] getSelectedUsers() {
         ArrayList<String> arrayList = new ArrayList<String>();
-        for(QBUser user: users) {
+        for (QBUser user : users) {
             arrayList.add(user.getId().toString());
         }
         return arrayList.toArray(new String[arrayList.size()]);
-    }
-
-    @Override
-    public void onLoaderException(int id, Exception e) {
-        loaderHelper.onLoaderException(id, e);
     }
 
     @Override
@@ -129,18 +128,23 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
                 friendsFacebookList = new ArrayList<InviteFriend>();
                 for (com.facebook.model.GraphUser user : users) {
-                    friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(), InviteFriend.VIA_FACEBOOK_TYPE, null, false));
+                    friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(),
+                            InviteFriend.VIA_FACEBOOK_TYPE, null, false));
                 }
-                startUserListLoader(true, friendsFacebookList);
+                if (friendsFacebookList.size() > 0) {
+                    startUserListLoader(true, friendsFacebookList);
+                }
             }
         });
     }
 
     private void startUserListLoader(boolean isFacebookFriends, List<InviteFriend> friends) {
         if (isFacebookFriends) {
-            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM,
+                    Consts.LOAD_PER_PAGE, getIDs(friends)));
         } else {
-            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM, Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM,
+                    Consts.LOAD_PER_PAGE, getIDs(friends)));
         }
     }
 
@@ -153,11 +157,12 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     }
 
     private class GetFriendsListTask extends AsyncTask<Void, Void, Void> {
+
         @Override
         protected Void doInBackground(Void... params) {
             expectedFriendsCallbacks++;
             friendsContactsList = friendsUtils.getContactsWithEmail();
-            startUserListLoader(false, friendsContactsList);
+                startUserListLoader(false, friendsContactsList);
             return null;
         }
 

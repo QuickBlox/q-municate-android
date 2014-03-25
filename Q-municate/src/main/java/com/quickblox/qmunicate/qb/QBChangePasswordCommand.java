@@ -14,14 +14,14 @@ public class QBChangePasswordCommand extends ServiceCommand {
 
     private static final String TAG = QBChangePasswordCommand.class.getSimpleName();
 
+    public QBChangePasswordCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, QBUser user) {
         Intent intent = new Intent(QBServiceConsts.CHANGE_PASSWORD_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         context.startService(intent);
-    }
-
-    public QBChangePasswordCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

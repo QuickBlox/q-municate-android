@@ -1,7 +1,7 @@
 apply plugin: 'android'
 
 dependencies {
-    compile "com.squareup.picasso:picasso:${rootProject.picassoVersion}"
+    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':dependencies:facebook')
     compile 'com.google.android.gms:play-services:4.+'

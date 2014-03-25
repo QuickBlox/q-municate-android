@@ -9,9 +9,6 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
 import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 
-/**
- * Created by vadim on 17.03.14.
- */
 public class QBSendMessageTask extends BaseProgressTask<Object, Void, QBEvent> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
@@ -20,7 +17,6 @@ public class QBSendMessageTask extends BaseProgressTask<Object, Void, QBEvent> {
     public QBSendMessageTask(Activity activity) {
         super(activity, -1);
     }
-
 
     @Override
     public QBEvent performInBackground(Object... params) throws Exception {

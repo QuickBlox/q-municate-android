@@ -132,6 +132,9 @@
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
 
+    // QuickBlox
+    <string name="api_quickblox_domain">api.quickblox.com</string>
+
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
