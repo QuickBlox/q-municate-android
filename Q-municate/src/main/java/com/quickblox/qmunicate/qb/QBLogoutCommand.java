@@ -17,13 +17,13 @@ public class QBLogoutCommand extends ServiceCommand {
 
     private static final String TAG = QBLogoutCommand.class.getSimpleName();
 
+    public QBLogoutCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context) {
         Intent intent = new Intent(QBServiceConsts.LOGOUT_ACTION, null, context, QBService.class);
         context.startService(intent);
-    }
-
-    public QBLogoutCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

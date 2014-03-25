@@ -2,13 +2,13 @@ package com.quickblox.qmunicate.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.smack.SmackAndroid;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.QBAddFriendCommand;
+import com.quickblox.qmunicate.qb.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
@@ -41,6 +41,8 @@ public class QBService extends Service {
     private ThreadPoolExecutor threadPool;
     private QBChatHelper qbChatHelper;
 
+    private SmackAndroid smackAndroid;
+
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
         threadPool = new ThreadPoolExecutor(
@@ -49,9 +51,11 @@ public class QBService extends Service {
                 KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT,
                 threadQueue);
-        qbChatHelper = new QBChatHelper();
+
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, new QBAddFriendsCommand(this,
+                QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, QBServiceConsts.ADD_FRIENDS_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.CHANGE_PASSWORD_ACTION, new QBChangePasswordCommand(this,
                 QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
@@ -75,7 +79,7 @@ public class QBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        QBChatService.init(this);
+        smackAndroid = SmackAndroid.init(this);
     }
 
     @Override

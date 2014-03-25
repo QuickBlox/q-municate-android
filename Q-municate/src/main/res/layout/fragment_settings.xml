@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:orientation="vertical"
-              android:paddingLeft="20dp"
-              android:paddingRight="20dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
 
     <Button
         android:id="@+id/profile"
@@ -15,12 +15,12 @@
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
         android:text="@string/stn_profile"
-        android:textSize="@dimen/text_size"/>
+        android:textSize="@dimen/text_size" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <Switch
         android:id="@+id/pushNotification"
@@ -29,12 +29,12 @@
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
         android:text="@string/stn_push_notifivation"
-        android:textSize="@dimen/text_size"/>
+        android:textSize="@dimen/text_size" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <Button
         android:id="@+id/changePassword"
@@ -45,12 +45,12 @@
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
         android:text="@string/stn_change_password"
-        android:textSize="@dimen/text_size"/>
+        android:textSize="@dimen/text_size" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+        android:background="@android:color/darker_gray" />
 
     <Button
         android:id="@+id/logout"
@@ -61,6 +61,5 @@
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
         android:text="@string/stn_logout"
-        android:textSize="@dimen/text_size"/>
-
+        android:textSize="@dimen/text_size" />
 </LinearLayout>

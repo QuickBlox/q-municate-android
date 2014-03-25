@@ -14,14 +14,14 @@ public class QBGetFileCommand extends ServiceCommand {
 
     private static final String TAG = QBGetFileCommand.class.getSimpleName();
 
+    public QBGetFileCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, int fileId) {
         Intent intent = new Intent(QBServiceConsts.GET_FILE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FILE_ID, fileId);
         context.startService(intent);
-    }
-
-    public QBGetFileCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

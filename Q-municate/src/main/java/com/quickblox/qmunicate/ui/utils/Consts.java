@@ -19,7 +19,33 @@ public class Consts {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String ACCEPTED_CALL = "accepted_call";
 
-    public static enum CALL_DIRECTION_TYPE {
+    // Facebook
+    public static final String FB_WALL_PARAM_NAME = "name";
+    public static final String FB_WALL_PARAM_DESCRIPTION = "description";
+    public static final String FB_WALL_PARAM_LINK = "link";
+    public static final String FB_WALL_PARAM_PICTURE = "picture";
+    public static final String FB_WALL_PARAM_PLACE = "place";
+    public static final String FB_WALL_PARAM_TAGS = "tags";
+    public static final String FB_WALL_PARAM_FEED = "me/feed";
+    public static final String INVITE_TYPE_OF_EMAIL = "message/rfc822";
+
+    public static String GSM_SENDER = "761750217637";
+    public static String SENDER_ID = "291727224931";
+
+    // Universal Image Loader
+    public static final int UIL_MAX_BITMAP_SIZE = 2000000;
+    public static DisplayImageOptions defaultDisplayOptions = new DisplayImageOptions.Builder()
+            .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+            .bitmapConfig(Bitmap.Config.RGB_565)
+            .cacheOnDisc(true)
+            .cacheInMemory(true)
+            .build();
+    public static DisplayImageOptions avatarDisplayOptions = new DisplayImageOptions.Builder()
+            .showImageOnLoading(R.drawable.placeholder_user)
+            .showImageForEmptyUri(R.drawable.placeholder_user)
+            .showImageOnFail(R.drawable.placeholder_user)
+            .build();
+}    public static enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING
     }
 }

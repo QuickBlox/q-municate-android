@@ -13,6 +13,8 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
+import com.quickblox.qmunicate.ui.utils.ImageHelper;
+
 public class CircularImageView extends ImageView {
 
     public static final String COLOR_CIRCLE_BACKGROUND = "#BAB399";
@@ -94,7 +96,7 @@ public class CircularImageView extends ImageView {
             return;
         }
 
-        Bitmap sourceBitmap = drawableToBitmap(drawable);
+        Bitmap sourceBitmap = ImageHelper.drawableToBitmap(drawable);
         Bitmap bitmap = sourceBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         int width = getWidth();
@@ -102,23 +104,5 @@ public class CircularImageView extends ImageView {
 
         Bitmap roundBitmap = getCroppedBitmap(bitmap, width);
         canvas.drawBitmap(roundBitmap, 0, 0, null);
-    }
-
-    public static Bitmap drawableToBitmap (Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
-        int width = drawable.getIntrinsicWidth();
-        width = width > 0 ? width : 1;
-        int height = drawable.getIntrinsicHeight();
-        height = height > 0 ? height : 1;
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
     }
 }

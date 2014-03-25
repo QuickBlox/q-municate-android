@@ -53,7 +53,19 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
-        registerBroadcastReceiver();
+        broadcastReceiver = new BaseBroadcastReceiver();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBroadcastActionList();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterBroadcastReceiver();
+        super.onPause();
     }
 
     @Override
@@ -71,6 +83,19 @@ public abstract class BaseActivity extends Activity {
                 doubleBackToExitPressedOnce = false;
             }
         }, DOUBLE_BACK_DELAY);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+    public void updateBroadcastActionList() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        IntentFilter intentFilter = new IntentFilter();
+        for (String commandName : broadcastCommandMap.keySet()) {
+            intentFilter.addAction(commandName);
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
     }
 
     public void showProgress() {
@@ -150,6 +175,21 @@ public abstract class BaseActivity extends Activity {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(activity, e);
             activity.hideProgress();
+        }
+    }
+
+    private class BaseBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (intent != null && (action) != null) {
+                Command command = broadcastCommandMap.get(action);
+                if (command != null) {
+                    Log.d("STEPS", "executing " + action);
+                    command.execute(intent.getExtras());
+                }
+            }
         }
     }
 

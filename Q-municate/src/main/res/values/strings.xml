@@ -13,8 +13,8 @@
 
     // Landing
     <string name="lnd_connect_with_facebook">Connect with Facebook</string>
-    <string name="lnd_log_in">Log In</string>
-    <string name="lnd_sign_up">Sign Up</string>
+    <string name="lnd_have_account">Already have an account?</string>
+    <string name="lnd_sign_up">Sign Up with Email</string>
     <string name="lnd_no_app_version">Couldn\'t get app version</string>
 
     // Login
@@ -25,10 +25,11 @@
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
 
-    // Registration
-    <string name="rgs_fullname_hint">Full Name</string>
-    <string name="rgs_email_hint">Email</string>
-    <string name="rgs_choose_user_picture">Choose user picture</string>
+    // Sing Up
+    <string name="sup_fullname_hint">Full Name</string>
+    <string name="sup_email_hint">Email</string>
+    <string name="sup_choose_user_picture">Choose user picture</string>
+    <string name="sup_sign_up">Sign Up</string>
 
     // Friend List
     <string name="frl_global_search">Global Search</string>
@@ -46,10 +47,21 @@
 
     // Chat
     <string name="cht_message">Message</string>
+    <string name="cht_hint_message">Type a message</string>
+
+    // Group Chat
+    <string name="gch_ctx_menu_reply">Reply</string>
+    <string name="gch_ctx_menu_prv_message">Private Message</string>
+    <string name="gch_ctx_menu_video_call">Video Call</string>
+    <string name="gch_ctx_menu_profile">View Profile</string>
 
     // Group Chat Details
     <string name="gcd_title">Group Details</string>
     <string name="gcd_leave_group">Leave group</string>
+
+    // New Chat
+    <string name="nch_title">New Chat</string>
+    <string name="nch_ac_mode_title">Create Group Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -124,6 +136,9 @@
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
 
+    // QuickBlox
+    <string name="api_quickblox_domain">api.quickblox.com</string>
+
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
@@ -131,4 +146,6 @@
     <string name="push_title">call from user</string>
     <string name="frd_offline_user">User must be online</string>
 
+    <string name="label_done">Done</string>
+    
 </resources>

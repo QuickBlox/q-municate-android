@@ -9,9 +9,14 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
+import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
@@ -24,8 +29,12 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private final int ID_SETTINGS_FRAGMENT = 2;
     private final int ID_INVITE_FRIENDS_FRAGMENT = 3;
 
-    private GSMHelper gsmHelper;
     private Fragment currentFragment;
+    private FacebookHelper facebookHelper;
+    private ImportFriends importFriends;
+    private boolean isImportInitialized;
+    
+    //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -37,6 +46,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onActivityResult(requestCode, resultCode, data);
         if (currentFragment instanceof InviteFriendsFragment) {
             currentFragment.onActivityResult(requestCode, resultCode, data);
+        } else if (facebookHelper != null) {
+            facebookHelper.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -49,11 +60,39 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment)
                 getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        navigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-        //TODO VF uncomment when PUSH would be needed
-        //checkGCMRegistration();
+        if (!isImportInitialized) {
+            showProgress();
+            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
+        }
+        
+        /*
+        gsmHelper = new GSMHelper(this);
+        if (gsmHelper.checkPlayServices()) {
+            String registrationId = gsmHelper.getRegistrationId();
+            Log.i(TAG, "registrationId=" + registrationId);
+            if (registrationId.isEmpty()) {
+                gsmHelper.registerInBackground();
+            }
+            int subscriptionId = gsmHelper.getSubscriptionId();
+            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
+                gsmHelper.subscribeToPushNotifications(registrationId);
+            }
+        } else {
+            Log.i(TAG, "No valid Google Play Services APK found.");
+        }
+        */
+    }
+
+    private void initNavigationDrawer() {
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // gsmHelper.checkPlayServices();
     }
 
     @Override
@@ -63,9 +102,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendListFragment.newInstance();
                 break;
-            case ID_CHAT_LIST_FRAGMENT:
-                DialogUtils.show(this, getString(R.string.comming_soon));
-                return;
+            case ID_CHATS_LIST_FRAGMENT:
+                fragment = ChatsListFragment.newInstance();
+                break;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
@@ -88,6 +127,19 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
+    }
+
+    private class FacebookSessionStatusCallback implements Session.StatusCallback {
+
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            if (session.isOpened()) {
+                importFriends.startGetFriendsListTask(true);
+            } else if (!(!session.isOpened() && !session.isClosed())) {
+                importFriends.startGetFriendsListTask(false);
+                hideProgress();
+            }
+        }
     }
 
     private void checkGCMRegistration() {

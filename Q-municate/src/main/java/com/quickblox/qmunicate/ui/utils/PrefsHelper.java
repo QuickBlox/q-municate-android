@@ -6,12 +6,13 @@ import android.content.SharedPreferences;
 import com.quickblox.qmunicate.R;
 
 public class PrefsHelper {
-
     public static final String PREF_REMEMBER_ME = "Remember Me";
+    public static final String PREF_LOGIN_TYPE = "Login type";
     public static final String PREF_USER_EMAIL = "Email";
     public static final String PREF_USER_PASSWORD = "Password";
     public static final String PREF_PUSH_NOTIFICATIONS = "Push Notifications";
     public static final String PREF_LANDING_SHOWN = "Landing screen was shown";
+    public static final String PREF_IMPORT_INITIALIZED = "Import initialized";
     public static final String PREF_USER_LEARNED_DRAWER = "Navigation Drawer learned";
 
     private final SharedPreferences sharedPreferences;

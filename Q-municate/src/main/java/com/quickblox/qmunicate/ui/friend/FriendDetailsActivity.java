@@ -14,20 +14,28 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.content.model.QBFile;
+import com.quickblox.internal.core.exception.BaseServiceException;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
+import com.quickblox.qmunicate.qb.QBSendMessageTask;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
+import com.quickblox.qmunicate.ui.voicecall.VoiceCallActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -76,6 +84,13 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
         fillUI(friend);
+    }
+
+    private void initChat() {
+        if (QBChatService.getInstance().isLoggedIn()) {
+            SignalingChannel signalingChannel = new SignalingChannel(
+                    QBChatService.getInstance().getPrivateChatInstance());
+        }
     }
 
     @Override
@@ -131,7 +146,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void chatClickListener(View view) {
-        // TODO IS start chat with user
+        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void callToUser(Friend friend, CallType callType) {
@@ -145,7 +160,12 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void fillUI(Friend friend) {
-        //QBGetFileCommand.start(this, friend.getFileId());
+        try {
+            String uri = UriCreator.getUri(friend.getAvatarUid());
+            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+        } catch (BaseServiceException e) {
+            ErrorUtils.showError(this, e);
+        }
         nameTextView.setText(friend.getFullname());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
@@ -190,15 +210,6 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
             App.getInstance().getFriends().remove(friend);
             DialogUtils.show(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
             finish();
-        }
-    }
-
-    private class GetFileSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            ImageLoader.getInstance().displayImage(file.getPublicUrl(), avatarImageView);
         }
     }
 }

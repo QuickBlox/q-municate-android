@@ -11,6 +11,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
 import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -31,12 +32,11 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
-        updateBroadcastActionList();
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        if (facebookHelper.isSessionOpened()) {
+        if (facebookHelper.isSessionOpened() && getLoginType() == LoginType.FACEBOOK) {
             return;
         }
 
@@ -45,13 +45,15 @@ public class SplashActivity extends BaseActivity {
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
+                false);
 
-        boolean isWellcomeShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LANDING_SHOWN, false);
+        boolean isLandingShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LANDING_SHOWN,
+                false);
 
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
-        } else if (isWellcomeShown) {
+        } else if (isLandingShown) {
             LoginActivity.start(SplashActivity.this);
             finish();
         } else {
@@ -67,9 +69,15 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onStop() {
-        super.onStop();
         facebookHelper.onActivityStop();
+        super.onStop();
     }
 
     @Override
@@ -78,22 +86,24 @@ public class SplashActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
-    }
-
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         QBLoginCommand.start(this, user);
     }
 
+    private LoginType getLoginType() {
+        int defValue = LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginType.values()[value];
+    }
+
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
+
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened()) {
-                QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+            if (session.isOpened() && getLoginType() == LoginType.FACEBOOK) {
+                QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(),
+                        null);
             }
         }
     }

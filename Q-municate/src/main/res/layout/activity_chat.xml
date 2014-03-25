@@ -1,13 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <ListView
         android:id="@+id/messagesContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/messageLayout"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="20dp"
@@ -17,7 +16,7 @@
     <RelativeLayout
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true">
 
         <EditText
@@ -25,7 +24,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/sendMessageButton"
             android:layout_toRightOf="@+id/attachButton"
             android:autoText="true"
             android:hint="@string/cht_message" />
@@ -53,6 +51,5 @@
             android:layout_height="@dimen/divider_height"
             android:layout_above="@id/messageEdit"
             android:background="@android:color/darker_gray" />
-
     </RelativeLayout>
 </RelativeLayout>

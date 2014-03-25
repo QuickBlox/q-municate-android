@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +24,9 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
+import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +34,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
-
-    public static final int PAGE_NUM = 1;
-    public static final int PER_PAGE = 100;
 
     private static final String TAG = FriendListFragment.class.getSimpleName();
     private static final int START_DELAY = 0;
@@ -54,14 +53,11 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private Timer friendListUpdateTimer;
     private String constraint;
-
+    private boolean isImportInitialized;
+    private boolean isStopFriendListLoader;
 
     public static FriendListFragment newInstance() {
-        FriendListFragment fragment = new FriendListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_TITLE, App.getInstance().getString(R.string.nvd_title_friends));
-        fragment.setArguments(args);
-        return fragment;
+        return new FriendListFragment();
     }
 
     @Override
@@ -70,40 +66,33 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
         listTitleView = inflater.inflate(R.layout.view_section_title, null);
         listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
+        listTitle.setVisibility(View.GONE);
+        listView.addHeaderView(listTitleView);
 
-        initFriendList();
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
+                false);
+
         initGlobalSearchButton(inflater);
-        return listView;
-    }
+        initFriendList();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        state = State.FRIEND_LIST;
+        return listView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        getBaseActivity().addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
-        getBaseActivity().updateBroadcastActionList();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (state == State.FRIEND_LIST) {
-            startFriendListLoaderWithTimer();
-        }
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(
+                baseActivity));
     }
 
     @Override
     public void onStop() {
-        stopFriendListLoader();
         super.onStop();
+        if (isStopFriendListLoader) {
+            stopFriendListLoader();
+        }
     }
 
     @Override
@@ -123,6 +112,27 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        title = getString(R.string.nvd_title_friends);
+        state = State.FRIEND_LIST;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!isImportInitialized) {
+            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
+            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+        } else {
+            if (state == State.FRIEND_LIST) {
+                startFriendListLoaderWithTimer();
+            }
         }
     }
 
@@ -171,32 +181,39 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, PAGE_NUM, PER_PAGE));
+        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.LOAD_PAGE_NUM,
+                Consts.LOAD_PER_PAGE));
     }
 
     private void startFriendListLoaderWithTimer() {
+        isStopFriendListLoader = true;
         friendListUpdateTimer = new Timer();
         friendListUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(PAGE_NUM, PER_PAGE));
+                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(Consts.LOAD_PAGE_NUM,
+                        Consts.LOAD_PER_PAGE));
             }
         }, START_DELAY, UPDATE_DATA_PERIOD);
     }
 
     private void stopFriendListLoader() {
+        isStopFriendListLoader = false;
         friendListUpdateTimer.cancel();
     }
 
     private void initFriendList() {
         friends = App.getInstance().getFriends();
-        friendListAdapter = new FriendListAdapter(getBaseActivity(), friends);
+        friendListAdapter = new FriendListAdapter(baseActivity, friends);
         listView.setAdapter(friendListAdapter);
         listView.setSelector(R.drawable.list_item_background_selector);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Friend friend = friendListAdapter.getItem(position);
+                if (position == 0) {
+                    return;
+                }
+                Friend friend = friendListAdapter.getItem(position - 1);
                 FriendDetailsActivity.start(getActivity(), friend);
             }
         });
@@ -204,12 +221,14 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void initUserList() {
         users = new ArrayList<Friend>();
-        userListAdapter = new UserListAdapter(getBaseActivity(), friends, users, new UserListAdapter.UserListListener() {
-            @Override
-            public void onUserSelected(int position) {
-                addToFriendList(users.get(position));
-            }
-        });
+        userListAdapter = new UserListAdapter(baseActivity, friends, users,
+                new UserListAdapter.UserListListener() {
+                    @Override
+                    public void onUserSelected(int position) {
+                        addToFriendList(users.get(position));
+                    }
+                }
+        );
         listView.setSelector(android.R.color.transparent);
         listView.setAdapter(userListAdapter);
         listView.setOnItemClickListener(null);
@@ -218,7 +237,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void addToFriendList(final Friend friend) {
-        getBaseActivity().showProgress();
+        baseActivity.showProgress();
         QBAddFriendCommand.start(getActivity(), friend);
     }
 
@@ -247,15 +266,21 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         initUserList();
     }
 
+    private void importFriendsFinished() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        startFriendListLoaderWithTimer();
+        baseActivity.hideProgress();
+    }
+
     private enum State {FRIEND_LIST, GLOBAL_LIST}
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
+
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            getActivity().getActionBar().setIcon(android.R.color.transparent);
-            // listTitle.setVisibility(View.VISIBLE);
-            listView.addHeaderView(listTitleView);
+            baseActivity.getActionBar().setIcon(android.R.color.transparent);
+            listTitle.setVisibility(View.VISIBLE);
             listTitle.setText(R.string.frl_friends);
             return true;
         }
@@ -263,12 +288,10 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
-            if (state == State.GLOBAL_LIST) {
-                state = State.FRIEND_LIST;
-                initFriendList();
-            }
-            getActivity().getActionBar().setDisplayShowHomeEnabled(true);
-            listView.removeHeaderView(listTitleView);
+            state = State.FRIEND_LIST;
+            listTitle.setVisibility(View.GONE);
+            initFriendList();
+            baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
             return true;
         }
     }
@@ -280,8 +303,24 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
             Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
             friends.add(friend);
             userListAdapter.notifyDataSetChanged();
-            getBaseActivity().hideProgress();
-            Log.d(TAG, "AddFriendSuccessAction");
+            baseActivity.hideProgress();
+        }
+    }
+
+    private class AddFriendsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
+        }
+    }
+
+    private class AddFriendsFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
+            DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_import_friends_filed));
         }
     }
 }

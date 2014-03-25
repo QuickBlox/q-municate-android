@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.module.auth.QBAuth;
+import com.quickblox.module.auth.model.QBSession;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
@@ -33,9 +35,10 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
 
-        QBAuth.createSession();
+        QBSession session = QBAuth.createSession();
         QBUser user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
-        // QBChatService.getInstance().loginWithUser(user);
+        user.setPassword(session.getToken());
+        QBChatService.getInstance().loginWithUser(user);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);

@@ -25,20 +25,18 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
+import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
 
 import java.io.File;
 
-public class SignUpActivity extends BaseActivity implements GettingImageFileListener {
+public class SignUpActivity extends BaseActivity implements OnGetImageFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
-
     private EditText password;
     private ImageView avatarImageView;
     private EditText fullname;
     private EditText email;
-
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
     private QBUser qbUser;
@@ -64,7 +62,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
 
         addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
         addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
     }
 
     @Override
@@ -122,7 +119,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
-
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
@@ -133,6 +129,7 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
     }
 
     private class SignUpSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);

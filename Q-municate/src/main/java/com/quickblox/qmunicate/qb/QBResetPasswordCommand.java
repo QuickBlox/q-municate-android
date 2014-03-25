@@ -14,14 +14,14 @@ public class QBResetPasswordCommand extends ServiceCommand {
 
     private static final String TAG = QBResetPasswordCommand.class.getSimpleName();
 
+    public QBResetPasswordCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, String email) {
         Intent intent = new Intent(QBServiceConsts.RESET_PASSWORD_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_EMAIL, email);
         context.startService(intent);
-    }
-
-    public QBResetPasswordCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

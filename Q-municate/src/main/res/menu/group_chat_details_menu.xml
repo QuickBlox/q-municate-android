@@ -1,6 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_leave_group"
-        android:showAsAction="ifRoom"
-        android:title="@string/gcd_leave_group" />
+        android:id="@+id/action_add"
+        android:icon="@drawable/adduser"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_leave"
+        android:icon="@drawable/leavechat"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom" />
 </menu>

@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.ui.utils.OnlineStatusHelper;
+import com.quickblox.qmunicate.ui.utils.UriCreator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,22 +10,18 @@ import java.util.Date;
 import java.util.List;
 
 public class Friend implements Serializable {
+
     private Integer id;
     private String fullname;
     private String email;
     private String phone;
     private Integer fileId;
+    private String avatarUid;
     private String status;
     private Date lastRequestAt;
     private boolean online;
 
-    public static List<Friend> createFriends(List<QBUser> users) {
-        List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : users) {
-            friends.add(new Friend(user));
-        }
-        return friends;
-    }
+    private boolean selected;
 
     public Friend(QBUser user) {
         this.id = user.getId();
@@ -33,6 +30,15 @@ public class Friend implements Serializable {
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
         this.lastRequestAt = user.getLastRequestAt();
+        this.avatarUid = UriCreator.cutUid(user.getWebsite());
+    }
+
+    public static List<Friend> createFriends(List<QBUser> users) {
+        List<Friend> friends = new ArrayList<Friend>();
+        for (QBUser user : users) {
+            friends.add(new Friend(user));
+        }
+        return friends;
     }
 
     @Override
@@ -120,5 +126,21 @@ public class Friend implements Serializable {
 
     public String getOnlineStatus() {
         return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public String getAvatarUid() {
+        return avatarUid;
+    }
+
+    public void setAvatarUid(String avatarUid) {
+        this.avatarUid = avatarUid;
     }
 }
