@@ -46,6 +46,12 @@ public class SettingsFragment extends BaseFragment {
 
         pushNotification.setChecked(getPushNotifications());
 
+        if (null == App.getInstance().getUser().getFacebookId()) {
+            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
+        } else {
+            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.GONE);
+        }
+
         initListeners();
         return rootView;
     }

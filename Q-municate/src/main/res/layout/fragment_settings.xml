@@ -17,10 +17,7 @@
         android:text="@string/stn_profile"
         android:textSize="@dimen/text_size" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray" />
+    <include layout="@layout/view_separator_gray" />
 
     <Switch
         android:id="@+id/pushNotification"
@@ -31,26 +28,28 @@
         android:text="@string/stn_push_notifivation"
         android:textSize="@dimen/text_size" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray" />
+    <include layout="@layout/view_separator_gray" />
 
-    <Button
-        android:id="@+id/changePassword"
+    <LinearLayout
+        android:id="@+id/changePasswordLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_general_selector"
-        android:gravity="left"
-        android:paddingBottom="14dp"
-        android:paddingTop="14dp"
-        android:text="@string/stn_change_password"
-        android:textSize="@dimen/text_size" />
+        android:orientation="vertical">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray" />
+        <Button
+            android:id="@+id/changePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:text="@string/stn_change_password"
+            android:textSize="@dimen/text_size" />
+
+        <include layout="@layout/view_separator_gray" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/logout"
