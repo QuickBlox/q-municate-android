@@ -28,22 +28,19 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-
     private NavigationDrawerCallbacks callbacks;
-
     private ActionBarDrawerToggle drawerToggle;
-
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
     private TextView fullName;
     private ImageButton logoutButton;
-
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
@@ -63,13 +60,17 @@ public class NavigationDrawerFragment extends BaseFragment {
         selectItem(currentSelectedPosition);
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
-        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
-        baseActivity.updateBroadcastActionList();
+    private void selectItem(int position) {
+        currentSelectedPosition = position;
+        if (drawerListView != null) {
+            drawerListView.setItemChecked(position, true);
+        }
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(fragmentContainerView);
+        }
+        if (callbacks != null) {
+            callbacks.onNavigationDrawerItemSelected(position);
+        }
     }
 
     @Override
@@ -111,6 +112,7 @@ public class NavigationDrawerFragment extends BaseFragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 baseActivity.showProgress();
+                FacebookHelper.logout();
                 QBLogoutCommand.start(baseActivity);
             }
         });
@@ -124,9 +126,12 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        callbacks = null;
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.updateBroadcastActionList();
     }
 
     @Override
@@ -139,6 +144,12 @@ public class NavigationDrawerFragment extends BaseFragment {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callbacks = null;
     }
 
     @Override
@@ -181,19 +192,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
 
-    private void selectItem(int position) {
-        currentSelectedPosition = position;
-        if (drawerListView != null) {
-            drawerListView.setItemChecked(position, true);
-        }
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
-        }
-        if (callbacks != null) {
-            callbacks.onNavigationDrawerItemSelected(position);
-        }
-    }
-
     public interface NavigationDrawerCallbacks {
 
         void onNavigationDrawerItemSelected(int position);
@@ -202,19 +200,9 @@ public class NavigationDrawerFragment extends BaseFragment {
     private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
 
         public QMActionBarDrawlerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
-                int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
+                                        int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
             super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes,
                     closeDrawlerContentDescRes);
-        }
-
-        @Override
-        public void onDrawerClosed(View drawerView) {
-            super.onDrawerClosed(drawerView);
-            if (!isAdded()) {
-                return;
-            }
-
-            baseActivity.invalidateOptionsMenu();
         }
 
         @Override
@@ -227,6 +215,16 @@ public class NavigationDrawerFragment extends BaseFragment {
             if (!userLearnedDrawer) {
                 userLearnedDrawer = true;
                 saveUserLearnedDrawler();
+            }
+
+            baseActivity.invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            super.onDrawerClosed(drawerView);
+            if (!isAdded()) {
+                return;
             }
 
             baseActivity.invalidateOptionsMenu();

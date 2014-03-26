@@ -72,11 +72,19 @@ public class FacebookHelper {
     }
 
     public void onActivityStop() {
-        Session.getActiveSession().removeCallback(facebookStatusCallback);
+        if(Session.getActiveSession() != null) {
+            Session.getActiveSession().removeCallback(facebookStatusCallback);
+        }
     }
 
     public boolean isSessionOpened() {
         return Session.getActiveSession().isOpened();
+    }
+
+    public static void logout() {
+        if (Session.getActiveSession() != null) {
+            Session.getActiveSession().closeAndClearTokenInformation();
+        }
     }
 
     public void postInviteToWall(Request.Callback requestCallback, String[] selectedFriends) {
