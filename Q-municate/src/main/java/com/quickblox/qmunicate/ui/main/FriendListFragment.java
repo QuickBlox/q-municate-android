@@ -69,8 +69,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         listTitle.setVisibility(View.GONE);
         listView.addHeaderView(listTitleView);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
-                false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
 
         initGlobalSearchButton(inflater);
         initFriendList();
@@ -320,7 +319,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public void execute(Bundle bundle) {
             importFriendsFinished();
-            DialogUtils.show(baseActivity, getResources().getString(R.string.dlg_import_friends_filed));
+            DialogUtils.show(baseActivity, getResources().getString(R.string.dlg_no_friends_for_import));
         }
     }
 }

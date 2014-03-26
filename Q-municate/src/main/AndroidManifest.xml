@@ -17,7 +17,6 @@
         android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
 
-
     <application
         android:name="com.quickblox.qmunicate.App"
         android:allowBackup="true"
@@ -47,7 +46,7 @@
         <activity
             android:name=".ui.signup.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/lnd_sign_up"
+            android:label="@string/sup_sign_up"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.main.MainActivity"
