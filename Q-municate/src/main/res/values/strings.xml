@@ -120,11 +120,11 @@
     <string name="dlg_no_facebook_friends">No Facebook friends</string>
     <string name="dlg_no_contacts_friends">No Contacts friends</string>
     <string name="dlg_no_friends">No friends</string>
-    <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
+    <string name="dlg_success_posted_to_facebook">Facebook chat was sent successful!</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
-    <string name="dlg_import_friends_filed">Failed to import friends</string>
+    <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

@@ -183,6 +183,7 @@ public class LoginActivity extends BaseActivity {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             MainActivity.start(LoginActivity.this);
             finish();
         }

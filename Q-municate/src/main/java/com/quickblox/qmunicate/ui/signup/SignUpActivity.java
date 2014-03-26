@@ -1,10 +1,8 @@
 package com.quickblox.qmunicate.ui.signup;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -27,6 +25,7 @@ import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
 import java.io.File;
 
@@ -83,8 +82,6 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Uri originalUri = data.getData();
@@ -134,6 +131,7 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
             MainActivity.start(SignUpActivity.this);
             finish();
         }
