@@ -19,6 +19,7 @@ import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
@@ -97,8 +98,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendListFragment.newInstance();
                 break;
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = ChatsListFragment.newInstance();
-                break;
+//                fragment = ChatsListFragment.newInstance();
+                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
+                return;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
