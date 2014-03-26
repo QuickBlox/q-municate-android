@@ -7,6 +7,7 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.ui.BaseLoader;
 import com.quickblox.qmunicate.model.Friend;
 
@@ -38,7 +39,10 @@ public class UserListLoader extends BaseLoader<List<Friend>> {
         Bundle params = new Bundle();
         List<QBUser> users = QBUsers.getUsersByFullName(arguments.constraint, requestBuilder, params);
 
-        return Friend.createFriends(users);
+        List<Friend> friends = Friend.createFriends(users);
+        friends.remove(new Friend(App.getInstance().getUser()));
+
+        return friends;
     }
 
     private static class Arguments extends BaseLoader.Args {

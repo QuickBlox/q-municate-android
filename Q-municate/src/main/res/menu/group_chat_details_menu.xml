@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_add"
-        android:icon="@drawable/adduser"
+        android:icon="@drawable/ic_action_add_friend"
         android:orderInCategory="100"
         android:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_leave"
-        android:icon="@drawable/leavechat"
+        android:icon="@drawable/ic_action_leave_chat"
         android:orderInCategory="100"
         android:showAsAction="ifRoom" />
 </menu>
