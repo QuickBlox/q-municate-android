@@ -23,4 +23,6 @@
     <dimen name="act_call_video_scr_opponent_height">150dp</dimen>
 
     <dimen name="chat_input_message_height">50dp</dimen>
+
+    <dimen name="inf_list_item_height">48dp</dimen>
 </resources>

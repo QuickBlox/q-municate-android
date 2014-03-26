@@ -162,7 +162,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         protected Void doInBackground(Void... params) {
             expectedFriendsCallbacks++;
             friendsContactsList = friendsUtils.getContactsWithEmail();
-                startUserListLoader(false, friendsContactsList);
+            startUserListLoader(false, friendsContactsList);
             return null;
         }
 
