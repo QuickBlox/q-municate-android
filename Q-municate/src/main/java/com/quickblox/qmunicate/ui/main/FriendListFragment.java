@@ -140,9 +140,9 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public Loader<LoaderResult<List<Friend>>> onLoaderCreate(int id, Bundle args) {
         switch (id) {
             case FriendListLoader.ID:
-                return new FriendListLoader(getActivity());
+                return new FriendListLoader(baseActivity);
             case UserListLoader.ID:
-                return new UserListLoader(getActivity());
+                return new UserListLoader(baseActivity);
             default:
                 return null;
         }
@@ -214,7 +214,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                     return;
                 }
                 Friend friend = friendListAdapter.getItem(position - 1);
-                FriendDetailsActivity.start(getActivity(), friend);
+                FriendDetailsActivity.start(baseActivity, friend);
             }
         });
     }
@@ -238,7 +238,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
     private void addToFriendList(final Friend friend) {
         baseActivity.showProgress();
-        QBAddFriendCommand.start(getActivity(), friend);
+        QBAddFriendCommand.start(baseActivity, friend);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
@@ -320,7 +320,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public void execute(Bundle bundle) {
             importFriendsFinished();
-            DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_import_friends_filed));
+            DialogUtils.show(baseActivity, getResources().getString(R.string.dlg_import_friends_filed));
         }
     }
 }
