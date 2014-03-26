@@ -14,6 +14,7 @@ public class PrefsHelper {
     public static final String PREF_LANDING_SHOWN = "Landing screen was shown";
     public static final String PREF_IMPORT_INITIALIZED = "Import initialized";
     public static final String PREF_USER_LEARNED_DRAWER = "Navigation Drawer learned";
+    public static final String PREF_SIGN_UP_INITIALIZED = "Sign Up initialized";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;

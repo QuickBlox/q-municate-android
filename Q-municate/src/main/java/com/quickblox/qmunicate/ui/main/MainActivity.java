@@ -35,6 +35,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private boolean isImportInitialized;
+    private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
 
     //    private GSMHelper gsmHelper;
@@ -61,13 +62,15 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
         useDoubleBackPressed = true;
         isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+        isSignUpInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
 
         initNavigationDrawer();
 
-        if (!isImportInitialized) {
+        if (!isImportInitialized && isSignUpInitialized) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
             importFriends = new ImportFriends(MainActivity.this, facebookHelper);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
         //TODO VF Uncomment when Push woild be needed
@@ -106,7 +109,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         setCurrentFragment(fragment);
     }
 
-
     public void setCurrentFragment(Fragment fragment) {
         currentFragment = fragment;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -117,7 +119,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private FragmentTransaction buildTransaction() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
     }
 
