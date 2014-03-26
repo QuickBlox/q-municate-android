@@ -2,6 +2,7 @@ package com.quickblox.qmunicate;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -10,6 +11,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 
@@ -18,11 +20,13 @@ import java.util.List;
 
 public class App extends Application {
 
+    private static final String TAG = App.class.getSimpleName();
     private static App instance;
 
     private PrefsHelper prefsHelper;
     private QBUser user;
     private List<Friend> friends;
+    private MediaPlayerManager soundPlayer;
 
     public static App getInstance() {
         return instance;
@@ -31,6 +35,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(TAG, "onCreate");
         initAppication();
     }
 
@@ -41,7 +46,7 @@ public class App extends Application {
                 .denyCacheImageMultipleSizesInMemory()
                 .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithOutToken())
                 .tasksProcessingOrder(QueueProcessingType.LIFO)
-                // TODO IS Remove for release app
+                        // TODO IS Remove for release app
                 .writeDebugLogs()
                 .build();
         ImageLoader.getInstance().init(config);
@@ -49,6 +54,10 @@ public class App extends Application {
 
     public PrefsHelper getPrefsHelper() {
         return prefsHelper;
+    }
+
+    public MediaPlayerManager getMediaPlayer() {
+        return soundPlayer;
     }
 
     public QBUser getUser() {
@@ -73,6 +82,7 @@ public class App extends Application {
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY, Consts.QB_AUTH_SECRET);
         friends = new ArrayList<Friend>();
         prefsHelper = new PrefsHelper(this);
+        soundPlayer = new MediaPlayerManager(this);
     }
 
     private class HashCodeFileNameGeneratorWithOutToken extends HashCodeFileNameGenerator {

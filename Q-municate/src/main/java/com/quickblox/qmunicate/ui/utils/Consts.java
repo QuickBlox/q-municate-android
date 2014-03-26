@@ -37,6 +37,9 @@ public class Consts {
         INCOMING, OUTGOING
     }
 
+    //Sound
+    public static final String ASSETS_SOUND_PATH = "sound/";
+
     // Facebook
     public static final String FB_WALL_PARAM_NAME = "name";
     public static final String FB_WALL_PARAM_DESCRIPTION = "description";

@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.mediacall;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,8 @@ import org.webrtc.MediaConstraints;
 import org.webrtc.SessionDescription;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, ISignalingChannel.MessageObserver {
@@ -41,7 +44,21 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private boolean bounded;
     private QBService service;
     private CallType call_type;
+    private Timer callTimer;
     private ServiceConnection serviceConnection = new ChetServiceConnection();
+    private OutgoingCallListener outgoingCallListener;
+
+    public interface OutgoingCallListener {
+        public void onConnectionAccepted();
+
+        public void onConnectionRejected();
+
+        public void onConnectionClosed();
+    }
+
+    private enum STOP_TYPE {
+        REJECTED, CLOSED
+    }
 
     protected abstract int getContentView();
 
@@ -58,6 +75,22 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            outgoingCallListener = (OutgoingCallListener) activity;
+        } catch (ClassCastException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        outgoingCallListener = null;
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         connectToService();
@@ -70,7 +103,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription, long sessionId) {
+    public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription,
+                       long sessionId) {
 
     }
 
@@ -89,7 +123,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onStop(QBUser user, String reason, long sessionId) {
-        stopCall(false);
+        stopCall(false, STOP_TYPE.CLOSED);
     }
 
     @Override
@@ -99,7 +133,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 @Override
                 public void run() {
                     DialogUtils.show(getActivity(), "Rejected");
-                    stopCall(false);
+                    stopCall(false, STOP_TYPE.REJECTED);
                 }
             });
         }
@@ -121,7 +155,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
         Log.i(TAG, "onCreateView");
         View rootView = inflater.inflate(getContentView(), container, false);
         SessionDescriptionWrapper sessionDescriptionWrapper =
@@ -141,7 +176,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.stopСallButton:
-                stopCall(true);
+                stopCall(true, STOP_TYPE.CLOSED);
                 break;
             default:
                 break;
@@ -174,14 +209,31 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     protected void onConnectionEstablished() {
-
+        if (outgoingCallListener != null) {
+            outgoingCallListener.onConnectionAccepted();
+        }
     }
 
     protected void postInit(View rootView) {
     }
 
     protected void onConnectionClosed() {
+        if (outgoingCallListener != null) {
+            outgoingCallListener.onConnectionClosed();
+        }
+    }
 
+    protected void onConnectionRejected() {
+        if (outgoingCallListener != null) {
+            outgoingCallListener.onConnectionRejected();
+        }
+    }
+
+    private void startCall() {
+        qbVideoChat.call(opponent, call_type);
+        callTimer = new Timer();
+        callTimer.schedule(new CancelCallTimerTask(),
+                30 * Consts.SECOND);
     }
 
     private void connectToService() {
@@ -201,7 +253,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    private void stopCall(boolean sendStop) {
+    private void stopCall(boolean sendStop, STOP_TYPE stopType) {
         if (qbVideoChat != null) {
             if (sendStop) {
                 qbVideoChat.stopCall();
@@ -209,8 +261,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             qbVideoChat.stop();
             qbVideoChat.dispose();
         }
-        onConnectionClosed();
-        getBaseActivity().finish();
+        if (STOP_TYPE.CLOSED.equals(stopType)) {
+            onConnectionClosed();
+        } else {
+            onConnectionRejected();
+        }
     }
 
     private void onConnectedToService() {
@@ -235,6 +290,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         @Override
         public void onServiceDisconnected(ComponentName name) {
 
+        }
+    }
+
+    class CancelCallTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            stopCall(true, STOP_TYPE.CLOSED);
         }
     }
 }
