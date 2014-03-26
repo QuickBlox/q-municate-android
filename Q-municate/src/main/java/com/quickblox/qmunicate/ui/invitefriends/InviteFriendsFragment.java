@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.invitefriends;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +28,7 @@ import com.quickblox.qmunicate.ui.utils.Consts;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.FriendsUtils;
+import com.quickblox.qmunicate.ui.utils.GetListViewSizeTask;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +44,6 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private TextView counterContactsTextView;
     private CheckBox checkAllFacebookFriendsCheckBox;
     private CheckBox checkAllContactsFriendsCheckBox;
-
     private FacebookHelper facebookHelper;
     private FacebookSessionStatusCallback facebookSessionStatusCallback;
     private List<InviteFriend> friendsList;
@@ -260,7 +261,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private String[] getSelectedFriendsForInvite(int type) {
         List<String> arrayList = new ArrayList<String>();
-        for (InviteFriend friend: friendsList) {
+        for (InviteFriend friend : friendsList) {
             if (friend.isSelected() && friend.getViaLabelType() == type) {
                 arrayList.add(friend.getId());
             }
@@ -280,7 +281,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
                 friendsList.addAll(friendsFacebookList);
                 updateFriendsList();
                 setVisibilityCountPart(friendsFacebookList, fromFacebookButton, counterFacebookTextView, checkAllFacebookFriendsCheckBox);
-                baseActivity.hideProgress();
+                resizeListView();
+//                baseActivity.hideProgress();
             }
         });
     }
@@ -288,6 +290,11 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private void updateFriendsList() {
         Collections.sort(friendsList, new SimpleComparator());
         friendsAdapter.notifyDataSetChanged();
+    }
+
+    private void resizeListView() {
+        new GetListViewSizeTask(baseActivity, friendsListView).execute();
+//        new GetListViewSizeTask().getListViewSize(friendsListView);
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {
@@ -348,7 +355,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             super.onPostExecute(result);
             updateFriendsList();
             setVisibilityCountPart(friendsContactsList, fromContactsButton, counterContactsTextView, checkAllContactsFriendsCheckBox);
-            baseActivity.hideProgress();
+            resizeListView();
+//            baseActivity.hideProgress();
         }
     }
 
