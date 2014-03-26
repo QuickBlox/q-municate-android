@@ -106,6 +106,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         setCurrentFragment(fragment);
     }
 
+
     public void setCurrentFragment(Fragment fragment) {
         currentFragment = fragment;
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);

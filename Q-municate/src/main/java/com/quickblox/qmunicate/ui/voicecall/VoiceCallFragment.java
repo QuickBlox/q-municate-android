@@ -27,6 +27,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
 
     @Override
     protected void onConnectionEstablished() {
+        super.onConnectionEstablished();
         startTimer(timeTextView);
     }
 
@@ -45,6 +46,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
 
     @Override
     protected void onConnectionClosed() {
+        super.onConnectionClosed();
         stopTimer();
     }
 

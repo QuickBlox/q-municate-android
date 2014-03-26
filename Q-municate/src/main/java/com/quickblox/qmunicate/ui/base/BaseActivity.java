@@ -63,6 +63,18 @@ public abstract class BaseActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        connectToService();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService();
+    }
+
+    @Override
     protected void onPause() {
         unregisterBroadcastReceiver();
         super.onPause();
@@ -150,7 +162,9 @@ public abstract class BaseActivity extends Activity {
     }
 
     private void unbindService() {
-        unbindService(serviceConnection);
+        if (bounded) {
+            unbindService(serviceConnection);
+        }
     }
 
     public static class FailAction implements Command {
