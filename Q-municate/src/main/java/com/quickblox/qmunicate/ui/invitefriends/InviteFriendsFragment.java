@@ -269,9 +269,11 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         for (InviteFriend friend : friendsList) {
             friend.setSelected(false);
         }
-        friendsAdapter.notifyDataSetChanged();
         onCounterFacebookChanged(Consts.ZERO_VALUE);
         onCounterContactsChanged(Consts.ZERO_VALUE);
+        friendsAdapter.setCounterFacebook(Consts.ZERO_VALUE);
+        friendsAdapter.setCounterContacts(Consts.ZERO_VALUE);
+        friendsAdapter.notifyDataSetChanged();
     }
 
     private void getFacebookFriendsList() {
