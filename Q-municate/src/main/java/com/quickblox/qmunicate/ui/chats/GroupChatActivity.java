@@ -1,8 +1,10 @@
 package com.quickblox.qmunicate.ui.chats;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -16,14 +18,18 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.model.ChatMessage;
+import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
 import com.quickblox.qmunicate.ui.utils.SizeUtility;
 import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
 import com.quickblox.qmunicate.ui.views.smiles.ChatEditText;
 import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
+import com.quickblox.qmunicate.ui.views.smiles.SmileysConvertor;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,6 +44,7 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
     private View smilesLayout;
     private IconPageIndicator smilesPagerIndicator;
     private HeightAnimator smilesAnimator;
+    private SmileSelectedBroadcastReceiver smileSelectedBroadcastReceiver;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, GroupChatActivity.class);
@@ -55,6 +62,10 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         messagesArrayList = new ArrayList<ChatMessage>();
         messagesAdapter = new ChatMessagesAdapter(this, R.layout.list_item_chat_message, messagesArrayList);
         messagesListView.setAdapter(messagesAdapter);
+
+        IntentFilter filter = new IntentFilter(BroadcastActions.SMILE_SELECTED);
+        smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
+        registerReceiver(smileSelectedBroadcastReceiver, filter);
 
         initListeners();
         initListView();
@@ -140,7 +151,7 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         }
     }
 
-    protected boolean isSmilesLayoutShowing() {
+    private boolean isSmilesLayoutShowing() {
         return smilesLayout.getHeight() != 0;
     }
 
@@ -152,6 +163,21 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
 
     private int getSmileLayoutSizeInPixels() {
         return SizeUtility.dipToPixels(this, SMILES_SIZE_IN_DIPS);
+    }
+
+    private class SmileSelectedBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int resourceId = intent.getIntExtra(SerializableKeys.SMILE_ID, R.drawable.smile);
+            int cursorPosition = chatEdit.getSelectionStart();
+
+            String roundTrip = "";
+            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName("UTF-8"));
+            roundTrip = new String(bytes, Charset.forName("UTF-8"));
+            String original = new String("A" + "\u00ea" + "\ue106" + "\u00f1" + "\u00fc" + "C");
+            chatEdit.getText().insert(cursorPosition, roundTrip);
+        }
     }
 
     private class OnSmileClickListener implements SmileClickListener {

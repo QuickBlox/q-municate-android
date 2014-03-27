@@ -4,8 +4,8 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/light_gray">
+    android:background="@color/light_gray"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/messagesListView"
@@ -21,6 +21,15 @@
         android:layout_height="@dimen/chat_input_message_height"
         android:background="@color/white">
 
+        <ImageButton
+            android:id="@+id/attachButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="@null"
+            android:src="@drawable/ic_photo" />
+
         <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
             android:id="@+id/messageEdit"
             android:layout_width="match_parent"
@@ -32,25 +41,8 @@
             android:maxEms="13"
             android:maxWidth="250dip"
             android:textAlignment="center"
-            android:textColor="@android:color/black" />
-
-        <!--<ImageButton-->
-        <!--android:id="@+id/attachButton"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:background="@null"-->
-        <!--android:src="@drawable/ic_photo" />-->
-
-        <!--<ImageButton-->
-        <!--android:id="@+id/smileButton"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:background="@null"-->
-        <!--android:src="@drawable/ic_smile" />-->
+            android:textColor="@android:color/black"
+            android:layout_toRightOf="@+id/attachButton" />
 
     </RelativeLayout>
 
