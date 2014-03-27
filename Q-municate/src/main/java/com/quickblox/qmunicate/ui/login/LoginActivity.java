@@ -134,6 +134,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void loginFacebookOnClickListener(View view) {
+        saveLoginType(LoginType.FACEBOOK);
         facebookHelper.loginWithFacebook();
     }
 
