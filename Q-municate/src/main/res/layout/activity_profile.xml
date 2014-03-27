@@ -9,7 +9,7 @@
     android:paddingRight="20dp">
 
     <LinearLayout
-        android:id="@+id/linearLayoutChangeAvatar"
+        android:id="@+id/changeAvatarLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
