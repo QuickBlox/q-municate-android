@@ -16,12 +16,12 @@ public class SmilesTabFragmentAdapter extends FragmentStatePagerAdapter implemen
 
     public static final String RESOURCE_KEY = "RESOURCE_KEY";
     private static final int SMILES_COUNT_PER_PAGE = 32;
+
     private List<Integer> smilesResources;
 
     public SmilesTabFragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
         smilesResources = SmileysConvertor.getMapAsList();
-
     }
 
     @Override

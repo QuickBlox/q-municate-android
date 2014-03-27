@@ -14,11 +14,26 @@ import com.quickblox.qmunicate.ui.views.customFontComponents.editTexts.LightEdit
 public class LightClearableEditText extends LightEditText {
 
     private static final int RIGHT_DRAWBLE = 2;
+
     private Drawable clearButtonImage;
 
     public LightClearableEditText(final Context context) {
         super(context);
         init();
+    }
+
+    public LightClearableEditText(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public LightClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs, defStyle);
+        init();
+    }
+
+    public String getTextFromField() {
+        return getText().toString();
     }
 
     private void init() {
@@ -51,7 +66,6 @@ public class LightClearableEditText extends LightEditText {
                     setText("");
                 }
                 return false;
-
             }
         });
 
@@ -70,20 +84,6 @@ public class LightClearableEditText extends LightEditText {
 
     private boolean isRightDrawableSet() {
         return getCompoundDrawables()[RIGHT_DRAWBLE] != null;
-    }
-
-    public LightClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    public LightClearableEditText(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public String getTextFromField() {
-        return getText().toString();
     }
 }
 

@@ -21,6 +21,20 @@ public class NormalClearableEditText extends NormalEditText {
         init();
     }
 
+    public NormalClearableEditText(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public NormalClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs, defStyle);
+        init();
+    }
+
+    public String getTextFromField() {
+        return getText().toString();
+    }
+
     private void init() {
         clearButtonImage = getResources().getDrawable(R.drawable.ic_action_delete);
         setFocusableInTouchMode(true);
@@ -51,7 +65,6 @@ public class NormalClearableEditText extends NormalEditText {
                     setText("");
                 }
                 return false;
-
             }
         });
 
@@ -70,19 +83,5 @@ public class NormalClearableEditText extends NormalEditText {
 
     private boolean isRightDrawableSet() {
         return getCompoundDrawables()[RIGHT_DRAWBLE] != null;
-    }
-
-    public NormalClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    public NormalClearableEditText(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public String getTextFromField() {
-        return getText().toString();
     }
 }

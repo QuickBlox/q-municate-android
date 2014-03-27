@@ -33,7 +33,7 @@
                     android:layout_gravity="bottom"
                     android:contentDescription="@string/ignore_content_description" />
 
-                <com.quickblox.qmunicate.ui.views.smiles.ChatTexView />
+                <com.quickblox.qmunicate.ui.views.smiles.ChatTextView />
                     android:id="@+id/text_message"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

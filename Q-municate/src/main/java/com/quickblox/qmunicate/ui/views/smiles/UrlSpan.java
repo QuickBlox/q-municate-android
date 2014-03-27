@@ -12,7 +12,7 @@ import java.util.List;
 
 public class UrlSpan extends ClickableSpan {
 
-    String url;
+    private String url;
     private Context context;
 
     public UrlSpan(Context context, String url) {

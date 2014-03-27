@@ -23,11 +23,11 @@ import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
-import com.quickblox.qmunicate.utils.SizeUtility;
 import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
 import com.quickblox.qmunicate.ui.views.smiles.ChatEditText;
 import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
 import com.quickblox.qmunicate.ui.views.smiles.SmileysConvertor;
+import com.quickblox.qmunicate.utils.SizeUtility;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -35,9 +35,12 @@ import java.util.Date;
 import java.util.List;
 
 public class GroupChatActivity extends FragmentActivity implements SwitchViewListener {
+
     private static final float SMILES_SIZE_IN_DIPS = 220;
+
     private ChatEditText chatEdit;
     private ListView messagesListView;
+
     private List<ChatMessage> messagesArrayList;
     private ChatMessagesAdapter messagesAdapter;
     private ViewPager smilesPager;
@@ -67,27 +70,18 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
         registerReceiver(smileSelectedBroadcastReceiver, filter);
 
-        initListeners();
+        registerForContextMenu(messagesListView);
+
         initListView();
     }
 
-    private void initUI() {
-        smilesLayout = findViewById(R.id.smiles_layout);
-        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
-        smilesPager = (ViewPager) findViewById(R.id.smiles_pager);
-        messagesListView = (ListView) findViewById(R.id.messagesListView);
-        chatEdit = (ChatEditText) findViewById(R.id.messageEdit);
-        actionBarSetup();
-    }
-
-    private void actionBarSetup() {
-        ActionBar ab = getActionBar();
-        ab.setTitle("Name of Chat");
-        ab.setSubtitle("some information");
-    }
-
-    private void initListeners() {
-        registerForContextMenu(messagesListView);
+    public void initSmileWidgets() {
+        chatEdit.setSmileClickListener(new OnSmileClickListener());
+        chatEdit.setSwitchViewListener(this);
+        FragmentStatePagerAdapter adapter = new SmilesTabFragmentAdapter(getSupportFragmentManager());
+        smilesPager.setAdapter(adapter);
+        smilesPagerIndicator.setViewPager(smilesPager);
+        smilesAnimator = new HeightAnimator(chatEdit, smilesLayout);
     }
 
     private void initListView() {
@@ -108,13 +102,19 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         messagesAdapter.notifyDataSetChanged();
     }
 
-    public void initSmileWidgets() {
-        chatEdit.setSmileClickListener(new OnSmileClickListener());
-        chatEdit.setSwitchViewListener(this);
-        FragmentStatePagerAdapter adapter = new SmilesTabFragmentAdapter(getSupportFragmentManager());
-        smilesPager.setAdapter(adapter);
-        smilesPagerIndicator.setViewPager(smilesPager);
-        smilesAnimator = new HeightAnimator(chatEdit, smilesLayout);
+    private void initUI() {
+        smilesLayout = findViewById(R.id.smiles_layout);
+        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
+        smilesPager = (ViewPager) findViewById(R.id.smiles_pager);
+        messagesListView = (ListView) findViewById(R.id.messagesListView);
+        chatEdit = (ChatEditText) findViewById(R.id.messageEdit);
+        actionBarSetup();
+    }
+
+    private void actionBarSetup() {
+        ActionBar ab = getActionBar();
+        ab.setTitle("Name of Chat");
+        ab.setSubtitle("some information");
     }
 
     @Override
@@ -151,14 +151,14 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         }
     }
 
-    private boolean isSmilesLayoutShowing() {
-        return smilesLayout.getHeight() != 0;
-    }
-
     private void hideView(View view) {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
         params.height = 0;
         view.setLayoutParams(params);
+    }
+
+    private boolean isSmilesLayoutShowing() {
+        return smilesLayout.getHeight() != 0;
     }
 
     private int getSmileLayoutSizeInPixels() {
@@ -175,7 +175,6 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
             String roundTrip = "";
             byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName("UTF-8"));
             roundTrip = new String(bytes, Charset.forName("UTF-8"));
-            String original = new String("A" + "\u00ea" + "\ue106" + "\u00f1" + "\u00fc" + "C");
             chatEdit.getText().insert(cursorPosition, roundTrip);
         }
     }

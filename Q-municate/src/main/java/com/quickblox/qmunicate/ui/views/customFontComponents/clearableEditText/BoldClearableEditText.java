@@ -21,6 +21,20 @@ public class BoldClearableEditText extends BoldEditText {
         init();
     }
 
+    public BoldClearableEditText(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public BoldClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
+        super(context, attrs, defStyle);
+        init();
+    }
+
+    public String getTextFromField() {
+        return getText().toString();
+    }
+
     private void init() {
         clearButtonImage = getResources().getDrawable(R.drawable.ic_action_delete);
         setFocusableInTouchMode(true);
@@ -51,7 +65,6 @@ public class BoldClearableEditText extends BoldEditText {
                     setText("");
                 }
                 return false;
-
             }
         });
 
@@ -71,19 +84,4 @@ public class BoldClearableEditText extends BoldEditText {
     private boolean isRightDrawableSet() {
         return getCompoundDrawables()[RIGHT_DRAWBLE] != null;
     }
-
-    public BoldClearableEditText(final Context context, final AttributeSet attrs, final int defStyle) {
-        super(context, attrs, defStyle);
-        init();
-    }
-
-    public BoldClearableEditText(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public String getTextFromField() {
-        return getText().toString();
-    }
 }
-

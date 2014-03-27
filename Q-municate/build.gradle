@@ -6,7 +6,7 @@ dependencies {
     compile project(':dependencies:facebook')
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
-	compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
+    compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
 }
 
 task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {

@@ -22,28 +22,17 @@ import java.util.List;
 public class ChatEditText extends LightEditText {
 
     private Drawable smileIcon;
-    private SmileClickListener smileClickListener;
-    private boolean isSmileActive;
     private Drawable smileIconActive;
+
     private Context context;
+    private boolean isSmileActive;
+    private SmileClickListener smileClickListener;
     private ChatTextChangeListener textWatcher;
     private SwitchViewListener switchViewListener;
 
     public ChatEditText(final Context context) {
         super(context);
         init(context);
-    }
-
-    private void init(Context context) {
-        this.context = context;
-        isSmileActive = false;
-        Resources resources = getResources();
-        smileIcon = resources.getDrawable(R.drawable.chat_smile);
-        smileIconActive = resources.getDrawable(R.drawable.chat_smile_active);
-        setCompoundDrawablesWithIntrinsicBounds(null, null, smileIcon, null);
-        setOnTouchListener(new SmileIconTouchListener());
-        textWatcher = new ChatTextChangeListener();
-        addTextChangedListener(textWatcher);
     }
 
     public ChatEditText(final Context context, final AttributeSet attrs, final int defStyle) {
@@ -69,6 +58,18 @@ public class ChatEditText extends LightEditText {
         isSmileActive = !isSmileActive;
     }
 
+    private void init(Context context) {
+        this.context = context;
+        isSmileActive = false;
+        Resources resources = getResources();
+        smileIcon = resources.getDrawable(R.drawable.chat_smile);
+        smileIconActive = resources.getDrawable(R.drawable.chat_smile_active);
+        setCompoundDrawablesWithIntrinsicBounds(null, null, smileIcon, null);
+        setOnTouchListener(new SmileIconTouchListener());
+        textWatcher = new ChatTextChangeListener();
+        addTextChangedListener(textWatcher);
+    }
+
     private class SmileIconTouchListener implements OnTouchListener {
 
         @Override
@@ -80,10 +81,8 @@ public class ChatEditText extends LightEditText {
             if (event.getX() > (getWidth() - getPaddingRight() - smileIcon.getIntrinsicWidth()) && smileClickListener != null) {
                 switchSmileIcon();
                 smileClickListener.onSmileClick();
-            } else {
-                if (switchViewListener != null) {
+            } else if (switchViewListener != null) {
                     switchViewListener.showLastListItem();
-                }
             }
 
             return false;
@@ -95,11 +94,6 @@ public class ChatEditText extends LightEditText {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
             checkIsNeedToDeleteSpannable(charSequence, start, count, after);
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            SmileysConvertor.addSmileySpans(ChatEditText.this.context, editable);
         }
 
         private void checkIsNeedToDeleteSpannable(CharSequence charSequence, int start, int count, int after) {
@@ -139,6 +133,11 @@ public class ChatEditText extends LightEditText {
         private List<ImageSpan> getListOfImageSpans() {
             ImageSpan[] spans = getText().getSpans(0, getText().length(), ImageSpan.class);
             return new ArrayList<ImageSpan>(Arrays.asList(spans));
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            SmileysConvertor.addSmileySpans(ChatEditText.this.context, editable);
         }
     }
 }

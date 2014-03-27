@@ -10,13 +10,10 @@ public class SmileSpan extends ImageSpan {
 
     private static final int SMILE_SIZE = 30;
 
-    private int sizeWidth;
-
-    private int sizeHeight;
-
-    private int resourceId;
-
     private Context context;
+    private int sizeWidth;
+    private int sizeHeight;
+    private int resourceId;
 
     public SmileSpan(Context context, int resourceId) {
         super(context, resourceId);
@@ -25,15 +22,15 @@ public class SmileSpan extends ImageSpan {
         setBounds();
     }
 
-    private void setBounds() {
-        sizeWidth = SizeUtility.dipToPixels(context, SMILE_SIZE);
-        sizeHeight = SizeUtility.dipToPixels(context, SMILE_SIZE);
-    }
-
     @Override
     public Drawable getDrawable() {
         Drawable drawable = context.getResources().getDrawable(resourceId);
         drawable.setBounds(0, 0, sizeWidth, sizeHeight);
         return drawable;
+    }
+
+    private void setBounds() {
+        sizeWidth = SizeUtility.dipToPixels(context, SMILE_SIZE);
+        sizeHeight = SizeUtility.dipToPixels(context, SMILE_SIZE);
     }
 }
