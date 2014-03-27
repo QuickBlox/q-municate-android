@@ -7,10 +7,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.List;
 
@@ -20,7 +23,8 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     private UserListListener listener;
     private List<Friend> friends;
 
-    public UserListAdapter(BaseActivity activity, List<Friend> friends, List<Friend> users, UserListListener listener) {
+    public UserListAdapter(BaseActivity activity, List<Friend> friends, List<Friend> users,
+            UserListListener listener) {
         super(activity, users);
         this.friends = friends;
         this.listener = listener;
@@ -40,9 +44,15 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (null != user.getFileId()) {
-            displayImage(user.getFileId(), holder.avatarImageView);
+        String url = null;
+        if (null != user.getAvatarUid()) {
+            try {
+                url = UriCreator.getUri(user.getAvatarUid());
+            } catch (BaseServiceException e) {
+                ErrorUtils.showError(activity, e);
+            }
         }
+        displayImage(url, holder.avatarImageView);
 
         holder.fullnameTextView.setText(user.getFullname());
         holder.addFriendButton.setOnClickListener(new View.OnClickListener() {
@@ -70,10 +80,12 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     }
 
     public interface UserListListener {
+
         void onUserSelected(int position);
     }
 
     private static class ViewHolder {
+
         public ImageView avatarImageView;
         public TextView fullnameTextView;
         public ImageButton addFriendButton;

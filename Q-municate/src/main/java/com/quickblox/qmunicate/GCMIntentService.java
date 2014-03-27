@@ -15,8 +15,8 @@ import com.google.gson.JsonSyntaxException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.model.PushMessage;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.videocall.VideoCallActivity;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.utils.Consts;
 
 
 public class GCMIntentService extends IntentService {
@@ -97,7 +97,7 @@ public class GCMIntentService extends IntentService {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        Intent contentIntent = new Intent(this, VideoCallActivity.class);
+        Intent contentIntent = new Intent(this, CallActivity.class);
         contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         contentIntent.putExtra("message", msg.getMessage());

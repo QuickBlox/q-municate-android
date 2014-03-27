@@ -50,15 +50,13 @@
                 android:text="3458 messages"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="15sp" />
-
         </LinearLayout>
-
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/action_bar_color" />
+        android:background="@color/action_bar_background_color" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -80,7 +78,6 @@
             android:layout_height="wrap_content"
             android:text="4/27 online"
             android:textSize="18sp" />
-
     </LinearLayout>
 
     <View
@@ -93,5 +90,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white" />
-
 </LinearLayout>

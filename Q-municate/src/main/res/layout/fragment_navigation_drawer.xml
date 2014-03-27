@@ -13,7 +13,7 @@
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
-        android:listSelector="@color/menu_item_background_pressed"
+        android:listSelector="@color/menu_item_background_pressed_color"
         tools:context="com.sample.app.NavigationDrawerFragment" />
 
     <LinearLayout
@@ -31,7 +31,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:textColor="@color/link_color"
+            android:textColor="@color/link_text_color"
             android:textSize="@dimen/text_size" />
 
         <ImageButton
@@ -43,5 +43,4 @@
             android:padding="10dp"
             android:src="@drawable/ic_logout" />
     </LinearLayout>
-
 </RelativeLayout>

@@ -26,18 +26,16 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
-
     private EditText email;
     private EditText password;
     private CheckBox rememberMe;
-
     private FacebookHelper facebookHelper;
 
     public static void start(Context context) {
@@ -55,16 +53,34 @@ public class LoginActivity extends BaseActivity {
         password = _findViewById(R.id.password);
         rememberMe = _findViewById(R.id.rememberMe);
 
-        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        boolean isRememberMe = App.getInstance().getPrefsHelper()
+                .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
         rememberMe.setChecked(isRememberMe);
 
-        addAction(QBServiceConsts.LOGIN_SUCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        facebookHelper.onActivityStop();
     }
 
     @Override
@@ -87,27 +103,9 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        facebookHelper.onActivityStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        facebookHelper.onActivityStop();
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         facebookHelper.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
     }
 
     public void loginOnClickListener(View view) {
@@ -131,7 +129,12 @@ public class LoginActivity extends BaseActivity {
         QBLoginCommand.start(this, user);
     }
 
+    private void saveLoginType(LoginType type) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
+    }
+
     public void loginFacebookOnClickListener(View view) {
+        saveLoginType(LoginType.FACEBOOK);
         facebookHelper.loginWithFacebook();
     }
 
@@ -158,10 +161,6 @@ public class LoginActivity extends BaseActivity {
         helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
-    }
-
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
@@ -169,8 +168,8 @@ public class LoginActivity extends BaseActivity {
             if (session.isOpened()) {
                 showProgress();
                 saveLoginType(LoginType.FACEBOOK);
-                QBSocialLoginCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
-                                           session.getAccessToken(), null);
+                QBSocialLoginCommand
+                        .start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }
     }
@@ -185,7 +184,7 @@ public class LoginActivity extends BaseActivity {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }
-            hideProgress();
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             MainActivity.start(LoginActivity.this);
             finish();
         }

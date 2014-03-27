@@ -1,10 +1,8 @@
 package com.quickblox.qmunicate.ui.signup;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -23,22 +21,21 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
-import com.quickblox.qmunicate.ui.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.File;
 
-public class SignUpActivity extends BaseActivity implements GettingImageFileListener {
+public class SignUpActivity extends BaseActivity implements OnGetImageFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
-
     private EditText password;
     private ImageView avatarImageView;
     private EditText fullname;
     private EditText email;
-
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
     private QBUser qbUser;
@@ -64,7 +61,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
 
         addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
         addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
     }
 
     @Override
@@ -86,8 +82,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Uri originalUri = data.getData();
@@ -122,7 +116,6 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
-
         } else {
             DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
@@ -133,10 +126,12 @@ public class SignUpActivity extends BaseActivity implements GettingImageFileList
     }
 
     private class SignUpSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
             MainActivity.start(SignUpActivity.this);
             finish();
         }

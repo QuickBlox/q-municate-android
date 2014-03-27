@@ -9,10 +9,13 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +44,15 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        if (null != friend.getFileId()) {
-            displayImage(friend.getFileId(), holder.avatarImageView);
+        String url = null;
+        if (null != friend.getAvatarUid()) {
+            try {
+                url = UriCreator.getUri(friend.getAvatarUid());
+            } catch (BaseServiceException e) {
+                ErrorUtils.showError(activity, e);
+            }
         }
+        displayImage(url, holder.avatarImageView);
         holder.fullnameTextView.setText(friend.getFullname());
         holder.statusTextView.setText(friend.getOnlineStatus());
         if (friend.isOnline()) {
@@ -71,6 +79,7 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
     }
 
     private static class ViewHolder {
+
         public ImageView avatarImageView;
         public TextView fullnameTextView;
         public TextView statusTextView;
@@ -78,12 +87,6 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
     }
 
     private class FriendListFilter extends Filter {
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            objects = (List<Friend>) results.values;
-            notifyDataSetChanged();
-        }
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -108,6 +111,13 @@ public class FriendListAdapter extends BaseListAdapter<Friend> implements Filter
                 results.values = filteredList;
             }
             return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            objects = (List<Friend>) results.values;
+            notifyDataSetChanged();
         }
     }
 }

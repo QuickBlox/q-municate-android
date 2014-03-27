@@ -13,7 +13,8 @@ public abstract class BaseFragment extends Fragment {
     protected static final String ARG_TITLE = "title";
 
     protected App app;
-    private String title;
+    protected BaseActivity baseActivity;
+    protected String title;
 
     public String getTitle() {
         return title;
@@ -22,6 +23,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        baseActivity = (BaseActivity) getActivity();
         app = App.getInstance();
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);

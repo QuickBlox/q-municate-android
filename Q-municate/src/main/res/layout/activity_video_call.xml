@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,19 +16,8 @@
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_marginBottom="30dp"
-            android:layout_marginTop="@dimen/act_call_margin_top"
-            android:background="@android:color/white"/>
-
-        <View
-            android:id="@+id/opponentVideoScreenImageView"
-            android:layout_width="@dimen/act_call_video_scr_opponent_width"
-            android:layout_height="@dimen/act_call_video_scr_opponent_height"
-            android:layout_above="@+id/controlPanelRelativeLayout"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:layout_marginBottom="50dp"
-            android:layout_marginLeft="20dp"
-            android:background="@android:color/holo_orange_light" />
+            android:layout_marginTop="@dimen/act_call_margin_top"/>
+        />
 
         <RelativeLayout
             android:id="@+id/controlPanelRelativeLayout"
@@ -36,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/screen_call_bg"
+            android:background="@color/screen_call_background_color"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -48,15 +37,15 @@
                 android:layout_gravity="center|left"
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
-                android:src="@drawable/ic_call_switch" />
+                android:src="@drawable/ic_call_switch"/>
 
             <ImageButton
-                android:id="@+id/endVideoCallImageButton"
+                android:id="@+id/stopСallButton"
                 android:layout_width="@dimen/act_call_end_button_width"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_centerInParent="true"
                 android:background="@drawable/button_general_selector"
-                android:src="@drawable/ic_call_mute" />
+                android:src="@drawable/ic_call_mute"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -66,8 +55,7 @@
                 android:layout_gravity="center|right"
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
-                android:src="@drawable/ic_call_mute_a" />
+                android:src="@drawable/ic_call_mute_a"/>
         </RelativeLayout>
     </RelativeLayout>
-
 </LinearLayout>

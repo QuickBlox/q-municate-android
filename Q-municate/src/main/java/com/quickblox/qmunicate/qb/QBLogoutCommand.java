@@ -6,30 +6,31 @@ import android.os.Bundle;
 
 import com.facebook.Session;
 import com.quickblox.module.auth.QBAuth;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class QBLogoutCommand extends ServiceCommand {
 
     private static final String TAG = QBLogoutCommand.class.getSimpleName();
+
+    public QBLogoutCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
 
     public static void start(Context context) {
         Intent intent = new Intent(QBServiceConsts.LOGOUT_ACTION, null, context, QBService.class);
         context.startService(intent);
     }
 
-    public QBLogoutCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
-    }
-
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-
+        QBChatService.getInstance().logout();
         resetFrienList();
         resetRememberMe();
         resetUserCredentials();

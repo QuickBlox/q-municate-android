@@ -1,15 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:focusable="true"
-              android:focusableInTouchMode="true"
-              android:orientation="vertical"
-              android:paddingLeft="20dp"
-              android:paddingRight="20dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
 
     <LinearLayout
-        android:id="@+id/linearLayoutChangeAvatar"
+        android:id="@+id/changeAvatarLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
@@ -19,11 +19,12 @@
         android:onClick="changeAvatarOnClick"
         android:orientation="horizontal">
 
-        <com.quickblox.qmunicate.ui.views.CircularImageView
+        <com.quickblox.qmunicate.ui.view.CircleImageView
             android:id="@+id/avatarImageView"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/placeholder_user"/>
+            android:layout_width="@dimen/image_view_big_avatar_layout_width"
+            android:layout_height="@dimen/image_view_big_avatar_layout_height"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_user" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,8 +34,7 @@
             android:layout_marginTop="5dp"
             android:text="@string/sup_choose_user_picture"
             android:textColor="@android:color/darker_gray"
-            android:textSize="@dimen/text_size"/>
-
+            android:textSize="@dimen/text_size" />
     </LinearLayout>
 
     <TextView
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_full_name"
-        android:textColor="@android:color/darker_gray"/>
+        android:textColor="@android:color/darker_gray" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -65,7 +65,7 @@
             android:inputType="text"
             android:singleLine="true"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"/>
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/changeFullNameTextView"
@@ -75,8 +75,8 @@
             android:background="@drawable/button_general_selector"
             android:clickable="false"
             android:text="@string/prf_change"
-            android:textColor="@color/link_color"
-            android:textSize="@dimen/text_size"/>
+            android:textColor="@color/link_text_color"
+            android:textSize="@dimen/text_size" />
 
     </RelativeLayout>
 
@@ -85,7 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_email"
-        android:textColor="@android:color/darker_gray"/>
+        android:textColor="@android:color/darker_gray" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -108,7 +108,7 @@
             android:inputType="textEmailAddress"
             android:singleLine="true"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"/>
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/changeEmailTextView"
@@ -118,7 +118,7 @@
             android:background="@drawable/button_general_selector"
             android:clickable="false"
             android:text="@string/prf_change"
-            android:textColor="@color/link_color"
+            android:textColor="@color/link_text_color"
             android:textSize="@dimen/text_size" />
 
     </RelativeLayout>
@@ -148,7 +148,7 @@
             android:inputType="textMultiLine"
             android:text="IMMATURE: A word boring people use to describe fun people."
             android:textColor="@android:color/black"
-            android:textSize="@dimen/text_size"/>
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -156,8 +156,7 @@
             android:background="@drawable/button_general_selector"
             android:clickable="false"
             android:text="@string/prf_edit_status"
-            android:textColor="@color/link_color"
-            android:textSize="@dimen/text_size"/>
-
+            android:textColor="@color/link_text_color"
+            android:textSize="@dimen/text_size" />
     </LinearLayout>
 </LinearLayout>

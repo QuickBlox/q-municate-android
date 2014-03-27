@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -20,8 +21,9 @@ import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Utils;
 
 public class SettingsFragment extends BaseFragment {
 
@@ -32,11 +34,7 @@ public class SettingsFragment extends BaseFragment {
     private ChangePasswordDialog changePasswordDialog;
 
     public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_TITLE, App.getInstance().getString(R.string.nvd_title_settings));
-        fragment.setArguments(args);
-        return fragment;
+        return new SettingsFragment();
     }
 
     @Override
@@ -50,6 +48,15 @@ public class SettingsFragment extends BaseFragment {
 
         pushNotification.setChecked(getPushNotifications());
 
+        if (null == App.getInstance().getUser().getFacebookId()) {
+            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
+        } else {
+            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.GONE);
+        }
+
+        TextView versionView = (TextView) rootView.findViewById(R.id.version);
+        versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
+
         initListeners();
         return rootView;
     }
@@ -58,6 +65,7 @@ public class SettingsFragment extends BaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        title = getString(R.string.nvd_title_settings);
         changePasswordDialog = ChangePasswordDialog.newInstance();
     }
 
@@ -65,11 +73,10 @@ public class SettingsFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getBaseActivity().addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        getBaseActivity().addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
-        getBaseActivity().addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
-        getBaseActivity().addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new BaseActivity.FailAction(getBaseActivity()));
-        getBaseActivity().updateBroadcastActionList();
+        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
     }
 
     private void initListeners() {
@@ -111,7 +118,7 @@ public class SettingsFragment extends BaseFragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                getBaseActivity().showProgress();
+                baseActivity.showProgress();
                 QBLogoutCommand.start(getActivity());
             }
         });
@@ -137,8 +144,8 @@ public class SettingsFragment extends BaseFragment {
     private class ChangePasswordSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
-            getBaseActivity().hideProgress();
-            DialogUtils.show(getBaseActivity(), getString(R.string.dlg_password_changed));
+            baseActivity.hideProgress();
+            DialogUtils.show(baseActivity, getString(R.string.dlg_password_changed));
         }
     }
 }

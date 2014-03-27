@@ -16,6 +16,7 @@
     <string name="lnd_have_account">Already have an account?</string>
     <string name="lnd_sign_up">Sign Up with Email</string>
     <string name="lnd_no_app_version">Couldn\'t get app version</string>
+    <string name="lnd_version">v. %1$s</string>
 
     // Login
     <string name="lgn_forgot_password">Forgot password?</string>
@@ -74,6 +75,7 @@
     <string name="stn_logout">Log Out</string>
     <string name="stn_change_password">Change Password</string>
     <string name="stn_push_notifivation">Push Notification</string>
+    <string name="stn_version">Version %1$s</string>
 
     // Profile
     <string name="prf_full_name">Full Name</string>
@@ -82,6 +84,7 @@
     <string name="prf_email">Email</string>
     <string name="prf_status_message">Status Message</string>
     <string name="prf_edit_status">Edit Status</string>
+    <string name="prf_done">Done</string>
 
     // Invite Friends
     <string name="inf_header_label">Let your other friends know about \n Q-munication by sending them private invitations</string>
@@ -93,7 +96,7 @@
     <string name="inf_choose_email_provider">Choose an email provider :</string>
     <string name="inf_subject_of_invitation">Qmunicate app</string>
     <string name="inf_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
-    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
     <string name="inf_fb_wall_param_name">QuickBlox</string>
     <string name="inf_fb_wall_param_description">This is QuickBlox, BABY!</string>
     <string name="inf_fb_wall_param_link">http://quickblox.com/</string>
@@ -117,10 +120,11 @@
     <string name="dlg_no_facebook_friends">No Facebook friends</string>
     <string name="dlg_no_contacts_friends">No Contacts friends</string>
     <string name="dlg_no_friends">No friends</string>
-    <string name="dlg_success_posted_to_facebook">Posting to wall of Facebook was successful!</string>
+    <string name="dlg_success_posted_to_facebook">Facebook chat was sent successful!</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
+    <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -131,12 +135,23 @@
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
 
+    //Calls
+    <string name="cll_incoming_call_audio">Incoming Call</string>
+    <string name="cll_incoming_call_video">Incoming Video Call</string>
+
+    // QuickBlox
+    <string name="api_quickblox_domain">api.quickblox.com</string>
+
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>
     <string name="search_hint">Search</string>
     <string name="push_title">call from user</string>
+    <string name="frd_offline_user">User must be online</string>
+
     <string name="label_done">Done</string>
+    <string name="error_playing_illegal_state">Error during playing sound</string>
+    <string name="error_playing_wrong_source">Wrond sound resource</string>
     <string name="ignore_content_description">ignored</string>
-    
+
 </resources>

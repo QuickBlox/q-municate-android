@@ -1,15 +1,11 @@
 package com.quickblox.qmunicate.ui.profile;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -17,33 +13,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
-import com.quickblox.module.content.model.QBFile;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.GettingImageFileListener;
-import com.quickblox.qmunicate.ui.utils.ImageHelper;
-import com.squareup.picasso.Picasso;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity implements GettingImageFileListener {
-
+public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
+    
+    private LinearLayout changeAvatarLinearLayout;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
-
     private ImageHelper imageHelper;
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
@@ -73,36 +74,24 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
 
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
         addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new FailAction(this));
-        addAction(QBServiceConsts.GET_FILE_SUCCESS_ACTION, new GetFileSuccessAction());
-        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
-        updateBroadcastActionList();
 
         initUsersData();
         initTextChangedListeners();
     }
 
-    private void initUI() {
-        avatarImageView = _findViewById(R.id.avatarImageView);
-        fullNameEditText = _findViewById(R.id.fullNameEditText);
-        emailEditText = _findViewById(R.id.emailEditText);
-        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
-    }
-
-    private void initTextChangedListeners() {
-        TextWatcher textWatcherListener = new TextWatcherListener();
-        fullNameEditText.addTextChangedListener(textWatcherListener);
-        emailEditText.addTextChangedListener(textWatcherListener);
-    }
-
-    private void initChangingEditText(EditText editText) {
-        editText.setEnabled(true);
-        editText.requestFocus();
-    }
-
     private void initUsersData() {
-        Integer fileId = qbUser.getFileId();
-        if (fileId != null) {
-            QBGetFileCommand.start(this, fileId);
+        try {
+            String uri;
+            if (getLoginType() == LoginType.FACEBOOK) {
+                changeAvatarLinearLayout.setClickable(false);
+                uri = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
+                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            } else if (getLoginType() == LoginType.EMAIL) {
+                uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
+                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            }
+        } catch (BaseServiceException e) {
+            ErrorUtils.showError(this, e);
         }
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
@@ -112,9 +101,31 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         emailOld = emailEditText.getText().toString();
     }
 
+    private LoginType getLoginType() {
+        int defValue = LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginType.values()[value];
+    }
+
+    private void initTextChangedListeners() {
+        TextWatcher textWatcherListener = new TextWatcherListener();
+        fullNameEditText.addTextChangedListener(textWatcherListener);
+        emailEditText.addTextChangedListener(textWatcherListener);
+    }
+
+    private void initUI() {
+        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
+        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        emailEditText = _findViewById(R.id.emailEditText);
+        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            fullNameEditText.setText(qbUser.getFullName());
+            emailEditText.setText(qbUser.getEmail());
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
@@ -122,6 +133,35 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
             closeActionMode = false;
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                navigateToParent();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            isNeedUpdateAvatar = true;
+            avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
+            Uri originalUri = data.getData();
+            avatarImageView.setImageURI(originalUri);
+            startAction();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void startAction() {
+        if (actionMode != null) {
+            return;
+        }
+        actionMode = startActionMode(new ActionModeCallback());
     }
 
     public void changeAvatarOnClick(View view) {
@@ -132,15 +172,13 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         initChangingEditText(fullNameEditText);
     }
 
-    public void changeEmailOnClick(View view) {
-        initChangingEditText(emailEditText);
+    private void initChangingEditText(EditText editText) {
+        editText.setEnabled(true);
+        editText.requestFocus();
     }
 
-    private void startAction() {
-        if (actionMode != null) {
-            return;
-        }
-        actionMode = startActionMode(new ActionModeCallback());
+    public void changeEmailOnClick(View view) {
+        initChangingEditText(emailEditText);
     }
 
     private void updateCurrentUserData() {
@@ -159,27 +197,8 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
-            Uri originalUri = data.getData();
-            avatarImageView.setImageURI(originalUri);
-            startAction();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    private boolean isUserDataChanges(String fullname, String email) {
+        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
     private void saveChanges(final Bitmap avatar, final String fullname,
@@ -199,10 +218,6 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
 
     private boolean isAvatarChanges(Bitmap avatar) {
         return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
-    }
-
-    private boolean isUserDataChanges(String fullname, String email) {
-        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
     @Override
@@ -242,18 +257,6 @@ public class ProfileActivity extends BaseActivity implements GettingImageFileLis
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             hideProgress();
-        }
-    }
-
-    private class GetFileSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
-            Picasso.with(ProfileActivity.this)
-                    .load(file.getPublicUrl())
-                    .placeholder(R.drawable.placeholder_user)
-                    .into(avatarImageView);
         }
     }
 }

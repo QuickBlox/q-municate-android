@@ -10,20 +10,20 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 public class QBAddFriendCommand extends ServiceCommand {
 
     private static final String TAG = QBAddFriendCommand.class.getSimpleName();
 
+    public QBAddFriendCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIEND_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
         context.startService(intent);
-    }
-
-    public QBAddFriendCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

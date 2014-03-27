@@ -1,9 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:orientation="vertical"
-              android:padding="15dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:padding="15dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -11,13 +11,14 @@
         android:layout_margin="35dp"
         android:orientation="horizontal">
 
-        <com.quickblox.qmunicate.ui.views.CircularImageView
+        <com.quickblox.qmunicate.ui.view.CircleImageView
             android:id="@+id/avatarImageView"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="@dimen/image_view_big_avatar_layout_width"
+            android:layout_height="@dimen/image_view_big_avatar_layout_height"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:src="@drawable/placeholder_user"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_user" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -30,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="5dp"
-                android:textSize="20sp"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/statusTextView"
@@ -38,16 +39,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="15sp"/>
-
+                android:textSize="15sp" />
         </LinearLayout>
-
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@color/action_bar_color"/>
+    <include layout="@layout/view_separator_blue" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -62,14 +58,13 @@
             android:layout_height="15dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="15dp"
-            android:src="@drawable/badge_online"/>
+            android:src="@drawable/badge_online" />
 
         <TextView
             android:id="@+id/onlineStatusTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"/>
-
+            android:textSize="18sp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -79,17 +74,15 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp">
 
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_height"
-            android:background="@android:color/darker_gray"/>
+        <include
+            android:id="@+id/separator"
+            layout="@layout/view_separator_gray" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/divider"
+            android:layout_below="@id/separator"
             android:layout_centerVertical="true"
             android:orientation="vertical">
 
@@ -97,7 +90,7 @@
                 android:id="@+id/phoneTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"/>
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/descriptionTextView"
@@ -105,15 +98,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/frd_mobile"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="13sp"/>
+                android:textSize="13sp" />
 
         </LinearLayout>
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+    <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
         android:id="@+id/videoCallButton"
@@ -131,7 +121,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:text="@string/frd_video_call"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -143,7 +133,7 @@
             <View
                 android:layout_width="@dimen/divider_width"
                 android:layout_height="match_parent"
-                android:background="@android:color/darker_gray"/>
+                android:background="@android:color/darker_gray" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -151,14 +141,11 @@
                 android:background="@drawable/button_general_selector"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:src="@drawable/ic_friends_video"/>
+                android:src="@drawable/ic_friends_video" />
         </LinearLayout>
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+    <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
         android:id="@+id/voiceCallButton"
@@ -176,7 +163,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:text="@string/frd_audio_call"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -188,7 +175,7 @@
             <View
                 android:layout_width="@dimen/divider_width"
                 android:layout_height="match_parent"
-                android:background="@android:color/darker_gray"/>
+                android:background="@android:color/darker_gray" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -197,14 +184,11 @@
                 android:background="@drawable/button_general_selector"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:src="@drawable/ic_friends_call"/>
+                android:src="@drawable/ic_friends_call" />
         </LinearLayout>
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+    <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
         android:id="@+id/chatButton"
@@ -222,7 +206,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:text="@string/frd_chat"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -234,7 +218,7 @@
             <View
                 android:layout_width="@dimen/divider_width"
                 android:layout_height="match_parent"
-                android:background="@android:color/darker_gray"/>
+                android:background="@android:color/darker_gray" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -242,12 +226,9 @@
                 android:background="@null"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:src="@drawable/ic_friends_chat"/>
+                android:src="@drawable/ic_friends_chat" />
         </LinearLayout>
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray"/>
+    <include layout="@layout/view_separator_gray" />
 </LinearLayout>

@@ -12,7 +12,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
@@ -20,14 +20,14 @@ public class QBRemoveFriendCommand extends ServiceCommand {
 
     private static final String TAG = QBRemoveFriendCommand.class.getSimpleName();
 
+    public QBRemoveFriendCommand(Context context, String successAction, String failAction) {
+        super(context, successAction, failAction);
+    }
+
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(QBServiceConsts.REMOVE_FRIEND_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
         context.startService(intent);
-    }
-
-    public QBRemoveFriendCommand(Context context, String successAction, String failAction) {
-        super(context, successAction, failAction);
     }
 
     @Override

@@ -14,15 +14,15 @@ allprojects {
 }
 
 ext.compileSdkVersion = 19
-ext.buildToolsVersion = '19.0.2'
+ext.buildToolsVersion = '19.0.3'
 
-ext.versionName = '0.1'
+ext.versionName = '1.0.1'
 ext.versionCode = 1
 
 ext.prodDebug = true
 ext.devDebug = true
 
 // Dependencies versions
-ext.picassoVersion = '2.2.0'
+ext.universalImageLoaderVersion = '1.9.0'
+ext.googlePlayServicesVersion = '4.+'
 ext.nineoldandroidsVersion = '2.4.0'
-
