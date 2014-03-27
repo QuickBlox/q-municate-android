@@ -16,6 +16,7 @@
     <string name="lnd_have_account">Already have an account?</string>
     <string name="lnd_sign_up">Sign Up with Email</string>
     <string name="lnd_no_app_version">Couldn\'t get app version</string>
+    <string name="lnd_version">v. %1$s</string>
 
     // Login
     <string name="lgn_forgot_password">Forgot password?</string>
@@ -74,6 +75,7 @@
     <string name="stn_logout">Log Out</string>
     <string name="stn_change_password">Change Password</string>
     <string name="stn_push_notifivation">Push Notification</string>
+    <string name="stn_version">Version %1$s</string>
 
     // Profile
     <string name="prf_full_name">Full Name</string>
@@ -94,7 +96,7 @@
     <string name="inf_choose_email_provider">Choose an email provider :</string>
     <string name="inf_subject_of_invitation">Qmunicate app</string>
     <string name="inf_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
-    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%s/picture?type=normal</string>
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
     <string name="inf_fb_wall_param_name">QuickBlox</string>
     <string name="inf_fb_wall_param_description">This is QuickBlox, BABY!</string>
     <string name="inf_fb_wall_param_link">http://quickblox.com/</string>

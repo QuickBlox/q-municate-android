@@ -20,6 +20,7 @@ import com.quickblox.qmunicate.ui.utils.Utils;
 
 import java.util.ArrayList;
 
+// TODO VF move to com.quickblox.qmunicate.core.gcm
 public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging, Void, Bundle> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
@@ -50,7 +51,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         return registration;
     }
 
-
+    // TODO VF remove comments
     /**
      * Subscribe to Push Notifications
      *
@@ -75,9 +76,10 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         return qbSubscription;
     }
 
+    // TODO VF move consts from Consts class to PrefsHelper and rename them
     private void storeRegistration(Context context, Bundle registration) {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        int appVersion = Utils.getAppVersion(context);
+        int appVersion = Utils.getAppVersionCode(context);
         Log.i(TAG, "Saving regId on app version " + appVersion);
         prefsHelper.savePref(Consts.PROPERTY_REG_ID, registration.getString(Consts.PROPERTY_REG_ID));
         prefsHelper.savePref(Consts.SUBSCRIPTION_ID, registration.getInt(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE));

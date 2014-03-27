@@ -28,13 +28,13 @@
         android:text="@string/stn_push_notifivation"
         android:textSize="@dimen/text_size" />
 
-    <include layout="@layout/view_separator_gray" />
-
     <LinearLayout
         android:id="@+id/changePasswordLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <include layout="@layout/view_separator_gray" />
 
         <Button
             android:id="@+id/changePassword"
@@ -46,10 +46,9 @@
             android:paddingTop="14dp"
             android:text="@string/stn_change_password"
             android:textSize="@dimen/text_size" />
-
-        <include layout="@layout/view_separator_gray" />
-
     </LinearLayout>
+
+    <include layout="@layout/view_separator_gray" />
 
     <Button
         android:id="@+id/logout"
@@ -61,4 +60,21 @@
         android:paddingTop="14dp"
         android:text="@string/stn_logout"
         android:textSize="@dimen/text_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_separator_gray" />
+
+        <TextView
+            android:id="@+id/version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
 </LinearLayout>
