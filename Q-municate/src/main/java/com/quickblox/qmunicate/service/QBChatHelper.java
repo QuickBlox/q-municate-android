@@ -12,7 +12,7 @@ import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.SignalingChannel;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import org.webrtc.SessionDescription;
 

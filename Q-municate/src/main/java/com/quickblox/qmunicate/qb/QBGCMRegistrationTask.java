@@ -14,9 +14,9 @@ import com.quickblox.module.messages.model.QBEnvironment;
 import com.quickblox.module.messages.model.QBSubscription;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.utils.Utils;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Utils;
 
 import java.util.ArrayList;
 

@@ -4,7 +4,7 @@ package com.quickblox.qmunicate.ui.mediacall;
 import android.os.Handler;
 import android.widget.TextView;
 
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 public class TimeUpdater implements Runnable {
 

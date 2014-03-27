@@ -13,7 +13,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.QBChangePasswordCommand;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.DialogUtils;
 
 public class ChangePasswordDialog extends DialogFragment {
 

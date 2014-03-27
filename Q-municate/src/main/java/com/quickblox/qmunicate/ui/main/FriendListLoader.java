@@ -13,7 +13,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.ui.BaseLoader;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.List;

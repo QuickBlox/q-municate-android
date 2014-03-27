@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.utils;
+package com.quickblox.qmunicate.utils;
 
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.auth.QBAuth;

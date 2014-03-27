@@ -16,7 +16,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallFragment;
 

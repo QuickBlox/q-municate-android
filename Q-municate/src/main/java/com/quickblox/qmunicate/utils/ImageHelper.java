@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.utils;
+package com.quickblox.qmunicate.utils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -44,6 +44,7 @@ public class ImageHelper {
     }
 
     public File getFileFromImageView(ImageView imageView) throws IOException {
+        /*
         int preferredWidth = 300;
         Bitmap origBitmap = drawableToBitmap(imageView.getDrawable());
         int origWidth = origBitmap.getWidth();
@@ -58,11 +59,11 @@ public class ImageHelper {
             destWidth = 300;
             destHeight = origHeight / (origWidth / destWidth);
         }
-
+        */
         File tempFile = new File(activity.getCacheDir(), "temp.png");
         tempFile.createNewFile();
 
-        Bitmap bitmap = resizeBitmap(origBitmap, destWidth, destHeight);
+        Bitmap bitmap = imageView.getDrawingCache(); //resizeBitmap(origBitmap, destWidth, destHeight);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
         byte[] bitmapData = bos.toByteArray();

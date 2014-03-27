@@ -1,8 +1,8 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.ui.utils.OnlineStatusHelper;
-import com.quickblox.qmunicate.ui.utils.UriCreator;
+import com.quickblox.qmunicate.utils.OnlineStatusHelper;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -26,9 +26,9 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class LoginActivity extends BaseActivity {
 

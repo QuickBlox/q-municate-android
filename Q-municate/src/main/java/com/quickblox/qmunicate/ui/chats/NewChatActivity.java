@@ -17,7 +17,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -12,7 +12,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 

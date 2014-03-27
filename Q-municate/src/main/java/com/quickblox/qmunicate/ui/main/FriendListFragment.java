@@ -24,9 +24,9 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.LoaderFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;

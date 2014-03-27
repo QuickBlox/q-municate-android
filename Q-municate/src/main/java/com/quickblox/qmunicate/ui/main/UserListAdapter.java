@@ -12,8 +12,8 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
-import com.quickblox.qmunicate.ui.utils.UriCreator;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.List;
 

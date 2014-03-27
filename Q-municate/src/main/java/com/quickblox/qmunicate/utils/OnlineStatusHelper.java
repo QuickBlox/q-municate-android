@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.utils;
+package com.quickblox.qmunicate.utils;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;

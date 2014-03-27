@@ -5,7 +5,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.DialogUtils;
 
 public class ConfirmDialog extends DialogFragment {
 

@@ -21,11 +21,11 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.ImageHelper;
-import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.File;
 
