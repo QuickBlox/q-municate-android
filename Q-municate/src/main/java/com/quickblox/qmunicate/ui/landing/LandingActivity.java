@@ -2,9 +2,7 @@ package com.quickblox.qmunicate.ui.landing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,6 +22,7 @@ import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.utils.FacebookHelper;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.ui.utils.Utils;
 
 public class LandingActivity extends BaseActivity {
 
@@ -50,20 +49,6 @@ public class LandingActivity extends BaseActivity {
         saveLandingShown();
     }
 
-    private void saveLandingShown() {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
-    }
-
-    private void initVersionName() {
-        try {
-            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            TextView versionView = _findViewById(R.id.version);
-            versionView.setText("v. " + versionName);
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot obtain version number from Manifest", e);
-        }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -71,15 +56,24 @@ public class LandingActivity extends BaseActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
         facebookHelper.onActivityStop();
+    }
+
+    private void saveLandingShown() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
+    }
+
+    private void initVersionName() {
+        TextView versionView = _findViewById(R.id.version);
+        versionView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
     }
 
     @Override
@@ -108,16 +102,19 @@ public class LandingActivity extends BaseActivity {
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
+
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                QBSocialLoginCommand.start(LandingActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+                QBSocialLoginCommand.start(LandingActivity.this, QBProvider.FACEBOOK,
+                        session.getAccessToken(), null);
             }
         }
     }
 
     private class SocialLoginSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);

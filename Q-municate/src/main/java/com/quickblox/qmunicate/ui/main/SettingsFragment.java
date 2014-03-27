@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -22,6 +23,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.ui.utils.DialogUtils;
 import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.ui.utils.Utils;
 
 public class SettingsFragment extends BaseFragment {
 
@@ -51,6 +53,9 @@ public class SettingsFragment extends BaseFragment {
         } else {
             rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.GONE);
         }
+
+        TextView versionView = (TextView) rootView.findViewById(R.id.version);
+        versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
 
         initListeners();
         return rootView;

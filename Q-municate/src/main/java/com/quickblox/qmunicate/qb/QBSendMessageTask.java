@@ -9,6 +9,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
 import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 
+// TODO VF remake as Command
 public class QBSendMessageTask extends BaseProgressTask<Object, Void, QBEvent> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
