@@ -79,10 +79,8 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         String uri = null;
         if (data.getViaLabelType() == InviteFriend.VIA_CONTACTS_TYPE) {
             uri = data.getUri().toString();
-            //holder.avatarImageView.setImageURI(data.getUri());
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             uri = String.format(activity.getString(R.string.inf_url_to_facebook_avatar), data.getId());
-
         }
         displayImage(uri, holder.avatarImageView);
         return convertView;
