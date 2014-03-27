@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
-private LinearLayout linearLayoutChangeAvatar;
+    private LinearLayout linearLayoutChangeAvatar;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;

@@ -15,6 +15,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -93,12 +94,17 @@ public class LandingActivity extends BaseActivity {
     }
 
     public void connectFacebookOnClickListener(View view) {
+        saveLoginType(LoginType.FACEBOOK);
         facebookHelper.loginWithFacebook();
     }
 
     public void loginOnClickListener(View view) {
         LoginActivity.start(LandingActivity.this);
         finish();
+    }
+
+    private void saveLoginType(LoginType type) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
