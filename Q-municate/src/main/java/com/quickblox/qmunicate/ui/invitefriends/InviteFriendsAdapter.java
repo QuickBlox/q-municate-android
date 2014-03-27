@@ -76,14 +76,13 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         holder.checkBox.setChecked(data.isSelected());
         holder.checkBox.setTag(data);
 
-        String uri = "";
+        String uri = null;
         if (data.getViaLabelType() == InviteFriend.VIA_CONTACTS_TYPE) {
-            uri = data.getLink();
+            uri = data.getUri().toString();
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             uri = String.format(activity.getString(R.string.inf_url_to_facebook_avatar), data.getId());
         }
         displayImage(uri, holder.avatarImageView);
-
         return convertView;
     }
 
