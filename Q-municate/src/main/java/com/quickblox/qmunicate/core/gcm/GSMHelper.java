@@ -64,7 +64,7 @@ public class GSMHelper {
         int subscriptionId = prefsHelper.getPref(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE);
 
         int registeredVersion = prefsHelper.getPref(Consts.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = Utils.getAppVersion(activity);
+        int currentVersion = Utils.getAppVersionCode(activity);
         if (registeredVersion != currentVersion) {
             Log.i(TAG, "App version changed.");
             return "";
