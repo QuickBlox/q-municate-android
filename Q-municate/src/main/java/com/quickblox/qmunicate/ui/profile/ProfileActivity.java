@@ -1,11 +1,9 @@
 package com.quickblox.qmunicate.ui.profile;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.view.ActionMode;
@@ -15,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
@@ -22,6 +21,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -32,13 +32,14 @@ import com.quickblox.qmunicate.ui.utils.ErrorUtils;
 import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
 import com.quickblox.qmunicate.ui.utils.ImageHelper;
 import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.ui.utils.PrefsHelper;
 import com.quickblox.qmunicate.ui.utils.UriCreator;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
-
+private LinearLayout linearLayoutChangeAvatar;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
@@ -79,8 +80,15 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
 
     private void initUsersData() {
         try {
-            String uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+            String uri;
+            if (getLoginType() == LoginType.FACEBOOK) {
+                linearLayoutChangeAvatar.setClickable(false);
+                uri = String.format(this.getString(R.string.inf_url_to_facebook_avatar), qbUser.getFacebookId());
+                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+            } else if (getLoginType() == LoginType.EMAIL) {
+                uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
+                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+            }
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }
@@ -92,6 +100,12 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         emailOld = emailEditText.getText().toString();
     }
 
+    private LoginType getLoginType() {
+        int defValue = LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginType.values()[value];
+    }
+
     private void initTextChangedListeners() {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
@@ -99,6 +113,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     }
 
     private void initUI() {
+        linearLayoutChangeAvatar = _findViewById(R.id.linearLayoutChangeAvatar);
         avatarImageView = _findViewById(R.id.avatarImageView);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
@@ -108,6 +123,8 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            fullNameEditText.setText(qbUser.getFullName());
+            emailEditText.setText(qbUser.getEmail());
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
@@ -127,7 +144,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         return super.onOptionsItemSelected(item);
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
