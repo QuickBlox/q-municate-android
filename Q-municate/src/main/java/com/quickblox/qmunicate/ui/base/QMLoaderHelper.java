@@ -6,7 +6,7 @@ import android.util.Log;
 import com.quickblox.qmunicate.core.ui.LoaderHelper;
 import com.quickblox.qmunicate.core.ui.LoaderManager;
 import com.quickblox.qmunicate.core.ui.OnLoadFinishedListener;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class QMLoaderHelper<T> extends LoaderHelper<T> {
 

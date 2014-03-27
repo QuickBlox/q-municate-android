@@ -28,8 +28,8 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class NavigationDrawerFragment extends BaseFragment {
 

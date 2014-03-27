@@ -19,8 +19,8 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class SplashActivity extends BaseActivity {
 

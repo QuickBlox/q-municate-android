@@ -21,9 +21,9 @@ import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.utils.Utils;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Utils;
 
 public class SettingsFragment extends BaseFragment {
 

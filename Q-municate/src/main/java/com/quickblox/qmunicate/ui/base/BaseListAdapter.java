@@ -4,7 +4,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 

@@ -28,10 +28,10 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
-import com.quickblox.qmunicate.ui.utils.UriCreator;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.Timer;
 import java.util.TimerTask;

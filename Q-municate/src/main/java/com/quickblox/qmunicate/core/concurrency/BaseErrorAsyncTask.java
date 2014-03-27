@@ -5,8 +5,8 @@ import android.app.DialogFragment;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.lang.ref.WeakReference;
 

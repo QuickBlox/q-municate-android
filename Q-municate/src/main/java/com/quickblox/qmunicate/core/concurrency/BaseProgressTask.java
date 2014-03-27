@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErrorAsyncTask<Params, Progress, Result> {
 

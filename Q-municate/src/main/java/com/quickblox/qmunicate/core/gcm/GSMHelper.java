@@ -10,9 +10,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.qb.QBGCMRegistrationTask;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.utils.Utils;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Utils;
 
 public class GSMHelper {
 

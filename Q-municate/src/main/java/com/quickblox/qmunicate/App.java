@@ -11,8 +11,8 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,6 @@ public class App extends Application {
                 .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS)
                 .denyCacheImageMultipleSizesInMemory()
                 .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithoutToken())
-                .threadPoolSize(Consts.UIL_THREAD_POOL_SIZE)
                         // TODO IS Remove for release app
                 .writeDebugLogs()
                 .build();

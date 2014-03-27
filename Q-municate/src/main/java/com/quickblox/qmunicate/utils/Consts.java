@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.utils;
+package com.quickblox.qmunicate.utils;
 
 import android.graphics.Bitmap;
 
@@ -51,7 +51,6 @@ public class Consts {
     public static final String INVITE_TYPE_OF_EMAIL = "message/rfc822";
 
     // Universal Image Loader
-    public static final int UIL_THREAD_POOL_SIZE = 5;
     public static final DisplayImageOptions UIL_DEFAULT_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
             .bitmapConfig(Bitmap.Config.RGB_565)

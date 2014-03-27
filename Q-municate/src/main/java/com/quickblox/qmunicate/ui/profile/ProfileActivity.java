@@ -1,11 +1,9 @@
 package com.quickblox.qmunicate.ui.profile;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.view.ActionMode;
@@ -29,13 +27,13 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
-import com.quickblox.qmunicate.ui.utils.GetImageFileTask;
-import com.quickblox.qmunicate.ui.utils.ImageHelper;
-import com.quickblox.qmunicate.ui.utils.OnGetImageFileListener;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.utils.UriCreator;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +84,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
             String uri;
             if (getLoginType() == LoginType.FACEBOOK) {
                 changeAvatarLinearLayout.setClickable(false);
-                uri = String.format(this.getString(R.string.inf_url_to_facebook_avatar), qbUser.getFacebookId());
+                uri = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
                 ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
             } else if (getLoginType() == LoginType.EMAIL) {
                 uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));

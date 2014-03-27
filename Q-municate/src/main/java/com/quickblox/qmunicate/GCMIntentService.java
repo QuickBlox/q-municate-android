@@ -16,7 +16,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.model.PushMessage;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 
 public class GCMIntentService extends IntentService {

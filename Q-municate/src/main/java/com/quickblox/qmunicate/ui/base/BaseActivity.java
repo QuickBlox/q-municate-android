@@ -21,8 +21,8 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -19,14 +19,12 @@
         android:onClick="changeAvatarOnClick"
         android:orientation="horizontal">
 
-        <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <com.quickblox.qmunicate.ui.view.CircleImageView
             android:id="@+id/avatarImageView"
             android:layout_width="@dimen/image_view_big_avatar_layout_width"
             android:layout_height="@dimen/image_view_big_avatar_layout_height"
             android:scaleType="centerCrop"
-            android:src="@drawable/placeholder_user"
-            app:is_oval="true"
-            app:round_background="true" />
+            android:src="@drawable/placeholder_user" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -37,7 +35,6 @@
             android:text="@string/sup_choose_user_picture"
             android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/text_size" />
-
     </LinearLayout>
 
     <TextView

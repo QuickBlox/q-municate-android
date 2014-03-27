@@ -20,9 +20,9 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
-import com.quickblox.qmunicate.ui.utils.Utils;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.Utils;
 
 public class LandingActivity extends BaseActivity {
 
