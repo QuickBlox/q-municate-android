@@ -142,7 +142,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void chatClickListener(View view) {
-        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
+//        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void callToUser(Friend friend, CallType callType) {
