@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {

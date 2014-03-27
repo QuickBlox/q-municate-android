@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.utils;
+package com.quickblox.qmunicate.utils;
 
 import android.graphics.Bitmap;
 
@@ -51,18 +51,17 @@ public class Consts {
     public static final String INVITE_TYPE_OF_EMAIL = "message/rfc822";
 
     // Universal Image Loader
-    public static final int UIL_MAX_BITMAP_SIZE = 2000000;
-    public static DisplayImageOptions defaultDisplayOptions = new DisplayImageOptions.Builder()
+    public static final DisplayImageOptions UIL_DEFAULT_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
             .bitmapConfig(Bitmap.Config.RGB_565)
             .cacheOnDisc(true)
             .cacheInMemory(true)
             .build();
-    public static DisplayImageOptions avatarDisplayOptions = new DisplayImageOptions.Builder()
+    public static DisplayImageOptions UIL_AVATAR_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.placeholder_user)
             .showImageForEmptyUri(R.drawable.placeholder_user)
             .showImageOnFail(R.drawable.placeholder_user)
+            .cacheOnDisc(true)
+            .cacheInMemory(true)
             .build();
-
-
 }

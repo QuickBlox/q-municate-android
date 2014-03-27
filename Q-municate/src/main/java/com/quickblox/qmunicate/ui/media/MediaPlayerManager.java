@@ -6,7 +6,7 @@ import android.media.MediaPlayer;
 import android.provider.Settings;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class MediaPlayerManager {
     private static final int INVALID_SOURCE = R.string.error_playing_wrong_source;

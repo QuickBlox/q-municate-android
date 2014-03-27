@@ -12,7 +12,7 @@ import android.widget.ListView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.DialogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;

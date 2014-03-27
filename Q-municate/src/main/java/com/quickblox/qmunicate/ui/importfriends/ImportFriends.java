@@ -17,9 +17,9 @@ import com.quickblox.qmunicate.core.ui.OnLoadFinishedListener;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.qb.QBAddFriendsCommand;
 import com.quickblox.qmunicate.ui.base.QMLoaderHelper;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.FacebookHelper;
-import com.quickblox.qmunicate.ui.utils.FriendsUtils;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.FriendsUtils;
 
 import java.util.ArrayList;
 import java.util.List;

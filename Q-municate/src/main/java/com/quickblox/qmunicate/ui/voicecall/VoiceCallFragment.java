@@ -8,7 +8,7 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.qmunicate.ui.mediacall.TimeUpdater;
-import com.quickblox.qmunicate.ui.utils.Consts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import org.webrtc.MediaConstraints;
 

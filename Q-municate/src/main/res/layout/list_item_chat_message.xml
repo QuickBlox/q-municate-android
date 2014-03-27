@@ -6,13 +6,14 @@
     android:padding="10dp"
     android:background="@drawable/list_item_background_selector">
 
-    <com.quickblox.qmunicate.ui.views.CircularImageView
+    <com.quickblox.qmunicate.ui.view.CircleImageView
         android:id="@+id/avatarImageView"
-        android:layout_width="53dp"
-        android:layout_height="53dp"
+        android:layout_width="@dimen/image_view_small_avatar_layout_width"
+        android:layout_height="@dimen/image_view_small_avatar_layout_height"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/placeholder_user" />
 
     <LinearLayout

@@ -11,7 +11,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class QBLogoutCommand extends ServiceCommand {
 

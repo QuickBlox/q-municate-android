@@ -26,13 +26,12 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
-import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.ui.utils.Consts;
-import com.quickblox.qmunicate.ui.utils.DialogUtils;
-import com.quickblox.qmunicate.ui.utils.ErrorUtils;
-import com.quickblox.qmunicate.ui.utils.UriCreator;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -158,7 +157,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     private void fillUI(Friend friend) {
         try {
             String uri = UriCreator.getUri(friend.getAvatarUid());
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }

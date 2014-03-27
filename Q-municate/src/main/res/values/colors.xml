@@ -21,6 +21,9 @@
     <color name="button_end_call_normal_color">#ff0000</color>
     <color name="button_end_call_pressed_color">#e4f4ff</color>
 
+    <color name="avatar_border_color">#ffffff</color>
+    <color name="circle_view_mask_color">#ffffff</color>
+
     <color name="menu_item_background_pressed_color">#1cba48</color>
     <color name="menu_item_background_activated_color">#1cba48</color>
     <color name="list_item_background_pressed_color">#e4f4ff</color>
