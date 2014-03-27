@@ -19,11 +19,14 @@
         android:onClick="changeAvatarOnClick"
         android:orientation="horizontal">
 
-        <com.quickblox.qmunicate.ui.views.CircularImageView
+        <com.makeramen.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/avatarImageView"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:src="@drawable/placeholder_user" />
+            android:layout_width="@dimen/image_view_big_avatar_layout_width"
+            android:layout_height="@dimen/image_view_big_avatar_layout_height"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_user"
+            app:is_oval="true"
+            app:round_background="true" />
 
         <TextView
             android:layout_width="wrap_content"

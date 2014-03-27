@@ -80,7 +80,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     private void initUsersData() {
         try {
             String uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
+            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }

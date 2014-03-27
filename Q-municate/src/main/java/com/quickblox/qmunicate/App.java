@@ -7,7 +7,6 @@ import android.util.Log;
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.quickblox.core.QBSettings;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
@@ -41,11 +40,10 @@ public class App extends Application {
 
     public void initImageLoader(Context context) {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
-                .defaultDisplayImageOptions(Consts.defaultDisplayOptions)
-                .threadPriority(Thread.NORM_PRIORITY - 2)
+                .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS)
                 .denyCacheImageMultipleSizesInMemory()
-                .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithOutToken())
-                .tasksProcessingOrder(QueueProcessingType.LIFO)
+                .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithoutToken())
+                .threadPoolSize(Consts.UIL_THREAD_POOL_SIZE)
                         // TODO IS Remove for release app
                 .writeDebugLogs()
                 .build();
@@ -85,7 +83,7 @@ public class App extends Application {
         soundPlayer = new MediaPlayerManager(this);
     }
 
-    private class HashCodeFileNameGeneratorWithOutToken extends HashCodeFileNameGenerator {
+    private class HashCodeFileNameGeneratorWithoutToken extends HashCodeFileNameGenerator {
 
         private static final String FACEBOOK_PATTERN = "https://graph.facebook.com/";
         private static final String TOKEN_PATTERN = "\\?token+=+.*";
