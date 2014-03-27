@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
@@ -38,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
-
+private LinearLayout linearLayoutChangeAvatar;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
@@ -81,6 +82,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         try {
             String uri;
             if (getLoginType() == LoginType.FACEBOOK) {
+                linearLayoutChangeAvatar.setClickable(false);
                 uri = String.format(this.getString(R.string.inf_url_to_facebook_avatar), qbUser.getFacebookId());
                 ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
             } else if (getLoginType() == LoginType.EMAIL) {
@@ -111,6 +113,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     }
 
     private void initUI() {
+        linearLayoutChangeAvatar = _findViewById(R.id.linearLayoutChangeAvatar);
         avatarImageView = _findViewById(R.id.avatarImageView);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
