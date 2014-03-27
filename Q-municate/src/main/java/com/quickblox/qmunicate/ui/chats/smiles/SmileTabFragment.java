@@ -16,6 +16,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import java.util.List;
 
 public class SmileTabFragment extends Fragment {
+
     private View view;
     private GridView smilesGrid;
 

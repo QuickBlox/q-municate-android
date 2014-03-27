@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.ui.views.customFontComponents.editTexts.NormalEdi
 public class NormalClearableEditText extends NormalEditText {
 
     private static final int RIGHT_DRAWBLE = 2;
+
     private Drawable clearButtonImage;
 
     public NormalClearableEditText(final Context context) {

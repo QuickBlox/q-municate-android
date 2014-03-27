@@ -15,12 +15,10 @@ public class AutofitBoldTextView extends TextView {
 
     private static final String TAG = AutofitBoldTextView.class.getSimpleName();
     private static final boolean SPEW = false;
-    // Minimum size of the text in pixels
-    private static final int DEFAULT_MIN_TEXT_SIZE = 8; //px
-    // How precise we want to be when reaching the target textWidth size
+    private static final int DEFAULT_MIN_TEXT_SIZE = 8;
     private static final float PRECISION = 0.5f;
     private static Typeface typeface;
-    // Attributes
+
     private float mMinTextSize;
     private float mMaxTextSize;
     private float mPrecision;
@@ -31,24 +29,9 @@ public class AutofitBoldTextView extends TextView {
         init();
     }
 
-    private void init() {
-        mMinTextSize = DEFAULT_MIN_TEXT_SIZE;
-        mMaxTextSize = getTextSize();
-        mPrecision = PRECISION;
-        mPaint = new Paint();
-    }
-
     public AutofitBoldTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
-    }
-
-    public float getMinTextSize() {
-        return mMinTextSize;
-    }
-
-    public void setMinTextSize(int minTextSize) {
-        mMinTextSize = minTextSize;
     }
 
     public float getMaxTextSize() {
@@ -57,6 +40,14 @@ public class AutofitBoldTextView extends TextView {
 
     public void setMaxTextSize(int maxTextSize) {
         mMaxTextSize = maxTextSize;
+    }
+
+    public float getMinTextSize() {
+        return mMinTextSize;
+    }
+
+    public void setMinTextSize(int minTextSize) {
+        mMinTextSize = minTextSize;
     }
 
     public float getPrecision() {
@@ -97,37 +88,6 @@ public class AutofitBoldTextView extends TextView {
         }
     }
 
-    // Recursive binary search to find the best size for the text
-    private float getTextSize(Resources resources, String text, float targetWidth, float low, float high) {
-        float mid = (low + high) / 2.0f;
-
-        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, mid, resources.getDisplayMetrics()));
-        float textWidth = mPaint.measureText(text);
-
-        if (SPEW) Log.d(TAG, "low=" + low + " high=" + high + " mid=" + mid + " target=" + targetWidth + " width=" + textWidth);
-
-        if ((high - low) < mPrecision) {
-            return low;
-        }
-        else if (textWidth > targetWidth) {
-            return getTextSize(resources, text, targetWidth, low, mid);
-        }
-        else if (textWidth < targetWidth) {
-            return getTextSize(resources, text, targetWidth, mid, high);
-        }
-        else {
-            return mid;
-        }
-    }
-
-    @Override
-    protected void onSizeChanged (int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        if (w != oldw) {
-            refitText(getText().toString(), w);
-        }
-    }
-
     @Override
     public void setTypeface(Typeface tf, int style) {
         if (typeface == null) {
@@ -137,8 +97,7 @@ public class AutofitBoldTextView extends TextView {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-    {
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         refitText(getText().toString(), parentWidth);
@@ -148,5 +107,41 @@ public class AutofitBoldTextView extends TextView {
     protected void onTextChanged(final CharSequence text, final int start, final int lengthBefore, final int lengthAfter) {
         super.onTextChanged(text, start, lengthBefore, lengthAfter);
         refitText(text.toString(), this.getWidth());
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (w != oldw) {
+            refitText(getText().toString(), w);
+        }
+    }
+
+    private void init() {
+        mMinTextSize = DEFAULT_MIN_TEXT_SIZE;
+        mMaxTextSize = getTextSize();
+        mPrecision = PRECISION;
+        mPaint = new Paint();
+    }
+
+    // Recursive binary search to find the best size for the text
+    private float getTextSize(Resources resources, String text, float targetWidth, float low, float high) {
+        float mid = (low + high) / 2.0f;
+
+        mPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, mid, resources.getDisplayMetrics()));
+        float textWidth = mPaint.measureText(text);
+
+        if (SPEW)
+            Log.d(TAG, "low=" + low + " high=" + high + " mid=" + mid + " target=" + targetWidth + " width=" + textWidth);
+
+        if ((high - low) < mPrecision) {
+            return low;
+        } else if (textWidth > targetWidth) {
+            return getTextSize(resources, text, targetWidth, low, mid);
+        } else if (textWidth < targetWidth) {
+            return getTextSize(resources, text, targetWidth, mid, high);
+        } else {
+            return mid;
+        }
     }
 }

@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.ui.views.customFontComponents.editTexts.BoldEditT
 public class BoldClearableEditText extends BoldEditText {
 
     private static final int RIGHT_DRAWBLE = 2;
+
     private Drawable clearButtonImage;
 
     public BoldClearableEditText(final Context context) {
