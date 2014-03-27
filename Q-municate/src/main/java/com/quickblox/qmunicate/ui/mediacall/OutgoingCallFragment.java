@@ -157,7 +157,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
-        Log.i(TAG, "onCreateView");
         View rootView = inflater.inflate(getContentView(), container, false);
         SessionDescriptionWrapper sessionDescriptionWrapper =
                 getArguments().getParcelable(Consts.REMOTE_DESCRIPTION);
@@ -258,8 +257,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             if (sendStop) {
                 qbVideoChat.stopCall();
             }
-            qbVideoChat.stop();
-            qbVideoChat.dispose();
         }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
             onConnectionClosed();

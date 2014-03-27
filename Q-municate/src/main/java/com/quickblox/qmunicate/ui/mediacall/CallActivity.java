@@ -55,18 +55,21 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     @Override
     public void onConnectionAccepted() {
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
     }
 
     @Override
     public void onConnectionRejected() {
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
         finish();
     }
 
     @Override
     public void onConnectionClosed() {
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
         finish();
     }
 
@@ -75,13 +78,14 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_call);
         actionBar.hide();
-        mediaPlayer = App.getInstance().getMediaPlayer();
         parseIntentExtras(getIntent().getExtras());
+        mediaPlayer = App.getInstance().getMediaPlayer();
     }
 
     @Override
     protected void onDestroy() {
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
         super.onDestroy();
     }
 
@@ -109,12 +113,14 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         if (signalingChannel != null && opponent != null) {
             signalingChannel.sendReject(opponent, System.currentTimeMillis());
         }
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
         finish();
     }
 
     private void accept() {
-        cancelPlayer();
+        //TODO VF will be implement in next version
+        //cancelPlayer();
         showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type);
     }
 
@@ -142,7 +148,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     private void showOutgoingFragment() {
-        playOutgoingRingtone();
+        //TODO VF will be implement in next version
+        //playOutgoingRingtone();
         OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(call_type) ? new VideoCallFragment() :
                 new VoiceCallFragment();
         Bundle bundle = new Bundle();
@@ -174,7 +181,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     private void showIncomingFragment() {
-        playIncomingRingtone();
+        //TODO VF will be implement in next version
+        //playIncomingRingtone();
         IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type, opponent.getFullName());
         setCurrentFragment(incomingCallFragment);
     }
