@@ -10,12 +10,13 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.common.collect.Lists;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.chats.SwitchViewListener;
 import com.quickblox.qmunicate.ui.views.customFontComponents.clearableEditText.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.customFontComponents.editTexts.LightEditText;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChatEditText extends LightEditText {
@@ -137,7 +138,7 @@ public class ChatEditText extends LightEditText {
 
         private List<ImageSpan> getListOfImageSpans() {
             ImageSpan[] spans = getText().getSpans(0, getText().length(), ImageSpan.class);
-            return Lists.newArrayList(spans);
+            return new ArrayList<ImageSpan>(Arrays.asList(spans));
         }
     }
 }

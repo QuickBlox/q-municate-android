@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.style.ImageSpan;
 
-import com.quickblox.qmunicate.ui.utils.SizeUtility;
+import com.quickblox.qmunicate.utils.SizeUtility;
 
 public class SmileSpan extends ImageSpan {
 

@@ -23,7 +23,7 @@ import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
-import com.quickblox.qmunicate.ui.utils.SizeUtility;
+import com.quickblox.qmunicate.utils.SizeUtility;
 import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
 import com.quickblox.qmunicate.ui.views.smiles.ChatEditText;
 import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
