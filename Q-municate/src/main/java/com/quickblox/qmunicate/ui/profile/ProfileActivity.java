@@ -123,6 +123,8 @@ private LinearLayout linearLayoutChangeAvatar;
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            fullNameEditText.setText(qbUser.getFullName());
+            emailEditText.setText(qbUser.getEmail());
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
