@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
-    private LinearLayout linearLayoutChangeAvatar;
+    private LinearLayout changeAvatarLinearLayout;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
@@ -82,7 +82,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         try {
             String uri;
             if (getLoginType() == LoginType.FACEBOOK) {
-                linearLayoutChangeAvatar.setClickable(false);
+                changeAvatarLinearLayout.setClickable(false);
                 uri = String.format(this.getString(R.string.inf_url_to_facebook_avatar), qbUser.getFacebookId());
                 ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.avatarDisplayOptions);
             } else if (getLoginType() == LoginType.EMAIL) {
@@ -113,7 +113,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     }
 
     private void initUI() {
-        linearLayoutChangeAvatar = _findViewById(R.id.linearLayoutChangeAvatar);
+        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
         avatarImageView = _findViewById(R.id.avatarImageView);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
