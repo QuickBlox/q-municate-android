@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/text_row_content_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:orientation="vertical">
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <!-- HACK-->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+                <!-- HACK-->
+
+                <ImageView
+                    android:id="@+id/icon"
+                    android:layout_width="30dip"
+                    android:layout_height="30dip"
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="bottom"
+                    android:contentDescription="@string/ignore_content_description" />
+
+                <com.quickblox.qmunicate.ui.views.smiles.ChatTextView />
+                    android:id="@+id/text_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dip"
+                    android:background="@android:color/holo_green_light"
+                    android:padding="-5dip"
+                    android:textAlignment="center"
+                    android:paddingBottom="-20dp"
+                    android:maxEms="13"
+                    android:autoLink="all"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical|right|left"
+                    android:maxWidth="250dip"
+                    android:textColor="@android:color/black" />
+            </TableRow>
+        </TableLayout>
+    </LinearLayout>
+</RelativeLayout>
