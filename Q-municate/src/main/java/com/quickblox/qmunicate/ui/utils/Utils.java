@@ -11,8 +11,9 @@ public class Utils {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException("Could not get package name: " + e);
+            ErrorUtils.logError(e);
         }
+        return 0;
     }
 
     public static String getAppVersionName(Context context) {
@@ -20,7 +21,8 @@ public class Utils {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException("Could not get package name: " + e);
+            ErrorUtils.logError(e);
         }
+        return null;
     }
 }
