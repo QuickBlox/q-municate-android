@@ -36,8 +36,6 @@ import java.util.TimerTask;
 public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
 
     private static final String TAG = FriendListFragment.class.getSimpleName();
-    private static final int START_DELAY = 0;
-    private static final int UPDATE_DATA_PERIOD = 300000;
 
     private ListView listView;
     private TextView listTitle;
@@ -180,8 +178,8 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.LOAD_PAGE_NUM,
-                Consts.LOAD_PER_PAGE));
+        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
+                Consts.FL_FRIENDS_PER_PAGE));
     }
 
     private void startFriendListLoaderWithTimer() {
@@ -190,10 +188,10 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         friendListUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(Consts.LOAD_PAGE_NUM,
-                        Consts.LOAD_PER_PAGE));
+                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
+                        Consts.FL_FRIENDS_PER_PAGE));
             }
-        }, START_DELAY, UPDATE_DATA_PERIOD);
+        }, Consts.FL_START_LOAD_DELAY, Consts.FL_UPDATE_DATA_PERIOD);
     }
 
     private void stopFriendListLoader() {

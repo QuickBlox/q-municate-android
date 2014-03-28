@@ -140,11 +140,11 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
 
     private void startUserListLoader(boolean isFacebookFriends, List<InviteFriend> friends) {
         if (isFacebookFriends) {
-            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.LOAD_PAGE_NUM,
-                    Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(GetUsersByFBLoader.ID, GetUsersByFBLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
+                    Consts.FL_FRIENDS_PER_PAGE, getIDs(friends)));
         } else {
-            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.LOAD_PAGE_NUM,
-                    Consts.LOAD_PER_PAGE, getIDs(friends)));
+            runLoader(UsersByEmailLoader.ID, UsersByEmailLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
+                    Consts.FL_FRIENDS_PER_PAGE, getIDs(friends)));
         }
     }
 
