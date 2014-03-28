@@ -13,10 +13,15 @@ public class Consts {
     public static final String QB_AUTH_KEY = "MpOecRZy-5WsFva";
     public static final String QB_AUTH_SECRET = "dTSLaxDsFKqegD7";
 
+    // Friend list consts
+    public static final int FL_START_LOAD_DELAY = 0;
+    public static final int FL_UPDATE_DATA_PERIOD = 30000;
+    public static final int FL_ONLINE_STATUS_TIMEOUT = 15;
+    public static final int FL_FRIENDS_PAGE_NUM = 1;
+    public static final int FL_FRIENDS_PER_PAGE = 100;
+
     public static final int ZERO_VALUE = 0;
 
-    public static final int LOAD_PAGE_NUM = 1;
-    public static final int LOAD_PER_PAGE = 100;
     public static final String FRIEND_CLASS_NAME = "Friend";
     public static final String FRIEND_FIELD_USER_ID = "user_id";
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";
@@ -27,6 +32,7 @@ public class Consts {
     public static final String CALL_TYPE_EXTRA = "call_type";
     public static final String REMOTE_DESCRIPTION = "session_description";
     public static final String GCM_SENDER_ID = "291727224931";
+    // TODO VF rename and move these consts to PrefsHelper
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String ACCEPTED_CALL = "accepted_call";

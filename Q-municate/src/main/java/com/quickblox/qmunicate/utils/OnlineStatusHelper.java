@@ -8,12 +8,10 @@ import java.util.concurrent.TimeUnit;
 
 public class OnlineStatusHelper {
 
-    private static final int ONLINE_TIMEOUT = 5;
-
     public static boolean isOnline(Date lastRequestAt) {
         if (lastRequestAt != null) {
             long timeout = new Date().getTime() - lastRequestAt.getTime();
-            return TimeUnit.MILLISECONDS.toMinutes(timeout) < ONLINE_TIMEOUT;
+            return TimeUnit.MILLISECONDS.toMinutes(timeout) < Consts.FL_ONLINE_STATUS_TIMEOUT;
         }
         return false;
     }
