@@ -90,14 +90,14 @@ public class NavigationDrawerFragment extends BaseFragment {
                         R.string.nvd_title_invite_friends),}
         ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        logoutButton = (ImageButton) rootView.findViewById(R.id.logoutButton);
+        logoutButton = (ImageButton) rootView.findViewById(R.id.logoutImageButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logout();
             }
         });
-        fullName = (TextView) rootView.findViewById(R.id.fullname);
+        fullName = (TextView) rootView.findViewById(R.id.fullnameTextView);
         QBUser user = App.getInstance().getUser();
         if (user != null) {
             fullName.setText(user.getFullName());
