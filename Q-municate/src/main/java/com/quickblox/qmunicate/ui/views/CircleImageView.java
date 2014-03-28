@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.view;
+package com.quickblox.qmunicate.ui.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;

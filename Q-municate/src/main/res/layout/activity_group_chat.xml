@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray">
+    android:background="@color/light_gray"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/messagesListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/messageLayout"
-        android:layout_alignParentTop="true"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:paddingBottom="20dp"
         android:transcriptMode="alwaysScroll" />
 
@@ -18,20 +19,7 @@
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chat_input_message_height"
-        android:layout_alignParentBottom="true"
         android:background="@color/white">
-
-        <EditText
-            android:id="@+id/messageEdit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
-            android:layout_toRightOf="@+id/attachButton"
-            android:autoText="true"
-            android:hint="@string/cht_hint_message"
-            android:layout_centerInParent="true"
-            android:layout_toLeftOf="@+id/smileButton"
-            android:background="@null" />
 
         <ImageButton
             android:id="@+id/attachButton"
@@ -42,14 +30,22 @@
             android:background="@null"
             android:src="@drawable/ic_photo" />
 
-        <ImageButton
-            android:id="@+id/smileButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@null"
-            android:src="@drawable/ic_smile" />
+        <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
+            android:id="@+id/messageEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/attachButton"
+            android:autoLink="all"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical|right|left"
+            android:maxEms="13"
+            android:maxWidth="250dip"
+            android:textAlignment="center"
+            android:textColor="@android:color/black" />
 
     </RelativeLayout>
-</RelativeLayout>
+
+    <include layout="@layout/smiles_layout" />
+
+</LinearLayout>

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:padding="4dp">
 
-        <com.quickblox.qmunicate.ui.view.CircleImageView
+        <com.quickblox.qmunicate.ui.views.CircleImageView
             android:id="@+id/avatarImageView"
             android:layout_width="@dimen/image_view_small_avatar_layout_width"
             android:layout_height="@dimen/image_view_small_avatar_layout_height"
