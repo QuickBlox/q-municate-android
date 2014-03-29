@@ -2,11 +2,13 @@
     <item android:state_pressed="false">
         <shape>
             <solid android:color="@color/button_sign_up_normal_blue_color" />
+            <corners android:bottomLeftRadius="5dp" android:bottomRightRadius="5dp" android:topLeftRadius="5dp" android:topRightRadius="5dp" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape>
             <solid android:color="@color/button_sign_up_pressed_blue_color" />
+            <corners android:bottomLeftRadius="5dp" android:bottomRightRadius="5dp" android:topLeftRadius="5dp" android:topRightRadius="5dp" />
         </shape>
     </item>
 </selector>
