@@ -46,6 +46,6 @@
 
     </RelativeLayout>
 
-    <include layout="@layout/smiles_layout" />
+    <include layout="@layout/view_smiles_pager" />
 
 </LinearLayout>

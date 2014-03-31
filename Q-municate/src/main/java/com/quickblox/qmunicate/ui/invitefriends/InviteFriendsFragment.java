@@ -80,7 +80,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         friendsAdapter = new InviteFriendsAdapter(baseActivity, friendsList);
         friendsAdapter.setCounterChangedListener(this);
 
-        View header = getActivity().getLayoutInflater().inflate(R.layout.listview_header_invite_friends, null);
+        View header = getActivity().getLayoutInflater().inflate(R.layout.view_section_title_invite_friends, null);
         friendsListView.addHeaderView(header);
         friendsListView.setAdapter(friendsAdapter);
 
