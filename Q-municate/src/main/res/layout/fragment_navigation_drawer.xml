@@ -2,13 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:clickable="true"
+    android:focusable="true">
 
     <ListView
         android:id="@+id/navigationList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/footer"
+        android:layout_above="@+id/footerLinearLayout"
         android:layout_alignParentTop="true"
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
@@ -17,7 +19,7 @@
         tools:context="com.sample.app.NavigationDrawerFragment" />
 
     <LinearLayout
-        android:id="@id/footer"
+        android:id="@id/footerLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -25,7 +27,7 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/fullname"
+            android:id="@+id/fullnameTextView"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -35,7 +37,7 @@
             android:textSize="@dimen/text_size" />
 
         <ImageButton
-            android:id="@+id/logoutButton"
+            android:id="@+id/logoutImageButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
