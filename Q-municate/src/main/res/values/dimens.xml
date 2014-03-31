@@ -31,4 +31,8 @@
     <dimen name="chat_input_message_height">50dp</dimen>
 
     <dimen name="inf_list_item_height">48dp</dimen>
+
+    <dimen name="corners_small_value">5dp</dimen>
+    <dimen name="corners_middle_value">10dp</dimen>
+    <dimen name="corners_big_value">15dp</dimen>
 </resources>

@@ -167,9 +167,11 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened()) {
+            boolean isSessionOpened = session.isOpened();
+            boolean isSessionClosed = session.isClosed();
+            if (isSessionOpened) {
                 importFriends.startGetFriendsListTask(true);
-            } else if (!(!session.isOpened() && !session.isClosed())) {
+            } else if (!(!isSessionOpened && !isSessionClosed)) {
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }

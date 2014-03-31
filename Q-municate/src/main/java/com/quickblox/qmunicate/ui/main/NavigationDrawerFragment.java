@@ -147,7 +147,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        drawerToggle = new QMActionBarDrawlerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer, R.string.nvd_open, R.string.nvd_close);
+        drawerToggle = new QMActionBarDrawlerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
+                R.string.nvd_open, R.string.nvd_close);
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
             drawerLayout.openDrawer(fragmentContainerView);

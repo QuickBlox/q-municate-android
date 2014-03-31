@@ -4,8 +4,8 @@
         android:width="2dp"
         android:color="@color/white" />
     <corners
-        android:bottomLeftRadius="10dp"
-        android:bottomRightRadius="10dp"
-        android:topLeftRadius="10dp"
-        android:topRightRadius="10dp" />
+        android:bottomLeftRadius="@dimen/corners_middle_value"
+        android:bottomRightRadius="@dimen/corners_middle_value"
+        android:topLeftRadius="@dimen/corners_middle_value"
+        android:topRightRadius="@dimen/corners_middle_value" />
 </shape>
