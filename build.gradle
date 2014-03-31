@@ -26,3 +26,4 @@ ext.devDebug = true
 ext.universalImageLoaderVersion = '1.9.0'
 ext.googlePlayServicesVersion = '4.+'
 ext.nineoldandroidsVersion = '2.4.0'
+ext.ormliteVersion = '4.48'

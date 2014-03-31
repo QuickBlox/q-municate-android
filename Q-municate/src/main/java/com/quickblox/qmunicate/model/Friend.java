@@ -1,6 +1,9 @@
 package com.quickblox.qmunicate.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.caching.Models.CacheList;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
@@ -9,17 +12,38 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@DatabaseTable
 public class Friend implements Serializable {
 
+    @DatabaseField
     private Integer id;
+
+    @DatabaseField
     private String fullname;
+
+    @DatabaseField
     private String email;
+
+    @DatabaseField
     private String phone;
+
+    @DatabaseField
     private Integer fileId;
+
+    @DatabaseField
     private String avatarUid;
+
+    @DatabaseField
     private String status;
+
+    @DatabaseField
     private Date lastRequestAt;
+
+    @DatabaseField
     private boolean online;
+
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    private CacheList cacheList;
 
     private boolean selected;
 
@@ -31,6 +55,9 @@ public class Friend implements Serializable {
         this.fileId = user.getFileId();
         this.lastRequestAt = user.getLastRequestAt();
         this.avatarUid = UriCreator.cutUid(user.getWebsite());
+    }
+
+    public Friend() {
     }
 
     public static List<Friend> createFriends(List<QBUser> users) {
@@ -60,20 +87,20 @@ public class Friend implements Serializable {
         return id.hashCode();
     }
 
-    public int getId() {
-        return id;
+    public String getAvatarUid() {
+        return avatarUid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAvatarUid(String avatarUid) {
+        this.avatarUid = avatarUid;
     }
 
-    public String getFullname() {
-        return fullname;
+    public CacheList getCacheList() {
+        return cacheList;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setCacheList(CacheList cacheList) {
+        this.cacheList = cacheList;
     }
 
     public String getEmail() {
@@ -84,14 +111,6 @@ public class Friend implements Serializable {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public Integer getFileId() {
         return fileId;
     }
@@ -100,20 +119,20 @@ public class Friend implements Serializable {
         this.fileId = fileId;
     }
 
-    public boolean isOnline() {
-        return OnlineStatusHelper.isOnline(lastRequestAt);
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setOnline(boolean online) {
-        this.online = online;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
-    public String getStatus() {
-        return status;
+    public int getId() {
+        return id;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Date getLastRequestAt() {
@@ -128,19 +147,35 @@ public class Friend implements Serializable {
         return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public boolean isOnline() {
+        return OnlineStatusHelper.isOnline(lastRequestAt);
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
     public boolean isSelected() {
         return selected;
     }
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    public String getAvatarUid() {
-        return avatarUid;
-    }
-
-    public void setAvatarUid(String avatarUid) {
-        this.avatarUid = avatarUid;
     }
 }
