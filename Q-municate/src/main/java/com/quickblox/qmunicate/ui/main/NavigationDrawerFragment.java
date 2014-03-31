@@ -35,13 +35,14 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
-    private NavigationDrawerCallbacks callbacks;
-    private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
     private TextView fullName;
     private ImageButton logoutButton;
+
+    private NavigationDrawerCallbacks callbacks;
+    private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
@@ -189,8 +190,12 @@ public class NavigationDrawerFragment extends BaseFragment {
         dialog.show(getFragmentManager(), null);
     }
 
-    private void saveUserLearnedDrawler() {
+    private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
+    }
+
+    public interface NavigationDrawerCallbacks {
+        void onNavigationDrawerItemSelected(int position);
     }
 
     private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
@@ -204,26 +209,28 @@ public class NavigationDrawerFragment extends BaseFragment {
         @Override
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
+
+            baseActivity.invalidateOptionsMenu();
+
             if (!isAdded()) {
                 return;
             }
 
             if (!userLearnedDrawer) {
                 userLearnedDrawer = true;
-                saveUserLearnedDrawler();
+                saveUserLearnedDrawer();
             }
-
-            baseActivity.invalidateOptionsMenu();
         }
 
         @Override
         public void onDrawerClosed(View drawerView) {
             super.onDrawerClosed(drawerView);
+
+            baseActivity.invalidateOptionsMenu();
+
             if (!isAdded()) {
                 return;
             }
-
-            baseActivity.invalidateOptionsMenu();
         }
     }
 
@@ -234,9 +241,5 @@ public class NavigationDrawerFragment extends BaseFragment {
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }
-    }
-
-    public interface NavigationDrawerCallbacks {
-        void onNavigationDrawerItemSelected(int position);
     }
 }
