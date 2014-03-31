@@ -242,8 +242,4 @@ public class NavigationDrawerFragment extends BaseFragment {
             baseActivity.finish();
         }
     }
-
-    public interface NavigationDrawerCallbacks {
-        void onNavigationDrawerItemSelected(int position);
-    }
 }
