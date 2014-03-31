@@ -132,7 +132,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
         baseActivity.updateBroadcastActionList();
-        baseActivity.getActionBar().setIcon(android.R.color.transparent);
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
     }
 

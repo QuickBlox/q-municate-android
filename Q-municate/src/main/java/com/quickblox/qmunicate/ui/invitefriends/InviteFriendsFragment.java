@@ -50,8 +50,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private InviteFriendsAdapter friendsAdapter;
     private FriendsUtils friendsUtils;
     private boolean isUpdateFacebookFriendsList = true;
-    private String[] selectedFacebookFriends;
-    private String[] selectedContactsFriends;
+    private String[] selectedFacebookFriendsArray;
+    private String[] selectedContactsFriendsArray;
 
     public static InviteFriendsFragment newInstance() {
         return new InviteFriendsFragment();
@@ -233,16 +233,16 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
             baseActivity.hideProgress();
         } else {
-            selectedFacebookFriends = getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE);
-            selectedContactsFriends = getSelectedFriendsForInvite(InviteFriend.VIA_CONTACTS_TYPE);
+            selectedFacebookFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE);
+            selectedContactsFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_CONTACTS_TYPE);
 
-            if (selectedFacebookFriends.length == 0 && selectedContactsFriends.length == 0) {
+            if (selectedFacebookFriendsArray.length == 0 && selectedContactsFriendsArray.length == 0) {
                 DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
                 baseActivity.hideProgress();
                 return;
             }
 
-            if (selectedFacebookFriends.length > 0) {
+            if (selectedFacebookFriendsArray.length > 0) {
                 sendInviteToFacebook();
             }
 
@@ -312,7 +312,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void sendInviteToContacts() {
-        friendsUtils.sendEmail(selectedContactsFriends);
+        friendsUtils.sendEmail(selectedContactsFriendsArray);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
@@ -380,7 +380,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private class ActionSendInviteToContactsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            if (selectedContactsFriends.length > 0) {
+            if (selectedContactsFriendsArray.length > 0) {
                 sendInviteToContacts();
                 baseActivity.hideProgress();
             }
