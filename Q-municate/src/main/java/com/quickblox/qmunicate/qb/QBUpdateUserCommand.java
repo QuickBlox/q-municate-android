@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.module.content.QBContent;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.service.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -18,8 +16,12 @@ public class QBUpdateUserCommand extends ServiceCommand {
 
     private static final String TAG = QBUpdateUserCommand.class.getSimpleName();
 
-    public QBUpdateUserCommand(Context context, String successAction, String failAction) {
+    private final QBAuthHelper qbAuthHelper;
+
+    public QBUpdateUserCommand(Context context, QBAuthHelper qbAuthHelper, String successAction,
+            String failAction) {
         super(context, successAction, failAction);
+        this.qbAuthHelper = qbAuthHelper;
     }
 
     public static void start(Context context, QBUser user, File file) {
@@ -34,16 +36,8 @@ public class QBUpdateUserCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        if (file != null) {
-            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            user.setWebsite(qbFile.getUid());
-        }
-
-        String password = user.getPassword();
-
-        user.setOldPassword(password);
-        user = QBUsers.updateUser(user);
-        user.setPassword(password);
+        user.setOldPassword(user.getPassword());
+        qbAuthHelper.updateUser(user, file);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
