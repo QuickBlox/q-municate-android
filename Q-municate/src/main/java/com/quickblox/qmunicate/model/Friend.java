@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.caching.Models.CacheList;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
@@ -15,7 +14,7 @@ import java.util.List;
 @DatabaseTable
 public class Friend implements Serializable {
 
-    @DatabaseField
+    @DatabaseField(generatedId = true)
     private Integer id;
 
     @DatabaseField
@@ -41,9 +40,6 @@ public class Friend implements Serializable {
 
     @DatabaseField
     private boolean online;
-
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
-    private CacheList cacheList;
 
     private boolean selected;
 
@@ -93,14 +89,6 @@ public class Friend implements Serializable {
 
     public void setAvatarUid(String avatarUid) {
         this.avatarUid = avatarUid;
-    }
-
-    public CacheList getCacheList() {
-        return cacheList;
-    }
-
-    public void setCacheList(CacheList cacheList) {
-        this.cacheList = cacheList;
     }
 
     public String getEmail() {
