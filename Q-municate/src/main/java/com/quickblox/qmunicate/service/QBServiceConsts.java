@@ -44,6 +44,4 @@ public class QBServiceConsts {
     public static final String EXTRA_EMAIL = "email";
     public static final String EXTRA_FILE_ID = "file id";
     public static final String EXTRA_PASSWORD = "password";
-
-    public static final String SMILE_SELECTED = "SMILE_SELECTED";
 }

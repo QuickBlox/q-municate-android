@@ -62,7 +62,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        listTitleView = inflater.inflate(R.layout.view_section_title, null);
+        listTitleView = inflater.inflate(R.layout.view_section_title_friends_list, null);
         listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
         listTitle.setVisibility(View.GONE);
         listView.addHeaderView(listTitleView);
@@ -276,7 +276,6 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            baseActivity.getActionBar().setIcon(android.R.color.transparent);
             listTitle.setVisibility(View.VISIBLE);
             listTitle.setText(R.string.frl_friends);
             return true;
