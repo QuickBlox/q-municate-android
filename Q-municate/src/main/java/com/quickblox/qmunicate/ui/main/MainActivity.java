@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private void prepareMenu(Menu menu) {
         for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setEnabled(!navigationDrawerFragment.isDrawerOpen());
+            menu.getItem(i).setVisible(!navigationDrawerFragment.isDrawerOpen());
             menu.getItem(i).collapseActionView();
         }
     }
