@@ -147,7 +147,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        drawerToggle = new QMActionBarDrawlerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
+        drawerToggle = new QMActionBarDrawerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
                 R.string.nvd_open, R.string.nvd_close);
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
@@ -198,12 +198,12 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
+    private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public QMActionBarDrawlerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
-                                        int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
-            super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes,
-                    closeDrawlerContentDescRes);
+        public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+                int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes,
+                    closeDrawerContentDescRes);
         }
 
         @Override
