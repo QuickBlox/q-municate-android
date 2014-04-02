@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.caching;
+package com.quickblox.qmunicate.caching.ormlite;
 
 import android.content.Context;
 

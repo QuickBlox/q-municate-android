@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.caching.contentProvider.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
@@ -41,11 +41,11 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     private ListView listView;
     private TextView listTitle;
     private View listTitleView;
-    private List<Friend> friends;
-    private List<Friend> users;
+    private List<Friend> friendsList;
+    private List<Friend> usersList;
 
-    private FriendListAdapter friendListAdapter;
-    private UserListAdapter userListAdapter;
+    private FriendListAdapter friendsListAdapter;
+    private UserListAdapter usersListAdapter;
     private LinearLayout globalLayout;
 
     private State state;
@@ -113,8 +113,6 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        DatabaseManager.init(getActivity());
-
         listTitleView = inflater.inflate(R.layout.view_section_title, null);
         listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
         listTitle.setVisibility(View.GONE);
@@ -165,9 +163,9 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void initFriendList() {
-        friends = DatabaseManager.getInstance().getCachedFriendsList();
-        friendListAdapter = new FriendListAdapter(baseActivity, friends);
-        listView.setAdapter(friendListAdapter);
+        friendsList = DatabaseManager.getFriendsList(getActivity());
+        friendsListAdapter = new FriendListAdapter(baseActivity, friendsList);
+        listView.setAdapter(friendsListAdapter);
         listView.setSelector(R.drawable.list_item_background_selector);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -175,7 +173,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
                 if (position == 0) {
                     return;
                 }
-                Friend friend = friendListAdapter.getItem(position - 1);
+                Friend friend = friendsListAdapter.getItem(position - 1);
                 FriendDetailsActivity.start(baseActivity, friend);
             }
         });
@@ -193,17 +191,17 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void initUserList() {
-        users = new ArrayList<Friend>();
-        userListAdapter = new UserListAdapter(baseActivity, friends, users,
+        usersList = new ArrayList<Friend>();
+        usersListAdapter = new UserListAdapter(baseActivity, friendsList, usersList,
                 new UserListAdapter.UserListListener() {
                     @Override
                     public void onUserSelected(int position) {
-                        addToFriendList(users.get(position));
+                        addToFriendList(usersList.get(position));
                     }
                 }
         );
         listView.setSelector(android.R.color.transparent);
-        listView.setAdapter(userListAdapter);
+        listView.setAdapter(usersListAdapter);
         listView.setOnItemClickListener(null);
 
         startUserListLoader(constraint);
@@ -235,28 +233,30 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public void onLoaderResult(int id, List<Friend> data) {
         switch (id) {
             case FriendListLoader.ID:
-                clearCacheFriends(friends);
-                friends.clear();
-                friends.addAll(data);
-                friendListAdapter.notifyDataSetChanged();
-                saveCacheFriends(friends);
+                clearCachedFriends();
+                friendsList.clear();
+                friendsList.addAll(data);
+                friendsListAdapter.notifyDataSetChanged();
+                saveFriendsToCache(friendsList);
                 break;
             case UserListLoader.ID:
-                users.clear();
-                users.addAll(data);
-                userListAdapter.notifyDataSetChanged();
+                usersList.clear();
+                usersList.addAll(data);
+                usersListAdapter.notifyDataSetChanged();
                 break;
         }
     }
 
-    private void clearCacheFriends(List<Friend> friendsList) {
-        DatabaseManager.getInstance().deleteCachedFriendsList(friendsList);
+    private void clearCachedFriends() {
+        DatabaseManager.deleteAllFriends(getActivity());
     }
 
-    private void saveCacheFriends(List<Friend> friendsList) {
-        for (Friend friend : friendsList) {
-            DatabaseManager.getInstance().addCacheFriend(friend);
-        }
+    private void saveFriendsToCache(List<Friend> friendsList) {
+        DatabaseManager.saveFriends(getActivity(), friendsList);
+    }
+
+    private void saveFriendToCache(Friend friend) {
+        DatabaseManager.saveFriend(getActivity(), friend);
     }
 
     @Override
@@ -268,7 +268,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
         if (state == State.FRIEND_LIST) {
-            friendListAdapter.getFilter().filter(newText);
+            friendsListAdapter.getFilter().filter(newText);
         } else {
             startUserListLoader(newText);
         }
@@ -314,9 +314,9 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public void execute(Bundle bundle) {
             Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
-            friends.add(friend);
-            DatabaseManager.getInstance().addCacheFriend(friend);
-            userListAdapter.notifyDataSetChanged();
+            friendsList.add(friend);
+            saveFriendToCache(friend);
+            usersListAdapter.notifyDataSetChanged();
             baseActivity.hideProgress();
         }
     }
