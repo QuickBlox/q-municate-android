@@ -122,6 +122,12 @@
         <service
             android:name=".service.QBService"
             android:icon="@drawable/ic_launcher"/>
+
+        <provider
+            android:name=".caching.DatabaseProvider"
+            android:authorities="com.qmun.quickblox"
+            android:exported="false" />
+
     </application>
 
 </manifest>

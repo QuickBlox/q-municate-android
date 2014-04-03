@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
@@ -33,6 +34,20 @@ public class Friend implements Serializable {
         this.avatarUid = UriCreator.cutUid(user.getWebsite());
     }
 
+    public Friend() {
+    }
+
+    public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUid,
+            Date lastRequestAt) {
+        this.id = id;
+        this.fullname = fullname;
+        this.email = email;
+        this.phone = phone;
+        this.fileId = fileId;
+        this.lastRequestAt = lastRequestAt;
+        this.avatarUid = UriCreator.cutUid(avatarUid);
+    }
+
     public static List<Friend> createFriends(List<QBUser> users) {
         List<Friend> friends = new ArrayList<Friend>();
         for (QBUser user : users) {
@@ -60,20 +75,12 @@ public class Friend implements Serializable {
         return id.hashCode();
     }
 
-    public int getId() {
-        return id;
+    public String getAvatarUid() {
+        return avatarUid;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFullname() {
-        return fullname;
-    }
-
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setAvatarUid(String avatarUid) {
+        this.avatarUid = avatarUid;
     }
 
     public String getEmail() {
@@ -84,14 +91,6 @@ public class Friend implements Serializable {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public Integer getFileId() {
         return fileId;
     }
@@ -100,12 +99,40 @@ public class Friend implements Serializable {
         this.fileId = fileId;
     }
 
-    public boolean isOnline() {
-        return OnlineStatusHelper.isOnline(lastRequestAt);
+    public String getFullname() {
+        return fullname;
     }
 
-    public void setOnline(boolean online) {
-        this.online = online;
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Date getLastRequestAt() {
+        return lastRequestAt;
+    }
+
+    public void setLastRequestAt(long lastRequestAt) {
+        this.lastRequestAt = DateUtils.longToDate(lastRequestAt);
+    }
+
+    public String getOnlineStatus() {
+        return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getStatus() {
@@ -116,16 +143,12 @@ public class Friend implements Serializable {
         this.status = status;
     }
 
-    public Date getLastRequestAt() {
-        return lastRequestAt;
+    public boolean isOnline() {
+        return OnlineStatusHelper.isOnline(lastRequestAt);
     }
 
-    public void setLastRequestAt(Date lastRequestAt) {
-        this.lastRequestAt = lastRequestAt;
-    }
-
-    public String getOnlineStatus() {
-        return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 
     public boolean isSelected() {
@@ -134,13 +157,5 @@ public class Friend implements Serializable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    public String getAvatarUid() {
-        return avatarUid;
-    }
-
-    public void setAvatarUid(String avatarUid) {
-        this.avatarUid = avatarUid;
     }
 }

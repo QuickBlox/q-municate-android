@@ -33,6 +33,7 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+
     private EditText email;
     private EditText password;
     private CheckBox rememberMe;

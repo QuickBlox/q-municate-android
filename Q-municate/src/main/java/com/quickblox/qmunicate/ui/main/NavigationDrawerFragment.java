@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -191,6 +192,11 @@ public class NavigationDrawerFragment extends BaseFragment {
         dialog.show(getFragmentManager(), null);
     }
 
+    private void clearCache() {
+        DatabaseManager.deleteAllFriends(getActivity());
+        // TODO SF clear something else
+    }
+    
     private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
@@ -239,6 +245,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
+            clearCache();
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }
