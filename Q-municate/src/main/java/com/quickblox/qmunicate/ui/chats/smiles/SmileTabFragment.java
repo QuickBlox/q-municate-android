@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -22,7 +23,7 @@ public class SmileTabFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.smiles_grid, container, false);
+        view = inflater.inflate(R.layout.fragment_smiles, container, false);
         smilesGrid = (GridView) view.findViewById(R.id.smiles_grid);
         initGrid();
         return view;
@@ -45,7 +46,7 @@ public class SmileTabFragment extends Fragment {
         }
 
         private void sendSmileSelectedBroadCast(int resourceId) {
-            Intent intent = new Intent(QBServiceConsts.SMILE_SELECTED);
+            Intent intent = new Intent(BroadcastActions.SMILE_SELECTED);
             intent.putExtra(SerializableKeys.SMILE_ID, resourceId);
             getActivity().sendBroadcast(intent);
         }

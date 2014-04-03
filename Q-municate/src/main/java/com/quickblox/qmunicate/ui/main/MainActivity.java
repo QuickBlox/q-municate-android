@@ -1,6 +1,8 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -31,6 +34,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 4;
 
     private Fragment currentFragment;
+    private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private boolean isImportInitialized;
@@ -42,6 +46,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (navigationDrawerFragment != null) {
+            prepareMenu(menu);
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -76,11 +88,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         //checkGCMRegistration();
     }
 
-    private void initNavigationDrawer() {
-        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -88,6 +95,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         // gsmHelper.checkPlayServices();
     }
 
+    private void prepareMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i).setVisible(!navigationDrawerFragment.isDrawerOpen());
+            menu.getItem(i).collapseActionView();
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         Fragment fragment = null;
@@ -110,6 +121,17 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = InviteFriendsFragment.newInstance();
                 break;
         }
+    }
+
+    private void initNavigationDrawer() {
+        navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
+    }
+
+    private FragmentTransaction buildTransaction() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        return transaction;
         setCurrentFragment(fragment);
     }
 

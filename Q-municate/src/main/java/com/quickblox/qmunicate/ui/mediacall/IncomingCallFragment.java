@@ -38,7 +38,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.popup_call, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_popup_call, container, false);
         callType = (CallType) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         userName = getArguments().getString(Consts.USER_NAME, "");
         boolean isVideoCall = CallType.VIDEO_AUDIO.equals(callType);
