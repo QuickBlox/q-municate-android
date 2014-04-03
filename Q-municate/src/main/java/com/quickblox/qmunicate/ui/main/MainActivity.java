@@ -1,13 +1,12 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -19,7 +18,6 @@ import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -95,10 +93,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         // gsmHelper.checkPlayServices();
     }
 
-    private void prepareMenu(Menu menu) {
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setVisible(!navigationDrawerFragment.isDrawerOpen());
-            menu.getItem(i).collapseActionView();
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         Fragment fragment = null;
@@ -121,6 +115,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = InviteFriendsFragment.newInstance();
                 break;
         }
+        setCurrentFragment(fragment);
+    }
+
+    private void prepareMenu(Menu menu) {
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i).setVisible(!navigationDrawerFragment.isDrawerOpen());
+            menu.getItem(i).collapseActionView();
+        }
     }
 
     private void initNavigationDrawer() {
@@ -128,12 +130,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
-    private FragmentTransaction buildTransaction() {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        return transaction;
-        setCurrentFragment(fragment);
-    }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 

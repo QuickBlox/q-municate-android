@@ -4,7 +4,6 @@ package com.quickblox.qmunicate.ui.main;
 import android.app.Activity;
 import android.content.Loader;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public abstract class AbsFriendListFragment extends LoaderFragment<List<Friend>>
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        listTitleView = inflater.inflate(R.layout.view_section_title, null);
+        listTitleView = inflater.inflate(R.layout.view_section_title_friends_list, null);
         listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
         listTitle.setVisibility(View.GONE);
         listView.addHeaderView(listTitleView);
@@ -69,7 +68,6 @@ public abstract class AbsFriendListFragment extends LoaderFragment<List<Friend>>
         switch (id) {
             case FriendListLoader.ID:
             case RoomOccupantsLoader.ID:
-                Log.i(TAG, "onLoaderResult " + "update list");
                 friends.clear();
                 friends.addAll(data);
                 friendListAdapter.setNewData(friends);
