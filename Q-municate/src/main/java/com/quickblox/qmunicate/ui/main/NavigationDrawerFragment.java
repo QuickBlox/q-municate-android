@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -171,7 +172,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        drawerToggle = new QMActionBarDrawlerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
+        drawerToggle = new QMActionBarDrawerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
                 R.string.nvd_open, R.string.nvd_close);
 
         if (!userLearnedDrawer && !fromSavedInstanceState) {
@@ -188,7 +189,12 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void saveUserLearnedDrawler() {
+    private void clearCache() {
+        DatabaseManager.deleteAllFriends(getActivity());
+        // TODO SF clear something else
+    }
+
+    private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
 
@@ -197,10 +203,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    private class QMActionBarDrawlerToggle extends ActionBarDrawerToggle {
+    private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public QMActionBarDrawlerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
-                                        int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
+        public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
+                int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
             super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes,
                     closeDrawlerContentDescRes);
         }
@@ -214,7 +220,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
             if (!userLearnedDrawer) {
                 userLearnedDrawer = true;
-                saveUserLearnedDrawler();
+                saveUserLearnedDrawer();
             }
 
             baseActivity.invalidateOptionsMenu();
@@ -235,6 +241,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
+            clearCache();
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }

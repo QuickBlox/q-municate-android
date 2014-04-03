@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.caching.contentProvider;
+package com.quickblox.qmunicate.caching;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.quickblox.qmunicate.caching.contentProvider.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 public class DatabaseProvider extends ContentProvider {
 

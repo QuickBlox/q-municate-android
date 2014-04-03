@@ -1,10 +1,10 @@
-package com.quickblox.qmunicate.caching.contentProvider;
+package com.quickblox.qmunicate.caching;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.quickblox.qmunicate.caching.contentProvider.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.DateUtils;
 
@@ -22,15 +22,17 @@ public class DatabaseManager {
     public static void saveFriend(Context context, Friend friend) {
         ContentValues values = new ContentValues();
 
-        values.put(FriendTable.Cols.ID, friend.getEmail());
+        values.put(FriendTable.Cols.ID, friend.getId());
         values.put(FriendTable.Cols.FULLNAME, friend.getFullname());
         values.put(FriendTable.Cols.EMAIL, friend.getEmail());
         values.put(FriendTable.Cols.PHONE, friend.getPhone());
         values.put(FriendTable.Cols.FILE_ID, friend.getFileId());
         values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUid());
-        values.put(FriendTable.Cols.STATUS, friend.getStatus());
-        values.put(FriendTable.Cols.LAST_REQUEST_AT, friend.getLastRequestAt());
-        values.put(FriendTable.Cols.ONLINE, friend.getOnlineStatus());
+        values.put(FriendTable.Cols.STATUS, friend.getOnlineStatus());
+        values.put(FriendTable.Cols.ONLINE, friend.isOnline());
+        if(friend.getLastRequestAt() != null) {
+            values.put(FriendTable.Cols.LAST_REQUEST_AT, DateUtils.dateToLong(friend.getLastRequestAt()));
+        }
 
         context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
     }
@@ -50,18 +52,17 @@ public class DatabaseManager {
         return friendsList;
     }
 
-    private static Friend getFriendFromCursor(Cursor cursor) {
-        Friend friend = new Friend();
+    public static Friend getFriendFromCursor(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ID));
+        String fullname = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME));
+        String email = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.EMAIL));
+        String phone = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.PHONE));
+        int fileId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.FILE_ID));
+        String avatarUid = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.AVATAR_UID));
+        long lastRequestAt = cursor.getLong(cursor.getColumnIndex(FriendTable.Cols.LAST_REQUEST_AT));
 
-        friend.setId(cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ID)));
-        friend.setFullname(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME)));
-        friend.setEmail(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.EMAIL)));
-        friend.setPhone(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.PHONE)));
-        friend.setFileId(cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.FILE_ID)));
-        friend.setAvatarUid(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.AVATAR_UID)));
-        friend.setStatus(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.STATUS)));
-        friend.setLastRequestAt(cursor.getString(cursor.getColumnIndex(FriendTable.Cols.LAST_REQUEST_AT)));
-        friend.setOnline(cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ONLINE)) > 0);
+        Friend friend = new Friend(id, fullname, email, phone, fileId, avatarUid, DateUtils.longToDate(
+                lastRequestAt));
 
         return friend;
     }

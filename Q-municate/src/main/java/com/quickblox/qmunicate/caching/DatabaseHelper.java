@@ -1,10 +1,10 @@
-package com.quickblox.qmunicate.caching.contentProvider;
+package com.quickblox.qmunicate.caching;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.quickblox.qmunicate.caching.contentProvider.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 import java.text.MessageFormat;
 

@@ -1,9 +1,9 @@
-package com.quickblox.qmunicate.caching.contentProvider.tables;
+package com.quickblox.qmunicate.caching.tables;
 
 
 import android.net.Uri;
 
-import com.quickblox.qmunicate.caching.contentProvider.ContentDescriptor;
+import com.quickblox.qmunicate.caching.ContentDescriptor;
 
 public class FriendTable {
 

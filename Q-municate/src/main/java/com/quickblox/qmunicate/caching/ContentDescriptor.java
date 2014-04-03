@@ -1,9 +1,9 @@
-package com.quickblox.qmunicate.caching.contentProvider;
+package com.quickblox.qmunicate.caching;
 
 import android.content.UriMatcher;
 import android.net.Uri;
 
-import com.quickblox.qmunicate.caching.contentProvider.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 public class ContentDescriptor {
 
