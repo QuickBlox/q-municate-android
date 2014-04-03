@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -37,7 +38,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
+public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener, FilterQueryProvider {
 
     private static final String TAG = FriendListFragment.class.getSimpleName();
 
@@ -47,7 +48,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     private List<Friend> usersList;
 
     private Context context;
-    private FriendListAdapter friendsListAdapter;
+    private FriendListCursorAdapter friendsListAdapter;
     private UserListAdapter usersListAdapter;
     private LinearLayout globalLayout;
 
@@ -105,6 +106,11 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     @Override
+    public Cursor runQuery(CharSequence constraint) {
+        return DatabaseManager.fetchFriendsByFullname(context, constraint.toString());
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -118,7 +124,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
 
         listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        listTitleView = inflater.inflate(R.layout.view_section_title, null);
+        listTitleView = inflater.inflate(R.layout.view_section_title_friends_list, null);
         listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
         listTitle.setVisibility(View.GONE);
         listView.addHeaderView(listTitleView);
@@ -158,7 +164,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     }
 
     private void initFriendList() {
-        friendsListAdapter = new FriendListAdapter(context, context.getContentResolver().query(
+        friendsListAdapter = new FriendListCursorAdapter(context, context.getContentResolver().query(
                 FriendTable.CONTENT_URI, null, null, null, null));
         listView.setAdapter(friendsListAdapter);
         listView.setSelector(R.drawable.list_item_background_selector);
@@ -266,6 +272,7 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
         if (state == State.FRIEND_LIST) {
+            friendsListAdapter.setFilterQueryProvider(this);
             friendsListAdapter.getFilter().filter(newText);
         } else {
             startUserListLoader(newText);

@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.caching;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
@@ -30,7 +31,7 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUid());
         values.put(FriendTable.Cols.STATUS, friend.getOnlineStatus());
         values.put(FriendTable.Cols.ONLINE, friend.isOnline());
-        if(friend.getLastRequestAt() != null) {
+        if (friend.getLastRequestAt() != null) {
             values.put(FriendTable.Cols.LAST_REQUEST_AT, DateUtils.dateToLong(friend.getLastRequestAt()));
         }
 
@@ -65,6 +66,19 @@ public class DatabaseManager {
                 lastRequestAt));
 
         return friend;
+    }
+
+    public static Cursor fetchFriendsByFullname(Context context, String inputText) {
+        Cursor cursor = null;
+        if (TextUtils.isEmpty(inputText)) {
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
+        } else {
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+        }
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
     }
 
     public static void deleteAllFriends(Context context) {
