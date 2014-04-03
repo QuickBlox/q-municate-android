@@ -35,13 +35,15 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-    private NavigationDrawerCallbacks callbacks;
-    private ActionBarDrawerToggle drawerToggle;
+
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
     private TextView fullName;
     private ImageButton logoutButton;
+
+    private NavigationDrawerCallbacks callbacks;
+    private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
@@ -61,19 +63,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         selectItem(currentSelectedPosition);
     }
 
-    private void selectItem(int position) {
-        currentSelectedPosition = position;
-        if (drawerListView != null) {
-            drawerListView.setItemChecked(position, true);
-        }
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
-        }
-        if (callbacks != null) {
-            callbacks.onNavigationDrawerItemSelected(position);
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
@@ -91,33 +80,20 @@ public class NavigationDrawerFragment extends BaseFragment {
                         R.string.nvd_title_invite_friends),}
         ));
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        logoutButton = (ImageButton) rootView.findViewById(R.id.logoutButton);
+        logoutButton = (ImageButton) rootView.findViewById(R.id.logoutImageButton);
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logout();
             }
         });
-        fullName = (TextView) rootView.findViewById(R.id.fullname);
+        fullName = (TextView) rootView.findViewById(R.id.fullnameTextView);
         QBUser user = App.getInstance().getUser();
         if (user != null) {
             fullName.setText(user.getFullName());
         }
 
         return rootView;
-    }
-
-    private void logout() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                baseActivity.showProgress();
-                FacebookHelper.logout();
-                QBLogoutCommand.start(baseActivity);
-            }
-        });
-        dialog.show(getFragmentManager(), null);
     }
 
     @Override
@@ -133,6 +109,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
         baseActivity.updateBroadcastActionList();
+        baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
@@ -189,31 +166,59 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
+    private void selectItem(int position) {
+        currentSelectedPosition = position;
+        if (drawerListView != null) {
+            drawerListView.setItemChecked(position, true);
+        }
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(fragmentContainerView);
+        }
+        if (callbacks != null) {
+            callbacks.onNavigationDrawerItemSelected(position);
+        }
+    }
+
+    private void logout() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                baseActivity.showProgress();
+                FacebookHelper.logout();
+                QBLogoutCommand.start(baseActivity);
+            }
+        });
+        dialog.show(getFragmentManager(), null);
+    }
+
     private void clearCache() {
         DatabaseManager.deleteAllFriends(getActivity());
         // TODO SF clear something else
     }
-
+    
     private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
 
     public interface NavigationDrawerCallbacks {
-
         void onNavigationDrawerItemSelected(int position);
     }
 
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawlerImageRes,
-                int openDrawlerContentDescRes, int closeDrawlerContentDescRes) {
-            super(activity, drawerLayout, drawlerImageRes, openDrawlerContentDescRes,
-                    closeDrawlerContentDescRes);
+        public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+                int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes,
+                    closeDrawerContentDescRes);
         }
 
         @Override
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
+
+            baseActivity.invalidateOptionsMenu();
+
             if (!isAdded()) {
                 return;
             }
@@ -222,18 +227,17 @@ public class NavigationDrawerFragment extends BaseFragment {
                 userLearnedDrawer = true;
                 saveUserLearnedDrawer();
             }
-
-            baseActivity.invalidateOptionsMenu();
         }
 
         @Override
         public void onDrawerClosed(View drawerView) {
             super.onDrawerClosed(drawerView);
+
+            baseActivity.invalidateOptionsMenu();
+
             if (!isAdded()) {
                 return;
             }
-
-            baseActivity.invalidateOptionsMenu();
         }
     }
 

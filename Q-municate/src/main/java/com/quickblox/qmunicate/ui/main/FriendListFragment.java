@@ -294,7 +294,6 @@ public class FriendListFragment extends LoaderFragment<List<Friend>> implements 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            baseActivity.getActionBar().setIcon(android.R.color.transparent);
             listTitle.setVisibility(View.VISIBLE);
             listTitle.setText(R.string.frl_friends);
             return true;

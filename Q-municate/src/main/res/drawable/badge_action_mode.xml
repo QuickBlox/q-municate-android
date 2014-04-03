@@ -2,7 +2,11 @@
     <item android:state_pressed="false">
         <shape>
             <solid android:color="@color/gray" />
-            <corners android:bottomLeftRadius="15dp" android:bottomRightRadius="15dp" android:topLeftRadius="15dp" android:topRightRadius="15dp" />
+            <corners
+                android:bottomLeftRadius="@dimen/corners_big_value"
+                android:bottomRightRadius="@dimen/corners_big_value"
+                android:topLeftRadius="@dimen/corners_big_value"
+                android:topRightRadius="@dimen/corners_big_value" />
         </shape>
     </item>
 </selector>

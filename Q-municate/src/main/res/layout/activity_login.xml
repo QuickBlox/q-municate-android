@@ -1,9 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:baselineAligned="true"
     android:orientation="vertical"
-    android:padding="20dp"
-    android:baselineAligned="true">
+    android:padding="20dp">
 
     <EditText
         android:id="@+id/email"
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="15dp"
-        android:background="@drawable/button_connect_facebook_selector"
+        android:background="@drawable/button_connect_facebook_oval_selector"
         android:clickable="true"
         android:onClick="loginFacebookOnClickListener">
 
@@ -88,4 +88,3 @@
         android:textColor="@color/gray"
         android:textSize="18sp" />
 </LinearLayout>
-
