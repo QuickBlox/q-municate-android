@@ -44,4 +44,8 @@ public abstract class BaseFragment extends Fragment {
     public BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }
+
+    protected boolean isExistActivity() {
+        return ((!isDetached()) && (getBaseActivity() != null));
+    }
 }

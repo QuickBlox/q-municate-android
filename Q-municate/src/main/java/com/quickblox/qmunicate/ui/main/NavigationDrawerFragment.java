@@ -85,8 +85,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         });
         drawerListView.setAdapter(new ArrayAdapter<String>(baseActivity.getActionBar().getThemedContext(),
                 R.layout.list_item_navigation_drawler, R.id.textView,
-                new String[]{getString(R.string.nvd_title_friends), getString(
-                        R.string.nvd_title_chats), getString(R.string.nvd_title_settings), getString(
+                new String[]{getString(R.string.nvd_title_friends), getString(R.string.nvd_title_web_room),
+                        getString(
+                                R.string.nvd_title_chats), getString(R.string.nvd_title_settings), getString(
                         R.string.nvd_title_invite_friends),}
         ));
         drawerListView.setItemChecked(currentSelectedPosition, true);

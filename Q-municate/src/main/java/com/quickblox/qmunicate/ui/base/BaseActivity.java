@@ -2,6 +2,9 @@ package com.quickblox.qmunicate.ui.base;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,6 +41,7 @@ public abstract class BaseActivity extends Activity {
     protected ActionBar actionBar;
     protected QBService service;
     protected boolean useDoubleBackPressed;
+    protected Fragment currentFragment;
     private boolean doubleBackToExitPressedOnce;
     private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
@@ -138,6 +142,20 @@ public abstract class BaseActivity extends Activity {
     @SuppressWarnings("unchecked")
     protected <T> T _findViewById(int viewId) {
         return (T) findViewById(viewId);
+    }
+
+    protected void setCurrentFragment(Fragment fragment) {
+        currentFragment = fragment;
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = buildTransaction();
+        transaction.replace(R.id.container, fragment, null);
+        transaction.commit();
+    }
+
+    private FragmentTransaction buildTransaction() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        return transaction;
     }
 
     private void registerBroadcastReceiver() {

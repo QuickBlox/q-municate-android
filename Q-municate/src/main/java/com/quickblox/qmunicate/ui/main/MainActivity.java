@@ -1,8 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +17,6 @@ import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -28,9 +25,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private static final int ID_CHATS_LIST_FRAGMENT = 1;
-    private static final int ID_SETTINGS_FRAGMENT = 2;
-    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+    private static final int ID_WEB_ROOM_FRAGMENT = 1;
+    private static final int ID_CHATS_LIST_FRAGMENT = 2;
+    private static final int ID_SETTINGS_FRAGMENT = 3;
+    private static final int ID_INVITE_FRIENDS_FRAGMENT = 4;
 
     private Fragment currentFragment;
     private FacebookHelper facebookHelper;
@@ -97,6 +95,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendListFragment.newInstance();
                 break;
+            case ID_WEB_ROOM_FRAGMENT:
+                fragment = RoomOccupantFragment.newInstance();
+                break;
             case ID_CHATS_LIST_FRAGMENT:
                 fragment = ChatsListFragment.newInstance();
                 break;
@@ -110,20 +111,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 break;
         }
         setCurrentFragment(fragment);
-    }
-
-    public void setCurrentFragment(Fragment fragment) {
-        currentFragment = fragment;
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = buildTransaction();
-        transaction.replace(R.id.container, fragment, null);
-        transaction.commit();
-    }
-
-    private FragmentTransaction buildTransaction() {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        return transaction;
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

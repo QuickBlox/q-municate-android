@@ -38,6 +38,7 @@ public class Consts {
     public static final String ACCEPTED_CALL = "accepted_call";
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int SECOND = 1000;
+    public static final String DEFAULT_WEB_ROOM = "test";
 
     public static enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING

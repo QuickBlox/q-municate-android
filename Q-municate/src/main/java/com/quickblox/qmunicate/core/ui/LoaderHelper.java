@@ -6,8 +6,6 @@ import android.os.Bundle;
 
 public abstract class LoaderHelper<T> implements LoaderManager<T> {
 
-    private static final String TAG = LoaderHelper.class.getName();
-
     protected final GenericCallback<T> callback;
     protected final Activity activity;
 
@@ -36,6 +34,7 @@ public abstract class LoaderHelper<T> implements LoaderManager<T> {
         BaseLoader<T> loader = getLoader(id);
         if (loader != null) {
             loader.reset();
+            loader = (BaseLoader<T>) activity.getLoaderManager().restartLoader(id, null, callback);
         } else {
             loader = (BaseLoader<T>) activity.getLoaderManager().initLoader(id, null, callback);
         }

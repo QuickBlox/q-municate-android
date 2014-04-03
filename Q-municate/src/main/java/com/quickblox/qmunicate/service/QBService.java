@@ -13,6 +13,7 @@ import com.quickblox.qmunicate.qb.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.QBJoinRoomCommand;
 import com.quickblox.qmunicate.qb.QBLoginCommand;
 import com.quickblox.qmunicate.qb.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
@@ -77,6 +78,8 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
+                QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
     }
 
     @Override

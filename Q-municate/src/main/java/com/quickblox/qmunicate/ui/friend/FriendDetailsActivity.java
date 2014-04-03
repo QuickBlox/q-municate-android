@@ -14,10 +14,8 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
-import com.quickblox.module.videochat_webrtc.SignalingChannel;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -81,13 +79,6 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         fillUI(friend);
     }
 
-    private void initChat() {
-        if (QBChatService.getInstance().isLoggedIn()) {
-            SignalingChannel signalingChannel = new SignalingChannel(
-                    QBChatService.getInstance().getPrivateChatInstance());
-        }
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -145,7 +136,7 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     private void callToUser(Friend friend, CallType callType) {
-        if (friend.isOnline()) {
+        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
             QBUser qbUser = new QBUser(friend.getId());
             qbUser.setFullName(friend.getFullname());
             CallActivity.start(FriendDetailsActivity.this, qbUser, callType);

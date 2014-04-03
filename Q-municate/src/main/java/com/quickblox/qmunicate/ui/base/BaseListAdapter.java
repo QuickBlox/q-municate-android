@@ -33,6 +33,11 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
         return position;
     }
 
+    public void setNewData(List<T> newData) {
+        objects = newData;
+        notifyDataSetChanged();
+    }
+
     protected void displayImage(String uri, ImageView imageView) {
         ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }

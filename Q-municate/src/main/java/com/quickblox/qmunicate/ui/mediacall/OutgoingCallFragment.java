@@ -200,7 +200,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             qbVideoChat.setRemoteSessionDescription(remoteSessionDescription);
         }
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
-            qbVideoChat.call(opponent, call_type);
+            startCall();
         } else {
             qbVideoChat.accept(opponent);
             onConnectionEstablished();
@@ -240,10 +240,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (isExistActivity()) {
             getBaseActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
-    }
-
-    private boolean isExistActivity() {
-        return ((!isDetached()) && (getBaseActivity() != null));
     }
 
     private void unbindService() {

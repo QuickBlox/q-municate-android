@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.ui.mediacall;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +15,9 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallFragment;
+import com.quickblox.qmunicate.utils.Consts;
 
 public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
@@ -90,15 +89,6 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         signalingChannel = service.getQbChatHelper().getSignalingChannel();
     }
 
-    private void setCurrentFragment(Fragment fragment) {
-        Log.i(TAG, "setCurrentFragment" + fragment.toString());
-        currentFragment = fragment;
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        FragmentTransaction transaction = buildTransaction();
-        transaction.replace(R.id.container, fragment, null);
-        transaction.commit();
-    }
-
     private void cancelPlayer() {
         if (mediaPlayer != null) {
             mediaPlayer.stopPlaying();
@@ -128,6 +118,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA);
         call_type = (CallType) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
         Log.i(TAG, "call_direction_type=" + call_direction_type);
+        Log.i(TAG, "call_type=" + call_type);
         opponent = (QBUser) extras.getSerializable(Consts.USER);
         if (call_direction_type != null) {
             if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {

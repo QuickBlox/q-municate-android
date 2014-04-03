@@ -28,4 +28,9 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
 
     public static class Args {
     }
+
+    public static class Arguments extends BaseLoader.Args {
+        public int page;
+        public int perPage;
+    }
 }

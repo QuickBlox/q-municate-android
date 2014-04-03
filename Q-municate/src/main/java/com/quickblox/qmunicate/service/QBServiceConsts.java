@@ -46,4 +46,7 @@ public class QBServiceConsts {
     public static final String EXTRA_PASSWORD = "password";
 
     public static final String SMILE_SELECTED = "SMILE_SELECTED";
+    public static final String JOIN_ROOM_ACTION = "join room action";
+    public static final String JOIN_ROOM_SUCCESS_ACTION = "join room success action";
+    public static final String JOIN_ROOM_FAIL_ACTION = "join room fail action";
 }
