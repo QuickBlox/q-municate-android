@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -19,8 +21,10 @@ import com.quickblox.qmunicate.qb.QBJoinRoomCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class RoomOccupantFragment extends AbsFriendListFragment {
@@ -70,14 +74,35 @@ public class RoomOccupantFragment extends AbsFriendListFragment {
     }
 
     @Override
-    protected FriendListAdapter getFriendsAdapter() {
+    protected BaseAdapter getFriendsAdapter() {
         friends = new ArrayList<Friend>();
-        return new FriendListAdapter(baseActivity, friends);
+        return new RoomOccupantAdapter(baseActivity, friends);
     }
 
     @Override
     protected AbsFriendListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
         return new RoomOccupantsLoader(activity, service.getQbChatHelper());
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        if (position == 0) {
+            return;
+        }
+        Friend friend = ((RoomOccupantAdapter) friendListAdapter).getItem(position - 1);
+        FriendDetailsActivity.start(baseActivity, friend);
+    }
+
+    @Override
+    public void onLoaderResult(int id, List<Friend> data) {
+        switch (id) {
+            case RoomOccupantsLoader.ID:
+                friends.clear();
+                friends.addAll(data);
+                ((RoomOccupantAdapter) friendListAdapter).setNewData(friends);
+        }
     }
 
     private void connectToService() {
