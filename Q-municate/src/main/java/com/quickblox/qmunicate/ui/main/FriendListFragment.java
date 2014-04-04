@@ -1,7 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.app.Activity;
 import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,68 +9,93 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.QBAddFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.LoaderFragment;
+import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class FriendListFragment extends AbsFriendListFragment implements SearchView.OnQueryTextListener {
+public class FriendListFragment extends LoaderFragment<List<Friend>> implements SearchView.OnQueryTextListener {
 
+    private static final String TAG = FriendListFragment.class.getSimpleName();
+
+    private ListView listView;
+    private TextView listTitle;
+    private View listTitleView;
+    private List<Friend> friends;
     private List<Friend> users;
 
-    private UserListAdapter userListAdapter;
+    private Context context;
+    private FriendListCursorAdapter friendsListAdapter;
+    private UserListAdapter usersListAdapter;
     private LinearLayout globalLayout;
 
     private State state;
 
+    private Timer friendListUpdateTimer;
     private String constraint;
     private boolean isImportInitialized;
+    private boolean isStopFriendListLoader;
 
     public static FriendListFragment newInstance() {
         return new FriendListFragment();
     }
 
     @Override
-    protected FriendListAdapter getFriendsAdapter() {
-        friends = App.getInstance().getFriends();
-        return new FriendListAdapter(baseActivity, friends);
-    }
-
-    @Override
-    protected AbsFriendListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
-        return new FriendListLoader(activity);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+        listView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
+
+        listTitleView = inflater.inflate(R.layout.view_section_title_friends_list, null);
+        listTitle = (TextView) listTitleView.findViewById(R.id.listTitle);
+        listTitle.setVisibility(View.GONE);
+        listView.addHeaderView(listTitleView);
 
         isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+
         initGlobalSearchButton(inflater);
-        return view;
+        initFriendList();
+
+        return listView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(
                 baseActivity));
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (isStopFriendListLoader) {
+            stopFriendListLoader();
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -92,6 +117,16 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         }
     }
 
+    private void stopFriendListLoader() {
+        isStopFriendListLoader = false;
+        friendListUpdateTimer.cancel();
+    }
+
+    @Override
+    public Cursor runQuery(CharSequence constraint) {
+        return DatabaseManager.fetchFriendsByFullname(context, constraint.toString());
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,56 +143,60 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
             baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
         } else {
             if (state == State.FRIEND_LIST) {
-                startFriendListLoaderWithTimer(FriendListLoader.ID);
+                startFriendListLoaderWithTimer();
             }
         }
+        initFriendList();
     }
 
-    @Override
-    public Loader<LoaderResult<List<Friend>>> onLoaderCreate(int id, Bundle args) {
-        Loader<LoaderResult<List<Friend>>> resultLoader = super.onLoaderCreate(id, args);
-        if (resultLoader != null) {
-            return resultLoader;
-        }
-        switch (id) {
-            case UserListLoader.ID:
-                return new UserListLoader(baseActivity);
-            default:
-                return null;
-        }
+    private void startFriendListLoaderWithTimer() {
+        isStopFriendListLoader = true;
+        friendListUpdateTimer = new Timer();
+        friendListUpdateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runLoader(FriendListLoader.ID, FriendListLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
+                        Consts.FL_FRIENDS_PER_PAGE));
+            }
+        }, Consts.FL_START_LOAD_DELAY, Consts.FL_UPDATE_DATA_PERIOD);
     }
 
-    @Override
-    public void onLoaderResult(int id, List<Friend> data) {
-        super.onLoaderResult(id, data);
-        switch (id) {
-            case UserListLoader.ID:
-                users.clear();
-                users.addAll(data);
-                userListAdapter.setNewData(users);
-                break;
-        }
+    private void initFriendList() {
+        friendsListAdapter = new FriendListCursorAdapter(context, context.getContentResolver().query(
+                FriendTable.CONTENT_URI, null, null, null, null));
+        listView.setAdapter(friendsListAdapter);
+        listView.setSelector(R.drawable.list_item_background_selector);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    return;
+                }
+                Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - 1);
+                FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
+            }
+        });
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
+    private void initGlobalSearchButton(LayoutInflater inflater) {
+        globalLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
+        globalLayout.findViewById(R.id.globalSearchButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startGlobalSearch();
+            }
+        });
     }
 
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        constraint = newText;
-        if (state == State.FRIEND_LIST) {
-            friendListAdapter.getFilter().filter(newText);
-        } else {
-            startUserListLoader(newText);
-        }
-        return true;
+    private void startGlobalSearch() {
+        state = State.GLOBAL_LIST;
+        listTitle.setText(R.string.frl_all_users);
+        hideGlobalSearchButton();
+        initUserList();
     }
 
-    private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
-                Consts.FL_FRIENDS_PER_PAGE));
+    private void hideGlobalSearchButton() {
+        listView.removeFooterView(globalLayout);
     }
 
     private void initUserList() {
@@ -196,8 +235,19 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         listView.addFooterView(globalLayout);
     }
 
-    private void hideGlobalSearchButton() {
-        listView.removeFooterView(globalLayout);
+    @Override
+    public void onLoaderResult(int id, List<Friend> data) {
+        switch (id) {
+            case FriendListLoader.ID:
+                clearCachedFriends();
+                saveFriendsToCache(data);
+                break;
+            case UserListLoader.ID:
+                usersList.clear();
+                usersList.addAll(data);
+                usersListAdapter.notifyDataSetChanged();
+                break;
+        }
     }
 
     private void startGlobalSearch() {
@@ -207,10 +257,39 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         initUserList();
     }
 
+    private void saveFriendsToCache(List<Friend> friendsList) {
+        DatabaseManager.saveFriends(context, friendsList);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        constraint = newText;
+        if (state == State.FRIEND_LIST) {
+            friendsListAdapter.setFilterQueryProvider(this);
+            friendsListAdapter.getFilter().filter(newText);
+        } else {
+            startUserListLoader(newText);
+        }
+        return true;
+    }
+
+    private void saveFriendToCache(Friend friend) {
+        DatabaseManager.saveFriend(context, friend);
+    }
+
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        startFriendListLoaderWithTimer(FriendListLoader.ID);
+        startFriendListLoaderWithTimer();
         baseActivity.hideProgress();
+    }
+
+    private void showGlobalSearchButton() {
+        listView.addFooterView(globalLayout);
     }
 
     private enum State {FRIEND_LIST, GLOBAL_LIST}
@@ -241,8 +320,8 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         @Override
         public void execute(Bundle bundle) {
             Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
-            friends.add(friend);
-            userListAdapter.notifyDataSetChanged();
+            saveFriendToCache(friend);
+            usersListAdapter.notifyDataSetChanged();
             baseActivity.hideProgress();
         }
     }
