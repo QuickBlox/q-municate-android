@@ -37,46 +37,49 @@ public class QBService extends Service {
     private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
     private static int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
-    private IBinder binder = new QBServiceBinder();
     private final BlockingQueue<Runnable> threadQueue;
+    private IBinder binder = new QBServiceBinder();
 
     private Map<String, ServiceCommand> serviceCommandMap = new HashMap<String, ServiceCommand>();
     private ThreadPoolExecutor threadPool;
+
     private QBChatHelper qbChatHelper;
+    private QBAuthHelper qbAuthHelper;
 
     private SmackAndroid smackAndroid;
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
-        threadPool = new ThreadPoolExecutor(
-                NUMBER_OF_CORES,
-                NUMBER_OF_CORES,
-                KEEP_ALIVE_TIME,
-                KEEP_ALIVE_TIME_UNIT,
-                threadQueue);
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
+                KEEP_ALIVE_TIME_UNIT, threadQueue);
 
         qbChatHelper = new QBChatHelper();
+        qbAuthHelper = new QBAuthHelper();
+
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, new QBAddFriendsCommand(this,
                 QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, QBServiceConsts.ADD_FRIENDS_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.CHANGE_PASSWORD_ACTION, new QBChangePasswordCommand(this,
-                QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION));
+                qbAuthHelper, QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION,
+                QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION, QBServiceConsts.GET_FILE_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this, qbChatHelper,
-                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this,
-                QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this, qbAuthHelper,
+                qbChatHelper, QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this, qbAuthHelper,
+                qbChatHelper, QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, new QBRemoveFriendCommand(this,
                 QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.RESET_PASSWORD_ACTION, new QBResetPasswordCommand(this,
-                QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, QBServiceConsts.RESET_PASSWORD_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.SIGNUP_ACTION, new QBSignUpCommand(this,
-                QBServiceConsts.SIGNUP_SUCCESS_ACTION, QBServiceConsts.SIGNUP_FAIL_ACTION));
+                qbAuthHelper, QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION,
+                QBServiceConsts.RESET_PASSWORD_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.SIGNUP_ACTION, new QBSignUpCommand(this, qbAuthHelper,
+                qbChatHelper, QBServiceConsts.SIGNUP_SUCCESS_ACTION, QBServiceConsts.SIGNUP_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, new QBSocialLoginCommand(this,
-                QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this,
+                qbAuthHelper, qbChatHelper, QBServiceConsts.LOGIN_SUCCESS_ACTION,
+                QBServiceConsts.LOGIN_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this, qbAuthHelper,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
                 QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
@@ -116,10 +119,8 @@ public class QBService extends Service {
         return qbChatHelper;
     }
 
-    public class QBServiceBinder extends Binder {
-        public QBService getService() {
-            return QBService.this;
-        }
+    public QBAuthHelper getQbAuthHelper() {
+        return qbAuthHelper;
     }
 
     private void startAsync(final ServiceCommand command, final Intent intent) {
@@ -129,5 +130,12 @@ public class QBService extends Service {
                 command.execute(intent.getExtras());
             }
         });
+    }
+
+    public class QBServiceBinder extends Binder {
+
+        public QBService getService() {
+            return QBService.this;
+        }
     }
 }
