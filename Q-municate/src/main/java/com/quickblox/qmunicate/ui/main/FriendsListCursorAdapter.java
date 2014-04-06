@@ -2,28 +2,22 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.UriCreator;
 
-public class FriendListCursorAdapter extends CursorAdapter {
+public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
-    private final LayoutInflater layoutInflater;
-
-    public FriendListCursorAdapter(Context context, Cursor cursor) {
+    public FriendsListCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
-        layoutInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -68,10 +62,6 @@ public class FriendListCursorAdapter extends CursorAdapter {
         } else {
             holder.onlineImageView.setVisibility(View.INVISIBLE);
         }
-    }
-
-    private void displayImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }
 
     private static class ViewHolder {

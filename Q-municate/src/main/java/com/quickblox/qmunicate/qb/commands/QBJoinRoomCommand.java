@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb;
+package com.quickblox.qmunicate.qb.commands;
 
 
 import android.content.Context;
@@ -9,7 +9,7 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.QBChatRoom;
 import com.quickblox.module.chat.listeners.RoomListener;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.service.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;

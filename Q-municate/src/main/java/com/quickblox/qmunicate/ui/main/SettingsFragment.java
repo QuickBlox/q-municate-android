@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBLogoutCommand;
+import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;

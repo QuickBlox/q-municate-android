@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -66,6 +67,15 @@ public class DatabaseManager {
                 lastRequestAt));
 
         return friend;
+    }
+
+    public static boolean searchFriendInBase(Context context, int searchId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + searchId + "", null, null);
+        if (cursor.getCount() > Consts.ZERO_VALUE) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static Cursor fetchFriendsByFullname(Context context, String inputText) {

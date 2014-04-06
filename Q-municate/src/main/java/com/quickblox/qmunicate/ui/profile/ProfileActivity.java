@@ -22,7 +22,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
-import com.quickblox.qmunicate.qb.QBUpdateUserCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;

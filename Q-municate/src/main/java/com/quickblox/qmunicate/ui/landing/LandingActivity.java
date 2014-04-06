@@ -14,7 +14,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
-import com.quickblox.qmunicate.qb.QBSocialLoginCommand;
+import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;

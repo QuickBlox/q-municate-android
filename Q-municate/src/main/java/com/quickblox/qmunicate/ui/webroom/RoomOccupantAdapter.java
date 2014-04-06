@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.webroom;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,20 +18,20 @@ import java.util.List;
 
 public class RoomOccupantAdapter extends BaseListAdapter<Friend> {
 
-    private final LayoutInflater inflater;
+    private final LayoutInflater layoutInflater;
 
     public RoomOccupantAdapter(BaseActivity activity, List<Friend> objects) {
         super(activity, objects);
-        inflater = LayoutInflater.from(activity);
+        layoutInflater = LayoutInflater.from(activity);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Friend friend = objects.get(position);
+        Friend friend = objectsList.get(position);
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.list_item_friend, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_friend, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {
@@ -42,7 +42,7 @@ public class RoomOccupantAdapter extends BaseListAdapter<Friend> {
             try {
                 url = UriCreator.getUri(friend.getAvatarUid());
             } catch (BaseServiceException e) {
-                ErrorUtils.showError(activity, e);
+                ErrorUtils.showError(baseActivity, e);
             }
         }
         displayImage(url, holder.avatarImageView);

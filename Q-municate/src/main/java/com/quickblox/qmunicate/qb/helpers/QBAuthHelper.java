@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.service;
+package com.quickblox.qmunicate.qb.helpers;
 
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;

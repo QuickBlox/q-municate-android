@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
@@ -21,12 +22,9 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
 
     private final LayoutInflater inflater;
     private UserListListener listener;
-    private List<Friend> friends;
 
-    public UserListAdapter(BaseActivity activity, List<Friend> friends, List<Friend> users,
-            UserListListener listener) {
+    public UserListAdapter(BaseActivity activity, List<Friend> users, UserListListener listener) {
         super(activity, users);
-        this.friends = friends;
         this.listener = listener;
         inflater = LayoutInflater.from(activity);
     }
@@ -34,7 +32,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Friend user = objects.get(position);
+        Friend user = objectsList.get(position);
 
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.list_item_user, null);
@@ -49,7 +47,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             try {
                 url = UriCreator.getUri(user.getAvatarUid());
             } catch (BaseServiceException e) {
-                ErrorUtils.showError(activity, e);
+                ErrorUtils.showError(baseActivity, e);
             }
         }
         displayImage(url, holder.avatarImageView);
@@ -62,7 +60,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             }
         });
 
-        if (friends.contains(user)) {
+        if (DatabaseManager.searchFriendInBase(baseActivity, user.getId())) {
             holder.addFriendButton.setVisibility(View.INVISIBLE);
         } else {
             holder.addFriendButton.setVisibility(View.VISIBLE);

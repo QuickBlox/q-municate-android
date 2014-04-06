@@ -1,16 +1,17 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.webroom;
 
 import android.content.Context;
 
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.service.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.ui.main.AbsFriendsListLoader;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 
-public class RoomOccupantsLoader extends AbsFriendListLoader {
+public class RoomOccupantsLoader extends AbsFriendsListLoader {
 
     public static final int ID = 4;
 

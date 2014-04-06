@@ -16,7 +16,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.QBSignUpCommand;
+import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;

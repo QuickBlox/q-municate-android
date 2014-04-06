@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.qmunicate.ui.webroom.RoomOccupantFragment;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
@@ -31,7 +32,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final int ID_SETTINGS_FRAGMENT = 3;
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 4;
 
-    private Fragment currentFragment;
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -98,7 +98,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         Fragment fragment = null;
         switch (position) {
             case ID_FRIEND_LIST_FRAGMENT:
-                fragment = FriendListFragment.newInstance();
+                fragment = FriendsListFragment.newInstance();
                 break;
             case ID_WEB_ROOM_FRAGMENT:
                 fragment = RoomOccupantFragment.newInstance();
@@ -129,7 +129,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
         navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
-
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 

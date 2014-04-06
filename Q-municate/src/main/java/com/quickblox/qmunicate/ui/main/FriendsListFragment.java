@@ -23,7 +23,7 @@ import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBAddFriendCommand;
+import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
@@ -34,60 +34,30 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendListFragment extends AbsFriendListFragment implements SearchView.OnQueryTextListener, FilterQueryProvider {
+public class FriendsListFragment extends AbsFriendsListFragment implements SearchView.OnQueryTextListener, FilterQueryProvider {
 
-    private static final String TAG = FriendListFragment.class.getSimpleName();
+    private static final String TAG = FriendsListFragment.class.getSimpleName();
 
     private List<Friend> usersList;
-
     private UserListAdapter usersListAdapter;
-    private LinearLayout globalLayout;
-
+    private LinearLayout globalSearchLayout;
     private State state;
-
     private String constraint;
     private boolean isImportInitialized;
 
-    public static FriendListFragment newInstance() {
-        return new FriendListFragment();
-    }
-
-    @Override
-    protected BaseAdapter getFriendsAdapter() {
-        return new FriendListCursorAdapter(baseActivity, baseActivity.getContentResolver().query(
-                FriendTable.CONTENT_URI, null, null, null, null));
-    }
-
-    @Override
-    protected AbsFriendListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
-        return new FriendListLoader(activity);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-
-        initGlobalSearchButton(inflater);
-
-        return view;
+    public static FriendsListFragment newInstance() {
+        return new FriendsListFragment();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(
-                baseActivity));
-        baseActivity.updateBroadcastActionList();
+        addActionsAddFriend();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.setOnActionExpandListener(new SearchOnActionExpandListener());
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -114,79 +84,81 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         title = getString(R.string.nvd_title_friends);
-        state = State.FRIEND_LIST;
+        state = State.FRIENDS_LIST;
     }
 
     @Override
     public void onStart() {
         super.onStart();
         if (!isImportInitialized) {
-            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
-            baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+            addActionsAddFriends();
         } else {
-            if (state == State.FRIEND_LIST) {
-                startFriendListLoaderWithTimer(FriendListLoader.ID);
+            if (state == State.FRIENDS_LIST) {
+                startFriendListLoaderWithTimer(FriendsListLoader.ID);
             }
         }
         initFriendList();
     }
 
-
-    private void initGlobalSearchButton(LayoutInflater inflater) {
-        globalLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
-        globalLayout.findViewById(R.id.globalSearchButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startGlobalSearch();
-            }
-        });
-    }
-
-    private void startGlobalSearch() {
-        state = State.GLOBAL_LIST;
-        listTitle.setText(R.string.frl_all_users);
-        hideGlobalSearchButton();
-        initUserList();
-    }
-
-    private void hideGlobalSearchButton() {
-        listView.removeFooterView(globalLayout);
-    }
-
-    private void initUserList() {
-        usersList = new ArrayList<Friend>();
-        usersListAdapter = new UserListAdapter(baseActivity, DatabaseManager.getFriendsList(getActivity()),
-                usersList, new UserListAdapter.UserListListener() {
-            @Override
-            public void onUserSelected(int position) {
-                addToFriendList(usersList.get(position));
-            }
+    @Override
+    public void onLoaderResult(int id, List<Friend> data) {
+        switch (id) {
+            case FriendsListLoader.ID:
+                clearCachedFriends();
+                saveFriendsToCache(data);
+                break;
+            case UserListLoader.ID:
+                usersList.clear();
+                usersList.addAll(data);
+                usersListAdapter.notifyDataSetChanged();
+                break;
         }
-        );
-        listView.setSelector(android.R.color.transparent);
-        listView.setAdapter(usersListAdapter);
-        listView.setOnItemClickListener(null);
-
-        startUserListLoader(constraint);
     }
 
-    private void addToFriendList(final Friend friend) {
-        baseActivity.showProgress();
-        QBAddFriendCommand.start(baseActivity, friend);
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
     }
 
-    private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
-                Consts.FL_FRIENDS_PER_PAGE));
-
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        constraint = newText;
+        if (state == State.FRIENDS_LIST) {
+            FriendsListCursorAdapter friendListCursorAdapter = (FriendsListCursorAdapter) friendsListAdapter;
+            friendListCursorAdapter.setFilterQueryProvider(this);
+            friendListCursorAdapter.getFilter().filter(newText);
+        } else {
+            startUserListLoader(newText);
+        }
+        return true;
     }
 
-    private void showGlobalSearchButton() {
-        listView.addFooterView(globalLayout);
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - 1);
+        FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
     }
 
-    private void clearCachedFriends() {
-        DatabaseManager.deleteAllFriends(baseActivity);
+    @Override
+    protected BaseAdapter getFriendsAdapter() {
+        return new FriendsListCursorAdapter(baseActivity, baseActivity.getContentResolver().query(
+                FriendTable.CONTENT_URI, null, null, null, null));
+    }
+
+    @Override
+    protected AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
+        return new FriendsListLoader(activity);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+
+        initGlobalSearchButton(inflater);
+
+        return view;
     }
 
     @Override
@@ -203,41 +175,77 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
         }
     }
 
-    @Override
-    public void onLoaderResult(int id, List<Friend> data) {
-        switch (id) {
-            case FriendListLoader.ID:
-                clearCachedFriends();
-                saveFriendsToCache(data);
-                break;
-            case UserListLoader.ID:
-                usersList.clear();
-                usersList.addAll(data);
-                usersListAdapter.notifyDataSetChanged();
-                break;
+    private void addActionsAddFriend() {
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private void addActionsAddFriends() {
+        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private void initGlobalSearchButton(LayoutInflater inflater) {
+        globalSearchLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
+        globalSearchLayout.findViewById(R.id.globalSearchButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startGlobalSearch();
+            }
+        });
+    }
+
+    private void startGlobalSearch() {
+        state = State.GLOBAL_LIST;
+        friendsTitle.setText(R.string.frl_all_users);
+        hideGlobalSearchButton();
+        initUserList();
+    }
+
+    private void hideGlobalSearchButton() {
+        friendsListView.removeFooterView(globalSearchLayout);
+    }
+
+    private void initUserList() {
+        usersList = new ArrayList<Friend>();
+        usersListAdapter = new UserListAdapter(baseActivity,
+                usersList, new UserListAdapter.UserListListener() {
+            @Override
+            public void onUserSelected(int position) {
+                addToFriendList(usersList.get(position));
+            }
         }
+        );
+        friendsListView.setSelector(android.R.color.transparent);
+        friendsListView.setAdapter(usersListAdapter);
+        friendsListView.setOnItemClickListener(null);
+
+        startUserListLoader(constraint);
+    }
+
+    private void addToFriendList(final Friend friend) {
+        baseActivity.showProgress();
+        QBAddFriendCommand.start(baseActivity, friend);
+    }
+
+    private void startUserListLoader(String newText) {
+        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
+                Consts.FL_FRIENDS_PER_PAGE));
+
+    }
+
+    private void showGlobalSearchButton() {
+        friendsListView.addFooterView(globalSearchLayout);
+    }
+
+    private void clearCachedFriends() {
+        DatabaseManager.deleteAllFriends(baseActivity);
     }
 
     private void saveFriendsToCache(List<Friend> friendsList) {
         DatabaseManager.saveFriends(baseActivity, friendsList);
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        constraint = newText;
-        if (state == State.FRIEND_LIST) {
-            FriendListCursorAdapter friendListCursorAdapter = (FriendListCursorAdapter) friendListAdapter;
-            friendListCursorAdapter.setFilterQueryProvider(this);
-            friendListCursorAdapter.getFilter().filter(newText);
-        } else {
-            startUserListLoader(newText);
-        }
-        return true;
     }
 
     private void saveFriendToCache(Friend friend) {
@@ -246,33 +254,27 @@ public class FriendListFragment extends AbsFriendListFragment implements SearchV
 
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        startFriendListLoaderWithTimer(FriendListLoader.ID);
+        startFriendListLoaderWithTimer(FriendsListLoader.ID);
         baseActivity.hideProgress();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Cursor selectedItem = (Cursor) friendListAdapter.getItem(position - 1);
-        FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
-    }
-
-    private enum State {FRIEND_LIST, GLOBAL_LIST}
+    private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            listTitle.setVisibility(View.VISIBLE);
-            listTitle.setText(R.string.frl_friends);
+            friendsTitle.setVisibility(View.VISIBLE);
+            friendsTitle.setText(R.string.frl_friends);
             return true;
         }
 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
-            state = State.FRIEND_LIST;
-            listTitle.setVisibility(View.GONE);
+            state = State.FRIENDS_LIST;
+            friendsTitle.setVisibility(View.GONE);
             initFriendList();
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
             return true;

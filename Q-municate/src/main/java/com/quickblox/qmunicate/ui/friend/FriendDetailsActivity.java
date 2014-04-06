@@ -21,7 +21,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBRemoveFriendCommand;
+import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.LoaderActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;

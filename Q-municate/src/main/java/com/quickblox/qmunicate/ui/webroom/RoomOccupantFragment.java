@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.webroom;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -17,17 +17,19 @@ import android.widget.BaseAdapter;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.QBJoinRoomCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinRoomCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
+import com.quickblox.qmunicate.ui.main.AbsFriendsListFragment;
+import com.quickblox.qmunicate.ui.main.AbsFriendsListLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class RoomOccupantFragment extends AbsFriendListFragment {
+public class RoomOccupantFragment extends AbsFriendsListFragment {
 
     private static final String TAG = RoomOccupantFragment.class.getSimpleName();
 
@@ -75,12 +77,12 @@ public class RoomOccupantFragment extends AbsFriendListFragment {
 
     @Override
     protected BaseAdapter getFriendsAdapter() {
-        friends = new ArrayList<Friend>();
-        return new RoomOccupantAdapter(baseActivity, friends);
+        friendsList = new ArrayList<Friend>();
+        return new RoomOccupantAdapter(baseActivity, friendsList);
     }
 
     @Override
-    protected AbsFriendListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
+    protected AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
         return new RoomOccupantsLoader(activity, service.getQbChatHelper());
     }
 
@@ -91,7 +93,7 @@ public class RoomOccupantFragment extends AbsFriendListFragment {
         if (position == 0) {
             return;
         }
-        Friend friend = ((RoomOccupantAdapter) friendListAdapter).getItem(position - 1);
+        Friend friend = ((RoomOccupantAdapter) friendsListAdapter).getItem(position - 1);
         FriendDetailsActivity.start(baseActivity, friend);
     }
 
@@ -99,9 +101,9 @@ public class RoomOccupantFragment extends AbsFriendListFragment {
     public void onLoaderResult(int id, List<Friend> data) {
         switch (id) {
             case RoomOccupantsLoader.ID:
-                friends.clear();
-                friends.addAll(data);
-                ((RoomOccupantAdapter) friendListAdapter).setNewData(friends);
+                friendsList.clear();
+                friendsList.addAll(data);
+                ((RoomOccupantAdapter) friendsListAdapter).setNewData(friendsList);
         }
     }
 
