@@ -208,7 +208,9 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
             qbUser.setFullName(fullname);
             qbUser.setEmail(email);
 
-            if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
+            boolean isAvatarChanged = isAvatarChanges(avatar);
+
+            if (isAvatarChanged && isNeedUpdateAvatar) {
                 new GetImageFileTask(this).execute(imageHelper, avatarImageView);
             } else {
                 QBUpdateUserCommand.start(this, qbUser, null);
