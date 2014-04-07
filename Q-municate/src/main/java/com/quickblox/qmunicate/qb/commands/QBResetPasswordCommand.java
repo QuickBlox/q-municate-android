@@ -1,11 +1,11 @@
-package com.quickblox.qmunicate.qb;
+package com.quickblox.qmunicate.qb.commands;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.service.QBAuthHelper;
+import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 

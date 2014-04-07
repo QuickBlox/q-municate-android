@@ -15,7 +15,7 @@ import com.quickblox.qmunicate.core.ui.LoaderManager;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.core.ui.OnLoadFinishedListener;
 import com.quickblox.qmunicate.model.InviteFriend;
-import com.quickblox.qmunicate.qb.QBAddFriendsCommand;
+import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.ui.base.QMLoaderHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;

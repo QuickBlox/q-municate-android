@@ -12,11 +12,11 @@ import com.quickblox.qmunicate.model.Friend;
 
 import java.util.List;
 
-public abstract class AbsFriendListLoader extends BaseLoader<List<Friend>> {
+public abstract class AbsFriendsListLoader extends BaseLoader<List<Friend>> {
 
     abstract protected List<Integer> getUserIds() throws Exception;
 
-    public AbsFriendListLoader(Context context) {
+    public AbsFriendsListLoader(Context context) {
         super(context);
     }
 
@@ -40,5 +40,4 @@ public abstract class AbsFriendListLoader extends BaseLoader<List<Friend>> {
 
         return Friend.createFriends(users);
     }
-
 }

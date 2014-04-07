@@ -52,7 +52,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     }
 
     private void initListView() {
-        // TODO temp friends list.
+        // TODO temp friendsList list.
         friendsArrayList.add(new Friend(new QBUser("serik", "11111111", "Sergey Fedunets")));
         friendsArrayList.add(new Friend(new QBUser("igor", "11111111", "Igor Shaforenko")));
         friendsArrayList.add(new Friend(new QBUser("anton", "11111111", "Anton Dyachenko")));

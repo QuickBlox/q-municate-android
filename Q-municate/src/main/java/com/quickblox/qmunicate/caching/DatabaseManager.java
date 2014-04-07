@@ -7,6 +7,7 @@ import android.text.TextUtils;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 import java.util.ArrayList;
@@ -68,12 +69,19 @@ public class DatabaseManager {
         return friend;
     }
 
+    public static boolean searchFriendInBase(Context context, int searchId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + searchId, null, null);
+        return cursor.getCount() > Consts.ZERO_VALUE;
+    }
+
     public static Cursor fetchFriendsByFullname(Context context, String inputText) {
         Cursor cursor = null;
         if (TextUtils.isEmpty(inputText)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
         } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
         }
         if (cursor != null) {
             cursor.moveToFirst();

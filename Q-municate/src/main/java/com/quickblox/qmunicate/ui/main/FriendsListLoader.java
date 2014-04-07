@@ -12,10 +12,10 @@ import com.quickblox.qmunicate.utils.Consts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendListLoader extends AbsFriendListLoader {
+public class FriendsListLoader extends AbsFriendsListLoader {
     public static final int ID = 0;
 
-    public FriendListLoader(Context context) {
+    public FriendsListLoader(Context context) {
         super(context);
     }
 
@@ -36,6 +36,4 @@ public class FriendListLoader extends AbsFriendListLoader {
         }
         return userIds;
     }
-
-
 }

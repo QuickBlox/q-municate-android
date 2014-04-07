@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.service;
+package com.quickblox.qmunicate.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;

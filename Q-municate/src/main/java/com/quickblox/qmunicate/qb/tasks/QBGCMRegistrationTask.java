@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.qb;
+package com.quickblox.qmunicate.qb.tasks;
 
 import android.app.Activity;
 import android.content.Context;

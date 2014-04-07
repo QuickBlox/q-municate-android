@@ -10,22 +10,22 @@ import java.util.List;
 
 public abstract class BaseListAdapter<T> extends BaseAdapter {
 
-    protected List<T> objects;
-    protected BaseActivity activity;
+    protected List<T> objectsList;
+    protected BaseActivity baseActivity;
 
-    public BaseListAdapter(BaseActivity activity, List<T> objects) {
-        this.activity = activity;
-        this.objects = objects;
+    public BaseListAdapter(BaseActivity baseActivity, List<T> objectsList) {
+        this.baseActivity = baseActivity;
+        this.objectsList = objectsList;
     }
 
     @Override
     public int getCount() {
-        return objects.size();
+        return objectsList.size();
     }
 
     @Override
     public T getItem(int position) {
-        return objects.get(position);
+        return objectsList.get(position);
     }
 
     @Override
@@ -34,7 +34,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     }
 
     public void setNewData(List<T> newData) {
-        objects = newData;
+        objectsList = newData;
         notifyDataSetChanged();
     }
 
