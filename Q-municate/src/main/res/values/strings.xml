@@ -151,8 +151,8 @@
     <string name="frd_offline_user">User must be online</string>
 
     <string name="label_done">Done</string>
-    <string name="error_playing_illegal_state">Error during playing sound</string>
-    <string name="error_playing_wrong_source">Wrond sound resource</string>
+    <string name="error_playing_ringtone">Error during playing ringtone</string>
+    <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
 
 </resources>

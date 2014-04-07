@@ -9,7 +9,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class MediaPlayerManager {
-    private static final int INVALID_SOURCE = R.string.error_playing_wrong_source;
+    private static final int INVALID_SOURCE = R.string.error_playing_ringtone;
 
     private MediaPlayer player;
     private Context context;

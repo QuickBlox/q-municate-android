@@ -17,7 +17,7 @@ import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.SignalingChannel;
-import com.quickblox.module.videochat_webrtc.VideoStreamsView;
+import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.service.QBService;
