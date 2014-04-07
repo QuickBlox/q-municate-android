@@ -70,12 +70,9 @@ public class DatabaseManager {
     }
 
     public static boolean searchFriendInBase(Context context, int searchId) {
-        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + searchId + "", null, null);
-        if (cursor.getCount() > Consts.ZERO_VALUE) {
-            return true;
-        } else {
-            return false;
-        }
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + searchId, null, null);
+        return cursor.getCount() > Consts.ZERO_VALUE;
     }
 
     public static Cursor fetchFriendsByFullname(Context context, String inputText) {
@@ -83,7 +80,8 @@ public class DatabaseManager {
         if (TextUtils.isEmpty(inputText)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
         } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
         }
         if (cursor != null) {
             cursor.moveToFirst();
