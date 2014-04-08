@@ -1,9 +1,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/screen_call_background_color"
-              android:orientation="vertical"
-              android:padding="15dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_call_background_color"
+    android:orientation="vertical"
+    android:padding="15dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
                 android:gravity="center"
                 android:text=""
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/act_call_name_size"/>
+                android:textSize="@dimen/act_call_name_size" />
 
             <TextView
                 android:id="@+id/timerTextView"
@@ -31,7 +31,7 @@
                 android:gravity="center"
                 android:text="00:00"
                 android:textColor="@color/screen_call_timer_text_color"
-                android:textSize="@dimen/act_call_name_size"/>
+                android:textSize="@dimen/act_call_name_size" />
 
         </LinearLayout>
 
@@ -44,7 +44,7 @@
             android:layout_centerInParent="true"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/act_call_margin_top"
-            android:src="@drawable/placeholder_user"/>
+            android:src="@drawable/placeholder_user" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -58,7 +58,7 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/dynamicVoiceCallImageButton"
+                android:id="@+id/muteDynamicButton"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_alignParentLeft="true"
@@ -66,7 +66,7 @@
                 android:layout_gravity="center|left"
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
-                android:src="@drawable/ic_dynamic"/>
+                android:src="@drawable/ic_dynamic" />
 
             <ImageButton
                 android:id="@+id/stopСallButton"
@@ -74,10 +74,10 @@
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_centerInParent="true"
                 android:background="@drawable/button_end_call_selector"
-                android:src="@drawable/ic_encall"/>
+                android:src="@drawable/ic_encall" />
 
             <ImageButton
-                android:id="@+id/muteVoiceCallImageButton"
+                android:id="@+id/muteMicrophoneButton"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_alignParentRight="true"
@@ -85,7 +85,7 @@
                 android:layout_gravity="center|right"
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
-                android:src="@drawable/ic_call_mute_a"/>
+                android:src="@drawable/ic_call_mute_a" />
         </RelativeLayout>
     </RelativeLayout>
 </LinearLayout>

@@ -49,6 +49,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private OutgoingCallListener outgoingCallListener;
 
     public interface OutgoingCallListener {
+
         public void onConnectionAccepted();
 
         public void onConnectionRejected();
@@ -65,7 +66,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract MediaConstraints getMediaConstraints();
 
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
-                                           Consts.CALL_DIRECTION_TYPE type, CallType callType) {
+            Consts.CALL_DIRECTION_TYPE type, CallType callType) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.USER, user);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
@@ -104,7 +105,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription,
-                       long sessionId) {
+            long sessionId) {
 
     }
 
@@ -155,18 +156,19 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
-            savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(getContentView(), container, false);
-        SessionDescriptionWrapper sessionDescriptionWrapper =
-                getArguments().getParcelable(Consts.REMOTE_DESCRIPTION);
+        SessionDescriptionWrapper sessionDescriptionWrapper = getArguments().getParcelable(
+                Consts.REMOTE_DESCRIPTION);
         if (sessionDescriptionWrapper != null) {
             remoteSessionDescription = sessionDescriptionWrapper.getSessionDescription();
         }
-        call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA);
+        call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
+                Consts.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (QBUser) getArguments().getSerializable(Consts.USER);
         call_type = (CallType) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
+        rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
         postInit(rootView);
         return rootView;
     }
@@ -176,6 +178,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         switch (v.getId()) {
             case R.id.stopСallButton:
                 stopCall(true, STOP_TYPE.CLOSED);
+                break;
+            case R.id.muteMicrophoneButton:
+                muteMicrophone();
                 break;
             default:
                 break;
@@ -228,11 +233,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
+    private void muteMicrophone() {
+        if (qbVideoChat != null) {
+            qbVideoChat.muteMicrophone(!qbVideoChat.isMicrophoneMute());
+        }
+    }
+
     private void startCall() {
         qbVideoChat.call(opponent, call_type);
         callTimer = new Timer();
-        callTimer.schedule(new CancelCallTimerTask(),
-                30 * Consts.SECOND);
+        callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
     }
 
     private void connectToService() {
@@ -287,6 +297,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     class CancelCallTimerTask extends TimerTask {
+
         @Override
         public void run() {
             stopCall(true, STOP_TYPE.CLOSED);

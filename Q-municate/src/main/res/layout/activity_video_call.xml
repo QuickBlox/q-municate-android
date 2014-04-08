@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black"
-    android:orientation="vertical">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/black"
+              android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -48,6 +48,7 @@
                 android:src="@drawable/ic_call_mute"/>
 
             <ImageButton
+                android:id="@+id/muteMicrophoneButton"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_alignParentRight="true"
