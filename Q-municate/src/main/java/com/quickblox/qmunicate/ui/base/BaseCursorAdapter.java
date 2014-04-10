@@ -13,10 +13,12 @@ import com.quickblox.qmunicate.utils.Consts;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {
 
+    protected final Context context;
     protected final LayoutInflater layoutInflater;
 
     public BaseCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
         super(context, cursor, autoRequery);
+        this.context = context;
         layoutInflater = LayoutInflater.from(context);
     }
 

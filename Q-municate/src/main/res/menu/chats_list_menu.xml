@@ -3,5 +3,6 @@
         android:id="@+id/action_add"
         android:icon="@drawable/ic_action_new"
         android:orderInCategory="100"
-        android:showAsAction="ifRoom" />
+        android:showAsAction="ifRoom"
+        android:title="@string/acb_add_chat_title"/>
 </menu>

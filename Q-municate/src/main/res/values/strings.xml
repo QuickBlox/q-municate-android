@@ -3,6 +3,14 @@
 
     <string name="app_name">Q-municate</string>
 
+    // ActionBar
+    <string name="acb_search_title">Search</string>
+    <string name="acb_add_chat_title">Add Chat</string>
+    <string name="acb_delete_friend_title">Delete Friend</string>
+    <string name="acb_add_friend_to_chat_title">Add friend to Chat</string>
+    <string name="acb_leave_chat_title">Leave Chat</string>
+    <string name="acb_chat_details_title">Chat details</string>
+
     // Navigation Drawler
     <string name="nvd_title_friends">Friends</string>
     <string name="nvd_title_web_room">Web room</string>

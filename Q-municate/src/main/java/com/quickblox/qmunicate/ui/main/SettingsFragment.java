@@ -83,7 +83,8 @@ public class SettingsFragment extends BaseFragment {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileActivity.start(getActivity());
+                ProfileActivity.start(baseActivity);
+                baseActivity.overridePendingTransition(R.anim.activity_enter_right, R.anim.activity_exit_left);
             }
         });
 

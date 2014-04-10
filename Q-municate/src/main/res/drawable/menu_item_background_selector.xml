@@ -2,10 +2,7 @@
     <item android:drawable="@color/menu_item_background_activated_color"
           android:state_activated="true">
     </item>
-    <item android:drawable="@color/menu_item_background_pressed_color"
-          android:state_pressed="true">
-    </item>
     <item android:drawable="@color/white"
-          android:state_pressed="false">
+        android:state_pressed="true">
     </item>
 </selector>

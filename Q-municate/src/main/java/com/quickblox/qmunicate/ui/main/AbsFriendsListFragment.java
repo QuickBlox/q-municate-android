@@ -33,10 +33,6 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
     protected boolean isStopFriendsListLoader;
     protected Timer friendsListUpdateTimer;
 
-    protected abstract BaseAdapter getFriendsAdapter();
-
-    protected abstract AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args);
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         friendsListView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
@@ -51,6 +47,15 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
         return friendsListView;
     }
 
+    protected void initFriendList() {
+        friendsListAdapter = getFriendsAdapter();
+        friendsListView.setAdapter(friendsListAdapter);
+        friendsListView.setSelector(R.drawable.list_item_background_selector);
+        friendsListView.setOnItemClickListener(this);
+    }
+
+    protected abstract BaseAdapter getFriendsAdapter();
+
     @Override
     public Loader<LoaderResult<List<Friend>>> onLoaderCreate(int id, Bundle args) {
         switch (id) {
@@ -62,12 +67,19 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
         }
     }
 
+    protected abstract AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args);
+
     @Override
     public void onStop() {
         super.onStop();
         if (isStopFriendsListLoader) {
             stopFriendListLoader();
         }
+    }
+
+    protected void stopFriendListLoader() {
+        isStopFriendsListLoader = false;
+        friendsListUpdateTimer.cancel();
     }
 
     protected void startFriendListLoaderWithTimer(final int idLoader) {
@@ -80,18 +92,5 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
                         Consts.FL_FRIENDS_PER_PAGE));
             }
         }, Consts.FL_START_LOAD_DELAY, Consts.FL_UPDATE_DATA_PERIOD);
-    }
-
-
-    protected void stopFriendListLoader() {
-        isStopFriendsListLoader = false;
-        friendsListUpdateTimer.cancel();
-    }
-
-    protected void initFriendList() {
-        friendsListAdapter = getFriendsAdapter();
-        friendsListView.setAdapter(friendsListAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
-        friendsListView.setOnItemClickListener(this);
     }
 }
