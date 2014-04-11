@@ -17,6 +17,7 @@ import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.SignalingChannel;
+import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
@@ -30,6 +31,7 @@ import org.webrtc.MediaConstraints;
 import org.webrtc.SessionDescription;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,6 +49,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private Timer callTimer;
     private ServiceConnection serviceConnection = new ChetServiceConnection();
     private OutgoingCallListener outgoingCallListener;
+    private String sessionId;
 
     public interface OutgoingCallListener {
 
@@ -66,12 +69,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract MediaConstraints getMediaConstraints();
 
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
-            Consts.CALL_DIRECTION_TYPE type, CallType callType) {
+            Consts.CALL_DIRECTION_TYPE type, CallType callType, String sessionId) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.USER, user);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
         args.putParcelable(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
+        args.putString(WebRTC.SESSION_ID_EXTENSION, sessionId);
         return args;
     }
 
@@ -105,12 +109,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription,
-            long sessionId) {
+            String sessionId, Map<String, String> params) {
 
     }
 
     @Override
-    public void onAccepted(QBUser user, SessionDescription sessionDescription, long sessionId) {
+    public void onAccepted(QBUser user, SessionDescription sessionDescription, String sessionId,
+            Map<String, String> params) {
+        cancelCallTimer();
         if (isExistActivity()) {
             getBaseActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -123,12 +129,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onStop(QBUser user, String reason, long sessionId) {
+    public void onStop(QBUser user, ISignalingChannel.STOP_REASON reason, String sessionId) {
         stopCall(false, STOP_TYPE.CLOSED);
     }
 
     @Override
-    public void onRejected(QBUser user, long sessionId) {
+    public void onRejected(QBUser user, String sessionId) {
+        cancelCallTimer();
         if (isExistActivity()) {
             getBaseActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -167,6 +174,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (QBUser) getArguments().getSerializable(Consts.USER);
         call_type = (CallType) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
+        sessionId = getArguments().getString(WebRTC.SESSION_ID_EXTENSION, "");
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
         rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
         postInit(rootView);
@@ -207,7 +215,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
             startCall();
         } else {
-            qbVideoChat.accept(opponent);
+            qbVideoChat.accept(opponent, sessionId);
             onConnectionEstablished();
         }
     }
@@ -252,6 +260,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
+    private void cancelCallTimer() {
+        if (callTimer != null) {
+            callTimer.cancel();
+            callTimer = null;
+        }
+    }
+
     private void unbindService() {
         if (isExistActivity() && bounded) {
             getBaseActivity().unbindService(serviceConnection);
@@ -259,6 +274,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void stopCall(boolean sendStop, STOP_TYPE stopType) {
+        cancelCallTimer();
         if (qbVideoChat != null) {
             if (sendStop) {
                 qbVideoChat.stopCall();
