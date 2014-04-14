@@ -12,6 +12,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.SignalingChannel;
+import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
@@ -19,6 +20,7 @@ import com.quickblox.qmunicate.utils.Consts;
 import org.webrtc.SessionDescription;
 
 import java.util.List;
+import java.util.Map;
 
 public class QBChatHelper implements RoomListener {
 
@@ -74,12 +76,14 @@ public class QBChatHelper implements RoomListener {
 
         @Override
         public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription,
-                           long l) {
-            SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(sessionDescription);
+                String sessionId, Map<String, String> params) {
+            SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
+                    sessionDescription);
             lo.g("onCall" + callType);
             Intent intent = new Intent(context, CallActivity.class);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
             intent.putExtra(Consts.CALL_TYPE_EXTRA, callType);
+            intent.putExtra(WebRTC.SESSION_ID_EXTENSION, sessionId);
             intent.putExtra(Consts.USER, user);
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -87,17 +91,18 @@ public class QBChatHelper implements RoomListener {
         }
 
         @Override
-        public void onAccepted(QBUser user, SessionDescription sessionDescription, long session) {
+        public void onAccepted(QBUser user, SessionDescription sessionDescription, String session,
+                Map<String, String> params) {
 
         }
 
         @Override
-        public void onStop(QBUser user, String s, long session) {
+        public void onStop(QBUser user, ISignalingChannel.STOP_REASON reason, String session) {
 
         }
 
         @Override
-        public void onRejected(QBUser user, long session) {
+        public void onRejected(QBUser user, String session) {
 
         }
 
@@ -106,7 +111,5 @@ public class QBChatHelper implements RoomListener {
             lo.g("error while establishing connection" + errors.toString());
         }
     }
-
-
 }
 

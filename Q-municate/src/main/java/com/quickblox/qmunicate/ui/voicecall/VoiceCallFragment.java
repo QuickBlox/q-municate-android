@@ -13,9 +13,22 @@ import com.quickblox.qmunicate.utils.Consts;
 import org.webrtc.MediaConstraints;
 
 public class VoiceCallFragment extends OutgoingCallFragment {
+
     private Handler handler;
     private TimeUpdater updater;
     private TextView timeTextView;
+
+    @Override
+    public void onClick(View v) {
+        super.onClick(v);
+        switch (v.getId()) {
+            case R.id.muteDynamicButton:
+                muteSound();
+                break;
+            default:
+                break;
+        }
+    }
 
     @Override
     protected void postInit(View rootView) {
@@ -23,6 +36,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
             ((TextView) rootView.findViewById(R.id.nameTextView)).setText(opponent.getFullName());
         }
         timeTextView = (TextView) rootView.findViewById(R.id.timerTextView);
+        rootView.findViewById(R.id.muteDynamicButton).setOnClickListener(this);
     }
 
     @Override
@@ -39,8 +53,8 @@ public class VoiceCallFragment extends OutgoingCallFragment {
     @Override
     protected MediaConstraints getMediaConstraints() {
         MediaConstraints sdpMediaConstraints = new MediaConstraints();
-        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-                WebRTC.RECEIVE_AUDIO, WebRTC.TRUE_FLAG));
+        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(WebRTC.RECEIVE_AUDIO,
+                WebRTC.TRUE_FLAG));
         return sdpMediaConstraints;
     }
 
@@ -50,10 +64,15 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         stopTimer();
     }
 
+    private void muteSound(){
+        if (qbVideoChat != null) {
+            qbVideoChat.muteSound(!qbVideoChat.isSoundMute());
+        }
+    }
+
     private void startTimer(TextView textView) {
         handler = new Handler();
-        updater = new TimeUpdater(textView,
-                handler);
+        updater = new TimeUpdater(textView, handler);
         handler.postDelayed(updater, Consts.SECOND);
     }
 
@@ -62,5 +81,4 @@ public class VoiceCallFragment extends OutgoingCallFragment {
             handler.removeCallbacks(updater);
         }
     }
-
 }
