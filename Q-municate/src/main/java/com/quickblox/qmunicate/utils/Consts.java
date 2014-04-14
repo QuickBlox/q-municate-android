@@ -22,6 +22,11 @@ public class Consts {
 
     public static final int ZERO_VALUE = 0;
 
+    public static final int CIRCL_BORDER_WIDTH = 4;
+    public static final float CIRCL_SHADOW_RADIUS = 4.0f;
+    public static final float CIRCL_SHADOW_DX = 0.0f;
+    public static final float CIRCL_SHADOW_DY = 2.0f;
+
     public static final String FRIEND_CLASS_NAME = "Friend";
     public static final String FRIEND_FIELD_USER_ID = "user_id";
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";

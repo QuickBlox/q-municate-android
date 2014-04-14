@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.utils.Consts;
 
 public class CircleImageView extends ImageView {
 
@@ -39,11 +40,10 @@ public class CircleImageView extends ImageView {
         paintBorder = new Paint();
         paintBorder.setAntiAlias(true);
 
-        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.CircularImageView, defStyle,
-                0);
+        TypedArray attributes = context.obtainStyledAttributes(attrs, R.styleable.CircularImageView, defStyle, Consts.ZERO_VALUE);
 
         if (attributes.getBoolean(R.styleable.CircularImageView_border, true)) {
-            setBorderWidth(attributes.getColor(R.styleable.CircularImageView_border_width, 4));
+            setBorderWidth(attributes.getColor(R.styleable.CircularImageView_border_width, Consts.CIRCL_BORDER_WIDTH));
             setBorderColor(attributes.getInt(R.styleable.CircularImageView_border_color, Color.WHITE));
         }
 
@@ -67,7 +67,7 @@ public class CircleImageView extends ImageView {
 
     public void addShadow() {
         setLayerType(LAYER_TYPE_SOFTWARE, paintBorder);
-        paintBorder.setShadowLayer(4.0f, 0.0f, 2.0f, Color.BLACK);
+        paintBorder.setShadowLayer(Consts.CIRCL_SHADOW_RADIUS, Consts.CIRCL_SHADOW_DX, Consts.CIRCL_SHADOW_DY, Color.BLACK);
     }
 
     @Override
@@ -79,38 +79,40 @@ public class CircleImageView extends ImageView {
 
     @Override
     public void onDraw(Canvas canvas) {
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) this.getDrawable();
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) getDrawable();
         if (bitmapDrawable != null) {
             image = bitmapDrawable.getBitmap();
         }
 
         if (image != null) {
-
             canvasSize = canvas.getWidth();
+
             if (canvas.getHeight() < canvasSize) {
                 canvasSize = canvas.getHeight();
             }
 
-            BitmapShader shader = new BitmapShader(Bitmap.createScaledBitmap(image, canvasSize, canvasSize,
-                    false), Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            paint.setShader(shader);
+            createBitmapShader();
 
             int circleCenter = (canvasSize - (borderWidth * 2)) / 2;
             canvas.drawCircle(circleCenter + borderWidth, circleCenter + borderWidth,
-                    ((canvasSize - (borderWidth * 2)) / 2) + borderWidth - 4.0f, paintBorder);
+                    ((canvasSize - (borderWidth * 2)) / 2) + borderWidth - Consts.CIRCL_SHADOW_RADIUS, paintBorder);
             canvas.drawCircle(circleCenter + borderWidth, circleCenter + borderWidth,
-                    ((canvasSize - (borderWidth * 2)) / 2) - 4.0f, paint);
+                    ((canvasSize - (borderWidth * 2)) / 2) - Consts.CIRCL_SHADOW_RADIUS, paint);
         }
     }
 
+    private void createBitmapShader() {
+        BitmapShader shader = new BitmapShader(Bitmap.createScaledBitmap(image, canvasSize, canvasSize,
+                false), Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        paint.setShader(shader);
+    }
+
     private int measureWidth(int measureSpec) {
-        int result = 0;
+        int result;
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
 
-        if (specMode == MeasureSpec.EXACTLY) {
-            result = specSize;
-        } else if (specMode == MeasureSpec.AT_MOST) {
+        if (specMode == MeasureSpec.EXACTLY || specMode == MeasureSpec.AT_MOST) {
             result = specSize;
         } else {
             result = canvasSize;
@@ -120,13 +122,11 @@ public class CircleImageView extends ImageView {
     }
 
     private int measureHeight(int measureSpecHeight) {
-        int result = 0;
+        int result;
         int specMode = MeasureSpec.getMode(measureSpecHeight);
         int specSize = MeasureSpec.getSize(measureSpecHeight);
 
-        if (specMode == MeasureSpec.EXACTLY) {
-            result = specSize;
-        } else if (specMode == MeasureSpec.AT_MOST) {
+        if (specMode == MeasureSpec.EXACTLY || specMode == MeasureSpec.AT_MOST) {
             result = specSize;
         } else {
             result = canvasSize;
