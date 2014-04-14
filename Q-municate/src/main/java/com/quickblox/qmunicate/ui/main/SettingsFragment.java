@@ -136,8 +136,8 @@ public class SettingsFragment extends BaseFragment {
     private class LogoutSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
-            LoginActivity.start(getActivity());
-            getActivity().finish();
+            LoginActivity.start(baseActivity);
+            baseActivity.finish();
         }
     }
 

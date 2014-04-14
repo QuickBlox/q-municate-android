@@ -1,7 +1,5 @@
 package com.quickblox.qmunicate.ui.mediacall;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +8,7 @@ import android.util.Log;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.module.videochat_webrtc.SignalingChannel;
+import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
@@ -24,11 +23,11 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private static final String TAG = CallActivity.class.getSimpleName();
     private QBUser opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
-    private Fragment currentFragment;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private CallType call_type;
     private SignalingChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
+    private String sessionId;
 
     public static void start(Context context, QBUser friend, CallType callType) {
         Intent intent = new Intent(context, CallActivity.class);
@@ -97,7 +96,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     private void reject() {
         if (signalingChannel != null && opponent != null) {
-            signalingChannel.sendReject(opponent, System.currentTimeMillis());
+            signalingChannel.sendReject(opponent, sessionId);
         }
         cancelPlayer();
         finish();
@@ -105,25 +104,20 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     private void accept() {
         cancelPlayer();
-        showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type);
-    }
-
-    private FragmentTransaction buildTransaction() {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setTransition(android.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        return transaction;
+        showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type, sessionId);
     }
 
     private void parseIntentExtras(Bundle extras) {
-        call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA);
+        call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(
+                Consts.CALL_DIRECTION_TYPE_EXTRA);
         call_type = (CallType) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
+        sessionId = extras.getString(WebRTC.SESSION_ID_EXTENSION, "");
         opponent = (QBUser) extras.getSerializable(Consts.USER);
         if (call_direction_type != null) {
             if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-                sessionDescriptionWrapper =
-                        extras.getParcelable(Consts.REMOTE_DESCRIPTION);
+                sessionDescriptionWrapper = extras.getParcelable(Consts.REMOTE_DESCRIPTION);
                 showIncomingFragment();
             } else {
                 showOutgoingFragment();
@@ -134,8 +128,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     private void showOutgoingFragment() {
         playOutgoingRingtone();
-        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(call_type) ? new VideoCallFragment() :
-                new VoiceCallFragment();
+        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(
+                call_type) ? new VideoCallFragment() : new VoiceCallFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, call_direction_type);
         bundle.putSerializable(Consts.USER, opponent);
@@ -156,18 +150,20 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         }
     }
 
-    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId, CallType callType) {
-        Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId, call_direction_type, callType);
-        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(call_type) ? new VideoCallFragment() :
-                new VoiceCallFragment();
+    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
+            CallType callType, String sessionId) {
+        Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
+                call_direction_type, callType, sessionId);
+        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(
+                call_type) ? new VideoCallFragment() : new VoiceCallFragment();
         outgoingCallFragment.setArguments(bundle);
         setCurrentFragment(outgoingCallFragment);
     }
 
     private void showIncomingFragment() {
         playIncomingRingtone();
-        IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type, opponent.getFullName());
+        IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
+                opponent.getFullName());
         setCurrentFragment(incomingCallFragment);
     }
-
 }

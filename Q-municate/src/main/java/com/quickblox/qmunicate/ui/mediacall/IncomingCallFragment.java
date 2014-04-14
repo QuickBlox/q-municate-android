@@ -22,6 +22,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     private String userName;
 
     public interface IncomingCallClickListener {
+
         public void onAcceptClick();
 
         public void onDenyClick();
@@ -45,8 +46,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         ((ImageButton) rootView.findViewById(R.id.acceptCallButton)).setImageResource(
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
-                isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio
-        );
+                isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
         ((TextView) rootView.findViewById(R.id.nameTextView)).setText(userName);
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);
@@ -95,5 +95,4 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
             incomingCallClickListener.onAcceptClick();
         }
     }
-
 }
