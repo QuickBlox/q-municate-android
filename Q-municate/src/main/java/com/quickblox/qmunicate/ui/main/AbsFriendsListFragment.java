@@ -20,31 +20,41 @@ import com.quickblox.qmunicate.ui.webroom.RoomOccupantsLoader;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>> implements AdapterView.OnItemClickListener {
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
+public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>> implements AdapterView.OnItemClickListener, OnRefreshListener {
 
     protected ListView friendsListView;
     protected TextView friendsTitle;
     protected View friendsListViewTitle;
     protected List<Friend> friendsList;
     protected BaseAdapter friendsListAdapter;
-    protected boolean isStopFriendsListLoader;
-    protected Timer friendsListUpdateTimer;
+    protected PullToRefreshLayout pullToRefreshLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        friendsListView = (ListView) inflater.inflate(R.layout.fragment_friend_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_friend_list, container, false);
+
+        friendsListView = (ListView) rootView.findViewById(R.id.friendList);
 
         friendsListViewTitle = inflater.inflate(R.layout.view_section_title_friends_list, null);
         friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
         friendsTitle.setVisibility(View.GONE);
         friendsListView.addHeaderView(friendsListViewTitle);
 
+        pullToRefreshLayout = (PullToRefreshLayout) rootView.findViewById(R.id.pullToRefreshLayout);
+
+        ActionBarPullToRefresh.from(baseActivity)
+                .allChildrenArePullable()
+                .listener(this)
+                .setup(pullToRefreshLayout);
+
         initFriendList();
 
-        return friendsListView;
+        return rootView;
     }
 
     protected void initFriendList() {
@@ -69,28 +79,8 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
 
     protected abstract AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args);
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (isStopFriendsListLoader) {
-            stopFriendListLoader();
-        }
-    }
-
-    protected void stopFriendListLoader() {
-        isStopFriendsListLoader = false;
-        friendsListUpdateTimer.cancel();
-    }
-
-    protected void startFriendListLoaderWithTimer(final int idLoader) {
-        isStopFriendsListLoader = true;
-        friendsListUpdateTimer = new Timer();
-        friendsListUpdateTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runLoader(idLoader, AbsFriendsListLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
-                        Consts.FL_FRIENDS_PER_PAGE));
-            }
-        }, Consts.FL_START_LOAD_DELAY, Consts.FL_UPDATE_DATA_PERIOD);
+    protected void updateFriendsList(final int idLoader) {
+        runLoader(idLoader, AbsFriendsListLoader.newArguments(Consts.FL_FRIENDS_PAGE_NUM,
+                                        Consts.FL_FRIENDS_PER_PAGE));
     }
 }

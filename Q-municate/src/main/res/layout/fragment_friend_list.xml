@@ -1,6 +1,13 @@
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/friendList"
+<uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pullToRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:longClickable="true" />
+    android:layout_height="match_parent">
+
+    <ListView android:id="@+id/friendList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:longClickable="true" />
+
+</uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout>

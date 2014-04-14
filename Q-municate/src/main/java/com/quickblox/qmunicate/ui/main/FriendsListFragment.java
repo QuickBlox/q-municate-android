@@ -98,10 +98,6 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         super.onStart();
         if (!isImportInitialized) {
             addActionsAddFriends();
-        } else {
-            if (state == State.FRIENDS_LIST) {
-                startFriendListLoaderWithTimer(FriendsListLoader.ID);
-            }
         }
         initFriendList();
     }
@@ -118,6 +114,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             case FriendsListLoader.ID:
                 clearCachedFriends();
                 saveFriendsToCache(data);
+                pullToRefreshLayout.setRefreshComplete();
                 break;
             case UserListLoader.ID:
                 usersList.clear();
@@ -151,6 +148,11 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             startUserListLoader(newText);
         }
         return true;
+    }
+
+    @Override
+    public void onRefreshStarted(View view) {
+        updateFriendsList(FriendsListLoader.ID);
     }
 
     private void startUserListLoader(String newText) {
@@ -261,7 +263,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        startFriendListLoaderWithTimer(FriendsListLoader.ID);
+        updateFriendsList(FriendsListLoader.ID);
         baseActivity.hideProgress();
     }
 

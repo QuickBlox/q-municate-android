@@ -84,7 +84,6 @@ public class SettingsFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 ProfileActivity.start(baseActivity);
-                baseActivity.overridePendingTransition(R.anim.activity_enter_right, R.anim.activity_exit_left);
             }
         });
 

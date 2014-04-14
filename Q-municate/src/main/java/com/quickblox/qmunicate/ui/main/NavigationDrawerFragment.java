@@ -4,8 +4,9 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,14 +30,17 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
-import com.quickblox.qmunicate.utils.AnimationHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
+    private Resources resources;
     private DrawerLayout drawerLayout;
     private ListView drawerListView;
     private View fragmentContainerView;
@@ -53,6 +56,8 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        resources = getResources();
 
         userLearnedDrawer = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
 
@@ -71,12 +76,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         initUI(rootView);
         initListeners();
 
-        drawerListView.setAdapter(new ArrayAdapter<String>(baseActivity.getActionBar().getThemedContext(),
-                R.layout.list_item_navigation_drawer, R.id.textView, new String[]{getString(
-                R.string.nvd_title_friends), getString(R.string.nvd_title_web_room), getString(
-                R.string.nvd_title_chats), getString(R.string.nvd_title_settings), getString(
-                R.string.nvd_title_invite_friends),}
-        ));
+        NavigationDrawerAdapter navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
+                getNavigationDrawerItems());
+        drawerListView.setAdapter(navigationDrawerAdapter);
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
 
@@ -110,16 +112,27 @@ public class NavigationDrawerFragment extends BaseFragment {
         });
     }
 
+    private List<String> getNavigationDrawerItems() {
+        List<String> namesList = new ArrayList<String>();
+        namesList.add(getString(R.string.nvd_title_friends));
+        namesList.add(getString(R.string.nvd_title_web_room));
+        namesList.add(getString(R.string.nvd_title_chats));
+        namesList.add(getString(R.string.nvd_title_settings));
+        namesList.add(getString(R.string.nvd_title_invite_friends));
+        return namesList;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     private void performItemClick(final View view, final int position) {
-        drawerListView.getChildAt(currentSelectedPosition).setBackgroundColor(getResources().getColor(R.color.white));
-        AnimationHelper.changeBackgroundColor(baseActivity, view, R.color.white,
-                R.color.menu_item_background_pressed_color);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                selectItem(position);
-            }
-        }, AnimationHelper.DURATION_CHANGE_BACKGROUND_COLOR);
+            TransitionDrawable newTransition = (TransitionDrawable) baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition);
+            drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition));
+            newTransition.startTransition(300);
+            view.setBackgroundDrawable(newTransition);
+        selectItem(position);
     }
 
     private void logout() {

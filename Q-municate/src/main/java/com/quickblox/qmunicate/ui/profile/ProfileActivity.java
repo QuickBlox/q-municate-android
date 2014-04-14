@@ -58,8 +58,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     private boolean closeActionMode;
 
     public static void start(Context context) {
-        Intent intent = new Intent();
-        intent.setClass(context, ProfileActivity.class);
+        Intent intent = new Intent(context, ProfileActivity.class);
         context.startActivity(intent);
     }
 
@@ -78,17 +77,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
 
         initUsersData();
         initTextChangedListeners();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finishWithChangedTransition();
-    }
-
-    private void finishWithChangedTransition() {
-        finish();
-        overridePendingTransition(R.anim.activity_enter_left, R.anim.activity_exit_right);
     }
 
     private void initUI() {
@@ -153,7 +141,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finishWithChangedTransition();
+                navigateToParent();
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -18,8 +18,6 @@ import java.util.List;
 
 public class RoomOccupantAdapter extends BaseListAdapter<Friend> {
 
-    private final LayoutInflater layoutInflater;
-
     public RoomOccupantAdapter(BaseActivity activity, List<Friend> objects) {
         super(activity, objects);
         layoutInflater = LayoutInflater.from(activity);
