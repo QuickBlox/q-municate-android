@@ -44,6 +44,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     private State state;
     private String constraint;
     private boolean isImportInitialized;
+    private boolean inNeedToInitFriendsList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -97,7 +98,6 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
                 startFriendListLoaderWithTimer(FriendsListLoader.ID);
             }
         }
-        initFriendList();
     }
 
     @Override
@@ -198,6 +198,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     private void startGlobalSearch() {
+        inNeedToInitFriendsList = true;
         state = State.GLOBAL_LIST;
         friendsTitle.setText(R.string.frl_all_users);
         hideGlobalSearchButton();
@@ -205,7 +206,9 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     private void hideGlobalSearchButton() {
-        friendsListView.removeFooterView(globalSearchLayout);
+        if(friendsListView != null) {
+            friendsListView.removeFooterView(globalSearchLayout);
+        }
     }
 
     private void initUserList() {
@@ -267,6 +270,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             showGlobalSearchButton();
             friendsTitle.setVisibility(View.VISIBLE);
             friendsTitle.setText(R.string.frl_friends);
+            inNeedToInitFriendsList = false;
             return true;
         }
 
@@ -274,8 +278,13 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
             state = State.FRIENDS_LIST;
-            friendsTitle.setVisibility(View.GONE);
-            initFriendList();
+            if(friendsTitle != null) {
+                friendsTitle.setVisibility(View.GONE);
+            }
+            if(inNeedToInitFriendsList) {
+                inNeedToInitFriendsList = false;
+                initFriendList();
+            }
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
             return true;
         }
