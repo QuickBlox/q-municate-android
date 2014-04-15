@@ -33,6 +33,7 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
     protected List<Friend> friendsList;
     protected BaseAdapter friendsListAdapter;
     protected PullToRefreshLayout pullToRefreshLayout;
+    protected int headersAndFootersCounter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +45,7 @@ public abstract class AbsFriendsListFragment extends LoaderFragment<List<Friend>
         friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
         friendsTitle.setVisibility(View.GONE);
         friendsListView.addHeaderView(friendsListViewTitle);
+        headersAndFootersCounter++;
 
         pullToRefreshLayout = (PullToRefreshLayout) rootView.findViewById(R.id.pullToRefreshLayout);
 

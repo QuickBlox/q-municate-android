@@ -161,7 +161,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(--position);
+        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - headersAndFootersCounter);
         FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
     }
 

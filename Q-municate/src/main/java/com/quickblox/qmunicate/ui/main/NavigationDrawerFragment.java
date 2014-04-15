@@ -119,10 +119,8 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void performItemClick(final View view, final int position) {
-        TransitionDrawable newTransition = (TransitionDrawable) baseActivity.getResources().getDrawable(
-                R.drawable.menu_item_background_click_transition);
-        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(
-                baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition));
+        TransitionDrawable newTransition = (TransitionDrawable) resources.getDrawable(R.drawable.menu_item_background_click_transition);
+        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(resources.getDrawable(R.drawable.menu_item_background_click_transition));
         newTransition.startTransition(Consts.DELAY_LONG_CLICK_ANIMATION_SHORT);
         view.setBackgroundDrawable(newTransition);
         selectItem(position);
