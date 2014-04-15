@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.base;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -19,7 +18,7 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     public BaseListAdapter(BaseActivity baseActivity, List<T> objectsList) {
         this.baseActivity = baseActivity;
         this.objectsList = objectsList;
-        this.layoutInflater = (LayoutInflater) baseActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.layoutInflater = LayoutInflater.from(baseActivity);
     }
 
     @Override

@@ -22,6 +22,9 @@ public class Consts {
 
     public static final int ZERO_VALUE = 0;
 
+    public static final int DELAY_LONG_CLICK_ANIMATION_LONG = 500;
+    public static final int DELAY_LONG_CLICK_ANIMATION_SHORT = 300;
+
     public static final int CIRCL_BORDER_WIDTH = 4;
     public static final float CIRCL_SHADOW_RADIUS = 4.0f;
     public static final float CIRCL_SHADOW_DX = 0.0f;

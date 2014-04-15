@@ -30,10 +30,11 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class NavigationDrawerFragment extends BaseFragment {
@@ -113,25 +114,17 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private List<String> getNavigationDrawerItems() {
-        List<String> namesList = new ArrayList<String>();
-        namesList.add(getString(R.string.nvd_title_friends));
-        namesList.add(getString(R.string.nvd_title_web_room));
-        namesList.add(getString(R.string.nvd_title_chats));
-        namesList.add(getString(R.string.nvd_title_settings));
-        namesList.add(getString(R.string.nvd_title_invite_friends));
-        return namesList;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
+        String [] itemsArray = resources.getStringArray(R.array.nvd_items_array);
+        return Arrays.asList(itemsArray);
     }
 
     private void performItemClick(final View view, final int position) {
-            TransitionDrawable newTransition = (TransitionDrawable) baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition);
-            drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition));
-            newTransition.startTransition(300);
-            view.setBackgroundDrawable(newTransition);
+        TransitionDrawable newTransition = (TransitionDrawable) baseActivity.getResources().getDrawable(
+                R.drawable.menu_item_background_click_transition);
+        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(
+                baseActivity.getResources().getDrawable(R.drawable.menu_item_background_click_transition));
+        newTransition.startTransition(Consts.DELAY_LONG_CLICK_ANIMATION_SHORT);
+        view.setBackgroundDrawable(newTransition);
         selectItem(position);
     }
 

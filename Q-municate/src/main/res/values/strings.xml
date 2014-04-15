@@ -11,7 +11,7 @@
     <string name="acb_leave_chat_title">Leave Chat</string>
     <string name="acb_chat_details_title">Chat details</string>
 
-    // Navigation Drawler
+    // Navigation Drawer
     <string name="nvd_title_friends">Friends</string>
     <string name="nvd_title_web_room">Web room</string>
     <string name="nvd_title_chats">Chats</string>
@@ -19,6 +19,15 @@
     <string name="nvd_title_invite_friends">Invite Friends</string>
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
+
+    <string-array
+        name="nvd_items_array">
+        <item>Friends</item>
+        <item>Web room</item>
+        <item>Chats</item>
+        <item>Settings</item>
+        <item>Invite Friends</item>
+    </string-array>
 
     // Landing
     <string name="lnd_connect_with_facebook">Connect with Facebook</string>
