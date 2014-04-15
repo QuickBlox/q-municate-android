@@ -1,14 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/menu_item_background_selector">
+    android:background="@drawable/menu_item_background_default_selector" >
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/nameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="15dp"
-        android:text="Friend fullname"
         android:textColor="@drawable/menu_item_text_selector"
         android:textSize="20sp" />
 </LinearLayout>

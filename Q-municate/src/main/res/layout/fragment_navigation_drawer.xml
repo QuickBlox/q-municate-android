@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="false">
 
     <ListView
         android:id="@+id/navigationList"
@@ -15,8 +15,8 @@
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
-        android:listSelector="@color/menu_item_background_pressed_color"
-        tools:context="com.sample.app.NavigationDrawerFragment" />
+        tools:context="com.sample.app.NavigationDrawerFragment"
+        android:background="@null"/>
 
     <LinearLayout
         android:id="@id/footerLinearLayout"

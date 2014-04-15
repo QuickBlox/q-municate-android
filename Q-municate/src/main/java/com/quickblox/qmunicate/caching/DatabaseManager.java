@@ -89,6 +89,10 @@ public class DatabaseManager {
         return cursor;
     }
 
+    public static Cursor getAllFriends(Context context) {
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID  + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+    }
+
     public static void deleteAllFriends(Context context) {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }

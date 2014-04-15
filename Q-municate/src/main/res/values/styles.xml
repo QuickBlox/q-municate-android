@@ -9,7 +9,6 @@
         <item name="android:background">@color/action_bar_background_color</item>
         <item name="android:displayOptions">showTitle</item>
         <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
-        <item name="android:icon">@android:color/transparent</item>
     </style>
 
     <!-- ActionBar title text -->

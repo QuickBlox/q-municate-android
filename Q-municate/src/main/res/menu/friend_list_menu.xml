@@ -3,5 +3,6 @@
         android:id="@+id/action_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="always|collapseActionView" />
+        android:showAsAction="always|collapseActionView"
+        android:title="@string/acb_search_title"/>
 </menu>

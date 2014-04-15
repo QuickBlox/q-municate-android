@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.main;
 
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -20,13 +19,11 @@ import java.util.List;
 
 public class UserListAdapter extends BaseListAdapter<Friend> {
 
-    private final LayoutInflater inflater;
     private UserListListener listener;
 
     public UserListAdapter(BaseActivity activity, List<Friend> users, UserListListener listener) {
         super(activity, users);
         this.listener = listener;
-        inflater = LayoutInflater.from(activity);
     }
 
     @Override
@@ -35,7 +32,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
         Friend user = objectsList.get(position);
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.list_item_user, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_user, null);
             holder = createViewHolder(convertView);
             convertView.setTag(holder);
         } else {

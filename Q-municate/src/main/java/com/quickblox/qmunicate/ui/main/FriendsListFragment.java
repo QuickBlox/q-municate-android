@@ -19,7 +19,6 @@ import android.widget.SearchView;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
@@ -75,6 +74,12 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         }
     }
 
+    private void addActionsAddFriend() {
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.updateBroadcastActionList();
+    }
+
     @Override
     public Cursor runQuery(CharSequence constraint) {
         return DatabaseManager.fetchFriendsByFullname(baseActivity, constraint.toString());
@@ -93,11 +98,13 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         super.onStart();
         if (!isImportInitialized) {
             addActionsAddFriends();
-        } else {
-            if (state == State.FRIENDS_LIST) {
-                startFriendListLoaderWithTimer(FriendsListLoader.ID);
-            }
         }
+    }
+
+    private void addActionsAddFriends() {
+        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+        baseActivity.updateBroadcastActionList();
     }
 
     @Override
@@ -106,6 +113,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             case FriendsListLoader.ID:
                 clearCachedFriends();
                 saveFriendsToCache(data);
+                pullToRefreshLayout.setRefreshComplete();
                 break;
             case UserListLoader.ID:
                 usersList.clear();
@@ -113,6 +121,14 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
                 usersListAdapter.notifyDataSetChanged();
                 break;
         }
+    }
+
+    private void clearCachedFriends() {
+        DatabaseManager.deleteAllFriends(baseActivity);
+    }
+
+    private void saveFriendsToCache(List<Friend> friendsList) {
+        DatabaseManager.saveFriends(baseActivity, friendsList);
     }
 
     @Override
@@ -134,20 +150,19 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - 1);
+    public void onRefreshStarted(View view) {
+        updateFriendsList(FriendsListLoader.ID);
+    }
+
+    private void startUserListLoader(String newText) {
+        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
+                Consts.FL_FRIENDS_PER_PAGE));
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - headersAndFootersCounter);
         FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
-    }
-
-    @Override
-    protected BaseAdapter getFriendsAdapter() {
-        return new FriendsListCursorAdapter(baseActivity, baseActivity.getContentResolver().query(
-                FriendTable.CONTENT_URI, null, null, null, null));
-    }
-
-    @Override
-    protected AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
-        return new FriendsListLoader(activity);
     }
 
     @Override
@@ -159,6 +174,11 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         initGlobalSearchButton(inflater);
 
         return view;
+    }
+
+    @Override
+    protected BaseAdapter getFriendsAdapter() {
+        return new FriendsListCursorAdapter(baseActivity, getAllFriends());
     }
 
     @Override
@@ -175,26 +195,25 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         }
     }
 
-    private void addActionsAddFriend() {
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
-        baseActivity.updateBroadcastActionList();
+    @Override
+    protected AbsFriendsListLoader onFriendsLoaderCreate(Activity activity, Bundle args) {
+        return new FriendsListLoader(activity);
     }
 
-    private void addActionsAddFriends() {
-        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
-        baseActivity.updateBroadcastActionList();
+    private Cursor getAllFriends() {
+        return DatabaseManager.getAllFriends(baseActivity);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
         globalSearchLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
-        globalSearchLayout.findViewById(R.id.globalSearchButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startGlobalSearch();
-            }
-        });
+        globalSearchLayout.findViewById(R.id.globalSearchButton).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startGlobalSearch();
+                    }
+                }
+        );
     }
 
     private void startGlobalSearch() {
@@ -213,13 +232,13 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     private void initUserList() {
         usersList = new ArrayList<Friend>();
-        usersListAdapter = new UserListAdapter(baseActivity,
-                usersList, new UserListAdapter.UserListListener() {
-            @Override
-            public void onUserSelected(int position) {
-                addToFriendList(usersList.get(position));
-            }
-        }
+        usersListAdapter = new UserListAdapter(baseActivity, usersList,
+                new UserListAdapter.UserListListener() {
+                    @Override
+                    public void onUserSelected(int position) {
+                        addToFriendList(usersList.get(position));
+                    }
+                }
         );
         friendsListView.setSelector(android.R.color.transparent);
         friendsListView.setAdapter(usersListAdapter);
@@ -233,22 +252,8 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         QBAddFriendCommand.start(baseActivity, friend);
     }
 
-    private void startUserListLoader(String newText) {
-        runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
-                Consts.FL_FRIENDS_PER_PAGE));
-
-    }
-
     private void showGlobalSearchButton() {
         friendsListView.addFooterView(globalSearchLayout);
-    }
-
-    private void clearCachedFriends() {
-        DatabaseManager.deleteAllFriends(baseActivity);
-    }
-
-    private void saveFriendsToCache(List<Friend> friendsList) {
-        DatabaseManager.saveFriends(baseActivity, friendsList);
     }
 
     private void saveFriendToCache(Friend friend) {
@@ -257,7 +262,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        startFriendListLoaderWithTimer(FriendsListLoader.ID);
+        updateFriendsList(FriendsListLoader.ID);
         baseActivity.hideProgress();
     }
 

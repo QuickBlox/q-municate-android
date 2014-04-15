@@ -1,11 +1,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/menu_item_background_activated_color"
-          android:state_activated="true">
-    </item>
-    <item android:drawable="@color/menu_item_background_pressed_color"
-          android:state_pressed="true">
+        android:state_activated="true">
     </item>
     <item android:drawable="@color/white"
-          android:state_pressed="false">
+        android:state_pressed="true">
     </item>
 </selector>

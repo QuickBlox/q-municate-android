@@ -14,11 +14,11 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.webroom.RoomOccupantFragment;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -104,10 +104,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = RoomOccupantFragment.newInstance();
                 break;
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = ChatsListFragment.newInstance();
-                break;
-//                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
-//                return;
+//                fragment = ChatsListFragment.newInstance();
+//                break;
+                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
+                return;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;

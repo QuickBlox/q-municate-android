@@ -1,7 +1,5 @@
 package com.quickblox.qmunicate.ui.invitefriends;
 
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -17,7 +15,6 @@ import java.util.List;
 
 public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
-    private LayoutInflater layoutInflater;
     private CounterChangedListener counterChangedListener;
     private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;
@@ -26,7 +23,6 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
     public InviteFriendsAdapter(BaseActivity activity, List<InviteFriend> objects) {
         super(activity, objects);
-        layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         selectedFriendFromFacebook = activity.getString(R.string.inf_from_facebook);
         selectedFriendFromContacts = activity.getString(R.string.inf_from_contacts);
     }

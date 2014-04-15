@@ -86,6 +86,10 @@ public class RoomOccupantFragment extends AbsFriendsListFragment {
         return new RoomOccupantsLoader(activity, service.getQbChatHelper());
     }
 
+    @Override
+    public void onRefreshStarted(View view) {
+        updateFriendsList(RoomOccupantsLoader.ID);
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -138,7 +142,7 @@ public class RoomOccupantFragment extends AbsFriendsListFragment {
     private class JoinRoomSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
-            startFriendListLoaderWithTimer(RoomOccupantsLoader.ID);
+            updateFriendsList(RoomOccupantsLoader.ID);
         }
     }
 }

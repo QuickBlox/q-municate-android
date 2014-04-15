@@ -39,7 +39,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
-    
+
     private LinearLayout changeAvatarLinearLayout;
     private ImageView avatarImageView;
     private EditText fullNameEditText;
@@ -79,16 +79,26 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         initTextChangedListeners();
     }
 
+    private void initUI() {
+        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
+        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        emailEditText = _findViewById(R.id.emailEditText);
+        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+    }
+
     private void initUsersData() {
         try {
             String uri;
             if (getLoginType() == LoginType.FACEBOOK) {
                 changeAvatarLinearLayout.setClickable(false);
                 uri = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
-                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                ImageLoader.getInstance().displayImage(uri, avatarImageView,
+                        Consts.UIL_AVATAR_DISPLAY_OPTIONS);
             } else if (getLoginType() == LoginType.EMAIL) {
                 uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
-                ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                ImageLoader.getInstance().displayImage(uri, avatarImageView,
+                        Consts.UIL_AVATAR_DISPLAY_OPTIONS);
             }
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
@@ -101,24 +111,16 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         emailOld = emailEditText.getText().toString();
     }
 
-    private LoginType getLoginType() {
-        int defValue = LoginType.EMAIL.ordinal();
-        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
-        return LoginType.values()[value];
-    }
-
     private void initTextChangedListeners() {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
         emailEditText.addTextChangedListener(textWatcherListener);
     }
 
-    private void initUI() {
-        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
-        avatarImageView = _findViewById(R.id.avatarImageView);
-        fullNameEditText = _findViewById(R.id.fullNameEditText);
-        emailEditText = _findViewById(R.id.emailEditText);
-        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+    private LoginType getLoginType() {
+        int defValue = LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginType.values()[value];
     }
 
     @Override
@@ -181,6 +183,11 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         initChangingEditText(emailEditText);
     }
 
+    @Override
+    public void onGotImageFile(File imageFile) {
+        QBUpdateUserCommand.start(this, qbUser, imageFile);
+    }
+
     private void updateCurrentUserData() {
         avatarBitmapCurrent = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
         fullnameCurrent = fullNameEditText.getText().toString();
@@ -202,7 +209,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     }
 
     private void saveChanges(final Bitmap avatar, final String fullname,
-                             final String email) throws IOException {
+            final String email) throws IOException {
         if (isUserDataChanges(fullname, email)) {
             showProgress();
             qbUser.setFullName(fullname);
@@ -218,11 +225,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
 
     private boolean isAvatarChanges(Bitmap avatar) {
         return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
-    }
-
-    @Override
-    public void onGotImageFile(File imageFile) {
-        QBUpdateUserCommand.start(this, qbUser, imageFile);
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {
