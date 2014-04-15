@@ -206,7 +206,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     private void hideGlobalSearchButton() {
-        if(friendsListView != null) {
+        if (friendsListView != null) {
             friendsListView.removeFooterView(globalSearchLayout);
         }
     }
@@ -278,10 +278,10 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
             state = State.FRIENDS_LIST;
-            if(friendsTitle != null) {
+            if (friendsTitle != null) {
                 friendsTitle.setVisibility(View.GONE);
             }
-            if(inNeedToInitFriendsList) {
+            if (inNeedToInitFriendsList) {
                 inNeedToInitFriendsList = false;
                 initFriendList();
             }
