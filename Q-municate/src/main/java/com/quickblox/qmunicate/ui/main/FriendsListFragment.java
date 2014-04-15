@@ -43,6 +43,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     private State state;
     private String constraint;
     private boolean isImportInitialized;
+    private boolean inNeedToInitFriendsList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -98,7 +99,6 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
         if (!isImportInitialized) {
             addActionsAddFriends();
         }
-        initFriendList();
     }
 
     private void addActionsAddFriends() {
@@ -217,6 +217,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     private void startGlobalSearch() {
+        inNeedToInitFriendsList = true;
         state = State.GLOBAL_LIST;
         friendsTitle.setText(R.string.frl_all_users);
         hideGlobalSearchButton();
@@ -224,7 +225,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     private void hideGlobalSearchButton() {
-        if (globalSearchLayout != null) {
+        if (friendsListView != null) {
             friendsListView.removeFooterView(globalSearchLayout);
         }
     }
@@ -274,6 +275,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             showGlobalSearchButton();
             friendsTitle.setVisibility(View.VISIBLE);
             friendsTitle.setText(R.string.frl_friends);
+            inNeedToInitFriendsList = false;
             return true;
         }
 
@@ -284,7 +286,10 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             if (friendsTitle != null) {
                 friendsTitle.setVisibility(View.GONE);
             }
-            initFriendList();
+            if (inNeedToInitFriendsList) {
+                inNeedToInitFriendsList = false;
+                initFriendList();
+            }
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
             return true;
         }
