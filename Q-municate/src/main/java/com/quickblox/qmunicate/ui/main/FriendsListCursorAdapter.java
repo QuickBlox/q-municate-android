@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,9 +13,12 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 public class FriendsListCursorAdapter extends BaseCursorAdapter {
+
+    private String searchCharacters;
 
     public FriendsListCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
@@ -62,6 +66,14 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         } else {
             holder.onlineImageView.setVisibility(View.INVISIBLE);
         }
+
+        if (!TextUtils.isEmpty(searchCharacters)) {
+            TextViewHelper.changeTextColorView(context, holder.fullnameTextView, searchCharacters);
+        }
+    }
+
+    public void setSearchCharacters(String searchCharacters) {
+        this.searchCharacters = searchCharacters;
     }
 
     private static class ViewHolder {
