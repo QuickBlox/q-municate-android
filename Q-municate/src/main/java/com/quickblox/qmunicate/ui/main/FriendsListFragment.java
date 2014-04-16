@@ -143,6 +143,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
             FriendsListCursorAdapter friendListCursorAdapter = (FriendsListCursorAdapter) friendsListAdapter;
             friendListCursorAdapter.setFilterQueryProvider(this);
             friendListCursorAdapter.getFilter().filter(newText);
+            friendListCursorAdapter.setSearchCharacters(newText);
         } else {
             startUserListLoader(newText);
         }
@@ -157,6 +158,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     private void startUserListLoader(String newText) {
         runLoader(UserListLoader.ID, UserListLoader.newArguments(newText, Consts.FL_FRIENDS_PAGE_NUM,
                 Consts.FL_FRIENDS_PER_PAGE));
+        usersListAdapter.setSearchCharacters(newText);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -13,6 +14,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class UserListAdapter extends BaseListAdapter<Friend> {
 
     private UserListListener listener;
+    private String searchCharacters;
 
     public UserListAdapter(BaseActivity activity, List<Friend> users, UserListListener listener) {
         super(activity, users);
@@ -63,7 +66,15 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             holder.addFriendButton.setVisibility(View.VISIBLE);
         }
 
+        if (!TextUtils.isEmpty(searchCharacters)) {
+            TextViewHelper.changeTextColorView(baseActivity, holder.fullnameTextView, searchCharacters);
+        }
+
         return convertView;
+    }
+
+    public void setSearchCharacters(String searchCharacters) {
+        this.searchCharacters = searchCharacters;
     }
 
     private ViewHolder createViewHolder(View view) {
