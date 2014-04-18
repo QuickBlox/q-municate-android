@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.quickblox.module.videochat.model.objects.CallType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
@@ -16,7 +15,7 @@ import com.quickblox.qmunicate.utils.Consts;
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
-    private CallType callType;
+    private int callType;
 
     private IncomingCallClickListener incomingCallClickListener;
     private String userName;
@@ -28,10 +27,10 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         public void onDenyClick();
     }
 
-    public static IncomingCallFragment newInstance(CallType callType, String userName) {
+    public static IncomingCallFragment newInstance(int callType, String userName) {
         IncomingCallFragment fragment = new IncomingCallFragment();
         Bundle args = new Bundle();
-        args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
+        args.putInt(Consts.CALL_TYPE_EXTRA, callType);
         args.putSerializable(Consts.USER_NAME, userName);
         fragment.setArguments(args);
         return fragment;
@@ -40,9 +39,9 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_popup_call, container, false);
-        callType = (CallType) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
+        callType = getArguments().getInt(Consts.CALL_TYPE_EXTRA, 1);
         userName = getArguments().getString(Consts.USER_NAME, "");
-        boolean isVideoCall = CallType.VIDEO_AUDIO.equals(callType);
+        boolean isVideoCall = CallActivity.VIDEO_AUDIO_CALL == callType;
         ((ImageButton) rootView.findViewById(R.id.acceptCallButton)).setImageResource(
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(

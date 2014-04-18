@@ -9,9 +9,8 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.RoomListener;
 import com.quickblox.module.chat.xmpp.QBPrivateChat;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat.model.objects.CallType;
+import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
-import com.quickblox.module.videochat_webrtc.SignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
@@ -26,14 +25,14 @@ public class QBChatHelper implements RoomListener {
 
     private Lo lo = new Lo(this);
     private QBPrivateChat privateChat;
-    private SignalingChannel signalingChannel;
+    private ISignalingChannel signalingChannel;
     private Context context;
     private ISignalingChannel.MessageObserver messageObserver = new SignalingMessageObserver();
 
     private QBChatRoom joinedRoom;
     private RoomListener roomListener;
 
-    public SignalingChannel getSignalingChannel() {
+    public ISignalingChannel getSignalingChannel() {
         return signalingChannel;
     }
 
@@ -59,7 +58,7 @@ public class QBChatHelper implements RoomListener {
     public void init(Context context) {
         this.context = context;
         privateChat = QBChatService.getInstance().getPrivateChatInstance();
-        signalingChannel = new SignalingChannel(privateChat);
+        signalingChannel = new ExtensionSignalingChannel(privateChat);
         signalingChannel.addMessageObserver(messageObserver);
     }
 
@@ -75,8 +74,9 @@ public class QBChatHelper implements RoomListener {
     private class SignalingMessageObserver implements ISignalingChannel.MessageObserver {
 
         @Override
-        public void onCall(QBUser user, CallType callType, SessionDescription sessionDescription,
-                String sessionId, Map<String, String> params) {
+        public void onCall(QBUser user, int callType, SessionDescription sessionDescription, String sessionId,
+                ISignalingChannel.PLATFORM platform,
+                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation, Map<String, String> params) {
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
                     sessionDescription);
             lo.g("onCall" + callType);
@@ -91,8 +91,16 @@ public class QBChatHelper implements RoomListener {
         }
 
         @Override
-        public void onAccepted(QBUser user, SessionDescription sessionDescription, String session,
-                Map<String, String> params) {
+        public void onAccepted(QBUser user, SessionDescription sessionDescription, String sessionId,
+                ISignalingChannel.PLATFORM platform,
+                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation, Map<String, String> params) {
+
+        }
+
+        @Override
+        public void onParametersChanged(QBUser qbUser, String s,
+                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation,
+                Map<String, String> stringStringMap) {
 
         }
 

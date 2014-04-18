@@ -84,7 +84,13 @@ public class QBAuthHelper {
         return user;
     }
 
-    private void loginChat(QBUser user) throws XMPPException {
-        QBChatService.getInstance().loginWithUser(user);
+    private void loginChat(QBUser user) throws QBResponseException {
+        try {
+            QBChatService.getInstance().loginWithUser(user);
+        } catch (QBResponseException e) {
+            if (!com.quickblox.module.chat.Consts.ALREADY_LOGGED_IN.equals(e.getLocalizedMessage())) {
+                throw e;
+            }
+        }
     }
 }

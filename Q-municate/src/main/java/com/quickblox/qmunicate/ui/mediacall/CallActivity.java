@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat.model.objects.CallType;
-import com.quickblox.module.videochat_webrtc.SignalingChannel;
+import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -21,13 +21,16 @@ import com.quickblox.qmunicate.utils.Consts;
 public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();
+    private static final int AUDIO_CALL = 2;
     private QBUser opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
-    private CallType call_type;
-    private SignalingChannel signalingChannel;
+    private int call_type;
+    private ISignalingChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
     private String sessionId;
+
+    public static final int VIDEO_AUDIO_CALL = 1;
 
     public static void start(Context context, QBUser friend, CallType callType) {
         Intent intent = new Intent(context, CallActivity.class);
@@ -110,7 +113,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private void parseIntentExtras(Bundle extras) {
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
-        call_type = (CallType) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
+        call_type = extras.getInt(Consts.CALL_TYPE_EXTRA, 1);
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
         sessionId = extras.getString(WebRTC.SESSION_ID_EXTENSION, "");
@@ -128,12 +131,11 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     private void showOutgoingFragment() {
         playOutgoingRingtone();
-        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(
-                call_type) ? new VideoCallFragment() : new VoiceCallFragment();
+        OutgoingCallFragment outgoingCallFragment = (VIDEO_AUDIO_CALL == call_type) ? new VideoCallFragment() : new VoiceCallFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, call_direction_type);
         bundle.putSerializable(Consts.USER, opponent);
-        bundle.putSerializable(Consts.CALL_TYPE_EXTRA, call_type);
+        bundle.putInt(Consts.CALL_TYPE_EXTRA, call_type);
         outgoingCallFragment.setArguments(bundle);
         setCurrentFragment(outgoingCallFragment);
     }
@@ -151,11 +153,10 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
-            CallType callType, String sessionId) {
+            int callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId);
-        OutgoingCallFragment outgoingCallFragment = CallType.VIDEO_AUDIO.equals(
-                call_type) ? new VideoCallFragment() : new VoiceCallFragment();
+        OutgoingCallFragment outgoingCallFragment = (VIDEO_AUDIO_CALL == call_type) ? new VideoCallFragment() : new VoiceCallFragment();
         outgoingCallFragment.setArguments(bundle);
         setCurrentFragment(outgoingCallFragment);
     }

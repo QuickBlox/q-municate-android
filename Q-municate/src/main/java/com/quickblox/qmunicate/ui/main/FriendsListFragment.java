@@ -76,7 +76,8 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     private void addActionsAddFriend() {
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(
+                baseActivity));
         baseActivity.updateBroadcastActionList();
     }
 
@@ -171,7 +172,8 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
+                false);
 
         initGlobalSearchButton(inflater);
 
