@@ -89,6 +89,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         title = getString(R.string.nvd_title_friends);
         state = State.FRIENDS_LIST;
     }
