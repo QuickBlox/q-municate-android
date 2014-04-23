@@ -152,6 +152,12 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateFriendsList(FriendsListLoader.ID);
+    }
+
+    @Override
     public void onRefreshStarted(View view) {
         updateFriendsList(FriendsListLoader.ID);
     }
@@ -172,8 +178,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
-                false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
 
         initGlobalSearchButton(inflater);
 
