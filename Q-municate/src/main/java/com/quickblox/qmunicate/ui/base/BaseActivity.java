@@ -110,7 +110,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void hideProgress() {
-        if (progress != null) {
+        if (progress != null && progress.isVisible()) {
             progress.dismissAllowingStateLoss();
         }
     }
