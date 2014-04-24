@@ -29,8 +29,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
     private static final int ID_WEB_ROOM_FRAGMENT = 1;
     private static final int ID_CHATS_LIST_FRAGMENT = 2;
-    private static final int ID_SETTINGS_FRAGMENT = 3;
-    private static final int ID_INVITE_FRIENDS_FRAGMENT = 4;
+    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
+    private static final int ID_SETTINGS_FRAGMENT = 4;
 
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
@@ -108,11 +108,11 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 //                break;
                 DialogUtils.show(this, getResources().getString(R.string.comming_soon));
                 return;
-            case ID_SETTINGS_FRAGMENT:
-                fragment = SettingsFragment.newInstance();
-                break;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();
+                break;
+            case ID_SETTINGS_FRAGMENT:
+                fragment = SettingsFragment.newInstance();
                 break;
         }
         setCurrentFragment(fragment);
