@@ -8,18 +8,17 @@ import com.quickblox.module.chat.QBChatRoom;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.RoomListener;
 import com.quickblox.module.chat.xmpp.QBPrivateChat;
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
+import com.quickblox.module.videochat_webrtc.model.CallConfig;
+import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
+import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 
-import org.webrtc.SessionDescription;
-
 import java.util.List;
-import java.util.Map;
 
 public class QBChatHelper implements RoomListener {
 
@@ -27,7 +26,7 @@ public class QBChatHelper implements RoomListener {
     private QBPrivateChat privateChat;
     private ISignalingChannel signalingChannel;
     private Context context;
-    private ISignalingChannel.MessageObserver messageObserver = new SignalingMessageObserver();
+    private ISignalingChannel.MessageHandler messageObserver = new SignalingMessageHandler();
 
     private QBChatRoom joinedRoom;
     private RoomListener roomListener;
@@ -51,7 +50,7 @@ public class QBChatHelper implements RoomListener {
 
     @Override
     public void onError(String s) {
-        lo.g("on Error when join" + s.toString());
+        lo.g("on Error when join" + s);
         roomListener.onError(s);
     }
 
@@ -59,7 +58,7 @@ public class QBChatHelper implements RoomListener {
         this.context = context;
         privateChat = QBChatService.getInstance().getPrivateChatInstance();
         signalingChannel = new ExtensionSignalingChannel(privateChat);
-        signalingChannel.addMessageObserver(messageObserver);
+        signalingChannel.addMessageHandler(messageObserver);
     }
 
     public QBChatRoom getJoinedRoom() {
@@ -71,47 +70,24 @@ public class QBChatHelper implements RoomListener {
         QBChatService.getInstance().joinRoom(name, this);
     }
 
-    private class SignalingMessageObserver implements ISignalingChannel.MessageObserver {
+    private class SignalingMessageHandler extends MessageHandlerImpl {
 
         @Override
-        public void onCall(QBUser user, int callType, SessionDescription sessionDescription, String sessionId,
-                ISignalingChannel.PLATFORM platform,
-                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation, Map<String, String> params) {
+        public void onCall(ConnectionConfig connectionConfig) {
+            CallConfig callConfig = (CallConfig) connectionConfig;
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
-                    sessionDescription);
-            lo.g("onCall" + callType);
+                    callConfig.getSessionDescription());
+            lo.g("onCall" + callConfig.getCallStreamType().toString());
             Intent intent = new Intent(context, CallActivity.class);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
-            intent.putExtra(Consts.CALL_TYPE_EXTRA, callType);
-            intent.putExtra(WebRTC.SESSION_ID_EXTENSION, sessionId);
-            intent.putExtra(Consts.USER, user);
+            intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
+            intent.putExtra(WebRTC.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());
+            intent.putExtra(Consts.CALL_TYPE_EXTRA, callConfig.getCallStreamType());
+            intent.putExtra(WebRTC.SESSION_ID_EXTENSION, callConfig.getConnectionSession());
+            intent.putExtra(Consts.USER, callConfig.getParticipant());
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(intent);
-        }
-
-        @Override
-        public void onAccepted(QBUser user, SessionDescription sessionDescription, String sessionId,
-                ISignalingChannel.PLATFORM platform,
-                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation, Map<String, String> params) {
-
-        }
-
-        @Override
-        public void onParametersChanged(QBUser qbUser, String s,
-                ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation,
-                Map<String, String> stringStringMap) {
-
-        }
-
-        @Override
-        public void onStop(QBUser user, ISignalingChannel.STOP_REASON reason, String session) {
-
-        }
-
-        @Override
-        public void onRejected(QBUser user, String session) {
-
         }
 
         @Override

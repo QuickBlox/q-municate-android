@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat.model.objects.CallType;
+import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -123,19 +123,19 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(friend, CallType.VIDEO_AUDIO);
+        callToUser(friend, WebRTC.MEDIA_STREAM.VIDEO);
     }
 
     public void voiceCallClickListener(View view) {
 
-        callToUser(friend, CallType.AUDIO);
+        callToUser(friend, WebRTC.MEDIA_STREAM.AUDIO);
     }
 
     public void chatClickListener(View view) {
-//        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
+        //        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
-    private void callToUser(Friend friend, CallType callType) {
+    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
             QBUser qbUser = new QBUser(friend.getId());
             qbUser.setFullName(friend.getFullname());

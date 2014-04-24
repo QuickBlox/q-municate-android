@@ -4,13 +4,10 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
-import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.qmunicate.ui.mediacall.TimeUpdater;
 import com.quickblox.qmunicate.utils.Consts;
-
-import org.webrtc.MediaConstraints;
 
 public class VoiceCallFragment extends OutgoingCallFragment {
 
@@ -51,20 +48,12 @@ public class VoiceCallFragment extends OutgoingCallFragment {
     }
 
     @Override
-    protected MediaConstraints getMediaConstraints() {
-        MediaConstraints sdpMediaConstraints = new MediaConstraints();
-        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(WebRTC.RECEIVE_AUDIO,
-                WebRTC.TRUE_FLAG));
-        return sdpMediaConstraints;
-    }
-
-    @Override
     protected void onConnectionClosed() {
         super.onConnectionClosed();
         stopTimer();
     }
 
-    private void muteSound(){
+    private void muteSound() {
         if (qbVideoChat != null) {
             qbVideoChat.muteSound(!qbVideoChat.isSoundMute());
         }

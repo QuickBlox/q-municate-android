@@ -16,7 +16,10 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.ISignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.WebRTC;
+import com.quickblox.module.videochat_webrtc.model.CallConfig;
+import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
+import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.service.QBService;
@@ -25,16 +28,14 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
-import org.webrtc.MediaConstraints;
 import org.webrtc.SessionDescription;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, ISignalingChannel.MessageObserver {
+public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();
     protected QBVideoChat qbVideoChat;
@@ -43,11 +44,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private SessionDescription remoteSessionDescription;
     private boolean bounded;
     private QBService service;
-    private int call_type;
+    private WebRTC.MEDIA_STREAM call_type;
     private Timer callTimer;
     private ServiceConnection serviceConnection = new ChetServiceConnection();
     private OutgoingCallListener outgoingCallListener;
     private String sessionId;
+    private ISignalingChannel.MessageHandler signalingMessageHandler;
+    private ISignalingChannel.PLATFORM remotePlatform;
+    private ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
 
     public interface OutgoingCallListener {
 
@@ -64,14 +68,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     protected abstract int getContentView();
 
-    protected abstract MediaConstraints getMediaConstraints();
-
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
-            Consts.CALL_DIRECTION_TYPE type, int callType, String sessionId) {
+            Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
+            ISignalingChannel.PLATFORM platform,
+            ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.USER, user);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
-        args.putInt(Consts.CALL_TYPE_EXTRA, callType);
+        args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
+        args.putSerializable(WebRTC.ORIENTATION_EXTENSION, deviceOrientation);
+        args.putSerializable(WebRTC.PLATFORM_EXTENSION, platform);
         args.putParcelable(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
         args.putString(WebRTC.SESSION_ID_EXTENSION, sessionId);
         return args;
@@ -106,61 +112,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     @Override
-    public void onCall(QBUser user, int callType, SessionDescription sessionDescription, String sessionId,
-            final ISignalingChannel.PLATFORM platform,
-            final ISignalingChannel.PLATFORM_DEVICE_ORIENTATION orientation, Map<String, String> params) {
-
-    }
-
-    @Override
-    public void onAccepted(QBUser user, SessionDescription sessionDescription, String sessionId,
-            final ISignalingChannel.PLATFORM platform,
-            final ISignalingChannel.PLATFORM_DEVICE_ORIENTATION orientation, Map<String, String> params) {
-        cancelCallTimer();
-        if (isExistActivity()) {
-            getBaseActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    DialogUtils.show(getActivity(), "accepted");
-                }
-            });
-        }
-        onConnectionEstablished();
-    }
-
-    @Override
-    public void onParametersChanged(QBUser qbUser, String s,
-            ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation,
-            Map<String, String> stringStringMap) {
-    }
-
-    @Override
-    public void onStop(QBUser user, ISignalingChannel.STOP_REASON reason, String sessionId) {
-        stopCall(false, STOP_TYPE.CLOSED);
-    }
-
-    @Override
-    public void onRejected(QBUser user, String sessionId) {
-        cancelCallTimer();
-        if (isExistActivity()) {
-            getBaseActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    DialogUtils.show(getActivity(), "Rejected");
-                    stopCall(false, STOP_TYPE.REJECTED);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onError(List<String> errors) {
-        if (isExistActivity()) {
-            ErrorUtils.showError(getActivity(), errors.toString());
-        }
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         if (qbVideoChat != null) {
@@ -179,7 +130,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (QBUser) getArguments().getSerializable(Consts.USER);
-        call_type = getArguments().getInt(Consts.CALL_TYPE_EXTRA);
+        call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
+        remotePlatform = (ISignalingChannel.PLATFORM) getArguments().getSerializable(
+                WebRTC.PLATFORM_EXTENSION);
+        deviceOrientation = (ISignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
+                WebRTC.ORIENTATION_EXTENSION);
         sessionId = getArguments().getString(WebRTC.SESSION_ID_EXTENSION, "");
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
         rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
@@ -211,17 +166,22 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     public void initChat(ISignalingChannel signalingChannel) {
-        MediaConstraints mediaConstraints = getMediaConstraints();
         VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
-        qbVideoChat = new QBVideoChat(getActivity(), mediaConstraints, signalingChannel, videoView);
-        signalingChannel.addMessageObserver(this);
+        qbVideoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
+        qbVideoChat.setMediaCaptureCallback(new MediaCapturerHandler());
+        signalingMessageHandler = new VideoChatMessageHandler();
+        signalingChannel.addMessageHandler(signalingMessageHandler);
         if (remoteSessionDescription != null) {
             qbVideoChat.setRemoteSessionDescription(remoteSessionDescription);
         }
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
             startCall();
         } else {
-            qbVideoChat.accept(opponent, sessionId);
+            CallConfig callConfig = new CallConfig(opponent, sessionId, deviceOrientation);
+            callConfig.setCallStreamType(call_type);
+            callConfig.setSessionDescription(remoteSessionDescription);
+            callConfig.setDevicePlatform(remotePlatform);
+            qbVideoChat.accept(callConfig);
             onConnectionEstablished();
         }
     }
@@ -300,6 +260,71 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             initChat(signalingChannel);
         } else if (isExistActivity()) {
             ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
+        }
+    }
+
+    private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {
+
+        @Override
+        public void onCaptureFail(WebRTC.MEDIA_STREAM media_stream, String s) {
+            if (isExistActivity()) {
+                ErrorUtils.showError(getActivity(), s);
+            }
+        }
+
+        @Override
+        public void onCaptureSuccess(WebRTC.MEDIA_STREAM media_stream) {
+
+        }
+    }
+
+    private class VideoChatMessageHandler extends MessageHandlerImpl {
+
+        @Override
+        public void onAccepted(ConnectionConfig connectionConfig) {
+            cancelCallTimer();
+            if (isExistActivity()) {
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DialogUtils.show(getActivity(), "accepted");
+                    }
+                });
+            }
+            onConnectionEstablished();
+        }
+
+        @Override
+        public void onStop(ConnectionConfig connectionConfig) {
+            stopCall(false, STOP_TYPE.CLOSED);
+        }
+
+        @Override
+        public void onRejected(ConnectionConfig connectionConfig) {
+            cancelCallTimer();
+            if (isExistActivity()) {
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DialogUtils.show(getActivity(), "Rejected");
+                        stopCall(false, STOP_TYPE.REJECTED);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onClosed(String error) {
+            if (isExistActivity()) {
+                ErrorUtils.showError(getActivity(), error);
+            }
+        }
+
+        @Override
+        public void onError(List<String> errors) {
+            if (isExistActivity()) {
+                ErrorUtils.showError(getActivity(), errors.toString());
+            }
         }
     }
 

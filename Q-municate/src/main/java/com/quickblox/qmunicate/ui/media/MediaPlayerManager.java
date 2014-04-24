@@ -9,6 +9,9 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class MediaPlayerManager {
+
+    public static final String DEFAULT_RINGTONE = "defaultRingtone.ogg";
+
     private static final int INVALID_SOURCE = R.string.error_playing_ringtone;
 
     private MediaPlayer player;
@@ -27,14 +30,16 @@ public class MediaPlayerManager {
     }
 
     public void playDefaultRingTone() {
-        UriSoundResource uriSoundResource = new UriSoundResource(Settings.System.DEFAULT_RINGTONE_URI, context);
+        UriSoundResource uriSoundResource = new UriSoundResource(Settings.System.DEFAULT_RINGTONE_URI,
+                context);
         playResource(uriSoundResource, true, true);
     }
 
     public void setMaxVolume() {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(
+                AudioManager.STREAM_MUSIC), 0);
     }
 
     public void returnOriginalVolume() {
@@ -61,7 +66,7 @@ public class MediaPlayerManager {
     }
 
     private void playDefault() {
-        AssetsSoundResource assetsSoundResource = new AssetsSoundResource("defaultRingtone.ogg", context);
+        AssetsSoundResource assetsSoundResource = new AssetsSoundResource(DEFAULT_RINGTONE, context);
         playResource(assetsSoundResource, true, false);
     }
 
