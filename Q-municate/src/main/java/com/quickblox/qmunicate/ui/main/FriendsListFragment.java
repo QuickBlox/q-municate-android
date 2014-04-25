@@ -76,8 +76,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
 
     private void addActionsAddFriend() {
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new BaseActivity.FailAction(
-                baseActivity));
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
     }
 

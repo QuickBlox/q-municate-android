@@ -42,6 +42,7 @@ public abstract class BaseActivity extends Activity {
     protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
+    protected FailAction failAction;
     private boolean doubleBackToExitPressedOnce;
     private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
@@ -52,12 +53,17 @@ public abstract class BaseActivity extends Activity {
 
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
 
+    public FailAction getFailAction() {
+        return failAction;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
+        failAction = new FailAction();
     }
 
     @Override
@@ -110,7 +116,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void hideProgress() {
-        if (progress != null && progress.isVisible()) {
+        if (progress != null) {
             progress.dismissAllowingStateLoss();
         }
     }
@@ -187,19 +193,13 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    public static class FailAction implements Command {
-
-        private BaseActivity activity;
-
-        public FailAction(BaseActivity activity) {
-            this.activity = activity;
-        }
+    public class FailAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            ErrorUtils.showError(activity, e);
-            activity.hideProgress();
+            ErrorUtils.showError(BaseActivity.this, e);
+            hideProgress();
         }
     }
 
@@ -231,5 +231,4 @@ public abstract class BaseActivity extends Activity {
 
         }
     }
-
 }

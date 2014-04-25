@@ -7,8 +7,6 @@ import com.quickblox.qmunicate.R;
 
 public class UriCreator {
 
-    private static final String SERVER_ADDRESS = App.getInstance().getResources().getString(
-            R.string.api_quickblox_domain);
     private static final String TEMPLATE = "http://%s/blobs/%s.xml?token=%s";
     private static final String HTTP = "http://";
 
@@ -16,7 +14,7 @@ public class UriCreator {
         if (uid == null) {
             return null;
         }
-        return String.format(TEMPLATE, SERVER_ADDRESS, uid, QBAuth.getBaseService().getToken());
+        return String.format(TEMPLATE, Consts.QB_DOMAIN, uid, QBAuth.getBaseService().getToken());
     }
 
     public static String cutUid(String website) {
