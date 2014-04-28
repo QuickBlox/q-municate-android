@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/headerImageView"
         android:layout_centerHorizontal="true"
-        android:padding="20dp"
+        android:paddingTop="5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/title" />
 
@@ -99,7 +99,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:paddingBottom="10dp"
         android:textColor="@color/gray"
         android:textSize="8sp" />
 </RelativeLayout>
