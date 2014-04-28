@@ -42,12 +42,14 @@ public class QBAuthHelper {
 
     public QBUser signup(QBUser user, File file) throws QBResponseException, XMPPException {
         QBAuth.createSession();
+        String password = user.getPassword();
         this.user = QBUsers.signUpSignInTask(user);
         if (null != file) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
             this.user.setWebsite(qbFile.getUid());
             this.user = QBUsers.updateUser(user);
         }
+        this.user.setPassword(password);
         loginChat(this.user);
 
         return user;
