@@ -163,7 +163,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, new BaseActivity.FailAction(baseActivity));
+        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
     }

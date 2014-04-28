@@ -60,7 +60,7 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         imageHelper = new ImageHelper(this);
 
         addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
-        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
     }
 
     @Override

@@ -23,7 +23,7 @@
     <string-array
         name="nvd_items_array">
         <item>Friends</item>
-        <item>Web room</item>
+        <!--<item>Web room</item>-->
         <item>Chats</item>
         <item>Invite Friends</item>
         <item>Settings</item>
@@ -156,9 +156,6 @@
     //Calls
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
-
-    // QuickBlox
-    <string name="api_quickblox_domain">api.quickblox.com</string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>

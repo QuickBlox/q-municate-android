@@ -70,8 +70,8 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         phoneView = _findViewById(R.id.phoneView);
 
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
-        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, new FailAction(this));
-        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
 
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);

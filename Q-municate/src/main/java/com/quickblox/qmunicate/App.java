@@ -8,6 +8,7 @@ import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGener
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.quickblox.core.QBSettings;
+import com.quickblox.core.TransferProtocol;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
@@ -76,6 +77,14 @@ public class App extends Application {
     private void initAppication() {
         instance = this;
         initImageLoader(this);
+
+        // TODO temp
+        QBSettings.getInstance().setServerApiDomain("api.stage.quickblox.com");
+        QBSettings.getInstance().setChatServerDomain("chatstage.quickblox.com");
+        QBSettings.getInstance().setContentBucketName("blobs-test-oz");
+        QBSettings.getInstance().setTransferProtocol(TransferProtocol.HTTP);
+        //
+
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY, Consts.QB_AUTH_SECRET);
         friends = new ArrayList<Friend>();
         prefsHelper = new PrefsHelper(this);

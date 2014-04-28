@@ -27,10 +27,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private static final int ID_WEB_ROOM_FRAGMENT = 1;
-    private static final int ID_CHATS_LIST_FRAGMENT = 2;
-    private static final int ID_INVITE_FRIENDS_FRAGMENT = 3;
-    private static final int ID_SETTINGS_FRAGMENT = 4;
+//    private static final int ID_WEB_ROOM_FRAGMENT = 1;
+    private static final int ID_CHATS_LIST_FRAGMENT = 1;
+    private static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
+    private static final int ID_SETTINGS_FRAGMENT = 3;
 
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
@@ -100,9 +100,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendsListFragment.newInstance();
                 break;
-            case ID_WEB_ROOM_FRAGMENT:
-                fragment = RoomOccupantFragment.newInstance();
-                break;
+//            case ID_WEB_ROOM_FRAGMENT:
+//                fragment = RoomOccupantFragment.newInstance();
+//                break;
             case ID_CHATS_LIST_FRAGMENT:
 //                fragment = ChatsListFragment.newInstance();
 //                break;

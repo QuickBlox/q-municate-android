@@ -14,6 +14,7 @@ public abstract class BaseFragment extends Fragment {
 
     protected App app;
     protected BaseActivity baseActivity;
+    protected BaseActivity.FailAction failAction;
     protected String title;
 
     public String getTitle() {
@@ -24,6 +25,7 @@ public abstract class BaseFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         baseActivity = (BaseActivity) getActivity();
+        failAction = baseActivity.getFailAction();
         app = App.getInstance();
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);

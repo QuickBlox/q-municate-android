@@ -59,9 +59,9 @@ public class LoginActivity extends BaseActivity {
         rememberMe.setChecked(isRememberMe);
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
-        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, failAction);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
     }

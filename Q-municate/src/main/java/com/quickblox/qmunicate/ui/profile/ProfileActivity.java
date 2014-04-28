@@ -73,7 +73,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         imageHelper = new ImageHelper(this);
 
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, failAction);
 
         initUsersData();
         initTextChangedListeners();

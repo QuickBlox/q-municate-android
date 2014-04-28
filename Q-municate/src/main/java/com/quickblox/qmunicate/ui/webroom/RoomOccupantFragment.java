@@ -45,8 +45,7 @@ public class RoomOccupantFragment extends AbsFriendsListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         baseActivity.addAction(QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, new JoinRoomSuccessAction());
-        baseActivity.addAction(QBServiceConsts.JOIN_ROOM_FAIL_ACTION, new BaseActivity.FailAction(
-                baseActivity));
+        baseActivity.addAction(QBServiceConsts.JOIN_ROOM_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
         QBJoinRoomCommand.start(baseActivity);
     }

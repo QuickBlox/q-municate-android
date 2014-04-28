@@ -37,7 +37,12 @@ public class QBUpdateUserCommand extends ServiceCommand {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
         user.setOldPassword(user.getPassword());
-        qbAuthHelper.updateUser(user, file);
+
+        if(file == null) {
+            qbAuthHelper.updateUser(user);
+        } else {
+            qbAuthHelper.updateUser(user, file);
+        }
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);

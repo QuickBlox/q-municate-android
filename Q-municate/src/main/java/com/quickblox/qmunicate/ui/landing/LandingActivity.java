@@ -41,7 +41,7 @@ public class LandingActivity extends BaseActivity {
         useDoubleBackPressed = true;
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new FailAction(this));
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
