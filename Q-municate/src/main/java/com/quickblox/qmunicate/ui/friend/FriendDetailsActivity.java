@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.ui.friend;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,11 +18,10 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.LoaderActivity;
+import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
@@ -31,15 +29,9 @@ import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.UriCreator;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-public class FriendDetailsActivity extends LoaderActivity<Friend> {
+public class FriendDetailsActivity extends BaseActivity {
 
     public static final String EXTRA_FRIEND = "Friend";
-
-    private static final int START_DELAY = 0;
-    private static final int UPDATE_DATA_PERIOD = 300000;
 
     private ImageView avatarImageView;
     private TextView nameTextView;
@@ -49,7 +41,6 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
     private View phoneView;
 
     private Friend friend;
-    private Timer friendUpdateTimer;
 
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
@@ -76,19 +67,30 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
 
         friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
 
-        fillUI(friend);
+        initFriendsFields(friend);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        startLoaderWithTimer();
-    }
+    private void initFriendsFields(Friend friend) {
+        try {
+            String uri = UriCreator.getUri(friend.getAvatarUid());
+            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        } catch (BaseServiceException e) {
+            ErrorUtils.showError(this, e);
+        }
 
-    @Override
-    public void onStop() {
-        friendUpdateTimer.cancel();
-        super.onStop();
+        nameTextView.setText(friend.getFullname());
+        if (friend.isOnline()) {
+            onlineImageView.setVisibility(View.VISIBLE);
+        } else {
+            onlineImageView.setVisibility(View.GONE);
+        }
+        if (friend.getPhone() != null) {
+            phoneView.setVisibility(View.VISIBLE);
+        } else {
+            phoneView.setVisibility(View.GONE);
+        }
+        onlineStatusTextView.setText(friend.getOnlineStatus());
+        phoneTextView.setText(friend.getPhone());
     }
 
     @Override
@@ -112,27 +114,20 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         }
     }
 
-    @Override
-    public Loader<LoaderResult<Friend>> onLoaderCreate(int id, Bundle args) {
-        return new FriendDetailsLoader(this);
-    }
-
-    @Override
-    public void onLoaderResult(int id, Friend data) {
-        fillUI(data);
+    private void showRemoveUserDialog() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showProgress();
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
+            }
+        });
+        dialog.show(getFragmentManager(), null);
     }
 
     public void videoCallClickListener(View view) {
         callToUser(friend, WebRTC.MEDIA_STREAM.VIDEO);
-    }
-
-    public void voiceCallClickListener(View view) {
-
-        callToUser(friend, WebRTC.MEDIA_STREAM.AUDIO);
-    }
-
-    public void chatClickListener(View view) {
-        //        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
@@ -145,48 +140,13 @@ public class FriendDetailsActivity extends LoaderActivity<Friend> {
         }
     }
 
-    private void fillUI(Friend friend) {
-        try {
-            String uri = UriCreator.getUri(friend.getAvatarUid());
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(this, e);
-        }
-        nameTextView.setText(friend.getFullname());
-        if (friend.isOnline()) {
-            onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            onlineImageView.setVisibility(View.GONE);
-        }
-        if (friend.getPhone() != null) {
-            phoneView.setVisibility(View.VISIBLE);
-        } else {
-            phoneView.setVisibility(View.GONE);
-        }
-        onlineStatusTextView.setText(friend.getOnlineStatus());
-        phoneTextView.setText(friend.getPhone());
+    public void voiceCallClickListener(View view) {
+
+        callToUser(friend, WebRTC.MEDIA_STREAM.AUDIO);
     }
 
-    private void startLoaderWithTimer() {
-        friendUpdateTimer = new Timer();
-        friendUpdateTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runLoader(FriendDetailsLoader.ID, FriendDetailsLoader.newArguments(friend.getId()));
-            }
-        }, START_DELAY, UPDATE_DATA_PERIOD);
-    }
-
-    private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                showProgress();
-                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
-            }
-        });
-        dialog.show(getFragmentManager(), null);
+    public void chatClickListener(View view) {
+        //        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
     }
 
     private class RemoveFriendSuccessAction implements Command {
