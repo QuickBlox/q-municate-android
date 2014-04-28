@@ -122,6 +122,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(getContentView(), container, false);
+        rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
+        rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
+        if (call_direction_type == null) {
+            initChatData();
+        }
+        postInit(rootView);
+        return rootView;
+    }
+
+    private void initChatData() {
         SessionDescriptionWrapper sessionDescriptionWrapper = getArguments().getParcelable(
                 Consts.REMOTE_DESCRIPTION);
         if (sessionDescriptionWrapper != null) {
@@ -136,10 +146,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         deviceOrientation = (ISignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
                 WebRTC.ORIENTATION_EXTENSION);
         sessionId = getArguments().getString(WebRTC.SESSION_ID_EXTENSION, "");
-        rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
-        rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
-        postInit(rootView);
-        return rootView;
     }
 
     @Override
