@@ -24,7 +24,6 @@ import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
@@ -53,6 +52,7 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         addActionsAddFriend();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -88,7 +88,6 @@ public class FriendsListFragment extends AbsFriendsListFragment implements Searc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         title = getString(R.string.nvd_title_friends);
         state = State.FRIENDS_LIST;
     }
