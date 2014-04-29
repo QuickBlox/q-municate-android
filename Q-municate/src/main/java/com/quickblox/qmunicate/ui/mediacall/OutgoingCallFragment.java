@@ -125,8 +125,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
         rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
         initChatData();
+        reInitChatIfExist(rootView);
         postInit(rootView);
         return rootView;
+    }
+
+    private void reInitChatIfExist(View rootView) {
+        VideoStreamsView videoView = (VideoStreamsView) rootView.findViewById(R.id.ownVideoScreenImageView);
+        if (qbVideoChat != null && videoView != null) {
+            qbVideoChat.setVideoView(videoView);
+        }
     }
 
     private void initChatData() {
@@ -173,11 +181,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     public void initChat(ISignalingChannel signalingChannel) {
-        VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
         if (qbVideoChat != null) {
-            qbVideoChat.setVideoView(videoView);
             return;
         }
+        VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
         qbVideoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
         qbVideoChat.setMediaCaptureCallback(new MediaCapturerHandler());
         signalingMessageHandler = new VideoChatMessageHandler();

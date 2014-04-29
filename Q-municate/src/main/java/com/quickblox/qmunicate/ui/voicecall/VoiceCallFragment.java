@@ -34,6 +34,9 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         }
         timeTextView = (TextView) rootView.findViewById(R.id.timerTextView);
         rootView.findViewById(R.id.muteDynamicButton).setOnClickListener(this);
+        if (updater != null) {
+            updater.setTextView(timeTextView);
+        }
     }
 
     @Override
@@ -60,6 +63,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
     }
 
     private void startTimer(TextView textView) {
+
         handler = new Handler();
         updater = new TimeUpdater(textView, handler);
         handler.postDelayed(updater, Consts.SECOND);
