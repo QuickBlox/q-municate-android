@@ -18,6 +18,14 @@ public class TimeUpdater implements Runnable {
         this.handler = handler;
     }
 
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
+
+    public void setTextView(TextView timeTextView) {
+        this.timeTextView = timeTextView;
+    }
+
     @Override
     public void run() {
         second++;
