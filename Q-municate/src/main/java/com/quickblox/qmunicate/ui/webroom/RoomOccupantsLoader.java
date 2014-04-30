@@ -24,11 +24,12 @@ public class RoomOccupantsLoader extends AbsFriendsListLoader {
 
     @Override
     protected List<Integer> getUserIds() throws Exception {
-        Collection<Integer> roomUsers = qbChatHelper.getJoinedRoom().getRoomUsers();
-        List<Integer> userIds = new ArrayList<Integer>();
-        userIds.addAll(roomUsers);
-        Integer ownUserId = App.getInstance().getUser().getId();
-        userIds.remove(ownUserId);
-        return userIds;
+//        Collection<Integer> roomUsers = qbChatHelper.getJoinedRoom().getRoomUsers();
+//        List<Integer> userIds = new ArrayList<Integer>();
+//        userIds.addAll(roomUsers);
+//        Integer ownUserId = App.getInstance().getUser().getId();
+//        userIds.remove(ownUserId);
+//        return userIds;
+        return null;
     }
 }

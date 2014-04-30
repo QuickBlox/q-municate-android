@@ -22,6 +22,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
@@ -146,7 +147,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     public void chatClickListener(View view) {
-        //        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
+        PrivateChatActivity.start(FriendDetailsActivity.this, friend);
     }
 
     private class RemoveFriendSuccessAction implements Command {

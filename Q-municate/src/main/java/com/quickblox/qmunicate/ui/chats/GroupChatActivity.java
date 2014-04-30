@@ -19,7 +19,6 @@ import android.widget.ListView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.receiver.BroadcastActions;
-import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
@@ -29,9 +28,10 @@ import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
 import com.quickblox.qmunicate.ui.views.smiles.SmileysConvertor;
 import com.quickblox.qmunicate.utils.SizeUtility;
 
+import org.jivesoftware.smack.packet.Message;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class GroupChatActivity extends FragmentActivity implements SwitchViewListener {
@@ -41,8 +41,8 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
     private ChatEditText chatEdit;
     private ListView messagesListView;
 
-    private List<ChatMessage> messagesArrayList;
-    private ChatMessagesAdapter messagesAdapter;
+    private List<Message> messagesArrayList;
+    private PrivateChatMessagesAdapter messagesAdapter;
     private ViewPager smilesPager;
     private View smilesLayout;
     private IconPageIndicator smilesPagerIndicator;
@@ -62,10 +62,6 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         initUI();
         initSmileWidgets();
 
-        messagesArrayList = new ArrayList<ChatMessage>();
-        messagesAdapter = new ChatMessagesAdapter(this, R.layout.list_item_chat_message, messagesArrayList);
-        messagesListView.setAdapter(messagesAdapter);
-
         IntentFilter filter = new IntentFilter(BroadcastActions.SMILE_SELECTED);
         smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
         registerReceiver(smileSelectedBroadcastReceiver, filter);
@@ -73,6 +69,15 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         registerForContextMenu(messagesListView);
 
         initListView();
+    }
+
+    private void initUI() {
+        smilesLayout = findViewById(R.id.smiles_layout);
+        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
+        smilesPager = (ViewPager) findViewById(R.id.smiles_pager);
+        messagesListView = (ListView) findViewById(R.id.messagesListView);
+        chatEdit = (ChatEditText) findViewById(R.id.messageEdit);
+        actionBarSetup();
     }
 
     public void initSmileWidgets() {
@@ -85,30 +90,20 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
     }
 
     private void initListView() {
-        // TODO SF temp list.
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        updateFriendListAdapter();
-    }
-
-    private void updateFriendListAdapter() {
-        messagesAdapter.notifyDataSetChanged();
-    }
-
-    private void initUI() {
-        smilesLayout = findViewById(R.id.smiles_layout);
-        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
-        smilesPager = (ViewPager) findViewById(R.id.smiles_pager);
-        messagesListView = (ListView) findViewById(R.id.messagesListView);
-        chatEdit = (ChatEditText) findViewById(R.id.messageEdit);
-        actionBarSetup();
+//        messagesArrayList = new ArrayList<Message>();
+//        messagesAdapter = new PrivateChatMessagesAdapter(this, R.layout.list_item_private_chat_message, messagesArrayList);
+//        messagesListView.setAdapter(messagesAdapter);
+        //        // TODO SF temp list.
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        messagesArrayList.add(new ChatMessage("", new Date(), true));
+        //        updateFriendListAdapter();
     }
 
     private void actionBarSetup() {
@@ -151,14 +146,14 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
         }
     }
 
+    private boolean isSmilesLayoutShowing() {
+        return smilesLayout.getHeight() != 0;
+    }
+
     private void hideView(View view) {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
         params.height = 0;
         view.setLayoutParams(params);
-    }
-
-    private boolean isSmilesLayoutShowing() {
-        return smilesLayout.getHeight() != 0;
     }
 
     private int getSmileLayoutSizeInPixels() {
@@ -173,7 +168,8 @@ public class GroupChatActivity extends FragmentActivity implements SwitchViewLis
             int cursorPosition = chatEdit.getSelectionStart();
 
             String roundTrip = "";
-            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName("UTF-8"));
+            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName(
+                    "UTF-8"));
             roundTrip = new String(bytes, Charset.forName("UTF-8"));
             chatEdit.getText().insert(cursorPosition, roundTrip);
         }

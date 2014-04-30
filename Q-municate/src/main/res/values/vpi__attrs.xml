@@ -104,7 +104,7 @@
         <attr name="selectedBold" format="boolean" />
         <!-- Color of regular titles. -->
         <attr name="android:textColor" />
-        <!-- Size of title text. -->
+        <!-- Size of title body. -->
         <attr name="android:textSize" />
         <!-- Padding between titles when bumping into each other. -->
         <attr name="titlePadding" format="dimension" />

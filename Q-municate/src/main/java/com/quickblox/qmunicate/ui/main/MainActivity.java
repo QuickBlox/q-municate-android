@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.webroom.RoomOccupantFragment;
@@ -27,7 +28,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-//    private static final int ID_WEB_ROOM_FRAGMENT = 1;
+    private static final int ID_WEB_ROOM_FRAGMENT = 1;
     private static final int ID_CHATS_LIST_FRAGMENT = 1;
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     private static final int ID_SETTINGS_FRAGMENT = 3;
@@ -104,10 +105,10 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 //                fragment = RoomOccupantFragment.newInstance();
 //                break;
             case ID_CHATS_LIST_FRAGMENT:
-//                fragment = ChatsListFragment.newInstance();
-//                break;
-                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
-                return;
+                fragment = ChatsListFragment.newInstance();
+                break;
+//                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
+//                return;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();
                 break;

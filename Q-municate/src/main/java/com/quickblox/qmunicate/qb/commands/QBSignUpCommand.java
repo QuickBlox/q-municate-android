@@ -40,7 +40,7 @@ public class QBSignUpCommand extends ServiceCommand {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
         user = qbAuthHelper.signup(user, file);
-        qbChatHelper.init(context);
+//        qbChatHelper.init(context);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);

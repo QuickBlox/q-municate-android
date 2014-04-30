@@ -41,7 +41,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
 
         QBUser user = qbAuthHelper.login(socialProvider, accessToken, accessTokenSecret);
-        qbChatHelper.init(context);
+//        qbChatHelper.init(context);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);

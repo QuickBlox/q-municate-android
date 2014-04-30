@@ -5,14 +5,17 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.auth.model.QBSession;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.utils.Consts;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
+import java.io.IOException;
 
 public class QBAuthHelper {
 
@@ -88,11 +91,17 @@ public class QBAuthHelper {
 
     private void loginChat(QBUser user) throws QBResponseException {
         try {
-            QBChatService.getInstance().loginWithUser(user);
+            QBChatService.getInstance().login(user);
         } catch (QBResponseException e) {
-            if (!com.quickblox.module.chat.Consts.ALREADY_LOGGED_IN.equals(e.getLocalizedMessage())) {
+            if (!Consts.ALREADY_LOGGED_IN.equals(e.getLocalizedMessage())) {
                 throw e;
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
+            e.printStackTrace();
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
     }
 }

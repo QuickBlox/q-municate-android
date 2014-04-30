@@ -47,7 +47,7 @@ public class RoomOccupantFragment extends AbsFriendsListFragment {
         baseActivity.addAction(QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, new JoinRoomSuccessAction());
         baseActivity.addAction(QBServiceConsts.JOIN_ROOM_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
-        QBJoinRoomCommand.start(baseActivity);
+//        QBJoinRoomCommand.start(baseActivity);
     }
 
     @Override

@@ -36,7 +36,7 @@ public class QBLoginCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
 
         user = qbAuthHelper.login(user);
-        qbChatHelper.init(context);
+//        qbChatHelper.init(context);
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
 

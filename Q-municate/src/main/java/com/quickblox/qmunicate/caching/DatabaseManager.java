@@ -3,9 +3,12 @@ package com.quickblox.qmunicate.caching;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.text.TextUtils;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
+import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
@@ -37,6 +40,20 @@ public class DatabaseManager {
         }
 
         context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
+    }
+
+    public static void savePrivateChatMessage(Context context, ChatMessage message) {
+        ContentValues values = new ContentValues();
+
+        values.put(PrivateChatMessagesTable.Cols.ID, message.getId());
+        values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
+        values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_NAME, message.getSenderName());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
+        values.put(PrivateChatMessagesTable.Cols.TIME, DateUtils.dateToLong(message.getTime()));
+        values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
+
+        context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }
 
     public static List<Friend> getFriendsList(Context context) {
@@ -80,13 +97,22 @@ public class DatabaseManager {
         if (TextUtils.isEmpty(inputText)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
         } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
         }
         if (cursor != null) {
             cursor.moveToFirst();
         }
         return cursor;
+    }
+
+    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int senderId) {
+        // TODO SF remove like
+//        Cursor cursor = context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.SENDER_ID + " like '%" + senderId + "%'", null, null);
+//        if(cursor.getCount() > 0 ) {
+//            return cursor;
+//        }
+//        return null;
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, PrivateChatMessagesTable.Cols.ID  + " ORDER BY " + PrivateChatMessagesTable.Cols.SENDER_NAME + " COLLATE NOCASE ASC");
     }
 
     public static Cursor getAllFriends(Context context) {

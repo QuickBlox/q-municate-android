@@ -3,32 +3,58 @@ package com.quickblox.qmunicate.ui.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBPrivateChat;
+import com.quickblox.module.chat.QBPrivateChatManager;
+import com.quickblox.module.chat.listeners.QBMessageListener;
+import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.ChatMessage;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
-import java.util.ArrayList;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+
+import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
-public class PrivateChatActivity extends BaseActivity {
-    private static String nameOpponent;
+public class PrivateChatActivity extends BaseActivity implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener {
+
+    public static final String EXTRA_OPPONENT = "opponentFriend";
+
     private ListView messagesListView;
+    private EditText messageEditText;
+    private ImageButton attachButton;
+    private ImageButton sendButton;
 
-    private List<ChatMessage> messagesArrayList;
-    private ChatMessagesAdapter messagesAdapter;
+    private BaseAdapter messagesAdapter;
+    private Friend opponentFriend;
+    private QBPrivateChat qbPrivateChat;
 
-    public static void start(Context context, String name) {
+    public static void start(Context context, Friend opponent) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
+        intent.putExtra(EXTRA_OPPONENT, opponent);
         context.startActivity(intent);
-        nameOpponent = name;
     }
 
     @Override
@@ -36,48 +62,130 @@ public class PrivateChatActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_chat);
 
+        opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
+
         initUI();
-
-        messagesArrayList = new ArrayList<ChatMessage>();
-        messagesAdapter = new ChatMessagesAdapter(this, R.layout.list_item_chat_message, messagesArrayList);
-        messagesListView.setAdapter(messagesAdapter);
-
-        initListeners();
         initListView();
-    }
-
-    private void initListView() {
-        // TODO temp list.
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        messagesArrayList.add(new ChatMessage("", new Date(), true));
-        updateFriendListAdapter();
-    }
-
-    private void updateFriendListAdapter() {
-        // TODO sort list
-        messagesAdapter.notifyDataSetChanged();
-    }
-
-    private void initListeners() {
-        registerForContextMenu(messagesListView);
+        initListeners();
+        initActionBar();
+        initChat();
     }
 
     private void initUI() {
         messagesListView = _findViewById(R.id.messagesListView);
-        actionBarSetup();
+        messageEditText = _findViewById(R.id.messageEditText);
+        attachButton = _findViewById(R.id.attachButton);
+        sendButton = _findViewById(R.id.sendButton);
     }
 
-    private void actionBarSetup() {
+    private void initListView() {
+        messagesAdapter = getMessagesAdapter();
+        messagesListView.setAdapter(messagesAdapter);
+    }
+
+    private void initListeners() {
+        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                super.onTextChanged(s, start, before, count);
+                if (TextUtils.isEmpty(s)) {
+                    sendButton.setVisibility(View.GONE);
+                    attachButton.setVisibility(View.VISIBLE);
+                } else {
+                    sendButton.setVisibility(View.VISIBLE);
+                    attachButton.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void initActionBar() {
         ActionBar ab = getActionBar();
-        ab.setTitle(nameOpponent);
-        ab.setSubtitle("some information");
+        ab.setTitle(opponentFriend.getEmail());
+        ab.setSubtitle(opponentFriend.getOnlineStatus());
+    }
+
+    private void initChat() {
+        // Step 1: Initialize Chat Module
+        QBChatService qbChatService;
+        QBPrivateChatManager qbPrivateChatManager;
+
+        // Step 2: Login
+        qbChatService = QBChatService.getInstance();
+        try {
+            qbChatService.login(App.getInstance().getUser());
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
+            e.printStackTrace();
+        }
+
+        // Step 3: Create Chat
+        qbPrivateChatManager = qbChatService.getPrivateChatManager();
+        qbPrivateChatManager.addPrivateChatManagerListener(this);
+        qbPrivateChat = qbPrivateChatManager.createChat(opponentFriend.getId(), this);
+    }
+
+    protected BaseAdapter getMessagesAdapter() {
+        Cursor cursor = getAllPrivateChatMessagesBySenderId();
+        if(cursor != null) {
+            return new PrivateChatMessagesAdapter(this, getAllPrivateChatMessagesBySenderId());
+        } else {
+            return null;
+        }
+    }
+
+    private Cursor getAllPrivateChatMessagesBySenderId() {
+        return DatabaseManager.getAllPrivateChatMessagesBySenderId(this, opponentFriend.getId());
+    }
+
+    public void sendMessageOnClick(View view) {
+        Message message = getMessage();
+        try {
+            qbPrivateChat.sendMessage(message);
+            saveMessageToCache(message);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Message getMessage() {
+        Message message = new Message();
+        message.setBody(messageEditText.getText().toString());
+        message.setSubject(App.getInstance().getUser().getEmail());
+        return message;
+    }
+
+    private void saveMessageToCache(Message message) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setSubject(message.getSubject());
+        chatMessage.setBody(message.getBody());
+        chatMessage.setSenderName(opponentFriend.getEmail());
+        chatMessage.setSenderId(opponentFriend.getId());
+        chatMessage.setTime(new Date(System.currentTimeMillis()));
+        DatabaseManager.savePrivateChatMessage(this, chatMessage);
+    }
+
+    @Override
+    public void processMessage(QBPrivateChat qbPrivateChat, Message message) {
+        saveMessageToCache(message);
+    }
+
+    @Override
+    public void chatCreated(QBPrivateChat qbPrivateChat, boolean createdLocally) {
+        if (createdLocally) {
+            // createdLocally = true
+            // мы сами создали этот чат
+        } else {
+            // createdLocally = false
+            // чат создал кто-то удаленно и нам пришло сообщение
+            // нужно добавить слушателя и первое сообщение получим в него же
+            this.qbPrivateChat.addMessageListener(PrivateChatActivity.this);
+        }
     }
 
     @Override

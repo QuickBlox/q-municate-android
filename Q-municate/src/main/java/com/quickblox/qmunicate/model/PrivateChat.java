@@ -35,7 +35,7 @@ public class PrivateChat extends Chat {
 
     @Override
     public ChatMessage getLastMessage() {
-        return new ChatMessage("hi", new Date(), false);
+        return new ChatMessage();
     }
 
     @Override

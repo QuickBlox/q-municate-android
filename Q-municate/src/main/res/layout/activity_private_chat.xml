@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
     android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_gray">
@@ -22,34 +23,56 @@
         android:background="@color/white">
 
         <EditText
-            android:id="@+id/messageEdit"
+            android:id="@+id/messageEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="false"
-            android:layout_toRightOf="@+id/attachButton"
-            android:autoText="true"
-            android:hint="@string/cht_hint_message"
             android:layout_centerInParent="true"
-            android:layout_toLeftOf="@+id/smileButton"
-            android:background="@null" />
-
-        <ImageButton
-            android:id="@+id/attachButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/attachLinearLayout"
+            android:layout_toRightOf="@+id/smileButton"
+            android:autoText="true"
             android:background="@null"
-            android:src="@drawable/ic_photo" />
+            android:hint="@string/cht_hint_message" />
 
         <ImageButton
             android:id="@+id/smileButton"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:background="@null"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/button_general_selector"
+            android:padding="5dp"
             android:src="@drawable/ic_smile" />
+
+        <LinearLayout
+            android:id="@+id/attachLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/attachButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_photo"
+                android:visibility="visible" />
+
+            <ImageButton
+                android:id="@+id/sendButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:onClick="sendMessageOnClick"
+                android:src="@drawable/ic_send_message"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 </RelativeLayout>

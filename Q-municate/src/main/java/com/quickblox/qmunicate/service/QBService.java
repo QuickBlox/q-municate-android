@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.smack.SmackAndroid;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
@@ -48,8 +47,6 @@ public class QBService extends Service {
     private QBChatHelper qbChatHelper;
     private QBAuthHelper qbAuthHelper;
 
-    private SmackAndroid smackAndroid;
-
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
         threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
@@ -83,8 +80,8 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this, qbAuthHelper,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
-                QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
+//        serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
+//                QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
     }
 
     @Override

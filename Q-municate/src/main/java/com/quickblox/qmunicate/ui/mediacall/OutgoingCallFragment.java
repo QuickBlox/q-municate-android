@@ -273,12 +273,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        ISignalingChannel signalingChannel = service.getQbChatHelper().getSignalingChannel();
-        if (signalingChannel != null && isExistActivity()) {
-            initChat(signalingChannel);
-        } else if (isExistActivity()) {
-            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
-        }
+//        ISignalingChannel signalingChannel = service.getQbChatHelper().getSignalingChannel();
+//        if (signalingChannel != null && isExistActivity()) {
+//            initChat(signalingChannel);
+//        } else if (isExistActivity()) {
+//            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
+//        }
     }
 
     private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {

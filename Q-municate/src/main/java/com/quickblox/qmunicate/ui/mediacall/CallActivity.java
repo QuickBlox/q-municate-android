@@ -93,7 +93,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     @Override
     protected void onConnectedToService() {
-        signalingChannel = service.getQbChatHelper().getSignalingChannel();
+//        signalingChannel = service.getQbChatHelper().getSignalingChannel();
         messageHandler = new ChatMessageHandler();
         signalingChannel.addMessageHandler(messageHandler);
     }
