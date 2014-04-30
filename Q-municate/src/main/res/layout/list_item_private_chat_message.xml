@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:padding="10dp"
-    android:background="@drawable/list_item_background_selector">
+    android:background="@drawable/list_item_background_selector"
+    android:animateLayoutChanges="true">
 
     <com.quickblox.qmunicate.ui.views.CircleImageView
         android:id="@+id/avatarImageView"

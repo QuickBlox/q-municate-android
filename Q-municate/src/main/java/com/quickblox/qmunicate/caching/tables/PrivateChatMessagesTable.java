@@ -8,9 +8,7 @@ import com.quickblox.qmunicate.caching.ContentDescriptor;
 public class PrivateChatMessagesTable {
 
     public static final String TABLE_NAME = "private_chat_messages";
-
     public static final String PATH = "private_chat_messages";
-
     public static final int PATH_TOKEN = 20;
 
     public static final Uri CONTENT_URI = ContentDescriptor.BASE_URI.buildUpon().appendPath(PATH).build();

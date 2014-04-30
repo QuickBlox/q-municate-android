@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.caching;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.text.TextUtils;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
@@ -45,12 +44,11 @@ public class DatabaseManager {
     public static void savePrivateChatMessage(Context context, ChatMessage message) {
         ContentValues values = new ContentValues();
 
-        values.put(PrivateChatMessagesTable.Cols.ID, message.getId());
         values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
         values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
         values.put(PrivateChatMessagesTable.Cols.SENDER_NAME, message.getSenderName());
         values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
-        values.put(PrivateChatMessagesTable.Cols.TIME, DateUtils.dateToLong(message.getTime()));
+        values.put(PrivateChatMessagesTable.Cols.TIME, message.getTime());
         values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
 
         context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
@@ -106,17 +104,11 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int senderId) {
-        // TODO SF remove like
-//        Cursor cursor = context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.SENDER_ID + " like '%" + senderId + "%'", null, null);
-//        if(cursor.getCount() > 0 ) {
-//            return cursor;
-//        }
-//        return null;
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, PrivateChatMessagesTable.Cols.ID  + " ORDER BY " + PrivateChatMessagesTable.Cols.SENDER_NAME + " COLLATE NOCASE ASC");
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.SENDER_ID + "=" + senderId, null, null);
     }
 
     public static Cursor getAllFriends(Context context) {
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID  + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllFriends(Context context) {

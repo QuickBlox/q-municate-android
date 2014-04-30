@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
+import com.quickblox.qmunicate.utils.DateUtils;
 
 public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
@@ -41,11 +42,14 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
         String senderName = cursor.getString(cursor.getColumnIndex(
                 PrivateChatMessagesTable.Cols.SENDER_NAME));
-        String time = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
+        long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
         holder.nameTextView.setText(senderName);
-        holder.timeTextView.setText(time);
+        holder.timeTextView.setText(DateUtils.longToMessageDate(time));
+
+//        Animation animation = AnimationUtils.loadAnimation(context, R.anim.message_in_animation);
+//        view.startAnimation(animation);
     }
 
     private static class ViewHolder {

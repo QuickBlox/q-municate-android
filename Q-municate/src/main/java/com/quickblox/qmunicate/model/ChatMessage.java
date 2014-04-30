@@ -1,18 +1,16 @@
 package com.quickblox.qmunicate.model;
 
-import java.util.Date;
-
 public class ChatMessage {
 
     private String id;
     private String subject;
     private String body;
-    private Date time;
+    private long time;
     private String senderName;
     private int senderId;
     private boolean incoming;
 
-    public ChatMessage(String id, String subject, String body, Date time, String senderName, int senderId,
+    public ChatMessage(String id, String subject, String body, long time, String senderName, int senderId,
             boolean incoming) {
         this.id = id;
         this.subject = subject;
@@ -66,11 +64,11 @@ public class ChatMessage {
         this.body = body;
     }
 
-    public Date getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
