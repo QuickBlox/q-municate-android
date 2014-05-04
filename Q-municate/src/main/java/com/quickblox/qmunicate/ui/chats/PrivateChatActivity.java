@@ -49,6 +49,7 @@ public class PrivateChatActivity extends BaseActivity implements QBMessageListen
 
     private QBChatService qbChatService;
     private QBPrivateChat qbPrivateChat;
+    private int chatId;
 
     public static void start(Context context, Friend opponent) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
@@ -62,12 +63,19 @@ public class PrivateChatActivity extends BaseActivity implements QBMessageListen
         setContentView(R.layout.activity_private_chat);
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
+        chatId = opponentFriend.getId();
 
         initUI();
         initListView();
         initListeners();
         initActionBar();
         initChat();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     public void sendMessageOnClick(View view) {
@@ -79,13 +87,16 @@ public class PrivateChatActivity extends BaseActivity implements QBMessageListen
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(message);
+        Friend senderFriend = new Friend();
+        senderFriend.setId(App.getInstance().getUser().getId());
+        senderFriend.setEmail(App.getInstance().getUser().getEmail());
+        saveMessageToCache(message, senderFriend);
         messageEditText.setText("");
     }
 
     @Override
     public void processMessage(QBPrivateChat qbPrivateChat, Message message) {
-        saveMessageToCache(message);
+        saveMessageToCache(message, opponentFriend);
     }
 
     @Override
@@ -200,23 +211,21 @@ public class PrivateChatActivity extends BaseActivity implements QBMessageListen
     }
 
     private Cursor getAllPrivateChatMessages() {
-        return DatabaseManager.getAllPrivateChatMessagesBySenderId(this, opponentFriend.getId());
+        return DatabaseManager.getAllPrivateChatMessagesBySenderId(this, chatId);
     }
 
     private Message getMessage() {
         Message message = new Message();
         message.setBody(messageEditText.getText().toString());
-        message.setSubject(App.getInstance().getUser().getEmail());
         return message;
     }
 
-    private void saveMessageToCache(Message message) {
+    private void saveMessageToCache(Message message, Friend senderFriend) {
         ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSubject(message.getSubject());
         chatMessage.setBody(message.getBody());
-        chatMessage.setSenderName(opponentFriend.getEmail());
-        chatMessage.setSenderId(opponentFriend.getId());
+        chatMessage.setSenderName(senderFriend.getEmail());
+        chatMessage.setSenderId(senderFriend.getId());
         chatMessage.setTime(System.currentTimeMillis());
-        DatabaseManager.savePrivateChatMessage(this, chatMessage);
+        DatabaseManager.savePrivateChatMessage(this, chatMessage, chatId);
     }
 }

@@ -41,7 +41,7 @@ public class DatabaseManager {
         context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
     }
 
-    public static void savePrivateChatMessage(Context context, ChatMessage message) {
+    public static void savePrivateChatMessage(Context context, ChatMessage message, int chatId) {
         ContentValues values = new ContentValues();
 
         values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
@@ -50,6 +50,7 @@ public class DatabaseManager {
         values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
         values.put(PrivateChatMessagesTable.Cols.TIME, message.getTime());
         values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
+        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
 
         context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }
@@ -103,8 +104,8 @@ public class DatabaseManager {
         return cursor;
     }
 
-    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int senderId) {
-        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.SENDER_ID + "=" + senderId, null, null);
+    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + "=" + chatId, null, null);
     }
 
     public static Cursor getAllFriends(Context context) {
