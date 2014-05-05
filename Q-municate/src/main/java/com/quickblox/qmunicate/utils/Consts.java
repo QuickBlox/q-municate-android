@@ -23,6 +23,8 @@ public class Consts {
 
     public static final int ZERO_VALUE = 0;
 
+    public static final String ENCODING_UTF8 = "UTF-8";
+
     public static final int DELAY_LONG_CLICK_ANIMATION_LONG = 500;
     public static final int DELAY_LONG_CLICK_ANIMATION_SHORT = 300;
 

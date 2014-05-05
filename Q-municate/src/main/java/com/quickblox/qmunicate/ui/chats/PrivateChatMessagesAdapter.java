@@ -9,13 +9,18 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
+import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
-    public PrivateChatMessagesAdapter(Context context, Cursor cursor) {
+    private Friend opponentFriend;
+
+    public PrivateChatMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
         super(context, cursor, true);
+        this.opponentFriend = opponentFriend;
     }
 
     @Override
@@ -24,10 +29,10 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
         ViewHolder holder = new ViewHolder();
 
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
-        holder.nameTextView = (TextView) view.findViewById(R.id.nameTextView);
-        holder.messageTextView = (TextView) view.findViewById(R.id.messageTextView);
-        holder.timeTextView = (TextView) view.findViewById(R.id.timeTextView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+        holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
 
         view.setTag(holder);
 
@@ -38,8 +43,8 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        String subject = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SUBJECT));
         String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
+        int senderId = cursor.getInt(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SENDER_ID));
         String senderName = cursor.getString(cursor.getColumnIndex(
                 PrivateChatMessagesTable.Cols.SENDER_NAME));
         long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
@@ -48,15 +53,23 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-//        Animation animation = AnimationUtils.loadAnimation(context, R.anim.message_in_animation);
-//        view.startAnimation(animation);
+        String avatarUrl = getAvatarUrl(senderId);
+        displayImage(avatarUrl, holder.avatarImageView);
+    }
+
+    private String getAvatarUrl(int friendId) {
+        if (currentUser.getId() == friendId) {
+            return getAvatarUrlForCurrentUser();
+        } else {
+            return getAvatarUrlForFriend(opponentFriend);
+        }
     }
 
     private static class ViewHolder {
 
         ImageView avatarImageView;
         TextView nameTextView;
-        TextView messageTextView;
+        ChatTextView messageTextView;
         TextView timeTextView;
     }
 }

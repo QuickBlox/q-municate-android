@@ -7,7 +7,7 @@
     android:gravity="right">
 
     <TextView
-        android:id="@+id/countSelectedFriendsTextView"
+        android:id="@+id/count_selected_friends_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"

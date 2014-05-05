@@ -32,9 +32,9 @@ public class ChatFriendsAdapter extends ArrayAdapter<Friend> {
             convertView = layoutInflater.inflate(R.layout.list_item_chat_friend, null);
             holder = new ViewHolder();
 
-            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
-            holder.onlineImageView = (ImageView) convertView.findViewById(R.id.onlineImageView);
+            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatar_imageview);
+            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
+            holder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
             holder.statusMessageTextView = (TextView) convertView.findViewById(R.id.statusMessageTextView);
 
             convertView.setTag(holder);

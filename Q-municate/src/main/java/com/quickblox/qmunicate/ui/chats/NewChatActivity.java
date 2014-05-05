@@ -76,7 +76,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
     }
 
     private void initUI() {
-        friendsListView = _findViewById(R.id.chatFriendsListView);
+        friendsListView = _findViewById(R.id.chat_friends_listview);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
     private void startAction() {
         actionMode = startActionMode(new ActionModeCallback());
         View view = getLayoutInflater().inflate(R.layout.action_mode_new_chat, null);
-        countSelectedFriendsTextView = (TextView) view.findViewById(R.id.countSelectedFriendsTextView);
+        countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         actionMode.setCustomView(view);
     }
 

@@ -22,6 +22,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
@@ -30,11 +31,11 @@ import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class FriendsListFragment extends AbsFriendsListFragment implements SearchView.OnQueryTextListener, FilterQueryProvider {
-
-    private static final String TAG = FriendsListFragment.class.getSimpleName();
 
     private List<Friend> usersList;
     private UserListAdapter usersListAdapter;

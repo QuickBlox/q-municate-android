@@ -81,7 +81,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
 
     private void initUI() {
         changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
-        avatarImageView = _findViewById(R.id.avatarImageView);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);

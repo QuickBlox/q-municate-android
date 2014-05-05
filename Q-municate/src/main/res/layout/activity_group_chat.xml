@@ -1,14 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_gray"
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/messagesListView"
+        android:id="@+id/messages_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -16,13 +13,13 @@
         android:transcriptMode="alwaysScroll" />
 
     <RelativeLayout
-        android:id="@+id/messageLayout"
+        android:id="@+id/message_relativelayout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chat_input_message_height"
         android:background="@color/white">
 
         <ImageButton
-            android:id="@+id/attachButton"
+            android:id="@+id/attach_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
@@ -31,17 +28,16 @@
             android:src="@drawable/ic_photo" />
 
         <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
-            android:id="@+id/messageEdit"
+            android:id="@+id/message_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/attachButton"
+            android:layout_toRightOf="@+id/attach_button"
             android:autoLink="all"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical|right|left"
             android:maxEms="13"
             android:maxWidth="250dip"
-            android:textAlignment="center"
             android:textColor="@android:color/black" />
 
     </RelativeLayout>

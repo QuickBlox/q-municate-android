@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <com.quickblox.qmunicate.ui.views.CircleImageView
-            android:id="@+id/avatarImageView"
+            android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_big_avatar_layout_width"
             android:layout_height="@dimen/image_view_big_avatar_layout_height"
             android:layout_marginLeft="15dp"
@@ -26,7 +26,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/nameTextView"
+                android:id="@+id/name_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -34,7 +34,7 @@
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/statusTextView"
+                android:id="@+id/status_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -53,7 +53,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/onlineImageView"
+            android:id="@+id/online_imageview"
             android:layout_width="15dp"
             android:layout_height="15dp"
             android:layout_gravity="center_vertical"
@@ -61,14 +61,14 @@
             android:src="@drawable/badge_online" />
 
         <TextView
-            android:id="@+id/onlineStatusTextView"
+            android:id="@+id/online_status_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp" />
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/phoneView"
+        android:id="@+id/phone_relativelayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
@@ -87,13 +87,13 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/phoneTextView"
+                android:id="@+id/phone_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/descriptionTextView"
+                android:id="@+id/description_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/frd_mobile"
@@ -106,7 +106,7 @@
     <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
-        android:id="@+id/videoCallButton"
+        android:id="@+id/video_call_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
@@ -148,7 +148,7 @@
     <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
-        android:id="@+id/voiceCallButton"
+        android:id="@+id/voice_call_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
@@ -191,7 +191,7 @@
     <include layout="@layout/view_separator_gray" />
 
     <RelativeLayout
-        android:id="@+id/chatButton"
+        android:id="@+id/chat_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"

@@ -45,7 +45,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     }
 
     private void initUI() {
-        friendsListView = _findViewById(R.id.chatFriendsListView);
+        friendsListView = _findViewById(R.id.chat_friends_listview);
     }
 
     private void initListeners() {

@@ -79,8 +79,8 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
 
     private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
-        holder.fullnameTextView = (TextView) view.findViewById(R.id.nameTextView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.addFriendButton = (ImageButton) view.findViewById(R.id.addFriendButton);
         return holder;
     }

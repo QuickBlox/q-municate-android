@@ -8,13 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
-import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.TextViewHelper;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
@@ -30,10 +28,10 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
         ViewHolder holder = new ViewHolder();
 
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
-        holder.fullnameTextView = (TextView) view.findViewById(R.id.nameTextView);
-        holder.statusTextView = (TextView) view.findViewById(R.id.statusTextView);
-        holder.onlineImageView = (ImageView) view.findViewById(R.id.onlineImageView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
+        holder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
+        holder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
 
         view.setTag(holder);
 
@@ -44,28 +42,19 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        String fullname = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME));
-        String avatarUid = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.AVATAR_UID));
-        String status = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.STATUS));
-        boolean online = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ONLINE)) > 0;
+        Friend friend = DatabaseManager.getFriendFromCursor(cursor);
 
-        String url = null;
-        if (null != avatarUid) {
-            try {
-                url = UriCreator.getUri(avatarUid);
-            } catch (BaseServiceException e) {
-                ErrorUtils.showError(context, e);
-            }
-        }
+        holder.fullnameTextView.setText(friend.getFullname());
+        holder.statusTextView.setText(friend.getStatus());
 
-        displayImage(url, holder.avatarImageView);
-        holder.fullnameTextView.setText(fullname);
-        holder.statusTextView.setText(status);
-        if (online) {
+        if (friend.isOnline()) {
             holder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
             holder.onlineImageView.setVisibility(View.INVISIBLE);
         }
+
+        String avatarUrl = getAvatarUrlForFriend(friend);
+        displayImage(avatarUrl, holder.avatarImageView);
 
         if (!TextUtils.isEmpty(searchCharacters)) {
             TextViewHelper.changeTextColorView(context, holder.fullnameTextView, searchCharacters);

@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/headerImageView"
+        android:id="@+id/header_imageview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -16,10 +16,10 @@
         android:paddingTop="20dp" />
 
     <ImageView
-        android:id="@+id/logoImageView"
+        android:id="@+id/logo_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/headerImageView"
+        android:layout_below="@id/header_imageview"
         android:layout_centerHorizontal="true"
         android:padding="20dp"
         android:scaleType="fitCenter"
@@ -29,7 +29,7 @@
         android:id="@+id/sloganImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/logoImageView"
+        android:layout_below="@id/logo_imageview"
         android:layout_centerHorizontal="true"
         android:padding="5dp"
         android:scaleType="fitCenter"

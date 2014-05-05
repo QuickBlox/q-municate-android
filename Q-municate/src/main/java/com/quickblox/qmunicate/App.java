@@ -11,6 +11,7 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.core.TransferProtocol;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
@@ -36,7 +37,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "onCreate");
-        initAppication();
+        initApplication();
     }
 
     public void initImageLoader(Context context) {
@@ -74,7 +75,13 @@ public class App extends Application {
         this.friends = friends;
     }
 
-    private void initAppication() {
+    public LoginType getUserLoginType() {
+        int defValue = LoginType.EMAIL.ordinal();
+        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
+        return LoginType.values()[value];
+    }
+
+    private void initApplication() {
         instance = this;
         initImageLoader(this);
 

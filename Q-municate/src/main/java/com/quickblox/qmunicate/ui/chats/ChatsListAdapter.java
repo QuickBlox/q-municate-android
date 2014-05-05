@@ -45,9 +45,9 @@ public class ChatsListAdapter extends ArrayAdapter<Chat> {
 
     private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatarImageView);
+        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
         holder.userCountTextView = (TextView) view.findViewById(R.id.userCountTextView);
-        holder.nameTextView = (TextView) view.findViewById(R.id.nameTextView);
+        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.lastMessageTextView = (TextView) view.findViewById(R.id.lastMessageTextView);
         holder.unreadMessagesTextView = (TextView) view.findViewById(R.id.unreadMessagesTextView);
         return holder;

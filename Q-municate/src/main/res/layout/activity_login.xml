@@ -34,7 +34,7 @@
         android:textSize="18sp" />
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/login_button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="25dp"
@@ -45,7 +45,7 @@
         android:textSize="@dimen/button_text_size" />
 
     <RelativeLayout
-        android:id="@+id/connectFacebookButton"
+        android:id="@+id/connect_facebook_button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
         android:layout_marginTop="15dp"
@@ -66,7 +66,7 @@
                 android:src="@drawable/ic_fb" />
 
             <TextView
-                android:id="@+id/connectFacebook"
+                android:id="@+id/connect_facebook_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

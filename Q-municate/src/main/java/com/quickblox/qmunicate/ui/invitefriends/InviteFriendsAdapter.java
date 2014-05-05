@@ -48,8 +48,8 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
             convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
             holder = new ViewHolder();
 
-            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
+            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatar_imageview);
+            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             holder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
 

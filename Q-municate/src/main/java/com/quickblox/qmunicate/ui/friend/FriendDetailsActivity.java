@@ -54,12 +54,12 @@ public class FriendDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
 
-        avatarImageView = _findViewById(R.id.avatarImageView);
-        nameTextView = _findViewById(R.id.nameTextView);
-        onlineImageView = _findViewById(R.id.onlineImageView);
-        onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
-        phoneTextView = _findViewById(R.id.phoneTextView);
-        phoneView = _findViewById(R.id.phoneView);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        nameTextView = _findViewById(R.id.name_textview);
+        onlineImageView = _findViewById(R.id.online_imageview);
+        onlineStatusTextView = _findViewById(R.id.online_status_textview);
+        phoneTextView = _findViewById(R.id.phone_textview);
+        phoneView = _findViewById(R.id.phone_relativelayout);
 
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);

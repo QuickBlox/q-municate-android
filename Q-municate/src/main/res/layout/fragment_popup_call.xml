@@ -18,7 +18,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/nameTextView"
+                android:id="@+id/name_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/act_call_margin_top"
@@ -39,7 +39,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/avatarImageView"
+            android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/act_call_avatar_size"
             android:layout_height="@dimen/act_call_avatar_size"
             android:layout_alignParentTop="false"

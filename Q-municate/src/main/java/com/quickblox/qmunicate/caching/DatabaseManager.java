@@ -17,6 +17,8 @@ import java.util.List;
 
 public class DatabaseManager {
 
+    //--------------------------------------- FriendTable -----------------------------------------------------
+
     public static void saveFriends(Context context, List<Friend> friendsList) {
         for (Friend friend : friendsList) {
             saveFriend(context, friend);
@@ -39,20 +41,6 @@ public class DatabaseManager {
         }
 
         context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
-    }
-
-    public static void savePrivateChatMessage(Context context, ChatMessage message, int chatId) {
-        ContentValues values = new ContentValues();
-
-        values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
-        values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
-        values.put(PrivateChatMessagesTable.Cols.SENDER_NAME, message.getSenderName());
-        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
-        values.put(PrivateChatMessagesTable.Cols.TIME, message.getTime());
-        values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
-        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
-
-        context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }
 
     public static List<Friend> getFriendsList(Context context) {
@@ -104,8 +92,8 @@ public class DatabaseManager {
         return cursor;
     }
 
-    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
-        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + "=" + chatId, null, null);
+    public static Cursor getFriendById(Context context, int friendId) {
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + friendId, null, null);
     }
 
     public static Cursor getAllFriends(Context context) {
@@ -114,5 +102,25 @@ public class DatabaseManager {
 
     public static void deleteAllFriends(Context context) {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
+    }
+
+    //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
+
+    public static void savePrivateChatMessage(Context context, ChatMessage message, int chatId) {
+        ContentValues values = new ContentValues();
+
+        values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
+        values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_NAME, message.getSenderName());
+        values.put(PrivateChatMessagesTable.Cols.TIME, message.getTime());
+        values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
+        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
+
+        context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
+    }
+
+    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 }

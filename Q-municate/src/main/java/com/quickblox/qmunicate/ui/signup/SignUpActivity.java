@@ -54,7 +54,7 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         fullname = _findViewById(R.id.fullnameEdit);
         email = _findViewById(R.id.emailEdit);
         password = _findViewById(R.id.password);
-        avatarImageView = _findViewById(R.id.avatarImageView);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
 
         qbUser = new QBUser();
         imageHelper = new ImageHelper(this);
