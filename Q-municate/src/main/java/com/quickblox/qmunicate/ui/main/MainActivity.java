@@ -17,9 +17,7 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.ui.webroom.RoomOccupantFragment;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -28,7 +26,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int ID_FRIEND_LIST_FRAGMENT = 0;
-    private static final int ID_WEB_ROOM_FRAGMENT = 1;
     private static final int ID_CHATS_LIST_FRAGMENT = 1;
     private static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     private static final int ID_SETTINGS_FRAGMENT = 3;
@@ -39,8 +36,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private boolean isImportInitialized;
     private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
-
-    //    private GSMHelper gsmHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -73,6 +68,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         useDoubleBackPressed = true;
         isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
         isSignUpInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
+        gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
 
@@ -83,15 +79,13 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
-        //TODO VF Uncomment when Push woild be needed
-        //checkGCMRegistration();
+        checkGCMRegistration();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        //TODO VF Uncomment when Push woild be needed
-        // gsmHelper.checkPlayServices();
+        gsmHelper.checkPlayServices();
     }
 
     @Override
@@ -101,14 +95,9 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             case ID_FRIEND_LIST_FRAGMENT:
                 fragment = FriendsListFragment.newInstance();
                 break;
-//            case ID_WEB_ROOM_FRAGMENT:
-//                fragment = RoomOccupantFragment.newInstance();
-//                break;
             case ID_CHATS_LIST_FRAGMENT:
                 fragment = ChatsListFragment.newInstance();
                 break;
-//                DialogUtils.show(this, getResources().getString(R.string.comming_soon));
-//                return;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();
                 break;

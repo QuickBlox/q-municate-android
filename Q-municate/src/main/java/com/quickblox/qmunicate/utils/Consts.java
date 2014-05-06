@@ -42,7 +42,8 @@ public class Consts {
     public static final String CALL_DIRECTION_TYPE_EXTRA = "call_type_direction";
     public static final String CALL_TYPE_EXTRA = "call_type";
     public static final String REMOTE_DESCRIPTION = "session_description";
-    public static final String GCM_SENDER_ID = "291727224931";
+    public static final String GCM_SENDER_ID = "265299067289";
+
     // TODO VF rename and move these consts to PrefsHelper
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
