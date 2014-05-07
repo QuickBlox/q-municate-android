@@ -34,9 +34,9 @@ public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-    private EditText email;
-    private EditText password;
-    private CheckBox rememberMe;
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private CheckBox rememberMeCheckBox;
     private FacebookHelper facebookHelper;
 
     public static void start(Context context) {
@@ -50,13 +50,13 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         useDoubleBackPressed = true;
 
-        email = _findViewById(R.id.email);
-        password = _findViewById(R.id.password);
-        rememberMe = _findViewById(R.id.rememberMe);
+        emailEditText = _findViewById(R.id.email);
+        passwordEditText = _findViewById(R.id.password_edittext);
+        rememberMeCheckBox = _findViewById(R.id.rememberMe);
 
         boolean isRememberMe = App.getInstance().getPrefsHelper()
                 .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
-        rememberMe.setChecked(isRememberMe);
+        rememberMeCheckBox.setChecked(isRememberMe);
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
@@ -110,8 +110,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void loginOnClickListener(View view) {
-        String userEmail = email.getText().toString();
-        String userPassword = password.getText().toString();
+        String userEmail = emailEditText.getText().toString();
+        String userPassword = passwordEditText.getText().toString();
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
@@ -140,7 +140,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void forgotPasswordOnClickListener(View view) {
-        String userEmail = email.getText().toString();
+        String userEmail = emailEditText.getText().toString();
 
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
 
@@ -181,7 +181,7 @@ public class LoginActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-            if (rememberMe.isChecked()) {
+            if (rememberMeCheckBox.isChecked()) {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }

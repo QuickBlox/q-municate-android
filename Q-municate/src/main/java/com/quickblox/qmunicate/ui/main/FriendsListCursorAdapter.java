@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.TextViewHelper;
 
 public class FriendsListCursorAdapter extends BaseCursorAdapter {
@@ -28,7 +29,8 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
         ViewHolder holder = new ViewHolder();
 
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView.setOval(true);
         holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
         holder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
@@ -67,7 +69,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
     private static class ViewHolder {
 
-        public ImageView avatarImageView;
+        public RoundedImageView avatarImageView;
         public TextView fullnameTextView;
         public TextView statusTextView;
         public ImageView onlineImageView;

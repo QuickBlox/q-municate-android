@@ -46,6 +46,7 @@ public class QBAuthHelper {
     public QBUser signup(QBUser user, File file) throws QBResponseException, XMPPException {
         QBAuth.createSession();
         String password = user.getPassword();
+        user.setOldPassword(password);
         this.user = QBUsers.signUpSignInTask(user);
         if (null != file) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);

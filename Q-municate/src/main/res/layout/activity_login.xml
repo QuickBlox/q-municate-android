@@ -15,7 +15,7 @@
         android:text="@string/lgn_default_user_email" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/password_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"

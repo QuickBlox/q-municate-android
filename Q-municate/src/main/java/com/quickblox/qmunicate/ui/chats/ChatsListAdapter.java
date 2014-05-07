@@ -5,11 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Chat;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
 import java.util.List;
 
@@ -45,7 +45,8 @@ public class ChatsListAdapter extends ArrayAdapter<Chat> {
 
     private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView.setOval(true);
         holder.userCountTextView = (TextView) view.findViewById(R.id.userCountTextView);
         holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.lastMessageTextView = (TextView) view.findViewById(R.id.lastMessageTextView);
@@ -54,7 +55,7 @@ public class ChatsListAdapter extends ArrayAdapter<Chat> {
     }
 
     private static class ViewHolder {
-        public ImageView avatarImageView;
+        public RoundedImageView avatarImageView;
         public TextView userCountTextView;
         public TextView nameTextView;
         public TextView lastMessageTextView;

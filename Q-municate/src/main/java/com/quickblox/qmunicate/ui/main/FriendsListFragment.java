@@ -49,11 +49,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private boolean isImportInitialized;
     private boolean inNeedToInitFriendsList;
     private ListView friendsListView;
-    private TextView friendsTitle;
-    private View friendsListViewTitle;
+//    private TextView friendsTitle;
+//    private View friendsListViewTitle;
     private BaseAdapter friendsListAdapter;
     private PullToRefreshLayout pullToRefreshLayout;
-    private int headersAndFootersCounter;
+    private int positionCounter;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -122,20 +122,20 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
         isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-        headersAndFootersCounter++;
+        positionCounter++;
 
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
         initPullToRefresh(rootView);
-        updateFriendsList();
+        initFriendsList();
 
         return rootView;
     }
 
     private void initUI(View view, LayoutInflater layoutInflater) {
         friendsListView = (ListView) view.findViewById(R.id.friendList);
-        friendsListViewTitle = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
-        friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
+//        friendsListViewTitle = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
+//        friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
@@ -156,10 +156,16 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 pullToRefreshLayout);
     }
 
-    private void updateFriendsList() {
-        friendsTitle.setVisibility(View.GONE);
+    private void initFriendsList() {
+//        friendsTitle.setVisibility(View.GONE);
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, getAllFriends());
-        friendsListView.addHeaderView(friendsListViewTitle);
+//        friendsListView.addHeaderView(friendsListViewTitle);
+        friendsListView.setAdapter(friendsListAdapter);
+        friendsListView.setSelector(R.drawable.list_item_background_selector);
+        friendsListView.setOnItemClickListener(this);
+    }
+
+    private void updateFriendsList() {
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
         friendsListView.setOnItemClickListener(this);
@@ -168,7 +174,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private void startGlobalSearch() {
         inNeedToInitFriendsList = true;
         state = State.GLOBAL_LIST;
-        friendsTitle.setText(R.string.frl_all_users);
+//        friendsTitle.setText(R.string.frl_all_users);
         hideGlobalSearchButton();
         initUserList();
     }
@@ -193,6 +199,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     }
                 }
         );
+
         friendsListView.setSelector(android.R.color.transparent);
         friendsListView.setAdapter(usersListAdapter);
         friendsListView.setOnItemClickListener(null);
@@ -253,7 +260,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if (position == Consts.ZERO_VALUE) {
             return;
         }
-        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - headersAndFootersCounter);
+        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position/* - positionCounter*/);
         FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
     }
 
@@ -297,8 +304,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             showGlobalSearchButton();
-            friendsTitle.setVisibility(View.VISIBLE);
-            friendsTitle.setText(R.string.frl_friends);
+//            friendsTitle.setVisibility(View.VISIBLE);
+//            friendsTitle.setText(R.string.frl_friends);
             inNeedToInitFriendsList = false;
             return true;
         }
@@ -307,9 +314,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public boolean onMenuItemActionCollapse(MenuItem item) {
             hideGlobalSearchButton();
             state = State.FRIENDS_LIST;
-            if (friendsTitle != null) {
-                friendsTitle.setVisibility(View.GONE);
-            }
+//            if (friendsTitle != null) {
+//                friendsTitle.setVisibility(View.GONE);
+//            }
             if (inNeedToInitFriendsList) {
                 inNeedToInitFriendsList = false;
                 updateFriendsList();

@@ -3,8 +3,10 @@ package com.quickblox.qmunicate.ui.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -12,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -27,6 +28,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.GetImageFileTask;
@@ -36,12 +38,13 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements OnGetImageFileListener {
 
     private LinearLayout changeAvatarLinearLayout;
-    private ImageView avatarImageView;
+    private RoundedImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
@@ -49,7 +52,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
     private String emailCurrent;
-    private Bitmap avatarOldBitmap;
     private String fullnameOld;
     private String emailOld;
     private QBUser qbUser;
@@ -82,6 +84,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     private void initUI() {
         changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
@@ -106,7 +109,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
 
-        avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
         fullnameOld = fullNameEditText.getText().toString();
         emailOld = emailEditText.getText().toString();
     }
@@ -151,9 +153,14 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
-            avatarOldBitmap = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
             Uri originalUri = data.getData();
-            avatarImageView.setImageURI(originalUri);
+            try {
+                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
+                avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -189,7 +196,6 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
     }
 
     private void updateCurrentUserData() {
-        avatarBitmapCurrent = ImageHelper.drawableToBitmap(avatarImageView.getDrawable());
         fullnameCurrent = fullNameEditText.getText().toString();
         emailCurrent = emailEditText.getText().toString();
     }
@@ -215,16 +221,12 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
             qbUser.setFullName(fullname);
             qbUser.setEmail(email);
 
-            if (isAvatarChanges(avatar) && isNeedUpdateAvatar) {
-                new GetImageFileTask(this).execute(imageHelper, avatarImageView);
+            if (isNeedUpdateAvatar) {
+                new GetImageFileTask(this).execute(imageHelper, avatarBitmapCurrent);
             } else {
                 QBUpdateUserCommand.start(this, qbUser, null);
             }
         }
-    }
-
-    private boolean isAvatarChanges(Bitmap avatar) {
-        return !imageHelper.equalsBitmaps(avatarOldBitmap, avatar);
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {

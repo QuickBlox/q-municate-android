@@ -25,6 +25,7 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -34,7 +35,7 @@ public class FriendDetailsActivity extends BaseActivity {
 
     public static final String EXTRA_FRIEND = "Friend";
 
-    private ImageView avatarImageView;
+    private RoundedImageView avatarImageView;
     private TextView nameTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
@@ -55,6 +56,7 @@ public class FriendDetailsActivity extends BaseActivity {
         setContentView(R.layout.activity_friend_details);
 
         avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
         nameTextView = _findViewById(R.id.name_textview);
         onlineImageView = _findViewById(R.id.online_imageview);
         onlineStatusTextView = _findViewById(R.id.online_status_textview);

@@ -11,6 +11,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.DateUtils;
 
@@ -29,7 +30,8 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
         ViewHolder holder = new ViewHolder();
 
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView.setOval(true);
         holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
@@ -67,7 +69,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
     private static class ViewHolder {
 
-        ImageView avatarImageView;
+        RoundedImageView avatarImageView;
         TextView nameTextView;
         ChatTextView messageTextView;
         TextView timeTextView;
