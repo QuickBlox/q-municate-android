@@ -29,6 +29,7 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, new FriendsLoadSuccessAction());
         baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, new UserSearchSuccessAction());
-        baseActivity.addAction(QBServiceConsts.USER_SEARCH_FAIL_ACTION, failAction);
+        baseActivity.addAction(QBServiceConsts.USER_SEARCH_FAIL_ACTION, new UserSearchFailAction());
         baseActivity.updateBroadcastActionList();
     }
 
@@ -345,6 +346,15 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public void execute(Bundle bundle) {
             List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             updateUsersList(friendsList);
+        }
+    }
+
+    private class UserSearchFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            ErrorUtils.showError(baseActivity, e);
         }
     }
 
