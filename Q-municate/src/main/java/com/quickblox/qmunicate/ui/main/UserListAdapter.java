@@ -4,7 +4,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.internal.core.exception.BaseServiceException;
@@ -13,6 +12,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
@@ -79,7 +79,8 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
 
     private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (ImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        holder.avatarImageView.setOval(true);
         holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.addFriendButton = (ImageButton) view.findViewById(R.id.addFriendButton);
         return holder;
@@ -92,7 +93,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
 
     private static class ViewHolder {
 
-        public ImageView avatarImageView;
+        public RoundedImageView avatarImageView;
         public TextView fullnameTextView;
         public ImageButton addFriendButton;
     }
