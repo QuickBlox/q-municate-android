@@ -18,6 +18,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -94,6 +95,9 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();
+            if(QBChatService.getInstance() != null) {
+                QBChatService.getInstance().logout();
+            }
             return;
         }
         this.doubleBackToExitPressedOnce = true;

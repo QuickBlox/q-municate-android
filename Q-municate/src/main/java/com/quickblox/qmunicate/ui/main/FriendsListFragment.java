@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
@@ -47,13 +46,13 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private State state;
     private String constraint;
     private boolean isImportInitialized;
-    private boolean inNeedToInitFriendsList;
     private ListView friendsListView;
-//    private TextView friendsTitle;
-//    private View friendsListViewTitle;
+    private TextView friendsTitle;
+    private View friendsListViewTitle;
     private BaseAdapter friendsListAdapter;
     private PullToRefreshLayout pullToRefreshLayout;
     private int positionCounter;
+    private boolean isHideSearchView;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -95,6 +94,10 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
+                friendsListView.addFooterView(globalSearchLayout);
+                friendsTitle.setText(R.string.frl_friends);
+                friendsListView.addHeaderView(friendsListViewTitle);
+                positionCounter++;
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -122,7 +125,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
         isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-        positionCounter++;
 
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
@@ -134,8 +136,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     private void initUI(View view, LayoutInflater layoutInflater) {
         friendsListView = (ListView) view.findViewById(R.id.friendList);
-//        friendsListViewTitle = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
-//        friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
+        friendsListViewTitle = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
+        friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
     }
 
     private void initGlobalSearchButton(LayoutInflater inflater) {
@@ -157,36 +159,20 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void initFriendsList() {
-//        friendsTitle.setVisibility(View.GONE);
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, getAllFriends());
-//        friendsListView.addHeaderView(friendsListViewTitle);
-        friendsListView.setAdapter(friendsListAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
-        friendsListView.setOnItemClickListener(this);
-    }
-
-    private void updateFriendsList() {
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
         friendsListView.setOnItemClickListener(this);
     }
 
     private void startGlobalSearch() {
-        inNeedToInitFriendsList = true;
         state = State.GLOBAL_LIST;
-//        friendsTitle.setText(R.string.frl_all_users);
-        hideGlobalSearchButton();
+        friendsListView.removeFooterView(globalSearchLayout);
         initUserList();
     }
 
     private Cursor getAllFriends() {
         return DatabaseManager.getAllFriends(baseActivity);
-    }
-
-    private void hideGlobalSearchButton() {
-        if (friendsListView != null) {
-            friendsListView.removeFooterView(globalSearchLayout);
-        }
     }
 
     private void initUserList() {
@@ -199,6 +185,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     }
                 }
         );
+
+        friendsTitle.setText(R.string.frl_all_users);
 
         friendsListView.setSelector(android.R.color.transparent);
         friendsListView.setAdapter(usersListAdapter);
@@ -257,10 +245,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        if (position == Consts.ZERO_VALUE) {
-            return;
-        }
-        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position/* - positionCounter*/);
+        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
         FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
     }
 
@@ -268,10 +253,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         usersList.clear();
         usersList.addAll(friendsList);
         usersListAdapter.notifyDataSetChanged();
-    }
-
-    private void showGlobalSearchButton() {
-        friendsListView.addFooterView(globalSearchLayout);
     }
 
     private void saveFriendToCache(Friend friend) {
@@ -303,25 +284,24 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
-            showGlobalSearchButton();
-//            friendsTitle.setVisibility(View.VISIBLE);
-//            friendsTitle.setText(R.string.frl_friends);
-            inNeedToInitFriendsList = false;
+            isHideSearchView = true;
             return true;
         }
 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
-            hideGlobalSearchButton();
             state = State.FRIENDS_LIST;
-//            if (friendsTitle != null) {
-//                friendsTitle.setVisibility(View.GONE);
-//            }
-            if (inNeedToInitFriendsList) {
-                inNeedToInitFriendsList = false;
-                updateFriendsList();
-            }
+
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
+
+            if(isHideSearchView) {
+                isHideSearchView = false;
+                friendsListView.removeFooterView(globalSearchLayout);
+                friendsListView.removeHeaderView(friendsListViewTitle);
+                positionCounter--;
+                initFriendsList();
+            }
+
             return true;
         }
     }

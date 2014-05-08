@@ -11,11 +11,10 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.gcm.NotificationHelper;
 import com.quickblox.qmunicate.model.PushMessage;
-import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.utils.Consts;
 
 
@@ -71,14 +70,14 @@ public class GCMIntentService extends IntentService {
         Log.i(TAG, "message=" + message);
         GsonBuilder gsonBuilder = new GsonBuilder();
         PushMessage pushMessage = null;
-        try {
-            pushMessage = gsonBuilder.create().fromJson(message, PushMessage.class);
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        }
-        if (pushMessage != null && NotificationHelper.CALL_TYPE.equals(pushMessage.getType())) {
-            sendNotification(pushMessage);
-        }
+//        try {
+//            pushMessage = gsonBuilder.create().fromJson(message, PushMessage.class);
+//        } catch (JsonSyntaxException e) {
+//            e.printStackTrace();
+//        }
+//        if (pushMessage != null && NotificationHelper.CALL_TYPE.equals(pushMessage.getType())) {
+            sendNotification(message);
+//        }
     }
 
     private void sendBroadcast(PushMessage message) {
@@ -93,30 +92,44 @@ public class GCMIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(PushMessage msg) {
-        mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
+    private void sendNotification(String msg) {
+//        mNotificationManager = (NotificationManager)
+//                this.getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        Intent contentIntent = new Intent(this, CallActivity.class);
+//        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+//                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        contentIntent.putExtra("message", msg);
+//
+//        int unique_id = (int) System.currentTimeMillis();
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, unique_id,
+//                contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//        NotificationCompat.Builder mBuilder =
+//                new NotificationCompat.Builder(this)
+//                        .setSmallIcon(R.drawable.ic_qb)
+//                        .setContentTitle(getString(R.string.push_title))
+//                        .setStyle(new NotificationCompat.BigTextStyle()
+//                                .bigText(msg))
+//                        .setContentText(msg)
+//                        .setVibrate(new long[]{0, VIBRATOR_DURATION});
+//
+//        mBuilder.setContentIntent(pendingIntent);
+//        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
-        Intent contentIntent = new Intent(this, CallActivity.class);
-        contentIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        contentIntent.putExtra("message", msg.getMessage());
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        int unique_id = (int) System.currentTimeMillis();
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, unique_id,
-                contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(this, PrivateChatActivity.class);
+        intent.putExtra(NotificationHelper.MESSAGE, msg);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_qb)
-                        .setContentTitle(getString(R.string.push_title))
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(msg.getMessage()))
-                        .setContentText(msg.getMessage())
-                        .setVibrate(new long[]{0, VIBRATOR_DURATION});
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-        mBuilder.setContentIntent(pendingIntent);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
+                R.drawable.app_icon).setContentTitle(getString(R.string.push_title)).setStyle(
+                new NotificationCompat.BigTextStyle().bigText(msg)).setContentText(msg).setVibrate(
+                new long[]{0, VIBRATOR_DURATION});
+
+        mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
     }
 }

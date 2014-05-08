@@ -50,6 +50,12 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     private QBPrivateChat qbPrivateChat;
     private int chatId;
 
+    private PrivateChatActivity instance;
+
+    public PrivateChatActivity getInstance() {
+        return instance;
+    }
+
     public PrivateChatActivity() {
         super(R.layout.activity_private_chat);
     }
@@ -64,7 +70,10 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        instance = this;
+
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
+
         chatId = opponentFriend.getId();
 
         initUI();
