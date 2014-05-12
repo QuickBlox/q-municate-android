@@ -31,6 +31,9 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
@@ -195,6 +198,10 @@ public abstract class BaseActivity extends Activity {
         if (bounded) {
             unbindService(serviceConnection);
         }
+    }
+
+    public void showMessageAlert(String message) {
+        Crouton.makeText(this, message, Style.ALERT).show();
     }
 
     public class FailAction implements Command {

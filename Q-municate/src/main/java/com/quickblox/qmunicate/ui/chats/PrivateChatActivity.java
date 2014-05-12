@@ -34,6 +34,9 @@ import org.jivesoftware.smack.packet.Message;
 
 import java.io.IOException;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 public class PrivateChatActivity extends BaseChatActivity implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
@@ -120,8 +123,11 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     private void initChat() {
         // Step 1: Initialize Chat Module
         QBPrivateChatManager qbPrivateChatManager;
-
         qbChatService = QBChatService.getInstance();
+        if(qbChatService == null) {
+            QBChatService.init(this);
+            qbChatService = QBChatService.getInstance();
+        }
 
         // Step 2: Login
         if (!qbChatService.isLoggedIn()) {
@@ -187,7 +193,12 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     }
 
     @Override
-    public void processMessage(QBPrivateChat qbPrivateChat, Message message) {
+    public void processMessage(QBPrivateChat qbPrivateChat, final Message message) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Crouton.makeText(PrivateChatActivity.this, message.getBody(), Style.ALERT).show();
+            }
+        });
         saveMessageToCache(message, opponentFriend);
     }
 

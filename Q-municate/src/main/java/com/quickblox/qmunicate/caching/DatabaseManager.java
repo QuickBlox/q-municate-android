@@ -92,8 +92,12 @@ public class DatabaseManager {
         return cursor;
     }
 
-    public static Cursor getFriendById(Context context, int friendId) {
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + friendId, null, null);
+    public static Cursor getCursorFriendById(Context context, int friendId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + friendId, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
     }
 
     public static Cursor getAllFriends(Context context) {

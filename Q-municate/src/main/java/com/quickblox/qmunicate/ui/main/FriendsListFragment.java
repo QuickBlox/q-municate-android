@@ -124,7 +124,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
+                false);
 
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
@@ -294,7 +295,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
 
-            if(isHideSearchView) {
+            if (isHideSearchView) {
                 isHideSearchView = false;
                 friendsListView.removeFooterView(globalSearchLayout);
                 friendsListView.removeHeaderView(friendsListViewTitle);

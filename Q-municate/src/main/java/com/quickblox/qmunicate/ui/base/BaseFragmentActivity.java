@@ -30,6 +30,9 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 public class BaseFragmentActivity extends FragmentActivity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
