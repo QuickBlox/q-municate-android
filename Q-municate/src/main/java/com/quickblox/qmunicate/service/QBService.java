@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
+import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
@@ -85,9 +86,8 @@ public class QBService extends Service {
                 QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.USER_SEARCH_ACTION, new QBUserSearchCommand(this,
                 QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, QBServiceConsts.USER_SEARCH_FAIL_ACTION));
-
-//        serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
-//                QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
+        serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this, qbChatHelper,
+                QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
     }
 
     @Override

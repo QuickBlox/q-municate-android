@@ -17,6 +17,7 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
@@ -180,22 +181,6 @@ public abstract class BaseActivity extends Activity {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
-    }
-
-    private void registerBroadcastReceiver() {
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (intent != null && (action) != null) {
-                    Command command = broadcastCommandMap.get(action);
-                    if (command != null) {
-                        Log.d("STEPS", "executing " + action);
-                        command.execute(intent.getExtras());
-                    }
-                }
-            }
-        };
     }
 
     private void connectToService() {

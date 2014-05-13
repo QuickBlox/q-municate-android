@@ -9,6 +9,8 @@ import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 
@@ -20,8 +22,11 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     private static QBChatHelper instance;
 
     private Context context;
+    private QBUser qbUser;
     private QBChatService qbChatService;
     private QBPrivateChat qbPrivateChat;
+    private QBPrivateChatManager qbPrivateChatManager;
+    private int privateChatId;
 
     private QBChatHelper() {
         instance = this;
@@ -35,15 +40,15 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     }
 
     public void sendPrivateMessage(String message) {
-        QBChatMessage chatMessage = getQBChatMessage(message);
+        QBChatMessage qbChatMessage = getQBChatMessage(message);
         try {
-            qbPrivateChat.sendMessage(chatMessage);
+            qbPrivateChat.sendMessage(qbChatMessage);
         } catch (XMPPException e) {
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(chatMessage);
+        saveMessageToCache(qbChatMessage, qbUser.getId(), privateChatId);
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -52,14 +57,14 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         return qbChatMessage;
     }
 
-    private void saveMessageToCache(QBChatMessage chatMessage) {
-        DatabaseManager.savePrivateChatMessage(context, chatMessage);
+    private void saveMessageToCache(QBChatMessage qbChatMessage, int senderId, int chatId) {
+        DatabaseManager.savePrivateChatMessage(context, qbChatMessage, senderId, chatId);
     }
 
     @Override
     public void processMessage(QBPrivateChat qbPrivateChat, QBChatMessage message) {
+        saveMessageToCache(message, message.getSenderId(), message.getSenderId());
         Intent intent = new Intent(BroadcastActions.GOT_MESSAGE);
-        saveMessageToCache(message);
         intent.putExtra(BroadcastActions.EXTRA_MESSAGE, message.getBody());
         context.sendBroadcast(intent);
     }
@@ -71,12 +76,16 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         }
     }
 
-    public void initPrivateChat(Context context, int opponentId) {
-        this.context = context;
+    public void initChats() {
         qbChatService = QBChatService.getInstance();
-        QBPrivateChatManager qbPrivateChatManager;
         qbPrivateChatManager = qbChatService.getPrivateChatManager();
         qbPrivateChatManager.addPrivateChatManagerListener(this);
+    }
+
+    public void initPrivateChat(Context context, int opponentId) {
+        this.context = context;
+        qbUser = App.getInstance().getUser();
         qbPrivateChat = qbPrivateChatManager.createChat(opponentId, this);
+        privateChatId = opponentId;
     }
 }

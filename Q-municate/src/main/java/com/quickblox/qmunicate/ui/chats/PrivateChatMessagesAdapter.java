@@ -45,26 +45,29 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
 
+        String senderName;
+        String avatarUrl;
+
         String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
         int senderId = cursor.getInt(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SENDER_ID));
-        Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
-        Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
+
+        if(senderId == currentUser.getId()) {
+            senderName = currentUser.getFullName();
+            avatarUrl = getAvatarUrlForCurrentUser();
+        } else {
+            Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
+            Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
+            senderName = senderFriend.getFullname();
+            avatarUrl = getAvatarUrlForFriend(opponentFriend);
+        }
+
         long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
-        holder.nameTextView.setText(senderFriend.getFullname());
+        holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        String avatarUrl = getAvatarUrl(senderId);
         displayImage(avatarUrl, holder.avatarImageView);
-    }
-
-    private String getAvatarUrl(int friendId) {
-        if (currentUser.getId() == friendId) {
-            return getAvatarUrlForCurrentUser();
-        } else {
-            return getAvatarUrlForFriend(opponentFriend);
-        }
     }
 
     private static class ViewHolder {

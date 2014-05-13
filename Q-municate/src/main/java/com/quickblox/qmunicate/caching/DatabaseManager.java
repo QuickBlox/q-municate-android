@@ -110,20 +110,20 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, QBChatMessage message) {
+    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId) {
         ContentValues values = new ContentValues();
 
         values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
-        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, senderId);
         values.put(PrivateChatMessagesTable.Cols.TIME, System.currentTimeMillis());
         // TODO INCOMING
         values.put(PrivateChatMessagesTable.Cols.INCOMING, false);
-        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, message.getSenderId());
+        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
 
         context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }
 
-    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
+    public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
         return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 }

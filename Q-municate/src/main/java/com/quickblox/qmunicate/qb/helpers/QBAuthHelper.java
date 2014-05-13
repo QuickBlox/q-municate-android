@@ -97,6 +97,7 @@ public class QBAuthHelper {
     private void loginChat(QBUser user) throws QBResponseException {
         try {
             QBChatService.getInstance().login(user);
+            QBChatHelper.getInstance().initChats();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SmackException e) {
