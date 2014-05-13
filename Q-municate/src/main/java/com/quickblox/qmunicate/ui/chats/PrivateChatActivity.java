@@ -15,29 +15,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.listeners.QBMessageListener;
-import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
+import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-
-import java.io.IOException;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
-
-public class PrivateChatActivity extends BaseChatActivity implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener {
+public class PrivateChatActivity extends BaseChatActivity {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
 
@@ -49,15 +35,10 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
 
-    private QBChatService qbChatService;
-    private QBPrivateChat qbPrivateChat;
     private int chatId;
 
     private PrivateChatActivity instance;
-
-    public PrivateChatActivity getInstance() {
-        return instance;
-    }
+    private QBChatHelper qbChatHelper;
 
     public PrivateChatActivity() {
         super(R.layout.activity_private_chat);
@@ -69,14 +50,16 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
         context.startActivity(intent);
     }
 
+    public PrivateChatActivity getInstance() {
+        return instance;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         instance = this;
-
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
-
         chatId = opponentFriend.getId();
 
         initUI();
@@ -121,39 +104,12 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     }
 
     private void initChat() {
-        // Step 1: Initialize Chat Module
-        QBPrivateChatManager qbPrivateChatManager;
-        qbChatService = QBChatService.getInstance();
-        if(qbChatService == null) {
-            QBChatService.init(this);
-            qbChatService = QBChatService.getInstance();
-        }
-
-        // Step 2: Login
-        if (!qbChatService.isLoggedIn()) {
-            loginToChat();
-        }
-
-        // Step 3: Create Chat
-        qbPrivateChatManager = qbChatService.getPrivateChatManager();
-        qbPrivateChatManager.addPrivateChatManagerListener(this);
-        qbPrivateChat = qbPrivateChatManager.createChat(opponentFriend.getId(), this);
+        qbChatHelper = QBChatHelper.getInstance();
+        qbChatHelper.initPrivateChat(this, opponentFriend.getId());
     }
 
     protected BaseAdapter getMessagesAdapter() {
         return new PrivateChatMessagesAdapter(this, getAllPrivateChatMessages(), opponentFriend);
-    }
-
-    private void loginToChat() {
-        try {
-            qbChatService.login(App.getInstance().getUser());
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        }
     }
 
     private Cursor getAllPrivateChatMessages() {
@@ -161,58 +117,8 @@ public class PrivateChatActivity extends BaseChatActivity implements QBMessageLi
     }
 
     public void sendMessageOnClick(View view) {
-        Message message = getMessage();
-        try {
-            qbPrivateChat.sendMessage(message);
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
-        }
-        Friend senderFriend = new Friend();
-        senderFriend.setId(App.getInstance().getUser().getId());
-        senderFriend.setFullname(App.getInstance().getUser().getFullName());
-        senderFriend.setEmail(App.getInstance().getUser().getEmail());
-        saveMessageToCache(message, senderFriend);
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString());
         messageEditText.setText("");
-    }
-
-    private Message getMessage() {
-        Message message = new Message();
-        message.setBody(messageEditText.getText().toString());
-        return message;
-    }
-
-    private void saveMessageToCache(Message message, Friend senderFriend) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setBody(message.getBody());
-        chatMessage.setSenderId(senderFriend.getId());
-        chatMessage.setSenderName(senderFriend.getFullname());
-        chatMessage.setTime(System.currentTimeMillis());
-        DatabaseManager.savePrivateChatMessage(this, chatMessage, chatId);
-    }
-
-    @Override
-    public void processMessage(QBPrivateChat qbPrivateChat, final Message message) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                Crouton.makeText(PrivateChatActivity.this, message.getBody(), Style.ALERT).show();
-            }
-        });
-        saveMessageToCache(message, opponentFriend);
-    }
-
-    @Override
-    public void chatCreated(QBPrivateChat qbPrivateChat, boolean createdLocally) {
-        if (createdLocally) {
-            // createdLocally = true
-            // мы сами создали этот чат
-        } else {
-            // createdLocally = false
-            // чат создал кто-то удаленно и нам пришло сообщение
-            // нужно добавить слушателя и первое сообщение получим в него же
-            this.qbPrivateChat.addMessageListener(PrivateChatActivity.this);
-        }
     }
 
     @Override

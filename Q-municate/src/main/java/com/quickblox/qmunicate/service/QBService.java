@@ -13,7 +13,6 @@ import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBFriendsLoadCommand;
 import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
-import com.quickblox.qmunicate.qb.commands.QBJoinRoomCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
@@ -54,7 +53,7 @@ public class QBService extends Service {
         threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT, threadQueue);
 
-        qbChatHelper = new QBChatHelper();
+        qbChatHelper = QBChatHelper.getInstance();
         qbAuthHelper = new QBAuthHelper();
 
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
@@ -86,6 +85,7 @@ public class QBService extends Service {
                 QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.USER_SEARCH_ACTION, new QBUserSearchCommand(this,
                 QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, QBServiceConsts.USER_SEARCH_FAIL_ACTION));
+
 //        serviceCommandMap.put(QBServiceConsts.JOIN_ROOM_ACTION, new QBJoinRoomCommand(this,
 //                QBServiceConsts.JOIN_ROOM_SUCCESS_ACTION, QBServiceConsts.JOIN_ROOM_FAIL_ACTION, qbChatHelper));
     }

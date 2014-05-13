@@ -14,6 +14,7 @@ public class QBServiceConsts {
     public static final String UPDATE_USER_ACTION = "update user action";
     public static final String FRIENDS_LOAD_ACTION = "friends_load_action";
     public static final String USER_SEARCH_ACTION = "user_search_action";
+    public static final String SEND_MESSAGE_ACTION = "send_message_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add friend success action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add friendsList success action";
@@ -39,7 +40,10 @@ public class QBServiceConsts {
     public static final String FRIENDS_LOAD_FAIL_ACTION = "friends_load_fail_action";
     public static final String USER_SEARCH_SUCCESS_ACTION = "user_search_success_action";
     public static final String USER_SEARCH_FAIL_ACTION = "user_search_fail_action";
+    public static final String SEND_MESSAGE_SUCCESS_ACTION = "send_message_success_action";
+    public static final String SEND_MESSAGE_FAIL_ACTION = "send_message_fail_action";
 
+    public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_USER = "qb user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";

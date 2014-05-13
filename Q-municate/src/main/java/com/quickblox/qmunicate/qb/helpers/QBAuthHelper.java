@@ -5,7 +5,6 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.auth.model.QBSession;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.utils.Consts;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
@@ -62,7 +61,11 @@ public class QBAuthHelper {
     public void logout() throws QBResponseException {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-        QBChatService.getInstance().logout();
+        try {
+            QBChatService.getInstance().logout();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
@@ -93,10 +96,6 @@ public class QBAuthHelper {
     private void loginChat(QBUser user) throws QBResponseException {
         try {
             QBChatService.getInstance().login(user);
-        } catch (QBResponseException e) {
-            if (!Consts.ALREADY_LOGGED_IN.equals(e.getLocalizedMessage())) {
-                throw e;
-            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SmackException e) {

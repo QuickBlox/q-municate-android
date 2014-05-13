@@ -9,7 +9,6 @@ import android.net.Uri;
 
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
-import com.quickblox.qmunicate.model.PrivateChat;
 
 public class DatabaseProvider extends ContentProvider {
 

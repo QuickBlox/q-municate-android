@@ -47,9 +47,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         StringBuilder privateChatMessagesTableFields = new StringBuilder();
         privateChatMessagesTableFields
                 .append(PrivateChatMessagesTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
-                .append(PrivateChatMessagesTable.Cols.SUBJECT).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.BODY).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.SENDER_NAME).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.TIME).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.INCOMING).append(" TEXT, ")

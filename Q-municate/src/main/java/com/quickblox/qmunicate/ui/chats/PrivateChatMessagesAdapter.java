@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
@@ -47,12 +47,12 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
         String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
         int senderId = cursor.getInt(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SENDER_ID));
-        String senderName = cursor.getString(cursor.getColumnIndex(
-                PrivateChatMessagesTable.Cols.SENDER_NAME));
+        Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
+        Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
         long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
-        holder.nameTextView.setText(senderName);
+        holder.nameTextView.setText(senderFriend.getFullname());
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         String avatarUrl = getAvatarUrl(senderId);

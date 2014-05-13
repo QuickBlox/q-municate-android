@@ -16,9 +16,7 @@ public class PrivateChatMessagesTable {
     public static class Cols {
 
         public static final String ID = "_id";
-        public static final String SUBJECT = "subject";
         public static final String BODY = "body";
-        public static final String SENDER_NAME = "sender_name";
         public static final String SENDER_ID = "sender_id";
         public static final String TIME = "time";
         public static final String INCOMING = "incoming";

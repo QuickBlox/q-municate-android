@@ -5,9 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
-import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
@@ -110,16 +110,15 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, ChatMessage message, int chatId) {
+    public static void savePrivateChatMessage(Context context, QBChatMessage message) {
         ContentValues values = new ContentValues();
 
-        values.put(PrivateChatMessagesTable.Cols.SUBJECT, message.getSubject());
         values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
         values.put(PrivateChatMessagesTable.Cols.SENDER_ID, message.getSenderId());
-        values.put(PrivateChatMessagesTable.Cols.SENDER_NAME, message.getSenderName());
-        values.put(PrivateChatMessagesTable.Cols.TIME, message.getTime());
-        values.put(PrivateChatMessagesTable.Cols.INCOMING, message.isIncoming());
-        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
+        values.put(PrivateChatMessagesTable.Cols.TIME, System.currentTimeMillis());
+        // TODO INCOMING
+        values.put(PrivateChatMessagesTable.Cols.INCOMING, false);
+        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, message.getSenderId());
 
         context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }
