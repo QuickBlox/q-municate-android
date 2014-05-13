@@ -7,6 +7,7 @@ dependencies {
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
     compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
+    compile "de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
 }
 

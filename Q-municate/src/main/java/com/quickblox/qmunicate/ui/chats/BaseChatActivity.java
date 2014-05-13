@@ -58,6 +58,12 @@ public class BaseChatActivity extends BaseFragmentActivity implements SwitchView
         registerReceiver(smileSelectedBroadcastReceiver, filter);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(smileSelectedBroadcastReceiver);
+    }
+
     private void initUI() {
         smilesLayout = findViewById(R.id.smiles_linearlayout);
         smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);

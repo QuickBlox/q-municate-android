@@ -26,7 +26,6 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -53,6 +52,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
+    private boolean isMissedMessage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,14 +60,42 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         resources = getResources();
 
-        userLearnedDrawer = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+        initPrefValues();
 
         if (savedInstanceState != null) {
             currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             fromSavedInstanceState = true;
         }
 
+        if (isMissedMessage) {
+            currentSelectedPosition = MainActivity.ID_CHATS_LIST_FRAGMENT;
+            saveMissedMessageFlag(false);
+        }
+
         selectItem(currentSelectedPosition);
+    }
+
+    private void initPrefValues() {
+        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
+        userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+        isMissedMessage = prefsHelper.getPref(PrefsHelper.PREF_MISSED_MESSAGE, false);
+    }
+
+    private void saveMissedMessageFlag(boolean isMissedMessage) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
+    }
+
+    private void selectItem(int position) {
+        currentSelectedPosition = position;
+        if (drawerListView != null) {
+            drawerListView.setItemChecked(position, true);
+        }
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(fragmentContainerView);
+        }
+        if (callbacks != null) {
+            callbacks.onNavigationDrawerItemSelected(position);
+        }
     }
 
     @Override
@@ -80,6 +108,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         NavigationDrawerAdapter navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
                 getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
+
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
 
@@ -114,13 +143,15 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private List<String> getNavigationDrawerItems() {
-        String [] itemsArray = resources.getStringArray(R.array.nvd_items_array);
+        String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
         return Arrays.asList(itemsArray);
     }
 
     private void performItemClick(final View view, final int position) {
-        TransitionDrawable newTransition = (TransitionDrawable) resources.getDrawable(R.drawable.menu_item_background_click_transition);
-        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(resources.getDrawable(R.drawable.menu_item_background_click_transition));
+        TransitionDrawable newTransition = (TransitionDrawable) resources.getDrawable(
+                R.drawable.menu_item_background_click_transition);
+        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(resources.getDrawable(
+                R.drawable.menu_item_background_click_transition));
         newTransition.startTransition(Consts.DELAY_LONG_CLICK_ANIMATION_SHORT);
         view.setBackgroundDrawable(newTransition);
         selectItem(position);
@@ -137,19 +168,6 @@ public class NavigationDrawerFragment extends BaseFragment {
             }
         });
         dialog.show(getFragmentManager(), null);
-    }
-
-    private void selectItem(int position) {
-        currentSelectedPosition = position;
-        if (drawerListView != null) {
-            drawerListView.setItemChecked(position, true);
-        }
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
-        }
-        if (callbacks != null) {
-            callbacks.onNavigationDrawerItemSelected(position);
-        }
     }
 
     @Override
