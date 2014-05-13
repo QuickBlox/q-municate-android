@@ -1,23 +1,8 @@
 package com.quickblox.qmunicate.qb.helpers;
 
-import android.content.Context;
-import android.content.Intent;
+public class QBChatHelper {
 
-import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
-import com.quickblox.module.videochat_webrtc.ISignalingChannel;
-import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.module.videochat_webrtc.model.CallConfig;
-import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
-import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
-import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.utils.Consts;
-
-import java.util.List;
-
-public class QBChatHelper {}
+}
 //        implements RoomListener {
 //
 //    private Lo lo = new Lo(this);
