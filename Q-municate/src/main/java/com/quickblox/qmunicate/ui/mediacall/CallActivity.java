@@ -1,5 +1,3 @@
-package com.quickblox.qmunicate.ui.mediacall;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,12 +31,17 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private ChatMessageHandler messageHandler;
 
+
     public static void start(Context context, QBUser friend, WebRTC.MEDIA_STREAM callType) {
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.USER, friend);
         intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.OUTGOING);
         intent.putExtra(Consts.CALL_TYPE_EXTRA, callType);
         context.startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     @Override
@@ -49,36 +52,6 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     public void onDenyClick() {
         reject();
-    }
-
-    private void reject() {
-        if (signalingChannel != null && opponent != null) {
-            ConnectionConfig connectionConfig = new ConnectionConfig(opponent, sessionId);
-            signalingChannel.sendReject(connectionConfig);
-        }
-        cancelPlayer();
-        finish();
-    }
-
-    private void accept() {
-        cancelPlayer();
-        showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type, sessionId);
-    }
-
-    private void cancelPlayer() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stopPlaying();
-        }
-    }
-
-    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
-            WebRTC.MEDIA_STREAM callType, String sessionId) {
-        Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
-                call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
-        OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
-                call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
-        outgoingCallFragment.setArguments(bundle);
-        setCurrentFragment(outgoingCallFragment);
     }
 
     @Override
@@ -111,7 +84,36 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     @Override
-    public void onBackPressed() {
+    protected void onDestroy() {
+        cancelPlayer();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onConnectedToService() {
+        //        signalingChannel = service.getQbChatHelper().getSignalingChannel();
+        messageHandler = new ChatMessageHandler();
+        //        signalingChannel.addMessageHandler(messageHandler);
+    }
+
+    private void cancelPlayer() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stopPlaying();
+        }
+    }
+
+    private void reject() {
+        if (signalingChannel != null && opponent != null) {
+            ConnectionConfig connectionConfig = new ConnectionConfig(opponent, sessionId);
+            signalingChannel.sendReject(connectionConfig);
+        }
+        cancelPlayer();
+        finish();
+    }
+
+    private void accept() {
+        cancelPlayer();
+        showOutgoingFragment(sessionDescriptionWrapper, opponent, call_type, sessionId);
     }
 
     private void parseIntentExtras(Bundle extras) {
@@ -136,13 +138,6 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         Log.i(TAG, "opponentId=" + opponent);
     }
 
-    private void showIncomingFragment() {
-        playIncomingRingtone();
-        IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
-                opponent.getFullName());
-        setCurrentFragment(incomingCallFragment);
-    }
-
     private void showOutgoingFragment() {
         playOutgoingRingtone();
         OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
@@ -155,22 +150,33 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         setCurrentFragment(outgoingCallFragment);
     }
 
-    private void playIncomingRingtone() {
-        if (mediaPlayer != null) {
-            mediaPlayer.playDefaultRingTone();
-        }
-    }
-
     private void playOutgoingRingtone() {
         if (mediaPlayer != null) {
             mediaPlayer.playSound("calling.mp3", true);
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        cancelPlayer();
-        super.onDestroy();
+    private void playIncomingRingtone() {
+        if (mediaPlayer != null) {
+            mediaPlayer.playDefaultRingTone();
+        }
+    }
+
+    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
+            WebRTC.MEDIA_STREAM callType, String sessionId) {
+        Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
+                call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
+        OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
+                call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
+        outgoingCallFragment.setArguments(bundle);
+        setCurrentFragment(outgoingCallFragment);
+    }
+
+    private void showIncomingFragment() {
+        playIncomingRingtone();
+        IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
+                opponent.getFullName());
+        setCurrentFragment(incomingCallFragment);
     }
 
     private class ChatMessageHandler extends SignalingListenerImpl {
@@ -180,4 +186,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
             onConnectionClosed();
         }
     }
+
+    ;
 }
+

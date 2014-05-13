@@ -61,10 +61,11 @@ public class QBAuthHelper {
     public void logout() throws QBResponseException {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
+
         try {
             QBChatService.getInstance().logout();
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            throw new QBResponseException(e.getLocalizedMessage());
         }
     }
 
