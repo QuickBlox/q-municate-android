@@ -33,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
+                android:onClick="attachButtonOnClick"
                 android:src="@drawable/ic_photo"
                 android:visibility="visible" />
 

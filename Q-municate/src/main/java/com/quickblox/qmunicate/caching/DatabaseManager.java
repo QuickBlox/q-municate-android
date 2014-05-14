@@ -110,7 +110,7 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId) {
+    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId, String attachUrl) {
         ContentValues values = new ContentValues();
 
         values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
@@ -119,6 +119,7 @@ public class DatabaseManager {
         // TODO INCOMING
         values.put(PrivateChatMessagesTable.Cols.INCOMING, false);
         values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
+        values.put(PrivateChatMessagesTable.Cols.ATTACH_FILE_URL, attachUrl);
 
         context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
     }

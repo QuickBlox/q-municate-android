@@ -2,8 +2,10 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
@@ -34,6 +36,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.avatarImageView.setOval(true);
         holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
 
         view.setTag(holder);
@@ -49,6 +52,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         String avatarUrl;
 
         String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.ATTACH_FILE_URL));
         int senderId = cursor.getInt(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SENDER_ID));
 
         if(senderId == currentUser.getId()) {
@@ -64,6 +68,12 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
+        if(!TextUtils.isEmpty(attachUrl)) {
+            holder.attachImageView.setVisibility(View.VISIBLE);
+            displayImage(attachUrl, holder.attachImageView);
+        } else {
+            holder.attachImageView.setVisibility(View.GONE);
+        }
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
@@ -75,6 +85,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         RoundedImageView avatarImageView;
         TextView nameTextView;
         ChatTextView messageTextView;
+        ImageView attachImageView;
         TextView timeTextView;
     }
 }

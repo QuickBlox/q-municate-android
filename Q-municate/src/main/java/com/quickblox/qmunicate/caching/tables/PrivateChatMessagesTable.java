@@ -21,5 +21,6 @@ public class PrivateChatMessagesTable {
         public static final String TIME = "time";
         public static final String INCOMING = "incoming";
         public static final String CHAT_ID = "chat_id";
+        public static final String ATTACH_FILE_URL = "attach_file_url";
     }
 }

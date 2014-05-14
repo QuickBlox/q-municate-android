@@ -51,7 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(PrivateChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.TIME).append(" TEXT, ")
                 .append(PrivateChatMessagesTable.Cols.INCOMING).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
+                .append(PrivateChatMessagesTable.Cols.CHAT_ID).append(" TEXT, ")
+                .append(PrivateChatMessagesTable.Cols.ATTACH_FILE_URL).append(" TEXT");
         createTable(db, PrivateChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
     }
 

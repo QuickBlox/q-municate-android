@@ -20,9 +20,9 @@ import com.quickblox.qmunicate.utils.Consts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBFriendsLoadCommand extends ServiceCommand {
+public class QBLoadFriendsCommand extends ServiceCommand {
 
-    public QBFriendsLoadCommand(Context context, String successAction, String failAction) {
+    public QBLoadFriendsCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 

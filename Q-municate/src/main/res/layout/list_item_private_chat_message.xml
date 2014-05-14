@@ -43,6 +43,11 @@
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_small" />
 
+        <ImageView
+            android:id="@+id/attach_imageview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
     <TextView

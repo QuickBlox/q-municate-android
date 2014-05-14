@@ -22,7 +22,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBFriendsLoadCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
@@ -105,7 +105,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void startFriendsListLoader() {
-        QBFriendsLoadCommand.start(baseActivity);
+        QBLoadFriendsCommand.start(baseActivity);
     }
 
     @Override

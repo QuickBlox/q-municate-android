@@ -4,7 +4,10 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,15 +18,27 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.quickblox.module.content.model.QBFile;
+import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetImageFileListener;
 
-public class PrivateChatActivity extends BaseChatActivity {
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class PrivateChatActivity extends BaseChatActivity implements OnGetImageFileListener {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
 
@@ -34,11 +49,13 @@ public class PrivateChatActivity extends BaseChatActivity {
 
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
+    private ImageHelper imageHelper;
+    private QBUser currentUser;
 
     private int chatId;
 
     private PrivateChatActivity instance;
-    private QBChatHelper qbChatHelper;
+    private QBChatHelper chatHelper;
 
     public PrivateChatActivity() {
         super(R.layout.activity_private_chat);
@@ -59,8 +76,10 @@ public class PrivateChatActivity extends BaseChatActivity {
         super.onCreate(savedInstanceState);
 
         instance = this;
+        currentUser = App.getInstance().getUser();
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
         chatId = opponentFriend.getId();
+        imageHelper = new ImageHelper(this);
 
         initUI();
         initListView();
@@ -104,8 +123,8 @@ public class PrivateChatActivity extends BaseChatActivity {
     }
 
     private void initChat() {
-        qbChatHelper = QBChatHelper.getInstance();
-        qbChatHelper.initPrivateChat(opponentFriend.getId());
+        chatHelper = QBChatHelper.getInstance();
+        chatHelper.initPrivateChat(opponentFriend.getId());
     }
 
     protected BaseAdapter getMessagesAdapter() {
@@ -114,6 +133,31 @@ public class PrivateChatActivity extends BaseChatActivity {
 
     private Cursor getAllPrivateChatMessages() {
         return DatabaseManager.getAllPrivateChatMessagesByChatId(this, chatId);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
+    }
+
+    @Override
+    public void onGotImageFile(File file) {
+        startLoadAttachFile(file);
+    }
+
+    private void startLoadAttachFile(File file) {
+        showProgress();
+        QBLoadAttachFileCommand.start(this, file);
+    }
+
+    public void attachButtonOnClick(View view) {
+        imageHelper.getImage();
     }
 
     public void sendMessageOnClick(View view) {
@@ -147,8 +191,39 @@ public class PrivateChatActivity extends BaseChatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            Uri originalUri = data.getData();
+            try {
+                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
+                new GetImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        addActions();
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
+    }
+
+    private class LoadAttachFileSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
+            chatHelper.sendPrivateMessageWithAttachFile(qbFile);
+            hideProgress();
+        }
     }
 }
