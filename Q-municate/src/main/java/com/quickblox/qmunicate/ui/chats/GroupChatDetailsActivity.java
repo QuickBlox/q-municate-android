@@ -2,15 +2,19 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 
 import java.util.ArrayList;
@@ -19,13 +23,17 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GroupChatDetailsActivity extends BaseActivity {
+    public static final String EXTRA_GROUP = "opponentGroup";
     private ListView friendsListView;
+    private GroupChat opponentChat;
+    private String groupId;
 
     private List<Friend> friendsArrayList;
     private ChatFriendsAdapter friendsAdapter;
 
-    public static void start(Context context) {
+    public static void start(Context context, GroupChat chat) {
         Intent intent = new Intent(context, GroupChatDetailsActivity.class);
+        intent.putExtra(EXTRA_GROUP, chat);
         context.startActivity(intent);
     }
 
@@ -33,12 +41,15 @@ public class GroupChatDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat_details);
+        opponentChat = (GroupChat) getIntent().getExtras().getSerializable(EXTRA_GROUP);
+
+        groupId = opponentChat.getId();
 
         initUI();
 
-        friendsArrayList = new ArrayList<Friend>();
-        friendsAdapter = new ChatFriendsAdapter(this, R.layout.list_item_chat_friend, friendsArrayList);
-        friendsListView.setAdapter(friendsAdapter);
+//        friendsArrayList = new ArrayList<Friend>();
+//        friendsAdapter = new ChatFriendsAdapter(this, R.layout.list_item_chat_friend, friendsArrayList);
+//        friendsListView.setAdapter(friendsAdapter);
 
         initListeners();
         initListView();
@@ -53,17 +64,27 @@ public class GroupChatDetailsActivity extends BaseActivity {
 
     private void initListView() {
         // TODO temp friendsList list.
-        friendsArrayList.add(new Friend(new QBUser("serik", "11111111", "Sergey Fedunets")));
-        friendsArrayList.add(new Friend(new QBUser("igor", "11111111", "Igor Shaforenko")));
-        friendsArrayList.add(new Friend(new QBUser("anton", "11111111", "Anton Dyachenko")));
-        friendsArrayList.add(new Friend(new QBUser("vadim", "11111111", "Vadim Fite")));
-        friendsArrayList.add(new Friend(new QBUser("gena", "11111111", "Gena Friend")));
-        updateFriendListAdapter();
+        friendsAdapter = getMessagesAdapter();
+//        friendsArrayList.add(new Friend(new QBUser("serik", "11111111", "Sergey Fedunets")));
+//        friendsArrayList.add(new Friend(new QBUser("igor", "11111111", "Igor Shaforenko")));
+//        friendsArrayList.add(new Friend(new QBUser("anton", "11111111", "Anton Dyachenko")));
+//        friendsArrayList.add(new Friend(new QBUser("vadim", "11111111", "Vadim Fite")));
+//        friendsArrayList.add(new Friend(new QBUser("gena", "11111111", "Gena Friend")));
+//        updateFriendListAdapter();
+        friendsListView.setAdapter(friendsAdapter);
     }
 
     private void updateFriendListAdapter() {
         Collections.sort(friendsArrayList, new SimpleComparator());
         friendsAdapter.notifyDataSetChanged();
+    }
+
+    protected ChatFriendsAdapter getMessagesAdapter() {
+        return new ChatFriendsAdapter(this, getAllGroupChatMessages(), opponentChat.getMessages());
+    }
+
+    private Cursor getAllGroupChatMessages() {
+        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, groupId);
     }
 
     @Override

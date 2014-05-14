@@ -11,21 +11,41 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.GroupChat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupChatActivity extends BaseChatActivity {
+    private List<Friend> friends;
+    private String nameOfChat = "";
+    private int allowedNameLength = 20;
 
     public GroupChatActivity() {
         super(R.layout.activity_group_chat);
     }
 
-    public static void start(Context context) {
+    public static void start(Context context, ArrayList<Friend> friends) {
         Intent intent = new Intent(context, GroupChatActivity.class);
+        intent.putExtra(GroupChatDetailsActivity.EXTRA_GROUP, friends);
         context.startActivity(intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
+            friends = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
+        }
+        for(Friend friend : friends){
+            if(nameOfChat.length() < allowedNameLength){
+                nameOfChat = nameOfChat + friend.getLogin() + ",";
+            } else {
+                nameOfChat = nameOfChat + "...";
+                break;
+            }
+        }
 
         initUI();
 
@@ -38,7 +58,7 @@ public class GroupChatActivity extends BaseChatActivity {
 
     private void actionBarSetup() {
         ActionBar ab = getActionBar();
-        ab.setTitle("Name of Chat");
+        ab.setTitle(nameOfChat);
         ab.setSubtitle("some information");
     }
 
@@ -56,7 +76,7 @@ public class GroupChatActivity extends BaseChatActivity {
                 navigateToParent();
                 return true;
             case R.id.action_group_details:
-                GroupChatDetailsActivity.start(this);
+//                GroupChatDetailsActivity.start(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

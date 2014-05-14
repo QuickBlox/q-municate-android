@@ -113,7 +113,7 @@ public class PrivateChatActivity extends BaseChatActivity {
     }
 
     private Cursor getAllPrivateChatMessages() {
-        return DatabaseManager.getAllPrivateChatMessagesByChatId(this, chatId);
+        return DatabaseManager.getAllPrivateChatMessagesBySenderId(this, chatId);
     }
 
     public void sendMessageOnClick(View view) {

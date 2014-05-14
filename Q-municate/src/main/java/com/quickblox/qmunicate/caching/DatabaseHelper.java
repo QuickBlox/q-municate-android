@@ -4,8 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 
 import java.text.MessageFormat;
 
@@ -46,19 +46,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createPrivateChatMessageTable(SQLiteDatabase db) {
         StringBuilder privateChatMessagesTableFields = new StringBuilder();
         privateChatMessagesTableFields
-                .append(PrivateChatMessagesTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
-                .append(PrivateChatMessagesTable.Cols.BODY).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.TIME).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.INCOMING).append(" TEXT, ")
-                .append(PrivateChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
-        createTable(db, PrivateChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
+                .append(ChatMessagesTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(ChatMessagesTable.Cols.BODY).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.TIME).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.INCOMING).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
+        createTable(db, ChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropTable(db, FriendTable.TABLE_NAME);
-        dropTable(db, PrivateChatMessagesTable.TABLE_NAME);
+        dropTable(db, ChatMessagesTable.TABLE_NAME);
         // TODO SF other tables can be dropped
         onCreate(db);
     }

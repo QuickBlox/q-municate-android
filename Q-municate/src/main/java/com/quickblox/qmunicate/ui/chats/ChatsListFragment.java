@@ -73,6 +73,7 @@ public class ChatsListFragment extends BaseFragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                GroupChatDetailsActivity.start(getActivity(), (GroupChat)chatsArrayList.get(position));
             }
         });
     }

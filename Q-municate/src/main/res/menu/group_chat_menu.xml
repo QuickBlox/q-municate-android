@@ -4,4 +4,5 @@
         android:icon="@drawable/ic_action_chat_info"
         android:showAsAction="ifRoom"
         android:title="@string/acb_chat_details_title"/>
+
 </menu>

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -44,12 +44,11 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
-
         String senderName;
         String avatarUrl;
 
-        String body = cursor.getString(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.BODY));
-        int senderId = cursor.getInt(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.SENDER_ID));
+        String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
 
         if(senderId == currentUser.getId()) {
             senderName = currentUser.getFullName();
@@ -61,7 +60,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForFriend(opponentFriend);
         }
 
-        long time = cursor.getLong(cursor.getColumnIndex(PrivateChatMessagesTable.Cols.TIME));
+        long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
         holder.nameTextView.setText(senderName);

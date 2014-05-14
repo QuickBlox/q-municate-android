@@ -13,6 +13,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
@@ -20,11 +21,13 @@ public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
     private LayoutInflater layoutInflater;
     private NewChatCounterFriendsListener counterChangedListener;
     private int counterFriends;
+    private List<Friend> selectedFriends;
 
     public ChatSelectableFriendsAdapter(Context context, int textViewResourceId, List<Friend> list) {
         super(context, textViewResourceId, list);
         this.context = context;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        selectedFriends = new ArrayList<Friend>();
     }
 
     public void setCounterChangedListener(NewChatCounterFriendsListener listener) {
@@ -55,6 +58,11 @@ public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
                     Friend friend = (Friend) cb.getTag();
                     friend.setSelected(cb.isChecked());
                     notifyCounterChanged(cb.isChecked());
+                    if(cb.isChecked()){
+                        selectedFriends.add(friend);
+                    } else if (selectedFriends.contains(friend)){
+                        selectedFriends.remove(friend);
+                    }
                 }
             });
         } else {
@@ -72,6 +80,10 @@ public class ChatSelectableFriendsAdapter extends ArrayAdapter<Friend> {
     private void notifyCounterChanged(boolean isIncrease) {
         changeCounter(isIncrease);
         counterChangedListener.onCounterFriendsChanged(counterFriends);
+    }
+
+    public ArrayList<Friend> getSelectedFriends() {
+        return (ArrayList<Friend>)selectedFriends;
     }
 
     private void changeCounter(boolean isIncrease) {

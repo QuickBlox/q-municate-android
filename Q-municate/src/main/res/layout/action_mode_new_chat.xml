@@ -19,6 +19,7 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/create_group_chat_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

@@ -27,6 +27,7 @@ import java.util.List;
 public class NewChatActivity extends BaseActivity implements AdapterView.OnItemClickListener, NewChatCounterFriendsListener {
     private ListView friendsListView;
     private TextView countSelectedFriendsTextView;
+    private TextView createGroupChatTextView;
 
     private Activity activity;
     private List<Friend> friendsArrayList;
@@ -58,11 +59,21 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
 
     private void initListView() {
         // TODO temp friendsList list.
-        friendsArrayList.add(new Friend(new QBUser("serik", "11111111", "Sergey Fedunets")));
-        friendsArrayList.add(new Friend(new QBUser("igor", "11111111", "Igor Shaforenko")));
-        friendsArrayList.add(new Friend(new QBUser("anton", "11111111", "Anton Dyachenko")));
-        friendsArrayList.add(new Friend(new QBUser("vadim", "11111111", "Vadim Fite")));
-        friendsArrayList.add(new Friend(new QBUser("gena", "11111111", "Gena Friend")));
+        QBUser serg = new QBUser("serik", "11111111", "Sergey Fedunets");
+        serg.setId(1);
+        QBUser igor = new QBUser("igor", "11111111", "Igor Shaforenko");
+        igor.setId(2);
+        QBUser anton = new QBUser("anton", "11111111", "Anton Dyachenko");
+        anton.setId(3);
+        QBUser vadim = new QBUser("vadim", "11111111", "Vadim Fite");
+        vadim.setId(4);
+        QBUser gena = new QBUser("gena", "11111111", "Gena Friend");
+        gena.setId(5);
+        friendsArrayList.add(new Friend(serg));
+        friendsArrayList.add(new Friend(igor));
+        friendsArrayList.add(new Friend(anton));
+        friendsArrayList.add(new Friend(vadim));
+        friendsArrayList.add(new Friend(gena));
         updateFriendListAdapter();
     }
 
@@ -111,6 +122,13 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         actionMode = startActionMode(new ActionModeCallback());
         View view = getLayoutInflater().inflate(R.layout.action_mode_new_chat, null);
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
+        createGroupChatTextView = (TextView) view.findViewById(R.id.create_group_chat_textview);
+//        createGroupChatTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                 GroupChatActivity.start(NewChatActivity.this, friendsAdapter.getSelectedFriends());
+//            }
+//        });
         actionMode.setCustomView(view);
     }
 
@@ -123,7 +141,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeWithoutRedirect) {
-                GroupChatActivity.start(activity);
+                GroupChatActivity.start(activity, friendsAdapter.getSelectedFriends());
                 actionMode = null;
                 closeWithoutRedirect = false;
             } else {
