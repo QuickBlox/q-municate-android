@@ -44,6 +44,7 @@ public class QBServiceConsts {
     public static final String SEND_MESSAGE_FAIL_ACTION = "send_message_fail_action";
 
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
+    public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
     public static final String EXTRA_USER = "qb user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
@@ -57,8 +58,9 @@ public class QBServiceConsts {
     public static final String EXTRA_PASSWORD = "password";
     public static final String EXTRA_CONSTRAINT = "constraint";
 
-    public static final String SMILE_SELECTED = "SMILE_SELECTED";
+    public static final String SMILE_SELECTED = "smile_selected";
     public static final String JOIN_ROOM_ACTION = "join room action";
     public static final String JOIN_ROOM_SUCCESS_ACTION = "join room success action";
     public static final String JOIN_ROOM_FAIL_ACTION = "join room fail action";
+    public static final String GOT_CHAT_MESSAGE = "got_chat_message";
 }

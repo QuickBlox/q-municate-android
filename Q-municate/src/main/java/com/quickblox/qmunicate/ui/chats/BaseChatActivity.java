@@ -12,8 +12,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.model.SerializableKeys;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
@@ -53,7 +53,7 @@ public class BaseChatActivity extends BaseFragmentActivity implements SwitchView
         initUI();
         initSmileWidgets();
 
-        IntentFilter filter = new IntentFilter(BroadcastActions.SMILE_SELECTED);
+        IntentFilter filter = new IntentFilter(QBServiceConsts.SMILE_SELECTED);
         smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
         registerReceiver(smileSelectedBroadcastReceiver, filter);
     }

@@ -17,14 +17,13 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.TextView;
 
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
@@ -37,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 public abstract class BaseActivity extends Activity {
 
@@ -46,87 +44,26 @@ public abstract class BaseActivity extends Activity {
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
     protected BroadcastReceiver messageBroadcastReceiver;
-
     protected App app;
     protected ActionBar actionBar;
     protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    private View newMessageView;
+    private TextView newMessageTextView;
+    private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
     private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
+    private ServiceConnection serviceConnection = new QBChatServiceConnection();
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
     }
 
-    private ServiceConnection serviceConnection = new QBChatServiceConnection();
-
     public FailAction getFailAction() {
         return failAction;
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        app = App.getInstance();
-        actionBar = getActionBar();
-        broadcastReceiver = new BaseBroadcastReceiver();
-        messageBroadcastReceiver = new MessageBroadcastReceiver();
-        failAction = new FailAction();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateBroadcastActionList();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        connectToService();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService();
-    }
-
-    @Override
-    protected void onPause() {
-        unregisterBroadcastReceiver();
-        super.onPause();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            if(QBChatService.getInstance() != null) {
-                try {
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        DialogUtils.show(this, getString(R.string.dlg_click_back_again));
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, DOUBLE_BACK_DELAY);
-    }
-
-    private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     public void showProgress() {
@@ -147,6 +84,88 @@ public abstract class BaseActivity extends Activity {
         broadcastCommandMap.remove(action);
     }
 
+    public void showNewMessageAlert(String sender, String message) {
+        newMessageTextView.setText(message);
+        senderMessageTextView.setText(sender);
+        Crouton.cancelAllCroutons();
+        Crouton.show(this, newMessageView);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        app = App.getInstance();
+        actionBar = getActionBar();
+        broadcastReceiver = new BaseBroadcastReceiver();
+        messageBroadcastReceiver = new MessageBroadcastReceiver();
+        failAction = new FailAction();
+        initUI();
+    }
+
+    private void initUI() {
+        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        connectToService();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateBroadcastActionList();
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterBroadcastReceiver();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
+            super.onBackPressed();
+            if (QBChatService.getInstance() != null) {
+                try {
+                    QBChatService.getInstance().logout();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return;
+        }
+        this.doubleBackToExitPressedOnce = true;
+        DialogUtils.show(this, getString(R.string.dlg_click_back_again));
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, DOUBLE_BACK_DELAY);
+    }
+
+    private void unbindService() {
+        if (bounded) {
+            unbindService(serviceConnection);
+        }
+    }
+
+    private void unregisterBroadcastReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
     public void updateBroadcastActionList() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
@@ -155,7 +174,13 @@ public abstract class BaseActivity extends Activity {
             intentFilter.addAction(commandName);
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(BroadcastActions.GOT_MESSAGE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.GOT_CHAT_MESSAGE));
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     protected void navigateToParent() {
@@ -181,21 +206,6 @@ public abstract class BaseActivity extends Activity {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void unbindService() {
-        if (bounded) {
-            unbindService(serviceConnection);
-        }
-    }
-
-    private void showNewMessageAlert(String message) {
-        Crouton.makeText(this, message, Style.ALERT).show();
     }
 
     public class FailAction implements Command {
@@ -229,13 +239,15 @@ public abstract class BaseActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                QBChatMessage qbChatMessage = (QBChatMessage) extras.getSerializable(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                showNewMessageAlert(qbChatMessage.getBody());
+                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+                showNewMessageAlert(sender, message);
             }
         }
     }
 
     private class QBChatServiceConnection implements ServiceConnection {
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             bounded = true;
