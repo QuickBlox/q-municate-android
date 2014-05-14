@@ -3,20 +3,15 @@ package com.quickblox.qmunicate.utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class ImageHelper {
+
     public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
     public static final int GALLERY_INTENT_CALLED = 1;
     private Activity activity;
@@ -43,9 +38,9 @@ public class ImageHelper {
         activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
     }
 
-    public File getFileFromImageView(ImageView imageView) throws IOException {
+    public File getFileFromImageView(Bitmap origBitmap) throws IOException {
         int preferredWidth = 300;
-        Bitmap origBitmap = drawableToBitmap(imageView.getDrawable());
+
         int origWidth = origBitmap.getWidth();
         int origHeight = origBitmap.getHeight();
 
@@ -76,37 +71,5 @@ public class ImageHelper {
 
     private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
         return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
-    }
-
-    public static Bitmap drawableToBitmap (Drawable drawable) {
-        if(drawable == null) {
-            return null;
-        }
-
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
-        }
-
-        int width = drawable.getIntrinsicWidth();
-        width = width > 0 ? width : 1;
-        int height = drawable.getIntrinsicHeight();
-        height = height > 0 ? height : 1;
-
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-
-        return bitmap;
-    }
-
-    public boolean equalsBitmaps(Bitmap bitmap1, Bitmap bitmap2) {
-        ByteBuffer buffer1 = ByteBuffer.allocate(bitmap1.getHeight() * bitmap1.getRowBytes());
-        bitmap1.copyPixelsToBuffer(buffer1);
-
-        ByteBuffer buffer2 = ByteBuffer.allocate(bitmap2.getHeight() * bitmap2.getRowBytes());
-        bitmap2.copyPixelsToBuffer(buffer2);
-
-        return Arrays.equals(buffer1.array(), buffer2.array());
     }
 }

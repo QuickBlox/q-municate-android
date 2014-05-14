@@ -17,18 +17,27 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.quickblox.module.chat.QBChatMessage;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
+import org.jivesoftware.smack.SmackException;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 public abstract class BaseActivity extends Activity {
 
@@ -36,6 +45,7 @@ public abstract class BaseActivity extends Activity {
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
+    protected BroadcastReceiver messageBroadcastReceiver;
 
     protected App app;
     protected ActionBar actionBar;
@@ -63,6 +73,7 @@ public abstract class BaseActivity extends Activity {
         app = App.getInstance();
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
+        messageBroadcastReceiver = new MessageBroadcastReceiver();
         failAction = new FailAction();
     }
 
@@ -94,6 +105,13 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();
+            if(QBChatService.getInstance() != null) {
+                try {
+                    QBChatService.getInstance().logout();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
+            }
             return;
         }
         this.doubleBackToExitPressedOnce = true;
@@ -131,14 +149,13 @@ public abstract class BaseActivity extends Activity {
 
     public void updateBroadcastActionList() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
         IntentFilter intentFilter = new IntentFilter();
         for (String commandName : broadcastCommandMap.keySet()) {
             intentFilter.addAction(commandName);
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    protected void onConnectedToService() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(BroadcastActions.GOT_MESSAGE));
     }
 
     protected void navigateToParent() {
@@ -166,22 +183,6 @@ public abstract class BaseActivity extends Activity {
         return transaction;
     }
 
-    private void registerBroadcastReceiver() {
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (intent != null && (action) != null) {
-                    Command command = broadcastCommandMap.get(action);
-                    if (command != null) {
-                        Log.d("STEPS", "executing " + action);
-                        command.execute(intent.getExtras());
-                    }
-                }
-            }
-        };
-    }
-
     private void connectToService() {
         Intent intent = new Intent(this, QBService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -191,6 +192,10 @@ public abstract class BaseActivity extends Activity {
         if (bounded) {
             unbindService(serviceConnection);
         }
+    }
+
+    private void showNewMessageAlert(String message) {
+        Crouton.makeText(this, message, Style.ALERT).show();
     }
 
     public class FailAction implements Command {
@@ -218,12 +223,23 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                QBChatMessage qbChatMessage = (QBChatMessage) extras.getSerializable(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+                showNewMessageAlert(qbChatMessage.getBody());
+            }
+        }
+    }
+
     private class QBChatServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
             bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService();
         }
 
         @Override

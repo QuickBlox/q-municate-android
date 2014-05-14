@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.utils;
 
-import android.widget.ImageView;
+import android.graphics.Bitmap;
 
 import com.quickblox.qmunicate.core.concurrency.BaseAsyncTask;
 
@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class GetImageFileTask extends BaseAsyncTask {
+
     private OnGetImageFileListener listener;
 
     public GetImageFileTask(OnGetImageFileListener listener) {
@@ -27,10 +28,10 @@ public class GetImageFileTask extends BaseAsyncTask {
     public Object performInBackground(Object[] params) throws Exception {
         File imageFile = null;
         ImageHelper imageHelper = (ImageHelper) params[0];
-        ImageView imageView = (ImageView) params[1];
+        Bitmap bitmap = (Bitmap) params[1];
 
         try {
-            imageFile = imageHelper.getFileFromImageView(imageView);
+            imageFile = imageHelper.getFileFromImageView(bitmap);
         } catch (IOException e) {
             onException(e);
         }

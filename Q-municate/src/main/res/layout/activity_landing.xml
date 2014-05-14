@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/headerImageView"
+        android:id="@+id/header_imageview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -14,20 +14,20 @@
         android:src="@drawable/bg" />
 
     <ImageView
-        android:id="@+id/logoImageView"
+        android:id="@+id/logo_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/headerImageView"
+        android:layout_below="@id/header_imageview"
         android:layout_centerHorizontal="true"
         android:paddingTop="5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/title" />
 
     <RelativeLayout
-        android:id="@+id/connectFacebookButton"
+        android:id="@+id/connect_facebook_button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
-        android:layout_below="@id/logoImageView"
+        android:layout_below="@id/logo_imageview"
         android:layout_marginTop="15dp"
         android:background="@drawable/button_connect_facebook_selector"
         android:clickable="true"
@@ -46,7 +46,7 @@
                 android:src="@drawable/ic_fb" />
 
             <TextView
-                android:id="@+id/connectFacebook"
+                android:id="@+id/connect_facebook_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -57,10 +57,10 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/signUpEmailButton"
+        android:id="@+id/sign_up_email_button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_height"
-        android:layout_below="@id/connectFacebookButton"
+        android:layout_below="@id/connect_facebook_button"
         android:layout_marginTop="10dp"
         android:background="@drawable/button_sign_up_green_selector"
         android:clickable="true"
@@ -78,10 +78,10 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/signUpEmailButton"
+        android:layout_below="@id/sign_up_email_button"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"

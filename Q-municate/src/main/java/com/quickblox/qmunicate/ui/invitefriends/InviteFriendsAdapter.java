@@ -10,6 +10,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
 import java.util.List;
 
@@ -48,8 +49,9 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
             convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
             holder = new ViewHolder();
 
-            holder.avatarImageView = (ImageView) convertView.findViewById(R.id.avatarImageView);
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
+            holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
+            holder.avatarImageView.setOval(true);
+            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             holder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
 
@@ -118,7 +120,7 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
     }
 
     private static class ViewHolder {
-        ImageView avatarImageView;
+        RoundedImageView avatarImageView;
         TextView nameTextView;
         TextView viaTextView;
         CheckBox checkBox;

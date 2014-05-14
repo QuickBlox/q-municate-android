@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
@@ -14,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
+
+    //--------------------------------------- FriendTable -----------------------------------------------------
 
     public static void saveFriends(Context context, List<Friend> friendsList) {
         for (Friend friend : friendsList) {
@@ -80,8 +84,7 @@ public class DatabaseManager {
         if (TextUtils.isEmpty(inputText)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
         } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
         }
         if (cursor != null) {
             cursor.moveToFirst();
@@ -89,11 +92,38 @@ public class DatabaseManager {
         return cursor;
     }
 
+    public static Cursor getCursorFriendById(Context context, int friendId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + friendId, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
     public static Cursor getAllFriends(Context context) {
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID  + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllFriends(Context context) {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
+    }
+
+    //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
+
+    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId) {
+        ContentValues values = new ContentValues();
+
+        values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
+        values.put(PrivateChatMessagesTable.Cols.SENDER_ID, senderId);
+        values.put(PrivateChatMessagesTable.Cols.TIME, System.currentTimeMillis());
+        // TODO INCOMING
+        values.put(PrivateChatMessagesTable.Cols.INCOMING, false);
+        values.put(PrivateChatMessagesTable.Cols.CHAT_ID, chatId);
+
+        context.getContentResolver().insert(PrivateChatMessagesTable.CONTENT_URI, values);
+    }
+
+    public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 }

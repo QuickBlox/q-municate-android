@@ -5,7 +5,7 @@
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/fullnameEdit"
+        android:id="@+id/fullname_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/sup_fullname_hint"
@@ -13,7 +13,7 @@
         android:maxLength="128" />
 
     <EditText
-        android:id="@+id/emailEdit"
+        android:id="@+id/email_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -22,7 +22,7 @@
         android:maxLength="128" />
 
     <EditText
-        android:id="@+id/password"
+        android:id="@+id/password_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -31,7 +31,6 @@
         android:maxLength="256" />
 
     <LinearLayout
-        android:id="@+id/avatarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
@@ -40,8 +39,8 @@
         android:onClick="changeAvatarOnClickListener"
         android:orientation="horizontal">
 
-        <com.quickblox.qmunicate.ui.views.CircleImageView
-            android:id="@+id/avatarImageView"
+        <com.quickblox.qmunicate.ui.views.RoundedImageView
+            android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_big_avatar_layout_width"
             android:layout_height="@dimen/image_view_big_avatar_layout_height"
             android:scaleType="centerCrop"

@@ -35,4 +35,6 @@
     <dimen name="corners_small_value">5dp</dimen>
     <dimen name="corners_middle_value">10dp</dimen>
     <dimen name="corners_big_value">15dp</dimen>
+
+    <dimen name="avatar_new_message_wh">30dp</dimen>
 </resources>

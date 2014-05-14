@@ -10,9 +10,11 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
+import java.io.IOException;
 
 public class QBAuthHelper {
 
@@ -43,6 +45,7 @@ public class QBAuthHelper {
     public QBUser signup(QBUser user, File file) throws QBResponseException, XMPPException {
         QBAuth.createSession();
         String password = user.getPassword();
+        user.setOldPassword(password);
         this.user = QBUsers.signUpSignInTask(user);
         if (null != file) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
@@ -58,7 +61,12 @@ public class QBAuthHelper {
     public void logout() throws QBResponseException {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-        QBChatService.getInstance().logout();
+
+        try {
+            QBChatService.getInstance().logout();
+        } catch (SmackException.NotConnectedException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
+        }
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
@@ -88,11 +96,14 @@ public class QBAuthHelper {
 
     private void loginChat(QBUser user) throws QBResponseException {
         try {
-            QBChatService.getInstance().loginWithUser(user);
-        } catch (QBResponseException e) {
-            if (!com.quickblox.module.chat.Consts.ALREADY_LOGGED_IN.equals(e.getLocalizedMessage())) {
-                throw e;
-            }
+            QBChatService.getInstance().login(user);
+            QBChatHelper.getInstance().initChats();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SmackException e) {
+            e.printStackTrace();
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
     }
 }

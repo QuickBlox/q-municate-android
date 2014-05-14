@@ -3,97 +3,89 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 import android.content.Intent;
 
-import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.module.chat.QBChatRoom;
+import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.listeners.RoomListener;
-import com.quickblox.module.chat.xmpp.QBPrivateChat;
-import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
-import com.quickblox.module.videochat_webrtc.ISignalingChannel;
-import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.module.videochat_webrtc.model.CallConfig;
-import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
-import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
-import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.module.chat.QBPrivateChat;
+import com.quickblox.module.chat.QBPrivateChatManager;
+import com.quickblox.module.chat.listeners.QBMessageListener;
+import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 
-import java.util.List;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
-public class QBChatHelper implements RoomListener {
+public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener {
 
-    private Lo lo = new Lo(this);
-    private QBPrivateChat privateChat;
-    private ISignalingChannel signalingChannel;
+    private static QBChatHelper instance;
+
     private Context context;
-    private ISignalingChannel.MessageHandler messageObserver = new SignalingMessageHandler();
+    private QBUser qbUser;
+    private QBChatService qbChatService;
+    private QBPrivateChat qbPrivateChat;
+    private QBPrivateChatManager qbPrivateChatManager;
+    private int privateChatId;
 
-    private QBChatRoom joinedRoom;
-    private RoomListener roomListener;
+    private QBChatHelper() {
+        instance = this;
+    }
 
-    public ISignalingChannel getSignalingChannel() {
-        return signalingChannel;
+    public static QBChatHelper getInstance() {
+        if (instance == null) {
+            return new QBChatHelper();
+        }
+        return instance;
+    }
+
+    public void sendPrivateMessage(String message) {
+        QBChatMessage qbChatMessage = getQBChatMessage(message);
+        try {
+            qbPrivateChat.sendMessage(qbChatMessage);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+        saveMessageToCache(qbChatMessage, qbUser.getId(), privateChatId);
+    }
+
+    private QBChatMessage getQBChatMessage(String body) {
+        QBChatMessage qbChatMessage = new QBChatMessage();
+        qbChatMessage.setBody(body);
+        return qbChatMessage;
+    }
+
+    private void saveMessageToCache(QBChatMessage qbChatMessage, int senderId, int chatId) {
+        DatabaseManager.savePrivateChatMessage(context, qbChatMessage, senderId, chatId);
     }
 
     @Override
-    public void onCreatedRoom(QBChatRoom qbChatRoom) {
-        lo.g("on create Room ");
-        roomListener.onCreatedRoom(qbChatRoom);
+    public void processMessage(QBPrivateChat qbPrivateChat, QBChatMessage message) {
+        saveMessageToCache(message, message.getSenderId(), message.getSenderId());
+        Intent intent = new Intent(BroadcastActions.GOT_MESSAGE);
+        intent.putExtra(BroadcastActions.EXTRA_MESSAGE, message.getBody());
+        context.sendBroadcast(intent);
     }
 
     @Override
-    public void onJoinedRoom(QBChatRoom qbChatRoom) {
-        lo.g("on join Room");
-        joinedRoom = qbChatRoom;
-        roomListener.onJoinedRoom(qbChatRoom);
+    public void chatCreated(QBPrivateChat qbPrivateChat, boolean createdLocally) {
+        if (!createdLocally) {
+            this.qbPrivateChat.addMessageListener(this);
+        }
     }
 
-    @Override
-    public void onError(String s) {
-        lo.g("on Error when join" + s);
-        roomListener.onError(s);
+    public void initChats() {
+        qbChatService = QBChatService.getInstance();
+        qbPrivateChatManager = qbChatService.getPrivateChatManager();
+        qbPrivateChatManager.addPrivateChatManagerListener(this);
     }
 
-    public void init(Context context) {
+    public void initPrivateChat(Context context, int opponentId) {
         this.context = context;
-        privateChat = QBChatService.getInstance().getPrivateChatInstance();
-        signalingChannel = new ExtensionSignalingChannel(privateChat);
-        signalingChannel.addMessageHandler(messageObserver);
-    }
-
-    public QBChatRoom getJoinedRoom() {
-        return joinedRoom;
-    }
-
-    public void joinRoom(String name, RoomListener roomListener) {
-        this.roomListener = roomListener;
-        QBChatService.getInstance().joinRoom(name, this);
-    }
-
-    private class SignalingMessageHandler extends MessageHandlerImpl {
-
-        @Override
-        public void onCall(ConnectionConfig connectionConfig) {
-            CallConfig callConfig = (CallConfig) connectionConfig;
-            SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
-                    callConfig.getSessionDescription());
-            lo.g("onCall" + callConfig.getCallStreamType().toString());
-            Intent intent = new Intent(context, CallActivity.class);
-            intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
-            intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
-            intent.putExtra(WebRTC.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());
-            intent.putExtra(Consts.CALL_TYPE_EXTRA, callConfig.getCallStreamType());
-            intent.putExtra(WebRTC.SESSION_ID_EXTENSION, callConfig.getConnectionSession());
-            intent.putExtra(Consts.USER, callConfig.getParticipant());
-            intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.getApplicationContext().startActivity(intent);
-        }
-
-        @Override
-        public void onError(List<String> errors) {
-            lo.g("error while establishing connection" + errors.toString());
-        }
+        qbUser = App.getInstance().getUser();
+        qbPrivateChat = qbPrivateChatManager.createChat(opponentId, this);
+        privateChatId = opponentId;
     }
 }
-

@@ -41,7 +41,7 @@ public class GroupChat extends Chat {
 
     @Override
     public ChatMessage getLastMessage() {
-        return new ChatMessage("bye", new Date(), false);
+        return new ChatMessage();
     }
 
     @Override

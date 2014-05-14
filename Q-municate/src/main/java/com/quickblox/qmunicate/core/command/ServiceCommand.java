@@ -25,6 +25,7 @@ public abstract class ServiceCommand implements Command {
             result = perform(bundle);
             sendResult(result, successAction);
         } catch (Exception e) {
+            e.printStackTrace();
             result = new Bundle();
             result.putSerializable(QBServiceConsts.EXTRA_ERROR, e);
             sendResult(result, failAction);

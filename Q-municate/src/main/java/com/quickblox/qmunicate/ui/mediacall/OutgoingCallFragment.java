@@ -13,13 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.ISignalingChannel;
+import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
-import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
+import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.service.QBService;
@@ -49,9 +49,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private ServiceConnection serviceConnection = new ChetServiceConnection();
     private OutgoingCallListener outgoingCallListener;
     private String sessionId;
-    private ISignalingChannel.MessageHandler signalingMessageHandler;
-    private ISignalingChannel.PLATFORM remotePlatform;
-    private ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
+    private QBSignalingChannel.SignalingListener signalingMessageHandler;
+    private QBSignalingChannel.PLATFORM remotePlatform;
+    private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
 
     public interface OutgoingCallListener {
 
@@ -69,9 +69,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract int getContentView();
 
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
-            Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
-            ISignalingChannel.PLATFORM platform,
-            ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
+                                           Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
+                                           QBSignalingChannel.PLATFORM platform,
+                                           QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.USER, user);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
@@ -150,9 +150,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (QBUser) getArguments().getSerializable(Consts.USER);
         call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
-        remotePlatform = (ISignalingChannel.PLATFORM) getArguments().getSerializable(
+        remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
                 WebRTC.PLATFORM_EXTENSION);
-        deviceOrientation = (ISignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
+        deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
                 WebRTC.ORIENTATION_EXTENSION);
         sessionId = getArguments().getString(WebRTC.SESSION_ID_EXTENSION, "");
     }
@@ -180,7 +180,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    public void initChat(ISignalingChannel signalingChannel) {
+    public void initChat(QBSignalingChannel signalingChannel) {
         if (qbVideoChat != null) {
             return;
         }
@@ -188,7 +188,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         qbVideoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
         qbVideoChat.setMediaCaptureCallback(new MediaCapturerHandler());
         signalingMessageHandler = new VideoChatMessageHandler();
-        signalingChannel.addMessageHandler(signalingMessageHandler);
+        signalingChannel.addSignalingListener(signalingMessageHandler);
         if (remoteSessionDescription != null) {
             qbVideoChat.setRemoteSessionDescription(remoteSessionDescription);
         }
@@ -273,12 +273,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        ISignalingChannel signalingChannel = service.getQbChatHelper().getSignalingChannel();
-        if (signalingChannel != null && isExistActivity()) {
-            initChat(signalingChannel);
-        } else if (isExistActivity()) {
-            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
-        }
+        //        ISignalingChannel signalingChannel = service.getQbChatHelper().getSignalingChannel();
+        //        if (signalingChannel != null && isExistActivity()) {
+        //            initChat(signalingChannel);
+        //        } else if (isExistActivity()) {
+        //            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
+        //        }
     }
 
     private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {
@@ -296,7 +296,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    private class VideoChatMessageHandler extends MessageHandlerImpl {
+    private class VideoChatMessageHandler extends SignalingListenerImpl {
 
         @Override
         public void onAccepted(ConnectionConfig connectionConfig) {

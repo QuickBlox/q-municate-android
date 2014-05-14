@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.ISignalingChannel;
+import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.utils.MessageHandlerImpl;
+import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
@@ -22,17 +22,17 @@ import com.quickblox.qmunicate.utils.Consts;
 public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();
+
     private QBUser opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private WebRTC.MEDIA_STREAM call_type;
-    private ISignalingChannel signalingChannel;
+    private QBSignalingChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
     private String sessionId;
-    private ISignalingChannel.PLATFORM remotePlatform;
-    private ISignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
+    private QBSignalingChannel.PLATFORM remotePlatform;
+    private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private ChatMessageHandler messageHandler;
-
 
     public static void start(Context context, QBUser friend, WebRTC.MEDIA_STREAM callType) {
         Intent intent = new Intent(context, CallActivity.class);
@@ -70,7 +70,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     public void onConnectionClosed() {
         if (signalingChannel != null) {
-            signalingChannel.removeMessageHandler(messageHandler);
+            signalingChannel.removeSignalingListener(messageHandler);
         }
         cancelPlayer();
         finish();
@@ -89,13 +89,6 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     protected void onDestroy() {
         cancelPlayer();
         super.onDestroy();
-    }
-
-    @Override
-    protected void onConnectedToService() {
-        signalingChannel = service.getQbChatHelper().getSignalingChannel();
-        messageHandler = new ChatMessageHandler();
-        signalingChannel.addMessageHandler(messageHandler);
     }
 
     private void cancelPlayer() {
@@ -122,8 +115,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
         call_type = (WebRTC.MEDIA_STREAM) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
-        remotePlatform = (ISignalingChannel.PLATFORM) extras.getSerializable(WebRTC.PLATFORM_EXTENSION);
-        deviceOrientation = (ISignalingChannel.PLATFORM_DEVICE_ORIENTATION) extras.getSerializable(
+        remotePlatform = (QBSignalingChannel.PLATFORM) extras.getSerializable(WebRTC.PLATFORM_EXTENSION);
+        deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) extras.getSerializable(
                 WebRTC.ORIENTATION_EXTENSION);
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
@@ -165,7 +158,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
-            WebRTC.MEDIA_STREAM callType, String sessionId) {
+                                      WebRTC.MEDIA_STREAM callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
         OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
@@ -181,13 +174,11 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         setCurrentFragment(incomingCallFragment);
     }
 
-    private class ChatMessageHandler extends MessageHandlerImpl {
+    private class ChatMessageHandler extends SignalingListenerImpl {
 
         @Override
         public void onStop(ConnectionConfig connectionConfig) {
             onConnectionClosed();
         }
     }
-
-    ;
 }

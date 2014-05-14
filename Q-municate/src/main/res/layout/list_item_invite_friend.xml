@@ -4,8 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <com.quickblox.qmunicate.ui.views.CircleImageView
-        android:id="@+id/avatarImageView"
+    <com.quickblox.qmunicate.ui.views.RoundedImageView
+        android:id="@+id/avatar_imageview"
         android:layout_width="@dimen/image_view_small_avatar_layout_width"
         android:layout_height="@dimen/image_view_small_avatar_layout_height"
         android:layout_alignParentLeft="true"
@@ -20,11 +20,11 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
         android:layout_toLeftOf="@+id/selectUserCheckBox"
-        android:layout_toRightOf="@id/avatarImageView"
+        android:layout_toRightOf="@id/avatar_imageview"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/nameTextView"
+            android:id="@+id/name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

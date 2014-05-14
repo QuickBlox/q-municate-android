@@ -85,5 +85,4 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         prefsHelper.savePref(Consts.SUBSCRIPTION_ID, registration.getInt(Consts.SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE));
         prefsHelper.savePref(Consts.PROPERTY_APP_VERSION, appVersion);
     }
-
 }

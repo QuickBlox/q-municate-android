@@ -2,15 +2,17 @@ package com.quickblox.qmunicate.ui.signup;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -21,6 +23,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
@@ -28,16 +31,18 @@ import com.quickblox.qmunicate.utils.OnGetImageFileListener;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class SignUpActivity extends BaseActivity implements OnGetImageFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
-    private EditText password;
-    private ImageView avatarImageView;
-    private EditText fullname;
-    private EditText email;
+    private EditText passwordEditText;
+    private RoundedImageView avatarImageView;
+    private EditText fullnameEditText;
+    private EditText emailEditText;
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
+    private Bitmap avatarBitmapCurrent;
     private QBUser qbUser;
 
     public static void start(Context context) {
@@ -51,10 +56,11 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         setContentView(R.layout.activity_signup);
         useDoubleBackPressed = true;
 
-        fullname = _findViewById(R.id.fullnameEdit);
-        email = _findViewById(R.id.emailEdit);
-        password = _findViewById(R.id.password);
-        avatarImageView = _findViewById(R.id.avatarImageView);
+        fullnameEditText = _findViewById(R.id.fullname_edittext);
+        emailEditText = _findViewById(R.id.email_edittext);
+        passwordEditText = _findViewById(R.id.password_edittext);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
 
         qbUser = new QBUser();
         imageHelper = new ImageHelper(this);
@@ -84,9 +90,15 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            Uri originalUri = data.getData();
             isNeedUpdateAvatar = true;
-            avatarImageView.setImageURI(originalUri);
+            Uri originalUri = data.getData();
+            try {
+                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
+                avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            avatarImageView.setImageBitmap(avatarBitmapCurrent);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -96,23 +108,23 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
     }
 
     public void signUpOnClickListener(View view) {
-        String fullNameText = fullname.getText().toString();
-        String emailText = email.getText().toString();
-        String passwordText = password.getText().toString();
+        String fullNameText = fullnameEditText.getText().toString();
+        String emailText = emailEditText.getText().toString();
+        String passwordText = passwordEditText.getText().toString();
 
         boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
         boolean isEmailEntered = !TextUtils.isEmpty(emailText);
         boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
 
         if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
-            qbUser.setFullName(fullname.getText().toString());
-            qbUser.setEmail(email.getText().toString());
-            qbUser.setPassword(password.getText().toString());
+            qbUser.setFullName(fullNameText);
+            qbUser.setEmail(emailText);
+            qbUser.setPassword(passwordText);
 
             showProgress();
 
             if (isNeedUpdateAvatar) {
-                new GetImageFileTask(this).execute(imageHelper, avatarImageView);
+                new GetImageFileTask(this).execute(imageHelper, avatarBitmapCurrent);
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }

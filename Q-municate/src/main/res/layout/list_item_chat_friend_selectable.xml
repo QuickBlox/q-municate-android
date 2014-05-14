@@ -8,7 +8,7 @@
     <include layout="@layout/list_item_chat_friend" />
 
     <CheckBox
-        android:id="@+id/timeTextView"
+        android:id="@+id/time_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

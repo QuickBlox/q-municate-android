@@ -47,7 +47,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
-        ((TextView) rootView.findViewById(R.id.nameTextView)).setText(userName);
+        ((TextView) rootView.findViewById(R.id.name_textview)).setText(userName);
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);
         return rootView;

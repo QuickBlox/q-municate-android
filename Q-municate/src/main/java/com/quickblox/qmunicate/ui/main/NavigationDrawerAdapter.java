@@ -28,7 +28,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_navigation_drawer, null);
             holder = new ViewHolder();
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.nameTextView);
+            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

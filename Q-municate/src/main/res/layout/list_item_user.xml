@@ -11,8 +11,8 @@
         android:layout_toLeftOf="@+id/addFriendButton"
         android:padding="10dp">
 
-        <com.quickblox.qmunicate.ui.views.CircleImageView
-            android:id="@+id/avatarImageView"
+        <com.quickblox.qmunicate.ui.views.RoundedImageView
+            android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_small_avatar_layout_width"
             android:layout_height="@dimen/image_view_small_avatar_layout_height"
             android:layout_marginLeft="5dp"
@@ -20,7 +20,7 @@
             android:src="@drawable/placeholder_user" />
 
         <TextView
-            android:id="@+id/nameTextView"
+            android:id="@+id/name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

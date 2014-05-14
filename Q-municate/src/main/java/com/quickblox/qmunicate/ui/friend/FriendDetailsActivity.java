@@ -22,8 +22,10 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.chats.PrivateChatActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -33,7 +35,7 @@ public class FriendDetailsActivity extends BaseActivity {
 
     public static final String EXTRA_FRIEND = "Friend";
 
-    private ImageView avatarImageView;
+    private RoundedImageView avatarImageView;
     private TextView nameTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
@@ -53,12 +55,13 @@ public class FriendDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
 
-        avatarImageView = _findViewById(R.id.avatarImageView);
-        nameTextView = _findViewById(R.id.nameTextView);
-        onlineImageView = _findViewById(R.id.onlineImageView);
-        onlineStatusTextView = _findViewById(R.id.onlineStatusTextView);
-        phoneTextView = _findViewById(R.id.phoneTextView);
-        phoneView = _findViewById(R.id.phoneView);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
+        nameTextView = _findViewById(R.id.name_textview);
+        onlineImageView = _findViewById(R.id.online_imageview);
+        onlineStatusTextView = _findViewById(R.id.online_status_textview);
+        phoneTextView = _findViewById(R.id.phone_textview);
+        phoneView = _findViewById(R.id.phone_relativelayout);
 
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
@@ -146,7 +149,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     public void chatClickListener(View view) {
-        //        PrivateChatActivity.start(FriendDetailsActivity.this, nameTextView.getText().toString());
+        PrivateChatActivity.start(FriendDetailsActivity.this, friend);
     }
 
     private class RemoveFriendSuccessAction implements Command {
