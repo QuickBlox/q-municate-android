@@ -9,6 +9,7 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -97,7 +98,7 @@ public class QBAuthHelper {
     private void loginChat(QBUser user) throws QBResponseException {
         try {
             QBChatService.getInstance().login(user);
-            QBChatHelper.getInstance().initChats();
+            QBChatHelper.getInstance().initChats(App.getInstance().getApplicationContext());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SmackException e) {

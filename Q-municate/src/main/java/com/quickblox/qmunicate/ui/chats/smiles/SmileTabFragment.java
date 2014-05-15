@@ -10,7 +10,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.core.receiver.BroadcastActions;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -46,7 +45,7 @@ public class SmileTabFragment extends Fragment {
         }
 
         private void sendSmileSelectedBroadCast(int resourceId) {
-            Intent intent = new Intent(BroadcastActions.SMILE_SELECTED);
+            Intent intent = new Intent(QBServiceConsts.SMILE_SELECTED);
             intent.putExtra(SerializableKeys.SMILE_ID, resourceId);
             getActivity().sendBroadcast(intent);
         }
