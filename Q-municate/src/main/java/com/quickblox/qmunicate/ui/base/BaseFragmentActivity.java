@@ -17,6 +17,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -31,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class BaseFragmentActivity extends FragmentActivity {
 
@@ -39,13 +40,16 @@ public class BaseFragmentActivity extends FragmentActivity {
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
-
+    protected BroadcastReceiver messageBroadcastReceiver;
     protected App app;
     protected ActionBar actionBar;
     protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    private View newMessageView;
+    private TextView newMessageTextView;
+    private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
     private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
@@ -53,6 +57,13 @@ public class BaseFragmentActivity extends FragmentActivity {
 
     public BaseFragmentActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
+    }
+
+    public void showNewMessageAlert(String sender, String message) {
+        newMessageTextView.setText(message);
+        senderMessageTextView.setText(sender);
+        Crouton.cancelAllCroutons();
+        Crouton.show(this, newMessageView);
     }
 
     public FailAction getFailAction() {
@@ -82,7 +93,15 @@ public class BaseFragmentActivity extends FragmentActivity {
         app = App.getInstance();
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
+        messageBroadcastReceiver = new MessageBroadcastReceiver();
         failAction = new FailAction();
+        initUI();
+    }
+
+    private void initUI() {
+        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
     }
 
     @Override
@@ -122,11 +141,14 @@ public class BaseFragmentActivity extends FragmentActivity {
 
     public void updateBroadcastActionList() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
         IntentFilter intentFilter = new IntentFilter();
         for (String commandName : broadcastCommandMap.keySet()) {
             intentFilter.addAction(commandName);
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     private void unregisterBroadcastReceiver() {
@@ -179,22 +201,6 @@ public class BaseFragmentActivity extends FragmentActivity {
         return transaction;
     }
 
-    private void registerBroadcastReceiver() {
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
-                if (intent != null && (action) != null) {
-                    Command command = broadcastCommandMap.get(action);
-                    if (command != null) {
-                        Log.d("STEPS", "executing " + action);
-                        command.execute(intent.getExtras());
-                    }
-                }
-            }
-        };
-    }
-
     public class FailAction implements Command {
 
         @Override
@@ -216,6 +222,19 @@ public class BaseFragmentActivity extends FragmentActivity {
                     Log.d("STEPS", "executing " + action);
                     command.execute(intent.getExtras());
                 }
+            }
+        }
+    }
+
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+                showNewMessageAlert(sender, message);
             }
         }
     }

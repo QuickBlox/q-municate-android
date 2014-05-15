@@ -105,7 +105,7 @@ public class PrivateChatActivity extends BaseChatActivity {
 
     private void initChat() {
         qbChatHelper = QBChatHelper.getInstance();
-        qbChatHelper.initPrivateChat(this, opponentFriend.getId());
+        qbChatHelper.initPrivateChat(opponentFriend.getId());
     }
 
     protected BaseAdapter getMessagesAdapter() {

@@ -11,6 +11,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.commands.*;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class QBService extends Service {
 
     private QBChatHelper qbChatHelper;
     private QBAuthHelper qbAuthHelper;
+    private QBVideoChatHelper qbVideoChatHelper;
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -43,7 +45,7 @@ public class QBService extends Service {
 
         qbChatHelper = QBChatHelper.getInstance();
         qbAuthHelper = new QBAuthHelper();
-
+        qbVideoChatHelper = new QBVideoChatHelper();
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, new QBAddFriendCommand(this,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, new QBAddFriendsCommand(this,
@@ -54,7 +56,7 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, new QBGetFileCommand(this,
                 QBServiceConsts.GET_FILE_SUCCESS_ACTION, QBServiceConsts.GET_FILE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, new QBLoginCommand(this, qbAuthHelper,
-                qbChatHelper, QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
+                qbVideoChatHelper, QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.LOGOUT_ACTION, new QBLogoutCommand(this, qbAuthHelper,
                 qbChatHelper, QBServiceConsts.LOGOUT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, new QBRemoveFriendCommand(this,
@@ -73,15 +75,17 @@ public class QBService extends Service {
                 QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.USER_SEARCH_ACTION, new QBUserSearchCommand(this,
                 QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, QBServiceConsts.USER_SEARCH_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this, qbChatHelper,
-                QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, new QBSendGroupChatMessageCommand(this, qbChatHelper,
                 QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this,
+                qbChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
+                QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        QBChatService.setDebugEnabled(true);
         QBChatService.init(this);
     }
 
@@ -124,6 +128,10 @@ public class QBService extends Service {
                 command.execute(intent.getExtras());
             }
         });
+    }
+
+    public QBVideoChatHelper getQbVideoChatHelper() {
+        return qbVideoChatHelper;
     }
 
     public class QBServiceBinder extends Binder {
