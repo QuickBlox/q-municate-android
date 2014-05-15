@@ -222,7 +222,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         @Override
         public void execute(Bundle bundle) {
             QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            chatHelper.sendPrivateMessageWithAttachFile(qbFile);
+            chatHelper.sendPrivateMessageWithAttachImage(qbFile);
             hideProgress();
         }
     }

@@ -17,7 +17,7 @@
         android:textColor="@color/black"
         android:textStyle="bold" />
 
-    <TextView
+    <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
         android:id="@+id/message_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

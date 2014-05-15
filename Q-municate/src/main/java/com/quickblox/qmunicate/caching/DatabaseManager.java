@@ -110,10 +110,10 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId, String attachUrl) {
+    public static void savePrivateChatMessage(Context context, String message, int senderId, int chatId, String attachUrl) {
         ContentValues values = new ContentValues();
 
-        values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
+        values.put(PrivateChatMessagesTable.Cols.BODY, message);
         values.put(PrivateChatMessagesTable.Cols.SENDER_ID, senderId);
         values.put(PrivateChatMessagesTable.Cols.TIME, System.currentTimeMillis());
         // TODO INCOMING

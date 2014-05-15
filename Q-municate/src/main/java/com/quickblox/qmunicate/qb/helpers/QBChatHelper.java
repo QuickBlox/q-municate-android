@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.QBChatMessage;
@@ -12,6 +13,7 @@ import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
+import com.quickblox.module.chat.model.QBAttachmentType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
@@ -23,6 +25,8 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener {
 
@@ -55,12 +59,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(chatMessage, user.getId(), privateChatId, "");
-    }
-
-    public void sendPrivateMessageWithAttachFile(QBFile qbFile) {
-        QBChatMessage chatMessage = getQBChatMessage(qbFile);
-        saveMessageToCache(chatMessage, user.getId(), privateChatId, qbFile.getPublicUrl());
+        saveMessageToCache(chatMessage.getBody(), user.getId(), privateChatId, "");
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -69,26 +68,64 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         return chatMessage;
     }
 
-    private QBChatMessage getQBChatMessage(QBFile qbFile) {
+    public void saveMessageToCache(String message, int senderId, int chatId, String attachUrl) {
+        DatabaseManager.savePrivateChatMessage(context, message, senderId, chatId, attachUrl);
+    }
+
+    public void sendPrivateMessageWithAttachImage(QBFile qbFile) {
+        QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
+        try {
+            privateChat.sendMessage(chatMessage);
+        } catch (XMPPException e) {
+            e.printStackTrace();
+        } catch (SmackException.NotConnectedException e) {
+            e.printStackTrace();
+        }
+        saveMessageToCache("", user.getId(), privateChatId, qbFile.getPublicUrl());
+    }
+
+    private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
         QBChatMessage chatMessage = new QBChatMessage();
         QBAttachment attachment = new QBAttachment();
+        attachment.setType(QBAttachmentType.photo.toString());
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
         return chatMessage;
     }
 
-    public void saveMessageToCache(QBChatMessage chatMessage, int senderId, int chatId, String attachUrl) {
-        DatabaseManager.savePrivateChatMessage(context, chatMessage, senderId, chatId, attachUrl);
-    }
-
     @Override
     public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        saveMessageToCache(chatMessage, chatMessage.getSenderId(), chatMessage.getSenderId(), "");
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, chatMessage.getBody());
+        String messageBody = getMessageBody(chatMessage);
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(messageBody)? "attach file" : messageBody);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
                 DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        String att = getAttachUrlFromQBChatMessage(chatMessage);
+        saveMessageToCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(), att);
+    }
+
+    private String getMessageBody(QBChatMessage chatMessage) {
+        String messageBody = chatMessage.getBody();
+        if (TextUtils.isEmpty(messageBody)) {
+            messageBody = "";
+        }
+        return messageBody;
+    }
+
+    private String getAttachUrlFromQBChatMessage(QBChatMessage chatMessage) {
+        List<QBAttachment> attachmentsList = null;
+        try {
+            attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (attachmentsList.isEmpty()) {
+            for (QBAttachment attachment : attachmentsList) {
+                return attachment.getUrl();
+            }
+        }
+        return "";
     }
 
     @Override
