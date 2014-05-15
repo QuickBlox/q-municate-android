@@ -59,7 +59,7 @@ public class GroupChatActivity extends BaseChatActivity {
         }
         for(Friend friend : friends){
             if(nameOfChat.length() < allowedNameLength){
-                nameOfChat = nameOfChat + friend.getLogin() + "_";
+                nameOfChat = nameOfChat + friend.getFullname() + "_";
             } else {
                 nameOfChat = nameOfChat + "...";
                 break;

@@ -116,7 +116,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
 
     }
 
-    public void initChats() {
+    public void initChats(Context context) {
         this.context = context;
         chatService = QBChatService.getInstance();
         privateChatManager = chatService.getPrivateChatManager();
