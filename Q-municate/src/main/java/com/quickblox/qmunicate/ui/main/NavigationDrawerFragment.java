@@ -47,7 +47,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private TextView fullnameTextView;
     private ImageButton logoutButton;
 
-    private NavigationDrawerCallbacks callbacks;
+    private NavigationDrawerCallbacks navigationDrawerCallbacks;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
@@ -93,8 +93,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(fragmentContainerView);
         }
-        if (callbacks != null) {
-            callbacks.onNavigationDrawerItemSelected(position);
+        if (navigationDrawerCallbacks != null) {
+            navigationDrawerCallbacks.onNavigationDrawerItemSelected(position);
         }
     }
 
@@ -109,13 +109,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
 
-
         drawerListView.setItemChecked(currentSelectedPosition, true);
-
-        QBUser user = App.getInstance().getUser();
-        if (user != null) {
-            fullnameTextView.setText(user.getFullName());
-        }
 
         return rootView;
     }
@@ -173,7 +167,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        callbacks = (NavigationDrawerCallbacks) activity;
+        navigationDrawerCallbacks = (NavigationDrawerCallbacks) activity;
     }
 
     @Override
@@ -184,6 +178,15 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        QBUser user = App.getInstance().getUser();
+        if (user != null) {
+            fullnameTextView.setText(user.getFullName());
+        }
     }
 
     @Override
@@ -201,7 +204,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        callbacks = null;
+        navigationDrawerCallbacks = null;
     }
 
     @Override
