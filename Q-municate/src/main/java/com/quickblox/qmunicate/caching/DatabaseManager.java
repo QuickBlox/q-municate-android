@@ -81,10 +81,12 @@ public class DatabaseManager {
 
     public static Cursor fetchFriendsByFullname(Context context, String inputText) {
         Cursor cursor = null;
+        String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
         if (TextUtils.isEmpty(inputText)) {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
         } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, null);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, sorting);
         }
         if (cursor != null) {
             cursor.moveToFirst();
@@ -93,7 +95,8 @@ public class DatabaseManager {
     }
 
     public static Cursor getCursorFriendById(Context context, int friendId) {
-        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, FriendTable.Cols.ID + " = " + friendId, null, null);
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + friendId, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
         }
@@ -101,7 +104,8 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllFriends(Context context) {
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null,
+                FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllFriends(Context context) {
@@ -110,7 +114,8 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId) {
+    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId,
+            int chatId) {
         ContentValues values = new ContentValues();
 
         values.put(PrivateChatMessagesTable.Cols.BODY, message.getBody());
@@ -124,6 +129,7 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
-        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null, PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null,
+                PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 }
