@@ -24,7 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         createFriendTable(db);
-        createPrivateChatMessageTable(db);
+        createChatMessageTable(db);
         // TODO SF other tables can be created
     }
 
@@ -43,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createTable(db, FriendTable.TABLE_NAME, friendTableFields.toString());
     }
 
-    private void createPrivateChatMessageTable(SQLiteDatabase db) {
+    private void createChatMessageTable(SQLiteDatabase db) {
         StringBuilder privateChatMessagesTableFields = new StringBuilder();
         privateChatMessagesTableFields
                 .append(ChatMessagesTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
@@ -51,6 +51,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(ChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.TIME).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.INCOMING).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.GROUP_ID).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.SENDER_NAME).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
         createTable(db, ChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
     }

@@ -8,20 +8,7 @@ import android.util.Log;
 
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
-import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
-import com.quickblox.qmunicate.qb.commands.QBFriendsLoadCommand;
-import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
-import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
-import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
-import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
-import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
-import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
-import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
+import com.quickblox.qmunicate.qb.commands.*;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 
@@ -87,6 +74,8 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.USER_SEARCH_ACTION, new QBUserSearchCommand(this,
                 QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, QBServiceConsts.USER_SEARCH_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this, qbChatHelper,
+                QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, new QBSendGroupChatMessageCommand(this, qbChatHelper,
                 QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
     }
 

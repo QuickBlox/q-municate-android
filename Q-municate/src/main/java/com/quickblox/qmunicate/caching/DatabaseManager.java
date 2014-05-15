@@ -126,11 +126,23 @@ public class DatabaseManager {
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
 
+    public static void saveGroupChatMessage(Context context, QBChatMessage message, int senderId, String groupId) {
+        ContentValues values = new ContentValues();
+        values.put(ChatMessagesTable.Cols.BODY, message.getBody());
+        values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
+        values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
+        // TODO INCOMING
+        values.put(ChatMessagesTable.Cols.INCOMING, false);
+        values.put(ChatMessagesTable.Cols.GROUP_ID, groupId);
+
+        context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
+    }
+
     public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
         return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 
     public static Cursor getAllGroupChatMessagesByGroupId(Context context, String groupId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.GROUP_ID + " = " + groupId, null, null);
+        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
     }
 }

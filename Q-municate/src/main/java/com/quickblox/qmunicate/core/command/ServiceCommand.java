@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import android.util.Log;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public abstract class ServiceCommand implements Command {
@@ -22,6 +23,7 @@ public abstract class ServiceCommand implements Command {
     public void execute(Bundle bundle) {
         Bundle result;
         try {
+            Log.i("GroupMessage: ", "From execute to perform, Chat message: ");
             result = perform(bundle);
             sendResult(result, successAction);
         } catch (Exception e) {

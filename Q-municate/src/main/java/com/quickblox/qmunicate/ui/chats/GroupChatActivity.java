@@ -3,16 +3,28 @@ package com.quickblox.qmunicate.ui.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupChat;
+import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
+import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
+import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +33,13 @@ public class GroupChatActivity extends BaseChatActivity {
     private List<Friend> friends;
     private String nameOfChat = "";
     private int allowedNameLength = 20;
+    private QBChatHelper qbChatHelper;
+    private BaseAdapter messagesAdapter;
+
+    private ListView messagesListView;
+    private EditText messageEditText;
+    private ImageButton attachButton;
+    private ImageButton sendButton;
 
     public GroupChatActivity() {
         super(R.layout.activity_group_chat);
@@ -40,7 +59,7 @@ public class GroupChatActivity extends BaseChatActivity {
         }
         for(Friend friend : friends){
             if(nameOfChat.length() < allowedNameLength){
-                nameOfChat = nameOfChat + friend.getLogin() + ",";
+                nameOfChat = nameOfChat + friend.getLogin() + "_";
             } else {
                 nameOfChat = nameOfChat + "...";
                 break;
@@ -48,17 +67,63 @@ public class GroupChatActivity extends BaseChatActivity {
         }
 
         initUI();
-
+        initListView();
+        initChat();
+        initListeners();
         registerForContextMenu(messagesListView);
     }
 
     private void initUI() {
+        messagesListView = _findViewById(R.id.messages_listview);
+        messageEditText = _findViewById(R.id.message_edittext);
+        attachButton = _findViewById(R.id.attach_button);
+        sendButton = _findViewById(R.id.send_button);
         actionBarSetup();
+    }
+
+    private void initListView() {
+        messagesAdapter = getMessagesAdapter();
+        messagesListView.setAdapter(messagesAdapter);
+    }
+
+    private void initListeners() {
+        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                super.onTextChanged(s, start, before, count);
+                if (TextUtils.isEmpty(s)) {
+                    sendButton.setVisibility(View.GONE);
+                    attachButton.setVisibility(View.VISIBLE);
+                } else {
+                    sendButton.setVisibility(View.VISIBLE);
+                    attachButton.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void initChat(){
+        qbChatHelper = QBChatHelper.getInstance();
+        qbChatHelper.initRoomChat(this, nameOfChat, friends);
+    }
+
+    private Cursor getAllGroupChatMessages() {
+        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, nameOfChat);
+    }
+
+    protected BaseAdapter getMessagesAdapter() {
+        return new GroupChatMessagesAdapter(this, getAllGroupChatMessages(), friends);
+    }
+
+    public void sendMessageOnClick(View view) {
+        Log.i("GroupMessage: ", "From send, Chat message: " + messageEditText.getText().toString());
+        QBSendGroupChatMessageCommand.start(this, messageEditText.getText().toString());
+        messageEditText.setText("");
     }
 
     private void actionBarSetup() {
         ActionBar ab = getActionBar();
-        ab.setTitle(nameOfChat);
+        ab.setTitle(nameOfChat.replace("_",","));
         ab.setSubtitle("some information");
     }
 

@@ -15,6 +15,7 @@ public class QBServiceConsts {
     public static final String FRIENDS_LOAD_ACTION = "friends_load_action";
     public static final String USER_SEARCH_ACTION = "user_search_action";
     public static final String SEND_MESSAGE_ACTION = "send_message_action";
+    public static final String SEND_GROUP_MESSAGE_ACTION = "send_group_message_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add friend success action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add friendsList success action";
