@@ -61,7 +61,9 @@ public class GroupChat extends Chat implements Serializable {
 
     @Override
     public ChatMessage getLastMessage() {
-        return new ChatMessage();
+        ChatMessage message = new ChatMessage();
+        message.setBody(this.lastMessage);
+        return message;
     }
 
     @Override

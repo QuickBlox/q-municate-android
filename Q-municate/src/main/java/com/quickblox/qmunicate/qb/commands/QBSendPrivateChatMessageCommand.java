@@ -19,16 +19,18 @@ public class QBSendPrivateChatMessageCommand extends ServiceCommand {
         this.qbChatHelper = qbChatHelper;
     }
 
-    public static void start(Context context, String message) {
+    public static void start(Context context, String message, String opponentName) {
         Intent intent = new Intent(QBServiceConsts.SEND_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, message);
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_OPPONENT_NAME, opponentName);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        qbChatHelper.sendPrivateMessage(message);
+        String opponentName = extras.getString(QBServiceConsts.EXTRA_CHAT_OPPONENT_NAME);
+        qbChatHelper.sendPrivateMessage(message, opponentName);
         return null;
     }
 }

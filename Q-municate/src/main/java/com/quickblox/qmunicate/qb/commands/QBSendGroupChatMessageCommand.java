@@ -11,12 +11,12 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendGroupChatMessageCommand extends ServiceCommand {
 
-    private QBChatHelper qbChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBSendGroupChatMessageCommand(Context context, QBChatHelper qbChatHelper, String successAction,
+    public QBSendGroupChatMessageCommand(Context context, QBChatHelper ChatHelper, String successAction,
                                          String failAction) {
         super(context, successAction, failAction);
-        this.qbChatHelper = qbChatHelper;
+        this.chatHelper = ChatHelper;
     }
 
     public static void start(Context context, String message) {
@@ -28,9 +28,9 @@ public class QBSendGroupChatMessageCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        Log.i("GroupMessage: ", "From perform, Chat message: ");
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        qbChatHelper.sendGroupMessage(message);
+        Log.i("GroupMessage: ", "From perform, Chat message: " + message);
+        chatHelper.sendGroupMessage(message);
         return null;
     }
 }

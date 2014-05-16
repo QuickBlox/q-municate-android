@@ -53,6 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(ChatMessagesTable.Cols.INCOMING).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.GROUP_ID).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.SENDER_NAME).append(" TEXT, ")
+                .append(ChatMessagesTable.Cols.OPPONENT_NAME).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
         createTable(db, ChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
     }

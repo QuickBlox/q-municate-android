@@ -23,7 +23,6 @@ public abstract class ServiceCommand implements Command {
     public void execute(Bundle bundle) {
         Bundle result;
         try {
-            Log.i("GroupMessage: ", "From execute to perform, Chat message: ");
             result = perform(bundle);
             sendResult(result, successAction);
         } catch (Exception e) {

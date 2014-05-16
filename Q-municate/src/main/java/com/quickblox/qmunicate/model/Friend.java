@@ -21,7 +21,6 @@ public class Friend implements Serializable {
     private String status;
     private Date lastRequestAt;
     private boolean online;
-    private String login;
 
     private boolean selected;
 
@@ -33,7 +32,6 @@ public class Friend implements Serializable {
         this.fileId = user.getFileId();
         this.lastRequestAt = user.getLastRequestAt();
         this.avatarUid = UriCreator.cutUid(user.getWebsite());
-        this.login = user.getLogin();
     }
 
     public Friend() {
@@ -159,13 +157,5 @@ public class Friend implements Serializable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
     }
 }

@@ -117,7 +117,7 @@ public class PrivateChatActivity extends BaseChatActivity {
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString());
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), opponentFriend.getFullname());
         messageEditText.setText("");
     }
 
