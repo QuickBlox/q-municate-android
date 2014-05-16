@@ -122,7 +122,7 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-    //--------------------------------------- ChatMessagesTable -----------------------------------------------------
+    //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
     public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId, int chatId, String opponentName) {
         ContentValues values = new ContentValues();
@@ -149,6 +149,9 @@ public class DatabaseManager {
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
 
+    public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
+        return context.getContentResolver().query(PrivateChatMessagesTable.CONTENT_URI, null,
+                PrivateChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
         return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
