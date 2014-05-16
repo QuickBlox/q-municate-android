@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
