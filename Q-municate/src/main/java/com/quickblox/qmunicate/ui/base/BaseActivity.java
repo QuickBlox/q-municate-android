@@ -136,13 +136,6 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();
-            if (QBChatService.getInstance() != null) {
-                try {
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-            }
             return;
         }
         this.doubleBackToExitPressedOnce = true;
@@ -178,9 +171,7 @@ public abstract class BaseActivity extends Activity {
                 QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    protected void onConnectedToService() {
     }
 
     protected void navigateToParent() {
@@ -200,6 +191,11 @@ public abstract class BaseActivity extends Activity {
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);
         transaction.commit();
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private FragmentTransaction buildTransaction() {
@@ -252,6 +248,7 @@ public abstract class BaseActivity extends Activity {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
+            onConnectedToService();
         }
 
         @Override

@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -32,6 +33,8 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -158,6 +161,11 @@ public class NavigationDrawerFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 baseActivity.showProgress();
                 FacebookHelper.logout();
+                try {
+                    QBChatService.getInstance().logout();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
                 QBLogoutCommand.start(baseActivity);
             }
         });
@@ -244,7 +252,8 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void clearCache() {
-        DatabaseManager.deleteAllFriends(getActivity());
+        DatabaseManager.deleteAllFriends(baseActivity);
+        DatabaseManager.deleteAllChats(baseActivity);
         // TODO SF clear something else
     }
 

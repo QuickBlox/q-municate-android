@@ -86,6 +86,13 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     @Override
+    protected void onConnectedToService() {
+        signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
+        messageHandler = new ChatMessageHandler();
+        signalingChannel.addSignalingListener(messageHandler);
+    }
+
+    @Override
     protected void onDestroy() {
         cancelPlayer();
         super.onDestroy();
@@ -158,7 +165,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     }
 
     private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
-                                      WebRTC.MEDIA_STREAM callType, String sessionId) {
+            WebRTC.MEDIA_STREAM callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
         OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(

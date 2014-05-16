@@ -6,6 +6,7 @@ public abstract class Chat {
 
     protected String name;
     protected Integer avatarId;
+    protected String lastMessage;
 
     public abstract String getId();
 

@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,25 +10,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.ChatMessage;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
 import java.util.List;
 
-public class ChatFriendsAdapter extends ArrayAdapter<Friend> {
+public class ChatFriendsAdapter extends /*ArrayAdapter<Friend>*/BaseCursorAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
+    private List <ChatMessage> opponentMessages;
 
-    public ChatFriendsAdapter(Context context, int textViewResourceId, List<Friend> list) {
-        super(context, textViewResourceId, list);
-        this.context = context;
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//    public ChatFriendsAdapter(Context context, int textViewResourceId, List<Friend> list) {
+//        super(context, textViewResourceId, list);
+//        this.context = context;
+//        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//    }
+
+    public ChatFriendsAdapter(Context context, Cursor cursor, List<ChatMessage> list) {
+        super(context, cursor, true);
+        this.opponentMessages = list;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Friend data = getItem(position);
+//        Friend data = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_chat_friend, null);
@@ -45,7 +54,7 @@ public class ChatFriendsAdapter extends ArrayAdapter<Friend> {
         }
 
         // TODO All fields
-        holder.nameTextView.setText(data.getEmail());
+//        holder.nameTextView.setText(data.getEmail());
 
         return convertView;
     }

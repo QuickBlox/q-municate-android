@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -16,13 +16,13 @@ public class QBLoginCommand extends ServiceCommand {
     private static final String TAG = QBLoginCommand.class.getSimpleName();
 
     private final QBAuthHelper qbAuthHelper;
-    private final QBChatHelper qbChatHelper;
+    private final QBVideoChatHelper qbVideoChatHelper;
 
-    public QBLoginCommand(Context context, QBAuthHelper qbAuthHelper, QBChatHelper qbChatHelper,
+    public QBLoginCommand(Context context, QBAuthHelper qbAuthHelper, QBVideoChatHelper qbVideoChatHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
         this.qbAuthHelper = qbAuthHelper;
-        this.qbChatHelper = qbChatHelper;
+        this.qbVideoChatHelper = qbVideoChatHelper;
     }
 
     public static void start(Context context, QBUser user) {
@@ -36,7 +36,7 @@ public class QBLoginCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
 
         user = qbAuthHelper.login(user);
-//        qbChatHelper.init(context);
+        qbVideoChatHelper.init(context);
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
 

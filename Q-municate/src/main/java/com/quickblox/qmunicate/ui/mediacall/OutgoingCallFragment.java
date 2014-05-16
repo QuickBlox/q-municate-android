@@ -69,9 +69,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract int getContentView();
 
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
-                                           Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
-                                           QBSignalingChannel.PLATFORM platform,
-                                           QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
+            Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
+            QBSignalingChannel.PLATFORM platform,
+            QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.USER, user);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
@@ -262,6 +262,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (qbVideoChat != null) {
             if (sendStop) {
                 qbVideoChat.stopCall();
+            } else {
+                qbVideoChat.disposeConnection();
             }
             qbVideoChat.clean();
         }
@@ -273,12 +275,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        //        ISignalingChannel signalingChannel = service.getQbChatHelper().getSignalingChannel();
-        //        if (signalingChannel != null && isExistActivity()) {
-        //            initChat(signalingChannel);
-        //        } else if (isExistActivity()) {
-        //            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
-        //        }
+        QBSignalingChannel signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
+        if (signalingChannel != null && isExistActivity()) {
+            initChat(signalingChannel);
+        } else if (isExistActivity()) {
+            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
+        }
     }
 
     private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {

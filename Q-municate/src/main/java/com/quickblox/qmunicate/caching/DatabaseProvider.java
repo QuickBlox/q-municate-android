@@ -7,8 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.caching.tables.PrivateChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+
 
 public class DatabaseProvider extends ContentProvider {
 
@@ -38,8 +40,8 @@ public class DatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case PrivateChatMessagesTable.PATH_TOKEN: {
-                result = doQuery(db, uri, PrivateChatMessagesTable.TABLE_NAME, projection, selection, selectionArgs,
+            case ChatMessagesTable.PATH_TOKEN: {
+                result = doQuery(db, uri, ChatMessagesTable.TABLE_NAME, projection, selection, selectionArgs,
                         sortOrder);
                 break;
             }
@@ -79,8 +81,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doInsert(db, FriendTable.TABLE_NAME, FriendTable.CONTENT_URI, uri, values);
                 break;
             }
-            case PrivateChatMessagesTable.PATH_TOKEN: {
-                result = doInsert(db, PrivateChatMessagesTable.TABLE_NAME, PrivateChatMessagesTable.CONTENT_URI, uri, values);
+            case ChatMessagesTable.PATH_TOKEN: {
+                result = doInsert(db, ChatMessagesTable.TABLE_NAME, ChatMessagesTable.CONTENT_URI, uri, values);
                 break;
             }
             // TODO SF other tables can be added
@@ -103,8 +105,8 @@ public class DatabaseProvider extends ContentProvider {
                 table = FriendTable.TABLE_NAME;
                 break;
             }
-            case PrivateChatMessagesTable.PATH_TOKEN: {
-                table = PrivateChatMessagesTable.TABLE_NAME;
+            case ChatMessagesTable.PATH_TOKEN: {
+                table = ChatMessagesTable.TABLE_NAME;
                 break;
             }
             // TODO SF other tables can be added
@@ -137,8 +139,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doDelete(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case PrivateChatMessagesTable.PATH_TOKEN: {
-                result = doDelete(db, uri, PrivateChatMessagesTable.TABLE_NAME, selection, selectionArgs);
+            case ChatMessagesTable.PATH_TOKEN: {
+                result = doDelete(db, uri, ChatMessagesTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             // TODO SF other tables can be added
@@ -159,8 +161,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doUpdate(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
-            case PrivateChatMessagesTable.PATH_TOKEN: {
-                result = doUpdate(db, uri, PrivateChatMessagesTable.TABLE_NAME, selection, selectionArgs, values);
+            case ChatMessagesTable.PATH_TOKEN: {
+                result = doUpdate(db, uri, ChatMessagesTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
             // TODO SF other tables can be added

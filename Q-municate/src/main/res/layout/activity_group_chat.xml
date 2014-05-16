@@ -26,6 +26,15 @@
             android:layout_alignParentLeft="true"
             android:background="@null"
             android:src="@drawable/ic_photo" />
+        <ImageButton
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:onClick="sendMessageOnClick"
+            android:padding="5dp"
+            android:src="@drawable/ic_send_message"
+            android:visibility="gone" />
 
         <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
             android:id="@+id/message_edittext"
@@ -37,7 +46,8 @@
             android:focusable="true"
             android:gravity="center_vertical|right|left"
             android:maxEms="13"
-            android:maxWidth="250dip"
+            android:layout_marginLeft="30dp"
+            android:maxWidth="230dip"
             android:textColor="@android:color/black" />
 
     </RelativeLayout>
