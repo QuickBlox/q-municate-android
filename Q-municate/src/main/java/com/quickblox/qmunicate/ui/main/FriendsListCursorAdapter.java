@@ -56,7 +56,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         }
 
         String avatarUrl = getAvatarUrlForFriend(friend);
-        displayImage(avatarUrl, holder.avatarImageView);
+        displayAvatarImage(avatarUrl, holder.avatarImageView);
 
         if (!TextUtils.isEmpty(searchCharacters)) {
             TextViewHelper.changeTextColorView(context, holder.fullnameTextView, searchCharacters);

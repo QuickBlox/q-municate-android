@@ -9,6 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.quickblox.core.QBSettings;
 import com.quickblox.core.TransferProtocol;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
@@ -83,6 +84,7 @@ public class App extends Application {
 
     private void initApplication() {
         instance = this;
+        QBChatService.setDebugEnabled(true);
         initImageLoader(this);
 
         // TODO temp

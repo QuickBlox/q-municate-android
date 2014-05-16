@@ -76,4 +76,7 @@ public class Consts {
     public static DisplayImageOptions UIL_AVATAR_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.placeholder_user).showImageForEmptyUri(R.drawable.placeholder_user)
             .showImageOnFail(R.drawable.placeholder_user).cacheOnDisc(true).cacheInMemory(true).build();
+    public static DisplayImageOptions UIL_ATTACH_FILE_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
+            .showImageOnLoading(R.drawable.ic_attach_placeholder).showImageForEmptyUri(R.drawable.ic_attach_placeholder)
+            .showImageOnFail(R.drawable.ic_attach_placeholder).cacheOnDisc(true).cacheInMemory(true).build();
 }

@@ -122,16 +122,17 @@ public class DatabaseManager {
 
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
-    public static void savePrivateChatMessage(Context context, QBChatMessage message, int senderId,
-            int chatId, String opponentName) {
+    // TODO SF context, message, senderId, chatId, attachUrl --- to Model
+    public static void savePrivateChatMessage(Context context, String message, int senderId, int chatId, String attachUrl) {
         ContentValues values = new ContentValues();
-        values.put(ChatMessagesTable.Cols.BODY, message.getBody());
+
+        values.put(ChatMessagesTable.Cols.BODY, message);
         values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        values.put(ChatMessagesTable.Cols.OPPONENT_NAME, opponentName);
         // TODO INCOMING
         values.put(ChatMessagesTable.Cols.INCOMING, false);
         values.put(ChatMessagesTable.Cols.CHAT_ID, chatId);
+        values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, attachUrl);
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
@@ -149,14 +150,13 @@ public class DatabaseManager {
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
 
-    public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
-                ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
-    }
-
     public static Cursor getAllGroupChatMessagesByGroupId(Context context, String groupId) {
         return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
                 ChatMessagesTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
+    }
+
+    public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
+        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 
     public static Cursor getAllPrivateConversations(Context context) {
@@ -166,5 +166,9 @@ public class DatabaseManager {
     public static Cursor getAllGroupConversations(Context context) {
         return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
                 "DISTINCT " + ChatMessagesTable.Cols.GROUP_ID, null, ChatMessagesTable.Cols.TIME + " DESC");
+    }
+
+    public static void deleteAllChats(Context context) {
+        context.getContentResolver().delete(ChatMessagesTable.CONTENT_URI, null, null);
     }
 }

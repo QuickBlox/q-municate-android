@@ -2,8 +2,11 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
@@ -34,7 +37,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.avatarImageView.setOval(true);
         holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
+        holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
 
         view.setTag(holder);
 
@@ -48,7 +53,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         String avatarUrl;
 
         String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.ATTACH_FILE_URL));
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
+        long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
 
         if(senderId == currentUser.getId()) {
             senderName = currentUser.getFullName();
@@ -60,13 +67,19 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForFriend(opponentFriend);
         }
 
-        long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
-
-        holder.messageTextView.setText(body);
+        if(!TextUtils.isEmpty(attachUrl)) {
+            holder.messageTextView.setVisibility(View.GONE);
+            holder.attachImageView.setVisibility(View.VISIBLE);
+            displayAttachImage(attachUrl, holder.attachImageView, holder.progressBar);
+        } else {
+            holder.messageTextView.setVisibility(View.VISIBLE);
+            holder.attachImageView.setVisibility(View.GONE);
+            holder.messageTextView.setText(body);
+        }
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        displayImage(avatarUrl, holder.avatarImageView);
+        displayAvatarImage(avatarUrl, holder.avatarImageView);
     }
 
     private static class ViewHolder {
@@ -74,6 +87,8 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         RoundedImageView avatarImageView;
         TextView nameTextView;
         ChatTextView messageTextView;
+        ImageView attachImageView;
         TextView timeTextView;
+        ProgressBar progressBar;
     }
 }
