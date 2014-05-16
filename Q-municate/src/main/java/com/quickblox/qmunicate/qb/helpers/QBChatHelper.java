@@ -13,7 +13,6 @@ import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
-import com.quickblox.module.chat.model.QBAttachmentType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
@@ -86,8 +85,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
         QBChatMessage chatMessage = new QBChatMessage();
-        QBAttachment attachment = new QBAttachment();
-        attachment.setType(QBAttachmentType.photo.toString());
+        QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
         return chatMessage;
@@ -97,7 +95,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(messageBody)? "attach file" : messageBody);
+        // TODO SF "file was attached" to Model
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(
+                messageBody) ? "file was attached" : messageBody);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
                 DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -114,16 +114,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     }
 
     private String getAttachUrlFromQBChatMessage(QBChatMessage chatMessage) {
-        List<QBAttachment> attachmentsList = null;
-        try {
-            attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (attachmentsList.isEmpty()) {
-            for (QBAttachment attachment : attachmentsList) {
-                return attachment.getUrl();
-            }
+        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
+        if (!attachmentsList.isEmpty()) {
+            return attachmentsList.get(attachmentsList.size() - 1).getUrl();
         }
         return "";
     }
