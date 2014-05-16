@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Chat;
 import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
@@ -39,7 +40,7 @@ public class ChatsListFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         chatsListView = (ListView) inflater.inflate(R.layout.fragment_chats_list, container, false);
         chatsArrayList = new ArrayList<Chat>();
-        chatsListAdapter = new ChatsListAdapter(getActivity(), R.layout.list_item_chat, chatsArrayList);
+        chatsListAdapter = new ChatsListAdapter(getActivity(), DatabaseManager.getAllPrivateConversations(getActivity()));
         chatsListView.setAdapter(chatsListAdapter);
 
         initUI();
@@ -73,6 +74,7 @@ public class ChatsListFragment extends BaseFragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                GroupChatDetailsActivity.start(getActivity(), (GroupChat)chatsArrayList.get(position));
             }
         });
     }

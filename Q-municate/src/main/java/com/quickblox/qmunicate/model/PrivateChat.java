@@ -13,6 +13,13 @@ public class PrivateChat extends Chat {
         // chat = QBChatService.getInstance().createChat();
     }
 
+    public PrivateChat(String name, int avatarId, String lastMessage){
+        this.friend = new Friend();
+        friend.setFullname(name);
+        friend.setFileId(avatarId);
+        this.lastMessage = lastMessage;
+    }
+
     @Override
     public String getId() {
         return String.valueOf(friend.getId());
@@ -35,7 +42,9 @@ public class PrivateChat extends Chat {
 
     @Override
     public ChatMessage getLastMessage() {
-        return new ChatMessage();
+        ChatMessage message = new ChatMessage();
+        message.setBody(this.lastMessage);
+        return message;
     }
 
     @Override

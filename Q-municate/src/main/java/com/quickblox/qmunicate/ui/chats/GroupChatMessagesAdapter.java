@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
@@ -15,13 +14,15 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.DateUtils;
 
-public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
+import java.util.List;
 
-    private Friend opponentFriend;
+public class GroupChatMessagesAdapter extends BaseCursorAdapter {
 
-    public PrivateChatMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
+    private List<Friend> opponentFriends;
+
+    public GroupChatMessagesAdapter(Context context, Cursor cursor, List<Friend> opponentFriends) {
         super(context, cursor, true);
-        this.opponentFriend = opponentFriend;
+        this.opponentFriends = opponentFriends;
     }
 
     @Override
@@ -52,12 +53,12 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
         if(senderId == currentUser.getId()) {
             senderName = currentUser.getFullName();
-            avatarUrl = getAvatarUrlForCurrentUser();
+//            avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
             Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
             senderName = senderFriend.getFullname();
-            avatarUrl = getAvatarUrlForFriend(opponentFriend);
+//            avatarUrl = getAvatarUrlForFriend(opponentFriends);
         }
 
         long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
@@ -66,7 +67,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        displayImage(avatarUrl, holder.avatarImageView);
+//        displayImage(avatarUrl, holder.avatarImageView);
     }
 
     private static class ViewHolder {

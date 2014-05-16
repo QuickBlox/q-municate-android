@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
+import android.util.Log;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public abstract class ServiceCommand implements Command {

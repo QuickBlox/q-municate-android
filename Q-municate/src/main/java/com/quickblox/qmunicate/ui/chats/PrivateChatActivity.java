@@ -113,11 +113,11 @@ public class PrivateChatActivity extends BaseChatActivity {
     }
 
     private Cursor getAllPrivateChatMessages() {
-        return DatabaseManager.getAllPrivateChatMessagesByChatId(this, chatId);
+        return DatabaseManager.getAllPrivateChatMessagesBySenderId(this, chatId);
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString());
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), opponentFriend.getFullname());
         messageEditText.setText("");
     }
 
