@@ -22,6 +22,7 @@ public class Consts {
     public static final int FL_FRIENDS_PER_PAGE = 100;
 
     public static final int ZERO_VALUE = 0;
+    public static final String EMPTY_STRING = "";
 
     public static final String ENCODING_UTF8 = "UTF-8";
 
@@ -76,4 +77,7 @@ public class Consts {
     public static DisplayImageOptions UIL_AVATAR_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.placeholder_user).showImageForEmptyUri(R.drawable.placeholder_user)
             .showImageOnFail(R.drawable.placeholder_user).cacheOnDisc(true).cacheInMemory(true).build();
+    public static DisplayImageOptions UIL_ATTACH_FILE_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
+            .showImageOnLoading(R.drawable.ic_attach_placeholder).showImageForEmptyUri(R.drawable.ic_attach_placeholder)
+            .showImageOnFail(R.drawable.ic_attach_placeholder).cacheOnDisc(true).cacheInMemory(true).build();
 }

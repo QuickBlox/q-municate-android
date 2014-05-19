@@ -28,7 +28,7 @@ public class ChatSelectableFriendsAdapter extends BaseCursorAdapter {
     private LayoutInflater layoutInflater;
     private NewChatCounterFriendsListener counterChangedListener;
     private int counterFriends;
-//    private String searchCharacters;
+    private String searchCharacters;
     private List<Friend> selectedFriends;
 
     public ChatSelectableFriendsAdapter(Context context, Cursor cursor) {
@@ -90,16 +90,16 @@ public class ChatSelectableFriendsAdapter extends BaseCursorAdapter {
             }
         });
         String avatarUrl = getAvatarUrlForFriend(friend);
-        displayImage(avatarUrl, holder.avatarImageView);
+        displayAvatarImage(avatarUrl, holder.avatarImageView);
 
-//        if (!TextUtils.isEmpty(searchCharacters)) {
-//            TextViewHelper.changeTextColorView(context, holder.nameTextView, searchCharacters);
-//        }
+        if (!TextUtils.isEmpty(searchCharacters)) {
+            TextViewHelper.changeTextColorView(context, holder.nameTextView, searchCharacters);
+        }
     }
 
-//    public void setSearchCharacters(String searchCharacters) {
-//        this.searchCharacters = searchCharacters;
-//    }
+    public void setSearchCharacters(String searchCharacters) {
+        this.searchCharacters = searchCharacters;
+    }
 
     private void notifyCounterChanged(boolean isIncrease) {
         changeCounter(isIncrease);

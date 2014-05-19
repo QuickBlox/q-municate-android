@@ -136,13 +136,6 @@ public abstract class BaseActivity extends Activity {
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();
-            if (QBChatService.getInstance() != null) {
-                try {
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
-            }
             return;
         }
         this.doubleBackToExitPressedOnce = true;

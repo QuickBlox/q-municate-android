@@ -155,11 +155,19 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     @Override
     public void onCounterFacebookChanged(int valueCounterFacebook) {
+        setCheckedCheckBox(valueCounterFacebook, checkAllFacebookFriendsCheckBox);
         counterFacebookTextView.setText(valueCounterFacebook + "");
+    }
+
+    private void setCheckedCheckBox(int countSelected, CheckBox checkBox) {
+        if(countSelected == 0) {
+            checkBox.setChecked(false);
+        }
     }
 
     @Override
     public void onCounterContactsChanged(int valueCounterContacts) {
+        setCheckedCheckBox(valueCounterContacts, checkAllContactsFriendsCheckBox);
         counterContactsTextView.setText(valueCounterContacts + "");
     }
 

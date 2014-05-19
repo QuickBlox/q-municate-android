@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -32,6 +33,8 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +50,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private TextView fullnameTextView;
     private ImageButton logoutButton;
 
-    private NavigationDrawerCallbacks callbacks;
+    private NavigationDrawerCallbacks navigationDrawerCallbacks;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
@@ -93,8 +96,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(fragmentContainerView);
         }
-        if (callbacks != null) {
-            callbacks.onNavigationDrawerItemSelected(position);
+        if (navigationDrawerCallbacks != null) {
+            navigationDrawerCallbacks.onNavigationDrawerItemSelected(position);
         }
     }
 
@@ -109,13 +112,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
 
-
         drawerListView.setItemChecked(currentSelectedPosition, true);
-
-        QBUser user = App.getInstance().getUser();
-        if (user != null) {
-            fullnameTextView.setText(user.getFullName());
-        }
 
         return rootView;
     }
@@ -164,6 +161,11 @@ public class NavigationDrawerFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 baseActivity.showProgress();
                 FacebookHelper.logout();
+                try {
+                    QBChatService.getInstance().logout();
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
                 QBLogoutCommand.start(baseActivity);
             }
         });
@@ -173,7 +175,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        callbacks = (NavigationDrawerCallbacks) activity;
+        navigationDrawerCallbacks = (NavigationDrawerCallbacks) activity;
     }
 
     @Override
@@ -184,6 +186,15 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        QBUser user = App.getInstance().getUser();
+        if (user != null) {
+            fullnameTextView.setText(user.getFullName());
+        }
     }
 
     @Override
@@ -201,7 +212,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        callbacks = null;
+        navigationDrawerCallbacks = null;
     }
 
     @Override
@@ -241,7 +252,8 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void clearCache() {
-        DatabaseManager.deleteAllFriends(getActivity());
+        DatabaseManager.deleteAllFriends(baseActivity);
+        DatabaseManager.deleteAllChats(baseActivity);
         // TODO SF clear something else
     }
 

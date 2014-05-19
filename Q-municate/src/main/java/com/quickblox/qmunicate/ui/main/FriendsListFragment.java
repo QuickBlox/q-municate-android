@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -23,7 +22,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBFriendsLoadCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
@@ -50,7 +49,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private ListView friendsListView;
     private TextView friendsTitle;
     private View friendsListViewTitle;
-    private BaseAdapter friendsListAdapter;
+    private FriendsListCursorAdapter friendsListAdapter;
     private PullToRefreshLayout pullToRefreshLayout;
     private int positionCounter;
     private boolean isHideSearchView;
@@ -96,10 +95,12 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_search:
-                friendsListView.addFooterView(globalSearchLayout);
                 friendsTitle.setText(R.string.frl_friends);
-                friendsListView.addHeaderView(friendsListViewTitle);
                 positionCounter++;
+                friendsListView.setAdapter(null);
+                friendsListView.addHeaderView(friendsListViewTitle);
+                friendsListView.addFooterView(globalSearchLayout);
+                friendsListView.setAdapter(friendsListAdapter);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -107,7 +108,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void startFriendsListLoader() {
-        QBFriendsLoadCommand.start(baseActivity);
+        QBLoadFriendsCommand.start(baseActivity);
     }
 
     @Override
@@ -129,8 +130,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
-                false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
 
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
@@ -160,8 +160,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     private void initPullToRefresh(View view) {
         pullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.pullToRefreshLayout);
-        ActionBarPullToRefresh.from(baseActivity).allChildrenArePullable().listener(this).setup(
-                pullToRefreshLayout);
+        ActionBarPullToRefresh.from(baseActivity).allChildrenArePullable().listener(this).setup(pullToRefreshLayout);
     }
 
     private void initFriendsList() {
@@ -238,10 +237,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
         if (state == State.FRIENDS_LIST) {
-            FriendsListCursorAdapter friendListCursorAdapter = (FriendsListCursorAdapter) friendsListAdapter;
-            friendListCursorAdapter.setFilterQueryProvider(this);
-            friendListCursorAdapter.getFilter().filter(newText);
-            friendListCursorAdapter.setSearchCharacters(newText);
+            friendsListAdapter.setFilterQueryProvider(this);
+            friendsListAdapter.getFilter().filter(newText);
+            friendsListAdapter.setSearchCharacters(newText);
         } else {
             startUsersListLoader(newText);
         }

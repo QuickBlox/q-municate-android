@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.qb.commands.*;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
+import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,15 +72,16 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, new QBUpdateUserCommand(this, qbAuthHelper,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION));
-        serviceCommandMap.put(QBServiceConsts.FRIENDS_LOAD_ACTION, new QBFriendsLoadCommand(this,
+        serviceCommandMap.put(QBServiceConsts.FRIENDS_LOAD_ACTION, new QBLoadFriendsCommand(this,
                 QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.USER_SEARCH_ACTION, new QBUserSearchCommand(this,
                 QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, QBServiceConsts.USER_SEARCH_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, new QBSendGroupChatMessageCommand(this, qbChatHelper,
                 QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this,
-                qbChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
-                QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
+                qbChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, new QBLoadAttachFileCommand(this, qbChatHelper,
+                QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION));
     }
 
     @Override
