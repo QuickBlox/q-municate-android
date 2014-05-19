@@ -10,6 +10,7 @@ import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
+import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
@@ -17,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-
-    //--------------------------------------- FriendTable -----------------------------------------------------
 
     public static void saveFriends(Context context, List<Friend> friendsList) {
         for (Friend friend : friendsList) {
@@ -120,19 +119,15 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-    //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
-
-    // TODO SF context, message, senderId, chatId, attachUrl --- to Model
-    public static void savePrivateChatMessage(Context context, String message, int senderId, int chatId, String attachUrl) {
+    public static void savePrivateChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
 
-        values.put(ChatMessagesTable.Cols.BODY, message);
-        values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
+        values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
+        values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        // TODO INCOMING
         values.put(ChatMessagesTable.Cols.INCOMING, false);
-        values.put(ChatMessagesTable.Cols.CHAT_ID, chatId);
-        values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, attachUrl);
+        values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
+        values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, privateChatMessageCache.getAttachUrl());
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
@@ -143,7 +138,6 @@ public class DatabaseManager {
         values.put(ChatMessagesTable.Cols.BODY, message.getBody());
         values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        // TODO INCOMING
         values.put(ChatMessagesTable.Cols.INCOMING, false);
         values.put(ChatMessagesTable.Cols.GROUP_ID, groupId);
 

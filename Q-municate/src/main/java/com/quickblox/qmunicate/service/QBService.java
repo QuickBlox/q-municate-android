@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.qb.commands.*;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
+import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,9 +79,8 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, new QBSendGroupChatMessageCommand(this, qbChatHelper,
                 QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
         serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, new QBSendPrivateChatMessageCommand(this,
-                qbChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
-                QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
-                serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, new QBLoadAttachFileCommand(this, qbChatHelper,
+                qbChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION, QBServiceConsts.SEND_MESSAGE_FAIL_ACTION));
+        serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, new QBLoadAttachFileCommand(this, qbChatHelper,
                 QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION));
     }
 

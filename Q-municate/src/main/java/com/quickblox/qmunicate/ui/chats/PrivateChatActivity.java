@@ -19,13 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -50,7 +48,6 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
     private ImageHelper imageHelper;
-    private QBUser currentUser;
 
     private int chatId;
 
@@ -76,7 +73,6 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         super.onCreate(savedInstanceState);
 
         instance = this;
-        currentUser = App.getInstance().getUser();
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
         chatId = opponentFriend.getId();
         imageHelper = new ImageHelper(this);
@@ -161,7 +157,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString());
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText("");
     }
 
@@ -222,7 +218,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         @Override
         public void execute(Bundle bundle) {
             QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            chatHelper.sendPrivateMessageWithAttachImage(qbFile);
+            QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, qbFile);
             hideProgress();
         }
     }
