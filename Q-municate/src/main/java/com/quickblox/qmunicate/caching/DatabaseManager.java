@@ -7,15 +7,14 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.text.TextUtils;
 
 
+import android.util.Log;
 import com.quickblox.module.chat.QBChatMessage;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.model.Chat;
-import com.quickblox.qmunicate.model.ChatMessage;
-import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.PrivateChat;
+import com.quickblox.qmunicate.model.*;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
@@ -80,11 +79,19 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static PrivateChat getPrivateChatFromCursor(Cursor cursor){
-        String fullname = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.OPPONENT_NAME));
-//        int fileId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.FILE_ID));
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
-        return new PrivateChat(fullname, 0, lastMessage);
+    public static Chat getChatFromCursor(Cursor cursor){
+        Chat chat = null;
+        String chatName = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.CHAT_NAME));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.LAST_MESSAGE));
+        String avatarUid = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.AVATAR_ID));
+        int isGroup = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.IS_GROUP));
+        if(isGroup == 1){
+            chat = new GroupChat(chatName, avatarUid == null ? 0 : Integer.parseInt(avatarUid));
+            chat.setLastMessage(lastMessage);
+        } else {
+            chat = new PrivateChat(chatName, avatarUid == null ? 0 : Integer.parseInt(avatarUid), lastMessage);
+        }
+        return chat;
     }
 
     public static boolean searchFriendInBase(Context context, int searchId) {
@@ -135,9 +142,21 @@ public class DatabaseManager {
         values.put(ChatMessagesTable.Cols.CHAT_ID, chatId);
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
+        ContentValues chatValues = new ContentValues();
+        chatValues.put(ChatTable.Cols.CHAT_ID, chatId);
+        chatValues.put(ChatTable.Cols.CHAT_NAME, opponentName);
+        chatValues.put(ChatTable.Cols.LAST_MESSAGE, message.getBody());
+        chatValues.put(ChatTable.Cols.IS_GROUP, 0);
+        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + opponentName + "'", null, null);
+        if (c.getCount() == 1) {
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + chatId, null);
+        } else {
+            context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
+        }
     }
 
     public static void saveGroupChatMessage(Context context, QBChatMessage message, int senderId, String groupId) {
+        Log.i("GroupMessage: ", " saveGroupChatMessage");
         ContentValues values = new ContentValues();
         values.put(ChatMessagesTable.Cols.BODY, message.getBody());
         values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
@@ -147,6 +166,19 @@ public class DatabaseManager {
         values.put(ChatMessagesTable.Cols.GROUP_ID, groupId);
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
+        ContentValues chatValues = new ContentValues();
+        chatValues.put(ChatTable.Cols.CHAT_ID, groupId);
+        chatValues.put(ChatTable.Cols.CHAT_NAME, groupId);
+        chatValues.put(ChatTable.Cols.LAST_MESSAGE, message.getBody());
+        chatValues.put(ChatTable.Cols.IS_GROUP, 1);
+        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null, null);
+        if (c != null && c.getCount() == 1) {
+            Log.i("GroupMessage: ", " There's already");
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + groupId, null);
+        } else {
+            Log.i("GroupMessage: ", "There's not yet");
+            context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
+        }
     }
 
     public static Cursor getAllPrivateChatMessagesBySenderId(Context context, int chatId) {
@@ -157,11 +189,19 @@ public class DatabaseManager {
         return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
     }
 
-    public static Cursor getAllPrivateConversations(Context context) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, null, null, null);
+    public static Cursor getAllChatConversations(Context context){
+        return context.getContentResolver().query(ChatTable.CONTENT_URI, null, null, null, null);
     }
 
-    public static Cursor getAllGroupConversations(Context context) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, "DISTINCT " + ChatMessagesTable.Cols.GROUP_ID, null, ChatMessagesTable.Cols.TIME + " DESC");
-    }
+//    public static List<Chat> getAllConversations(Context context) {
+//        List<Chat> conversations = new ArrayList<Chat>();
+//        Chat chat = null;
+//        Cursor cursor = context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, null, null, null);
+//        String fullname = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME));
+//        String lastMessage =
+//        for(cursor.moveToFirst(); !cursor.isAfterLast();cursor.moveToNext()){
+//            Chat chat = new Chat();
+//        }
+//        return conversations;
+//    }
 }

@@ -69,6 +69,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
            //TODO: reconnect
         }
         Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
+
         saveGroupMessageToCache(chatMessage, user.getId(), groupChatName);
     }
 
@@ -83,6 +84,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     }
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId){
+        Log.i("GroupMessage: ", " Saving to cache " + groupChatName);
         DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId);
     }
 

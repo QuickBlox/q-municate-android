@@ -40,7 +40,7 @@ public class ChatsListFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         chatsListView = (ListView) inflater.inflate(R.layout.fragment_chats_list, container, false);
         chatsArrayList = new ArrayList<Chat>();
-        chatsListAdapter = new ChatsListAdapter(getActivity(), DatabaseManager.getAllPrivateConversations(getActivity()));
+        chatsListAdapter = new ChatsListAdapter(getActivity(), DatabaseManager.getAllChatConversations(getActivity()));
         chatsListView.setAdapter(chatsListAdapter);
 
         initUI();
