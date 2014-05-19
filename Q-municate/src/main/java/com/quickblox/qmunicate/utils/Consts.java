@@ -24,6 +24,10 @@ public class Consts {
     public static final int ZERO_VALUE = 0;
     public static final String EMPTY_STRING = "";
 
+    public static final int MESSAGE_TYPE_1 = 0;
+    public static final int MESSAGE_TYPE_2 = 1;
+    public static final int MESSAGES_TYPE_COUNT = 2;
+
     public static final String ENCODING_UTF8 = "UTF-8";
 
     public static final int DELAY_LONG_CLICK_ANIMATION_LONG = 500;
@@ -77,7 +81,4 @@ public class Consts {
     public static DisplayImageOptions UIL_AVATAR_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .showImageOnLoading(R.drawable.placeholder_user).showImageForEmptyUri(R.drawable.placeholder_user)
             .showImageOnFail(R.drawable.placeholder_user).cacheOnDisc(true).cacheInMemory(true).build();
-    public static DisplayImageOptions UIL_ATTACH_FILE_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
-            .showImageOnLoading(R.drawable.ic_attach_placeholder).showImageForEmptyUri(R.drawable.ic_attach_placeholder)
-            .showImageOnFail(R.drawable.ic_attach_placeholder).cacheOnDisc(true).cacheInMemory(true).build();
 }

@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -30,6 +31,7 @@ import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
@@ -106,11 +108,11 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }
+
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());
 
-        fullnameOld = fullNameEditText.getText().toString();
-        emailOld = emailEditText.getText().toString();
+        updateOldUserData();
     }
 
     private void initTextChangedListeners() {
@@ -200,10 +202,15 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         emailCurrent = emailEditText.getText().toString();
     }
 
+    private void updateOldUserData() {
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+    }
+
     private void updateUserData() {
         if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
             try {
-                saveChanges(avatarBitmapCurrent, fullnameCurrent, emailCurrent);
+                saveChanges(fullnameCurrent, emailCurrent);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -214,8 +221,15 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
     }
 
-    private void saveChanges(final Bitmap avatar, final String fullname,
-            final String email) throws IOException {
+    private boolean isUserDataCorrect() {
+        return fullnameCurrent.length() > Consts.ZERO_VALUE && emailCurrent.length() > Consts.ZERO_VALUE;
+    }
+
+    private void saveChanges(final String fullname, final String email) throws IOException {
+        if(!isUserDataCorrect()) {
+            DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
+            return;
+        }
         if (isUserDataChanges(fullname, email)) {
             showProgress();
             qbUser.setFullName(fullname);
@@ -260,6 +274,7 @@ public class ProfileActivity extends BaseActivity implements OnGetImageFileListe
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
+            updateOldUserData();
             hideProgress();
         }
     }

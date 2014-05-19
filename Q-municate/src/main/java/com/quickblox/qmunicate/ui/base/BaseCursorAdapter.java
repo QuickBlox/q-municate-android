@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -21,6 +22,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {
@@ -52,23 +54,27 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
         ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }
 
-    protected void displayAttachImage(String uri, ImageView imageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_ATTACH_FILE_DISPLAY_OPTIONS,
-                new SimpleImageLoadingListener() {
+    protected void displayAttachImage(String uri, final TextView pleaseWaitTextView, final ImageView attachImageView, final ProgressBar progressBar) {
+        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String imageUri, View view) {
                         progressBar.setProgress(0);
                         progressBar.setVisibility(View.VISIBLE);
+                        pleaseWaitTextView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
                         progressBar.setVisibility(View.GONE);
+                        pleaseWaitTextView.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         progressBar.setVisibility(View.GONE);
+                        pleaseWaitTextView.setVisibility(View.GONE);
+                        attachImageView.setVisibility(View.VISIBLE);
+                        attachImageView.setImageBitmap(loadedImage);
                     }
                 }
         );

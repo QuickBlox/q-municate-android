@@ -15,6 +15,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
@@ -44,6 +45,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
         holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        holder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
 
         view.setTag(holder);
 
@@ -64,7 +66,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
         long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
 
-        if (senderId == currentUser.getId()) {
+        holder.attachImageView.setVisibility(View.GONE);
+
+        if (isOwnMessage(senderId)) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             avatarUrl = getAvatarUrlForFriend(opponentFriend);
@@ -72,8 +76,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
 
         if (!TextUtils.isEmpty(attachUrl)) {
             holder.messageTextView.setVisibility(View.GONE);
-            holder.attachImageView.setVisibility(View.VISIBLE);
-            displayAttachImage(attachUrl, holder.attachImageView, holder.progressBar);
+            displayAttachImage(attachUrl, holder.pleaseWaitTextView, holder.attachImageView, holder.progressBar);
         } else {
             holder.messageTextView.setVisibility(View.VISIBLE);
             holder.attachImageView.setVisibility(View.GONE);
@@ -84,6 +87,26 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         displayAvatarImage(avatarUrl, holder.avatarImageView);
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        Cursor cursor = (Cursor) getItem(position);
+        return getItemViewType(cursor);
+    }
+
+    private int getItemViewType(Cursor cursor) {
+        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
+        if (isOwnMessage(senderId)) {
+            return Consts.MESSAGE_TYPE_1;
+        } else {
+            return Consts.MESSAGE_TYPE_2;
+        }
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return Consts.MESSAGES_TYPE_COUNT;
+    }
+
     private static class ViewHolder {
 
         RoundedImageView avatarImageView;
@@ -91,5 +114,6 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         ImageView attachImageView;
         TextView timeTextView;
         ProgressBar progressBar;
+        TextView pleaseWaitTextView;
     }
 }
