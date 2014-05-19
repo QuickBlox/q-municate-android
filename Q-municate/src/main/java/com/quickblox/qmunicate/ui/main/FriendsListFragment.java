@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +54,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private PullToRefreshLayout pullToRefreshLayout;
     private int positionCounter;
     private boolean isHideSearchView;
+    private Cursor friendsCursor;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -110,6 +112,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     @Override
     public Cursor runQuery(CharSequence constraint) {
+        if (TextUtils.isEmpty(constraint)) {
+            return null;
+        }
         return DatabaseManager.fetchFriendsByFullname(baseActivity, constraint.toString());
     }
 
@@ -160,7 +165,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void initFriendsList() {
-        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, getAllFriends());
+        if (friendsCursor != null && !friendsCursor.isClosed()) {
+            friendsCursor.close();
+        }
+        friendsCursor = getAllFriends();
+        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, friendsCursor);
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
         friendsListView.setOnItemClickListener(this);
