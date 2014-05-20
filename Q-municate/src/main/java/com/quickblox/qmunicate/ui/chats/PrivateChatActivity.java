@@ -29,14 +29,14 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetFileListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class PrivateChatActivity extends BaseChatActivity implements OnGetFileListener {
+public class PrivateChatActivity extends BaseChatActivity implements ReceiveFileListener {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
 
@@ -143,12 +143,12 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetFileLi
     }
 
     @Override
-    public void onGotCachedFile(File file) {
+    public void onCachedImageFileReceived(File file) {
         startLoadAttachFile(file);
     }
 
     @Override
-    public void onGotAbsolutePathCreatedFile(String absolutePath) {
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void startLoadAttachFile(File file) {
@@ -201,7 +201,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetFileLi
             Uri originalUri = data.getData();
             try {
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                new GetImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+                new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
                         BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

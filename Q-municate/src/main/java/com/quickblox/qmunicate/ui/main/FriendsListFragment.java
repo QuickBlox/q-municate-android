@@ -236,11 +236,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
-        if (state == State.FRIENDS_LIST) {
-            friendsListAdapter.setFilterQueryProvider(this);
+        friendsListAdapter.setFilterQueryProvider(this);
+        if (state == State.FRIENDS_LIST && isHideSearchView) {
             friendsListAdapter.getFilter().filter(newText);
             friendsListAdapter.setSearchCharacters(newText);
-        } else {
+        } else if(state == State.GLOBAL_LIST) {
             startUsersListLoader(newText);
         }
         return true;
@@ -304,6 +304,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
             if (isHideSearchView) {
                 isHideSearchView = false;
+                friendsListAdapter.setSearchCharacters(null);
+                friendsListAdapter.setFilterQueryProvider(null);
                 friendsListView.removeFooterView(globalSearchLayout);
                 friendsListView.removeHeaderView(friendsListViewTitle);
                 positionCounter--;

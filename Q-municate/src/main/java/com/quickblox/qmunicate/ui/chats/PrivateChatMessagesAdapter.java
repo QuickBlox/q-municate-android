@@ -21,13 +21,13 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetFileListener;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 
-public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnGetFileListener {
+public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
     private Friend opponentFriend;
     private ImageHelper imageHelper;
@@ -87,7 +87,8 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnG
 
         if (!TextUtils.isEmpty(attachUrl)) {
             holder.messageTextView.setVisibility(View.GONE);
-            displayAttachImage(attachUrl, holder.pleaseWaitTextView, holder.attachImageView, holder.progressBar);
+            displayAttachImage(attachUrl, holder.pleaseWaitTextView, holder.attachImageView,
+                    holder.progressBar);
         } else {
             holder.messageTextView.setVisibility(View.VISIBLE);
             holder.attachImageView.setVisibility(View.GONE);
@@ -105,11 +106,11 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnG
     }
 
     @Override
-    public void onGotCachedFile(File imageFile) {
+    public void onCachedImageFileReceived(File imageFile) {
     }
 
     @Override
-    public void onGotAbsolutePathCreatedFile(String absolutePath) {
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
         imageHelper.showFullImage(context, absolutePath);
     }
 
@@ -122,9 +123,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnG
     private int getItemViewType(Cursor cursor) {
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            return Consts.MESSAGE_TYPE_1;
+            return Consts.LEFT_CHAT_MESSAGE_TYPE_1;
         } else {
-            return Consts.MESSAGE_TYPE_2;
+            return Consts.RIGHT_CHAT_MESSAGE_TYPE_2;
         }
     }
 
@@ -148,6 +149,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnG
         private TextView pleaseWaitTextView;
         private ImageView attachImageView;
         private ProgressBar progressBar;
+        private Bitmap loadedImageBitmap;
 
         public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
                 final ProgressBar progressBar) {
@@ -175,14 +177,18 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnG
             pleaseWaitTextView.setVisibility(View.GONE);
             attachImageView.setVisibility(View.VISIBLE);
             attachImageView.setImageBitmap(loadedImageBitmap);
-            attachImageView.setOnClickListener(new View.OnClickListener() {
+            attachImageView.setOnClickListener(receiveImageFileOnClickListener());
+        }
+
+        private View.OnClickListener receiveImageFileOnClickListener() {
+            return new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    new GetImageFileTask(PrivateChatMessagesAdapter.this).execute(imageHelper,
+                    new ReceiveImageFileTask(PrivateChatMessagesAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);
                 }
-            });
+            };
         }
     }
 }

@@ -7,20 +7,20 @@ import com.quickblox.qmunicate.core.concurrency.BaseAsyncTask;
 import java.io.File;
 import java.io.IOException;
 
-public class GetImageFileTask extends BaseAsyncTask {
+public class ReceiveImageFileTask extends BaseAsyncTask {
 
-    private OnGetFileListener listener;
+    private ReceiveFileListener listener;
 
-    public GetImageFileTask(OnGetFileListener listener) {
+    public ReceiveImageFileTask(ReceiveFileListener listener) {
         this.listener = listener;
     }
 
     @Override
     public void onResult(Object object) {
         if (object instanceof File) {
-            listener.onGotCachedFile((File) object);
+            listener.onCachedImageFileReceived((File) object);
         } else if (object instanceof String) {
-            listener.onGotAbsolutePathCreatedFile((String) object);
+            listener.onAbsolutePathExtFileReceived((String) object);
         }
     }
 

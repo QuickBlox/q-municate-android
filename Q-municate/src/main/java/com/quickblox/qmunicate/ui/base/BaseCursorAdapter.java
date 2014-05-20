@@ -2,18 +2,13 @@ package com.quickblox.qmunicate.ui.base;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -22,8 +17,6 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
-import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {

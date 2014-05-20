@@ -32,9 +32,9 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetFileListener;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
@@ -42,7 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity implements OnGetFileListener {
+public class ProfileActivity extends BaseActivity implements ReceiveFileListener {
 
     private LinearLayout changeAvatarLinearLayout;
     private RoundedImageView avatarImageView;
@@ -197,12 +197,12 @@ public class ProfileActivity extends BaseActivity implements OnGetFileListener {
     }
 
     @Override
-    public void onGotCachedFile(File imageFile) {
+    public void onCachedImageFileReceived(File imageFile) {
         QBUpdateUserCommand.start(this, qbUser, imageFile);
     }
 
     @Override
-    public void onGotAbsolutePathCreatedFile(String absolutePath) {
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
 
     }
 
@@ -236,7 +236,7 @@ public class ProfileActivity extends BaseActivity implements OnGetFileListener {
             qbUser.setEmail(email);
 
             if (isNeedUpdateAvatar) {
-                new GetImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
+                new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
             } else {
                 QBUpdateUserCommand.start(this, qbUser, null);
             }
