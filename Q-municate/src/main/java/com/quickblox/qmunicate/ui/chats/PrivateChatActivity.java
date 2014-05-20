@@ -33,14 +33,14 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetImageFileListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class PrivateChatActivity extends BaseChatActivity implements OnGetImageFileListener {
+public class PrivateChatActivity extends BaseChatActivity implements ReceiveFileListener {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
 
@@ -147,8 +147,12 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     }
 
     @Override
-    public void onGotImageFile(File file) {
+    public void onCachedImageFileReceived(File file) {
         startLoadAttachFile(file);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void startLoadAttachFile(File file) {
@@ -163,6 +167,11 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     public void sendMessageOnClick(View view) {
         QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText("");
+        scrollListView();
+    }
+
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     @Override
@@ -194,8 +203,8 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
             Uri originalUri = data.getData();
             try {
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                new GetImageFileTask(PrivateChatActivity.this).execute(imageHelper,
-                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()));
+                new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -206,7 +215,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     @Override
     protected void onResume() {
         super.onResume();
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        scrollListView();
         addActions();
     }
 
@@ -232,6 +241,7 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
             QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, qbFile);
             hideProgress();
+            scrollListView();
         }
     }
 }
