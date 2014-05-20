@@ -7,19 +7,19 @@
     android:focusable="false">
 
     <ListView
-        android:id="@+id/navigationList"
+        android:id="@+id/navigation_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/footerLinearLayout"
+        android:layout_above="@+id/footer_linearlayout"
         android:layout_alignParentTop="true"
+        android:background="@null"
         android:choiceMode="singleChoice"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
-        tools:context="com.sample.app.NavigationDrawerFragment"
-        android:background="@null"/>
+        tools:context="com.sample.app.NavigationDrawerFragment" />
 
     <LinearLayout
-        android:id="@id/footerLinearLayout"
+        android:id="@id/footer_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -27,7 +27,7 @@
         android:padding="5dp">
 
         <TextView
-            android:id="@+id/fullnameTextView"
+            android:id="@+id/fullname_textview"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -37,7 +37,7 @@
             android:textSize="@dimen/text_size" />
 
         <ImageButton
-            android:id="@+id/logoutImageButton"
+            android:id="@+id/logout_imagebutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
