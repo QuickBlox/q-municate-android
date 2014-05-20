@@ -37,6 +37,7 @@ public class FriendDetailsActivity extends BaseActivity {
 
     private RoundedImageView avatarImageView;
     private TextView nameTextView;
+    private TextView statusTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
     private TextView phoneTextView;
@@ -54,46 +55,71 @@ public class FriendDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
+        friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
+        initUI();
+        initUIWithFriendsData();
+        initBroadcastActionList();
+    }
 
+    private void initUI() {
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
         nameTextView = _findViewById(R.id.name_textview);
+        statusTextView = _findViewById(R.id.status_textview);
         onlineImageView = _findViewById(R.id.online_imageview);
         onlineStatusTextView = _findViewById(R.id.online_status_textview);
         phoneTextView = _findViewById(R.id.phone_textview);
         phoneView = _findViewById(R.id.phone_relativelayout);
+    }
 
+    private void initBroadcastActionList() {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
-
-        friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
-
-        initFriendsFields(friend);
     }
 
-    private void initFriendsFields(Friend friend) {
+    private void initUIWithFriendsData() {
+        loadAvatar();
+        setName();
+        setOnlineStatus();
+        setStatus();
+        setPhone();
+    }
+
+    private void setStatus() {
+        statusTextView.setText(friend.getStatus());
+    }
+
+    private void setName() {
+        nameTextView.setText(friend.getFullname());
+    }
+
+    private void setPhone() {
+        if (friend.getPhone() != null) {
+            phoneView.setVisibility(View.VISIBLE);
+        } else {
+            phoneView.setVisibility(View.GONE);
+        }
+        phoneTextView.setText(friend.getPhone());
+    }
+
+    private void setOnlineStatus() {
+        if (friend.isOnline()) {
+            onlineImageView.setVisibility(View.VISIBLE);
+        } else {
+            onlineImageView.setVisibility(View.GONE);
+        }
+        onlineStatusTextView.setText(friend.getOnlineStatus());
+    }
+
+    private void loadAvatar() {
         try {
             String uri = UriCreator.getUri(friend.getAvatarUid());
             ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         } catch (BaseServiceException e) {
             ErrorUtils.showError(this, e);
         }
-
-        nameTextView.setText(friend.getFullname());
-        if (friend.isOnline()) {
-            onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            onlineImageView.setVisibility(View.GONE);
-        }
-        if (friend.getPhone() != null) {
-            phoneView.setVisibility(View.VISIBLE);
-        } else {
-            phoneView.setVisibility(View.GONE);
-        }
-        onlineStatusTextView.setText(friend.getOnlineStatus());
-        phoneTextView.setText(friend.getPhone());
     }
 
     @Override
@@ -144,7 +170,6 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     public void voiceCallClickListener(View view) {
-
         callToUser(friend, WebRTC.MEDIA_STREAM.AUDIO);
     }
 
@@ -156,7 +181,6 @@ public class FriendDetailsActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            App.getInstance().getFriends().remove(friend);
             DialogUtils.show(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
             finish();
         }

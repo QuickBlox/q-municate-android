@@ -76,17 +76,17 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     public void fiendsReceived() {
         realFriendsCallbacks++;
         if (realFriendsCallbacks == expectedFriendsCallbacks) {
-            String[] users = getSelectedUsers();
+            Integer[] users = getSelectedUsers();
             QBAddFriendsCommand.start(activity, users);
         }
     }
 
-    private String[] getSelectedUsers() {
-        ArrayList<String> arrayList = new ArrayList<String>();
+    private Integer[] getSelectedUsers() {
+        List<Integer> userIds = new ArrayList<Integer>();
         for (QBUser user : users) {
-            arrayList.add(user.getId().toString());
+            userIds.add(user.getId());
         }
-        return arrayList.toArray(new String[arrayList.size()]);
+        return userIds.toArray(new Integer[userIds.size()]);
     }
 
     @Override

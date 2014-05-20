@@ -61,8 +61,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
             senderName = currentUser.getFullName();
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
-            Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
-            Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
+            Friend senderFriend = DatabaseManager.getFriend(context, senderId);
             senderName = senderFriend.getFullname();
             avatarUrl = getAvatarUrlForFriend(opponentFriend);
         }

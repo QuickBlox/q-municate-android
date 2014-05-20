@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -29,8 +28,6 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-
-import org.jivesoftware.smack.SmackException;
 
 import java.util.HashMap;
 import java.util.Map;

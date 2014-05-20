@@ -14,6 +14,9 @@ public class ImageHelper {
 
     public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
     public static final int GALLERY_INTENT_CALLED = 1;
+
+    private static final String TEMP_FILE_NAME = "temp.png";
+
     private Activity activity;
 
     public ImageHelper(Activity activity) {
@@ -54,7 +57,7 @@ public class ImageHelper {
             destHeight = origHeight / (origWidth / destWidth);
         }
 
-        File tempFile = new File(activity.getCacheDir(), "temp.png");
+        File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
 
         Bitmap bitmap = resizeBitmap(origBitmap, destWidth, destHeight);

@@ -11,12 +11,12 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendPrivateChatMessageCommand extends ServiceCommand {
 
-    private QBChatHelper qbChatHelper;
+    private QBChatHelper chatHelper;
 
-    public QBSendPrivateChatMessageCommand(Context context, QBChatHelper qbChatHelper, String successAction,
+    public QBSendPrivateChatMessageCommand(Context context, QBChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.qbChatHelper = qbChatHelper;
+        this.chatHelper = chatHelper;
     }
 
     public static void start(Context context, String message) {
@@ -28,7 +28,7 @@ public class QBSendPrivateChatMessageCommand extends ServiceCommand {
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        qbChatHelper.sendPrivateMessage(message);
+        chatHelper.sendPrivateMessage(message);
         return null;
     }
 }

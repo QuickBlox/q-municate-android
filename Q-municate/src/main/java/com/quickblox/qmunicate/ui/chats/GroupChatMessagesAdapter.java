@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
@@ -51,14 +52,13 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
 
-        if(senderId == currentUser.getId()) {
+        if (senderId == currentUser.getId()) {
             senderName = currentUser.getFullName();
-//            avatarUrl = getAvatarUrlForCurrentUser();
+            //            avatarUrl = getAvatarUrlForCurrentUser();
         } else {
-            Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
-            Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
+            Friend senderFriend = DatabaseManager.getFriend(context, senderId);
             senderName = senderFriend.getFullname();
-//            avatarUrl = getAvatarUrlForFriend(opponentFriends);
+            //            avatarUrl = getAvatarUrlForFriend(opponentFriends);
         }
 
         long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
@@ -67,7 +67,7 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-//        displayImage(avatarUrl, holder.avatarImageView);
+        //        displayImage(avatarUrl, holder.avatarImageView);
     }
 
     private static class ViewHolder {

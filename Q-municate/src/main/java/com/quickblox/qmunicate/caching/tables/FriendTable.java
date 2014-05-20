@@ -24,7 +24,7 @@ public class FriendTable {
         public static final String FILE_ID = "fileId";
         public static final String AVATAR_UID = "avatarUid";
         public static final String STATUS = "status";
-        public static final String LAST_REQUEST_AT = "lastRequestAt";
         public static final String ONLINE = "online";
+        public static final String TYPE = "type";
     }
 }

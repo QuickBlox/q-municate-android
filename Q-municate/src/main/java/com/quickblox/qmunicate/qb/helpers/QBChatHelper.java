@@ -122,8 +122,8 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         // TODO SF "file was attached" to Model
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(
                 messageBody) ? "file was attached" : messageBody);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
-                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
+        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriend(context,
+                chatMessage.getSenderId()).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         saveMessageToCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
                 TextUtils.isEmpty(messageBody) ? getAttachUrlFromQBChatMessage(chatMessage) : "");

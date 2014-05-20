@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.service;
 
 public class QBServiceConsts {
+
     public static final String ADD_FRIEND_ACTION = "add friend action";
     public static final String ADD_FRIENDS_ACTION = "add friendsList action";
     public static final String CHANGE_PASSWORD_ACTION = "change password action";
@@ -17,6 +18,7 @@ public class QBServiceConsts {
     public static final String SEND_MESSAGE_ACTION = "send message action";
     public static final String SEND_GROUP_MESSAGE_ACTION = "send group message action";
     public static final String LOAD_ATTACH_FILE_ACTION = "load_attach_file_action";
+    public static final String INIT_FRIEND_LIST_ACTION = "init friend list action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add friend success action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add friendsList success action";
@@ -46,6 +48,10 @@ public class QBServiceConsts {
     public static final String SEND_MESSAGE_FAIL_ACTION = "send message fail action";
     public static final String LOAD_ATTACH_FILE_SUCCESS_ACTION = "load_attach_file_success_action";
     public static final String LOAD_ATTACH_FILE_FAIL_ACTION = "load_attach_file_fail_action";
+    public static final String INIT_FRIEND_LIST_SUCCESS_ACTION = "init friend list success action";
+    public static final String INIT_FRIEND_LIST_FAIL_ACTION = "init friend list fail action";
+
+    public static final String FRIEND_STATUS_CHANGED_ACTION = "friend status changed";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat message";
@@ -63,6 +69,7 @@ public class QBServiceConsts {
     public static final String EXTRA_FILE_ID = "file id";
     public static final String EXTRA_PASSWORD = "password";
     public static final String EXTRA_CONSTRAINT = "constraint";
+    public static final String EXTRA_STATUS = "status";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String JOIN_ROOM_ACTION = "join room action";

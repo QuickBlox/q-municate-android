@@ -1,5 +1,7 @@
 package com.quickblox.qmunicate.qb.helpers;
 
+import android.content.Context;
+
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
@@ -9,19 +11,22 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
-import java.io.IOException;
 
 public class QBAuthHelper {
 
     private String TAG = QBAuthHelper.class.getSimpleName();
 
+    private Context context;
     private QBUser user;
+
+    public QBAuthHelper(Context context) {
+        this.context = context;
+    }
 
     public QBUser login(QBUser user) throws QBResponseException, XMPPException {
         QBAuth.createSession();
@@ -65,6 +70,7 @@ public class QBAuthHelper {
 
         try {
             QBChatService.getInstance().logout();
+            QBChatService.getInstance().destroy();
         } catch (SmackException.NotConnectedException e) {
             throw new QBResponseException(e.getLocalizedMessage());
         }
@@ -97,15 +103,12 @@ public class QBAuthHelper {
 
     private void loginChat(QBUser user) throws QBResponseException {
         try {
-            if(!QBChatService.getInstance().isLoggedIn()) {
+            QBChatService.init(context);
+            if (!QBChatService.getInstance().isLoggedIn()) {
                 QBChatService.getInstance().login(user);
             }
-            QBChatHelper.getInstance().initChats(App.getInstance().getApplicationContext());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
+            QBChatHelper.getInstance().initChats(context);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

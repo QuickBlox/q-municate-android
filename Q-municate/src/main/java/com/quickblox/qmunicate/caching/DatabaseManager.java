@@ -11,7 +11,6 @@ import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,24 +26,25 @@ public class DatabaseManager {
     }
 
     public static void saveFriend(Context context, Friend friend) {
-        ContentValues values = new ContentValues();
+        ContentValues values = getContentValues(friend);
+        context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
+    }
 
+    private static ContentValues getContentValues(Friend friend) {
+        ContentValues values = new ContentValues();
         values.put(FriendTable.Cols.ID, friend.getId());
         values.put(FriendTable.Cols.FULLNAME, friend.getFullname());
         values.put(FriendTable.Cols.EMAIL, friend.getEmail());
         values.put(FriendTable.Cols.PHONE, friend.getPhone());
         values.put(FriendTable.Cols.FILE_ID, friend.getFileId());
         values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUid());
-        values.put(FriendTable.Cols.STATUS, friend.getOnlineStatus());
+        values.put(FriendTable.Cols.STATUS, friend.getStatus());
         values.put(FriendTable.Cols.ONLINE, friend.isOnline());
-        if (friend.getLastRequestAt() != null) {
-            values.put(FriendTable.Cols.LAST_REQUEST_AT, DateUtils.dateToLong(friend.getLastRequestAt()));
-        }
-
-        context.getContentResolver().insert(FriendTable.CONTENT_URI, values);
+        values.put(FriendTable.Cols.TYPE, friend.getType().name());
+        return values;
     }
 
-    public static List<Friend> getFriendsList(Context context) {
+    public static List<Friend> getFriends(Context context) {
         List<Friend> friendsList = new ArrayList<Friend>();
         Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, null);
 
@@ -59,6 +59,16 @@ public class DatabaseManager {
         return friendsList;
     }
 
+    public static Friend getFriend(Context context, int friendId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + friendId, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            return getFriendFromCursor(cursor);
+        } else {
+            return null;
+        }
+    }
+
     public static Friend getFriendFromCursor(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ID));
         String fullname = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME));
@@ -66,10 +76,13 @@ public class DatabaseManager {
         String phone = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.PHONE));
         int fileId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.FILE_ID));
         String avatarUid = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.AVATAR_UID));
-        long lastRequestAt = cursor.getLong(cursor.getColumnIndex(FriendTable.Cols.LAST_REQUEST_AT));
+        String status = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.STATUS));
+        boolean online = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ONLINE)) > 0;
+        String type = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.TYPE));
 
-        Friend friend = new Friend(id, fullname, email, phone, fileId, avatarUid, DateUtils.longToDate(
-                lastRequestAt));
+        Friend friend = new Friend(id, fullname, email, phone, fileId, avatarUid, Friend.Type.valueOf(type));
+        friend.setStatus(status);
+        friend.setOnline(online);
 
         return friend;
     }
@@ -87,24 +100,15 @@ public class DatabaseManager {
         return cursor.getCount() > Consts.ZERO_VALUE;
     }
 
-    public static Cursor fetchFriendsByFullname(Context context, String inputText) {
+    public static Cursor getFriends(Context context, String fullname) {
         Cursor cursor = null;
         String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
-        if (TextUtils.isEmpty(inputText)) {
+        if (TextUtils.isEmpty(fullname)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
         } else {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, sorting);
+                    FriendTable.Cols.FULLNAME + " like '%" + fullname + "%'", null, sorting);
         }
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-
-    public static Cursor getCursorFriendById(Context context, int friendId) {
-        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                FriendTable.Cols.ID + " = " + friendId, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
         }
@@ -120,10 +124,22 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
+    public static void deleteFriends(Context context, List<Friend> friends) {
+        for (Friend friend : friends) {
+            deleteFriend(context, friend);
+        }
+    }
+
+    public static void deleteFriend(Context context, Friend friend) {
+        String where = FriendTable.Cols.ID + " = " + friend.getId();
+        context.getContentResolver().delete(FriendTable.CONTENT_URI, where, null);
+    }
+
     //--------------------------------------- PrivateChatMessagesTable -----------------------------------------------------
 
     // TODO SF context, message, senderId, chatId, attachUrl --- to Model
-    public static void savePrivateChatMessage(Context context, String message, int senderId, int chatId, String attachUrl) {
+    public static void savePrivateChatMessage(Context context, String message, int senderId, int chatId,
+            String attachUrl) {
         ContentValues values = new ContentValues();
 
         values.put(ChatMessagesTable.Cols.BODY, message);
@@ -156,7 +172,8 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
+        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
+                ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 
     public static Cursor getAllPrivateConversations(Context context) {

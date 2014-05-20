@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -15,14 +14,12 @@ public class QBSocialLoginCommand extends ServiceCommand {
 
     private static final String TAG = QBSocialLoginCommand.class.getSimpleName();
 
-    private final QBAuthHelper qbAuthHelper;
-    private final QBChatHelper qbChatHelper;
+    private final QBAuthHelper authHelper;
 
-    public QBSocialLoginCommand(Context context, QBAuthHelper qbAuthHelper, QBChatHelper qbChatHelper,
-            String successAction, String failAction) {
+    public QBSocialLoginCommand(Context context, QBAuthHelper authHelper, String successAction,
+            String failAction) {
         super(context, successAction, failAction);
-        this.qbAuthHelper = qbAuthHelper;
-        this.qbChatHelper = qbChatHelper;
+        this.authHelper = authHelper;
     }
 
     public static void start(Context context, String socialProvier, String accessToken,
@@ -40,8 +37,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
 
-        QBUser user = qbAuthHelper.login(socialProvider, accessToken, accessTokenSecret);
-//        qbChatHelper.init(context);
+        QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);

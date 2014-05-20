@@ -1,13 +1,11 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Friend implements Serializable {
@@ -18,9 +16,9 @@ public class Friend implements Serializable {
     private String phone;
     private Integer fileId;
     private String avatarUid;
-    private String status;
-    private Date lastRequestAt;
+    private String status = "";
     private boolean online;
+    private Type type;
 
     private boolean selected;
 
@@ -30,7 +28,6 @@ public class Friend implements Serializable {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
-        this.lastRequestAt = user.getLastRequestAt();
         this.avatarUid = UriCreator.cutUid(user.getWebsite());
     }
 
@@ -38,14 +35,14 @@ public class Friend implements Serializable {
     }
 
     public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUid,
-            Date lastRequestAt) {
+            Type type) {
         this.id = id;
         this.fullname = fullname;
         this.email = email;
         this.phone = phone;
         this.fileId = fileId;
-        this.lastRequestAt = lastRequestAt;
         this.avatarUid = UriCreator.cutUid(avatarUid);
+        this.type = type;
     }
 
     public static List<Friend> createFriends(List<QBUser> users) {
@@ -115,16 +112,8 @@ public class Friend implements Serializable {
         this.id = id;
     }
 
-    public Date getLastRequestAt() {
-        return lastRequestAt;
-    }
-
-    public void setLastRequestAt(long lastRequestAt) {
-        this.lastRequestAt = DateUtils.longToDate(lastRequestAt);
-    }
-
     public String getOnlineStatus() {
-        return OnlineStatusHelper.getOnlineStatus(lastRequestAt);
+        return OnlineStatusHelper.getOnlineStatus(online);
     }
 
     public String getPhone() {
@@ -144,7 +133,7 @@ public class Friend implements Serializable {
     }
 
     public boolean isOnline() {
-        return OnlineStatusHelper.isOnline(lastRequestAt);
+        return online;
     }
 
     public void setOnline(boolean online) {
@@ -157,5 +146,17 @@ public class Friend implements Serializable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public enum Type {
+        to, from, both
     }
 }
