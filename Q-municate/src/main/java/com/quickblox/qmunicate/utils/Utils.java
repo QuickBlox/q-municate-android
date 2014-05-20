@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.view.View;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -44,6 +46,16 @@ public class Utils {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void closeOutputStream(OutputStream outputStream) {
+        if (outputStream != null) {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
