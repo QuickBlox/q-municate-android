@@ -22,6 +22,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.TextViewHelper;
 import com.quickblox.qmunicate.utils.UriCreator;
 
@@ -52,32 +53,6 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
         ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-    }
-
-    protected void displayAttachImage(String uri, final TextView pleaseWaitTextView, final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoadingListener() {
-                    @Override
-                    public void onLoadingStarted(String imageUri, View view) {
-                        progressBar.setProgress(0);
-                        progressBar.setVisibility(View.VISIBLE);
-                        pleaseWaitTextView.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                        progressBar.setVisibility(View.GONE);
-                        pleaseWaitTextView.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        progressBar.setVisibility(View.GONE);
-                        pleaseWaitTextView.setVisibility(View.GONE);
-                        attachImageView.setVisibility(View.VISIBLE);
-                        attachImageView.setImageBitmap(loadedImage);
-                    }
-                }
-        );
     }
 
     protected String getAvatarUrlForCurrentUser() {

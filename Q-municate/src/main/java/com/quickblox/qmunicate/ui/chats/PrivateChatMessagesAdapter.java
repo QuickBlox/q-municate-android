@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.model.Friend;
@@ -17,14 +21,21 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
+import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.OnGetFileListener;
 
-public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
+import java.io.File;
+
+public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements OnGetFileListener {
 
     private Friend opponentFriend;
+    private ImageHelper imageHelper;
 
     public PrivateChatMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
+        imageHelper = new ImageHelper((android.app.Activity) context);
     }
 
     @Override
@@ -57,8 +68,8 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder holder = (ViewHolder) view.getTag();
+    public void bindView(View view, final Context context, Cursor cursor) {
+        final ViewHolder holder = (ViewHolder) view.getTag();
         String avatarUrl;
 
         String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
@@ -85,6 +96,21 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         displayAvatarImage(avatarUrl, holder.avatarImageView);
+    }
+
+    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
+            final ImageView attachImageView, final ProgressBar progressBar) {
+        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
+                progressBar));
+    }
+
+    @Override
+    public void onGotCachedFile(File imageFile) {
+    }
+
+    @Override
+    public void onGotAbsolutePathCreatedFile(String absolutePath) {
+        imageHelper.showFullImage(context, absolutePath);
     }
 
     @Override
@@ -115,5 +141,48 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter {
         TextView timeTextView;
         ProgressBar progressBar;
         TextView pleaseWaitTextView;
+    }
+
+    private class SimpleImageLoading extends SimpleImageLoadingListener {
+
+        private TextView pleaseWaitTextView;
+        private ImageView attachImageView;
+        private ProgressBar progressBar;
+
+        public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
+                final ProgressBar progressBar) {
+            this.pleaseWaitTextView = pleaseWaitTextView;
+            this.attachImageView = attachImageView;
+            this.progressBar = progressBar;
+        }
+
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+            progressBar.setProgress(Consts.ZERO_VALUE);
+            progressBar.setVisibility(View.VISIBLE);
+            pleaseWaitTextView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+            progressBar.setVisibility(View.GONE);
+            pleaseWaitTextView.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImageBitmap) {
+            progressBar.setVisibility(View.GONE);
+            pleaseWaitTextView.setVisibility(View.GONE);
+            attachImageView.setVisibility(View.VISIBLE);
+            attachImageView.setImageBitmap(loadedImageBitmap);
+            attachImageView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    new GetImageFileTask(PrivateChatMessagesAdapter.this).execute(imageHelper,
+                            loadedImageBitmap, false);
+                }
+            });
+        }
     }
 }

@@ -1,14 +1,22 @@
 package com.quickblox.qmunicate.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+
+import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ImageHelper {
 
@@ -36,6 +44,31 @@ public class ImageHelper {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
         activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
+    }
+
+    public void showFullImage(Context context, String absolutePath) {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        Uri uri = Uri.parse("file://" + absolutePath);
+        intent.setDataAndType(uri, "image/*");
+        context.startActivity(intent);
+    }
+
+    public String getAbsolutePathByBitmap(Bitmap origBitmap) {
+        File tempFile = new File(activity.getExternalFilesDir(null), "temp.png");
+        try {
+            Bitmap bitmap = resizeBitmap(origBitmap, origBitmap.getWidth(), origBitmap.getHeight());
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
+            byte[] bitmapData = bos.toByteArray();
+
+            FileOutputStream fos = new FileOutputStream(tempFile);
+            fos.write(bitmapData);
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return tempFile.getAbsolutePath();
     }
 
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {

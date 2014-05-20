@@ -19,17 +19,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
-        android:orientation="vertical"
         android:layout_toLeftOf="@+id/avatar_imageview"
-        android:layout_toRightOf="@+id/time_textview">
+        android:layout_toRightOf="@+id/time_textview"
+        android:orientation="vertical">
 
         <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:indeterminate="false"
-            android:visibility="gone"
-            android:max="100" />
+            android:max="100"
+            android:visibility="gone" />
 
         <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
             android:id="@+id/message_textview"
@@ -43,10 +43,13 @@
             android:id="@+id/attach_imageview"
             android:layout_width="match_parent"
             android:layout_height="@dimen/chat_attach_image_height"
-            android:scaleType="fitCenter"
-            android:src="@null"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
             android:paddingRight="5dp"
             android:paddingTop="5dp"
+            android:scaleType="fitCenter"
+            android:src="@null"
             android:visibility="gone" />
 
         <TextView
@@ -64,9 +67,9 @@
         android:id="@+id/time_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="false"
         android:layout_marginRight="10dp"
-        android:textColor="@color/gray"
-        android:layout_alignParentLeft="true" />
+        android:textColor="@color/gray" />
 
 </RelativeLayout>

@@ -9,15 +9,19 @@ import java.io.IOException;
 
 public class GetImageFileTask extends BaseAsyncTask {
 
-    private OnGetImageFileListener listener;
+    private OnGetFileListener listener;
 
-    public GetImageFileTask(OnGetImageFileListener listener) {
+    public GetImageFileTask(OnGetFileListener listener) {
         this.listener = listener;
     }
 
     @Override
-    public void onResult(Object imageFile) {
-        listener.onGotImageFile((File) imageFile);
+    public void onResult(Object object) {
+        if (object instanceof File) {
+            listener.onGotCachedFile((File) object);
+        } else if (object instanceof String) {
+            listener.onGotAbsolutePathCreatedFile((String) object);
+        }
     }
 
     @Override
@@ -26,16 +30,24 @@ public class GetImageFileTask extends BaseAsyncTask {
 
     @Override
     public Object performInBackground(Object[] params) throws Exception {
-        File imageFile = null;
+        File imageFile;
+        String absolutePath;
         ImageHelper imageHelper = (ImageHelper) params[0];
         Bitmap bitmap = (Bitmap) params[1];
+        boolean isGettingFile = (Boolean) params[2];
 
         try {
-            imageFile = imageHelper.getFileFromImageView(bitmap);
+            if (isGettingFile) {
+                imageFile = imageHelper.getFileFromImageView(bitmap);
+                return imageFile;
+            } else {
+                absolutePath = imageHelper.getAbsolutePathByBitmap(bitmap);
+                return absolutePath;
+            }
         } catch (IOException e) {
             onException(e);
         }
 
-        return imageFile;
+        return null;
     }
 }

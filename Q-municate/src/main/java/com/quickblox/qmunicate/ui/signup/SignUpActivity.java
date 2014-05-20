@@ -27,13 +27,13 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetImageFileListener;
+import com.quickblox.qmunicate.utils.OnGetFileListener;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class SignUpActivity extends BaseActivity implements OnGetImageFileListener {
+public class SignUpActivity extends BaseActivity implements OnGetFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
     private EditText passwordEditText;
@@ -124,7 +124,7 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
             showProgress();
 
             if (isNeedUpdateAvatar) {
-                new GetImageFileTask(this).execute(imageHelper, avatarBitmapCurrent);
+                new GetImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
@@ -133,8 +133,13 @@ public class SignUpActivity extends BaseActivity implements OnGetImageFileListen
         }
     }
 
-    public void onGotImageFile(File imageFile) {
+    public void onGotCachedFile(File imageFile) {
         QBSignUpCommand.start(SignUpActivity.this, qbUser, imageFile);
+    }
+
+    @Override
+    public void onGotAbsolutePathCreatedFile(String absolutePath) {
+
     }
 
     private class SignUpSuccessAction implements Command {

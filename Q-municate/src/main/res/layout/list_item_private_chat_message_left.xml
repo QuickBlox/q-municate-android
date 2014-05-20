@@ -35,7 +35,6 @@
             android:id="@+id/message_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="mrewcew"
             android:paddingRight="5dp"
             android:textColor="@color/black"
             android:textSize="@dimen/text_size_small" />
@@ -44,6 +43,9 @@
             android:id="@+id/attach_imageview"
             android:layout_width="match_parent"
             android:layout_height="@dimen/chat_attach_image_height"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:clickable="true"
             android:paddingRight="5dp"
             android:paddingTop="5dp"
             android:scaleType="fitCenter"
