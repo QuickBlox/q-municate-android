@@ -19,16 +19,20 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.quickblox.module.content.model.QBFile;
+import com.quickblox.module.users.model.QBUser;
+import com.quickblox.module.videochat_webrtc.WebRTC;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.GetImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.OnGetImageFileListener;
@@ -175,12 +179,10 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
                 navigateToParent();
                 return true;
             case R.id.action_audio_call:
-                // TODO add audio call
-                DialogUtils.show(this, getString(R.string.comming_soon));
+                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.AUDIO);
                 return true;
             case R.id.action_video_call:
-                // TODO add video call
-                DialogUtils.show(this, getString(R.string.comming_soon));
+                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -206,6 +208,16 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         super.onResume();
         messagesListView.setSelection(messagesAdapter.getCount() - 1);
         addActions();
+    }
+
+    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
+        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
+            QBUser qbUser = new QBUser(friend.getId());
+            qbUser.setFullName(friend.getFullname());
+            CallActivity.start(PrivateChatActivity.this, qbUser, callType);
+        } else if (!friend.isOnline()) {
+            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        }
     }
 
     private void addActions() {
