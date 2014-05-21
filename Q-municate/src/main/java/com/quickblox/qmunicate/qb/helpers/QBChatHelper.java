@@ -33,7 +33,9 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener, QBRoomChatManagerListener {
 
@@ -45,6 +47,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     private QBUser user;
     private QBChatService chatService;
     private QBPrivateChat privateChat;
+    private Map<String,QBRoomChat> roomChatMap;
     private QBPrivateChatManager privateChatManager;
     private int privateChatId;
     private String groupChatName;
@@ -94,7 +97,6 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
             e.printStackTrace();
             //TODO: SS reconnect
         }
-        Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
 
         saveGroupMessageToCache(chatMessage, user.getId(), groupChatName, membersIDs);
     }
@@ -113,7 +115,6 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
 
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
-        Log.i("GroupMessage: ", " Saving to cache " + groupChatName);
         DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId, membersIds);
     }
 
@@ -194,6 +195,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         privateChatManager.addPrivateChatManagerListener(this);
         roomChatManager = chatService.getRoomChatManager();
         roomChatManager.addRoomChatManagerListener(this);
+        roomChatMap = new HashMap<String, QBRoomChat>();
     }
 
     public void initPrivateChat(int opponentId, String opponentName) {
@@ -206,17 +208,31 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     public void initRoomChat(Context context, String roomName, List<Friend> friendList) {
         this.context = context;
         user = App.getInstance().getUser();
-        roomChat = roomChatManager.createRoom(roomName);
+        if(roomChat == null){
+            roomChat = roomChatManager.createRoom(roomName);
+        } else if(roomChatManager.getRoom(roomName) == null){
+            initChats(context);
+            roomChat = roomChatManager.createRoom(roomName);
+        }else {
+
+            roomChat = roomChatManager.getRoom(roomName);
+        }
+        String membersNames = "";
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
             for (Friend friend : friendList) {
-                roomChat.addRoomUser(Integer.valueOf(friend.getId()));
+                if(roomChat == null){
+                    roomChat.addRoomUser(Integer.valueOf(friend.getId()));
+                }
+
                 if(friend != null){
                     membersIDs = membersIDs + friend.getId() + ",";
+                    membersNames = membersNames + friend.getFullname() + ",";
                 }
             }
-            Log.i("Members IDs", membersIDs);
+
+            Log.i("ChatName﹕", membersNames + " while formed.");
         } catch (Exception e) {
             e.printStackTrace();
         }

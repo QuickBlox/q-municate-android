@@ -243,7 +243,6 @@ public class DatabaseManager {
         ContentValues chatValues = new ContentValues();
         chatValues.put(ChatTable.Cols.CHAT_ID, groupId);
         chatValues.put(ChatTable.Cols.CHAT_NAME, groupId);
-        chatValues.put(ChatTable.Cols.MEMBERS_IDS, membersIds);
         chatValues.put(ChatTable.Cols.LAST_MESSAGE, message.getBody());
         chatValues.put(ChatTable.Cols.IS_GROUP, 1);
         Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null, null);
@@ -254,6 +253,7 @@ public class DatabaseManager {
         } else {
             //TODO: Log will be removed after debugging.
             Log.i("GroupMessage: ", "There's not yet");
+            chatValues.put(ChatTable.Cols.MEMBERS_IDS, membersIds);
             context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
         }
     }

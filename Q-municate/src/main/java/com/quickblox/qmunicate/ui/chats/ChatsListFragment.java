@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -84,9 +85,13 @@ public class ChatsListFragment extends BaseFragment {
                 if(chat instanceof PrivateChat) {
                     PrivateChatActivity.start(baseActivity, ((PrivateChat)chat).getFriend());
                 } else if(chat instanceof GroupChat){
-                    ArrayList<Friend> opponents = (ArrayList)((GroupChat)chat).getOpponentsList();
-                    Collections.sort(opponents, new NewChatActivity.SimpleComparator());
-                    GroupChatActivity.start(baseActivity, opponents);
+                    Log.i("ChatName", chat.getName());
+                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
+                        Log.i("ChatName", friend.getFullname());
+                    }
+                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
+                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
+                    GroupChatActivity.start(baseActivity, opponentsList);
                 }
             }
         });
