@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -52,9 +53,11 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
 
         if(senderId == currentUser.getId()) {
+            Log.i("Sender", "currentUser");
             senderName = currentUser.getFullName();
 //            avatarUrl = getAvatarUrlForCurrentUser();
         } else {
+            Log.i("Sender", "otherUser");
             Cursor senderCursor = DatabaseManager.getCursorFriendById(context, senderId);
             Friend senderFriend = DatabaseManager.getFriendFromCursor(senderCursor);
             senderName = senderFriend.getFullname();

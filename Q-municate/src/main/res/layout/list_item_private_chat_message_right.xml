@@ -5,6 +5,15 @@
     android:background="@drawable/list_item_incomming_message_selector"
     android:orientation="horizontal"
     android:padding="10dp">
+    <TextView
+        android:id="@+id/name_textview"
+        android:layout_toLeftOf="@+id/avatar_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
 
     <com.quickblox.qmunicate.ui.views.RoundedImageView
         android:id="@+id/avatar_imageview"
