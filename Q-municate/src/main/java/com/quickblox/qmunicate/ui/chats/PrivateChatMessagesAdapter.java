@@ -178,6 +178,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
             attachImageView.setVisibility(View.VISIBLE);
             attachImageView.setImageBitmap(loadedImageBitmap);
             attachImageView.setOnClickListener(receiveImageFileOnClickListener());
+            this.loadedImageBitmap = loadedImageBitmap;
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {
