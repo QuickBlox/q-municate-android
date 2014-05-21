@@ -18,6 +18,10 @@ public abstract class Chat {
 
     public abstract ChatMessage getLastMessage();
 
+    public void setLastMessage(String lastMessage){
+        this.lastMessage = lastMessage;
+    }
+
     public abstract void sendMessage(String message) throws XMPPException;
 
     public enum ChatType {PRIVATE, GROUP}

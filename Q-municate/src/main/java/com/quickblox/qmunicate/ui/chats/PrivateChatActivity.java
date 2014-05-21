@@ -124,7 +124,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     private void initChat() {
         chatHelper = QBChatHelper.getInstance();
-        chatHelper.initPrivateChat(opponentFriend.getId());
+        chatHelper.initPrivateChat(opponentFriend.getId(), opponentFriend.getFullname());
     }
 
     protected BaseAdapter getMessagesAdapter() {

@@ -4,6 +4,7 @@ import android.content.UriMatcher;
 import android.net.Uri;
 
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 public class ContentDescriptor {
@@ -17,6 +18,7 @@ public class ContentDescriptor {
 
         matcher.addURI(AUTHORITY, FriendTable.PATH, FriendTable.PATH_TOKEN);
         matcher.addURI(AUTHORITY, ChatMessagesTable.PATH, ChatMessagesTable.PATH_TOKEN);
+        matcher.addURI(AUTHORITY, ChatTable.PATH, ChatTable.PATH_TOKEN);
         // TODO SF other tables can be added
 
         return matcher;
