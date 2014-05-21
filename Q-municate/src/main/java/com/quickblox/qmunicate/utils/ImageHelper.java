@@ -1,8 +1,10 @@
 package com.quickblox.qmunicate.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 
 import java.io.ByteArrayOutputStream;
@@ -41,6 +43,40 @@ public class ImageHelper {
         activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
     }
 
+    public void showFullImage(Context context, String absolutePath) {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        Uri uri = Uri.parse("file://" + absolutePath);
+        intent.setDataAndType(uri, "image/*");
+        context.startActivity(intent);
+    }
+
+    public String getAbsolutePathByBitmap(Bitmap origBitmap) {
+        File tempFile = new File(activity.getExternalFilesDir(null), "temp.png");
+        ByteArrayOutputStream bos = null;
+        FileOutputStream fos = null;
+        try {
+            Bitmap bitmap = resizeBitmap(origBitmap, origBitmap.getWidth(), origBitmap.getHeight());
+            bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, Consts.ZERO_VALUE, bos);
+            byte[] bitmapData = bos.toByteArray();
+            fos = new FileOutputStream(tempFile);
+            fos.write(bitmapData);
+            fos.close();
+            bos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            Utils.closeOutputStream(fos);
+            Utils.closeOutputStream(bos);
+        }
+        return tempFile.getAbsolutePath();
+    }
+
+    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
+        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
+    }
+
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {
         int preferredWidth = 300;
 
@@ -70,9 +106,5 @@ public class ImageHelper {
         fos.close();
 
         return tempFile;
-    }
-
-    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
-        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
     }
 }

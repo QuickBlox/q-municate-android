@@ -20,25 +20,27 @@ import android.widget.ListView;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.GetImageFileTask;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.OnGetImageFileListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class PrivateChatActivity extends BaseChatActivity implements OnGetImageFileListener {
+public class PrivateChatActivity extends BaseChatActivity implements ReceiveFileListener {
 
     public static final String EXTRA_OPPONENT = "opponentFriend";
 
@@ -50,7 +52,6 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
     private ImageHelper imageHelper;
-    private QBUser currentUser;
 
     private int chatId;
 
@@ -76,7 +77,6 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         super.onCreate(savedInstanceState);
 
         instance = this;
-        currentUser = App.getInstance().getUser();
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(EXTRA_OPPONENT);
         chatId = opponentFriend.getId();
         imageHelper = new ImageHelper(this);
@@ -147,8 +147,12 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     }
 
     @Override
-    public void onGotImageFile(File file) {
+    public void onCachedImageFileReceived(File file) {
         startLoadAttachFile(file);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void startLoadAttachFile(File file) {
@@ -161,8 +165,13 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString());
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText("");
+        scrollListView();
+    }
+
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     @Override
@@ -179,12 +188,10 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
                 navigateToParent();
                 return true;
             case R.id.action_audio_call:
-                // TODO add audio call
-                DialogUtils.show(this, getString(R.string.comming_soon));
+                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.AUDIO);
                 return true;
             case R.id.action_video_call:
-                // TODO add video call
-                DialogUtils.show(this, getString(R.string.comming_soon));
+                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -196,8 +203,8 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
             Uri originalUri = data.getData();
             try {
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                new GetImageFileTask(PrivateChatActivity.this).execute(imageHelper,
-                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()));
+                new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -208,8 +215,18 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
     @Override
     protected void onResume() {
         super.onResume();
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        scrollListView();
         addActions();
+    }
+
+    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
+        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
+            QBUser qbUser = new QBUser(friend.getId());
+            qbUser.setFullName(friend.getFullname());
+            CallActivity.start(PrivateChatActivity.this, qbUser, callType);
+        } else if (!friend.isOnline()) {
+            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        }
     }
 
     private void addActions() {
@@ -222,8 +239,9 @@ public class PrivateChatActivity extends BaseChatActivity implements OnGetImageF
         @Override
         public void execute(Bundle bundle) {
             QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            chatHelper.sendPrivateMessageWithAttachImage(qbFile);
+            QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, qbFile);
             hideProgress();
+            scrollListView();
         }
     }
 }

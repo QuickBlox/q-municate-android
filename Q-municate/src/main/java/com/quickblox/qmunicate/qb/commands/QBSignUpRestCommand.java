@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -13,14 +13,11 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 import java.io.File;
 
-public class QBSignUpCommand extends ServiceCommand {
+public class QBSignUpRestCommand extends CompositeServiceCommand {
 
-    private static final String TAG = QBSignUpCommand.class.getSimpleName();
+    private static final String TAG = QBSignUpRestCommand.class.getSimpleName();
 
-    private final QBAuthHelper qbAuthHelper;
-    private final QBVideoChatHelper videoChatHelper;
-
-    public QBSignUpCommand(Context context, QBAuthHelper qbAuthHelper, QBVideoChatHelper videoChatHelper,
+    public QBSignUpRestCommand(Context context, QBAuthHelper qbAuthHelper, QBVideoChatHelper videoChatHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
         this.qbAuthHelper = qbAuthHelper;

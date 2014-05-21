@@ -28,7 +28,7 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.list_item_private_chat_message, null, true);
+        View view = layoutInflater.inflate(R.layout.list_item_private_chat_message_right, null, true);
 
         ViewHolder holder = new ViewHolder();
 

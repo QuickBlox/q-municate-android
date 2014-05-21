@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.view.View;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 
 public class Utils {
@@ -37,6 +39,16 @@ public class Utils {
             setLayerTypeMethod.invoke(view, new Object[]{View.LAYER_TYPE_SOFTWARE, null});
         } catch (Exception e) {
             ErrorUtils.logError(e);
+        }
+    }
+
+    public static void closeOutputStream(OutputStream outputStream) {
+        if (outputStream != null) {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                ErrorUtils.logError(e);
+            }
         }
     }
 }

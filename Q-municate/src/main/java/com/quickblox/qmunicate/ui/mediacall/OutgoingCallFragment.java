@@ -308,10 +308,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                     @Override
                     public void run() {
                         DialogUtils.show(getActivity(), "accepted");
+                        onConnectionEstablished();
                     }
                 });
             }
-            onConnectionEstablished();
         }
 
         @Override

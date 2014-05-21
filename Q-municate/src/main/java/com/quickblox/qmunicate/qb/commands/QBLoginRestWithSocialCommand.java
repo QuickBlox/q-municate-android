@@ -10,13 +10,13 @@ import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-public class QBSocialLoginCommand extends ServiceCommand {
+public class QBLoginRestWithSocialCommand extends ServiceCommand {
 
-    private static final String TAG = QBSocialLoginCommand.class.getSimpleName();
+    private static final String TAG = QBLoginRestWithSocialCommand.class.getSimpleName();
 
     private final QBAuthHelper authHelper;
 
-    public QBSocialLoginCommand(Context context, QBAuthHelper authHelper, String successAction,
+    public QBLoginRestWithSocialCommand(Context context, QBAuthHelper authHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.authHelper = authHelper;
@@ -36,12 +36,8 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String socialProvider = (String) extras.getSerializable(QBServiceConsts.EXTRA_SOCIAL_PROVIDER);
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
-
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-
-        Bundle result = new Bundle();
-        result.putSerializable(QBServiceConsts.EXTRA_USER, user);
-
-        return result;
+        extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        return extras;
     }
 }

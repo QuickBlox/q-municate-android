@@ -3,7 +3,7 @@ package com.quickblox.qmunicate.ui.invitefriends;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
@@ -42,13 +42,15 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
         final InviteFriend data = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
             holder = new ViewHolder();
 
+            holder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
+                    R.id.contentRelativeLayout);
             holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             holder.avatarImageView.setOval(true);
             holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
@@ -57,12 +59,14 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
             convertView.setTag(holder);
 
+            final ViewHolder finalHolder = holder;
             holder.checkBox.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    CheckBox cb = (CheckBox) v;
-                    InviteFriend inviteFriend = (InviteFriend) cb.getTag();
-                    inviteFriend.setSelected(cb.isChecked());
-                    notifyCounterChanged(cb.isChecked(), inviteFriend.getViaLabelType());
+                public void onClick(View view) {
+                    CheckBox checkBox = (CheckBox) view;
+                    InviteFriend inviteFriend = (InviteFriend) checkBox.getTag();
+                    inviteFriend.setSelected(checkBox.isChecked());
+                    notifyCounterChanged(checkBox.isChecked(), inviteFriend.getViaLabelType());
+                    finalHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checkBox.isChecked()));
                 }
             });
         } else {
@@ -80,6 +84,9 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
             uri = baseActivity.getString(R.string.inf_url_to_facebook_avatar, data.getId());
         }
+
+        holder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(holder.checkBox.isChecked()));
+
         displayImage(uri, holder.avatarImageView);
         return convertView;
     }
@@ -97,15 +104,6 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         }
     }
 
-    private int getChangedCounter(boolean isIncrease, int counter) {
-        if (isIncrease) {
-            counter++;
-        } else {
-            counter--;
-        }
-        return counter;
-    }
-
     private String getViaLabelById(int type) {
         String viaLabel = null;
         switch (type) {
@@ -119,7 +117,23 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         return viaLabel;
     }
 
+    private int getChangedCounter(boolean isIncrease, int counter) {
+        if (isIncrease) {
+            counter++;
+        } else {
+            counter--;
+        }
+        return counter;
+    }
+
+    private int getBackgroundColorItem(boolean isSelect) {
+        return isSelect ? resources.getColor(R.color.list_item_background_pressed_color) : resources.getColor(
+                R.color.white);
+    }
+
     private static class ViewHolder {
+
+        RelativeLayout contentRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
         TextView viaTextView;

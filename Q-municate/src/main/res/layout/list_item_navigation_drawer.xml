@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/menu_item_background_default_selector" >
+    android:background="@drawable/menu_item_background_default_selector">
 
     <TextView
         android:id="@+id/name_textview"
@@ -9,5 +9,5 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:textColor="@drawable/menu_item_text_selector"
-        android:textSize="20sp" />
+        android:textSize="@dimen/text_size" />
 </LinearLayout>

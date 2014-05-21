@@ -20,9 +20,12 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.Consts;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -65,7 +68,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(chatMessage.getBody(), user.getId(), privateChatId, "");
+        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), privateChatId, Consts.EMPTY_STRING));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -74,8 +77,8 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         return chatMessage;
     }
 
-    public void saveMessageToCache(String message, int senderId, int chatId, String attachUrl) {
-        DatabaseManager.savePrivateChatMessage(context, message, senderId, chatId, attachUrl);
+    public void saveMessageToCache(PrivateChatMessageCache privateChatMessageCache) {
+        DatabaseManager.savePrivateChatMessage(context, privateChatMessageCache);
     }
 
     public void sendGroupMessage(String message) {
@@ -86,7 +89,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
             e.printStackTrace();
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
-            //TODO: reconnect
+            //TODO: SS reconnect
         }
         saveGroupMessageToCache(chatMessage, user.getId(), groupChatName);
     }
@@ -104,7 +107,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache("", user.getId(), privateChatId, qbFile.getPublicUrl());
+        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl()));
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -119,20 +122,19 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
-        // TODO SF "file was attached" to Model
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(
-                messageBody) ? "file was attached" : messageBody);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriend(context,
-                chatMessage.getSenderId()).getFullname());
+                messageBody) ? context.getResources().getString(R.string.file_was_attached) : messageBody);
+        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
+                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        saveMessageToCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
-                TextUtils.isEmpty(messageBody) ? getAttachUrlFromQBChatMessage(chatMessage) : "");
+        saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
+                TextUtils.isEmpty(messageBody) ? getAttachUrlFromQBChatMessage(chatMessage) : Consts.EMPTY_STRING));
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
         String messageBody = chatMessage.getBody();
         if (TextUtils.isEmpty(messageBody)) {
-            messageBody = "";
+            messageBody = Consts.EMPTY_STRING;
         }
         return messageBody;
     }
@@ -142,7 +144,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         if (!attachmentsList.isEmpty()) {
             return attachmentsList.get(attachmentsList.size() - 1).getUrl();
         }
-        return "";
+        return Consts.EMPTY_STRING;
     }
 
     @Override
