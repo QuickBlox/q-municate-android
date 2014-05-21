@@ -127,6 +127,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeWithoutRedirect) {
+                //TODO: The best implementation for preserving friends order which is critical for storing will be selected later.
 //                String membersIds = "";
 //                for(Friend friend :  friendsAdapter.getSelectedFriends()){
 //                    membersIds += friend.getId() + "_";

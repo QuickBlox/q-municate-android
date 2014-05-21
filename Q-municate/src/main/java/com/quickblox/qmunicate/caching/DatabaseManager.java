@@ -92,6 +92,7 @@ public class DatabaseManager {
         List<String> friendsIds = new ArrayList<String>();
 
         int isGroup = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.IS_GROUP));
+        //TODO: Sometimes causes crash, logging will be improved later.
 //        Log.i("ChatName", membersIds);
         if(isGroup == 1){
             String[] friendsArray = membersIds.split("_");
