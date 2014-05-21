@@ -43,7 +43,7 @@ public class GroupChat extends Chat implements Serializable {
         this.avatarId = avatarId;
     }
 
-    public List<Friend> getOpponents() {
+    public List<Friend> getOpponentsList() {
         return opponents;
     }
 

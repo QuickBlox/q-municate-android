@@ -123,20 +123,32 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
         return chatMessage;
-
     }
 
     @Override
     public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(
-                messageBody) ? context.getResources().getString(R.string.file_was_attached) : messageBody);
+        String extraChatMessage = "";
+        if(TextUtils.isEmpty(messageBody)){
+            extraChatMessage = context.getResources().getString(R.string.file_was_attached);
+        } else {
+            extraChatMessage = messageBody;
+        }
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
                 DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+        String attachURL = "";
+        if(TextUtils.isEmpty(messageBody)){
+            attachURL = getAttachUrlFromQBChatMessage(chatMessage);
+        } else {
+            attachURL = Consts.EMPTY_STRING;
+        }
+
         saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
-                TextUtils.isEmpty(messageBody) ? getAttachUrlFromQBChatMessage(chatMessage) : Consts.EMPTY_STRING, opponentName));
+                attachURL, opponentName));
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
@@ -191,17 +203,17 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         this.opponentName = opponentName;
     }
 
-    public void initRoomChat(Context context, String roomName, List<Friend> friends) {
+    public void initRoomChat(Context context, String roomName, List<Friend> friendList) {
         this.context = context;
         user = App.getInstance().getUser();
         roomChat = roomChatManager.createRoom(roomName);
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
-            for (Friend friend : friends) {
+            for (Friend friend : friendList) {
                 roomChat.addRoomUser(Integer.valueOf(friend.getId()));
                 if(friend != null){
-                    membersIDs = membersIDs + friend.getId() + "_";
+                    membersIDs = membersIDs + friend.getId() + ",";
                 }
             }
             Log.i("Members IDs", membersIDs);

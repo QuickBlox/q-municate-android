@@ -130,12 +130,12 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
                 //TODO: The best implementation for preserving friends order which is critical for storing will be selected later.
 //                String membersIds = "";
 //                for(Friend friend :  friendsAdapter.getSelectedFriends()){
-//                    membersIds += friend.getId() + "_";
+//                    membersIds += friend.getId() + ",";
 //                }
-//                List<Friend> members = DatabaseManager.getFriendsById(NewChatActivity.this, membersIds.split("_"));
-                List<Friend> members = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
-                Collections.sort(members, new SimpleComparator());
-                GroupChatActivity.start(activity, (ArrayList<Friend>)members);
+//                List<Friend> membersList = DatabaseManager.getFriendsById(NewChatActivity.this, membersIds.split("_"));
+                List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
+                Collections.sort(membersList, new SimpleComparator());
+                GroupChatActivity.start(activity, (ArrayList<Friend>)membersList);
                 actionMode = null;
                 closeWithoutRedirect = false;
             } else {
@@ -147,7 +147,6 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
 
     public static class SimpleComparator implements Comparator<Friend> {
         public int compare(Friend friend1, Friend friend2) {
-            // TODO getEmail() is wrong
             return (new Integer(friend1.getId())).compareTo(friend2.getId());
         }
     }

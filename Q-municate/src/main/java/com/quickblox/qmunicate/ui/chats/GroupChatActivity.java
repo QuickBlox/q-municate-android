@@ -20,9 +20,7 @@ import android.widget.ListView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
@@ -30,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupChatActivity extends BaseChatActivity {
-    private List<Friend> friends;
-    private String nameOfChat = "";
+    private List<Friend> friendList;
+    private String chatName = "";
     private int allowedNameLength = 20;
     private QBChatHelper qbChatHelper;
     private BaseAdapter messagesAdapter;
@@ -55,15 +53,15 @@ public class GroupChatActivity extends BaseChatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
-            friends = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
+            friendList = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
         }
         //TODO: Sometimes causes crash, logging will be improved later.
-//        Log.i("ChatName", "Size in GroupChat: " + friends.size());
-        for(Friend friend : friends){
+//        Log.i("ChatName", "Size in GroupChat: " + friendList.size());
+        for(Friend friend : friendList){
             if(friend != null){
-                nameOfChat = nameOfChat + friend.getFullname() + "_";
+                chatName = chatName + friend.getFullname() + ",";
             }
-            Log.i("ChatName","nameOfChat: " + nameOfChat);
+            Log.i("ChatName","chatName: " + chatName);
         }
 
         initUI();
@@ -104,15 +102,15 @@ public class GroupChatActivity extends BaseChatActivity {
 
     private void initChat(){
         qbChatHelper = QBChatHelper.getInstance();
-        qbChatHelper.initRoomChat(this, nameOfChat, friends);
+        qbChatHelper.initRoomChat(this, chatName, friendList);
     }
 
     private Cursor getAllGroupChatMessages() {
-        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, nameOfChat);
+        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, chatName);
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new GroupChatMessagesAdapter(this, getAllGroupChatMessages(), friends);
+        return new GroupChatMessagesAdapter(this, getAllGroupChatMessages(), friendList);
     }
 
     public void sendMessageOnClick(View view) {
@@ -123,7 +121,7 @@ public class GroupChatActivity extends BaseChatActivity {
 
     private void actionBarSetup() {
         ActionBar ab = getActionBar();
-        ab.setTitle(nameOfChat.replace("_",","));
+        ab.setTitle(chatName);
         ab.setSubtitle("some information");
     }
 
