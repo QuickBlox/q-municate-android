@@ -138,7 +138,7 @@ public class FriendDetailsActivity extends BaseActivity {
             QBUser qbUser = new QBUser(friend.getId());
             qbUser.setFullName(friend.getFullname());
             CallActivity.start(FriendDetailsActivity.this, qbUser, callType);
-        } else {
+        } else if (!friend.isOnline()) {
             ErrorUtils.showError(this, getString(R.string.frd_offline_user));
         }
     }

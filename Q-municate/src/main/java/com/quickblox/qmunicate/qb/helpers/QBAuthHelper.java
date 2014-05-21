@@ -97,7 +97,7 @@ public class QBAuthHelper {
 
     private void loginChat(QBUser user) throws QBResponseException {
         try {
-            if(!QBChatService.getInstance().isLoggedIn()) {
+            if (!QBChatService.getInstance().isLoggedIn()) {
                 QBChatService.getInstance().login(user);
             }
             QBChatHelper.getInstance().initChats(App.getInstance().getApplicationContext());

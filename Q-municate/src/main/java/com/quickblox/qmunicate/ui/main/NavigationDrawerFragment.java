@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -19,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -30,11 +28,8 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-
-import org.jivesoftware.smack.SmackException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -118,16 +113,16 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void initUI(View rootView) {
-        drawerListView = (ListView) rootView.findViewById(R.id.navigationList);
-        logoutButton = (ImageButton) rootView.findViewById(R.id.logoutImageButton);
-        fullnameTextView = (TextView) rootView.findViewById(R.id.fullnameTextView);
+        drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
+        logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
+        fullnameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
     }
 
     private void initListeners() {
         drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-                performItemClick(view, position);
+                selectItem(position);
             }
         });
 
@@ -144,16 +139,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         return Arrays.asList(itemsArray);
     }
 
-    private void performItemClick(final View view, final int position) {
-        TransitionDrawable newTransition = (TransitionDrawable) resources.getDrawable(
-                R.drawable.menu_item_background_click_transition);
-        drawerListView.getChildAt(currentSelectedPosition).setBackgroundDrawable(resources.getDrawable(
-                R.drawable.menu_item_background_click_transition));
-        newTransition.startTransition(Consts.DELAY_LONG_CLICK_ANIMATION_SHORT);
-        view.setBackgroundDrawable(newTransition);
-        selectItem(position);
-    }
-
     private void logout() {
         ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
@@ -161,11 +146,6 @@ public class NavigationDrawerFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 baseActivity.showProgress();
                 FacebookHelper.logout();
-                try {
-                    QBChatService.getInstance().logout();
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }
                 QBLogoutCommand.start(baseActivity);
             }
         });

@@ -20,8 +20,7 @@
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
 
-    <string-array
-        name="nvd_items_array">
+    <string-array name="nvd_items_array">
         <item>Friends</item>
         <!--<item>Web room</item>-->
         <item>Chats</item>
@@ -143,6 +142,7 @@
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
     <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
+    <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
@@ -164,6 +164,7 @@
     <string name="push_title">QMUN: Missed messages</string>
     <string name="frd_offline_user">User must be online</string>
     <string name="file_was_attached">file was attached</string>
+    <string name="uploading_file">Uploading… Please wait</string>
 
     <string name="label_done">Done</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>

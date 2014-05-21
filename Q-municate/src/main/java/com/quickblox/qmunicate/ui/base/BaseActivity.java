@@ -135,6 +135,20 @@ public abstract class BaseActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
+
+            // TODO SF temp
+            new Thread(new Runnable() {
+                public void run() {
+                    if (QBChatService.getInstance().isLoggedIn()) {
+                        try {
+                            QBChatService.getInstance().logout();
+                        } catch (SmackException.NotConnectedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+
             super.onBackPressed();
             return;
         }
