@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QBFriendListHelper {
+public class QBFriendListHelper extends BaseHelper {
 
     private static final String TAG = QBFriendListHelper.class.getSimpleName();
     private static final int FIRST_PAGE = 1;
@@ -36,11 +36,10 @@ public class QBFriendListHelper {
     // with presence that is sent on login by default
     private static final int STATUS_PRESENCE_PRIORITY = 1;
 
-    private Context context;
     private QBRoster roster;
 
     public QBFriendListHelper(Context context) {
-        this.context = context;
+        super(context);
     }
 
     public void init() {

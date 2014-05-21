@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -17,15 +16,16 @@ public class QBSignUpRestCommand extends CompositeServiceCommand {
 
     private static final String TAG = QBSignUpRestCommand.class.getSimpleName();
 
-    public QBSignUpRestCommand(Context context, QBAuthHelper qbAuthHelper, QBVideoChatHelper videoChatHelper,
-            String successAction, String failAction) {
+    private final QBAuthHelper authHelper;
+
+    public QBSignUpRestCommand(Context context, QBAuthHelper authHelper, String successAction,
+            String failAction) {
         super(context, successAction, failAction);
-        this.qbAuthHelper = qbAuthHelper;
-        this.videoChatHelper = videoChatHelper;
+        this.authHelper = authHelper;
     }
 
     public static void start(Context context, QBUser user, File image) {
-        Intent intent = new Intent(QBServiceConsts.SIGNUP_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.SIGNUP_REST_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
@@ -35,13 +35,8 @@ public class QBSignUpRestCommand extends CompositeServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
-
-        user = qbAuthHelper.signup(user, file);
-        videoChatHelper.init(context);
-
-        Bundle result = new Bundle();
-        result.putSerializable(QBServiceConsts.EXTRA_USER, user);
-
-        return result;
+        user = authHelper.signup(user, file);
+        extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        return extras;
     }
 }

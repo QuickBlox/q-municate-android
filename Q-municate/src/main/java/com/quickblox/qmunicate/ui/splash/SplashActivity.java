@@ -13,7 +13,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
-import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
@@ -102,8 +102,8 @@ public class SplashActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened() && getLoginType() == LoginType.FACEBOOK) {
-                QBSocialLoginCommand.start(SplashActivity.this, QBProvider.FACEBOOK, session.getAccessToken(),
-                        null);
+                QBLoginRestWithSocialCommand.start(SplashActivity.this, QBProvider.FACEBOOK,
+                        session.getAccessToken(), null);
             }
         }
     }

@@ -32,10 +32,10 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.ReceiveFileListener;
-import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.File;
@@ -99,11 +99,9 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         emailEditText.setText(user.getEmail());
         String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, "");
         statusMessageEditText.setText(status);
-
-        fullnameOld = fullNameEditText.getText().toString();
-        emailOld = emailEditText.getText().toString();
-        statusOld = status;
+        updateOldUserData();
     }
+
 
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
@@ -129,7 +127,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
     }
-    
+
     private void initTextChangedListeners() {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
@@ -267,6 +265,12 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     private boolean isUserDataCorrect() {
         return fullnameCurrent.length() > Consts.ZERO_VALUE && emailCurrent.length() > Consts.ZERO_VALUE;
+    }
+
+    private void updateOldUserData() {
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+        statusOld = statusMessageEditText.getText().toString();
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {

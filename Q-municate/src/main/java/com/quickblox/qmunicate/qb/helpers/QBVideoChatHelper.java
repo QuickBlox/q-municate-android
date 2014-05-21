@@ -17,24 +17,30 @@ import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
-public class QBVideoChatHelper {
+public class QBVideoChatHelper extends BaseHelper {
 
     private final Lo lo = new Lo(this);
     private QBSignalingChannel signalingChannel;
 
-    private Context context;
+    public QBVideoChatHelper(Context context) {
+        super(context);
+    }
 
     public QBSignalingChannel getSignalingChannel() {
         return signalingChannel;
     }
 
-    public void init(Context context) {
-        this.context = context;
+    public void init() {
         signalingChannel = new ExtensionSignalingChannel(QBChatService.getInstance().getSignalingManager());
         signalingChannel.addSignalingListener(new VideoSignalingListener());
     }
 
     private class VideoSignalingListener extends SignalingListenerImpl {
+
+        @Override
+        public void onError(List<String> errors) {
+            lo.g("error while establishing connection" + errors.toString());
+        }
 
         @Override
         public void onCall(ConnectionConfig connectionConfig) {
@@ -52,11 +58,6 @@ public class QBVideoChatHelper {
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(intent);
-        }
-
-        @Override
-        public void onError(List<String> errors) {
-            lo.g("error while establishing connection" + errors.toString());
         }
     }
 }

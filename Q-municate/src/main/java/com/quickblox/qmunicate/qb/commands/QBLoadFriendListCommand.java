@@ -20,7 +20,7 @@ public class QBLoadFriendListCommand extends ServiceCommand {
     }
 
     public static void start(Context context) {
-        Intent intent = new Intent(QBServiceConsts.FRIENDS_LOAD_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.LOAD_FRIENDS_ACTION, null, context, QBService.class);
         context.startService(intent);
     }
 

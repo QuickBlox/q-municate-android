@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallFragment;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 
 public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
@@ -87,7 +88,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     @Override
     protected void onConnectedToService() {
-        signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();

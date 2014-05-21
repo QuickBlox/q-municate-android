@@ -23,7 +23,7 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
-import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
@@ -90,11 +90,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
         /*
-        baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, new FriendsLoadSuccessAction());
-        baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION, failAction);
+        baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new FriendsLoadSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
         */
-        baseActivity.addAction(QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, new UserSearchSuccessAction());
-        baseActivity.addAction(QBServiceConsts.USER_SEARCH_FAIL_ACTION, new UserSearchFailAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
         baseActivity.updateBroadcastActionList();
     }
 
@@ -201,7 +201,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void startUsersListLoader(String newText) {
-        QBUserSearchCommand.start(baseActivity, newText);
+        QBLoadUsersCommand.start(baseActivity, newText);
         usersListAdapter.setSearchCharacters(newText);
     }
 

@@ -6,7 +6,7 @@ import android.os.Bundle;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class CompositeServiceCommand extends ServiceCommand {
+public class CompositeServiceCommand extends ServiceCommand {
 
     private List<ServiceCommand> commands = new LinkedList<ServiceCommand>();
 
@@ -27,19 +27,7 @@ public abstract class CompositeServiceCommand extends ServiceCommand {
         Bundle params = extras;
         for (ServiceCommand command : commands) {
             params = command.perform(params);
-        } return null;
-    }
-
-    @Override
-    public void execute(Bundle bundle) {
-        for (Map.Entry<Command, Bundle> commandBundleEntry : commands.entrySet()) {
-            Command command = commandBundleEntry.getKey();
-            try {
-                command.execute(commandBundleEntry.getValue());
-            } catch (Exception e) {
-                break;
-            }
         }
-        commands.clear();
+        return params;
     }
 }

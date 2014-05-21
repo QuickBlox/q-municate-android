@@ -275,7 +275,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        QBSignalingChannel signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        QBSignalingChannel signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
         if (signalingChannel != null && isExistActivity()) {
             initChat(signalingChannel);
         } else if (isExistActivity()) {

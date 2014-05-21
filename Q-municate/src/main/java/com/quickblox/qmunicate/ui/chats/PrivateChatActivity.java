@@ -27,15 +27,16 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
-import com.quickblox.qmunicate.utils.ImageHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -117,14 +118,13 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     }
 
     private void initActionBar() {
-        ActionBar ab = getActionBar();
-        ab.setTitle(opponentFriend.getFullname());
-        ab.setSubtitle(opponentFriend.getOnlineStatus());
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(opponentFriend.getFullname());
+        actionBar.setSubtitle(opponentFriend.getOnlineStatus());
     }
 
     private void initChat() {
-        chatHelper = QBChatHelper.getInstance();
-        chatHelper.initPrivateChat(opponentFriend.getId());
+        QBCreatePrivateChatCommand.start(this, opponentFriend);
     }
 
     protected BaseAdapter getMessagesAdapter() {

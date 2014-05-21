@@ -27,6 +27,7 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         chatHelper.logout();
+        chatHelper.destroy();
         return extras;
     }
 }

@@ -20,8 +20,8 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
-import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
@@ -169,7 +169,7 @@ public class LoginActivity extends BaseActivity {
             if (session.isOpened()) {
                 showProgress();
                 saveLoginType(LoginType.FACEBOOK);
-                QBSocialLoginCommand
+                QBLoginRestWithSocialCommand
                         .start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
             }
         }

@@ -6,22 +6,17 @@ import android.os.Bundle;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
+import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
-public class QBLogoutCommand extends ServiceCommand {
+public class QBLogoutCommand extends CompositeServiceCommand {
 
     private static final String TAG = QBLogoutCommand.class.getSimpleName();
 
-    private final QBAuthHelper authHelper;
-
-    public QBLogoutCommand(Context context, QBAuthHelper authHelper, String successAction,
-            String failAction) {
+    public QBLogoutCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.authHelper = authHelper;
     }
 
     public static void start(Context context) {
@@ -31,11 +26,11 @@ public class QBLogoutCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        authHelper.logout();
+        super.perform(extras);
         resetFriendList();
         resetRememberMe();
         resetUserData();
-        return null;
+        return extras;
     }
 
     private void resetFriendList() {
