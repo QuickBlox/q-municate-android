@@ -206,7 +206,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
                 new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
                         BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                ErrorUtils.showError(PrivateChatActivity.this, e);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

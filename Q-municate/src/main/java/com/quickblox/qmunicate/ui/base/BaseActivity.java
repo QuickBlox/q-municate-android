@@ -143,7 +143,7 @@ public abstract class BaseActivity extends Activity {
                         try {
                             QBChatService.getInstance().logout();
                         } catch (SmackException.NotConnectedException e) {
-                            e.printStackTrace();
+                            ErrorUtils.showError(BaseActivity.this, e);
                         }
                     }
                 }

@@ -12,6 +12,7 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
@@ -59,7 +60,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         try {
             incomingCallClickListener = (IncomingCallClickListener) activity;
         } catch (ClassCastException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(baseActivity, e);
         }
     }
 

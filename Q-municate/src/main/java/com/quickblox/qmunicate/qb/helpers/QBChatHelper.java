@@ -27,6 +27,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -67,9 +68,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         try {
             privateChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), privateChatId, Consts.EMPTY_STRING, opponentName));
     }
@@ -89,9 +90,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         try {
             roomChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
             //TODO: SS reconnect
         }
         Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
@@ -104,9 +105,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         try {
             privateChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl(), opponentName));
     }
@@ -218,7 +219,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
             }
             Log.i("Members IDs", membersIDs);
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         groupChatName = roomName;
     }
@@ -228,7 +229,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         try {
             qbFile = QBContent.uploadFileTask(file, true, (String) null);
         } catch (QBResponseException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         return qbFile;
     }

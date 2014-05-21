@@ -164,7 +164,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
                 avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                ErrorUtils.showError(this, e);
             }
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
@@ -216,7 +216,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             try {
                 saveChanges(fullnameCurrent, emailCurrent);
             } catch (IOException e) {
-                e.printStackTrace();
+                ErrorUtils.showError(this, e);
             }
         }
     }

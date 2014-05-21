@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import android.util.Log;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public abstract class ServiceCommand implements Command {
 
@@ -26,7 +26,7 @@ public abstract class ServiceCommand implements Command {
             result = perform(bundle);
             sendResult(result, successAction);
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
             result = new Bundle();
             result.putSerializable(QBServiceConsts.EXTRA_ERROR, e);
             sendResult(result, failAction);
