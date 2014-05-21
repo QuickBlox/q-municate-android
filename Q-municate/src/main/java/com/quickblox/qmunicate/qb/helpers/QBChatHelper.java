@@ -49,6 +49,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     private int privateChatId;
     private String groupChatName;
     private String opponentName;
+    private String membersIDs = "";
 
     private QBChatHelper() {
         instance = this;
@@ -95,7 +96,7 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         }
         Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
 
-        saveGroupMessageToCache(chatMessage, user.getId(), groupChatName);
+        saveGroupMessageToCache(chatMessage, user.getId(), groupChatName, membersIDs);
     }
 
     public void sendPrivateMessageWithAttachImage(QBFile qbFile) {
@@ -111,9 +112,9 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     }
 
 
-    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId){
+    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
         Log.i("GroupMessage: ", " Saving to cache " + groupChatName);
-        DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId);
+        DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId, membersIds);
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -199,7 +200,11 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
             roomChat.addRoomUser(user.getId());
             for (Friend friend : friends) {
                 roomChat.addRoomUser(Integer.valueOf(friend.getId()));
+                if(friend != null){
+                    membersIDs = membersIDs + friend.getId() + "_";
+                }
             }
+            Log.i("Members IDs", membersIDs);
         } catch (Exception e) {
             e.printStackTrace();
         }

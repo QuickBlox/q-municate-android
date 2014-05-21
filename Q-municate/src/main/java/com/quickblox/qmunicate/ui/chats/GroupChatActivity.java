@@ -57,13 +57,12 @@ public class GroupChatActivity extends BaseChatActivity {
         if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
             friends = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
         }
+//        Log.i("ChatName", "Size in GroupChat: " + friends.size());
         for(Friend friend : friends){
-            if(nameOfChat.length() < allowedNameLength){
+            if(friend != null){
                 nameOfChat = nameOfChat + friend.getFullname() + "_";
-            } else {
-                nameOfChat = nameOfChat + "...";
-                break;
             }
+            Log.i("ChatName","nameOfChat: " + nameOfChat);
         }
 
         initUI();

@@ -1,6 +1,8 @@
 package com.quickblox.qmunicate.ui.chats;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,10 +15,13 @@ import android.widget.ListView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Chat;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupChat;
+import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ChatsListFragment extends BaseFragment {
@@ -74,7 +79,16 @@ public class ChatsListFragment extends BaseFragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                GroupChatDetailsActivity.start(getActivity(), (GroupChat)chatsArrayList.get(position));
+                Cursor cursor = (Cursor)chatsListAdapter.getItem(position);
+                Chat chat = DatabaseManager.getChatFromCursor(cursor, getActivity());
+//                Log.i("ChatName", "Size: " + ((ArrayList)((GroupChat)chat).getOpponents()).size());
+                if(chat instanceof PrivateChat) {
+                    PrivateChatActivity.start(getActivity(), ((PrivateChat)chat).getFriend());
+                } else if(chat instanceof GroupChat){
+                    ArrayList<Friend> opps = (ArrayList)((GroupChat)chat).getOpponents();
+                    Collections.sort(opps, new NewChatActivity.SimpleComparator());
+                    GroupChatActivity.start(getActivity(), opps);
+                }
             }
         });
     }

@@ -20,6 +20,7 @@ public class ChatTable {
         public static final String LAST_MESSAGE = "last_message";
         public static final String FILE_ID = "file_id";
         public static final String IS_GROUP = "is_group";
+        public static final String MEMBERS_IDS = "members_ids";
         public static final String AVATAR_ID = "avatar_id";
     }
 }

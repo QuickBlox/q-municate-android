@@ -7,6 +7,7 @@ public class PrivateChatMessageCache {
     private int chatId;
     private String attachUrl;
     private String opponentName;
+    private String opponentId;
 
     public PrivateChatMessageCache(String message, int senderId, int chatId, String attachUrl, String opponentName) {
         this.message = message;

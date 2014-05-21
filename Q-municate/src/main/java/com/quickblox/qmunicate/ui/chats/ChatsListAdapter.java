@@ -60,7 +60,7 @@ public class ChatsListAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        Chat data = DatabaseManager.getChatFromCursor(cursor);
+        Chat data = DatabaseManager.getChatFromCursor(cursor, context);
         holder.nameTextView.setText(data.getName());
         holder.lastMessageTextView.setText(data.getLastMessage().getBody());
 
