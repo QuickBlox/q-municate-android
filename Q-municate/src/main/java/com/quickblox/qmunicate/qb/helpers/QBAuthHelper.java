@@ -61,6 +61,7 @@ public class QBAuthHelper extends BaseHelper {
     public void logout() throws QBResponseException {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
+        user = null;
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
@@ -86,5 +87,9 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser getUser() {
         return user;
+    }
+
+    public boolean isLoggedIn() {
+        return user != null;
     }
 }

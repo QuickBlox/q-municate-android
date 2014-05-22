@@ -20,6 +20,7 @@ import android.widget.ListView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
@@ -101,8 +102,7 @@ public class GroupChatActivity extends BaseChatActivity {
     }
 
     private void initChat(){
-        qbChatHelper = QBChatHelper.getInstance();
-        qbChatHelper.initRoomChat(this, chatName, friendList);
+        QBCreateGroupChatCommand.start(this, chatName, friendList);
     }
 
     private Cursor getAllGroupChatMessages() {
@@ -120,9 +120,9 @@ public class GroupChatActivity extends BaseChatActivity {
     }
 
     private void actionBarSetup() {
-        ActionBar ab = getActionBar();
-        ab.setTitle(chatName);
-        ab.setSubtitle("some information");
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(chatName);
+        actionBar.setSubtitle("some information");
     }
 
     @Override

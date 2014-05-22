@@ -58,7 +58,7 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
 //            avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Log.i("Sender", "otherUser");
-            Friend senderFriend = DatabaseManager.getFriend(context, senderId);
+            Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
             senderName = senderFriend.getFullname();
 //            avatarUrl = getAvatarUrlForFriend(opponentFriends);
         }

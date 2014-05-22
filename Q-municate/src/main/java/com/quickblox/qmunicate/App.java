@@ -2,7 +2,6 @@ package com.quickblox.qmunicate;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -13,6 +12,7 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
+import com.quickblox.qmunicate.utils.ActivityLifecycleHandler;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -32,8 +32,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "onCreate");
         initApplication();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
     }
 
     public void initImageLoader(Context context) {

@@ -203,7 +203,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            Friend friend = DatabaseManager.getFriend(context, presence.getUserId());
+            Friend friend = DatabaseManager.getFriendById(context, presence.getUserId());
             fillFriendOnlineStatus(friend);
             fillFriendStatus(friend);
             DatabaseManager.deleteFriend(context, friend);

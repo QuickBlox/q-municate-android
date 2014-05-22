@@ -6,12 +6,15 @@ public class PrivateChatMessageCache {
     private int senderId;
     private int chatId;
     private String attachUrl;
+    private String opponentName;
+    private String opponentId;
 
-    public PrivateChatMessageCache(String message, int senderId, int chatId, String attachUrl) {
+    public PrivateChatMessageCache(String message, int senderId, int chatId, String attachUrl, String opponentName) {
         this.message = message;
         this.senderId = senderId;
         this.chatId = chatId;
         this.attachUrl = attachUrl;
+        this.opponentName = opponentName;
     }
 
     public String getMessage() {
@@ -44,5 +47,13 @@ public class PrivateChatMessageCache {
 
     public void setAttachUrl(String attachUrl) {
         this.attachUrl = attachUrl;
+    }
+
+    public String getOpponentName() {
+        return opponentName;
+    }
+
+    public void setOpponentName(String opponentName) {
+        this.opponentName = opponentName;
     }
 }

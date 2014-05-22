@@ -105,8 +105,8 @@ public class QBService extends Service {
     }
 
     private void registerLoginChatCommand() {
-        ServiceCommand loginCommand = new QBLogoutChatCommand(this, qbChatHelper,
-                QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
+        ServiceCommand loginCommand = new QBLoginChatCommand(this, qbAuthHelper, qbChatHelper,
+                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginCommand);
     }
 
@@ -245,7 +245,7 @@ public class QBService extends Service {
     private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand) {
         QBInitChatCommand initChatCommand = new QBInitChatCommand(this, qbChatHelper,
                 QBServiceConsts.INIT_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_CHAT_FAIL_ACTION);
-        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, qbChatHelper,
+        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, qbAuthHelper, qbChatHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, qbVideoChatHelper,
                 QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
