@@ -7,12 +7,7 @@ import android.text.TextUtils;
 
 import android.util.Log;
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.QBRoomChat;
-import com.quickblox.module.chat.QBRoomChatManager;
+import com.quickblox.module.chat.*;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.listeners.QBRoomChatManagerListener;
@@ -24,6 +19,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -37,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener, QBRoomChatManagerListener {
+public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatManagerListener, QBRoomChatManagerListener {
 
     private static QBChatHelper instance;
 
@@ -47,7 +43,6 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     private QBUser user;
     private QBChatService chatService;
     private QBPrivateChat privateChat;
-    private Map<String,QBRoomChat> roomChatMap;
     private QBPrivateChatManager privateChatManager;
     private int privateChatId;
     private String groupChatName;
@@ -127,18 +122,21 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
     }
 
     @Override
-    public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
+    public void processMessage(QBChat chat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage = "";
+        Friend friend = DatabaseManager.getFriendFromCursor(
+                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId()));
+        String fullname = friend.getFullname();
         if(TextUtils.isEmpty(messageBody)){
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
         }
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendFromCursor(
-                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId())).getFullname());
+        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullname);
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
         String attachURL = "";
@@ -147,9 +145,14 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         } else {
             attachURL = Consts.EMPTY_STRING;
         }
+        Log.i("Message", "Processing... " + messageBody + "SenderID: " + chatMessage.getSenderId() + ", Opponent name: " + fullname);
 
-        saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
-                attachURL, opponentName));
+        if(chat instanceof QBRoomChat){
+            saveGroupMessageToCache(chatMessage, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), membersIDs);
+        } else {
+            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), friend.getId(),
+                    attachURL, fullname));
+        }
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
@@ -195,7 +198,6 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         privateChatManager.addPrivateChatManagerListener(this);
         roomChatManager = chatService.getRoomChatManager();
         roomChatManager.addRoomChatManagerListener(this);
-        roomChatMap = new HashMap<String, QBRoomChat>();
     }
 
     public void initPrivateChat(int opponentId, String opponentName) {
@@ -211,9 +213,8 @@ public class QBChatHelper implements QBMessageListener<QBPrivateChat>, QBPrivate
         if(roomChat == null){
             roomChat = roomChatManager.createRoom(roomName);
         } else if(roomChatManager.getRoom(roomName) == null){
-            initChats(context);
             roomChat = roomChatManager.createRoom(roomName);
-        }else {
+        }else if(roomChatManager.getRoom(roomName) != null){
 
             roomChat = roomChatManager.getRoom(roomName);
         }

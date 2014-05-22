@@ -208,7 +208,7 @@ public class DatabaseManager {
 
     public static void savePrivateChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
-
+        Log.i("Message","savePrivateChatMessage: " + privateChatMessageCache.getMessage() + ", in " + privateChatMessageCache.getChatId())   ;
         values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
         values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
@@ -224,7 +224,7 @@ public class DatabaseManager {
         chatValues.put(ChatTable.Cols.IS_GROUP, 0);
         Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null, null);
         if (c != null && c.getCount() > Consts.ZERO_VALUE) {
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId(), null);
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
         } else {
             context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
         }

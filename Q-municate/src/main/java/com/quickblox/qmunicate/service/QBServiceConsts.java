@@ -52,6 +52,7 @@ public class QBServiceConsts {
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_CHAT_OPPONENT_NAME = "chat_opponent_name";
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
+    public static final String EXTRA_CHAT_ID = "chat_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
