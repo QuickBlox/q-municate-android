@@ -55,12 +55,12 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         if(senderId == currentUser.getId()) {
             Log.i("Sender", "currentUser");
             senderName = currentUser.getFullName();
-//            avatarUrl = getAvatarUrlForCurrentUser();
+            avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Log.i("Sender", "otherUser");
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
             senderName = senderFriend.getFullname();
-//            avatarUrl = getAvatarUrlForFriend(opponentFriends);
+            avatarUrl = getAvatarUrlForFriend(senderFriend);
         }
 
         long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
@@ -69,7 +69,7 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         holder.nameTextView.setText(senderName);
         holder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-//        displayImage(avatarUrl, holder.avatarImageView);
+        displayAvatarImage(avatarUrl, holder.avatarImageView);
     }
 
     private static class ViewHolder {

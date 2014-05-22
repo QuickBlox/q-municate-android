@@ -7,12 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.QBRoomChat;
-import com.quickblox.module.chat.QBRoomChatManager;
+import com.quickblox.module.chat.*;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.listeners.QBRoomChatManagerListener;
@@ -20,8 +15,11 @@ import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -32,9 +30,11 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPrivateChat>, QBPrivateChatManagerListener, QBRoomChatManagerListener {
+public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat>, QBPrivateChatManagerListener, QBRoomChatManagerListener {
 
     private QBRoomChat roomChat;
     private QBRoomChatManager roomChatManager;
@@ -84,7 +84,6 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
             ErrorUtils.logError(e);
             //TODO: SS reconnect
         }
-        Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
 
         saveGroupMessageToCache(chatMessage, user.getId(), groupChatName, membersIDs);
     }
@@ -103,9 +102,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
     }
 
 
-    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId,
-            String membersIds) {
-        Log.i("GroupMessage: ", " Saving to cache " + groupChatName);
+    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
         DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId, membersIds);
     }
 
@@ -118,18 +115,21 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
     }
 
     @Override
-    public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
+    public void processMessage(QBChat chat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage = "";
+        Friend friend = DatabaseManager.getFriendFromCursor(
+                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId()));
+        String fullname = friend.getFullname();
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
         }
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriendById(context,
-                chatMessage.getSenderId()).getFullname());
+        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullname);
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
         String attachURL = "";
@@ -138,9 +138,14 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         } else {
             attachURL = Consts.EMPTY_STRING;
         }
+        Log.i("Message", "Processing... " + messageBody + "SenderID: " + chatMessage.getSenderId() + ", Opponent name: " + fullname);
 
-        saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(),
-                chatMessage.getSenderId(), attachURL, opponentName));
+        if(chat instanceof QBRoomChat){
+            saveGroupMessageToCache(chatMessage, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), membersIDs);
+        } else {
+            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), friend.getId(),
+                    attachURL, fullname));
+        }
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
@@ -190,18 +195,33 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
     public void initPrivateChat(int opponentId) {
         privateChat = privateChatManager.createChat(opponentId, this);
         privateChatId = opponentId;
+        this.opponentName = opponentName;
     }
 
-    public void initRoomChat(String roomName, Integer[] friendIds) {
-        roomChat = roomChatManager.createRoom(roomName);
+    public void initRoomChat(String roomName, List<Friend> friendList) {
+        if(roomChat == null){
+            roomChat = roomChatManager.createRoom(roomName);
+        } else if(roomChatManager.getRoom(roomName) == null){
+            roomChat = roomChatManager.createRoom(roomName);
+        }else if(roomChatManager.getRoom(roomName) != null){
+            roomChat = roomChatManager.getRoom(roomName);
+        }
+        String membersNames = "";
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
-            for (Integer friendId : friendIds) {
-                roomChat.addRoomUser(friendId);
-                membersIDs = membersIDs + friendId + ",";
+            for (Friend friend : friendList) {
+                if(roomChat == null){
+                    roomChat.addRoomUser(Integer.valueOf(friend.getId()));
+                }
+
+                if(friend != null){
+                    membersIDs = membersIDs + friend.getId() + ",";
+                    membersNames = membersNames + friend.getFullname() + ",";
+                }
             }
-            Log.i("Members IDs", membersIDs);
+
+            Log.i("ChatName﹕", membersNames + " while formed.");
         } catch (Exception e) {
             ErrorUtils.showError(context, e);
         }

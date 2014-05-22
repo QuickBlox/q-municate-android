@@ -56,6 +56,7 @@ public class GroupChatActivity extends BaseChatActivity {
         if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
             friendList = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
         }
+        chatName = "";
         //TODO: Sometimes causes crash, logging will be improved later.
 //        Log.i("ChatName", "Size in GroupChat: " + friendList.size());
         for(Friend friend : friendList){

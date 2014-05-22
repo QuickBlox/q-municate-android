@@ -92,7 +92,7 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static Chat getChatFromCursor(Cursor cursor, Context context) {
+    public static Chat getChatFromCursor(Cursor cursor, Context context){
         Chat chat;
         String chatName = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.CHAT_NAME));
         String membersIds = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.MEMBERS_IDS));
@@ -102,32 +102,32 @@ public class DatabaseManager {
 
         boolean isGroup = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.IS_GROUP)) > Consts.ZERO_VALUE;
         //TODO: Sometimes causes crash, logging will be improved later.
-        //        Log.i("ChatName", membersIds);
+//        Log.i("ChatName", membersIds);
         int avatarId = 0;
-        if (isGroup) {
+        if(isGroup){
             String[] friendsArray = membersIds.split(",");
-            for (String friend : friendsArray) {
+            for(String friend : friendsArray){
                 //TODO: Log will be removed after debugging.
                 Log.i("ChatName", "Adding friend: " + friend + ", List size: " + friendsArray.length);
                 friendsIdsList.add(friend);
             }
             List<Friend> friendList = getFriendsById(context, friendsArray);
-            if (avatarUid != null) {
+            if(avatarUid != null){
                 avatarId = Integer.parseInt(avatarUid);
             }
             chat = new GroupChat(chatName, avatarId);
             chat.setLastMessage(lastMessage);
-            ((GroupChat) chat).setOpponents(friendList);
+            ((GroupChat)chat).setOpponents(friendList);
         } else {
-            if (avatarUid != null) {
+            if(avatarUid != null){
                 avatarId = Integer.parseInt(avatarUid);
             }
             chat = new PrivateChat(chatName, avatarId, lastMessage);
-            int friendId = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.CHAT_ID));
+            String friendId = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.CHAT_ID));
             //TODO: Log will be removed after debugging.
             Log.i("ChatName", "Adding friend: " + friendId);
             Friend friend = getFriendById(context, friendId);
-            ((PrivateChat) chat).setFriend(friend);
+            ((PrivateChat)chat).setFriend(friend);
         }
         return chat;
     }
@@ -156,11 +156,11 @@ public class DatabaseManager {
     public static Cursor getFriends(Context context, String fullname) {
         Cursor cursor = null;
         String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
-        if (TextUtils.isEmpty(fullname)) {
+        if (TextUtils.isEmpty(inputText)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
         } else {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + fullname + "%'", null, sorting);
+                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, sorting);
         }
         if (cursor != null) {
             cursor.moveToFirst();
@@ -195,7 +195,6 @@ public class DatabaseManager {
         values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
         values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        // TODO INCOMING
         values.put(ChatMessagesTable.Cols.INCOMING, false);
         values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
         values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, privateChatMessageCache.getAttachUrl());
@@ -210,21 +209,18 @@ public class DatabaseManager {
                 ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null,
                 null);
         if (c != null && c.getCount() > Consts.ZERO_VALUE) {
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues,
-                    ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId(), null);
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
         } else {
             context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
         }
     }
 
-    public static void saveGroupChatMessage(Context context, QBChatMessage message, int senderId,
-            String groupId, String membersIds) {
+    public static void saveGroupChatMessage(Context context, QBChatMessage message, int senderId, String groupId, String membersIds) {
         Log.i("GroupMessage: ", " saveGroupChatMessage");
         ContentValues values = new ContentValues();
         values.put(ChatMessagesTable.Cols.BODY, message.getBody());
         values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        // TODO INCOMING
         values.put(ChatMessagesTable.Cols.INCOMING, false);
         values.put(ChatMessagesTable.Cols.GROUP_ID, groupId);
 
@@ -235,13 +231,11 @@ public class DatabaseManager {
         chatValues.put(ChatTable.Cols.MEMBERS_IDS, membersIds);
         chatValues.put(ChatTable.Cols.LAST_MESSAGE, message.getBody());
         chatValues.put(ChatTable.Cols.IS_GROUP, 1);
-        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
-                ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null, null);
+        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null, null);
         if (c != null && c.getCount() > Consts.ZERO_VALUE) {
             //TODO: Log will be removed after debugging.
             Log.i("GroupMessage: ", " There's already");
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues,
-                    ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null);
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null);
         } else {
             //TODO: Log will be removed after debugging.
             Log.i("GroupMessage: ", "There's not yet");
@@ -254,13 +248,12 @@ public class DatabaseManager {
                 ChatMessagesTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
     }
 
-    public static Cursor getAllChatConversations(Context context) {
+    public static Cursor getAllChatConversations(Context context){
         return context.getContentResolver().query(ChatTable.CONTENT_URI, null, null, null, null);
     }
 
     public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
-                ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
+        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
     }
 
     public static void deleteAllChats(Context context) {
