@@ -1,8 +1,8 @@
 package com.quickblox.qmunicate.model;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ public class Friend implements Serializable {
     private String email;
     private String phone;
     private Integer fileId;
-    private String avatarUid;
-    private String status = "";
+    private String avatarUrl;
+    private String status = Consts.EMPTY_STRING;
     private boolean online;
     private Type type;
 
@@ -28,20 +28,20 @@ public class Friend implements Serializable {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
-        this.avatarUid = UriCreator.cutUid(user.getWebsite());
+        this.avatarUrl = user.getWebsite();
     }
 
     public Friend() {
     }
 
-    public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUid,
+    public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUrl,
             Type type) {
         this.id = id;
         this.fullname = fullname;
         this.email = email;
         this.phone = phone;
         this.fileId = fileId;
-        this.avatarUid = UriCreator.cutUid(avatarUid);
+        this.avatarUrl = avatarUrl;
         this.type = type;
     }
 
@@ -72,12 +72,12 @@ public class Friend implements Serializable {
         return id.hashCode();
     }
 
-    public String getAvatarUid() {
-        return avatarUid;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setAvatarUid(String avatarUid) {
-        this.avatarUid = avatarUid;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getEmail() {

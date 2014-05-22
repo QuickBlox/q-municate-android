@@ -15,7 +15,6 @@ import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.TextViewHelper;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.util.List;
 
@@ -42,14 +41,8 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        String url = null;
-        if (null != user.getAvatarUid()) {
-            try {
-                url = UriCreator.getUri(user.getAvatarUid());
-            } catch (BaseServiceException e) {
-                ErrorUtils.showError(baseActivity, e);
-            }
-        }
+        String url = user.getAvatarUrl();
+
         displayImage(url, holder.avatarImageView);
 
         holder.fullnameTextView.setText(user.getFullname());

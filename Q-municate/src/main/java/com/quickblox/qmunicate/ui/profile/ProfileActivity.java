@@ -36,7 +36,6 @@ import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -117,22 +116,20 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private void loadAvatar() throws BaseServiceException {
-        String uri;
+        String url = null;
         if (getLoginType() == LoginType.FACEBOOK) {
             changeAvatarLinearLayout.setClickable(false);
-            uri = getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            url = getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
         } else if (getLoginType() == LoginType.EMAIL) {
-            uri = UriCreator.getUri(UriCreator.cutUid(user.getWebsite()));
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            url = user.getWebsite();
         }
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void initTextChangedListeners() {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
         emailEditText.addTextChangedListener(textWatcherListener);
-        statusMessageEditText.addTextChangedListener(textWatcherListener);
     }
 
     private LoginType getLoginType() {
@@ -304,7 +301,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_STATUS, statusCurrent);
             updateOldUserData();
             hideProgress();
         }

@@ -74,7 +74,7 @@ public class GCMIntentService extends IntentService {
                 Consts.ZERO_VALUE);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
-                R.drawable.app_icon).setContentTitle(getString(R.string.push_title)).setStyle(
+                R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
                 new NotificationCompat.BigTextStyle().bigText(msg)).setContentText(msg).setVibrate(
                 new long[]{Consts.ZERO_VALUE, VIBRATOR_DURATION});
 

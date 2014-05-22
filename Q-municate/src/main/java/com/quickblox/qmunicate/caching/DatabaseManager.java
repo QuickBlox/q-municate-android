@@ -42,8 +42,8 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.EMAIL, friend.getEmail());
         values.put(FriendTable.Cols.PHONE, friend.getPhone());
         values.put(FriendTable.Cols.FILE_ID, friend.getFileId());
-        values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUid());
-        values.put(FriendTable.Cols.STATUS, friend.getStatus());
+        values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUrl());
+        values.put(FriendTable.Cols.STATUS, friend.getOnlineStatus());
         values.put(FriendTable.Cols.ONLINE, friend.isOnline());
         values.put(FriendTable.Cols.TYPE, friend.getType().name());
         return values;

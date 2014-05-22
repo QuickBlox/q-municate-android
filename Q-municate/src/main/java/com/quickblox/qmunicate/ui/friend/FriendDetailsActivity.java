@@ -29,7 +29,6 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 public class FriendDetailsActivity extends BaseActivity {
 
@@ -114,12 +113,8 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void loadAvatar() {
-        try {
-            String uri = UriCreator.getUri(friend.getAvatarUid());
-            ImageLoader.getInstance().displayImage(uri, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(this, e);
-        }
+        String url = friend.getAvatarUrl();
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }
 
     @Override
