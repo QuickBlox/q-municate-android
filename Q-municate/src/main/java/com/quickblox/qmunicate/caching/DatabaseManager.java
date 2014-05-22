@@ -174,19 +174,7 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-    public static void deleteFriends(Context context, List<Friend> friendList) {
-        // TODO IS delete in one request
-        for (Friend friend : friendList) {
-            deleteFriend(context, friend);
-        }
-    }
-
-    public static void deleteFriend(Context context, Friend friend) {
-        String where = FriendTable.Cols.ID + " = " + friend.getId();
-        context.getContentResolver().delete(FriendTable.CONTENT_URI, where, null);
-    }
-
-    public static void savePrivateChatMessage(Context context,
+   public static void savePrivateChatMessage(Context context,
             PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
 

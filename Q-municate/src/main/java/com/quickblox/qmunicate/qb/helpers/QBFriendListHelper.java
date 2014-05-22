@@ -82,7 +82,6 @@ public class QBFriendListHelper extends BaseHelper {
         Friend friend = loadFriend(userId);
         fillFriendWithRosterData(friend);
 
-        DatabaseManager.deleteFriend(context, friend);
         DatabaseManager.saveFriend(context, friend);
     }
 
@@ -119,8 +118,6 @@ public class QBFriendListHelper extends BaseHelper {
         List<Friend> friends = Friend.createFriendList(users);
         fillFriendsWithRosterData(friends);
 
-        // TODO IS remove delete method
-        DatabaseManager.deleteFriends(context, friends);
         DatabaseManager.saveFriends(context, friends);
     }
 
@@ -207,7 +204,6 @@ public class QBFriendListHelper extends BaseHelper {
             Friend friend = DatabaseManager.getFriendById(context, presence.getUserId());
             fillFriendOnlineStatus(friend);
             fillFriendStatus(friend);
-            DatabaseManager.deleteFriend(context, friend);
             DatabaseManager.saveFriend(context, friend);
             notifyFriendStatusChanged(friend);
         }
