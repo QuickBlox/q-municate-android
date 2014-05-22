@@ -116,9 +116,10 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void updateFriends(Collection<Integer> userIds) throws QBResponseException {
         List<QBUser> users = loadUsers(userIds);
-        List<Friend> friends = Friend.createFriends(users);
+        List<Friend> friends = Friend.createFriendList(users);
         fillFriendsWithRosterData(friends);
 
+        // TODO IS remove delete method
         DatabaseManager.deleteFriends(context, friends);
         DatabaseManager.saveFriends(context, friends);
     }

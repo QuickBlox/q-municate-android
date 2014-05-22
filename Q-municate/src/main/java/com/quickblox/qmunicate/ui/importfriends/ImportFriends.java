@@ -82,6 +82,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     }
 
     private Integer[] getSelectedUsers() {
+        // TODO IS Integer[] userIds = new Integer[user.size()]
         List<Integer> userIds = new ArrayList<Integer>();
         for (QBUser user : users) {
             userIds.add(user.getId());

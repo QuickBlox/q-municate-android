@@ -38,8 +38,8 @@ public class QBVideoChatHelper extends BaseHelper {
     private class VideoSignalingListener extends SignalingListenerImpl {
 
         @Override
-        public void onError(List<String> errors) {
-            lo.g("error while establishing connection" + errors.toString());
+        public void onError(List<String> errorList) {
+            lo.g("error while establishing connection" + errorList.toString());
         }
 
         @Override

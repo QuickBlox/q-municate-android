@@ -19,22 +19,22 @@ public class QBAddFriendsCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, Integer[] users) {
+    public static void start(Context context, Integer[] userIdsArray) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, users);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, userIdsArray);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        Integer[] userIds = (Integer[]) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
+        Integer[] userIds = (Integer[]) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
 
         for (Integer userId : userIds) {
             friendListHelper.inviteFriend(userId);
         }
 
         Bundle result = new Bundle();
-        result.putSerializable(QBServiceConsts.EXTRA_FRIEND, userIds);
+        result.putSerializable(QBServiceConsts.EXTRA_FRIENDS, userIds);
 
         return result;
     }

@@ -9,6 +9,4 @@ public abstract class BaseHelper {
     public BaseHelper(Context context) {
         this.context = context;
     }
-
-
 }

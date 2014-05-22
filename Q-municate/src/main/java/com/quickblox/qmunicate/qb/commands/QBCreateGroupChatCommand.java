@@ -22,19 +22,19 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, String roomName, ArrayList<Friend> friends) {
+    public static void start(Context context, String roomName, ArrayList<Friend> friendList) {
         Intent intent = new Intent(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_ROOM_NAME, roomName);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendList);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        ArrayList<Friend> friends = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        chatHelper.initRoomChat(roomName, friends);
+        chatHelper.initRoomChat(roomName, friendList);
 
         return extras;
     }

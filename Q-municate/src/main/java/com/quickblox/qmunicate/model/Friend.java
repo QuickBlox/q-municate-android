@@ -45,9 +45,9 @@ public class Friend implements Serializable {
         this.type = type;
     }
 
-    public static List<Friend> createFriends(List<QBUser> users) {
+    public static List<Friend> createFriendList(List<QBUser> userList) {
         List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : users) {
+        for (QBUser user : userList) {
             friends.add(new Friend(user));
         }
         return friends;

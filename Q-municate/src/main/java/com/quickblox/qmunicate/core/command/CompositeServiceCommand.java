@@ -8,24 +8,24 @@ import java.util.List;
 
 public class CompositeServiceCommand extends ServiceCommand {
 
-    private List<ServiceCommand> commands = new LinkedList<ServiceCommand>();
+    private List<ServiceCommand> commandList = new LinkedList<ServiceCommand>();
 
     public CompositeServiceCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 
     public void addCommand(ServiceCommand command) {
-        commands.add(command);
+        commandList.add(command);
     }
 
     public void removeCommand(ServiceCommand command) {
-        commands.remove(command);
+        commandList.remove(command);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         Bundle params = extras;
-        for (ServiceCommand command : commands) {
+        for (ServiceCommand command : commandList) {
             params = command.perform(params);
         }
         return params;
