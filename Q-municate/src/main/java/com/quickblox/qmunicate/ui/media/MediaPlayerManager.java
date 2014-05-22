@@ -53,7 +53,6 @@ public class MediaPlayerManager {
                 player.stop();
             }
             shutDown();
-            returnOriginalVolume();
         }
         isPlaying = false;
     }
@@ -75,7 +74,6 @@ public class MediaPlayerManager {
         stopPlaying();
         player = new MediaPlayer();
         try {
-            setMaxVolume();
             player.setLooping(looping);
             resource.putResourceInPlayer(player);
             player.prepare();
