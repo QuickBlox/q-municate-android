@@ -19,7 +19,6 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -29,9 +28,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatManagerListener, QBRoomChatManagerListener {
 
@@ -69,7 +66,7 @@ public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatMa
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), privateChatId, Consts.EMPTY_STRING, opponentName));
+        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), String.valueOf(privateChatId), Consts.EMPTY_STRING, opponentName, null));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -79,7 +76,7 @@ public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatMa
     }
 
     public void saveMessageToCache(PrivateChatMessageCache privateChatMessageCache) {
-        DatabaseManager.savePrivateChatMessage(context, privateChatMessageCache);
+        DatabaseManager.saveChatMessage(context, privateChatMessageCache);
     }
 
     public void sendGroupMessage(String message) {
@@ -105,12 +102,12 @@ public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatMa
         } catch (SmackException.NotConnectedException e) {
             e.printStackTrace();
         }
-        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl(), opponentName));
+        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(privateChatId), qbFile.getPublicUrl(), opponentName, null));
     }
 
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
-        DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId, membersIds);
+        DatabaseManager.saveChatMessage(context, new PrivateChatMessageCache(chatMessage.getBody(), senderId,  groupId, null, null, membersIds));
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -148,10 +145,10 @@ public class QBChatHelper implements QBMessageListener<QBChat>,  QBPrivateChatMa
         Log.i("Message", "Processing... " + messageBody + "SenderID: " + chatMessage.getSenderId() + ", Opponent name: " + fullname);
 
         if(chat instanceof QBRoomChat){
-            saveGroupMessageToCache(chatMessage, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), membersIDs);
+            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), null, null, membersIDs));
         } else {
-            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), friend.getId(),
-                    attachURL, fullname));
+            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), String.valueOf(friend.getId()),
+                    attachURL, fullname, null));
         }
     }
 
