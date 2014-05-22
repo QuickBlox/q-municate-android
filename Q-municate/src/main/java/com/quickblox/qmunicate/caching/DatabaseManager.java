@@ -123,7 +123,7 @@ public class DatabaseManager {
                 avatarId = Integer.parseInt(avatarUid);
             }
             chat = new PrivateChat(chatName, avatarId, lastMessage);
-            String friendId = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.CHAT_ID));
+            int friendId = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.CHAT_ID));
             //TODO: Log will be removed after debugging.
             Log.i("ChatName", "Adding friend: " + friendId);
             Friend friend = getFriendById(context, friendId);
@@ -156,11 +156,11 @@ public class DatabaseManager {
     public static Cursor getFriends(Context context, String fullname) {
         Cursor cursor = null;
         String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
-        if (TextUtils.isEmpty(inputText)) {
+        if (TextUtils.isEmpty(fullname)) {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
         } else {
             cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + inputText + "%'", null, sorting);
+                    FriendTable.Cols.FULLNAME + " like '%" + fullname + "%'", null, sorting);
         }
         if (cursor != null) {
             cursor.moveToFirst();

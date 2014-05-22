@@ -21,7 +21,7 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
     }
 
     public static void start(Context context, Friend friend) {
-        Intent intent = new Intent(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.CREATE_PRIVATE_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend.getId());
         context.startService(intent);
     }

@@ -10,7 +10,7 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class QBCreateGroupChatCommand extends ServiceCommand {
 
@@ -22,28 +22,19 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, String roomName, List<Friend> friends) {
-        Integer[] friendIds = getFriendIds(friends);
+    public static void start(Context context, String roomName, ArrayList<Friend> friends) {
         Intent intent = new Intent(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_ROOM_NAME, roomName);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendIds);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startService(intent);
-    }
-
-    private static Integer[] getFriendIds(List<Friend> friends) {
-        Integer[] friendIds = new Integer[friends.size()];
-        for (int index = 0; index < friends.size(); index++) {
-            friendIds[index] = friends.get(index).getId();
-        }
-        return friendIds;
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        Integer[] friendIds = (Integer[]) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<Friend> friends = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        chatHelper.initRoomChat(roomName, friendIds);
+        chatHelper.initRoomChat(roomName, friends);
 
         return extras;
     }

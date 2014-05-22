@@ -7,7 +7,13 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.*;
+import com.quickblox.module.chat.QBChat;
+import com.quickblox.module.chat.QBChatMessage;
+import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBPrivateChat;
+import com.quickblox.module.chat.QBPrivateChatManager;
+import com.quickblox.module.chat.QBRoomChat;
+import com.quickblox.module.chat.QBRoomChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.listeners.QBRoomChatManagerListener;
@@ -15,11 +21,9 @@ import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -30,9 +34,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat>, QBPrivateChatManagerListener, QBRoomChatManagerListener {
 
@@ -119,8 +121,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage = "";
-        Friend friend = DatabaseManager.getFriendFromCursor(
-                DatabaseManager.getCursorFriendById(context, chatMessage.getSenderId()));
+        Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
         String fullname = friend.getFullname();
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
@@ -195,10 +196,9 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
     public void initPrivateChat(int opponentId) {
         privateChat = privateChatManager.createChat(opponentId, this);
         privateChatId = opponentId;
-        this.opponentName = opponentName;
     }
 
-    public void initRoomChat(String roomName, List<Friend> friendList) {
+    public void initRoomChat(String roomName, List<Friend> friends) {
         if(roomChat == null){
             roomChat = roomChatManager.createRoom(roomName);
         } else if(roomChatManager.getRoom(roomName) == null){
@@ -210,7 +210,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
-            for (Friend friend : friendList) {
+            for (Friend friend : friends) {
                 if(roomChat == null){
                     roomChat.addRoomUser(Integer.valueOf(friend.getId()));
                 }

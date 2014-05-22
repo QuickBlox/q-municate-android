@@ -12,11 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
@@ -26,10 +26,9 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GroupChatActivity extends BaseChatActivity {
-    private List<Friend> friendList;
+    private ArrayList<Friend> friendList;
     private String chatName = "";
     private int allowedNameLength = 20;
     private QBChatHelper qbChatHelper;
@@ -54,7 +53,7 @@ public class GroupChatActivity extends BaseChatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
-            friendList = (List<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
+            friendList = (ArrayList<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
         }
         chatName = "";
         //TODO: Sometimes causes crash, logging will be improved later.
