@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
+import android.util.Log;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
@@ -44,6 +45,8 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
     private QBPrivateChatManager privateChatManager;
     private int privateChatId;
     private String groupChatName;
+    private String opponentName;
+    private String membersIDs = "";
 
     public QBChatHelper(Context context) {
         super(context);
@@ -54,12 +57,11 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         try {
             privateChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
-        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), privateChatId,
-                Consts.EMPTY_STRING));
+        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), privateChatId, Consts.EMPTY_STRING, opponentName));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -77,16 +79,14 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         try {
             roomChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
             //TODO: SS reconnect
         }
-        saveGroupMessageToCache(chatMessage, user.getId(), groupChatName);
-    }
+        Log.i("GroupMessage: ", " Chat ID: " + groupChatName);
 
-    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
-        DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId);
+        saveGroupMessageToCache(chatMessage, user.getId(), groupChatName, membersIDs);
     }
 
     public void sendPrivateMessageWithAttachImage(QBFile qbFile) {
@@ -94,12 +94,17 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         try {
             privateChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         } catch (SmackException.NotConnectedException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
-        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId,
-                qbFile.getPublicUrl()));
+        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl(), opponentName));
+    }
+
+
+    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
+        Log.i("GroupMessage: ", " Saving to cache " + groupChatName);
+        DatabaseManager.saveGroupChatMessage(context, chatMessage, senderId, groupId, membersIds);
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -114,15 +119,26 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
     public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, TextUtils.isEmpty(messageBody) ? context
-                .getResources().getString(R.string.file_was_attached) : messageBody);
+        String extraChatMessage = "";
+        if(TextUtils.isEmpty(messageBody)){
+            extraChatMessage = context.getResources().getString(R.string.file_was_attached);
+        } else {
+            extraChatMessage = messageBody;
+        }
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, DatabaseManager.getFriend(context,
                 chatMessage.getSenderId()).getFullname());
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(),
-                chatMessage.getSenderId(), TextUtils.isEmpty(messageBody) ? getAttachUrlFromQBChatMessage(
-                chatMessage) : Consts.EMPTY_STRING
-        ));
+
+        String attachURL = "";
+        if(TextUtils.isEmpty(messageBody)){
+            attachURL = getAttachUrlFromQBChatMessage(chatMessage);
+        } else {
+            attachURL = Consts.EMPTY_STRING;
+        }
+
+        saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), chatMessage.getSenderId(),
+                attachURL, opponentName));
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
@@ -169,22 +185,29 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         roomChatManager.addRoomChatManagerListener(this);
     }
 
-    public void initPrivateChat(int opponentId) {
+    public void initPrivateChat(int opponentId, String opponentName) {
+        user = App.getInstance().getUser();
         privateChat = privateChatManager.createChat(opponentId, this);
         privateChatId = opponentId;
+        this.opponentName = opponentName;
     }
 
-    public void initRoomChat(String roomName, Integer[] friendIds) {
+    public void initRoomChat(Context context, String roomName, List<Friend> friendList) {
+        this.context = context;
         user = App.getInstance().getUser();
         roomChat = roomChatManager.createRoom(roomName);
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
-            for (Integer friendId : friendIds) {
-                roomChat.addRoomUser(friendId);
+            for (Friend friend : friendList) {
+                roomChat.addRoomUser(Integer.valueOf(friend.getId()));
+                if(friend != null){
+                    membersIDs = membersIDs + friend.getId() + ",";
+                }
             }
+            Log.i("Members IDs", membersIDs);
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         groupChatName = roomName;
     }
@@ -194,7 +217,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBPriv
         try {
             qbFile = QBContent.uploadFileTask(file, true, (String) null);
         } catch (QBResponseException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         return qbFile;
     }

@@ -3,12 +3,9 @@ package com.quickblox.qmunicate.utils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.view.View;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 
 public class Utils {
 
@@ -30,16 +27,6 @@ public class Utils {
             ErrorUtils.logError(e);
         }
         return null;
-    }
-
-    public static void disableViewHardwareAcceleration(View view) {
-        try {
-            Method setLayerTypeMethod = view.getClass().getMethod("setLayerType",
-                    new Class[]{int.class, Paint.class});
-            setLayerTypeMethod.invoke(view, new Object[]{View.LAYER_TYPE_SOFTWARE, null});
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
     }
 
     public static void closeOutputStream(OutputStream outputStream) {

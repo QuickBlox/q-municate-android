@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 import java.text.MessageFormat;
@@ -25,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         createFriendTable(db);
         createChatMessageTable(db);
+        createChatTable(db);
         // TODO SF other tables can be created
     }
 
@@ -57,6 +59,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(ChatMessagesTable.Cols.ATTACH_FILE_URL).append(" TEXT, ")
                 .append(ChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
         createTable(db, ChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
+    }
+
+    private void createChatTable(SQLiteDatabase db){
+        StringBuilder chatTableFields = new StringBuilder();
+        chatTableFields
+                .append(ChatTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(ChatTable.Cols.CHAT_NAME).append(" TEXT, ")
+                .append(ChatTable.Cols.CHAT_ID).append(" TEXT, ")
+                .append(ChatTable.Cols.LAST_MESSAGE).append(" TEXT, ")
+                .append(ChatTable.Cols.MEMBERS_IDS).append(" TEXT, ")
+                .append(ChatTable.Cols.IS_GROUP).append(" INTEGER, ")
+                .append(ChatTable.Cols.AVATAR_ID).append(" TEXT");
+        createTable(db, ChatTable.TABLE_NAME, chatTableFields.toString());
     }
 
     @Override

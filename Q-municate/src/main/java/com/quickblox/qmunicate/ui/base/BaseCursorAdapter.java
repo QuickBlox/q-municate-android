@@ -70,7 +70,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
             try {
                 avatarUrl = UriCreator.getUri(avatarUid);
             } catch (BaseServiceException e) {
-                e.printStackTrace();
+                ErrorUtils.showError(context, e);
             }
         }
         return avatarUrl;

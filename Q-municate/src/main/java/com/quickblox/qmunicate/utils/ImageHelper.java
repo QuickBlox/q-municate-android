@@ -65,7 +65,7 @@ public class ImageHelper {
             fos.close();
             bos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(activity, e);
         } finally {
             Utils.closeOutputStream(fos);
             Utils.closeOutputStream(bos);
