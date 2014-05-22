@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.model;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class Friend implements Serializable {
     private String email;
     private String phone;
     private Integer fileId;
-    private String avatarUid;
+    private String avatarUrl;
     private String status;
     private Date lastRequestAt;
     private boolean online;
@@ -31,13 +30,13 @@ public class Friend implements Serializable {
         this.phone = user.getPhone();
         this.fileId = user.getFileId();
         this.lastRequestAt = user.getLastRequestAt();
-        this.avatarUid = UriCreator.cutUid(user.getWebsite());
+        this.avatarUrl = user.getWebsite();
     }
 
     public Friend() {
     }
 
-    public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUid,
+    public Friend(Integer id, String fullname, String email, String phone, Integer fileId, String avatarUrl,
             Date lastRequestAt) {
         this.id = id;
         this.fullname = fullname;
@@ -45,7 +44,7 @@ public class Friend implements Serializable {
         this.phone = phone;
         this.fileId = fileId;
         this.lastRequestAt = lastRequestAt;
-        this.avatarUid = UriCreator.cutUid(avatarUid);
+        this.avatarUrl = avatarUrl;
     }
 
     public static List<Friend> createFriends(List<QBUser> users) {
@@ -75,12 +74,12 @@ public class Friend implements Serializable {
         return id.hashCode();
     }
 
-    public String getAvatarUid() {
-        return avatarUid;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setAvatarUid(String avatarUid) {
-        this.avatarUid = avatarUid;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getEmail() {

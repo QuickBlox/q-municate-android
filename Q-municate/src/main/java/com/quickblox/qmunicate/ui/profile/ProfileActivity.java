@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -32,11 +31,10 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.ReceiveFileListener;
-import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-import com.quickblox.qmunicate.utils.UriCreator;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -92,21 +90,14 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private void initUsersData() {
-        try {
-            String uri;
-            if (getLoginType() == LoginType.FACEBOOK) {
-                changeAvatarLinearLayout.setClickable(false);
-                uri = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
-                ImageLoader.getInstance().displayImage(uri, avatarImageView,
-                        Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-            } else if (getLoginType() == LoginType.EMAIL) {
-                uri = UriCreator.getUri(UriCreator.cutUid(qbUser.getWebsite()));
-                ImageLoader.getInstance().displayImage(uri, avatarImageView,
-                        Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-            }
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(this, e);
+        String url = null;
+        if (getLoginType() == LoginType.FACEBOOK) {
+            changeAvatarLinearLayout.setClickable(false);
+            url = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
+        } else if (getLoginType() == LoginType.EMAIL) {
+            url = qbUser.getWebsite();
         }
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
 
         fullNameEditText.setText(qbUser.getFullName());
         emailEditText.setText(qbUser.getEmail());

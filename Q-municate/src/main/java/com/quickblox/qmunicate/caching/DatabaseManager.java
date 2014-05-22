@@ -13,11 +13,7 @@ import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.*;
-import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
@@ -44,7 +40,7 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.EMAIL, friend.getEmail());
         values.put(FriendTable.Cols.PHONE, friend.getPhone());
         values.put(FriendTable.Cols.FILE_ID, friend.getFileId());
-        values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUid());
+        values.put(FriendTable.Cols.AVATAR_UID, friend.getAvatarUrl());
         values.put(FriendTable.Cols.STATUS, friend.getOnlineStatus());
         values.put(FriendTable.Cols.ONLINE, friend.isOnline());
         if (friend.getLastRequestAt() != null) {
@@ -208,7 +204,8 @@ public class DatabaseManager {
 
     public static void savePrivateChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
-        Log.i("Message","savePrivateChatMessage: " + privateChatMessageCache.getMessage() + ", in " + privateChatMessageCache.getChatId())   ;
+        Log.i("Message", "savePrivateChatMessage: " + privateChatMessageCache
+                .getMessage() + ", in " + privateChatMessageCache.getChatId())   ;
         values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
         values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());

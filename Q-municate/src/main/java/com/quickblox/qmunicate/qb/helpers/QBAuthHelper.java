@@ -51,7 +51,7 @@ public class QBAuthHelper {
         this.user = QBUsers.signUpSignInTask(user);
         if (null != file) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            this.user.setWebsite(qbFile.getUid());
+            this.user.setWebsite(qbFile.getPublicUrl());
             this.user = QBUsers.updateUser(user);
         }
         this.user.setPassword(password);
@@ -81,7 +81,7 @@ public class QBAuthHelper {
 
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-        user.setWebsite(qbFile.getUid());
+        user.setWebsite(qbFile.getPublicUrl());
         user.setFileId(qbFile.getId());
 
         return updateUser(user);
