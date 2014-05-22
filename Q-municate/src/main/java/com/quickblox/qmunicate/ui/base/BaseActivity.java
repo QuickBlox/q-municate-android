@@ -23,7 +23,9 @@ import android.widget.TextView;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
@@ -251,6 +253,7 @@ public abstract class BaseActivity extends Activity {
             if (extras != null) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+                Log.i("Message", "Sender: " + sender + ", Message: " + message);
                 showNewMessageAlert(sender, message);
             }
         }

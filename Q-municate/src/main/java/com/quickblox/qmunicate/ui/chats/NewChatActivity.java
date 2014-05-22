@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -127,12 +128,6 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeWithoutRedirect) {
-                //TODO: The best implementation for preserving friends order which is critical for storing will be selected later.
-//                String membersIds = "";
-//                for(Friend friend :  friendsAdapter.getSelectedFriends()){
-//                    membersIds += friend.getId() + ",";
-//                }
-//                List<Friend> membersList = DatabaseManager.getFriendsById(NewChatActivity.this, membersIds.split("_"));
                 List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
                 Collections.sort(membersList, new SimpleComparator());
                 GroupChatActivity.start(activity, (ArrayList<Friend>)membersList);
