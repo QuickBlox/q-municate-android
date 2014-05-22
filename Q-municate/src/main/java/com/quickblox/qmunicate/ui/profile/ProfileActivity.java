@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -47,13 +48,18 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
+
     private ImageHelper imageHelper;
+
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
     private String emailCurrent;
+    private String statusCurrent;
     private String fullnameOld;
     private String emailOld;
-    private QBUser qbUser;
+    private String statusOld;
+
+    private QBUser user;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
     private boolean closeActionMode;
@@ -68,15 +74,12 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         useDoubleBackPressed = false;
-
-        initUI();
-        qbUser = App.getInstance().getUser();
+        user = App.getInstance().getUser();
         imageHelper = new ImageHelper(this);
 
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, failAction);
-
-        initUsersData();
+        initUI();
+        initUIWithUsersData();
+        initBroadcastActionList();
         initTextChangedListeners();
     }
 
@@ -89,20 +92,38 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    private void initUsersData() {
+    private void initUIWithUsersData() {
+        tryLoadAvatar();
+        fullNameEditText.setText(user.getFullName());
+        emailEditText.setText(user.getEmail());
+        String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, "");
+        statusMessageEditText.setText(status);
+        updateOldUserData();
+    }
+
+
+    private void initBroadcastActionList() {
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, failAction);
+    }
+
+    private void tryLoadAvatar() {
+        try {
+            loadAvatar();
+        } catch (BaseServiceException e) {
+            ErrorUtils.showError(this, e);
+        }
+    }
+
+    private void loadAvatar() throws BaseServiceException {
         String url = null;
         if (getLoginType() == LoginType.FACEBOOK) {
             changeAvatarLinearLayout.setClickable(false);
-            url = getString(R.string.inf_url_to_facebook_avatar, qbUser.getFacebookId());
+            url = getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
         } else if (getLoginType() == LoginType.EMAIL) {
-            url = qbUser.getWebsite();
+            url = user.getWebsite();
         }
         ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-
-        fullNameEditText.setText(qbUser.getFullName());
-        emailEditText.setText(qbUser.getEmail());
-
-        updateOldUserData();
     }
 
     private void initTextChangedListeners() {
@@ -117,16 +138,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         return LoginType.values()[value];
     }
 
-    private void updateOldUserData() {
-        fullnameOld = fullNameEditText.getText().toString();
-        emailOld = emailEditText.getText().toString();
-    }
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            fullNameEditText.setText(qbUser.getFullName());
-            emailEditText.setText(qbUser.getEmail());
+            fullNameEditText.setText(user.getFullName());
+            emailEditText.setText(user.getEmail());
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
@@ -155,7 +171,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
                 avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
             } catch (FileNotFoundException e) {
-                ErrorUtils.showError(this, e);
+                ErrorUtils.logError(e);
             }
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
@@ -187,9 +203,14 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         initChangingEditText(emailEditText);
     }
 
+    public void changeStatusOnClick(View view) {
+        initChangingEditText(statusMessageEditText);
+    }
+
     @Override
     public void onCachedImageFileReceived(File imageFile) {
-        QBUpdateUserCommand.start(this, qbUser, imageFile);
+        String status = statusMessageEditText.getText().toString();
+        QBUpdateUserCommand.start(this, user, imageFile, status);
     }
 
     @Override
@@ -200,20 +221,26 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void updateCurrentUserData() {
         fullnameCurrent = fullNameEditText.getText().toString();
         emailCurrent = emailEditText.getText().toString();
+        statusCurrent = statusMessageEditText.getText().toString();
     }
 
     private void updateUserData() {
-        if (isUserDataChanges(fullnameCurrent, emailCurrent)) {
-            try {
-                saveChanges(fullnameCurrent, emailCurrent);
-            } catch (IOException e) {
-                ErrorUtils.showError(this, e);
-            }
+        if (isUserDataChanged(fullnameCurrent, emailCurrent, statusCurrent)) {
+            trySaveUserData();
         }
     }
 
-    private boolean isUserDataChanges(String fullname, String email) {
-        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld);
+    private void trySaveUserData() {
+        try {
+            saveChanges(fullnameCurrent, emailCurrent);
+        } catch (IOException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    private boolean isUserDataChanged(String fullname, String email, String status) {
+        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !email.equals(emailOld) || !status
+                .equals(statusOld);
     }
 
     private void saveChanges(final String fullname, final String email) throws IOException {
@@ -221,21 +248,26 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
         }
-        if (isUserDataChanges(fullname, email)) {
-            showProgress();
-            qbUser.setFullName(fullname);
-            qbUser.setEmail(email);
+        showProgress();
+        user.setFullName(fullname);
+        user.setEmail(email);
 
-            if (isNeedUpdateAvatar) {
-                new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
-            } else {
-                QBUpdateUserCommand.start(this, qbUser, null);
-            }
+        if (isNeedUpdateAvatar) {
+            new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
+        } else {
+            String status = statusMessageEditText.getText().toString();
+            QBUpdateUserCommand.start(this, user, null, status);
         }
     }
 
     private boolean isUserDataCorrect() {
         return fullnameCurrent.length() > Consts.ZERO_VALUE && emailCurrent.length() > Consts.ZERO_VALUE;
+    }
+
+    private void updateOldUserData() {
+        fullnameOld = fullNameEditText.getText().toString();
+        emailOld = emailEditText.getText().toString();
+        statusOld = statusMessageEditText.getText().toString();
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {

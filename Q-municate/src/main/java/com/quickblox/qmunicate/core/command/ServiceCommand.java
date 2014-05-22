@@ -24,6 +24,7 @@ public abstract class ServiceCommand implements Command {
         Bundle result;
         try {
             result = perform(bundle);
+
             sendResult(result, successAction);
         } catch (Exception e) {
             ErrorUtils.logError(e);

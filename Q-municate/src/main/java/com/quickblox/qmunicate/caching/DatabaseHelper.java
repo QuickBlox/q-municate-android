@@ -40,8 +40,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(FriendTable.Cols.FILE_ID).append(" TEXT, ")
                 .append(FriendTable.Cols.AVATAR_UID).append(" TEXT, ")
                 .append(FriendTable.Cols.STATUS).append(" TEXT, ")
-                .append(FriendTable.Cols.LAST_REQUEST_AT).append(" TEXT, ")
-                .append(FriendTable.Cols.ONLINE).append(" TEXT");
+                .append(FriendTable.Cols.ONLINE).append(" TEXT, ")
+                .append(FriendTable.Cols.TYPE).append(" TEXT");
         createTable(db, FriendTable.TABLE_NAME, friendTableFields.toString());
     }
 

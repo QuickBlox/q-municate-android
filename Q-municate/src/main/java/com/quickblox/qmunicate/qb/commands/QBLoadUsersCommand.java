@@ -16,14 +16,14 @@ import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
-public class QBUserSearchCommand extends ServiceCommand {
+public class QBLoadUsersCommand extends ServiceCommand {
 
-    public QBUserSearchCommand(Context context, String successAction, String failAction) {
+    public QBLoadUsersCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 
     public static void start(Context context, String constraint) {
-        Intent intent = new Intent(QBServiceConsts.USER_SEARCH_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.LOAD_USERS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
         context.startService(intent);
     }
@@ -38,7 +38,7 @@ public class QBUserSearchCommand extends ServiceCommand {
 
         Bundle params = new Bundle();
         List<QBUser> users = QBUsers.getUsersByFullName(constraint, requestBuilder, params);
-        List<Friend> friendsList = Friend.createFriends(users);
+        List<Friend> friendsList = Friend.createFriendList(users);
         friendsList.remove(new Friend(App.getInstance().getUser()));
         params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendsList);
         return params;
