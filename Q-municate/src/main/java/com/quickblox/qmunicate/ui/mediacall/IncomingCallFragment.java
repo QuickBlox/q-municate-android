@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
+    private static final String TAG = IncomingCallFragment.class.getSimpleName();
     private WebRTC.MEDIA_STREAM callType;
 
     private IncomingCallClickListener incomingCallClickListener;
@@ -60,7 +61,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         try {
             incomingCallClickListener = (IncomingCallClickListener) activity;
         } catch (ClassCastException e) {
-            ErrorUtils.showError(baseActivity, e);
+            ErrorUtils.logError(TAG, e);
         }
     }
 

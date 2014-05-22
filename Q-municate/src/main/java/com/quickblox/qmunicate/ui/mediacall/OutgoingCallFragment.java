@@ -89,7 +89,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         try {
             outgoingCallListener = (OutgoingCallListener) activity;
         } catch (ClassCastException e) {
-            ErrorUtils.showError(baseActivity, e);
+            ErrorUtils.logError(TAG, e);
         }
     }
 
