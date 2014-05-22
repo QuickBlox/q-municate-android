@@ -233,7 +233,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         try {
             qbFile = QBContent.uploadFileTask(file, true, (String) null);
         } catch (QBResponseException e) {
-            ErrorUtils.showError(context, e);
+            ErrorUtils.logError(e);
         }
         return qbFile;
     }

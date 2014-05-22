@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
@@ -135,10 +136,10 @@ public class QBService extends Service {
     }
 
     private void registerLoadAttachFileCommand() {
-        ServiceCommand loadFriendListCommand = new QBLoadFriendListCommand(this, friendListHelper,
+        ServiceCommand loadAttachFileCommand = new QBLoadAttachFileCommand(this, chatHelper,
                 QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, loadFriendListCommand);
+        serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, loadAttachFileCommand);
     }
 
     private void registerGetFileCommand() {
