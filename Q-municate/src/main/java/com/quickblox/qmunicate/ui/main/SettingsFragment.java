@@ -58,6 +58,9 @@ public class SettingsFragment extends BaseFragment {
         versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
 
         initListeners();
+
+        showTip(getActivity().getString(R.string.tip_settings));
+
         return rootView;
     }
 

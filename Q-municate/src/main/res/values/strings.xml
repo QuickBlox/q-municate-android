@@ -157,6 +157,19 @@
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
 
+    //Tips
+    <string name="tip_friend_list">Here you can view your friends and open
+                 their details to send them messages and blah-blah-blah.........
+                You also can find new friends using global search in the right top.
+                We need to add here a lot of text to expand this yip view as far as
+                 possible. So we will type here everything we want.</string>
+    <string name="tip_friend_list_button">Find friends </string>
+    <string name="tip_chats_list">Here is the list of all your chats. You can
+        click on any one you want to continue.</string>
+    <string name="tip_settings">Here you can adjust your profile up to your
+        preferences.</string>
+    <string name="tip_invite_friends">Here you can invite your friends to use this app.</string>
+
     // Other
     <string name="comming_soon">Will be implemented soon</string>
     <string name="prefs_name">QMmunicate</string>

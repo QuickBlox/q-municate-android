@@ -30,6 +30,7 @@ import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private int positionCounter;
     private boolean isHideSearchView;
     private Cursor friendsCursor;
+    private SearchOnActionExpandListener searchListener;
+    private MenuItem searchItem;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -64,8 +67,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(new SearchOnActionExpandListener());
+        searchListener = new SearchOnActionExpandListener();
+        searchItem = menu.findItem(R.id.action_search);
+        searchItem.setOnActionExpandListener(searchListener);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
@@ -123,7 +127,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
         initFriendsList();
-
+        showTip(getActivity().getString(R.string.tip_friend_list));
         return rootView;
     }
 
@@ -134,6 +138,19 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
             addActionsAddFriends();
         }
         QBLoadFriendListCommand.start(baseActivity);
+    }
+
+    @Override
+    protected void showTip(String body){
+        String title = getActivity().getString(R.string.tip_friend_list_button);
+        View.OnClickListener clicker = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onOptionsItemSelected(searchItem);
+                searchItem.expandActionView();
+            }
+        };
+        baseActivity.showTip(body, clicker, title);
     }
 
     private void initUI(View view, LayoutInflater layoutInflater) {
