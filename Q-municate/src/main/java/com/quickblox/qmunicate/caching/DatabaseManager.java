@@ -174,61 +174,36 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-   public static void savePrivateChatMessage(Context context,
-            PrivateChatMessageCache privateChatMessageCache) {
+    public static void saveChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
-
+        Log.i("Message","saveChatMessage: " + privateChatMessageCache.getMessage() + ", in " + privateChatMessageCache.getChatId())   ;
         values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
         values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
         values.put(ChatMessagesTable.Cols.INCOMING, false);
-        values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
         values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, privateChatMessageCache.getAttachUrl());
+        if(privateChatMessageCache.isGroup()){
+            values.put(ChatMessagesTable.Cols.GROUP_ID, privateChatMessageCache.getChatId());
+            values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
+        } else{
+            values.put(ChatMessagesTable.Cols.CHAT_ID, Integer.parseInt(privateChatMessageCache.getChatId()));
+        }
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
         ContentValues chatValues = new ContentValues();
         chatValues.put(ChatTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
         chatValues.put(ChatTable.Cols.CHAT_NAME, privateChatMessageCache.getOpponentName());
         chatValues.put(ChatTable.Cols.LAST_MESSAGE, privateChatMessageCache.getMessage());
-        chatValues.put(ChatTable.Cols.IS_GROUP, 0);
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
-                ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null,
-                null);
-        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues,
-                    ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
+        chatValues.put(ChatTable.Cols.IS_GROUP, privateChatMessageCache.isGroup() ? 1 : 0);
+        Log.i("Chat Name!", "From cache: " + privateChatMessageCache.getOpponentName());
+        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null, null);
+        Log.i("Chat Name!", "Cursor length: " + c.getCount());
+        if (c != null && c.getCount() > Consts.ZERO_VALUE) {
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
         } else {
-            context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
-        }
-    }
-
-    public static void saveGroupChatMessage(Context context, QBChatMessage message, int senderId,
-            String groupId, String membersIds) {
-        Log.i("GroupMessage: ", " saveGroupChatMessage");
-        ContentValues values = new ContentValues();
-        values.put(ChatMessagesTable.Cols.BODY, message.getBody());
-        values.put(ChatMessagesTable.Cols.SENDER_ID, senderId);
-        values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        values.put(ChatMessagesTable.Cols.INCOMING, false);
-        values.put(ChatMessagesTable.Cols.GROUP_ID, groupId);
-
-        context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
-        ContentValues chatValues = new ContentValues();
-        chatValues.put(ChatTable.Cols.CHAT_ID, groupId);
-        chatValues.put(ChatTable.Cols.CHAT_NAME, groupId);
-        chatValues.put(ChatTable.Cols.MEMBERS_IDS, membersIds);
-        chatValues.put(ChatTable.Cols.LAST_MESSAGE, message.getBody());
-        chatValues.put(ChatTable.Cols.IS_GROUP, 1);
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
-                ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null, null);
-        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            //TODO: Log will be removed after debugging.
-            Log.i("GroupMessage: ", " There's already");
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues,
-                    ChatTable.Cols.CHAT_ID + "='" + groupId + "'", null);
-        } else {
-            //TODO: Log will be removed after debugging.
-            Log.i("GroupMessage: ", "There's not yet");
+            if(privateChatMessageCache.isGroup()){
+                chatValues.put(ChatTable.Cols.MEMBERS_IDS, privateChatMessageCache.getMembersIds());
+            }
             context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
         }
     }

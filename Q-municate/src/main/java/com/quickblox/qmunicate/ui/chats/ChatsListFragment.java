@@ -64,7 +64,7 @@ public class ChatsListFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                NewChatActivity.start(baseActivity);
+//                NewChatActivity.start(baseActivity);
                 break;
         }
         return true;
@@ -85,13 +85,13 @@ public class ChatsListFragment extends BaseFragment {
                 if(chat instanceof PrivateChat) {
                     PrivateChatActivity.start(baseActivity, ((PrivateChat)chat).getFriend());
                 } else if(chat instanceof GroupChat){
-                    Log.i("ChatName", chat.getName());
-                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
-                        Log.i("ChatName", friend.getFullname());
-                    }
-                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
-                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
-                    GroupChatActivity.start(baseActivity, opponentsList);
+//                    Log.i("ChatName", chat.getName());
+//                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
+//                        Log.i("ChatName", friend.getFullname());
+//                    }
+//                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
+//                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
+//                    GroupChatActivity.start(baseActivity, opponentsList);
                 }
             }
         });

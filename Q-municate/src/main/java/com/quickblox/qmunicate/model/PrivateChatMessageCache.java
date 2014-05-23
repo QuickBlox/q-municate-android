@@ -1,20 +1,25 @@
 package com.quickblox.qmunicate.model;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 public class PrivateChatMessageCache {
 
     private String message;
     private int senderId;
-    private int chatId;
+    private String chatId;
     private String attachUrl;
     private String opponentName;
-    private String opponentId;
+    private String membersIds;
+    private boolean isGroup;
 
-    public PrivateChatMessageCache(String message, int senderId, int chatId, String attachUrl, String opponentName) {
+    public PrivateChatMessageCache(String message, int senderId, String chatId, String attachUrl, String opponentName, String membersIds) {
         this.message = message;
         this.senderId = senderId;
         this.chatId = chatId;
         this.attachUrl = attachUrl;
         this.opponentName = opponentName;
+        setGroup(!TextUtils.isEmpty(membersIds));
     }
 
     public String getMessage() {
@@ -33,11 +38,11 @@ public class PrivateChatMessageCache {
         this.senderId = senderId;
     }
 
-    public int getChatId() {
+    public String getChatId() {
         return chatId;
     }
 
-    public void setChatId(int chatId) {
+    public void setChatId(String chatId) {
         this.chatId = chatId;
     }
 
@@ -55,5 +60,22 @@ public class PrivateChatMessageCache {
 
     public void setOpponentName(String opponentName) {
         this.opponentName = opponentName;
+    }
+
+    public boolean isGroup() {
+        return isGroup;
+    }
+
+    private void setGroup(boolean isGroup) {
+        Log.i("Group", "setGroup: " + isGroup);
+        this.isGroup = isGroup;
+    }
+
+    public String getMembersIds() {
+        return membersIds;
+    }
+
+    public void setMembersIds(String membersIds) {
+        this.membersIds = membersIds;
     }
 }
