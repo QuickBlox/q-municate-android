@@ -2,7 +2,6 @@ package com.quickblox.qmunicate;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -11,14 +10,11 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.core.TransferProtocol;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
+import com.quickblox.qmunicate.utils.ActivityLifecycleHandler;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class App extends Application {
 
@@ -27,7 +23,6 @@ public class App extends Application {
 
     private PrefsHelper prefsHelper;
     private QBUser user;
-    private List<Friend> friends;
     private MediaPlayerManager soundPlayer;
 
     public static App getInstance() {
@@ -37,8 +32,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "onCreate");
         initApplication();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
     }
 
     public void initImageLoader(Context context) {
@@ -68,14 +63,6 @@ public class App extends Application {
         this.user = user;
     }
 
-    public List<Friend> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<Friend> friends) {
-        this.friends = friends;
-    }
-
     public LoginType getUserLoginType() {
         int defValue = LoginType.EMAIL.ordinal();
         int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
@@ -95,7 +82,6 @@ public class App extends Application {
         //
 
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY, Consts.QB_AUTH_SECRET);
-        friends = new ArrayList<Friend>();
         prefsHelper = new PrefsHelper(this);
         soundPlayer = new MediaPlayerManager(this);
     }

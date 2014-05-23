@@ -88,8 +88,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         super.onAttach(activity);
         try {
             outgoingCallListener = (OutgoingCallListener) activity;
-        } catch (ClassCastException exception) {
-            exception.printStackTrace();
+        } catch (ClassCastException e) {
+            ErrorUtils.logError(TAG, e);
         }
     }
 
@@ -275,7 +275,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        QBSignalingChannel signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
+        QBSignalingChannel signalingChannel = service.getVideoChatHelper().getSignalingChannel();
         if (signalingChannel != null && isExistActivity()) {
             initChat(signalingChannel);
         } else if (isExistActivity()) {

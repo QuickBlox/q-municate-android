@@ -1,34 +1,35 @@
 package com.quickblox.qmunicate.qb.helpers;
 
+import android.content.Context;
+
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.auth.model.QBSession;
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
-import java.io.IOException;
 
-public class QBAuthHelper {
+public class QBAuthHelper extends BaseHelper {
 
     private String TAG = QBAuthHelper.class.getSimpleName();
 
     private QBUser user;
+
+    public QBAuthHelper(Context context) {
+        super(context);
+    }
 
     public QBUser login(QBUser user) throws QBResponseException, XMPPException {
         QBAuth.createSession();
         String password = user.getPassword();
         this.user = QBUsers.signIn(user);
         this.user.setPassword(password);
-        loginChat(this.user);
 
         return this.user;
     }
@@ -38,7 +39,6 @@ public class QBAuthHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-        loginChat(user);
 
         return user;
     }
@@ -50,11 +50,10 @@ public class QBAuthHelper {
         this.user = QBUsers.signUpSignInTask(user);
         if (null != file) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            this.user.setWebsite(qbFile.getUid());
+            this.user.setWebsite(qbFile.getPublicUrl());
             this.user = QBUsers.updateUser(user);
         }
         this.user.setPassword(password);
-        loginChat(this.user);
 
         return user;
     }
@@ -62,12 +61,7 @@ public class QBAuthHelper {
     public void logout() throws QBResponseException {
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-
-        try {
-            QBChatService.getInstance().logout();
-        } catch (SmackException.NotConnectedException e) {
-            throw new QBResponseException(e.getLocalizedMessage());
-        }
+        user = null;
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
@@ -80,7 +74,7 @@ public class QBAuthHelper {
 
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-        user.setWebsite(qbFile.getUid());
+        user.setWebsite(qbFile.getPublicUrl());
         user.setFileId(qbFile.getId());
 
         return updateUser(user);
@@ -95,18 +89,7 @@ public class QBAuthHelper {
         return user;
     }
 
-    private void loginChat(QBUser user) throws QBResponseException {
-        try {
-            if (!QBChatService.getInstance().isLoggedIn()) {
-                QBChatService.getInstance().login(user);
-            }
-            QBChatHelper.getInstance().initChats(App.getInstance().getApplicationContext());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SmackException e) {
-            e.printStackTrace();
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        }
+    public boolean isLoggedIn() {
+        return user != null;
     }
 }

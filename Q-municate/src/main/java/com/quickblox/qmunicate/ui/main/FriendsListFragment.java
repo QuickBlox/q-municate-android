@@ -22,8 +22,8 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadFriendsCommand;
-import com.quickblox.qmunicate.qb.commands.QBUserSearchCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
@@ -34,11 +34,7 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
-
-public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, OnRefreshListener, SearchView.OnQueryTextListener, FilterQueryProvider {
+public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, FilterQueryProvider {
 
     private List<Friend> usersList;
     private UserListAdapter usersListAdapter;
@@ -50,7 +46,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private TextView friendsTitle;
     private View friendsListViewTitle;
     private FriendsListCursorAdapter friendsListAdapter;
-    private PullToRefreshLayout pullToRefreshLayout;
     private int positionCounter;
     private boolean isHideSearchView;
     private Cursor friendsCursor;
@@ -64,22 +59,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         super.onActivityCreated(savedInstanceState);
         addActionsAddFriend();
         setHasOptionsMenu(true);
-    }
-
-    private void addActionsAddFriend() {
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
-        baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_SUCCESS_ACTION, new FriendsLoadSuccessAction());
-        baseActivity.addAction(QBServiceConsts.FRIENDS_LOAD_FAIL_ACTION, failAction);
-        baseActivity.addAction(QBServiceConsts.USER_SEARCH_SUCCESS_ACTION, new UserSearchSuccessAction());
-        baseActivity.addAction(QBServiceConsts.USER_SEARCH_FAIL_ACTION, new UserSearchFailAction());
-        baseActivity.updateBroadcastActionList();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        startFriendsListLoader();
     }
 
     @Override
@@ -107,8 +86,16 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         }
     }
 
-    private void startFriendsListLoader() {
-        QBLoadFriendsCommand.start(baseActivity);
+    private void addActionsAddFriend() {
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
+        /*
+        baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new FriendsLoadSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
+        */
+        baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
+        baseActivity.updateBroadcastActionList();
     }
 
     @Override
@@ -116,7 +103,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if (TextUtils.isEmpty(constraint)) {
             return null;
         }
-        return DatabaseManager.fetchFriendsByFullname(baseActivity, constraint.toString());
+        return DatabaseManager.getFriends(baseActivity, constraint.toString());
     }
 
     @Override
@@ -130,14 +117,23 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
+                false);
 
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
-        initPullToRefresh(rootView);
         initFriendsList();
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!isImportInitialized) {
+            addActionsAddFriends();
+        }
+        QBLoadFriendListCommand.start(baseActivity);
     }
 
     private void initUI(View view, LayoutInflater layoutInflater) {
@@ -156,11 +152,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     }
                 }
         );
-    }
-
-    private void initPullToRefresh(View view) {
-        pullToRefreshLayout = (PullToRefreshLayout) view.findViewById(R.id.pullToRefreshLayout);
-        ActionBarPullToRefresh.from(baseActivity).allChildrenArePullable().listener(this).setup(pullToRefreshLayout);
     }
 
     private void initFriendsList() {
@@ -210,16 +201,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void startUsersListLoader(String newText) {
-        QBUserSearchCommand.start(baseActivity, newText);
+        QBLoadUsersCommand.start(baseActivity, newText);
         usersListAdapter.setSearchCharacters(newText);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (!isImportInitialized) {
-            addActionsAddFriends();
-        }
     }
 
     private void addActionsAddFriends() {
@@ -247,11 +230,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     @Override
-    public void onRefreshStarted(View view) {
-        startFriendsListLoader();
-    }
-
-    @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
         FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
@@ -263,27 +241,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         usersListAdapter.notifyDataSetChanged();
     }
 
-    private void saveFriendToCache(Friend friend) {
-        DatabaseManager.saveFriend(baseActivity, friend);
-    }
-
     private void importFriendsFinished() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        startFriendsListLoader();
         baseActivity.hideProgress();
-    }
-
-    private void updateFriends(List<Friend> friendsList) {
-        clearCachedFriends();
-        saveFriendsToCache(friendsList);
-    }
-
-    private void clearCachedFriends() {
-        DatabaseManager.deleteAllFriends(baseActivity);
-    }
-
-    private void saveFriendsToCache(List<Friend> friendsList) {
-        DatabaseManager.saveFriends(baseActivity, friendsList);
     }
 
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
@@ -320,20 +280,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            Friend friend = (Friend) bundle.getSerializable(QBServiceConsts.EXTRA_FRIEND);
-            saveFriendToCache(friend);
             usersListAdapter.notifyDataSetChanged();
             baseActivity.hideProgress();
-        }
-    }
-
-    private class FriendsLoadSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
-            updateFriends(friendsList);
-            pullToRefreshLayout.setRefreshComplete();
         }
     }
 

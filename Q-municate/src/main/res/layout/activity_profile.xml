@@ -130,15 +130,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_status_message"
-        android:textColor="@android:color/darker_gray"
-        android:visibility="gone" />
+        android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="false"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:clickable="true"
+        android:onClick="changeStatusOnClick"
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/statusMessageEditText"
@@ -148,7 +147,6 @@
             android:clickable="false"
             android:enabled="false"
             android:inputType="textMultiLine"
-            android:text="IMMATURE: A word boring people use to describe fun people."
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size" />
 

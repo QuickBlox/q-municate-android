@@ -88,7 +88,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     @Override
     protected void onConnectedToService() {
-        signalingChannel = service.getQbVideoChatHelper().getSignalingChannel();
+        signalingChannel = service.getVideoChatHelper().getSignalingChannel();
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();

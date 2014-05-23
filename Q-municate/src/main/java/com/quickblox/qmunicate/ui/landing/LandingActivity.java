@@ -14,7 +14,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
-import com.quickblox.qmunicate.qb.commands.QBSocialLoginCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -107,7 +107,7 @@ public class LandingActivity extends BaseActivity {
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                QBSocialLoginCommand.start(LandingActivity.this, QBProvider.FACEBOOK,
+                QBLoginRestWithSocialCommand.start(LandingActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }
         }

@@ -47,7 +47,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         Friend friend = DatabaseManager.getFriendFromCursor(cursor);
 
         holder.fullnameTextView.setText(friend.getFullname());
-        holder.statusTextView.setText(friend.getStatus());
+        holder.statusTextView.setText(friend.getOnlineStatus());
 
         if (friend.isOnline()) {
             holder.onlineImageView.setVisibility(View.VISIBLE);

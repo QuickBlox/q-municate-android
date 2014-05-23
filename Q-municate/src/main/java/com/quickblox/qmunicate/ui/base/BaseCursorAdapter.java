@@ -9,15 +9,12 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.UriCreator;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {
 
@@ -49,30 +46,15 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
     }
 
     protected String getAvatarUrlForCurrentUser() {
-        try {
-            if (currentLoginType == LoginType.FACEBOOK) {
-                return context.getString(R.string.inf_url_to_facebook_avatar, currentUser.getFacebookId());
-            } else if (currentLoginType == LoginType.EMAIL) {
-                return UriCreator.getUri(UriCreator.cutUid(currentUser.getWebsite()));
-            }
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(context, e);
+        if (currentLoginType == LoginType.FACEBOOK) {
+            return context.getString(R.string.inf_url_to_facebook_avatar, currentUser.getFacebookId());
+        } else if (currentLoginType == LoginType.EMAIL) {
+            return currentUser.getWebsite();
         }
         return null;
     }
 
     protected String getAvatarUrlForFriend(Friend friend) {
-        String avatarUid;
-        String avatarUrl = null;
-
-        avatarUid = friend.getAvatarUid();
-        if (null != avatarUid) {
-            try {
-                avatarUrl = UriCreator.getUri(avatarUid);
-            } catch (BaseServiceException e) {
-                e.printStackTrace();
-            }
-        }
-        return avatarUrl;
+        return friend.getAvatarUrl();
     }
 }

@@ -12,10 +12,12 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
+    private static final String TAG = IncomingCallFragment.class.getSimpleName();
     private WebRTC.MEDIA_STREAM callType;
 
     private IncomingCallClickListener incomingCallClickListener;
@@ -59,7 +61,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         try {
             incomingCallClickListener = (IncomingCallClickListener) activity;
         } catch (ClassCastException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(TAG, e);
         }
     }
 

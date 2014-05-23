@@ -6,16 +6,18 @@ import android.content.SharedPreferences;
 import com.quickblox.qmunicate.R;
 
 public class PrefsHelper {
-    public static final String PREF_REMEMBER_ME = "Remember Me";
-    public static final String PREF_LOGIN_TYPE = "Login type";
-    public static final String PREF_USER_EMAIL = "Email";
-    public static final String PREF_USER_PASSWORD = "Password";
-    public static final String PREF_PUSH_NOTIFICATIONS = "Push Notifications";
-    public static final String PREF_LANDING_SHOWN = "Landing screen was shown";
-    public static final String PREF_IMPORT_INITIALIZED = "Import initialized";
-    public static final String PREF_USER_LEARNED_DRAWER = "Navigation Drawer learned";
-    public static final String PREF_SIGN_UP_INITIALIZED = "Sign Up initialized";
+
+    public static final String PREF_REMEMBER_ME = "remember_me";
+    public static final String PREF_LOGIN_TYPE = "login_type";
+    public static final String PREF_USER_EMAIL = "email";
+    public static final String PREF_USER_PASSWORD = "password";
+    public static final String PREF_PUSH_NOTIFICATIONS = "push_notifications";
+    public static final String PREF_LANDING_SHOWN = "landing_screen_was_shown";
+    public static final String PREF_IMPORT_INITIALIZED = "import_initialized";
+    public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
+    public static final String PREF_SIGN_UP_INITIALIZED = "sign_up_initialized";
     public static final String PREF_MISSED_MESSAGE = "missed_message";
+    public static final String PREF_STATUS = "status";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;

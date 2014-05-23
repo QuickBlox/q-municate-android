@@ -5,25 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
-public class QBLogoutCommand extends ServiceCommand {
+public class QBLogoutCommand extends CompositeServiceCommand {
 
     private static final String TAG = QBLogoutCommand.class.getSimpleName();
 
-    private final QBAuthHelper qbAuthHelper;
-    private final QBChatHelper qbChatHelper;
-
-    public QBLogoutCommand(Context context, QBAuthHelper qbAuthHelper, QBChatHelper qbChatHelper,
-            String successAction, String failAction) {
+    public QBLogoutCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.qbAuthHelper = qbAuthHelper;
-        this.qbChatHelper = qbChatHelper;
     }
 
     public static void start(Context context) {
@@ -33,24 +26,25 @@ public class QBLogoutCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        qbAuthHelper.logout();
-        resetFrienList();
+        super.perform(extras);
+        resetFriendList();
         resetRememberMe();
-        resetUserCredentials();
-        return null;
+        resetUserData();
+        return extras;
     }
 
-    private void resetFrienList() {
-        App.getInstance().getFriends().clear();
+    private void resetFriendList() {
+        DatabaseManager.deleteAllFriends(context);
     }
 
     private void resetRememberMe() {
         App.getInstance().getPrefsHelper().delete(PrefsHelper.PREF_REMEMBER_ME);
     }
 
-    private void resetUserCredentials() {
+    private void resetUserData() {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         helper.delete(PrefsHelper.PREF_USER_EMAIL);
         helper.delete(PrefsHelper.PREF_USER_PASSWORD);
+        helper.delete(PrefsHelper.PREF_STATUS);
     }
 }

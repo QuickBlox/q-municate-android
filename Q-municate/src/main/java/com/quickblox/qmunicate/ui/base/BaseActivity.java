@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
@@ -31,8 +30,6 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-
-import org.jivesoftware.smack.SmackException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -137,20 +134,6 @@ public abstract class BaseActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-
-            // TODO SF temp
-            new Thread(new Runnable() {
-                public void run() {
-                    if (QBChatService.getInstance().isLoggedIn()) {
-                        try {
-                            QBChatService.getInstance().logout();
-                        } catch (SmackException.NotConnectedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-
             super.onBackPressed();
             return;
         }

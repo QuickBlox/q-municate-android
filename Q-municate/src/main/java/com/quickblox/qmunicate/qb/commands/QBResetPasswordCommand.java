@@ -13,12 +13,12 @@ public class QBResetPasswordCommand extends ServiceCommand {
 
     private static final String TAG = QBResetPasswordCommand.class.getSimpleName();
 
-    private final QBAuthHelper qbAuthHelper;
+    private final QBAuthHelper authHelper;
 
-    public QBResetPasswordCommand(Context context, QBAuthHelper qbAuthHelper, String successAction,
+    public QBResetPasswordCommand(Context context, QBAuthHelper authHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.qbAuthHelper = qbAuthHelper;
+        this.authHelper = authHelper;
     }
 
     public static void start(Context context, String email) {
@@ -31,7 +31,7 @@ public class QBResetPasswordCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         String email = extras.getString(QBServiceConsts.EXTRA_EMAIL);
 
-        qbAuthHelper.resetPassword(email);
+        authHelper.resetPassword(email);
 
         Bundle result = new Bundle();
         result.putString(QBServiceConsts.EXTRA_EMAIL, email);

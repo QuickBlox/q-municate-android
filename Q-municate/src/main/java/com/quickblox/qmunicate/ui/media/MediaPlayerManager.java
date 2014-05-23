@@ -53,7 +53,6 @@ public class MediaPlayerManager {
                 player.stop();
             }
             shutDown();
-            returnOriginalVolume();
         }
         isPlaying = false;
     }
@@ -75,7 +74,6 @@ public class MediaPlayerManager {
         stopPlaying();
         player = new MediaPlayer();
         try {
-            setMaxVolume();
             player.setLooping(looping);
             resource.putResourceInPlayer(player);
             player.prepare();
@@ -83,7 +81,7 @@ public class MediaPlayerManager {
             isPlaying = true;
         } catch (Exception e) {
             errorId = INVALID_SOURCE;
-            e.printStackTrace();
+            ErrorUtils.showError(context, e);
         }
         if (errorId != 0) {
             if (!catchException) {

@@ -19,6 +19,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
+import com.quickblox.qmunicate.utils.ErrorUtils;
+
 @SuppressWarnings("UnusedDeclaration")
 public class RoundedDrawable extends Drawable {
 
@@ -357,7 +359,7 @@ public class RoundedDrawable extends Drawable {
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
             drawable.draw(canvas);
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
             bitmap = null;
         }
 

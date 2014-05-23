@@ -8,6 +8,7 @@ public class ErrorUtils {
 
     public static void showError(Context context, Exception e) {
         Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        e.printStackTrace();
     }
 
     public static void showError(Context context, String error) {
@@ -21,5 +22,4 @@ public class ErrorUtils {
     public static void logError(Exception e) {
         e.printStackTrace();
     }
-
 }

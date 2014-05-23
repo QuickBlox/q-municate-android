@@ -25,6 +25,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
@@ -96,7 +97,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                 ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
                 avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                ErrorUtils.showError(this, e);
             }
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
         }

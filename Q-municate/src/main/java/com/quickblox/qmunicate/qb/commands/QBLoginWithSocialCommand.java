@@ -8,18 +8,15 @@ import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-import java.io.File;
+public class QBLoginWithSocialCommand extends CompositeServiceCommand {
 
-public class QBSignUpCommand extends CompositeServiceCommand {
-
-    public QBSignUpCommand(Context context, String successAction, String failAction) {
+    public QBLoginWithSocialCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 
-    public static void start(Context context, QBUser user, File image) {
-        Intent intent = new Intent(QBServiceConsts.SIGNUP_ACTION, null, context, QBService.class);
+    public static void start(Context context, QBUser user) {
+        Intent intent = new Intent(QBServiceConsts.LOGIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
-        intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
     }
 }
