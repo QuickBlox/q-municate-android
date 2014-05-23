@@ -6,11 +6,11 @@ import android.content.Intent;
 import com.quickblox.internal.core.helper.Lo;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
-import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
@@ -20,18 +20,19 @@ import java.util.List;
 public class QBVideoChatHelper extends BaseHelper {
 
     private final Lo lo = new Lo(this);
-    private QBSignalingChannel signalingChannel;
+    private ExtensionSignalingChannel signalingChannel;
 
     public QBVideoChatHelper(Context context) {
         super(context);
     }
 
-    public QBSignalingChannel getSignalingChannel() {
+    public ExtensionSignalingChannel getSignalingChannel() {
         return signalingChannel;
     }
 
     public void init() {
-        signalingChannel = new ExtensionSignalingChannel(QBChatService.getInstance().getSignalingManager());
+        signalingChannel = new ExtensionSignalingChannel(QBChatService.getInstance().getSignalingManager(),
+                App.getInstance().getUser());
         signalingChannel.addSignalingListener(new VideoSignalingListener());
     }
 
