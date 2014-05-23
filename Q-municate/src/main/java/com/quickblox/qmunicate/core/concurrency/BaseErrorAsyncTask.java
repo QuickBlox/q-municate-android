@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.core.concurrency;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.qmunicate.utils.DialogUtils;
@@ -22,7 +21,6 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
 
     @Override
     public void onException(Exception e) {
-        Log.e(TAG, "Cannot perform async task ", e);
 
         Activity parentActivity = activityRef.get();
 

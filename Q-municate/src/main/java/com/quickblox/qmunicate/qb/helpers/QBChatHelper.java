@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.QBChat;
@@ -137,7 +136,6 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         } else {
             attachURL = Consts.EMPTY_STRING;
         }
-        Log.i("Message", "Processing... " + messageBody + "SenderID: " + chatMessage.getSenderId() + ", Opponent name: " + fullname);
 
         if(chat instanceof QBRoomChat){
             saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), null, null, membersIDs));
@@ -198,7 +196,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         opponentName = opponent.getFullname();
     }
 
-    public void initRoomChat(String roomName, List<Friend> friends) {
+    public void initRoomChat(String roomName, List<Friend> friendList) {
         if(roomChat == null){
             roomChat = roomChatManager.createRoom(roomName);
         } else if(roomChatManager.getRoom(roomName) == null){
@@ -210,7 +208,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         try {
             roomChat.join();
             roomChat.addRoomUser(user.getId());
-            for (Friend friend : friends) {
+            for (Friend friend : friendList) {
                 if(roomChat == null){
                     roomChat.addRoomUser(Integer.valueOf(friend.getId()));
                 }
@@ -221,7 +219,6 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
                 }
             }
 
-            Log.i("ChatName﹕", membersNames + " while formed.");
         } catch (Exception e) {
             ErrorUtils.showError(context, e);
         }
