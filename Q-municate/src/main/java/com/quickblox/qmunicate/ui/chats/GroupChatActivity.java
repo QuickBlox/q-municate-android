@@ -22,16 +22,15 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 import java.util.ArrayList;
 
 public class GroupChatActivity extends BaseChatActivity {
+
     private ArrayList<Friend> friendList;
     private String chatName = "";
     private int allowedNameLength = 20;
-    private QBChatHelper qbChatHelper;
     private BaseAdapter messagesAdapter;
 
     private ListView messagesListView;
@@ -45,25 +44,16 @@ public class GroupChatActivity extends BaseChatActivity {
 
     public static void start(Context context, ArrayList<Friend> friends) {
         Intent intent = new Intent(context, GroupChatActivity.class);
-        intent.putExtra(GroupChatDetailsActivity.EXTRA_GROUP, friends);
+        intent.putExtra(GroupChatDetailsActivity.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_GROUP)) {
-            friendList = (ArrayList<Friend>)getIntent().getExtras().getSerializable(GroupChatDetailsActivity.EXTRA_GROUP);
-        }
-        chatName = "";
-        //TODO: Sometimes causes crash, logging will be improved later.
-//        Log.i("ChatName", "Size in GroupChat: " + friendList.size());
-        for(Friend friend : friendList){
-            if(friend != null){
-                chatName = chatName + friend.getFullname() + ",";
-            }
-            Log.i("ChatName","chatName: " + chatName);
-        }
+        friendList = (ArrayList<Friend>) getIntent().getExtras().getSerializable(
+                GroupChatDetailsActivity.EXTRA_FRIENDS);
+        chatName = TextUtils.join(",", friendList);
 
         initUI();
         initListView();
@@ -101,7 +91,7 @@ public class GroupChatActivity extends BaseChatActivity {
         });
     }
 
-    private void initChat(){
+    private void initChat() {
         QBCreateGroupChatCommand.start(this, chatName, friendList);
     }
 
@@ -139,7 +129,7 @@ public class GroupChatActivity extends BaseChatActivity {
                 navigateToParent();
                 return true;
             case R.id.action_group_details:
-//                GroupChatDetailsActivity.start(this);
+                // GroupChatDetailsActivity.start(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

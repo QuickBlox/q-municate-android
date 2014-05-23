@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,7 +64,7 @@ public class ChatsListFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-//                NewChatActivity.start(baseActivity);
+                NewChatActivity.start(baseActivity);
                 break;
         }
         return true;
@@ -80,18 +81,18 @@ public class ChatsListFragment extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
                 Cursor cursor = (Cursor)chatsListAdapter.getItem(position);
                 Chat chat = DatabaseManager.getChatFromCursor(cursor, baseActivity);
-//                Log.i("ChatName", "Size: " + ((ArrayList)((GroupChat)chat).getOpponentsList()).size());
+                Log.i("ChatName", "Size: " + ((ArrayList)((GroupChat)chat).getOpponentsList()).size());
                 if(chat instanceof PrivateChat) {
                     PrivateChatActivity.start(baseActivity, ((PrivateChat)chat).getFriend());
                 } else if(chat instanceof GroupChat){
                     //TODO: implement opening of multichat dialog.
-//                    Log.i("ChatName", chat.getName());
-//                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
-//                        Log.i("ChatName", friend.getFullname());
-//                    }
-//                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
-//                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
-//                    GroupChatActivity.start(baseActivity, opponentsList);
+                    Log.i("ChatName", chat.getName());
+                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
+                        Log.i("ChatName", friend.getFullname());
+                    }
+                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
+                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
+                    GroupChatActivity.start(baseActivity, opponentsList);
                 }
             }
         });
