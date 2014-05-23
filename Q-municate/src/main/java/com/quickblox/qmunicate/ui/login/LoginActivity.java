@@ -54,8 +54,8 @@ public class LoginActivity extends BaseActivity {
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.rememberMe);
 
-        boolean isRememberMe = App.getInstance().getPrefsHelper()
-                .getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
+                false);
         rememberMeCheckBox.setChecked(isRememberMe);
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
@@ -169,8 +169,8 @@ public class LoginActivity extends BaseActivity {
             if (session.isOpened()) {
                 showProgress();
                 saveLoginType(LoginType.FACEBOOK);
-                QBLoginRestWithSocialCommand
-                        .start(LoginActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
+                QBLoginRestWithSocialCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
+                        session.getAccessToken(), null);
             }
         }
     }

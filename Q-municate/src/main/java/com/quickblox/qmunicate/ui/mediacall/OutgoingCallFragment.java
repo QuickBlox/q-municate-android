@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.WebRTC;
@@ -20,6 +21,7 @@ import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.service.QBService;
@@ -275,7 +277,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        QBSignalingChannel signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        ExtensionSignalingChannel signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        signalingChannel.setInitiator(App.getInstance().getUser());
         if (signalingChannel != null && isExistActivity()) {
             initChat(signalingChannel);
         } else if (isExistActivity()) {
