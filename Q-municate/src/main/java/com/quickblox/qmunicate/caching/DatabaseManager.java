@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
@@ -98,14 +97,10 @@ public class DatabaseManager {
         List<String> friendsIdsList = new ArrayList<String>();
 
         boolean isGroup = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.IS_GROUP)) > Consts.ZERO_VALUE;
-        //TODO: Sometimes causes crash, logging will be improved later.
-        //        Log.i("ChatName", membersIds);
         int avatarId = 0;
         if (isGroup) {
             String[] friendsArray = membersIds.split(",");
             for (String friend : friendsArray) {
-                //TODO: Log will be removed after debugging.
-                Log.i("ChatName", "Adding friend: " + friend + ", List size: " + friendsArray.length);
                 friendsIdsList.add(friend);
             }
             List<Friend> friendList = getFriendListByIds(context, friendsArray);
@@ -121,8 +116,6 @@ public class DatabaseManager {
             }
             chat = new PrivateChat(chatName, avatarId, lastMessage);
             int friendId = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.CHAT_ID));
-            //TODO: Log will be removed after debugging.
-            Log.i("ChatName", "Adding friend: " + friendId);
             Friend friend = getFriendById(context, friendId);
             ((PrivateChat) chat).setFriend(friend);
         }
@@ -176,7 +169,6 @@ public class DatabaseManager {
 
     public static void saveChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
         ContentValues values = new ContentValues();
-        Log.i("Message","saveChatMessage: " + privateChatMessageCache.getMessage() + ", in " + privateChatMessageCache.getChatId())   ;
         values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
         values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
@@ -195,10 +187,8 @@ public class DatabaseManager {
         chatValues.put(ChatTable.Cols.CHAT_NAME, privateChatMessageCache.getOpponentName());
         chatValues.put(ChatTable.Cols.LAST_MESSAGE, privateChatMessageCache.getMessage());
         chatValues.put(ChatTable.Cols.IS_GROUP, privateChatMessageCache.isGroup() ? 1 : 0);
-        Log.i("Chat Name!", "From cache: " + privateChatMessageCache.getOpponentName());
-        Cursor c = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null, null);
-        Log.i("Chat Name!", "Cursor length: " + c.getCount());
-        if (c != null && c.getCount() > Consts.ZERO_VALUE) {
+        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null, null);
+        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
             context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
         } else {
             if(privateChatMessageCache.isGroup()){
@@ -233,8 +223,6 @@ public class DatabaseManager {
                 friendList.add(getFriendFromCursor(cursor));
             }
             cursor.close();
-            //TODO: Log will be removed after debugging.
-            Log.i("Members IDs", "Returned friends size: " + friendList.size());
             return friendList;
         }
         return null;

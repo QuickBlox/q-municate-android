@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.core.gcm;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -35,8 +34,6 @@ public class GSMHelper {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
                 GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
                         PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
             }
             return false;
         }
@@ -57,7 +54,6 @@ public class GSMHelper {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         String registrationId = prefsHelper.getPref(Consts.PROPERTY_REG_ID, "");
         if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
             return "";
         }
 
@@ -66,7 +62,6 @@ public class GSMHelper {
         int registeredVersion = prefsHelper.getPref(Consts.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = Utils.getAppVersionCode(activity);
         if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
             return "";
         }
         return registrationId;

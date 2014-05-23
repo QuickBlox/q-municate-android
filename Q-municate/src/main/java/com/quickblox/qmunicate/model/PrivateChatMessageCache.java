@@ -1,7 +1,6 @@
 package com.quickblox.qmunicate.model;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 public class PrivateChatMessageCache {
 
@@ -67,7 +66,6 @@ public class PrivateChatMessageCache {
     }
 
     private void setGroup(boolean isGroup) {
-        Log.i("Group", "setGroup: " + isGroup);
         this.isGroup = isGroup;
     }
 
