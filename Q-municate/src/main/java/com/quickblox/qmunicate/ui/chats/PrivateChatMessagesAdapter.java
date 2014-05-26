@@ -73,7 +73,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         String avatarUrl;
 
         String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.ATTACH_FILE_URL));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.ATTACH_FILE_ID));
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
         long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
 

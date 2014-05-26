@@ -1,8 +1,6 @@
 package com.quickblox.qmunicate.ui.chats;
 
-import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,24 +10,21 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.model.Chat;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.GroupChat;
-import com.quickblox.qmunicate.model.PrivateChat;
+import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ChatsListFragment extends BaseFragment {
 
-    private ListView chatsListView;
-
-    private List<Chat> chatsArrayList;
-    private ChatsListAdapter chatsListAdapter;
+    private ListView chatsDialogsListView;
+    private ChatsDialogsAdapter chatsDialogsAdapter;
 
     public static ChatsListFragment newInstance() {
         return new ChatsListFragment();
@@ -43,16 +38,55 @@ public class ChatsListFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        chatsListView = (ListView) inflater.inflate(R.layout.fragment_chats_list, container, false);
-        chatsArrayList = new ArrayList<Chat>();
-        chatsListAdapter = new ChatsListAdapter(getActivity(), DatabaseManager.getAllChatConversations(baseActivity));
-        chatsListView.setAdapter(chatsListAdapter);
+        View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
 
-        initUI();
+        initUI(view);
         initListeners();
-        initListView();
 
-        return chatsListView;
+        return view;
+    }
+
+    private void initUI(View view) {
+        setHasOptionsMenu(true);
+        chatsDialogsListView = (ListView) view.findViewById(R.id.chats_listview);
+    }
+
+    private void initListeners() {
+        chatsDialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                QBDialog dialog = chatsDialogsAdapter.getItem(position);
+                if (dialog.getType() == QBDialogType.PRIVATE) {
+                    startPrivateChatActivity(dialog);
+                }
+            }
+        });
+    }
+
+    private void startPrivateChatActivity(QBDialog dialog) {
+        int occupantId = chatsDialogsAdapter.getOccupantIdFromPrivateDialog(dialog);
+        Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
+        PrivateChatActivity.start(baseActivity, occupant);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        addActions();
+        loadChatsDialogs();
+    }
+
+    private void addActions() {
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
+                new LoadChatsDialogsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private void loadChatsDialogs() {
+        baseActivity.showProgress();
+        QBLoadChatsDialogsCommand.start(baseActivity);
     }
 
     @Override
@@ -70,38 +104,19 @@ public class ChatsListFragment extends BaseFragment {
         return true;
     }
 
-    private void initUI() {
-        setHasOptionsMenu(true);
+    private void initChatsDialogs(List<QBDialog> dialogsList) {
+        chatsDialogsAdapter = new ChatsDialogsAdapter(baseActivity, dialogsList);
+        chatsDialogsListView.setAdapter(chatsDialogsAdapter);
     }
 
-    private void initListeners() {
-        chatsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private class LoadChatsDialogsSuccessAction implements Command {
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                Cursor cursor = (Cursor)chatsListAdapter.getItem(position);
-                Chat chat = DatabaseManager.getChatFromCursor(cursor, baseActivity);
-                Log.i("ChatName", "Size: " + ((ArrayList)((GroupChat)chat).getOpponentsList()).size());
-                if(chat instanceof PrivateChat) {
-                    PrivateChatActivity.start(baseActivity, ((PrivateChat)chat).getFriend());
-                } else if(chat instanceof GroupChat){
-                    //TODO: implement opening of multichat dialog.
-                    Log.i("ChatName", chat.getName());
-                    for(Friend friend : ((GroupChat)chat).getOpponentsList()){
-                        Log.i("ChatName", friend.getFullname());
-                    }
-                    ArrayList<Friend> opponentsList = (ArrayList)((GroupChat)chat).getOpponentsList();
-                    Collections.sort(opponentsList, new NewChatActivity.SimpleComparator());
-                    GroupChatActivity.start(baseActivity, opponentsList);
-                }
-            }
-        });
-    }
-
-    private void initListView() {
-        chatsArrayList.add(new GroupChat("Aaa", 1));
-        chatsArrayList.add(new GroupChat("Bbb", 2));
-        chatsArrayList.add(new GroupChat("Ccc", 3));
-        chatsListAdapter.notifyDataSetChanged();
+        @Override
+        public void execute(Bundle bundle) {
+            List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
+                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
+            initChatsDialogs(dialogsList);
+            baseActivity.hideProgress();
+        }
     }
 }

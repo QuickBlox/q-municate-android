@@ -21,6 +21,8 @@ public class Consts {
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 100;
 
+    public static final int CHATS_DIALOGS_PER_PAGE = 100;
+
     public static final int ZERO_VALUE = 0;
     public static final String EMPTY_STRING = "";
 

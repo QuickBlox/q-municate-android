@@ -6,6 +6,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPrivateChat;
@@ -226,5 +227,18 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     roomChat.getJid(), null));
         }
+    }
+
+    public List<QBDialog> getChatDialogs() {
+        Bundle bundle = new Bundle();
+        List<QBDialog> chatDialogs = Collections.emptyList();
+        try {
+            QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+            customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
+            chatDialogs = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+        } catch (QBResponseException e) {
+            e.printStackTrace();
+        }
+        return chatDialogs;
     }
 }

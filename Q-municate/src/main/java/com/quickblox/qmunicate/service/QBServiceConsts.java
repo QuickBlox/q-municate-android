@@ -28,6 +28,7 @@ public class QBServiceConsts {
     public static final String SIGNUP_REST_ACTION = "signup_rest_action";
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
+    public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
@@ -79,6 +80,8 @@ public class QBServiceConsts {
     public static final String CREATE_GROUP_CHAT_FAIL_ACTION = "create_group_chat_fail_action";
     public static final String CREATE_PRIVATE_CHAT_SUCCESS_ACTION = "create_private_chat_success_action";
     public static final String CREATE_PRIVATE_CHAT_FAIL_ACTION = "create_private_chat_fail_action";
+    public static final String LOAD_CHATS_DIALOGS_SUCCESS_ACTION = "chats_dialogs_success_action";
+    public static final String LOAD_CHATS_DIALOGS_FAIL_ACTION = "chats_dialogs_fail_action";
 
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
 
@@ -101,6 +104,7 @@ public class QBServiceConsts {
     public static final String EXTRA_PASSWORD = "password";
     public static final String EXTRA_CONSTRAINT = "constraint";
     public static final String EXTRA_STATUS = "status";
+    public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String JOIN_ROOM_ACTION = "join_room_action";
