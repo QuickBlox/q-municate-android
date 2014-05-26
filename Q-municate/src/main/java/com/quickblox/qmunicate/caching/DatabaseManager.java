@@ -173,30 +173,14 @@ public class DatabaseManager {
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
         values.put(ChatMessagesTable.Cols.INCOMING, false);
         values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, chatMessageCache.getAttachUrl());
-        if(chatMessageCache.isGroup()){
-            values.put(ChatMessagesTable.Cols.GROUP_ID, chatMessageCache.getChatId());
+        if (chatMessageCache.getRoomJid() != null) {
+            values.put(ChatMessagesTable.Cols.GROUP_ID, chatMessageCache.getRoomJid());
+        }
+        if (chatMessageCache.getChatId() != null) {
             values.put(ChatMessagesTable.Cols.CHAT_ID, chatMessageCache.getChatId());
-        } else{
-            values.put(ChatMessagesTable.Cols.CHAT_ID, Integer.parseInt(chatMessageCache.getChatId()));
         }
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
-        ContentValues chatValues = new ContentValues();
-        chatValues.put(ChatTable.Cols.CHAT_ID, chatMessageCache.getChatId());
-        chatValues.put(ChatTable.Cols.CHAT_NAME, chatMessageCache.getOpponentName());
-        chatValues.put(ChatTable.Cols.LAST_MESSAGE, chatMessageCache.getMessage());
-        chatValues.put(ChatTable.Cols.IS_GROUP, chatMessageCache.isGroup() ? 1 : 0);
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + chatMessageCache
-                .getOpponentName() + "'", null, null);
-        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + chatMessageCache
-                    .getChatId() + "'", null);
-        } else {
-            if(chatMessageCache.isGroup()){
-                chatValues.put(ChatTable.Cols.MEMBERS_IDS, chatMessageCache.getMembersIds());
-            }
-            context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
-        }
     }
 
     public static Cursor getAllGroupChatMessagesByGroupId(Context context, String groupId) {

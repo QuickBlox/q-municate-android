@@ -1,25 +1,25 @@
 package com.quickblox.qmunicate.model;
 
-import android.text.TextUtils;
-
 public class ChatMessageCache {
 
     private String message;
-    private int senderId;
-    private String chatId;
+    private Integer senderId;
+    private Integer chatId;
     private String attachUrl;
-    private String opponentName;
-    private String membersIds;
-    private boolean isGroup;
+    private String roomJid;
 
-    public ChatMessageCache(String message, int senderId, String chatId, String attachUrl,
-            String opponentName, String membersIds) {
+    public ChatMessageCache(String message, int senderId, int chatId, String attachUrl) {
         this.message = message;
         this.senderId = senderId;
         this.chatId = chatId;
         this.attachUrl = attachUrl;
-        this.opponentName = opponentName;
-        setGroup(!TextUtils.isEmpty(membersIds));
+    }
+
+    public ChatMessageCache(String message, int senderId, String roomJid, String attachUrl) {
+        this.message = message;
+        this.senderId = senderId;
+        this.roomJid = roomJid;
+        this.attachUrl = attachUrl;
     }
 
     public String getMessage() {
@@ -38,11 +38,11 @@ public class ChatMessageCache {
         this.senderId = senderId;
     }
 
-    public String getChatId() {
+    public Integer getChatId() {
         return chatId;
     }
 
-    public void setChatId(String chatId) {
+    public void setChatId(int chatId) {
         this.chatId = chatId;
     }
 
@@ -54,27 +54,11 @@ public class ChatMessageCache {
         this.attachUrl = attachUrl;
     }
 
-    public String getOpponentName() {
-        return opponentName;
+    public String getRoomJid() {
+        return roomJid;
     }
 
-    public void setOpponentName(String opponentName) {
-        this.opponentName = opponentName;
-    }
-
-    public boolean isGroup() {
-        return isGroup;
-    }
-
-    private void setGroup(boolean isGroup) {
-        this.isGroup = isGroup;
-    }
-
-    public String getMembersIds() {
-        return membersIds;
-    }
-
-    public void setMembersIds(String membersIds) {
-        this.membersIds = membersIds;
+    public void setRoomJid(String roomJid) {
+        this.roomJid = roomJid;
     }
 }

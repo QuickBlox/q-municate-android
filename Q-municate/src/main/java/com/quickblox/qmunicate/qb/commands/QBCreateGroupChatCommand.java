@@ -11,6 +11,7 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QBCreateGroupChatCommand extends ServiceCommand {
 
@@ -31,11 +32,20 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(
+                QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        chatHelper.createOrJoinRoomChat(roomName, friendList);
+        chatHelper.createRoomChat(roomName, getFriendIdsList(friendList));
 
         return extras;
+    }
+
+    private ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
+        for (Friend friend : friendList) {
+            friendIdsList.add(friend.getId());
+        }
+        return friendIdsList;
     }
 }

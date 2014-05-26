@@ -62,6 +62,4 @@ public class GroupChat extends Chat implements Serializable {
         message.setBody(this.lastMessage);
         return message;
     }
-
-
 }
