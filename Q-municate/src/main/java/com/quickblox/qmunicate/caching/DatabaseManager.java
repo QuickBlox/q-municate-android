@@ -6,15 +6,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Chat;
+import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.model.PrivateChat;
-import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.ArrayList;
@@ -167,32 +166,34 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-    public static void saveChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
+    public static void saveChatMessage(Context context, ChatMessageCache chatMessageCache) {
         ContentValues values = new ContentValues();
-        values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
-        values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
+        values.put(ChatMessagesTable.Cols.BODY, chatMessageCache.getMessage());
+        values.put(ChatMessagesTable.Cols.SENDER_ID, chatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
         values.put(ChatMessagesTable.Cols.INCOMING, false);
-        values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, privateChatMessageCache.getAttachUrl());
-        if(privateChatMessageCache.isGroup()){
-            values.put(ChatMessagesTable.Cols.GROUP_ID, privateChatMessageCache.getChatId());
-            values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
+        values.put(ChatMessagesTable.Cols.ATTACH_FILE_URL, chatMessageCache.getAttachUrl());
+        if(chatMessageCache.isGroup()){
+            values.put(ChatMessagesTable.Cols.GROUP_ID, chatMessageCache.getChatId());
+            values.put(ChatMessagesTable.Cols.CHAT_ID, chatMessageCache.getChatId());
         } else{
-            values.put(ChatMessagesTable.Cols.CHAT_ID, Integer.parseInt(privateChatMessageCache.getChatId()));
+            values.put(ChatMessagesTable.Cols.CHAT_ID, Integer.parseInt(chatMessageCache.getChatId()));
         }
 
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
         ContentValues chatValues = new ContentValues();
-        chatValues.put(ChatTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
-        chatValues.put(ChatTable.Cols.CHAT_NAME, privateChatMessageCache.getOpponentName());
-        chatValues.put(ChatTable.Cols.LAST_MESSAGE, privateChatMessageCache.getMessage());
-        chatValues.put(ChatTable.Cols.IS_GROUP, privateChatMessageCache.isGroup() ? 1 : 0);
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + privateChatMessageCache.getOpponentName() + "'", null, null);
+        chatValues.put(ChatTable.Cols.CHAT_ID, chatMessageCache.getChatId());
+        chatValues.put(ChatTable.Cols.CHAT_NAME, chatMessageCache.getOpponentName());
+        chatValues.put(ChatTable.Cols.LAST_MESSAGE, chatMessageCache.getMessage());
+        chatValues.put(ChatTable.Cols.IS_GROUP, chatMessageCache.isGroup() ? 1 : 0);
+        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null, ChatTable.Cols.CHAT_NAME + "='" + chatMessageCache
+                .getOpponentName() + "'", null, null);
         if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + privateChatMessageCache.getChatId() + "'", null);
+            context.getContentResolver().update(ChatTable.CONTENT_URI, chatValues, ChatTable.Cols.CHAT_ID + "='" + chatMessageCache
+                    .getChatId() + "'", null);
         } else {
-            if(privateChatMessageCache.isGroup()){
-                chatValues.put(ChatTable.Cols.MEMBERS_IDS, privateChatMessageCache.getMembersIds());
+            if(chatMessageCache.isGroup()){
+                chatValues.put(ChatTable.Cols.MEMBERS_IDS, chatMessageCache.getMembersIds());
             }
             context.getContentResolver().insert(ChatTable.CONTENT_URI, chatValues);
         }

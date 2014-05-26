@@ -22,8 +22,8 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -32,6 +32,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,16 +53,12 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         super(context);
     }
 
-    public void sendPrivateMessage(String message) {
+    public void sendPrivateMessage(String message) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessage(message);
-        try {
-            privateChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
-        } catch (SmackException.NotConnectedException e) {
-            ErrorUtils.logError(e);
-        }
-        saveMessageToCache(new PrivateChatMessageCache(chatMessage.getBody(), user.getId(), String.valueOf(privateChatId), Consts.EMPTY_STRING, opponentName, null));
+        privateChat.sendMessage(chatMessage);
+
+        saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), user.getId(), String.valueOf(
+                privateChatId), Consts.EMPTY_STRING, opponentName, null));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -70,39 +67,29 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         return chatMessage;
     }
 
-    public void saveMessageToCache(PrivateChatMessageCache privateChatMessageCache) {
-        DatabaseManager.saveChatMessage(context, privateChatMessageCache);
+    public void saveMessageToCache(ChatMessageCache chatMessageCache) {
+        DatabaseManager.saveChatMessage(context, chatMessageCache);
     }
 
-    public void sendGroupMessage(String message) {
+    public void sendGroupMessage(String message) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessage(message);
-        try {
-            roomChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
-        } catch (SmackException.NotConnectedException e) {
-            ErrorUtils.logError(e);
-            //TODO: SS reconnect
-        }
-
+        roomChat.sendMessage(chatMessage);
         saveGroupMessageToCache(chatMessage, user.getId(), groupChatName, membersIDs);
     }
 
-    public void sendPrivateMessageWithAttachImage(QBFile qbFile) {
+    public void sendPrivateMessageWithAttachImage(
+            QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
-        try {
-            privateChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
-        } catch (SmackException.NotConnectedException e) {
-            ErrorUtils.logError(e);
-        }
-        saveMessageToCache(new PrivateChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(privateChatId), qbFile.getPublicUrl(), opponentName, null));
+        privateChat.sendMessage(chatMessage);
+        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(
+                privateChatId), qbFile.getPublicUrl(), opponentName, null));
     }
 
 
-    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId, String membersIds){
-        DatabaseManager.saveChatMessage(context, new PrivateChatMessageCache(chatMessage.getBody(), senderId,  groupId, null, null, membersIds));
+    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId,
+            String membersIds) {
+        DatabaseManager.saveChatMessage(context, new ChatMessageCache(chatMessage.getBody(), senderId,
+                groupId, null, null, membersIds));
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -137,11 +124,12 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
             attachURL = Consts.EMPTY_STRING;
         }
 
-        if(chat instanceof QBRoomChat){
-            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), ((QBRoomChat) chat).getName(), null, null, membersIDs));
+        if (chat instanceof QBRoomChat) {
+            saveMessageToCache(new ChatMessageCache(messageBody, chatMessage.getSenderId(),
+                    ((QBRoomChat) chat).getName(), null, null, membersIDs));
         } else {
-            saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(), String.valueOf(friend.getId()),
-                    attachURL, fullname, null));
+            saveMessageToCache(new ChatMessageCache(messageBody, chatMessage.getSenderId(), String.valueOf(
+                    friend.getId()), attachURL, fullname, null));
         }
     }
 
@@ -189,38 +177,27 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         roomChatManager.addRoomChatManagerListener(this);
     }
 
-    public void initPrivateChat(int opponentId) {
+    public void createPrivateChat(int opponentId) {
         Friend opponent = DatabaseManager.getFriendById(context, opponentId);
         privateChat = privateChatManager.createChat(opponentId, this);
         privateChatId = opponentId;
         opponentName = opponent.getFullname();
     }
 
-    public void initRoomChat(String roomName, List<Friend> friendList) {
-        if(roomChat == null){
+    public void createOrJoinRoomChat(String roomName,
+            List<Friend> friendList) throws SmackException.NotConnectedException, XMPPException, SmackException.NoResponseException {
+        QBRoomChat roomChat = roomChatManager.getRoom(roomName);
+        if (roomChat == null) {
+            /*
             roomChat = roomChatManager.createRoom(roomName);
-        } else if(roomChatManager.getRoom(roomName) == null){
-            roomChat = roomChatManager.createRoom(roomName);
-        }else if(roomChatManager.getRoom(roomName) != null){
-            roomChat = roomChatManager.getRoom(roomName);
-        }
-        String membersNames = "";
-        try {
             roomChat.join();
-            roomChat.addRoomUser(user.getId());
-            for (Friend friend : friendList) {
-                if(roomChat == null){
-                    roomChat.addRoomUser(Integer.valueOf(friend.getId()));
-                }
-
-                if(friend != null){
-                    membersIDs = membersIDs + friend.getId() + ",";
-                    membersNames = membersNames + friend.getFullname() + ",";
-                }
+            */
+        }
+        roomChat.addRoomUser(user.getId());
+        for (Friend friend : friendList) {
+            if (roomChat == null) {
+                roomChat.addRoomUser(friend.getId());
             }
-
-        } catch (Exception e) {
-            ErrorUtils.showError(context, e);
         }
         groupChatName = roomName;
     }
@@ -235,30 +212,22 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         return qbFile;
     }
 
-    public void login(QBUser user) {
-        try {
-            if (!QBChatService.isInitialized()) {
-                QBChatService.init(context);
-            }
-            if (!QBChatService.getInstance().isLoggedIn()) {
-                QBChatService.getInstance().login(user);
-                this.user = user;
-            }
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
+    public void login(QBUser user) throws XMPPException, IOException, SmackException {
+        if (!QBChatService.isInitialized()) {
+            QBChatService.init(context);
+        }
+        if (!QBChatService.getInstance().isLoggedIn()) {
+            QBChatService.getInstance().login(user);
+            this.user = user;
         }
     }
 
-    public void logout() throws QBResponseException {
-        try {
-            QBChatService.getInstance().logout();
-        } catch (SmackException.NotConnectedException e) {
-            throw new QBResponseException(e.getMessage());
-        }
+    public void logout() throws QBResponseException, SmackException.NotConnectedException {
+        chatService.logout();
     }
 
     public void destroy() {
-        QBChatService.getInstance().destroy();
+        chatService.destroy();
     }
 
     public boolean isLoggedIn() {

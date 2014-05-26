@@ -34,7 +34,7 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
         ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        chatHelper.initRoomChat(roomName, friendList);
+        chatHelper.createOrJoinRoomChat(roomName, friendList);
 
         return extras;
     }

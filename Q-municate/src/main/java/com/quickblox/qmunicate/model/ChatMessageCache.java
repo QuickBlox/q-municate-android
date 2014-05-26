@@ -2,7 +2,7 @@ package com.quickblox.qmunicate.model;
 
 import android.text.TextUtils;
 
-public class PrivateChatMessageCache {
+public class ChatMessageCache {
 
     private String message;
     private int senderId;
@@ -12,7 +12,8 @@ public class PrivateChatMessageCache {
     private String membersIds;
     private boolean isGroup;
 
-    public PrivateChatMessageCache(String message, int senderId, String chatId, String attachUrl, String opponentName, String membersIds) {
+    public ChatMessageCache(String message, int senderId, String chatId, String attachUrl,
+            String opponentName, String membersIds) {
         this.message = message;
         this.senderId = senderId;
         this.chatId = chatId;
