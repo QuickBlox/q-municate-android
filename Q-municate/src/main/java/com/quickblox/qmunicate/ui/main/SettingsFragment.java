@@ -23,6 +23,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.TipsManager;
 import com.quickblox.qmunicate.utils.Utils;
 
 public class SettingsFragment extends BaseFragment {
@@ -59,11 +60,7 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-        PrefsHelper pHelper = new PrefsHelper(getActivity());
-        if(!pHelper.isPrefExists(this.getClass().getName())){
-            pHelper.savePref(this.getClass().getName(), true);
-            showTip(getActivity().getString(R.string.tip_settings));
-        }
+        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
 
         return rootView;
     }

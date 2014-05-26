@@ -48,7 +48,7 @@ public abstract class BaseFragment extends Fragment {
         return (BaseActivity) getActivity();
     }
 
-    protected void showTip(String body){
+    public void showTip(String body){
         baseActivity.showTip(body, null, null);
     }
 

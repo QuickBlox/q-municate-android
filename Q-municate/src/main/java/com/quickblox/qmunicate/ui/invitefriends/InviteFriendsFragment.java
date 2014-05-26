@@ -84,11 +84,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         initHeaderUI(header);
 
         initListeners();
-        PrefsHelper pHelper = new PrefsHelper(getActivity());
-        if(!pHelper.isPrefExists(((Object) this).getClass().getName())){
-            pHelper.savePref(((Object) this).getClass().getName(), true);
-            showTip(getActivity().getString(R.string.tip_invite_friends));
-        }
+        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_invite_friends));
 
 
 
