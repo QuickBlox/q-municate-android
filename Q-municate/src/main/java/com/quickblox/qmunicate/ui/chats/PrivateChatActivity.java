@@ -29,10 +29,10 @@ import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -57,7 +57,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private int chatId;
 
     private PrivateChatActivity instance;
-    private QBChatHelper chatHelper;
 
     public PrivateChatActivity() {
         super(R.layout.activity_private_chat);
@@ -166,7 +165,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     public void sendMessageOnClick(View view) {
         QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
-        messageEditText.setText("");
+        messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
 
