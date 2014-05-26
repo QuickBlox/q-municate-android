@@ -18,6 +18,8 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.TipsManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +51,7 @@ public class ChatsListFragment extends BaseFragment {
 
         initUI();
         initListeners();
-        initListView();
-
+        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_chats_list));
         return chatsListView;
     }
 
@@ -95,12 +96,5 @@ public class ChatsListFragment extends BaseFragment {
                 }
             }
         });
-    }
-
-    private void initListView() {
-        chatsArrayList.add(new GroupChat("Aaa", 1));
-        chatsArrayList.add(new GroupChat("Bbb", 2));
-        chatsArrayList.add(new GroupChat("Ccc", 3));
-        chatsListAdapter.notifyDataSetChanged();
     }
 }

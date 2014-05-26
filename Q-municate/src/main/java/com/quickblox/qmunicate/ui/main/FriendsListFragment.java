@@ -27,9 +27,8 @@ import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
-import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.*;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private int positionCounter;
     private boolean isHideSearchView;
     private Cursor friendsCursor;
+    private SearchOnActionExpandListener searchListener;
+    private MenuItem searchItem;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -71,8 +72,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(new SearchOnActionExpandListener());
+        searchListener = new SearchOnActionExpandListener();
+        searchItem = menu.findItem(R.id.action_search);
+        searchItem.setOnActionExpandListener(searchListener);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
@@ -130,7 +132,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
         initFriendsList();
-
+        TipsManager.showTipWithButtonsIfNotShownYet(this,
+                getActivity().getString(R.string.tip_friend_list),
+                new FriendsListTipButtonClicker(this));
         return rootView;
     }
 
@@ -328,5 +332,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
             importFriendsFinished();
             DialogUtils.show(baseActivity, getResources().getString(R.string.dlg_no_friends_for_import));
         }
+    }
+
+    public MenuItem getSearchItem() {
+        return searchItem;
     }
 }

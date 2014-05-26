@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 
 public abstract class BaseFragment extends Fragment {
 
@@ -45,6 +46,10 @@ public abstract class BaseFragment extends Fragment {
 
     public BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
+    }
+
+    public void showTip(String body){
+        baseActivity.showTip(body, null, null);
     }
 
     protected boolean isExistActivity() {

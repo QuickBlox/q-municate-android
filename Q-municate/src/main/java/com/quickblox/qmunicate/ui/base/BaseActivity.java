@@ -17,7 +17,10 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
@@ -34,11 +37,16 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
+    private static final Configuration CONFIGURATION_INFINITE = new Configuration.Builder()
+            .setDuration(Configuration.DURATION_INFINITE)
+            .build();
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
@@ -50,8 +58,12 @@ public abstract class BaseActivity extends Activity {
     protected Fragment currentFragment;
     protected FailAction failAction;
     private View newMessageView;
+    private View tipView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
+    private TextView tipTextView;
+    private Button tipButton;
+    private Button tipAlternativeButton;
     private boolean doubleBackToExitPressedOnce;
     private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
@@ -90,6 +102,33 @@ public abstract class BaseActivity extends Activity {
         Crouton.show(this, newMessageView);
     }
 
+    public void showTip(String tip, View.OnClickListener secondButtonListener, String secondButtonTitle){
+        tipTextView.setText(tip);
+        final Crouton crouton = Crouton.make(this, tipView);
+        crouton.setConfiguration(CONFIGURATION_INFINITE);
+        crouton.show();
+        tipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                crouton.hide();
+            }
+        });
+        if(secondButtonListener != null){
+            tipAlternativeButton.setVisibility(View.VISIBLE);
+            tipAlternativeButton.setOnClickListener(secondButtonListener);
+            tipAlternativeButton.setText(secondButtonTitle);
+            tipAlternativeButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    crouton.hide();
+                    return false;
+                }
+            });
+        } else{
+            tipAlternativeButton.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +144,10 @@ public abstract class BaseActivity extends Activity {
         newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
         newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
         senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+        tipView = getLayoutInflater().inflate(R.layout.list_item_tip, null);
+        tipTextView = (TextView) tipView.findViewById(R.id.tip_textview);
+        tipButton = (Button) tipView.findViewById(R.id.ok_button);
+        tipAlternativeButton = (Button) tipView.findViewById(R.id.alternative_button);
     }
 
     @Override
