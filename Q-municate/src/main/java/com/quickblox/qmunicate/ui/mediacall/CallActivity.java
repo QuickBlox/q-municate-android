@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
@@ -28,7 +29,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private WebRTC.MEDIA_STREAM call_type;
-    private QBSignalingChannel signalingChannel;
+    private ExtensionSignalingChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
     private String sessionId;
     private QBSignalingChannel.PLATFORM remotePlatform;
@@ -89,6 +90,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     protected void onConnectedToService() {
         signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        signalingChannel.setInitiator(App.getInstance().getUser());
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Q-municate</string>
+    <string name="app_name">Qmunicate</string>
 
     // ActionBar
     <string name="acb_search_title">Search</string>
@@ -55,6 +55,7 @@
     <string name="frl_offline">Offline</string>
     <string name="frl_friends">Friends</string>
     <string name="frl_all_users">All Users</string>
+    <string name="frl_no_friends">Currently there are no friends.\nYou can search friends or invite them via Invite screen.</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -104,20 +105,20 @@
     <string name="prf_done">Done</string>
 
     // Invite Friends
-    <string name="inf_header_label">Let your other friends know about \n Q-munication by sending them private invitations</string>
+    <string name="inf_header_label">Let your other friends know about \n Qmunication by sending them private invitations</string>
     <string name="inf_select_from_facebook">From Facebook</string>
     <string name="inf_select_from_contacts">From Contacts</string>
     <string name="inf_from_facebook">(invite via Facebook)</string>
     <string name="inf_from_contacts">(invite via Email)</string>
     <string name="inf_send">Send</string>
-    <string name="inf_choose_email_provider">Choose an email provider :</string>
-    <string name="inf_subject_of_invitation">Qmunicate app</string>
-    <string name="inf_body_of_invitation">Id like to add you to my contact list in Qmunicate app.</string>
+    <string name="inf_choose_email_provider">Choose an email provider:</string>
+    <string name="inf_subject_of_invitation">Qmunicate</string>
+    <string name="inf_body_of_invitation">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
     <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
-    <string name="inf_fb_wall_param_name">QuickBlox</string>
-    <string name="inf_fb_wall_param_description">This is QuickBlox, BABY!</string>
-    <string name="inf_fb_wall_param_link">http://quickblox.com/</string>
-    <string name="inf_fb_wall_param_picture">http://www.apps-world.net/europe/images/stories/Quickblox.jpg</string>
+    <string name="inf_fb_wall_param_name">Qmunicate</string>
+    <string name="inf_fb_wall_param_description">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
+    <string name="inf_fb_wall_param_link">http://qmunicate.com/</string>
+    <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
 
     // Dialog Messages
@@ -172,7 +173,7 @@
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
-    <string name="prefs_name">QMmunicate</string>
+    <string name="prefs_name">Qmunicate</string>
     <string name="search_hint">Search</string>
     <string name="push_title">QMUN: Missed messages</string>
     <string name="frd_offline_user">User must be online</string>
