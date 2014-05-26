@@ -23,6 +23,7 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.TipsManager;
 import com.quickblox.qmunicate.utils.Utils;
 
 public class SettingsFragment extends BaseFragment {
@@ -58,6 +59,9 @@ public class SettingsFragment extends BaseFragment {
         versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
 
         initListeners();
+
+        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
+
         return rootView;
     }
 

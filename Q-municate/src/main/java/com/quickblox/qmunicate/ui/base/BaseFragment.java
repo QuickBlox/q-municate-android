@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 
 public abstract class BaseFragment extends Fragment {
 
