@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
@@ -107,6 +108,8 @@ public class QBService extends Service {
 
         registerGetFileCommand();
         registerLoadAttachFileCommand();
+
+        registerChatsDialogsCommand();
     }
 
     private void registerCreateGroupChatCommand() {
@@ -273,6 +276,12 @@ public class QBService extends Service {
         loginCommand.addCommand(initChatCommand);
         loginCommand.addCommand(initVideoChatCommand);
         loginCommand.addCommand(initFriendListCommand);
+    }
+
+    private void registerChatsDialogsCommand() {
+        QBLoadChatsDialogsCommand chatsDialogsCommand = new QBLoadChatsDialogsCommand(this, chatHelper,
+                QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
     }
 
     @Override
