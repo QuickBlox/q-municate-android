@@ -48,10 +48,6 @@ public abstract class BaseFragment extends Fragment {
         return (BaseActivity) getActivity();
     }
 
-    public void showTip(String body){
-        baseActivity.showTip(body, null, null);
-    }
-
     protected boolean isExistActivity() {
         return ((!isDetached()) && (getBaseActivity() != null));
     }
