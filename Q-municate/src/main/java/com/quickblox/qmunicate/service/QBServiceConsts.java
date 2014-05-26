@@ -29,6 +29,7 @@ public class QBServiceConsts {
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
     public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
+    public static final String UPDATE_CHAT_DIALOG_ACTION = "update_chat_dialog_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
@@ -82,6 +83,8 @@ public class QBServiceConsts {
     public static final String CREATE_PRIVATE_CHAT_FAIL_ACTION = "create_private_chat_fail_action";
     public static final String LOAD_CHATS_DIALOGS_SUCCESS_ACTION = "chats_dialogs_success_action";
     public static final String LOAD_CHATS_DIALOGS_FAIL_ACTION = "chats_dialogs_fail_action";
+    public static final String UPDATE_CHAT_DIALOG_SUCCESS_ACTION = "update_chat_dialog_success_action";
+    public static final String UPDATE_CHAT_DIALOG_FAIL_ACTION = "update_chat_dialog_fail_action";
 
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
 
@@ -89,7 +92,6 @@ public class QBServiceConsts {
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_CHAT_OPPONENT_NAME = "chat_opponent_name";
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
-    public static final String EXTRA_CHAT_ID = "chat_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
@@ -105,6 +107,9 @@ public class QBServiceConsts {
     public static final String EXTRA_CONSTRAINT = "constraint";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
+    public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
+    public static final String EXTRA_OPPONENT_ID = "opponent_id";
+    public static final String EXTRA_CHAT_DIALOG = "chats_dialogs";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String JOIN_ROOM_ACTION = "join_room_action";

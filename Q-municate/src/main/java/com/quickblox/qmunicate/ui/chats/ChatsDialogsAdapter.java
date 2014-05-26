@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
+import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class ChatsDialogsAdapter extends BaseListAdapter<QBDialog> {
         }
 
         if (data.getType() == QBDialogType.PRIVATE) {
-            int occupantId = getOccupantIdFromPrivateDialog(data);
+            int occupantId = ChatUtils.getOccupantsIdsFromDialog(data).get(Consts.ZERO_VALUE);
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
         } else {
@@ -46,31 +47,21 @@ public class ChatsDialogsAdapter extends BaseListAdapter<QBDialog> {
         }
 
         viewHolder.lastMessageTextView.setText(data.getLastMessage());
+        viewHolder.userCountTextView.setText(data.getOccupants().size() + Consts.EMPTY_STRING);
+        viewHolder.unreadMessagesTextView.setText(data.getUnreadMessageCount() + Consts.EMPTY_STRING);
 
         return convertView;
     }
 
     private ViewHolder createViewHolder(View view) {
-        ViewHolder holder = new ViewHolder();
-        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
-        holder.userCountTextView = (TextView) view.findViewById(R.id.user_count_textview);
-        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
-        holder.lastMessageTextView = (TextView) view.findViewById(R.id.last_message_textview);
-        holder.unreadMessagesTextView = (TextView) view.findViewById(R.id.unread_messages_textview);
-        return holder;
-    }
-
-    public int getOccupantIdFromPrivateDialog(QBDialog dialog) {
-        int occupantId = Consts.ZERO_VALUE;
-        QBUser user = App.getInstance().getUser();
-        List<Integer> occupantsList = dialog.getOccupants();
-        for (int occupant : occupantsList) {
-            if (occupant != user.getId()) {
-                occupantId = occupant;
-            }
-        }
-        return occupantId;
+        ViewHolder viewHolder = new ViewHolder();
+        viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        viewHolder.avatarImageView.setOval(true);
+        viewHolder.userCountTextView = (TextView) view.findViewById(R.id.user_count_textview);
+        viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+        viewHolder.lastMessageTextView = (TextView) view.findViewById(R.id.last_message_textview);
+        viewHolder.unreadMessagesTextView = (TextView) view.findViewById(R.id.unread_messages_textview);
+        return viewHolder;
     }
 
     public Friend getOccupantById(int occupantId) {

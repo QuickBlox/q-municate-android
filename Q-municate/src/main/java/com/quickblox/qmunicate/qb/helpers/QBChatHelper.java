@@ -20,14 +20,17 @@ import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.listeners.QBRoomChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -50,10 +53,12 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
     private int privateChatId;
     private String groupChatName;
     private String opponentName;
-    private String membersIDs = "";
+    private String membersIDs = Consts.EMPTY_STRING;
+    private List<QBDialog> chatsDialogsList;
 
     public QBChatHelper(Context context) {
         super(context);
+        chatsDialogsList = Collections.emptyList();
     }
 
     public void sendPrivateMessage(String message) {
@@ -151,6 +156,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
             saveMessageToCache(new PrivateChatMessageCache(messageBody, chatMessage.getSenderId(),
                     String.valueOf(friend.getId()), attachURL, fullname, null));
         }
+        updateLoadedChatDialog(chatMessage.getSenderId(), extraChatMessage);
     }
 
     private String getMessageBody(QBChatMessage chatMessage) {
@@ -272,16 +278,46 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         return chatService.isLoggedIn();
     }
 
-    public List<QBDialog> getChatDialogs() {
+    public List<QBDialog> getChatsDialogs() {
         Bundle bundle = new Bundle();
-        List<QBDialog> chatDialogs = Collections.emptyList();
         try {
             QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
             customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
-            chatDialogs = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+            chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
         } catch (QBResponseException e) {
             e.printStackTrace();
         }
-        return chatDialogs;
+        return chatsDialogsList;
+    }
+
+    public List<QBDialog> getLoadedChatsDialogs() {
+        return chatsDialogsList;
+    }
+
+    public void updateLoadedChatDialog(int occupantId, String lastMessage) {
+        for(int i = 0; i< chatsDialogsList.size(); i++) {
+            String dialogId = ChatUtils.getPrivateDialogIdByOccupantId(chatsDialogsList, occupantId);
+            if(dialogId == null) {
+                // TODo SF only for private chat
+                addNewChatDialog(occupantId, lastMessage, QBDialogType.PRIVATE);
+            }
+            if(dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
+                chatsDialogsList.get(i).setLastMessage(lastMessage);
+                break;
+            }
+        }
+    }
+
+    private void addNewChatDialog(int occupantId, String lastMessage, QBDialogType type) {
+        QBDialog newDialog = new QBDialog();
+        newDialog.setId(occupantId);
+        newDialog.setLastMessage(lastMessage);
+        ArrayList occupantsIdsList = new ArrayList<Integer>();
+        occupantsIdsList.add(App.getInstance().getUser().getId());
+        occupantsIdsList.add(occupantId);
+        newDialog.setOccupantsIds(occupantsIdsList);
+        newDialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        newDialog.setType(type);
+        chatsDialogsList.add(newDialog);
     }
 }
