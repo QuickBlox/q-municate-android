@@ -59,7 +59,11 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-        showTip(getActivity().getString(R.string.tip_settings));
+        PrefsHelper pHelper = new PrefsHelper(getActivity());
+        if(!pHelper.isPrefExists(this.getClass().getName())){
+            pHelper.savePref(this.getClass().getName(), true);
+            showTip(getActivity().getString(R.string.tip_settings));
+        }
 
         return rootView;
     }

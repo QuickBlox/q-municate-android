@@ -23,10 +23,7 @@ import com.facebook.SessionState;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.FacebookHelper;
-import com.quickblox.qmunicate.utils.FriendsUtils;
+import com.quickblox.qmunicate.utils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,7 +84,13 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         initHeaderUI(header);
 
         initListeners();
-        showTip(getActivity().getString(R.string.tip_invite_friends));
+        PrefsHelper pHelper = new PrefsHelper(getActivity());
+        if(!pHelper.isPrefExists(((Object) this).getClass().getName())){
+            pHelper.savePref(((Object) this).getClass().getName(), true);
+            showTip(getActivity().getString(R.string.tip_invite_friends));
+        }
+
+
 
         return view;
     }

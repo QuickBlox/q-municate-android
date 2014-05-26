@@ -142,6 +142,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     @Override
     protected void showTip(String body){
+        PrefsHelper pHelper = new PrefsHelper(getActivity());
+        if(pHelper.isPrefExists(this.getClass().getName())){
+            return;
+        }
+        pHelper.savePref(this.getClass().getName(), true);
         String title = getActivity().getString(R.string.tip_friend_list_button);
         View.OnClickListener clicker = new View.OnClickListener() {
             @Override
