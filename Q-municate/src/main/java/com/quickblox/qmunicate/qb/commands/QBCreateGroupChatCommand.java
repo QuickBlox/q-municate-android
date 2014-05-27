@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
@@ -11,6 +12,7 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QBCreateGroupChatCommand extends ServiceCommand {
 
@@ -31,11 +33,20 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(
+                QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        chatHelper.initRoomChat(roomName, friendList);
-
+        QBDialog dialog = chatHelper.createRoomChat(roomName, getFriendIdsList(friendList));
+        extras.putSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG, dialog);
         return extras;
+    }
+
+    private ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
+        for (Friend friend : friendList) {
+            friendIdsList.add(friend.getId());
+        }
+        return friendIdsList;
     }
 }

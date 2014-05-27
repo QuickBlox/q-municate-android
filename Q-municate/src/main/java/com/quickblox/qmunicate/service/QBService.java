@@ -19,6 +19,7 @@ import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
@@ -106,16 +107,24 @@ public class QBService extends Service {
         registerLogoutChatCommand();
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
+        registerJoinGroupChat();
         registerSendMessageCommand();
         registerSendGroupMessageCommand();
 
         registerGetFileCommand();
         registerLoadAttachFileCommand();
 
-        registerChatsDialogsCommand();
+        registerLoadChatsDialogsCommand();
         registerUpdateChatDialogCommand();
         registerGetCountUnreadChatsDialogsCommand();
         registerLoadDialogMessagesCommand();
+    }
+
+    private void registerJoinGroupChat() {
+        QBJoinGroupChatCommand joinGroupChatCommand = new QBJoinGroupChatCommand(this, chatHelper,
+                QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);
     }
 
     private void registerCreateGroupChatCommand() {
@@ -284,7 +293,7 @@ public class QBService extends Service {
         loginCommand.addCommand(initFriendListCommand);
     }
 
-    private void registerChatsDialogsCommand() {
+    private void registerLoadChatsDialogsCommand() {
         QBLoadChatsDialogsCommand chatsDialogsCommand = new QBLoadChatsDialogsCommand(this, chatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);

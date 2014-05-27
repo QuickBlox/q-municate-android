@@ -30,6 +30,8 @@ public class QBServiceConsts {
     public static final String CREATE_PRIVATE_CHAT_ACTION = "create_private_chat_action";
     public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
     public static final String UPDATE_CHAT_DIALOG_ACTION = "update_chat_dialog_action";
+    public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
+    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_ACTION = "load_chats_dialogs_and_join_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_ACTION = "get_unread_chats_dialogs_action";
     public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
 
@@ -85,8 +87,12 @@ public class QBServiceConsts {
     public static final String CREATE_PRIVATE_CHAT_FAIL_ACTION = "create_private_chat_fail_action";
     public static final String LOAD_CHATS_DIALOGS_SUCCESS_ACTION = "chats_dialogs_success_action";
     public static final String LOAD_CHATS_DIALOGS_FAIL_ACTION = "chats_dialogs_fail_action";
+    public static final String JOIN_GROUP_CHAT_SUCCESS_ACTION = "join_group_chat_success_action";
+    public static final String JOIN_GROUP_CHAT_FAIL_ACTION = "join_group_chat_fail_action";
     public static final String UPDATE_CHAT_DIALOG_SUCCESS_ACTION = "update_chat_dialog_success_action";
     public static final String UPDATE_CHAT_DIALOG_FAIL_ACTION = "update_chat_dialog_fail_action";
+    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_SUCCESS_ACTION = "load_chats_dialogs_and_join_success_action";
+    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_FAIL_ACTION = "load_chats_dialogs_and_join_fail_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_SUCCESS_ACTION = "get_unread_chats_dialogs_success_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_FAIL_ACTION = "get_unread_chats_dialogs_fail_action";
     public static final String LOAD_DIALOG_MESSAGES_SUCCESS_ACTION = "load_dialog_messages_load_success_action";
@@ -97,6 +103,7 @@ public class QBServiceConsts {
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
+    public static final String EXTRA_CHAT_ID = "chat_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
@@ -111,8 +118,11 @@ public class QBServiceConsts {
     public static final String EXTRA_CONSTRAINT = "constraint";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
+    public static final String EXTRA_ROOM_NAME = "room_name";
+    public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";
     public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
+    public static final String EXTRA_CHAT_DIALOG = "chats_dialogs";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_CHAT_DIALOG = "chat_dialog";
     public static final String EXTRA_OPPONENT = "opponent_friend";
@@ -124,5 +134,4 @@ public class QBServiceConsts {
     public static final String JOIN_ROOM_SUCCESS_ACTION = "join_room_success_action";
     public static final String JOIN_ROOM_FAIL_ACTION = "join_room_fail_action";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
-    public static final String EXTRA_ROOM_NAME = "room_name";
 }

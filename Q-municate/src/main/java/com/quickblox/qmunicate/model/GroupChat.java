@@ -1,9 +1,6 @@
 package com.quickblox.qmunicate.model;
 
-import org.jivesoftware.smack.XMPPException;
-
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 public class GroupChat extends Chat implements Serializable {
@@ -64,10 +61,5 @@ public class GroupChat extends Chat implements Serializable {
         ChatMessage message = new ChatMessage();
         message.setBody(this.lastMessage);
         return message;
-    }
-
-    @Override
-    public void sendMessage(String message) throws XMPPException {
-        // TODO send message to group chat
     }
 }

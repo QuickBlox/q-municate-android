@@ -16,6 +16,7 @@
         android:padding="10dp"
         android:textSize="@dimen/text_size_small"
         android:text="@string/frl_no_friends"
-        android:textColor="@color/dark_gray" />
+        android:textColor="@color/dark_gray"
+        android:visibility="gone" />
 
 </RelativeLayout>

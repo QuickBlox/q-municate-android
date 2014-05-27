@@ -15,12 +15,14 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatsDialogsFragment extends BaseFragment {
@@ -61,9 +63,15 @@ public class ChatsDialogsFragment extends BaseFragment {
                 QBDialog dialog = chatsDialogsAdapter.getItem(position);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
+                } else {
+                    startGroupChatActivity(dialog);
                 }
             }
         });
+    }
+
+    private void startGroupChatActivity(QBDialog dialog) {
+        GroupChatActivity.start(baseActivity, dialog);
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {
@@ -83,17 +91,6 @@ public class ChatsDialogsFragment extends BaseFragment {
         loadChatsDialogs();
     }
 
-    private void addActions() {
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
-                new LoadChatsDialogsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        baseActivity.updateBroadcastActionList();
-    }
-
-    private void loadChatsDialogs() {
-        QBLoadChatsDialogsCommand.start(baseActivity);
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.chats_list_menu, menu);
@@ -109,9 +106,35 @@ public class ChatsDialogsFragment extends BaseFragment {
         return true;
     }
 
+    private void addActions() {
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
+                new LoadChatsDialogsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private void loadChatsDialogs() {
+        QBLoadChatsDialogsCommand.start(baseActivity);
+    }
+
     private void initChatsDialogs(List<QBDialog> dialogsList) {
         chatsDialogsAdapter = new ChatsDialogsAdapter(baseActivity, dialogsList);
         chatsDialogsListView.setAdapter(chatsDialogsAdapter);
+    }
+
+    private void joinGroupDialogs(List<QBDialog> dialogsList) {
+        List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
+        QBJoinGroupChatCommand.start(baseActivity, roomJidList);
+    }
+
+    private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
+        List<String> roomJidList = new ArrayList<String>();
+        for (QBDialog dialog : dialogsList) {
+            if (dialog.getType() != QBDialogType.PRIVATE) {
+                roomJidList.add(dialog.getRoomJid());
+            }
+        }
+        return roomJidList;
     }
 
     private class LoadChatsDialogsSuccessAction implements Command {
@@ -121,6 +144,7 @@ public class ChatsDialogsFragment extends BaseFragment {
             List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
             initChatsDialogs(dialogsList);
+            joinGroupDialogs(dialogsList);
         }
     }
 }

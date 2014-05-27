@@ -7,18 +7,19 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.utils.TipsManager;
 
-public class QBLoginCommand extends CompositeServiceCommand {
+import java.io.File;
 
-    public QBLoginCommand(Context context, String successAction, String failAction) {
+public class QBLoadChatsDialogsAndJoinCommand extends CompositeServiceCommand {
+
+    public QBLoadChatsDialogsAndJoinCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 
-    public static void start(Context context, QBUser user) {
-        Intent intent = new Intent(QBServiceConsts.LOGIN_ACTION, null, context, QBService.class);
+    public static void start(Context context, QBUser user, File image) {
+        Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_AND_JOIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
-        TipsManager.setIsJustLogined(true);
+        intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
     }
 }

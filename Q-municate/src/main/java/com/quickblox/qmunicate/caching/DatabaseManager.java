@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
@@ -131,17 +132,17 @@ public class DatabaseManager {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
 
-    public static void saveChatMessage(Context context, PrivateChatMessageCache privateChatMessageCache) {
+    public static void saveChatMessage(Context context, ChatMessageCache chatMessageCache) {
         ContentValues values = new ContentValues();
-        values.put(ChatMessagesTable.Cols.BODY, privateChatMessageCache.getMessage());
-        values.put(ChatMessagesTable.Cols.SENDER_ID, privateChatMessageCache.getSenderId());
+        values.put(ChatMessagesTable.Cols.BODY, chatMessageCache.getMessage());
+        values.put(ChatMessagesTable.Cols.SENDER_ID, chatMessageCache.getSenderId());
         values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        values.put(ChatMessagesTable.Cols.ATTACH_FILE_ID, privateChatMessageCache.getAttachUrl());
-        if(privateChatMessageCache.isGroup()){
-            values.put(ChatMessagesTable.Cols.GROUP_ID, privateChatMessageCache.getChatId());
-            values.put(ChatMessagesTable.Cols.CHAT_ID, privateChatMessageCache.getChatId());
-        } else{
-            values.put(ChatMessagesTable.Cols.CHAT_ID, Integer.parseInt(privateChatMessageCache.getChatId()));
+        values.put(ChatMessagesTable.Cols.ATTACH_FILE_ID, chatMessageCache.getAttachUrl());
+        if (chatMessageCache.getRoomJid() != null) {
+            values.put(ChatMessagesTable.Cols.GROUP_ID, chatMessageCache.getRoomJid());
+        }
+        if (chatMessageCache.getChatId() != null) {
+            values.put(ChatMessagesTable.Cols.CHAT_ID, chatMessageCache.getChatId());
         }
         context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
     }
@@ -172,9 +173,9 @@ public class DatabaseManager {
         return null;
     }
 
-    private static String getSelection(String[] iDs) {
+    private static String getSelection(String[] ids) {
         String selection = "";
-        for (String id : iDs) {
+        for (String id : ids) {
             selection += "?, ";
         }
         return selection;
