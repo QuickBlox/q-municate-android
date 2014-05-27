@@ -66,7 +66,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onResume() {
         super.onResume();
-        emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+        // TODO SF temp
+        // emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
