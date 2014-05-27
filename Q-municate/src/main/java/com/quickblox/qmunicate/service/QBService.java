@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBGetCountUnreadChatsDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
@@ -112,6 +113,7 @@ public class QBService extends Service {
 
         registerChatsDialogsCommand();
         registerUpdateChatDialogCommand();
+        registerGetCountUnreadChatsDialogsCommand();
     }
 
     private void registerCreateGroupChatCommand() {
@@ -290,6 +292,12 @@ public class QBService extends Service {
         QBUpdateChatDialogCommand updateChatDialogCommand = new QBUpdateChatDialogCommand(this, chatHelper,
                 QBServiceConsts.UPDATE_CHAT_DIALOG_SUCCESS_ACTION, QBServiceConsts.UPDATE_CHAT_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, updateChatDialogCommand);
+    }
+
+    private void registerGetCountUnreadChatsDialogsCommand() {
+        QBGetCountUnreadChatsDialogsCommand getCountUnreadChatsDialogsCommand = new QBGetCountUnreadChatsDialogsCommand(this, chatHelper,
+                QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_ACTION, getCountUnreadChatsDialogsCommand);
     }
 
     @Override

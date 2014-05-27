@@ -55,6 +55,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
     private String opponentName;
     private String membersIDs = Consts.EMPTY_STRING;
     private List<QBDialog> chatsDialogsList;
+    private int counterUnreadChatsDialogs;
 
     public QBChatHelper(Context context) {
         super(context);
@@ -283,6 +284,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
         chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+        initCounterUnreadChatsDialogs();
         return chatsDialogsList;
     }
 
@@ -314,5 +316,17 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         newDialog.setUnreadMessageCount(Consts.ZERO_VALUE);
         newDialog.setType(type);
         chatsDialogsList.add(newDialog);
+    }
+
+    private void initCounterUnreadChatsDialogs() {
+        for (QBDialog dialog: chatsDialogsList) {
+            if(dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+                counterUnreadChatsDialogs++;
+            }
+        }
+    }
+
+    public int getCountUnreadChatsDialogs() {
+        return counterUnreadChatsDialogs;
     }
 }

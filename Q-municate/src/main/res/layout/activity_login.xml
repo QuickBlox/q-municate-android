@@ -6,13 +6,12 @@
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/email_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/lgn_email_hint"
         android:inputType="textEmailAddress"
-        android:maxLength="128"
-        android:text="@string/lgn_default_user_email" />
+        android:maxLength="128" />
 
     <EditText
         android:id="@+id/password_edittext"
@@ -21,11 +20,10 @@
         android:layout_marginTop="30dp"
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
-        android:maxLength="256"
-        android:text="@string/lgn_default_user_password" />
+        android:maxLength="256" />
 
     <CheckBox
-        android:id="@+id/rememberMe"
+        android:id="@+id/remember_me_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
@@ -77,7 +75,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/forgotPassword"
+        android:id="@+id/forgot_password_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
