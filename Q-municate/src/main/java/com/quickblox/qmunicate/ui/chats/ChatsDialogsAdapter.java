@@ -47,8 +47,14 @@ public class ChatsDialogsAdapter extends BaseListAdapter<QBDialog> {
             viewHolder.userCountTextView.setText(data.getOccupants().size() + Consts.EMPTY_STRING);
         }
 
+        if (data.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+            viewHolder.unreadMessagesTextView.setText(data.getUnreadMessageCount() + Consts.EMPTY_STRING);
+            viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
+        }
+
         viewHolder.lastMessageTextView.setText(data.getLastMessage());
-        viewHolder.unreadMessagesTextView.setText(data.getUnreadMessageCount() + Consts.EMPTY_STRING);
 
         return convertView;
     }

@@ -69,7 +69,11 @@ public class ChatsDialogsFragment extends BaseFragment {
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantsIdsFromDialog(dialog).get(Consts.ZERO_VALUE);
         Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
-        PrivateChatActivity.start(baseActivity, occupant);
+        if(dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
+            PrivateChatActivity.start(baseActivity, occupant, null);
+        } else{
+            PrivateChatActivity.start(baseActivity, occupant, dialog);
+        }
     }
 
     @Override

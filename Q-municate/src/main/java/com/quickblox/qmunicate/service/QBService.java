@@ -20,6 +20,7 @@ import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
@@ -114,6 +115,7 @@ public class QBService extends Service {
         registerChatsDialogsCommand();
         registerUpdateChatDialogCommand();
         registerGetCountUnreadChatsDialogsCommand();
+        registerLoadDialogMessagesCommand();
     }
 
     private void registerCreateGroupChatCommand() {
@@ -298,6 +300,12 @@ public class QBService extends Service {
         QBGetCountUnreadChatsDialogsCommand getCountUnreadChatsDialogsCommand = new QBGetCountUnreadChatsDialogsCommand(this, chatHelper,
                 QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_ACTION, getCountUnreadChatsDialogsCommand);
+    }
+
+    private void registerLoadDialogMessagesCommand() {
+        QBLoadDialogMessagesCommand loadDialogMessagesCommand = new QBLoadDialogMessagesCommand(this, chatHelper,
+                QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, loadDialogMessagesCommand);
     }
 
     @Override

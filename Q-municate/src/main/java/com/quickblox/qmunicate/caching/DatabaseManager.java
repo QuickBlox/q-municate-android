@@ -6,11 +6,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
 
+import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
 import com.quickblox.qmunicate.model.PrivateChatMessageCache;
+import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.ArrayList;
@@ -176,5 +178,29 @@ public class DatabaseManager {
             selection += "?, ";
         }
         return selection;
+    }
+
+    public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList, int chatId) {
+        for (QBHistoryMessage message : messagesList) {
+            String body = message.getBody();
+            int senderId = message.getSenderId();
+            String attachURL;
+
+            if (TextUtils.isEmpty(body)) {
+                attachURL = ChatUtils.getAttachUrlFromQBChatMessage(message);
+            } else {
+                attachURL = Consts.EMPTY_STRING;
+            }
+
+            String opponentName = null;
+            String membersIds = Consts.EMPTY_STRING;
+
+            PrivateChatMessageCache privateChatMessageCache = new PrivateChatMessageCache(body, senderId, chatId + Consts.EMPTY_STRING, attachURL, opponentName, membersIds);
+            saveChatMessage(context, privateChatMessageCache);
+        }
+    }
+
+    public static void deleteMessagesByDialog(Context context, String chatId) {
+        context.getContentResolver().delete(ChatMessagesTable.CONTENT_URI, ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null);
     }
 }

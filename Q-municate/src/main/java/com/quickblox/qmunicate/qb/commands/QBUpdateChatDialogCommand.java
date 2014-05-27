@@ -19,11 +19,12 @@ public class QBUpdateChatDialogCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, int opponentId, String lastMessage) {
+    public static void start(Context context, int opponentId, String lastMessage, int countMessage) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT_ID, opponentId);
         intent.putExtra(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE, lastMessage);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE, countMessage);
         context.startService(intent);
     }
 
@@ -31,7 +32,8 @@ public class QBUpdateChatDialogCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         int opponentId = extras.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         String lastMessage = extras.getString(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE);
-        chatHelper.updateLoadedChatDialog(opponentId, lastMessage);
+        int countMessage = extras.getInt(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE);
+        chatHelper.updateLoadedChatDialog(opponentId, lastMessage, countMessage);
         return null;
     }
 }
