@@ -14,9 +14,6 @@ import com.quickblox.qmunicate.ui.main.NavigationDrawerFragment;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-/**
- * Created by stas on 26.05.14.
- */
 public class TipsManager {
 
     private static final Configuration CONFIGURATION_INFINITE = new Configuration.Builder()
@@ -28,12 +25,9 @@ public class TipsManager {
     private static Button tipAlternativeButton;
     private static View tipView;
     private static LayoutInflater inflater;
-    private static boolean justLogined;
+    private static boolean isJustLogined;
 
     private static void init(Context context){
-//        if(inflater != null){
-//            return;
-//        }
         inflater = LayoutInflater.from(context);
         tipView = inflater.inflate(R.layout.list_item_tip, null);
         tipTextView = (TextView) tipView.findViewById(R.id.tip_textview);
@@ -51,10 +45,8 @@ public class TipsManager {
     }
 
     public static void showTipWithButtonsIfNotShownYet(BaseFragment fragment, String tipText, View.OnClickListener listener){
-        MainActivity mActivity = (MainActivity)fragment.getActivity();
-        NavigationDrawerFragment ndFragment = mActivity.getNavigationDrawerFragment();
-        if(justLogined){
-            justLogined = false;
+        if(isJustLogined){
+            isJustLogined = false;
             return;
         }
         init(fragment.getActivity());
@@ -94,7 +86,7 @@ public class TipsManager {
         }
     }
 
-    public static void setJustLogined(boolean justLogined) {
-        TipsManager.justLogined = justLogined;
+    public static void setIsJustLogined(boolean isJustLogined) {
+        TipsManager.isJustLogined = isJustLogined;
     }
 }
