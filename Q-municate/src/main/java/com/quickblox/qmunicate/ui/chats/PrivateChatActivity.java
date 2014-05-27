@@ -24,14 +24,17 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateChatDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ImageHelper;
@@ -55,6 +58,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private ImageHelper imageHelper;
 
     private int chatId;
+    private int oldSizeMessagesAdapter;
 
     private PrivateChatActivity instance;
 
@@ -98,6 +102,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private void initListView() {
         messagesAdapter = getMessagesAdapter();
         messagesListView.setAdapter(messagesAdapter);
+        oldSizeMessagesAdapter = messagesAdapter.getCount();
     }
 
     private void initListeners() {
@@ -196,6 +201,16 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         return super.onOptionsItemSelected(item);
     }
 
+    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
+        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
+            QBUser qbUser = new QBUser(friend.getId());
+            qbUser.setFullName(friend.getFullname());
+            CallActivity.start(PrivateChatActivity.this, qbUser, callType);
+        } else if (!friend.isOnline()) {
+            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
@@ -212,20 +227,18 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if(oldSizeMessagesAdapter != messagesAdapter.getCount()) {
+            startUpdateChatDialog();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
         addActions();
-    }
-
-    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
-            QBUser qbUser = new QBUser(friend.getId());
-            qbUser.setFullName(friend.getFullname());
-            CallActivity.start(PrivateChatActivity.this, qbUser, callType);
-        } else if (!friend.isOnline()) {
-            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
-        }
     }
 
     private void addActions() {
@@ -233,12 +246,18 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
     }
 
+    private void startUpdateChatDialog() {
+        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        QBUpdateChatDialogCommand.start(this, opponentFriend.getId(), lastMessage);
+    }
+
     private class LoadAttachFileSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            QBFile qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, qbFile);
+            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
+            QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, file);
             hideProgress();
             scrollListView();
         }

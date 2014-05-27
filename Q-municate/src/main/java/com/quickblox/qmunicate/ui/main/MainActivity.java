@@ -14,7 +14,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.chats.ChatsListFragment;
+import com.quickblox.qmunicate.ui.chats.ChatsDialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendsListFragment.newInstance();
                 break;
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = ChatsListFragment.newInstance();
+                fragment = ChatsDialogsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();
