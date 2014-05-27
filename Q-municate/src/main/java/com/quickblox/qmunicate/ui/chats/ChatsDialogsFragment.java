@@ -18,16 +18,18 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.utils.ChatUtils;
+import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
-public class ChatsListFragment extends BaseFragment {
+public class ChatsDialogsFragment extends BaseFragment {
 
     private ListView chatsDialogsListView;
     private ChatsDialogsAdapter chatsDialogsAdapter;
 
-    public static ChatsListFragment newInstance() {
-        return new ChatsListFragment();
+    public static ChatsDialogsFragment newInstance() {
+        return new ChatsDialogsFragment();
     }
 
     @Override
@@ -71,7 +73,7 @@ public class ChatsListFragment extends BaseFragment {
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {
-        int occupantId = chatsDialogsAdapter.getOccupantIdFromPrivateDialog(dialog);
+        int occupantId = ChatUtils.getOccupantsIdsFromDialog(dialog).get(Consts.ZERO_VALUE);
         Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
         PrivateChatActivity.start(baseActivity, occupant);
     }
@@ -91,7 +93,6 @@ public class ChatsListFragment extends BaseFragment {
     }
 
     private void loadChatsDialogs() {
-        baseActivity.showProgress();
         QBLoadChatsDialogsCommand.start(baseActivity);
     }
 
@@ -122,7 +123,6 @@ public class ChatsListFragment extends BaseFragment {
             List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
             initChatsDialogs(dialogsList);
-            baseActivity.hideProgress();
         }
     }
 }

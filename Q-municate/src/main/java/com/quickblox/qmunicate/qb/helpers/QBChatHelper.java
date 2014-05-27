@@ -22,11 +22,13 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -52,9 +54,11 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private QBRoomChat roomChat;
     private String roomJid;
     private String opponentName;
+    private List<QBDialog> chatsDialogsList;
 
     public QBChatHelper(Context context) {
         super(context);
+        chatsDialogsList = Collections.emptyList();
     }
 
     public void sendPrivateMessage(
@@ -231,16 +235,41 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
-    public List<QBDialog> getChatDialogs() {
+    public List<QBDialog> getChatsDialogs() throws QBResponseException {
         Bundle bundle = new Bundle();
-        List<QBDialog> chatDialogs = Collections.emptyList();
-        try {
-            QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-            customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
-            chatDialogs = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
-        } catch (QBResponseException e) {
-            e.printStackTrace();
+        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
+        chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+        return chatsDialogsList;
+    }
+
+    public List<QBDialog> getLoadedChatsDialogs() {
+        return chatsDialogsList;
+    }
+
+    public void updateLoadedChatDialog(int occupantId, String lastMessage) {
+        for (int i = 0; i < chatsDialogsList.size(); i++) {
+            String dialogId = ChatUtils.getPrivateDialogIdByOccupantId(chatsDialogsList, occupantId);
+            if (dialogId == null) {
+                // TODo SF only for private chat
+                addNewChatDialog(occupantId, lastMessage, QBDialogType.PRIVATE);
+            }
+            if (dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
+                chatsDialogsList.get(i).setLastMessage(lastMessage);
+                break;
+            }
         }
-        return chatDialogs;
+    }
+
+    private void addNewChatDialog(int occupantId, String lastMessage, QBDialogType type) {
+        QBDialog newDialog = new QBDialog(occupantId + Consts.EMPTY_STRING);
+        newDialog.setLastMessage(lastMessage);
+        ArrayList occupantsIdsList = new ArrayList<Integer>();
+        occupantsIdsList.add(App.getInstance().getUser().getId());
+        occupantsIdsList.add(occupantId);
+        newDialog.setOccupantsIds(occupantsIdsList);
+        newDialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        newDialog.setType(type);
+        chatsDialogsList.add(newDialog);
     }
 }
