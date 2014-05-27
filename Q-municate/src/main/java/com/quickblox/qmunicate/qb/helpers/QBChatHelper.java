@@ -63,6 +63,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private QBRoomChat roomChat;
     private String opponentName;
     private List<QBDialog> chatsDialogsList;
+    private int counterUnreadChatsDialogs;
 
     private PrivateChatMessageListener privateChatMessageListener = new PrivateChatMessageListener();
     private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
@@ -275,6 +276,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
         chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+        initCounterUnreadChatsDialogs();
         return chatsDialogsList;
     }
 
@@ -379,5 +381,17 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 notifyMessageReceived(chatMessage, friend);
             }
         }
+    }
+
+    private void initCounterUnreadChatsDialogs() {
+        for (QBDialog dialog: chatsDialogsList) {
+            if(dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+                counterUnreadChatsDialogs++;
+            }
+        }
+    }
+
+    public int getCountUnreadChatsDialogs() {
+        return counterUnreadChatsDialogs;
     }
 }

@@ -2,20 +2,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@color/green"
+    android:background="@color/black"
     android:gravity="center"
+    android:alpha="0.85"
     android:orientation="vertical"
     android:paddingBottom="5dp"
     android:paddingTop="5dp">
 
-    <TextView
-        android:id="@+id/tip_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/black"
-        android:textStyle="bold" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tip_height"
+        android:id="@+id/scrollView"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tip_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:textSize="@dimen/text_size"
+            android:textColor="@color/white"/>
+    </ScrollView>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -24,16 +32,26 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:layout_margin="15dp"
+            android:background="@drawable/button_tip_item_selector"
             android:layout_weight="1"
             android:text="Ok"
+            android:padding="15dp"
+            android:textColor="@color/white"
             android:visibility="gone"
+            android:textSize="@dimen/text_size_small"
             android:id="@+id/alternative_button"/>
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:layout_margin="15dp"
+            android:background="@drawable/button_tip_item_selector"
             android:layout_weight="1"
+            android:padding="15dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_small"
             android:text="Ok"
             android:id="@+id/ok_button"/>
     </LinearLayout>

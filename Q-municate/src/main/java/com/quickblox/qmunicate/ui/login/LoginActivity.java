@@ -50,9 +50,9 @@ public class LoginActivity extends BaseActivity {
         setContentView(R.layout.activity_login);
         useDoubleBackPressed = true;
 
-        emailEditText = _findViewById(R.id.email);
+        emailEditText = _findViewById(R.id.email_edittext);
         passwordEditText = _findViewById(R.id.password_edittext);
-        rememberMeCheckBox = _findViewById(R.id.rememberMe);
+        rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
 
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
                 false);

@@ -56,8 +56,6 @@ android {
             signingConfig signingConfigs.debug
             zipAlign true
             packageNameSuffix ".dev"
-            resValue "string", "lgn_default_user_email", "shaforenko.igor@injoit.com"
-            resValue "string", "lgn_default_user_password", "qweqweqwe"
         }
         release {
             debuggable rootProject.prodDebug
