@@ -170,7 +170,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
             Integer friendId) throws XMPPException, SmackException {
-        QBPrivateChat chat = privateChatManager.createChat(friendId, new PrivateChatMessageListener());
+        QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
         QBChatMessage message = createRoomNotificationMessage(dialog);
         chat.sendMessage(message);
         Log.d(TAG, "friend notified id=" + friendId);
