@@ -259,7 +259,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = Consts.EMPTY_STRING;
         if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = getAttachUrlFromQBChatMessage(chatMessage);
+            attachURL = ChatUtils.getAttachUrlFromQBChatMessage(chatMessage);
         }
         return attachURL;
     }
@@ -377,6 +377,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend);
             }
+            updateLoadedChatDialog(chatMessage.getSenderId(), chatMessage.getBody(), -1);
         }
     }
 

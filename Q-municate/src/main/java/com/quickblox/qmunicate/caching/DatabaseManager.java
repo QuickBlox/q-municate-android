@@ -12,7 +12,6 @@ import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.PrivateChat;
-import com.quickblox.qmunicate.model.PrivateChatMessageCache;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
@@ -193,10 +192,7 @@ public class DatabaseManager {
                 attachURL = Consts.EMPTY_STRING;
             }
 
-            String opponentName = null;
-            String membersIds = Consts.EMPTY_STRING;
-
-            PrivateChatMessageCache privateChatMessageCache = new PrivateChatMessageCache(body, senderId, chatId + Consts.EMPTY_STRING, attachURL, opponentName, membersIds);
+            ChatMessageCache privateChatMessageCache = new ChatMessageCache(body, senderId, chatId, attachURL);
             saveChatMessage(context, privateChatMessageCache);
         }
     }
