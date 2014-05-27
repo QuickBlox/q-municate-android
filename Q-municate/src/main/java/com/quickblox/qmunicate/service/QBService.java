@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
@@ -103,6 +104,7 @@ public class QBService extends Service {
         registerLogoutChatCommand();
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
+        registerJoinGroupChat();
         registerSendMessageCommand();
         registerSendGroupMessageCommand();
 
@@ -110,6 +112,13 @@ public class QBService extends Service {
         registerLoadAttachFileCommand();
 
         registerChatsDialogsCommand();
+    }
+
+    private void registerJoinGroupChat() {
+        QBJoinGroupChatCommand joinGroupChatCommand = new QBJoinGroupChatCommand(this, chatHelper,
+                QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);
     }
 
     private void registerCreateGroupChatCommand() {

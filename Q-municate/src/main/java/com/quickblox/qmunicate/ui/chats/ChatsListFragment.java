@@ -59,9 +59,15 @@ public class ChatsListFragment extends BaseFragment {
                 QBDialog dialog = chatsDialogsAdapter.getItem(position);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
+                } else {
+                    startGroupChatActivity(dialog);
                 }
             }
         });
+    }
+
+    private void startGroupChatActivity(QBDialog dialog) {
+        GroupChatActivity.start(baseActivity, dialog);
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {

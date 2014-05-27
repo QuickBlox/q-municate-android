@@ -17,10 +17,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
@@ -28,10 +30,10 @@ import java.util.ArrayList;
 
 public class GroupChatActivity extends BaseChatActivity {
 
-    private ArrayList<Friend> friendList;
-    private String chatName = "";
-    private int allowedNameLength = 20;
     private BaseAdapter messagesAdapter;
+
+    private QBDialog groupDialog;
+    private ArrayList<Friend> friendList;
 
     private ListView messagesListView;
     private EditText messageEditText;
@@ -48,16 +50,18 @@ public class GroupChatActivity extends BaseChatActivity {
         context.startActivity(intent);
     }
 
+    public static void start(Context context, QBDialog dialog) {
+        Intent intent = new Intent(context, GroupChatActivity.class);
+        intent.putExtra(GroupChatDetailsActivity.EXTRA_ROOM_DIALOG, dialog);
+        context.startActivity(intent);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        friendList = (ArrayList<Friend>) getIntent().getExtras().getSerializable(
-                GroupChatDetailsActivity.EXTRA_FRIENDS);
-        chatName = TextUtils.join(",", friendList);
-
+        initChat();
         initUI();
         initListView();
-        initChat();
         initListeners();
         registerForContextMenu(messagesListView);
     }
@@ -92,11 +96,19 @@ public class GroupChatActivity extends BaseChatActivity {
     }
 
     private void initChat() {
-        QBCreateGroupChatCommand.start(this, chatName, friendList);
+        Bundle extras = getIntent().getExtras();
+        if (getIntent().hasExtra(GroupChatDetailsActivity.EXTRA_ROOM_DIALOG)) {
+            groupDialog = (QBDialog) extras.getSerializable(GroupChatDetailsActivity.EXTRA_ROOM_DIALOG);
+            QBJoinGroupChatCommand.start(this, groupDialog.getRoomJid());
+        } else {
+            friendList = (ArrayList<Friend>) extras.getSerializable(GroupChatDetailsActivity.EXTRA_FRIENDS);
+            String chatName = TextUtils.join(",", friendList);
+            QBCreateGroupChatCommand.start(this, chatName, friendList);
+        }
     }
 
     private Cursor getAllGroupChatMessages() {
-        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, chatName);
+        return DatabaseManager.getAllGroupChatMessagesByGroupId(this, groupDialog.getRoomJid());
     }
 
     protected BaseAdapter getMessagesAdapter() {
@@ -111,7 +123,7 @@ public class GroupChatActivity extends BaseChatActivity {
 
     private void actionBarSetup() {
         ActionBar actionBar = getActionBar();
-        actionBar.setTitle(chatName);
+        actionBar.setTitle(groupDialog.getName());
         actionBar.setSubtitle("some information");
     }
 

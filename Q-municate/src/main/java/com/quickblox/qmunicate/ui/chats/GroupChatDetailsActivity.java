@@ -21,6 +21,8 @@ import java.util.List;
 
 public class GroupChatDetailsActivity extends BaseActivity {
     public static final String EXTRA_FRIENDS = "opponentGroup";
+    public static final String EXTRA_ROOM_DIALOG = "room_dialog";
+
     private ListView friendsListView;
     private GroupChat opponentChat;
     private String groupId;
