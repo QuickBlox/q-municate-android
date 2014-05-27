@@ -30,7 +30,7 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         Integer friendId = (Integer) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
-        chatHelper.initPrivateChat(friendId);
+        chatHelper.createPrivateChat(friendId);
 
         return extras;
     }

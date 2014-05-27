@@ -72,6 +72,11 @@ public class Friend implements Serializable {
         return id.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return fullname;
+    }
+
     public String getAvatarUrl() {
         return avatarUrl;
     }

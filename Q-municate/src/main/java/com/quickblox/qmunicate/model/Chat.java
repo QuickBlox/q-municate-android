@@ -22,7 +22,5 @@ public abstract class Chat {
         this.lastMessage = lastMessage;
     }
 
-    public abstract void sendMessage(String message) throws XMPPException;
-
     public enum ChatType {PRIVATE, GROUP}
 }

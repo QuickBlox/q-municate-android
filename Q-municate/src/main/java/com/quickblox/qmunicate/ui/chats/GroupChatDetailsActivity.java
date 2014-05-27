@@ -7,23 +7,22 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupChat;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class GroupChatDetailsActivity extends BaseActivity {
-    public static final String EXTRA_GROUP = "opponentGroup";
+    public static final String EXTRA_FRIENDS = "opponentGroup";
+    public static final String EXTRA_ROOM_DIALOG = "room_dialog";
+
     private ListView friendsListView;
     private GroupChat opponentChat;
     private String groupId;
@@ -33,7 +32,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
 
     public static void start(Context context, GroupChat chat) {
         Intent intent = new Intent(context, GroupChatDetailsActivity.class);
-        intent.putExtra(EXTRA_GROUP, chat);
+        intent.putExtra(EXTRA_FRIENDS, chat);
         context.startActivity(intent);
     }
 
@@ -41,7 +40,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat_details);
-        opponentChat = (GroupChat) getIntent().getExtras().getSerializable(EXTRA_GROUP);
+        opponentChat = (GroupChat) getIntent().getExtras().getSerializable(EXTRA_FRIENDS);
 
         groupId = opponentChat.getId();
 

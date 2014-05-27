@@ -47,11 +47,6 @@ public class PrivateChat extends Chat {
         return message;
     }
 
-    @Override
-    public void sendMessage(String message) throws XMPPException {
-        // TODO send message to private chat
-    }
-
     public Friend getFriend() {
         return friend;
     }
