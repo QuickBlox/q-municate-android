@@ -30,6 +30,7 @@ import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import java.util.Arrays;
 import java.util.List;
@@ -257,7 +258,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         @Override
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
-
+            Crouton.cancelAllCroutons();
             baseActivity.invalidateOptionsMenu();
 
             if (!userLearnedDrawer) {
