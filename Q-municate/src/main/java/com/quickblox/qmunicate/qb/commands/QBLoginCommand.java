@@ -18,7 +18,7 @@ public class QBLoginCommand extends CompositeServiceCommand {
     public static void start(Context context, QBUser user) {
         Intent intent = new Intent(QBServiceConsts.LOGIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
-        TipsManager.setJustLogined(true);
+        TipsManager.setIsJustLogined(true);
         context.startService(intent);
     }
 }
