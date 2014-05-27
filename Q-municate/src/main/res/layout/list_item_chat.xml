@@ -34,17 +34,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="Chat name"
-                android:textSize="20sp" />
+                android:textSize="@dimen/text_size" />
 
             <TextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="lastMessage"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
+                android:textSize="@dimen/text_size" />
         </LinearLayout>
 
         <TextView
@@ -59,9 +57,8 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="1dp"
-            android:text="35"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size" />
 
     </RelativeLayout>
 
@@ -76,7 +73,7 @@
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
         android:paddingTop="1dp"
-        android:text="27"
         android:textColor="@android:color/white"
-        android:textSize="14sp" />
+        android:textSize="@dimen/text_size" />
+
 </RelativeLayout>

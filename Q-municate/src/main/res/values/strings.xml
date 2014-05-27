@@ -22,7 +22,6 @@
 
     <string-array name="nvd_items_array">
         <item>Friends</item>
-        <!--<item>Web room</item>-->
         <item>Chats</item>
         <item>Invite Friends</item>
         <item>Settings</item>
