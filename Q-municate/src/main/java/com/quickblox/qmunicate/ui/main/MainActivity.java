@@ -158,4 +158,8 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
             }
         }
     }
+
+    public NavigationDrawerFragment getNavigationDrawerFragment() {
+        return navigationDrawerFragment;
+    }
 }
