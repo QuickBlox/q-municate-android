@@ -278,15 +278,11 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
         return chatService.isLoggedIn();
     }
 
-    public List<QBDialog> getChatsDialogs() {
+    public List<QBDialog> getChatsDialogs() throws QBResponseException {
         Bundle bundle = new Bundle();
-        try {
-            QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-            customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
-            chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
-        } catch (QBResponseException e) {
-            e.printStackTrace();
-        }
+        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
+        chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
         return chatsDialogsList;
     }
 
@@ -295,13 +291,13 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
     }
 
     public void updateLoadedChatDialog(int occupantId, String lastMessage) {
-        for(int i = 0; i< chatsDialogsList.size(); i++) {
+        for (int i = 0; i < chatsDialogsList.size(); i++) {
             String dialogId = ChatUtils.getPrivateDialogIdByOccupantId(chatsDialogsList, occupantId);
-            if(dialogId == null) {
+            if (dialogId == null) {
                 // TODo SF only for private chat
                 addNewChatDialog(occupantId, lastMessage, QBDialogType.PRIVATE);
             }
-            if(dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
+            if (dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
                 chatsDialogsList.get(i).setLastMessage(lastMessage);
                 break;
             }
@@ -309,8 +305,7 @@ public class QBChatHelper extends BaseHelper implements QBMessageListener<QBChat
     }
 
     private void addNewChatDialog(int occupantId, String lastMessage, QBDialogType type) {
-        QBDialog newDialog = new QBDialog();
-        newDialog.setId(occupantId);
+        QBDialog newDialog = new QBDialog(occupantId + Consts.EMPTY_STRING);
         newDialog.setLastMessage(lastMessage);
         ArrayList occupantsIdsList = new ArrayList<Integer>();
         occupantsIdsList.add(App.getInstance().getUser().getId());
