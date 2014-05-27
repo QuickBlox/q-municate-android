@@ -36,7 +36,7 @@
                 android:layout_gravity="center_vertical"
                 android:textSize="@dimen/text_size" />
 
-            <TextView
+            <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
