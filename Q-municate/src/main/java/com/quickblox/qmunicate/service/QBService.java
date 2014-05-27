@@ -112,7 +112,7 @@ public class QBService extends Service {
         registerGetFileCommand();
         registerLoadAttachFileCommand();
 
-        registerChatsDialogsCommand();
+        registerLoadChatsDialogsCommand();
         registerUpdateChatDialogCommand();
     }
 
@@ -289,7 +289,7 @@ public class QBService extends Service {
         loginCommand.addCommand(initFriendListCommand);
     }
 
-    private void registerChatsDialogsCommand() {
+    private void registerLoadChatsDialogsCommand() {
         QBLoadChatsDialogsCommand chatsDialogsCommand = new QBLoadChatsDialogsCommand(this, chatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);

@@ -17,7 +17,7 @@ public class QBLoadChatsDialogsAndJoinCommand extends CompositeServiceCommand {
     }
 
     public static void start(Context context, QBUser user, File image) {
-        Intent intent = new Intent(QBServiceConsts.LOAD_AND_JOIN, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.LOAD_CHATS_DIALOGS_AND_JOIN_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
