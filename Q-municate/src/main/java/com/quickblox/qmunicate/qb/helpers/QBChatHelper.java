@@ -102,8 +102,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
         privateChat.sendMessage(chatMessage);
-        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(
-                privateChatId), qbFile.getPublicUrl()));
+        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl()));
     }
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
@@ -364,6 +363,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     chatMessage.getSenderId(), attachURL));
             notifyMessageReceived(chatMessage, friend);
+            updateLoadedChatDialog(chatMessage.getSenderId(), chatMessage.getBody(), -1);
         }
     }
 
@@ -377,7 +377,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend);
             }
-            updateLoadedChatDialog(chatMessage.getSenderId(), chatMessage.getBody(), -1);
         }
     }
 
