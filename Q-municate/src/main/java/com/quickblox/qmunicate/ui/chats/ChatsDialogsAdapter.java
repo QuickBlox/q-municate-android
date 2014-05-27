@@ -6,8 +6,6 @@ import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
@@ -42,12 +40,14 @@ public class ChatsDialogsAdapter extends BaseListAdapter<QBDialog> {
             int occupantId = ChatUtils.getOccupantsIdsFromDialog(data).get(Consts.ZERO_VALUE);
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
+            viewHolder.userCountTextView.setVisibility(View.GONE);
         } else {
             viewHolder.nameTextView.setText(data.getName());
+            viewHolder.userCountTextView.setVisibility(View.VISIBLE);
+            viewHolder.userCountTextView.setText(data.getOccupants().size() + Consts.EMPTY_STRING);
         }
 
         viewHolder.lastMessageTextView.setText(data.getLastMessage());
-        viewHolder.userCountTextView.setText(data.getOccupants().size() + Consts.EMPTY_STRING);
         viewHolder.unreadMessagesTextView.setText(data.getUnreadMessageCount() + Consts.EMPTY_STRING);
 
         return convertView;
