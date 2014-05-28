@@ -91,7 +91,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private void initUI() {
-        changeAvatarLinearLayout = (LinearLayout)findViewById(R.id.changeAvatarLinearLayout);
+        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
         avatarTextView = _findViewById(R.id.avatar_textview);
         changeFullNameRelativeLayout = _findViewById(R.id.changeFullNameRelativeLayout);
         changeEmailRelativeLayout = _findViewById(R.id.changeEmailRelativeLayout);

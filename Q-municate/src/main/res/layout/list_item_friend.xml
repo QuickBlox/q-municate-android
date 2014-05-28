@@ -39,7 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="status"
-            android:visibility="gone"
             android:textColor="@android:color/darker_gray"
             android:textSize="15sp" />
     </LinearLayout>

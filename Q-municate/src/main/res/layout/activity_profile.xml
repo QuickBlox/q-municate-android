@@ -140,12 +140,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_status_message"
+        android:visibility="gone"
         android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/changeStatusLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:clickable="true"
         android:orientation="vertical">
 
