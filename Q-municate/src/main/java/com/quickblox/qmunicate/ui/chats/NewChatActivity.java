@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,12 +13,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.main.FriendsListCursorAdapter;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.utils.Consts;
 
@@ -29,6 +26,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class NewChatActivity extends BaseActivity implements AdapterView.OnItemClickListener, NewChatCounterFriendsListener {
+
     private ListView friendsListView;
     private TextView countSelectedFriendsTextView;
     private TextView createGroupChatTextView;
@@ -119,7 +117,15 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
         actionMode.setCustomView(view);
     }
 
+    public static class SimpleComparator implements Comparator<Friend> {
+
+        public int compare(Friend friend1, Friend friend2) {
+            return (new Integer(friend1.getId())).compareTo(friend2.getId());
+        }
+    }
+
     private class ActionModeCallback extends SimpleActionModeCallback {
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             return true;
@@ -130,19 +136,14 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
             if (!closeWithoutRedirect) {
                 List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
                 Collections.sort(membersList, new SimpleComparator());
-                GroupChatActivity.start(activity, (ArrayList<Friend>)membersList);
+                GroupChatActivity.start(activity, (ArrayList<Friend>) membersList);
+                finish();
                 actionMode = null;
                 closeWithoutRedirect = false;
             } else {
                 actionMode = null;
                 closeWithoutRedirect = false;
             }
-        }
-    }
-
-    public static class SimpleComparator implements Comparator<Friend> {
-        public int compare(Friend friend1, Friend friend2) {
-            return (new Integer(friend1.getId())).compareTo(friend2.getId());
         }
     }
 }
