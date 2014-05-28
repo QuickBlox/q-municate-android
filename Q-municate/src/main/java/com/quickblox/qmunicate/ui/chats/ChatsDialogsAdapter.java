@@ -41,10 +41,12 @@ public class ChatsDialogsAdapter extends BaseListAdapter<QBDialog> {
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
             viewHolder.userCountTextView.setVisibility(View.GONE);
+            viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_user);
         } else {
             viewHolder.nameTextView.setText(data.getName());
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);
             viewHolder.userCountTextView.setText(data.getOccupants().size() + Consts.EMPTY_STRING);
+            viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
         }
 
         if (data.getUnreadMessageCount() > Consts.ZERO_VALUE) {
