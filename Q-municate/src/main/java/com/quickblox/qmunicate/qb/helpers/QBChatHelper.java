@@ -61,7 +61,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private QBRoomChatManager roomChatManager;
     private QBRoomChat roomChat;
-    private String opponentName;
     private List<QBDialog> chatsDialogsList;
     private int counterUnreadChatsDialogs;
 
@@ -101,8 +100,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
         privateChat.sendMessage(chatMessage);
-        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(
-                privateChatId), qbFile.getPublicUrl()));
+        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId,
+                qbFile.getPublicUrl()));
     }
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
@@ -149,7 +148,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         Friend opponent = DatabaseManager.getFriendById(context, opponentId);
         privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);
         privateChatId = opponentId;
-        opponentName = opponent.getFullname();
     }
 
     public QBDialog createRoomChat(String roomName,
@@ -357,6 +355,18 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return occupantIdsList;
     }
 
+    private void initCounterUnreadChatsDialogs() {
+        for (QBDialog dialog : chatsDialogsList) {
+            if (dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+                counterUnreadChatsDialogs++;
+            }
+        }
+    }
+
+    public int getCountUnreadChatsDialogs() {
+        return counterUnreadChatsDialogs;
+    }
+
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
 
         @Override
@@ -381,17 +391,5 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 notifyMessageReceived(chatMessage, friend);
             }
         }
-    }
-
-    private void initCounterUnreadChatsDialogs() {
-        for (QBDialog dialog: chatsDialogsList) {
-            if(dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
-                counterUnreadChatsDialogs++;
-            }
-        }
-    }
-
-    public int getCountUnreadChatsDialogs() {
-        return counterUnreadChatsDialogs;
     }
 }
