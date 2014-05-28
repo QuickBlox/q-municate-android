@@ -33,6 +33,7 @@ public class QBServiceConsts {
     public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
     public static final String LOAD_CHATS_DIALOGS_AND_JOIN_ACTION = "load_chats_dialogs_and_join_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_ACTION = "get_unread_chats_dialogs_action";
+    public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
@@ -90,10 +91,10 @@ public class QBServiceConsts {
     public static final String JOIN_GROUP_CHAT_FAIL_ACTION = "join_group_chat_fail_action";
     public static final String UPDATE_CHAT_DIALOG_SUCCESS_ACTION = "update_chat_dialog_success_action";
     public static final String UPDATE_CHAT_DIALOG_FAIL_ACTION = "update_chat_dialog_fail_action";
-    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_SUCCESS_ACTION = "load_chats_dialogs_and_join_success_action";
-    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_FAIL_ACTION = "load_chats_dialogs_and_join_fail_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_SUCCESS_ACTION = "get_unread_chats_dialogs_success_action";
     public static final String GET_COUNT_UNREAD_CHATS_DIALOGS_FAIL_ACTION = "get_unread_chats_dialogs_fail_action";
+    public static final String LOAD_DIALOG_MESSAGES_SUCCESS_ACTION = "load_dialog_messages_load_success_action";
+    public static final String LOAD_DIALOG_MESSAGES_FAIL_ACTION = "load_dialog_messages_load_fail_action";
 
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
 
@@ -119,12 +120,12 @@ public class QBServiceConsts {
     public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";
     public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
-    public static final String EXTRA_CHAT_DIALOG = "chats_dialogs";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
+    public static final String EXTRA_CHAT_DIALOG = "chat_dialog";
+    public static final String EXTRA_OPPONENT = "opponent_friend";
+    public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
+    public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
 
     public static final String SMILE_SELECTED = "smile_selected";
-    public static final String JOIN_ROOM_ACTION = "join_room_action";
-    public static final String JOIN_ROOM_SUCCESS_ACTION = "join_room_success_action";
-    public static final String JOIN_ROOM_FAIL_ACTION = "join_room_fail_action";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
 }

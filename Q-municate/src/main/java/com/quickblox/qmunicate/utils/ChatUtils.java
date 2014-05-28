@@ -1,9 +1,13 @@
 package com.quickblox.qmunicate.utils;
 
+import com.quickblox.module.chat.QBChatMessage;
+import com.quickblox.module.chat.QBHistoryMessage;
+import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChatUtils {
@@ -23,5 +27,21 @@ public class ChatUtils {
         List<Integer> occupantsList = dialog.getOccupants();
         occupantsList.remove(user.getId());
         return occupantsList;
+    }
+
+    public static String getAttachUrlFromQBChatMessage(QBChatMessage chatMessage) {
+        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
+        if (!attachmentsList.isEmpty()) {
+            return attachmentsList.get(attachmentsList.size() - 1).getUrl();
+        }
+        return Consts.EMPTY_STRING;
+    }
+
+    public static String getAttachUrlFromQBChatMessage(QBHistoryMessage chatMessage) {
+        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
+        if (!attachmentsList.isEmpty()) {
+            return attachmentsList.get(attachmentsList.size() - 1).getUrl();
+        }
+        return Consts.EMPTY_STRING;
     }
 }
