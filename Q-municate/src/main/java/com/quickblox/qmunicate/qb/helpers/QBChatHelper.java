@@ -11,6 +11,7 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.QBRoomChat;
@@ -101,8 +102,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
         privateChat.sendMessage(chatMessage);
-        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), String.valueOf(
-                privateChatId), qbFile.getPublicUrl()));
+        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl()));
     }
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
@@ -124,14 +124,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             messageBody = Consts.EMPTY_STRING;
         }
         return messageBody;
-    }
-
-    private String getAttachUrlFromQBChatMessage(QBChatMessage chatMessage) {
-        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
-        if (!attachmentsList.isEmpty()) {
-            return attachmentsList.get(attachmentsList.size() - 1).getUrl();
-        }
-        return Consts.EMPTY_STRING;
     }
 
     @Override
@@ -177,7 +169,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
             Integer friendId) throws XMPPException, SmackException {
-        QBPrivateChat chat = privateChatManager.createChat(friendId, new PrivateChatMessageListener());
+        QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
         QBChatMessage message = createRoomNotificationMessage(dialog);
         chat.sendMessage(message);
         Log.d(TAG, "friend notified id=" + friendId);
@@ -266,7 +258,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = Consts.EMPTY_STRING;
         if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = getAttachUrlFromQBChatMessage(chatMessage);
+            attachURL = ChatUtils.getAttachUrlFromQBChatMessage(chatMessage);
         }
         return attachURL;
     }
@@ -284,7 +276,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return chatsDialogsList;
     }
 
-    public void updateLoadedChatDialog(int occupantId, String lastMessage) {
+    public void updateLoadedChatDialog(int occupantId, String lastMessage, int unreadMessages) {
         for (int i = 0; i < chatsDialogsList.size(); i++) {
             String dialogId = ChatUtils.getPrivateDialogIdByOccupantId(chatsDialogsList, occupantId);
             if (dialogId == null) {
@@ -293,6 +285,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             }
             if (dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
                 chatsDialogsList.get(i).setLastMessage(lastMessage);
+                if(unreadMessages != -1) {
+                    chatsDialogsList.get(i).setUnreadMessageCount(unreadMessages);
+                    counterUnreadChatsDialogs--;
+                }
                 break;
             }
         }
@@ -367,6 +363,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     chatMessage.getSenderId(), attachURL));
             notifyMessageReceived(chatMessage, friend);
+            updateLoadedChatDialog(chatMessage.getSenderId(), chatMessage.getBody(), -1);
         }
     }
 
@@ -393,5 +390,12 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public int getCountUnreadChatsDialogs() {
         return counterUnreadChatsDialogs;
+    }
+
+    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog) throws QBResponseException {
+        Bundle bundle = new Bundle();
+        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
+        return QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
     }
 }

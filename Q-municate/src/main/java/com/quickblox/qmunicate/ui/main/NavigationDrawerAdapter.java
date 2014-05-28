@@ -38,10 +38,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
         }
 
         if (data.equals(chatItem)) {
-            holder.unreadMessagesTextView.setVisibility(View.VISIBLE);
             counterUnreadChatsDialogs = holder.unreadMessagesTextView;
-        } else {
-            holder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
         holder.nameTextView.setText(data);
@@ -51,7 +48,10 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
 
     @Override
     public void onUpdateCountUnreadChatsDialogs(int count) {
-        counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
+        if (count > Consts.ZERO_VALUE) {
+            counterUnreadChatsDialogs.setVisibility(View.VISIBLE);
+            counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
+        }
     }
 
     private static class ViewHolder {

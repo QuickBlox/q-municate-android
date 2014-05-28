@@ -31,8 +31,6 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class FriendDetailsActivity extends BaseActivity {
 
-    public static final String EXTRA_FRIEND = "Friend";
-
     private RoundedImageView avatarImageView;
     private TextView nameTextView;
     private TextView statusTextView;
@@ -45,7 +43,7 @@ public class FriendDetailsActivity extends BaseActivity {
 
     public static void start(Context context, Friend friend) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
-        intent.putExtra(EXTRA_FRIEND, friend);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
         context.startActivity(intent);
     }
 
@@ -53,7 +51,7 @@ public class FriendDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
-        friend = (Friend) getIntent().getExtras().getSerializable(EXTRA_FRIEND);
+        friend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_FRIEND);
         initUI();
         initUIWithFriendsData();
         initBroadcastActionList();
@@ -168,7 +166,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     public void chatClickListener(View view) {
-        PrivateChatActivity.start(FriendDetailsActivity.this, friend);
+        PrivateChatActivity.start(FriendDetailsActivity.this, friend, null);
     }
 
     private class RemoveFriendSuccessAction implements Command {
