@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ChatUtils {
 
-    public static String getPrivateDialogIdByOccupantId(List<QBDialog> chatsDialogsList, int occupantId) {
+    public static String getPrivateDialogIdByChatId(List<QBDialog> chatsDialogsList, int occupantId) {
         for (QBDialog dialog : chatsDialogsList) {
             List<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsFromDialog(dialog);
             if (occupantsIdsList.contains(occupantId)) {
@@ -43,5 +43,14 @@ public class ChatUtils {
             return attachmentsList.get(attachmentsList.size() - 1).getUrl();
         }
         return Consts.EMPTY_STRING;
+    }
+
+    public static boolean isGroupMessageByChatId(Object chatId) {
+        if (chatId instanceof String) {
+            return true;
+        } else if (chatId instanceof Integer) {
+            return false;
+        }
+        return false;
     }
 }

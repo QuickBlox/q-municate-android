@@ -8,17 +8,12 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 
-import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
@@ -27,45 +22,31 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
-import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateChatDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 public class PrivateChatActivity extends BaseChatActivity implements ReceiveFileListener {
 
-    private ListView messagesListView;
-    private EditText messageEditText;
-    private ImageButton attachButton;
-    private ImageButton sendButton;
-
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
-    private ImageHelper imageHelper;
     private QBDialog dialog;
 
     private int chatId;
     private int oldSizeMessagesAdapter;
 
-    private PrivateChatActivity instance;
-
     public PrivateChatActivity() {
-        super(R.layout.activity_private_chat);
+        super(R.layout.activity_chat);
     }
 
     public static void start(Context context, Friend opponent, QBDialog dialog) {
@@ -75,54 +56,55 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         context.startActivity(intent);
     }
 
-    public PrivateChatActivity getInstance() {
-        return instance;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        instance = this;
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
         chatId = opponentFriend.getId();
-        imageHelper = new ImageHelper(this);
 
-        initUI();
         initListView();
-        initListeners();
         initActionBar();
         initChat();
     }
 
-    private void initUI() {
-        messagesListView = _findViewById(R.id.messages_listview);
-        messageEditText = _findViewById(R.id.message_edittext);
-        attachButton = _findViewById(R.id.attach_button);
-        sendButton = _findViewById(R.id.send_button);
+    @Override
+    protected void onUpdateChatDialog() {
+        startUpdateChatDialog();
+    }
+
+    @Override
+    protected void onFileSelected(Uri originalUri) {
+        try {
+            ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
+            new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+                    BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onFileLoaded(QBFile file) {
+        QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, file);
+        scrollListView();
+    }
+
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+    }
+
+    private void startUpdateChatDialog() {
+        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        QBUpdateChatDialogCommand.start(this, chatId, lastMessage, Consts.ZERO_VALUE);
     }
 
     private void initListView() {
         messagesAdapter = getMessagesAdapter();
         messagesListView.setAdapter(messagesAdapter);
         oldSizeMessagesAdapter = messagesAdapter.getCount();
-    }
-
-    private void initListeners() {
-        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                super.onTextChanged(s, start, before, count);
-                if (TextUtils.isEmpty(s)) {
-                    sendButton.setVisibility(View.GONE);
-                    attachButton.setVisibility(View.VISIBLE);
-                } else {
-                    sendButton.setVisibility(View.VISIBLE);
-                    attachButton.setVisibility(View.GONE);
-                }
-            }
-        });
     }
 
     private void initActionBar() {
@@ -144,19 +126,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeActions();
-    }
-
-    private void removeActions() {
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
-    }
-
-    @Override
     public void onCachedImageFileReceived(File file) {
         startLoadAttachFile(file);
     }
@@ -165,27 +134,10 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
-    private void startLoadAttachFile(File file) {
-        showProgress();
-        QBLoadAttachFileCommand.start(this, file);
-    }
-
-    private void startLoadDialogMessages(QBDialog dialog) {
-        QBLoadDialogMessagesCommand.start(this, dialog);
-    }
-
-    public void attachButtonOnClick(View view) {
-        imageHelper.getImage();
-    }
-
     public void sendMessageOnClick(View view) {
         QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
-    }
-
-    private void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     @Override
@@ -222,78 +174,11 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            Uri originalUri = data.getData();
-            try {
-                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
-                        BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(oldSizeMessagesAdapter != messagesAdapter.getCount()) {
-            startUpdateChatDialog();
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
-        addActions();
-        if(dialog != null) {
-            startLoadDialogMessages(dialog);
-        }
-    }
-
-    private void addActions() {
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
-    }
-
-    private void startUpdateChatDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
-        QBUpdateChatDialogCommand.start(this, opponentFriend.getId(), lastMessage, Consts.ZERO_VALUE);
-    }
-
-    private void saveMessagesToCache(List<QBHistoryMessage> messagesList) {
-        DatabaseManager.saveChatMessages(this, messagesList, chatId);
-    }
-
-    private void deleteMessagesByDialog() {
-        DatabaseManager.deleteMessagesByDialog(this, opponentFriend.getId() + Consts.EMPTY_STRING);
-    }
-
-    private class LoadAttachFileSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, file);
-            hideProgress();
-            scrollListView();
-        }
-    }
-
-    private class LoadDialogMessagesSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            List<QBHistoryMessage> messagesList = (List<QBHistoryMessage>) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES);
-            deleteMessagesByDialog();
-            saveMessagesToCache(messagesList);
+        if (dialog != null) {
+            startLoadDialogMessages(dialog, chatId);
         }
     }
 }

@@ -122,6 +122,8 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_CHAT_DIALOG = "chat_dialog";
+    public static final String EXTRA_GROUP_CHAT = "group_chat";
+    public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";

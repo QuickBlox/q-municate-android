@@ -43,9 +43,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         View view;
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_private_chat_message_left, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_chat_message_left, null, true);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_private_chat_message_right, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_chat_message_right, null, true);
         }
 
         ViewHolder holder = new ViewHolder();

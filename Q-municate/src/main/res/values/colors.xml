@@ -36,6 +36,7 @@
     <color name="dark_gray">#ff6c6c6c</color>
     <color name="red">#ff0000</color>
     <color name="green">#1cba48</color>
+    <color name="blue">#0d70b3</color>
 
     <color name="screen_call_background_color">#333333</color>
     <color name="screen_call_timer_text_color">#999999</color>

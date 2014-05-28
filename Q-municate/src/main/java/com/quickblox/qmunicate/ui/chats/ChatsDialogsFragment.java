@@ -15,14 +15,12 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ChatsDialogsFragment extends BaseFragment {
@@ -70,18 +68,18 @@ public class ChatsDialogsFragment extends BaseFragment {
         });
     }
 
-    private void startGroupChatActivity(QBDialog dialog) {
-        GroupChatActivity.start(baseActivity, dialog);
-    }
-
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantsIdsFromDialog(dialog).get(Consts.ZERO_VALUE);
         Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
-        if(dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
+        if (dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
             PrivateChatActivity.start(baseActivity, occupant, null);
-        } else{
+        } else {
             PrivateChatActivity.start(baseActivity, occupant, dialog);
         }
+    }
+
+    private void startGroupChatActivity(QBDialog dialog) {
+        GroupChatActivity.start(baseActivity, dialog);
     }
 
     @Override
@@ -122,21 +120,6 @@ public class ChatsDialogsFragment extends BaseFragment {
         chatsDialogsListView.setAdapter(chatsDialogsAdapter);
     }
 
-    private void joinGroupDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
-        QBJoinGroupChatCommand.start(baseActivity, roomJidList);
-    }
-
-    private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
-    }
-
     private class LoadChatsDialogsSuccessAction implements Command {
 
         @Override
@@ -144,7 +127,6 @@ public class ChatsDialogsFragment extends BaseFragment {
             List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
             initChatsDialogs(dialogsList);
-            joinGroupDialogs(dialogsList);
         }
     }
 }
