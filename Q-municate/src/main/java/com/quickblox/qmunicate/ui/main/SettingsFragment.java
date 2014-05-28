@@ -10,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
@@ -48,8 +49,9 @@ public class SettingsFragment extends BaseFragment {
         logout = (Button) rootView.findViewById(R.id.logout);
 
         pushNotification.setChecked(getPushNotifications());
-
-        if (null == App.getInstance().getUser().getFacebookId()) {
+        App app = App.getInstance();
+        QBUser user = app.getUser();
+        if (user == null || null == user.getFacebookId()) {
             rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
         } else {
             rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.GONE);

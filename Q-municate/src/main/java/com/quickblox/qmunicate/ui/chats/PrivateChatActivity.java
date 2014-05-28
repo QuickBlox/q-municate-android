@@ -128,7 +128,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private void initActionBar() {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(opponentFriend.getFullname());
-        actionBar.setSubtitle(opponentFriend.getOnlineStatus());
     }
 
     private void initChat() {

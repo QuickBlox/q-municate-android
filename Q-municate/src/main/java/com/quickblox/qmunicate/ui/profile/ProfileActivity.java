@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
@@ -41,13 +43,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class ProfileActivity extends BaseActivity implements ReceiveFileListener {
+public class ProfileActivity extends BaseActivity implements ReceiveFileListener, View.OnClickListener {
 
     private LinearLayout changeAvatarLinearLayout;
+    private RelativeLayout changeFullNameRelativeLayout;
+    private RelativeLayout changeEmailRelativeLayout;
+    private LinearLayout changeStatusLinearLayout;
     private RoundedImageView avatarImageView;
     private EditText fullNameEditText;
     private EditText emailEditText;
     private EditText statusMessageEditText;
+    private TextView avatarTextView;
 
     private ImageHelper imageHelper;
 
@@ -78,18 +84,32 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         imageHelper = new ImageHelper(this);
 
         initUI();
+        initListeners();
         initUIWithUsersData();
         initBroadcastActionList();
         initTextChangedListeners();
     }
 
     private void initUI() {
-        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
+        changeAvatarLinearLayout = (LinearLayout)findViewById(R.id.changeAvatarLinearLayout);
+        avatarTextView = _findViewById(R.id.avatar_textview);
+        changeFullNameRelativeLayout = _findViewById(R.id.changeFullNameRelativeLayout);
+        changeEmailRelativeLayout = _findViewById(R.id.changeEmailRelativeLayout);
+        changeStatusLinearLayout = _findViewById(R.id.changeStatusLinearLayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
         fullNameEditText = _findViewById(R.id.fullNameEditText);
         emailEditText = _findViewById(R.id.emailEditText);
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+    }
+
+    private void initListeners(){
+        avatarTextView.setOnClickListener(this);
+        changeAvatarLinearLayout.setOnClickListener(this);
+        avatarImageView.setOnClickListener(this);
+        changeFullNameRelativeLayout.setOnClickListener(this);
+        changeEmailRelativeLayout.setOnClickListener(this);
+        changeStatusLinearLayout.setOnClickListener(this);
     }
 
     private void initUIWithUsersData() {
@@ -136,6 +156,31 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         int defValue = LoginType.EMAIL.ordinal();
         int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
         return LoginType.values()[value];
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.avatar_textview:
+                changeAvatarOnClick();
+                break;
+            case R.id.changeAvatarLinearLayout:
+                changeAvatarOnClick();
+                break;
+            case R.id.avatar_imageview:
+                changeAvatarOnClick();
+                break;
+            case R.id.changeFullNameRelativeLayout:
+                changeFullNameOnClick();
+                break;
+            case R.id.changeEmailRelativeLayout:
+                changeEmailOnClick();
+                break;
+            case R.id.changeStatusLinearLayout:
+                changeStatusOnClick();
+                break;
+
+        }
     }
 
     @Override
@@ -186,11 +231,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         actionMode = startActionMode(new ActionModeCallback());
     }
 
-    public void changeAvatarOnClick(View view) {
+    public void changeAvatarOnClick() {
         imageHelper.getImage();
     }
 
-    public void changeFullNameOnClick(View view) {
+    public void changeFullNameOnClick() {
         initChangingEditText(fullNameEditText);
     }
 
@@ -199,11 +244,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         editText.requestFocus();
     }
 
-    public void changeEmailOnClick(View view) {
+    public void changeEmailOnClick() {
         initChangingEditText(emailEditText);
     }
 
-    public void changeStatusOnClick(View view) {
+    public void changeStatusOnClick() {
         initChangingEditText(statusMessageEditText);
     }
 
