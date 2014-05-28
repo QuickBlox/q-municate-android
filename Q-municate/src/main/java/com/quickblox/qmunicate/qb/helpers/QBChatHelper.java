@@ -62,7 +62,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private QBRoomChatManager roomChatManager;
     private QBRoomChat roomChat;
-    private String opponentName;
     private List<QBDialog> chatsDialogsList;
     private int counterUnreadChatsDialogs;
 
@@ -141,7 +140,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         Friend opponent = DatabaseManager.getFriendById(context, opponentId);
         privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);
         privateChatId = opponentId;
-        opponentName = opponent.getFullname();
     }
 
     public QBDialog createRoomChat(String roomName,
