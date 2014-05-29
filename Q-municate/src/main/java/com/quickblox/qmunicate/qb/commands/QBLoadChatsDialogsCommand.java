@@ -29,10 +29,7 @@ public class QBLoadChatsDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogsList  = chatHelper.getLoadedChatsDialogs();
-        if (dialogsList.isEmpty()) {
-            dialogsList = chatHelper.getChatsDialogs();
-        }
+        List<QBDialog> dialogsList  = chatHelper.getChatsDialogs();
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_CHATS_DIALOGS, (java.io.Serializable) dialogsList);
         return bundle;

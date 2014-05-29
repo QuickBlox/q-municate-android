@@ -7,8 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.utils.Consts;
 
 public class DatabaseProvider extends ContentProvider {
 
@@ -38,8 +40,13 @@ public class DatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case ChatMessagesTable.PATH_TOKEN: {
-                result = doQuery(db, uri, ChatMessagesTable.TABLE_NAME, projection, selection, selectionArgs,
+            case ChatMessageTable.PATH_TOKEN: {
+                result = doQuery(db, uri, ChatMessageTable.TABLE_NAME, projection, selection, selectionArgs,
+                        sortOrder);
+                break;
+            }
+            case ChatTable.PATH_TOKEN: {
+                result = doQuery(db, uri, ChatTable.TABLE_NAME, projection, selection, selectionArgs,
                         sortOrder);
                 break;
             }
@@ -79,8 +86,12 @@ public class DatabaseProvider extends ContentProvider {
                 result = doInsert(db, FriendTable.TABLE_NAME, FriendTable.CONTENT_URI, uri, values);
                 break;
             }
-            case ChatMessagesTable.PATH_TOKEN: {
-                result = doInsert(db, ChatMessagesTable.TABLE_NAME, ChatMessagesTable.CONTENT_URI, uri, values);
+            case ChatMessageTable.PATH_TOKEN: {
+                result = doInsert(db, ChatMessageTable.TABLE_NAME, ChatMessageTable.CONTENT_URI, uri, values);
+                break;
+            }
+            case ChatTable.PATH_TOKEN: {
+                result = doInsert(db, ChatTable.TABLE_NAME, ChatTable.CONTENT_URI, uri, values);
                 break;
             }
             // TODO SF other tables can be added
@@ -103,8 +114,12 @@ public class DatabaseProvider extends ContentProvider {
                 table = FriendTable.TABLE_NAME;
                 break;
             }
-            case ChatMessagesTable.PATH_TOKEN: {
-                table = ChatMessagesTable.TABLE_NAME;
+            case ChatMessageTable.PATH_TOKEN: {
+                table = ChatMessageTable.TABLE_NAME;
+                break;
+            }
+            case ChatTable.PATH_TOKEN: {
+                table = ChatTable.TABLE_NAME;
                 break;
             }
             // TODO SF other tables can be added
@@ -130,15 +145,19 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int token = ContentDescriptor.URI_MATCHER.match(uri);
 
-        int result = 0;
+        int result = Consts.ZERO_VALUE;
 
         switch (token) {
             case FriendTable.PATH_TOKEN: {
                 result = doDelete(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case ChatMessagesTable.PATH_TOKEN: {
-                result = doDelete(db, uri, ChatMessagesTable.TABLE_NAME, selection, selectionArgs);
+            case ChatMessageTable.PATH_TOKEN: {
+                result = doDelete(db, uri, ChatMessageTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case ChatTable.PATH_TOKEN: {
+                result = doDelete(db, uri, ChatTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             // TODO SF other tables can be added
@@ -152,15 +171,19 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int token = ContentDescriptor.URI_MATCHER.match(uri);
 
-        int result = 0;
+        int result = Consts.ZERO_VALUE;
 
         switch (token) {
             case FriendTable.PATH_TOKEN: {
                 result = doUpdate(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
-            case ChatMessagesTable.PATH_TOKEN: {
-                result = doUpdate(db, uri, ChatMessagesTable.TABLE_NAME, selection, selectionArgs, values);
+            case ChatMessageTable.PATH_TOKEN: {
+                result = doUpdate(db, uri, ChatMessageTable.TABLE_NAME, selection, selectionArgs, values);
+                break;
+            }
+            case ChatTable.PATH_TOKEN: {
+                result = doUpdate(db, uri, ChatTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
             // TODO SF other tables can be added

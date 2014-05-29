@@ -4,7 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 
 import java.text.MessageFormat;
@@ -25,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         createFriendTable(db);
         createChatMessageTable(db);
+        createChatTable(db);
         // TODO SF other tables can be created
     }
 
@@ -44,24 +46,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createChatMessageTable(SQLiteDatabase db) {
-        StringBuilder privateChatMessagesTableFields = new StringBuilder();
-        privateChatMessagesTableFields
-                .append(ChatMessagesTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
-                .append(ChatMessagesTable.Cols.BODY).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.SENDER_ID).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.TIME).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.GROUP_ID).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.SENDER_NAME).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.OPPONENT_NAME).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
-                .append(ChatMessagesTable.Cols.CHAT_ID).append(" TEXT");
-        createTable(db, ChatMessagesTable.TABLE_NAME, privateChatMessagesTableFields.toString());
+        StringBuilder chatMessageTableFields = new StringBuilder();
+        chatMessageTableFields
+                .append(ChatMessageTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(ChatMessageTable.Cols.BODY).append(" TEXT, ")
+                .append(ChatMessageTable.Cols.SENDER_ID).append(" TEXT, ")
+                .append(ChatMessageTable.Cols.TIME).append(" TEXT, ")
+                .append(ChatMessageTable.Cols.GROUP_ID).append(" TEXT, ")
+                .append(ChatMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(ChatMessageTable.Cols.CHAT_ID).append(" TEXT");
+        createTable(db, ChatMessageTable.TABLE_NAME, chatMessageTableFields.toString());
+    }
+
+    private void createChatTable(SQLiteDatabase db) {
+        StringBuilder chatTableFields = new StringBuilder();
+        chatTableFields
+                .append(ChatTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(ChatTable.Cols.DIALOG_ID).append(" TEXT, ")
+                .append(ChatTable.Cols.JID_ID).append(" TEXT, ")
+                .append(ChatTable.Cols.NAME).append(" TEXT, ")
+                .append(ChatTable.Cols.COUNT_UNREAD_MESSAGES).append(" TEXT, ")
+                .append(ChatTable.Cols.LAST_MESSAGE).append(" TEXT, ")
+                .append(ChatTable.Cols.OCCUPANTS_IDS).append(" TEXT, ")
+                .append(ChatTable.Cols.TYPE).append(" TEXT");
+        createTable(db, ChatTable.TABLE_NAME, chatTableFields.toString());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropTable(db, FriendTable.TABLE_NAME);
-        dropTable(db, ChatMessagesTable.TABLE_NAME);
+        dropTable(db, ChatMessageTable.TABLE_NAME);
+        dropTable(db, ChatTable.TABLE_NAME);
         // TODO SF other tables can be dropped
         onCreate(db);
     }

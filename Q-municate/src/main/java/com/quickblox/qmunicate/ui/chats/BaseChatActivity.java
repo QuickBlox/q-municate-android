@@ -20,6 +20,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -187,9 +188,9 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, Object chatId) {
+    protected void startLoadDialogMessages(ChatCache chatCache, Object chatId) {
         showProgress();
-        QBLoadDialogMessagesCommand.start(this, dialog, chatId);
+        QBLoadDialogMessagesCommand.start(this, chatCache, chatId);
     }
 
     private int getSmileLayoutSizeInPixels() {

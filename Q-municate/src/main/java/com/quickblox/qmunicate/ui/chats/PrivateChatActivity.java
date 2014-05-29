@@ -21,7 +21,8 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
@@ -40,7 +41,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
-    private QBDialog dialog;
+    private ChatCache chatCache;
 
     private int chatId;
 
@@ -48,10 +49,10 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         super(R.layout.activity_chat);
     }
 
-    public static void start(Context context, Friend opponent, QBDialog dialog) {
+    public static void start(Context context, Friend opponent, ChatCache chatCache) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_DIALOG, chatCache);
         context.startActivity(intent);
     }
 
@@ -60,7 +61,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         super.onCreate(savedInstanceState);
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
+        chatCache = (ChatCache) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
         chatId = opponentFriend.getId();
 
         initListView();
@@ -98,7 +99,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     private void startUpdateChatDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
         QBUpdateChatDialogCommand.start(this, chatId, lastMessage, Consts.ZERO_VALUE);
     }
 
@@ -177,8 +178,8 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     protected void onResume() {
         super.onResume();
         scrollListView();
-        if (dialog != null) {
-            startLoadDialogMessages(dialog, chatId);
+        if (chatCache != null) {
+            startLoadDialogMessages(chatCache, chatId);
         }
     }
 }

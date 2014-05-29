@@ -10,6 +10,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
         QBDialog dialog = chatHelper.createRoomChat(roomName, getFriendIdsList(friendList));
-        extras.putSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG, dialog);
+        extras.putSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG, ChatUtils.getChatCacheFromQBDialog(dialog));
         return extras;
     }
 

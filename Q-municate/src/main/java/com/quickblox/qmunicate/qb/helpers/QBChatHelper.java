@@ -25,6 +25,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -53,15 +54,12 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private QBRoomChatManager roomChatManager;
     private QBRoomChat roomChat;
-    private List<QBDialog> chatsDialogsList;
-    private int counterUnreadChatsDialogs;
 
     private PrivateChatMessageListener privateChatMessageListener = new PrivateChatMessageListener();
     private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
 
     public QBChatHelper(Context context) {
         super(context);
-        chatsDialogsList = new ArrayList<QBDialog>();
     }
 
     public void sendPrivateMessage(
@@ -132,7 +130,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
         joinRoomChat(dialog.getRoomJid());
         inviteFriendsToRoom(dialog, friendIdsList);
-        chatsDialogsList.add(dialog);
+        saveChatToCache(ChatUtils.getChatCacheFromQBDialog(dialog));
         return dialog;
     }
 
@@ -191,7 +189,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public void destroy() {
-        chatsDialogsList.clear();
         chatService.destroy();
     }
 
@@ -203,71 +200,31 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         Bundle bundle = new Bundle();
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
-        chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
-        initCounterUnreadChatsDialogs();
+        List<QBDialog> chatsDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+//        deleteChats();
+        saveChatsToCache(chatsDialogsList);
         return chatsDialogsList;
     }
 
-    private void initCounterUnreadChatsDialogs() {
-        for (QBDialog dialog : chatsDialogsList) {
-            if (dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
-                counterUnreadChatsDialogs++;
-            }
-        }
+    private void deleteChats() {
+        DatabaseManager.deleteAllChats(context);
     }
 
-    public List<QBDialog> getLoadedChatsDialogs() {
-        return chatsDialogsList;
+    private void saveChatsToCache(List<QBDialog> dialogsList) {
+        DatabaseManager.saveChats(context, ChatUtils.getChatCacheList(dialogsList));
     }
 
-    private void updateChatData(int index, String lastMessage, int unreadMessages) {
-        chatsDialogsList.get(index).setLastMessage(lastMessage);
-        if (unreadMessages != -1) {
-            chatsDialogsList.get(index).setUnreadMessageCount(unreadMessages);
-            counterUnreadChatsDialogs--;
-        }
+    private void saveChatToCache(ChatCache chatCache) {
+        DatabaseManager.saveChat(context, chatCache);
     }
 
     public void updateLoadedChatDialog(Object chatId, String lastMessage, int unreadMessages) {
-        for (int i = 0; i < chatsDialogsList.size(); i++) {
-            if(ChatUtils.isGroupMessageByChatId(chatId)) {
-                if (chatId.equals(chatsDialogsList.get(i).getRoomJid())) {
-                    updateChatData(i, lastMessage, unreadMessages);
-                    break;
-                }
-            } else {
-                String dialogId = ChatUtils.getPrivateDialogIdByChatId(chatsDialogsList, (Integer) chatId);
-                if (dialogId == null) {
-                    // TODo SF only for private chat
-                    addNewChatDialog((Integer) chatId, lastMessage, QBDialogType.PRIVATE);
-                }
-                if (dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
-                    updateChatData(i, lastMessage, unreadMessages);
-                    break;
-                }
-            }
-        }
     }
 
-    private void addNewChatDialog(int chatId, String lastMessage, QBDialogType type) {
-        QBDialog newDialog = new QBDialog(chatId + Consts.EMPTY_STRING);
-        newDialog.setLastMessage(lastMessage);
-        ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
-        occupantsIdsList.add(user.getId());
-        occupantsIdsList.add(chatId);
-        newDialog.setOccupantsIds(occupantsIdsList);
-        newDialog.setUnreadMessageCount(Consts.ZERO_VALUE);
-        newDialog.setType(type);
-        chatsDialogsList.add(newDialog);
-    }
-
-    public int getCountUnreadChatsDialogs() {
-        return counterUnreadChatsDialogs;
-    }
-
-    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog,
+    public List<QBHistoryMessage> getDialogMessages(ChatCache chatCache,
             Object chatId) throws QBResponseException {
         Bundle bundle = new Bundle();
+        QBDialog dialog = ChatUtils.getQBDialogFromChatCache(chatCache);
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
@@ -331,7 +288,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         if (ChatUtils.isNotificationMessage(chatMessage)) {
             QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage);
             tryJoinRoomChat(dialog.getRoomJid());
-            chatsDialogsList.add(dialog);
+
+            saveChatToCache(ChatUtils.getChatCacheFromQBDialog(dialog));
+
             String message = context.getResources().getString(R.string.user_created_room,
                     sender.getFullname(), dialog.getName());
             chatMessage.setBody(message);
@@ -356,7 +315,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     chatMessage.getSenderId(), attachURL));
             notifyMessageReceived(chatMessage, friend);
-            updateLoadedChatDialog(chatMessage.getSenderId(), chatMessage.getBody(), -1);
         }
     }
 

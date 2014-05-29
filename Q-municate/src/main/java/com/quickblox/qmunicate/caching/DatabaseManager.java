@@ -7,8 +7,10 @@ import android.database.Cursor;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBHistoryMessage;
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
+import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.ChatMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
@@ -26,7 +28,7 @@ public class DatabaseManager {
     }
 
     public static void saveFriend(Context context, Friend friend) {
-        ContentValues values = getContentValues(friend);
+        ContentValues values = getContentValuesFriendTable(friend);
 
         String condition = FriendTable.Cols.ID + "='" + friend.getId() + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -38,7 +40,7 @@ public class DatabaseManager {
         }
     }
 
-    private static ContentValues getContentValues(Friend friend) {
+    private static ContentValues getContentValuesFriendTable(Friend friend) {
         ContentValues values = new ContentValues();
         values.put(FriendTable.Cols.ID, friend.getId());
         values.put(FriendTable.Cols.FULLNAME, friend.getFullname());
@@ -50,6 +52,53 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.ONLINE, friend.isOnline());
         values.put(FriendTable.Cols.TYPE, friend.getType().name());
         return values;
+    }
+
+    public static void saveChats(Context context, List<ChatCache> chatCacheList) {
+        for (ChatCache chatCache : chatCacheList) {
+            saveChat(context, chatCache);
+        }
+    }
+
+    public static void saveChat(Context context, ChatCache chatCache) {
+        ContentValues values = getContentValuesChatTable(chatCache);
+        String condition = ChatTable.Cols.DIALOG_ID + "='" + chatCache.getDialogId() + "'";
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(ChatTable.CONTENT_URI, null, condition, null, null);
+        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
+            resolver.update(ChatTable.CONTENT_URI, values, condition, null);
+        } else {
+            resolver.insert(ChatTable.CONTENT_URI, values);
+        }
+    }
+
+    private static ContentValues getContentValuesChatTable(ChatCache chatCache) {
+        ContentValues values = new ContentValues();
+        values.put(ChatTable.Cols.DIALOG_ID, chatCache.getDialogId());
+        values.put(ChatTable.Cols.JID_ID, chatCache.getRoomJidId());
+        values.put(ChatTable.Cols.NAME, chatCache.getName());
+        values.put(ChatTable.Cols.COUNT_UNREAD_MESSAGES, chatCache.getCountUnreadMessages());
+        values.put(ChatTable.Cols.LAST_MESSAGE, chatCache.getLastMessage());
+        String occupantsIds = ChatUtils.occupantIdsToStringFromArray(chatCache.getOccupantsIds());
+        values.put(ChatTable.Cols.OCCUPANTS_IDS, occupantsIds);
+        values.put(ChatTable.Cols.TYPE, chatCache.getType());
+        return values;
+    }
+
+    public static ChatCache getChatCacheFromCursor(Cursor cursor) {
+        String dialogId = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.DIALOG_ID));
+        String jidId = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.JID_ID));
+        String name = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.NAME));
+        String[] occupantsIdsArray = (cursor.getString(cursor.getColumnIndex(ChatTable.Cols.OCCUPANTS_IDS)))
+                .split(ChatUtils.OCCUPANT_IDS_DIVIDER);
+        int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.COUNT_UNREAD_MESSAGES));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.LAST_MESSAGE));
+        int type = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.TYPE));
+
+        ChatCache chatCache = new ChatCache(dialogId, jidId, name, countUnreadMessages, lastMessage,
+                occupantsIdsArray, type);
+
+        return chatCache;
     }
 
     public static Friend getFriendById(Context context, int friendId) {
@@ -83,18 +132,6 @@ public class DatabaseManager {
         return friend;
     }
 
-    private static List<Friend> getFriendListFromCursor(Cursor cursor) {
-        if (cursor.getCount() > Consts.ZERO_VALUE) {
-            List<Friend> friendList = new ArrayList<Friend>(cursor.getCount());
-            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                friendList.add(getFriendFromCursor(cursor));
-            }
-            cursor.close();
-            return friendList;
-        }
-        return null;
-    }
-
     public static boolean searchFriendInBase(Context context, int searchId) {
         Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
                 FriendTable.Cols.ID + " = " + searchId, null, null);
@@ -116,6 +153,23 @@ public class DatabaseManager {
         return cursor;
     }
 
+    public static Cursor getAllChats(Context context) {
+        return context.getContentResolver().query(ChatTable.CONTENT_URI, null, null, null,
+                ChatTable.Cols.ID + " ORDER BY " + ChatTable.Cols.NAME + " COLLATE NOCASE ASC");
+    }
+
+    public static int getCountUnreadChatsDialogs(Context context) {
+        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
+                ChatTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
+        return cursor.getCount();
+    }
+
+    public static boolean isChatDialogInBase(Context context, String dialogId) {
+        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
+                ChatTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
+        return cursor.getCount() > Consts.ZERO_VALUE;
+    }
+
     public static Cursor getAllFriends(Context context) {
         return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null,
                 FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
@@ -126,17 +180,21 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllGroupChatMessagesByGroupId(Context context, String groupId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
-                ChatMessagesTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
+        return context.getContentResolver().query(ChatMessageTable.CONTENT_URI, null,
+                ChatMessageTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
     }
 
     public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
-        return context.getContentResolver().query(ChatMessagesTable.CONTENT_URI, null,
-                ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null, null);
+        return context.getContentResolver().query(ChatMessageTable.CONTENT_URI, null,
+                ChatMessageTable.Cols.CHAT_ID + " = " + chatId, null, null);
+    }
+
+    public static void deleteAllMessages(Context context) {
+        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI, null, null);
     }
 
     public static void deleteAllChats(Context context) {
-        context.getContentResolver().delete(ChatMessagesTable.CONTENT_URI, null, null);
+        context.getContentResolver().delete(ChatTable.CONTENT_URI, null, null);
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList, Object chatId) {
@@ -164,25 +222,37 @@ public class DatabaseManager {
 
     public static void saveChatMessage(Context context, ChatMessageCache chatMessageCache) {
         ContentValues values = new ContentValues();
-        values.put(ChatMessagesTable.Cols.BODY, chatMessageCache.getMessage());
-        values.put(ChatMessagesTable.Cols.SENDER_ID, chatMessageCache.getSenderId());
-        values.put(ChatMessagesTable.Cols.TIME, System.currentTimeMillis());
-        values.put(ChatMessagesTable.Cols.ATTACH_FILE_ID, chatMessageCache.getAttachUrl());
+        values.put(ChatMessageTable.Cols.BODY, chatMessageCache.getMessage());
+        values.put(ChatMessageTable.Cols.SENDER_ID, chatMessageCache.getSenderId());
+        values.put(ChatMessageTable.Cols.TIME, System.currentTimeMillis());
+        values.put(ChatMessageTable.Cols.ATTACH_FILE_ID, chatMessageCache.getAttachUrl());
         if (chatMessageCache.getRoomJid() != null) {
-            values.put(ChatMessagesTable.Cols.GROUP_ID, chatMessageCache.getRoomJid());
+            values.put(ChatMessageTable.Cols.GROUP_ID, chatMessageCache.getRoomJid());
         } else if (chatMessageCache.getChatId() != null) {
-            values.put(ChatMessagesTable.Cols.CHAT_ID, chatMessageCache.getChatId());
+            values.put(ChatMessageTable.Cols.CHAT_ID, chatMessageCache.getChatId());
         }
-        context.getContentResolver().insert(ChatMessagesTable.CONTENT_URI, values);
+        context.getContentResolver().insert(ChatMessageTable.CONTENT_URI, values);
     }
 
     public static void deleteMessagesByChatId(Context context, int chatId) {
-        context.getContentResolver().delete(ChatMessagesTable.CONTENT_URI,
-                ChatMessagesTable.Cols.CHAT_ID + " = " + chatId, null);
+        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI,
+                ChatMessageTable.Cols.CHAT_ID + " = " + chatId, null);
     }
 
     public static void deleteMessagesByGroupId(Context context, String groupId) {
-        context.getContentResolver().delete(ChatMessagesTable.CONTENT_URI,
-                ChatMessagesTable.Cols.GROUP_ID + " = '" + groupId + "'", null);
+        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI,
+                ChatMessageTable.Cols.GROUP_ID + " = '" + groupId + "'", null);
+    }
+
+    private static List<Friend> getFriendListFromCursor(Cursor cursor) {
+        if (cursor.getCount() > Consts.ZERO_VALUE) {
+            List<Friend> friendList = new ArrayList<Friend>(cursor.getCount());
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                friendList.add(getFriendFromCursor(cursor));
+            }
+            cursor.close();
+            return friendList;
+        }
+        return null;
     }
 }

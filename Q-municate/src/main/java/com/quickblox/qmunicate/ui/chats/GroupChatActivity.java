@@ -16,13 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.BaseAdapter;
 
-import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
@@ -41,7 +41,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
 
     private BaseAdapter messagesAdapter;
 
-    private QBDialog groupDialog;
+    private ChatCache chatCache;
     private ArrayList<Friend> friendList;
     private String groupName;
     private String groupJid;
@@ -56,9 +56,9 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
         context.startActivity(intent);
     }
 
-    public static void start(Context context, QBDialog dialog) {
+    public static void start(Context context, ChatCache chatCache) {
         Intent intent = new Intent(context, GroupChatActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_DIALOG, dialog);
+        intent.putExtra(QBServiceConsts.EXTRA_CHAT_DIALOG, chatCache);
         context.startActivity(intent);
     }
 
@@ -76,9 +76,9 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     private void initChat() {
         Bundle extras = getIntent().getExtras();
         if (getIntent().hasExtra(QBServiceConsts.EXTRA_CHAT_DIALOG)) {
-            groupDialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
-            groupName = groupDialog.getName();
-            groupJid = groupDialog.getRoomJid();
+            chatCache = (ChatCache) extras.getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
+            groupName = chatCache.getName();
+            groupJid = chatCache.getRoomJidId();
             QBJoinGroupChatCommand.start(this, groupJid);
         } else {
             friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_GROUP_CHAT);
@@ -132,7 +132,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
 
     private void startUpdateChatDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
         QBUpdateChatDialogCommand.start(this, groupJid, lastMessage, Consts.ZERO_VALUE);
     }
 
@@ -213,16 +213,18 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     protected void onResume() {
         super.onResume();
         addActions();
-        startLoadDialogMessages(groupDialog, groupJid);
+        if (chatCache != null) {
+            startLoadDialogMessages(chatCache, groupJid);
+        }
     }
 
     private class CreateChatSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            groupDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
-            groupName = groupDialog.getName();
-            groupJid = groupDialog.getRoomJid();
+            chatCache = (ChatCache) bundle.getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
+            groupName = chatCache.getName();
+            groupJid = chatCache.getDialogId();
             initListView();
         }
     }
