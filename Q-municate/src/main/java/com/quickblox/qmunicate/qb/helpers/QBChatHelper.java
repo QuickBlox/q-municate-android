@@ -92,7 +92,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
         privateChat.sendMessage(chatMessage);
-        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId, qbFile.getPublicUrl()));
+        saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId,
+                qbFile.getPublicUrl()));
     }
 
     private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
@@ -252,7 +253,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             }
             if (dialogId.equals(chatsDialogsList.get(i).getDialogId())) {
                 chatsDialogsList.get(i).setLastMessage(lastMessage);
-                if(unreadMessages != -1) {
+                if (unreadMessages != -1) {
                     chatsDialogsList.get(i).setUnreadMessageCount(unreadMessages);
                     counterUnreadChatsDialogs--;
                 }
@@ -273,7 +274,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         chatsDialogsList.add(newDialog);
     }
 
-    private void processIfRoomNotificationMessage(Friend sender, QBChatMessage chatMessage) {
+    private void processIfInvitationToRoomMessage(Friend sender, QBChatMessage chatMessage) {
         if (ChatUtils.isNotificationMessage(chatMessage)) {
             QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage);
             tryJoinRoomChat(dialog.getRoomJid());
@@ -292,12 +293,31 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
+    private void initCounterUnreadChatsDialogs() {
+        for (QBDialog dialog : chatsDialogsList) {
+            if (dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+                counterUnreadChatsDialogs++;
+            }
+        }
+    }
+
+    public int getCountUnreadChatsDialogs() {
+        return counterUnreadChatsDialogs;
+    }
+
+    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog) throws QBResponseException {
+        Bundle bundle = new Bundle();
+        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
+        return QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
+    }
+
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
 
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-            processIfRoomNotificationMessage(friend, chatMessage);
+            processIfInvitationToRoomMessage(friend, chatMessage);
             String attachURL = getAttachUrlIfExists(chatMessage);
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     chatMessage.getSenderId(), attachURL));
@@ -317,24 +337,5 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 notifyMessageReceived(chatMessage, friend);
             }
         }
-    }
-
-    private void initCounterUnreadChatsDialogs() {
-        for (QBDialog dialog: chatsDialogsList) {
-            if(dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
-                counterUnreadChatsDialogs++;
-            }
-        }
-    }
-
-    public int getCountUnreadChatsDialogs() {
-        return counterUnreadChatsDialogs;
-    }
-
-    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog) throws QBResponseException {
-        Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-        customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
-        return QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
     }
 }
