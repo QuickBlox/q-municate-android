@@ -38,19 +38,11 @@ import org.jivesoftware.smack.XMPPException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerListener {
 
-    public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
-    public static final String PROPERTY_ROOM_NAME = "name";
-    public static final String PROPERTY_DIALOG_TYPE_CODE = "type";
-    public static final String PROPERTY_DIALOG_ID = "_id";
-    public static final String PROPERTY_ROOM_JID = "room_jid";
-
     private static final String TAG = QBChatHelper.class.getSimpleName();
-    private static final String OCCUPANT_IDS_DIVIDER = ",";
 
     private QBChatService chatService;
     private QBUser user;
@@ -69,7 +61,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public QBChatHelper(Context context) {
         super(context);
-        chatsDialogsList = Collections.emptyList();
+        chatsDialogsList = new ArrayList<QBDialog>();
     }
 
     public void sendPrivateMessage(
@@ -169,11 +161,11 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private void notifyFriendAboutInvitation(QBDialog dialog,
             Integer friendId) throws XMPPException, SmackException {
         QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
-        QBChatMessage message = createRoomNotificationMessage(dialog);
+        QBChatMessage message = ChatUtils.createRoomNotificationMessage(dialog);
         chat.sendMessage(message);
     }
-
-    private QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
+        
+	private QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getId());
         String roomJid = dialog.getRoomJid();
         String occupantsIds = occupantIdsToStringFromDialog(dialog);
@@ -191,6 +183,15 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private String occupantIdsToStringFromDialog(QBDialog dialog) {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, dialog.getOccupants());
+    }
+
+    public void joinRoomChat(String jid) throws XMPPException, SmackException {
+        roomChat = roomChatManager.getRoom(jid);
+        if (roomChat == null) {
+            roomChat = roomChatManager.createRoom(jid);
+            roomChat.addMessageListener(roomChatMessageListener);
+            roomChat.join();
+        }
     }
 
     public QBFile loadAttachFile(File file) {
@@ -280,7 +281,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private void addNewChatDialog(int chatId, String lastMessage, QBDialogType type) {
         QBDialog newDialog = new QBDialog(chatId + Consts.EMPTY_STRING);
         newDialog.setLastMessage(lastMessage);
-        ArrayList occupantsIdsList = new ArrayList<Integer>();
+        ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
         occupantsIdsList.add(user.getId());
         occupantsIdsList.add(chatId);
         newDialog.setOccupantsIds(occupantsIdsList);
@@ -356,8 +357,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void processIfRoomNotificationMessage(Friend sender, QBChatMessage chatMessage) {
-        if (isNotificationMessage(chatMessage)) {
-            QBDialog dialog = parseDialogFromMessage(chatMessage);
+        if (ChatUtils.isNotificationMessage(chatMessage)) {
+            QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage);
             tryJoinRoomChat(dialog.getRoomJid());
             chatsDialogsList.add(dialog);
             String message = context.getResources().getString(R.string.user_created_room,
