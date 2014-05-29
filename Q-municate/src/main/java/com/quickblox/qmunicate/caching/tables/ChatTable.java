@@ -20,6 +20,6 @@ public class ChatTable {
         public static final String COUNT_UNREAD_MESSAGES = "count_unread_messages";
         public static final String LAST_MESSAGE = "last_message";
         public static final String OCCUPANTS_IDS = "occupants_ids";
-        public static final String TYPE = "type";
+        public static final String ORDINAL_TYPE = "ordinal_type";
     }
 }

@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(ChatTable.Cols.COUNT_UNREAD_MESSAGES).append(" TEXT, ")
                 .append(ChatTable.Cols.LAST_MESSAGE).append(" TEXT, ")
                 .append(ChatTable.Cols.OCCUPANTS_IDS).append(" TEXT, ")
-                .append(ChatTable.Cols.TYPE).append(" TEXT");
+                .append(ChatTable.Cols.ORDINAL_TYPE).append(" TEXT");
         createTable(db, ChatTable.TABLE_NAME, chatTableFields.toString());
     }
 

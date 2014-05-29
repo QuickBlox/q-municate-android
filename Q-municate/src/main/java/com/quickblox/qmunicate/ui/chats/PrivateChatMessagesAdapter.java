@@ -63,10 +63,6 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         return view;
     }
 
-    private boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
-    }
-
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
@@ -99,12 +95,6 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
-    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-            final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
-    }
-
     @Override
     public void onCachedImageFileReceived(File imageFile) {
     }
@@ -120,6 +110,21 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         return getItemViewType(cursor);
     }
 
+    @Override
+    public int getViewTypeCount() {
+        return Consts.MESSAGES_TYPE_COUNT;
+    }
+
+    private boolean isOwnMessage(int senderId) {
+        return senderId == currentUser.getId();
+    }
+
+    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
+                                    final ImageView attachImageView, final ProgressBar progressBar) {
+        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
+                progressBar));
+    }
+
     private int getItemViewType(Cursor cursor) {
         int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
@@ -127,11 +132,6 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         } else {
             return Consts.RIGHT_CHAT_MESSAGE_TYPE_2;
         }
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return Consts.MESSAGES_TYPE_COUNT;
     }
 
     private static class ViewHolder {
@@ -152,7 +152,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         private Bitmap loadedImageBitmap;
 
         public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
-                final ProgressBar progressBar) {
+                                  final ProgressBar progressBar) {
             this.pleaseWaitTextView = pleaseWaitTextView;
             this.attachImageView = attachImageView;
             this.progressBar = progressBar;

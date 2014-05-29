@@ -22,7 +22,6 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
-import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
@@ -41,7 +40,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
-    private ChatCache chatCache;
+    private QBDialog dialog;
 
     private int chatId;
 
@@ -49,10 +48,10 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         super(R.layout.activity_chat);
     }
 
-    public static void start(Context context, Friend opponent, ChatCache chatCache) {
+    public static void start(Context context, Friend opponent, QBDialog dialog) {
         Intent intent = new Intent(context, PrivateChatActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_DIALOG, chatCache);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startActivity(intent);
     }
 
@@ -61,7 +60,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         super.onCreate(savedInstanceState);
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        chatCache = (ChatCache) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG);
+        dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         chatId = opponentFriend.getId();
 
         initListView();
@@ -71,7 +70,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     @Override
     protected void onUpdateChatDialog() {
-        if(!messagesAdapter.isEmpty()) {
+        if (!messagesAdapter.isEmpty()) {
             startUpdateChatDialog();
         }
     }
@@ -91,39 +90,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     protected void onFileLoaded(QBFile file) {
         QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, file);
         scrollListView();
-    }
-
-    private void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
-    }
-
-    private void startUpdateChatDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
-        QBUpdateChatDialogCommand.start(this, chatId, lastMessage, Consts.ZERO_VALUE);
-    }
-
-    private void initListView() {
-        messagesAdapter = getMessagesAdapter();
-        messagesListView.setAdapter(messagesAdapter);
-    }
-
-    private void initActionBar() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(opponentFriend.getFullname());
-        actionBar.setSubtitle(opponentFriend.getOnlineStatus());
-    }
-
-    private void initChat() {
-        QBCreatePrivateChatCommand.start(this, opponentFriend);
-    }
-
-    protected BaseAdapter getMessagesAdapter() {
-        return new PrivateChatMessagesAdapter(this, getAllPrivateChatMessages(), opponentFriend);
-    }
-
-    private Cursor getAllPrivateChatMessages() {
-        return DatabaseManager.getAllPrivateChatMessagesByChatId(this, chatId);
     }
 
     @Override
@@ -164,6 +130,48 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         return super.onOptionsItemSelected(item);
     }
 
+    protected BaseAdapter getMessagesAdapter() {
+        return new PrivateChatMessagesAdapter(this, getAllPrivateChatMessages(), opponentFriend);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        scrollListView();
+        if (dialog != null) {
+            startLoadDialogMessages(dialog, chatId);
+        }
+    }
+
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+    }
+
+    private void startUpdateChatDialog() {
+        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
+        QBUpdateChatDialogCommand.start(this, chatId, lastMessage, Consts.ZERO_VALUE);
+    }
+
+    private void initListView() {
+        messagesAdapter = getMessagesAdapter();
+        messagesListView.setAdapter(messagesAdapter);
+    }
+
+    private void initActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setTitle(opponentFriend.getFullname());
+        actionBar.setSubtitle(opponentFriend.getOnlineStatus());
+    }
+
+    private void initChat() {
+        QBCreatePrivateChatCommand.start(this, opponentFriend);
+    }
+
+    private Cursor getAllPrivateChatMessages() {
+        return DatabaseManager.getAllPrivateChatMessagesByChatId(this, chatId);
+    }
+
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
             QBUser qbUser = new QBUser(friend.getId());
@@ -171,15 +179,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
             CallActivity.start(PrivateChatActivity.this, qbUser, callType);
         } else if (!friend.isOnline()) {
             ErrorUtils.showError(this, getString(R.string.frd_offline_user));
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        scrollListView();
-        if (chatCache != null) {
-            startLoadDialogMessages(chatCache, chatId);
         }
     }
 }

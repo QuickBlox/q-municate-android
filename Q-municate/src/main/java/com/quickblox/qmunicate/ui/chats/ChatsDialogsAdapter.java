@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.ChatTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -42,34 +42,29 @@ public class ChatsDialogsAdapter extends BaseCursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        int type = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.TYPE));
-        String name = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.NAME));
-        String occupantsIds = ChatUtils.deleteBracketsFromOccupantsArray(cursor.getString(cursor.getColumnIndex(ChatTable.Cols.OCCUPANTS_IDS)));
-        int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.COUNT_UNREAD_MESSAGES));
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.LAST_MESSAGE));
-        String[] occupantsIdsArray = occupantsIds.split(ChatUtils.OCCUPANT_IDS_DIVIDER);
+        QBDialog dialog = DatabaseManager.getQBDialogFromCursor(cursor);
 
-        if (type == QBDialogType.PRIVATE.ordinal()) {
-            int occupantId = ChatUtils.getOccupantIdFromArray(occupantsIdsArray);
+        if (dialog.getType() == QBDialogType.PRIVATE) {
+            int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
             viewHolder.userCountTextView.setVisibility(View.GONE);
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_user);
         } else {
-            viewHolder.nameTextView.setText(name);
+            viewHolder.nameTextView.setText(dialog.getName());
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);
-            viewHolder.userCountTextView.setText(occupantsIdsArray.length + Consts.EMPTY_STRING);
+            viewHolder.userCountTextView.setText(dialog.getOccupants().size() + Consts.EMPTY_STRING);
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
         }
 
-        if (countUnreadMessages > Consts.ZERO_VALUE) {
-            viewHolder.unreadMessagesTextView.setText(countUnreadMessages + Consts.EMPTY_STRING);
+        if (dialog.getUnreadMessageCount() > Consts.ZERO_VALUE) {
+            viewHolder.unreadMessagesTextView.setText(dialog.getUnreadMessageCount() + Consts.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(lastMessage);
+        viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
     }
 
     public Friend getOccupantById(int occupantId) {

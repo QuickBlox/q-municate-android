@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -45,43 +45,8 @@ public class ChatsDialogsFragment extends BaseFragment {
         initUI(view);
         initListeners();
         initChatsDialogs();
-        
+
         return view;
-    }
-
-    private void initUI(View view) {
-        setHasOptionsMenu(true);
-        chatsDialogsListView = (ListView) view.findViewById(R.id.chats_listview);
-    }
-
-    private void initListeners() {
-        chatsDialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                Cursor selectedChatCursor = (Cursor) chatsDialogsAdapter.getItem(position);
-                ChatCache chatCache = DatabaseManager.getChatCacheFromCursor(selectedChatCursor);
-                if (chatCache.getType() == QBDialogType.PRIVATE.ordinal()) {
-                    startPrivateChatActivity(chatCache);
-                } else {
-                    startGroupChatActivity(chatCache);
-                }
-            }
-        });
-    }
-
-    private void startPrivateChatActivity(ChatCache chatCache) {
-        int occupantId = ChatUtils.getOccupantIdFromArray(chatCache.getOccupantsIds());
-        Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
-        if (chatCache.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
-            PrivateChatActivity.start(baseActivity, occupant, null);
-        } else {
-            PrivateChatActivity.start(baseActivity, occupant, chatCache);
-        }
-    }
-
-    private void startGroupChatActivity(ChatCache chatCache) {
-        GroupChatActivity.start(baseActivity, chatCache);
     }
 
     @Override
@@ -104,6 +69,41 @@ public class ChatsDialogsFragment extends BaseFragment {
                 break;
         }
         return true;
+    }
+
+    private void initUI(View view) {
+        setHasOptionsMenu(true);
+        chatsDialogsListView = (ListView) view.findViewById(R.id.chats_listview);
+    }
+
+    private void initListeners() {
+        chatsDialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                Cursor selectedChatCursor = (Cursor) chatsDialogsAdapter.getItem(position);
+                QBDialog dialog = DatabaseManager.getQBDialogFromCursor(selectedChatCursor);
+                if (dialog.getType() == QBDialogType.PRIVATE) {
+                    startPrivateChatActivity(dialog);
+                } else {
+                    startGroupChatActivity(dialog);
+                }
+            }
+        });
+    }
+
+    private void startPrivateChatActivity(QBDialog dialog) {
+        int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
+        Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
+        if (dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
+            PrivateChatActivity.start(baseActivity, occupant, null);
+        } else {
+            PrivateChatActivity.start(baseActivity, occupant, dialog);
+        }
+    }
+
+    private void startGroupChatActivity(QBDialog dialog) {
+        GroupChatActivity.start(baseActivity, dialog);
     }
 
     private void addActions() {
@@ -130,10 +130,9 @@ public class ChatsDialogsFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
-//            List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
-//                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-//
-//            initChatsDialogs();
+            // TODO SF now not used
+            // List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(QBServiceConsts.EXTRA_CHATS_DIALOGS);
+            // initChatsDialogs();
         }
     }
 }

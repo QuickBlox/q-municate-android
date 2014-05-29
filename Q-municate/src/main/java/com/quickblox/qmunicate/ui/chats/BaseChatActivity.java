@@ -20,7 +20,6 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
-import com.quickblox.qmunicate.model.ChatCache;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -77,31 +76,10 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
         addActions();
     }
 
-    private void initUI() {
-        smilesLayout = findViewById(R.id.smiles_linearlayout);
-        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
-        smilesViewPager = (ViewPager) findViewById(R.id.smiles_viewpager);
-        chatEditText = (ChatEditText) findViewById(R.id.message_edittext);
-        messagesListView = (ListView) findViewById(R.id.messages_listview);
-        messageEditText = _findViewById(R.id.message_edittext);
-        attachButton = _findViewById(R.id.attach_button);
-        sendButton = _findViewById(R.id.send_button);
-    }
-
-    private void initListeners() {
-        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                super.onTextChanged(s, start, before, count);
-                if (TextUtils.isEmpty(s)) {
-                    sendButton.setVisibility(View.GONE);
-                    attachButton.setVisibility(View.VISIBLE);
-                } else {
-                    sendButton.setVisibility(View.VISIBLE);
-                    attachButton.setVisibility(View.GONE);
-                }
-            }
-        });
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onUpdateChatDialog();
     }
 
     public void initSmileWidgets() {
@@ -112,28 +90,6 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
         smilesPagerIndicator.setViewPager(smilesViewPager);
         smilesAnimator = new HeightAnimator(chatEditText, smilesLayout);
     }
-
-    private void initSmiles() {
-        IntentFilter filter = new IntentFilter(QBServiceConsts.SMILE_SELECTED);
-        smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
-        registerReceiver(smileSelectedBroadcastReceiver, filter);
-    }
-
-    protected void addActions() {
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        onUpdateChatDialog();
-    }
-
-    protected abstract void onUpdateChatDialog();
 
     public void attachButtonOnClick(View view) {
         imageHelper.getImage();
@@ -147,15 +103,15 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
         }
     }
 
-    private boolean isSmilesLayoutShowing() {
-        return smilesLayout.getHeight() != Consts.ZERO_VALUE;
+    protected void addActions() {
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
+        updateBroadcastActionList();
     }
 
-    private void hideView(View view) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-        params.height = Consts.ZERO_VALUE;
-        view.setLayoutParams(params);
-    }
+    protected abstract void onUpdateChatDialog();
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -188,9 +144,52 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(ChatCache chatCache, Object chatId) {
+    protected void startLoadDialogMessages(QBDialog dialog, Object chatId) {
         showProgress();
-        QBLoadDialogMessagesCommand.start(this, chatCache, chatId);
+        QBLoadDialogMessagesCommand.start(this, dialog, chatId);
+    }
+
+    private void initUI() {
+        smilesLayout = findViewById(R.id.smiles_linearlayout);
+        smilesPagerIndicator = (IconPageIndicator) findViewById(R.id.smiles_pager_indicator);
+        smilesViewPager = (ViewPager) findViewById(R.id.smiles_viewpager);
+        chatEditText = (ChatEditText) findViewById(R.id.message_edittext);
+        messagesListView = (ListView) findViewById(R.id.messages_listview);
+        messageEditText = _findViewById(R.id.message_edittext);
+        attachButton = _findViewById(R.id.attach_button);
+        sendButton = _findViewById(R.id.send_button);
+    }
+
+    private void initListeners() {
+        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                super.onTextChanged(s, start, before, count);
+                if (TextUtils.isEmpty(s)) {
+                    sendButton.setVisibility(View.GONE);
+                    attachButton.setVisibility(View.VISIBLE);
+                } else {
+                    sendButton.setVisibility(View.VISIBLE);
+                    attachButton.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void initSmiles() {
+        IntentFilter filter = new IntentFilter(QBServiceConsts.SMILE_SELECTED);
+        smileSelectedBroadcastReceiver = new SmileSelectedBroadcastReceiver();
+        registerReceiver(smileSelectedBroadcastReceiver, filter);
+    }
+
+    private boolean isSmilesLayoutShowing() {
+        return smilesLayout.getHeight() != Consts.ZERO_VALUE;
+    }
+
+    private void hideView(View view) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+        params.height = Consts.ZERO_VALUE;
+        view.setLayoutParams(params);
     }
 
     private int getSmileLayoutSizeInPixels() {

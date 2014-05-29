@@ -13,14 +13,13 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.ChatUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class QBCreateGroupChatCommand extends ServiceCommand {
 
     private QBChatHelper chatHelper;
 
     public QBCreateGroupChatCommand(Context context, QBChatHelper chatHelper, String successAction,
-            String failAction) {
+                                    String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;
     }
@@ -38,16 +37,8 @@ public class QBCreateGroupChatCommand extends ServiceCommand {
                 QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        QBDialog dialog = chatHelper.createRoomChat(roomName, getFriendIdsList(friendList));
-        extras.putSerializable(QBServiceConsts.EXTRA_CHAT_DIALOG, ChatUtils.getChatCacheFromQBDialog(dialog));
+        QBDialog dialog = chatHelper.createRoomChat(roomName, ChatUtils.getFriendIdsList(friendList));
+        extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
-    }
-
-    private ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
-        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (Friend friend : friendList) {
-            friendIdsList.add(friend.getId());
-        }
-        return friendIdsList;
     }
 }

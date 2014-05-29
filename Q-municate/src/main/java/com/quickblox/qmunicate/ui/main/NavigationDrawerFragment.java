@@ -47,7 +47,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private ImageButton logoutButton;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private UpdateCountUnreadChatsDialogsListener updateCountUnreadChatsDialogsListener;
+    private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
@@ -110,7 +110,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView.setAdapter(navigationDrawerAdapter);
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        updateCountUnreadChatsDialogsListener = navigationDrawerAdapter;
+        updateCountUnreadDialogsListener = navigationDrawerAdapter;
 
         return rootView;
     }
@@ -254,13 +254,13 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    public interface UpdateCountUnreadChatsDialogsListener {
+    public interface UpdateCountUnreadDialogsListener {
 
-        public void onUpdateCountUnreadChatsDialogs(int count);
+        public void onUpdateCountUnreadDialogs(int count);
     }
 
-    private int getCounterUnreadChatsDialogs() {
-        return DatabaseManager.getCountUnreadChatsDialogs(baseActivity);
+    private int getCounterUnreadDialogs() {
+        return DatabaseManager.getCountUnreadDialogs(baseActivity);
     }
 
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
@@ -284,7 +284,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawer();
             }
 
-            updateCountUnreadChatsDialogsListener.onUpdateCountUnreadChatsDialogs(getCounterUnreadChatsDialogs());
+            updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
         }
 
         @Override
