@@ -12,26 +12,32 @@
         android:id="@+id/changeAvatarLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/button_general_selector"
         android:gravity="center_horizontal"
-        android:onClick="changeAvatarOnClick"
         android:orientation="horizontal">
 
         <com.quickblox.qmunicate.ui.views.RoundedImageView
             android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_big_avatar_layout_width"
             android:layout_height="@dimen/image_view_big_avatar_layout_height"
+            android:duplicateParentState="true"
             android:scaleType="centerCrop"
             android:src="@drawable/placeholder_user" />
 
         <TextView
+            android:id="@+id/avatar_textview"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:paddingRight="70dp"
+            android:duplicateParentState="true"
             android:text="@string/sup_choose_user_picture"
             android:textColor="@android:color/darker_gray"
             android:textSize="@dimen/text_size" />
@@ -45,11 +51,11 @@
         android:textColor="@android:color/darker_gray" />
 
     <RelativeLayout
+        android:id="@+id/changeFullNameRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
         android:clickable="true"
-        android:onClick="changeFullNameOnClick"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -64,6 +70,7 @@
             android:focusableInTouchMode="true"
             android:inputType="text"
             android:singleLine="true"
+            android:duplicateParentState="true"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size" />
 
@@ -74,6 +81,7 @@
             android:layout_alignParentRight="true"
             android:background="@drawable/button_general_selector"
             android:clickable="false"
+            android:duplicateParentState="true"
             android:text="@string/prf_change"
             android:textColor="@color/link_text_color"
             android:textSize="@dimen/text_size" />
@@ -88,11 +96,11 @@
         android:textColor="@android:color/darker_gray" />
 
     <RelativeLayout
+        android:id="@+id/changeEmailRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
         android:clickable="true"
-        android:onClick="changeEmailOnClick"
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
@@ -109,6 +117,7 @@
             android:focusableInTouchMode="true"
             android:inputType="textEmailAddress"
             android:singleLine="true"
+            android:duplicateParentState="true"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size" />
 
@@ -119,6 +128,7 @@
             android:layout_alignParentRight="true"
             android:background="@drawable/button_general_selector"
             android:clickable="false"
+            android:duplicateParentState="true"
             android:text="@string/prf_change"
             android:textColor="@color/link_text_color"
             android:textSize="@dimen/text_size" />
@@ -130,13 +140,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/prf_status_message"
+        android:visibility="gone"
         android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
+        android:id="@+id/changeStatusLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:clickable="true"
-        android:onClick="changeStatusOnClick"
         android:orientation="vertical">
 
         <EditText
@@ -146,6 +158,7 @@
             android:background="@null"
             android:clickable="false"
             android:enabled="false"
+            android:duplicateParentState="true"
             android:inputType="textMultiLine"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size" />
@@ -155,6 +168,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_general_selector"
             android:clickable="false"
+            android:duplicateParentState="true"
             android:text="@string/prf_edit_status"
             android:textColor="@color/link_text_color"
             android:textSize="@dimen/text_size" />
