@@ -127,9 +127,9 @@ public class FriendDetailsActivity extends BaseActivity {
             case android.R.id.home:
                 navigateToParent();
                 return true;
-            case R.id.action_delete:
-                showRemoveUserDialog();
-                return true;
+//            case R.id.action_delete:
+//                showRemoveUserDialog();
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

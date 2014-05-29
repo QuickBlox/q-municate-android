@@ -101,11 +101,16 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public void sendPrivateMessageWithAttachImage(
-            QBFile file) throws XMPPException, SmackException.NotConnectedException {
-        QBChatMessage chatMessage = getQBChatMessageWithImage(file);
+            QBFile qbFile) throws XMPPException, SmackException.NotConnectedException {
+        QBChatMessage chatMessage = getQBChatMessageWithImage(qbFile);
         privateChat.sendMessage(chatMessage);
         saveMessageToCache(new ChatMessageCache(Consts.EMPTY_STRING, user.getId(), privateChatId,
-                file.getPublicUrl()));
+                qbFile.getPublicUrl()));
+    }
+
+    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
+        DatabaseManager.saveChatMessage(context, new ChatMessageCache(chatMessage.getBody(), senderId,
+                groupId, null));
     }
 
     @Override
@@ -284,13 +289,11 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return attachURL;
     }
 
-    private void processIfRoomNotificationMessage(Friend sender, QBChatMessage chatMessage) {
+    private void processIfInvitationToRoomMessage(Friend sender, QBChatMessage chatMessage) {
         if (ChatUtils.isNotificationMessage(chatMessage)) {
             QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage);
             tryJoinRoomChat(dialog.getRoomJid());
-
             saveChatToCache(ChatUtils.getChatCacheFromQBDialog(dialog));
-
             String message = context.getResources().getString(R.string.user_created_room,
                     sender.getFullname(), dialog.getName());
             chatMessage.setBody(message);
@@ -310,7 +313,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-            processIfRoomNotificationMessage(friend, chatMessage);
+            processIfInvitationToRoomMessage(friend, chatMessage);
             String attachURL = getAttachUrlIfExists(chatMessage);
             saveMessageToCache(new ChatMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
                     chatMessage.getSenderId(), attachURL));
