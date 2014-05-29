@@ -234,9 +234,9 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
         public void onSmileClick() {
             int smilesLayoutHeight = getSmileLayoutSizeInPixels();
             if (isSmilesLayoutShowing()) {
-                smilesAnimator.animateHeightFrom(smilesLayoutHeight, 0);
+                smilesAnimator.animateHeightFrom(smilesLayoutHeight, Consts.ZERO_VALUE);
             } else {
-                smilesAnimator.animateHeightFrom(0, smilesLayoutHeight);
+                smilesAnimator.animateHeightFrom(Consts.ZERO_VALUE, smilesLayoutHeight);
             }
         }
     }

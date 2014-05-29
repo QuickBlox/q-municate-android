@@ -43,7 +43,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private QBDialog dialog;
 
     private int chatId;
-    private int oldSizeMessagesAdapter;
 
     public PrivateChatActivity() {
         super(R.layout.activity_chat);
@@ -71,7 +70,9 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     @Override
     protected void onUpdateChatDialog() {
-        startUpdateChatDialog();
+        if(!messagesAdapter.isEmpty()) {
+            startUpdateChatDialog();
+        }
     }
 
     @Override
@@ -104,7 +105,6 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     private void initListView() {
         messagesAdapter = getMessagesAdapter();
         messagesListView.setAdapter(messagesAdapter);
-        oldSizeMessagesAdapter = messagesAdapter.getCount();
     }
 
     private void initActionBar() {

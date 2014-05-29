@@ -125,7 +125,9 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
 
     @Override
     protected void onUpdateChatDialog() {
-        startUpdateChatDialog();
+        if(!messagesAdapter.isEmpty()) {
+            startUpdateChatDialog();
+        }
     }
 
     private void startUpdateChatDialog() {

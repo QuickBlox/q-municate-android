@@ -68,7 +68,7 @@ public class ChatUtils {
         dialog.setOccupantsIds(parseOccupantIdsFromString(occupantsIds));
         dialog.setName(dialogName);
         dialog.setType(QBDialogType.parseByCode(Integer.parseInt(dialogTypeCode)));
-        dialog.setUnreadMessageCount(0);
+        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
         return dialog;
     }
 
