@@ -20,7 +20,7 @@ import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.chats.ChatsDialogsFragment;
+import com.quickblox.qmunicate.ui.chats.DialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendsListFragment.newInstance();
                 break;
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = ChatsDialogsFragment.newInstance();
+                fragment = DialogsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();

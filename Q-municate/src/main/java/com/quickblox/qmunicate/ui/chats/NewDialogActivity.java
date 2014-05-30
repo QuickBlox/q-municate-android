@@ -33,7 +33,7 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
 
     private Activity activity;
     private List<Friend> friendsArrayList;
-    private ChatSelectableFriendsAdapter friendsAdapter;
+    private DialogsSelectableFriendsAdapter friendsAdapter;
     private ActionMode actionMode;
     private boolean closeWithoutRedirect;
 
@@ -51,7 +51,7 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
         initUI();
 
         friendsArrayList = new ArrayList<Friend>();
-        friendsAdapter = new ChatSelectableFriendsAdapter(this, getAllFriends());
+        friendsAdapter = new DialogsSelectableFriendsAdapter(this, getAllFriends());
         friendsAdapter.setCounterChangedListener(this);
 
         initListeners();

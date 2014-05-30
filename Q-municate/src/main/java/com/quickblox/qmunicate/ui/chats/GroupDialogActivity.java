@@ -122,9 +122,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void startUpdateChatDialog() {
+        QBUpdateDialogCommand.start(this, getQBDialog(), roomJidId);
+    }
+
+    private QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        QBUpdateDialogCommand.start(this, roomJidId, lastMessage, Consts.ZERO_VALUE);
+        dialog.setLastMessage(lastMessage);
+        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        return dialog;
     }
 
     private void initChat() {

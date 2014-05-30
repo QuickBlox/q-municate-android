@@ -63,9 +63,24 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         roomJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
 
+        if(dialog == null) {
+            dialog = getDialogByRoomJidId();
+        }
+
         initListView();
         initActionBar();
         initChat();
+        initStartLoadDialogMessages();
+    }
+
+    private QBDialog getDialogByRoomJidId() {
+        return DatabaseManager.getQBDialogByRoomJidId(this, roomJidId);
+    }
+
+    private void initStartLoadDialogMessages() {
+        if (dialog != null) {
+            startLoadDialogMessages(dialog, roomJidId);
+        }
     }
 
     @Override
@@ -97,9 +112,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void startUpdateChatDialog() {
+        QBUpdateDialogCommand.start(this, getQBDialog(), roomJidId);
+    }
+
+    private QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        QBUpdateDialogCommand.start(this, roomJidId, lastMessage, Consts.ZERO_VALUE);
+        QBDialog dialog;
+        if (this.dialog.getDialogId() != null) {
+            dialog = new QBDialog(this.dialog.getDialogId());
+        } else {
+            dialog = new QBDialog(null);
+        }
+        dialog.setLastMessage(lastMessage);
+        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        return dialog;
     }
 
     private void initListView() {
@@ -177,8 +204,5 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onResume() {
         super.onResume();
         scrollListView();
-        if (dialog != null) {
-            startLoadDialogMessages(dialog, roomJidId);
-        }
     }
 }

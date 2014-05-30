@@ -20,7 +20,7 @@ import com.quickblox.qmunicate.utils.TextViewHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatSelectableFriendsAdapter extends BaseCursorAdapter {
+public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
     private NewDialogCounterFriendsListener counterChangedListener;
@@ -28,7 +28,7 @@ public class ChatSelectableFriendsAdapter extends BaseCursorAdapter {
     private String searchCharacters;
     private List<Friend> selectedFriends;
 
-    public ChatSelectableFriendsAdapter(Context context, Cursor cursor) {
+    public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         this.context = context;
         selectedFriends = new ArrayList<Friend>();

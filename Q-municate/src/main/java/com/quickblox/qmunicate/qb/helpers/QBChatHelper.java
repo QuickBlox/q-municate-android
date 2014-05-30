@@ -112,6 +112,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         privateChat.addMessageListener(privateChatMessageListener);
     }
 
+    public void updateLoadedChatDialog(QBDialog dialog, String roomJidId) {
+        saveDialogToCache(dialog, roomJidId);
+    }
+
     public void init() {
         privateChatManager = chatService.getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(this);
@@ -129,7 +133,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
         joinRoomChat(dialog.getRoomJid());
         inviteFriendsToRoom(dialog, friendIdsList);
-        saveDialogToCache(dialog);
+        saveDialogToCache(dialog, dialog.getRoomJid());
         return dialog;
     }
 
@@ -149,8 +153,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
-    private void saveDialogToCache(QBDialog dialog) {
-        DatabaseManager.saveDialog(context, dialog);
+    private void saveDialogToCache(QBDialog dialog, String roomJidId) {
+        DatabaseManager.saveDialog(context, dialog, roomJidId);
     }
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
@@ -271,7 +275,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         if (ChatUtils.isNotificationMessage(chatMessage)) {
             QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage);
             tryJoinRoomChat(dialog.getRoomJid());
-            saveDialogToCache(dialog);
+            saveDialogToCache(dialog, dialog.getRoomJid());
             String message = context.getResources().getString(R.string.user_created_room,
                     sender.getFullname(), dialog.getName());
             chatMessage.setBody(message);

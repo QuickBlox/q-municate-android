@@ -23,13 +23,13 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
-public class ChatsDialogsFragment extends BaseFragment {
+public class DialogsFragment extends BaseFragment {
 
-    private ListView chatsDialogsListView;
-    private ChatsDialogsAdapter chatsDialogsAdapter;
+    private ListView dialogsListView;
+    private DialogsAdapter dialogsAdapter;
 
-    public static ChatsDialogsFragment newInstance() {
-        return new ChatsDialogsFragment();
+    public static DialogsFragment newInstance() {
+        return new DialogsFragment();
     }
 
     @Override
@@ -73,15 +73,15 @@ public class ChatsDialogsFragment extends BaseFragment {
 
     private void initUI(View view) {
         setHasOptionsMenu(true);
-        chatsDialogsListView = (ListView) view.findViewById(R.id.chats_listview);
+        dialogsListView = (ListView) view.findViewById(R.id.chats_listview);
     }
 
     private void initListeners() {
-        chatsDialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                Cursor selectedChatCursor = (Cursor) chatsDialogsAdapter.getItem(position);
+                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
                 QBDialog dialog = DatabaseManager.getQBDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
@@ -94,12 +94,8 @@ public class ChatsDialogsFragment extends BaseFragment {
 
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
-        Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
-        if (dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
-            PrivateDialogActivity.start(baseActivity, occupant, null);
-        } else {
-            PrivateDialogActivity.start(baseActivity, occupant, dialog);
-        }
+        Friend occupant = dialogsAdapter.getOccupantById(occupantId);
+        PrivateDialogActivity.start(baseActivity, occupant, dialog);
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
@@ -114,12 +110,12 @@ public class ChatsDialogsFragment extends BaseFragment {
     }
 
     private void loadChatsDialogs() {
-        QBLoadDialogsCommand.start(baseActivity);
+//        QBLoadDialogsCommand.start(baseActivity);
     }
 
     private void initChatsDialogs() {
-        chatsDialogsAdapter = new ChatsDialogsAdapter(baseActivity, getAllChats());
-        chatsDialogsListView.setAdapter(chatsDialogsAdapter);
+        dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
+        dialogsListView.setAdapter(dialogsAdapter);
     }
 
     private Cursor getAllChats() {

@@ -16,9 +16,9 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
-public class ChatsDialogsAdapter extends BaseCursorAdapter {
+public class DialogsAdapter extends BaseCursorAdapter {
 
-    public ChatsDialogsAdapter(Context context, Cursor cursor) {
+    public DialogsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
     }
 
