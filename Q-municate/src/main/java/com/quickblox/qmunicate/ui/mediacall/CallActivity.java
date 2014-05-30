@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
+import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
@@ -29,7 +29,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private WebRTC.MEDIA_STREAM call_type;
-    private ExtensionSignalingChannel signalingChannel;
+    private VideoSenderChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
     private String sessionId;
     private QBSignalingChannel.PLATFORM remotePlatform;
@@ -73,8 +73,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     public void onConnectionClosed() {
         if (signalingChannel != null) {
             signalingChannel.removeSignalingListener(messageHandler);
+            signalingChannel.close();
         }
-        cancelPlayer();
         finish();
     }
 
@@ -89,9 +89,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     @Override
     protected void onConnectedToService() {
-        signalingChannel = service.getVideoChatHelper().getSignalingChannel();
-        signalingChannel.setInitiator(App.getInstance().getUser());
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
+            signalingChannel = service.getVideoChatHelper().getSignalingChannel();
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);
@@ -118,8 +117,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         if (signalingChannel != null && opponent != null) {
             ConnectionConfig connectionConfig = new ConnectionConfig(opponent, sessionId);
             signalingChannel.sendReject(connectionConfig);
+            signalingChannel.close();
         }
-        cancelPlayer();
         finish();
     }
 
