@@ -59,6 +59,7 @@ public class FacebookHelper {
     }
 
     public void loginWithFacebook() {
+        TipsManager.setIsJustLogined(true);
         Session session = Session.getActiveSession();
         if (!session.isOpened() && !session.isClosed()) {
             session.openForRead(new Session.OpenRequest(activity).setCallback(facebookStatusCallback));
