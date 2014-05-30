@@ -5,7 +5,7 @@ import java.util.List;
 
 public class GroupDialog extends Chat implements Serializable {
     private List<Friend> opponents;
-    private List<ChatMessage> messages;
+    private List<DialogMessage> messages;
 
     public GroupDialog(String name, Integer avatarId) {
         this.name = name;
@@ -44,11 +44,11 @@ public class GroupDialog extends Chat implements Serializable {
         return opponents;
     }
 
-    public List<ChatMessage> getMessages() {
+    public List<DialogMessage> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<ChatMessage> messages) {
+    public void setMessages(List<DialogMessage> messages) {
         this.messages = messages;
     }
 
@@ -57,8 +57,8 @@ public class GroupDialog extends Chat implements Serializable {
     }
 
     @Override
-    public ChatMessage getLastMessage() {
-        ChatMessage message = new ChatMessage();
+    public DialogMessage getLastMessage() {
+        DialogMessage message = new DialogMessage();
         message.setBody(this.lastMessage);
         return message;
     }
