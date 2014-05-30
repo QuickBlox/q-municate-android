@@ -213,7 +213,7 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void execute(Bundle bundle) {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            ErrorUtils.logError(e);
+            ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
         }
     }

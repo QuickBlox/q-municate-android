@@ -152,10 +152,12 @@ public class DatabaseManager {
         if (cursor != null && cursor.moveToFirst()) {
             dialog = getQBDialogFromCursor(cursor);
         } else {
-            dialog = new QBDialog(null);
+            dialog = new QBDialog(Consts.EMPTY_STRING);
             dialog.setRoomJid(roomJidId);
             Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
             dialog.setName(opponentFriend.getFullname());
+            ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(opponentFriend.getId());
+            dialog.setOccupantsIds(occupantsIdsList);
             saveDialog(context, dialog, roomJidId);
         }
         return dialog;
@@ -249,7 +251,7 @@ public class DatabaseManager {
             // TODO end
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,
-                    attachURL);
+                    attachURL, historyMessage.getDateSent());
 
             saveChatMessage(context, dialogMessageCache);
         }
@@ -270,8 +272,7 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.ROOM_JID_ID, dialogMessageCache.getRoomJidId());
         values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
         values.put(DialogMessageTable.Cols.BODY, dialogMessageCache.getMessage());
-        // TODO SF temp time value
-        values.put(DialogMessageTable.Cols.TIME, System.currentTimeMillis());
+        values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
         updateUnreadMessagesCount(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage());

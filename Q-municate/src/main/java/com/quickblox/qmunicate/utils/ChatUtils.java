@@ -107,6 +107,14 @@ public class ChatUtils {
         return occupantsArray;
     }
 
+    public static ArrayList<Integer> getOccupantsIdsListForCreatePrivateDialog(int opponentId) {
+        QBUser user = App.getInstance().getUser();
+        ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
+        occupantsIdsList.add(user.getId());
+        occupantsIdsList.add(opponentId);
+        return occupantsIdsList;
+    }
+
     public static ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
         for (Friend friend : friendList) {

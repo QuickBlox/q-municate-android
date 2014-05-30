@@ -64,7 +64,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = Consts.EMPTY_STRING;
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl));
+        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl, System.currentTimeMillis()));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -104,7 +104,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = qbFile.getPublicUrl();
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl));
+        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl, System.currentTimeMillis()));
     }
 
     @Override
@@ -299,7 +299,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             String attachUrl = getAttachUrlIfExists(chatMessage);
             String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
             saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl));
+                    chatMessage.getBody(), attachUrl, System.currentTimeMillis()));
             notifyMessageReceived(chatMessage, friend);
         }
     }
@@ -310,7 +310,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachURL = getAttachUrlIfExists(chatMessage);
-            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(), chatMessage.getBody(), attachURL));
+            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(), chatMessage.getBody(), attachURL, System.currentTimeMillis()));
             if (!chatMessage.getSenderId().equals(user.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend);
