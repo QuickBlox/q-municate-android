@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-public class GroupChatActivity extends BaseChatActivity implements ReceiveFileListener {
+public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private BaseAdapter messagesAdapter;
 
@@ -46,18 +46,18 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     private String groupName;
     private String roomJidId;
 
-    public GroupChatActivity() {
-        super(R.layout.activity_chat);
+    public GroupDialogActivity() {
+        super(R.layout.activity_dialog);
     }
 
     public static void start(Context context, ArrayList<Friend> friends) {
-        Intent intent = new Intent(context, GroupChatActivity.class);
+        Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
     }
 
     public static void start(Context context, QBDialog dialog) {
-        Intent intent = new Intent(context, GroupChatActivity.class);
+        Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startActivity(intent);
     }
@@ -109,7 +109,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(GroupChatActivity.this).execute(imageHelper,
+            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper,
                     BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -118,7 +118,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendGroupDialogMessageCommand.start(GroupChatActivity.this, null, file);
+        QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, null, file);
     }
 
     private void startUpdateChatDialog() {
@@ -135,7 +135,6 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
             roomJidId = dialog.getRoomJid();
             QBJoinGroupChatCommand.start(this, roomJidId);
         } else {
-            showProgress();
             friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             groupName = createChatName();
             QBCreateGroupDialogCommand.start(this, groupName, friendList);
@@ -161,7 +160,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new GroupChatMessagesAdapter(this, getAllDialogMessagesByRoomJidId());
+        return new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId());
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
@@ -186,7 +185,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_chat_menu, menu);
+        inflater.inflate(R.menu.group_dialog_menu, menu);
         return true;
     }
 
@@ -207,7 +206,7 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater m = getMenuInflater();
-        m.inflate(R.menu.group_chat_ctx_menu, menu);
+        m.inflate(R.menu.group_dialog_ctx_menu, menu);
     }
 
     @Override
@@ -225,7 +224,6 @@ public class GroupChatActivity extends BaseChatActivity implements ReceiveFileLi
             groupName = dialog.getName();
             roomJidId = dialog.getRoomJid();
             initListView();
-            hideProgress();
         }
     }
 }

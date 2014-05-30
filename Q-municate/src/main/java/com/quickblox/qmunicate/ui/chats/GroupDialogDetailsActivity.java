@@ -12,10 +12,10 @@ import com.quickblox.qmunicate.model.GroupDialog;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 
-public class GroupChatDetailsActivity extends BaseActivity {
+public class GroupDialogDetailsActivity extends BaseActivity {
 
     public static void start(Context context, GroupDialog chat) {
-        Intent intent = new Intent(context, GroupChatDetailsActivity.class);
+        Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_GROUP_DIALOG, chat);
         context.startActivity(intent);
     }
@@ -23,7 +23,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_chat_details);
+        setContentView(R.layout.activity_group_dialog_details);
 
         initUI();
         initListeners();
@@ -38,7 +38,7 @@ public class GroupChatDetailsActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.group_chat_details_menu, menu);
+        inflater.inflate(R.menu.group_dialog_details_menu, menu);
         return true;
     }
 

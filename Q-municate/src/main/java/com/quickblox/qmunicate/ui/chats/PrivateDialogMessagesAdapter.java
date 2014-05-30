@@ -27,12 +27,12 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 
-public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
+public class PrivateDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
     private Friend opponentFriend;
     private ImageHelper imageHelper;
 
-    public PrivateChatMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
+    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
         imageHelper = new ImageHelper((android.app.Activity) context);
@@ -43,9 +43,9 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         View view;
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_chat_message_left, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_dialog_message_left, null, true);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_chat_message_right, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_dialog_message_right, null, true);
         }
 
         ViewHolder holder = new ViewHolder();
@@ -186,7 +186,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
 
                 @Override
                 public void onClick(View v) {
-                    new ReceiveImageFileTask(PrivateChatMessagesAdapter.this).execute(imageHelper,
+                    new ReceiveImageFileTask(PrivateDialogMessagesAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);
                 }
             };

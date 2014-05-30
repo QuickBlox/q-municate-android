@@ -25,7 +25,7 @@ public class ChatsDialogsAdapter extends BaseCursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View convertView;
-        convertView = layoutInflater.inflate(R.layout.list_item_chat, null);
+        convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
         viewHolder.avatarImageView.setOval(true);
@@ -44,7 +44,7 @@ public class ChatsDialogsAdapter extends BaseCursorAdapter {
 
         QBDialog dialog = DatabaseManager.getQBDialogFromCursor(cursor);
 
-        if (dialog.getType() == QBDialogType.PRIVATE) {
+        if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());

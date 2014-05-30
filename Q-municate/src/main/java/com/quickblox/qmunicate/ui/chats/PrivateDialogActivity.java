@@ -36,7 +36,7 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class PrivateChatActivity extends BaseChatActivity implements ReceiveFileListener {
+public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
@@ -44,12 +44,12 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     private String roomJidId;
 
-    public PrivateChatActivity() {
-        super(R.layout.activity_chat);
+    public PrivateDialogActivity() {
+        super(R.layout.activity_dialog);
     }
 
     public static void start(Context context, Friend opponent, QBDialog dialog) {
-        Intent intent = new Intent(context, PrivateChatActivity.class);
+        Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startActivity(intent);
@@ -79,7 +79,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(PrivateChatActivity.this).execute(imageHelper,
+            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper,
                     BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -88,7 +88,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendPrivateChatMessageCommand.start(PrivateChatActivity.this, null, file);
+        QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, file);
         scrollListView();
     }
 
@@ -118,7 +118,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new PrivateChatMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend);
+        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
@@ -143,7 +143,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.private_chat_menu, menu);
+        inflater.inflate(R.menu.private_dialog_menu, menu);
         return true;
     }
 
@@ -167,7 +167,7 @@ public class PrivateChatActivity extends BaseChatActivity implements ReceiveFile
         if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
             QBUser qbUser = new QBUser(friend.getId());
             qbUser.setFullName(friend.getFullname());
-            CallActivity.start(PrivateChatActivity.this, qbUser, callType);
+            CallActivity.start(PrivateDialogActivity.this, qbUser, callType);
         } else if (!friend.isOnline()) {
             ErrorUtils.showError(this, getString(R.string.frd_offline_user));
         }

@@ -40,7 +40,7 @@ public class ChatsDialogsFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_chats_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
         initUI(view);
         initListeners();
@@ -58,14 +58,14 @@ public class ChatsDialogsFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.chats_list_menu, menu);
+        inflater.inflate(R.menu.dialogs_list_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                NewChatActivity.start(baseActivity);
+                NewDialogActivity.start(baseActivity);
                 break;
         }
         return true;
@@ -96,14 +96,14 @@ public class ChatsDialogsFragment extends BaseFragment {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
         Friend occupant = chatsDialogsAdapter.getOccupantById(occupantId);
         if (dialog.getDialogId().equals(occupantId + Consts.EMPTY_STRING)) {
-            PrivateChatActivity.start(baseActivity, occupant, null);
+            PrivateDialogActivity.start(baseActivity, occupant, null);
         } else {
-            PrivateChatActivity.start(baseActivity, occupant, dialog);
+            PrivateDialogActivity.start(baseActivity, occupant, dialog);
         }
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupChatActivity.start(baseActivity, dialog);
+        GroupDialogActivity.start(baseActivity, dialog);
     }
 
     private void addActions() {

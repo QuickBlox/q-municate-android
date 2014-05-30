@@ -229,11 +229,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId);
     }
 
-    private void saveGroupMessageToCache(QBChatMessage chatMessage, int senderId, String groupId) {
-        DatabaseManager.saveChatMessage(context, new DialogMessageCache(chatMessage.getBody(), senderId,
-                groupId, null));
-    }
-
     private void deleteDialogs() {
         DatabaseManager.deleteAllDialogs(context);
     }
@@ -309,14 +304,13 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
-            //            Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-            //            String attachURL = getAttachUrlIfExists(chatMessage);
-            //            saveMessageToCache(new DialogMessageCache(chatMessage.getBody(), chatMessage.getSenderId(),
-            //                    roomChat.getJid(), attachURL));
-            //            if (!chatMessage.getSenderId().equals(user.getId())) {
-            //                // TODO IS handle logic when friend is not in the friend list
-            //                notifyMessageReceived(chatMessage, friend);
-            //            }
+            Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+            String attachURL = getAttachUrlIfExists(chatMessage);
+            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(), chatMessage.getBody(), attachURL));
+            if (!chatMessage.getSenderId().equals(user.getId())) {
+                // TODO IS handle logic when friend is not in the friend list
+                notifyMessageReceived(chatMessage, friend);
+            }
         }
     }
 }

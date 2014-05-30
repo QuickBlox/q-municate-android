@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.ChatMessage;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
@@ -39,7 +37,7 @@ public class ChatFriendsAdapter extends /*ArrayAdapter<Friend>*/BaseCursorAdapte
 //        Friend data = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_chat_friend, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_dialog_friend, null);
             holder = new ViewHolder();
 
             holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);

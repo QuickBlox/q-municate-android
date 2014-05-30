@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.model.Friend;
@@ -25,11 +24,7 @@ public class ChatUtils {
     private static final String PROPERTY_ROOM_JID = "room_jid";
     private static final String PROPERTY_DIALOG_ID = "_id";
 
-    private static final int PRIVATE_DIALOG_ORDINAL = 1;
-    private static final int GROUP_DIALOG_ORDINAL = 2;
-    private static final int PUBLIC_DIALOG_ORDINAL = 3;
-
-    public static int getOccupantIdFromList(List<Integer> occupantsIdsList) {
+    public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = App.getInstance().getUser();
         int resultId = Consts.ZERO_VALUE;
         for (Integer id : occupantsIdsList) {
@@ -79,30 +74,6 @@ public class ChatUtils {
         return occupantIdsList;
     }
 
-    public static QBDialogType getQBDialogTypeByOrdinal(final int ordinal) {
-        switch (ordinal) {
-            case PRIVATE_DIALOG_ORDINAL:
-                return QBDialogType.PRIVATE;
-            case GROUP_DIALOG_ORDINAL:
-                return QBDialogType.GROUP;
-            case PUBLIC_DIALOG_ORDINAL:
-                return QBDialogType.PUBLIC_GROUP;
-        }
-        return null;
-    }
-
-    public static int getOrdinalByQBDialogType(QBDialogType type) {
-        switch (type) {
-            case PRIVATE:
-                return PRIVATE_DIALOG_ORDINAL;
-            case GROUP:
-                return GROUP_DIALOG_ORDINAL;
-            case PUBLIC_GROUP:
-                return PUBLIC_DIALOG_ORDINAL;
-        }
-        return Consts.ZERO_VALUE;
-    }
-
     public static QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getDialogId());
         String roomJid = dialog.getRoomJid();
@@ -126,15 +97,6 @@ public class ChatUtils {
 
     public static boolean isNotificationMessage(QBChatMessage chatMessage) {
         return chatMessage.getProperty(PROPERTY_DIALOG_ID) != null;
-    }
-
-    public static boolean isGroupMessageByChatId(Object chatId) {
-        if (chatId instanceof String) {
-            return true;
-        } else if (chatId instanceof Integer) {
-            return false;
-        }
-        return false;
     }
 
     public static String[] getOccupantsIdsArrayFromList(ArrayList<Integer> occupantsList) {
