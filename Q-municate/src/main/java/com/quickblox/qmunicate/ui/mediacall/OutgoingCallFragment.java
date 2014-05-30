@@ -12,14 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quickblox.module.chat.exceptions.QBChatException;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.ExtensionSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
+import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
+import com.quickblox.module.videochat_webrtc.signaling.SIGNAL_STATE;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -32,7 +34,6 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import org.webrtc.SessionDescription;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,6 +55,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private QBSignalingChannel.SignalingListener signalingMessageHandler;
     private QBSignalingChannel.PLATFORM remotePlatform;
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
+    private VideoSenderChannel signalingChannel;
 
     public interface OutgoingCallListener {
 
@@ -234,9 +236,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-        qbVideoChat.call(opponent, call_type);
-        callTimer = new Timer();
-        callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
+        QBUser sender = App.getInstance().getUser();
+        if (sender != null) {
+            qbVideoChat.call(opponent, sender, call_type);
+            callTimer = new Timer();
+            callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
+        }
     }
 
     private void connectToService() {
@@ -269,6 +274,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             }
             qbVideoChat.clean();
         }
+        if (signalingChannel != null) {
+            signalingChannel.close();
+        }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
             onConnectionClosed();
         } else {
@@ -277,8 +285,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        ExtensionSignalingChannel signalingChannel = service.getVideoChatHelper().getSignalingChannel();
-        signalingChannel.setInitiator(App.getInstance().getUser());
+        if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
+            signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+        } else {
+            signalingChannel = service.getVideoChatHelper().makeSignalingChannel(opponent.getId());
+        }
         if (signalingChannel != null && isExistActivity()) {
             initChat(signalingChannel);
         } else if (isExistActivity()) {
@@ -337,16 +348,35 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
 
         @Override
-        public void onClosed(String error) {
+        public void onClosed(final String error) {
             if (isExistActivity()) {
-                ErrorUtils.showError(getActivity(), error);
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ErrorUtils.showError(getActivity(), error);
+                    }
+                });
             }
         }
 
         @Override
-        public void onError(List<String> errors) {
+        public void onError(final SIGNAL_STATE state, final QBChatException e) {
             if (isExistActivity()) {
-                ErrorUtils.showError(getActivity(), errors.toString());
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
+                        switch (state) {
+                            case CALL:
+                            case ACCEPT: {
+                                stopCall(true, STOP_TYPE.CLOSED);
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+                });
             }
         }
     }
