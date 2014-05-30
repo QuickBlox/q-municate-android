@@ -14,7 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -41,7 +41,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             view = layoutInflater.inflate(R.layout.list_item_chat_message_left, null, true);
         } else {
@@ -68,10 +68,10 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
         String avatarUrl;
 
-        String body = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.ATTACH_FILE_ID));
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
-        long time = cursor.getLong(cursor.getColumnIndex(ChatMessageTable.Cols.TIME));
+        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
 
         viewHolder.attachImageView.setVisibility(View.GONE);
 
@@ -126,7 +126,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
     }
 
     private int getItemViewType(Cursor cursor) {
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             return Consts.LEFT_CHAT_MESSAGE_TYPE_1;
         } else {

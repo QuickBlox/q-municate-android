@@ -144,9 +144,9 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, Object chatId) {
+    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId) {
         showProgress();
-        QBLoadDialogMessagesCommand.start(this, dialog, chatId);
+        QBLoadDialogMessagesCommand.start(this, dialog, roomJidId);
     }
 
     private void initUI() {

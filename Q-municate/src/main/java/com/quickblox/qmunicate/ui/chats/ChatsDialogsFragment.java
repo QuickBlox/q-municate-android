@@ -17,7 +17,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
@@ -114,7 +114,7 @@ public class ChatsDialogsFragment extends BaseFragment {
     }
 
     private void loadChatsDialogs() {
-        QBLoadChatsDialogsCommand.start(baseActivity);
+        QBLoadDialogsCommand.start(baseActivity);
     }
 
     private void initChatsDialogs() {
@@ -123,7 +123,7 @@ public class ChatsDialogsFragment extends BaseFragment {
     }
 
     private Cursor getAllChats() {
-        return DatabaseManager.getAllChats(baseActivity);
+        return DatabaseManager.getAllDialogs(baseActivity);
     }
 
     private class LoadChatsDialogsSuccessAction implements Command {

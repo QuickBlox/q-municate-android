@@ -112,7 +112,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if (TextUtils.isEmpty(constraint)) {
             return null;
         }
-        return DatabaseManager.getFriends(baseActivity, constraint.toString());
+        return DatabaseManager.getFriendsByFullname(baseActivity, constraint.toString());
     }
 
     @Override
