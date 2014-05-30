@@ -11,7 +11,7 @@ import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
-public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.UpdateCountUnreadChatsDialogsListener {
+public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.UpdateCountUnreadDialogsListener {
 
     private TextView counterUnreadChatsDialogs;
 
@@ -47,10 +47,12 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
     }
 
     @Override
-    public void onUpdateCountUnreadChatsDialogs(int count) {
+    public void onUpdateCountUnreadDialogs(int count) {
         if (count > Consts.ZERO_VALUE) {
             counterUnreadChatsDialogs.setVisibility(View.VISIBLE);
             counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
+        } else {
+            counterUnreadChatsDialogs.setVisibility(View.GONE);
         }
     }
 

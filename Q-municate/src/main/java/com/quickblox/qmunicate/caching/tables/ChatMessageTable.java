@@ -5,7 +5,7 @@ import android.net.Uri;
 
 import com.quickblox.qmunicate.caching.ContentDescriptor;
 
-public class ChatMessagesTable {
+public class ChatMessageTable {
 
     public static final String TABLE_NAME = "chat_messages";
     public static final String PATH = "chat_messages";
@@ -17,8 +17,6 @@ public class ChatMessagesTable {
 
         public static final String ID = "_id";
         public static final String BODY = "body";
-        public static final String SENDER_NAME = "sender_name";
-        public static final String OPPONENT_NAME = "opponent_name";
         public static final String SENDER_ID = "sender_id";
         public static final String TIME = "time";
         public static final String CHAT_ID = "chat_id";

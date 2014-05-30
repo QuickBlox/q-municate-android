@@ -23,7 +23,6 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.commands.QBGetCountUnreadChatsDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
@@ -48,7 +47,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private ImageButton logoutButton;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private UpdateCountUnreadChatsDialogsListener updateCountUnreadChatsDialogsListener;
+    private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
@@ -111,7 +110,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView.setAdapter(navigationDrawerAdapter);
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        updateCountUnreadChatsDialogsListener = navigationDrawerAdapter;
+        updateCountUnreadDialogsListener = navigationDrawerAdapter;
 
         return rootView;
     }
@@ -172,13 +171,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
-        baseActivity.addAction(QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_SUCCESS_ACTION, new GetCountUnreadChatsDialogsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.GET_COUNT_UNREAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
-    }
-
-    private void getCountUnreadChatsDialogsCommand() {
-        QBGetCountUnreadChatsDialogsCommand.start(baseActivity);
     }
 
     @Override
@@ -247,6 +240,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     private void clearCache() {
         DatabaseManager.deleteAllFriends(baseActivity);
+        DatabaseManager.deleteAllMessages(baseActivity);
         DatabaseManager.deleteAllChats(baseActivity);
         // TODO SF clear something else
     }
@@ -260,9 +254,13 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    public interface UpdateCountUnreadChatsDialogsListener {
+    public interface UpdateCountUnreadDialogsListener {
 
-        public void onUpdateCountUnreadChatsDialogs(int count);
+        public void onUpdateCountUnreadDialogs(int count);
+    }
+
+    private int getCounterUnreadDialogs() {
+        return DatabaseManager.getCountUnreadDialogs(baseActivity);
     }
 
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
@@ -276,7 +274,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         @Override
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
+
             Crouton.cancelAllCroutons();
+
             baseActivity.invalidateOptionsMenu();
 
             if (!userLearnedDrawer) {
@@ -284,7 +284,7 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawer();
             }
 
-            getCountUnreadChatsDialogsCommand();
+            updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
         }
 
         @Override
@@ -301,15 +301,6 @@ public class NavigationDrawerFragment extends BaseFragment {
             clearCache();
             LoginActivity.start(baseActivity);
             baseActivity.finish();
-        }
-    }
-
-    private class GetCountUnreadChatsDialogsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            int countUnreadChatsDialogs =  bundle.getInt(QBServiceConsts.EXTRA_COUNT_UNREAD_CHATS_DIALOGS);
-            updateCountUnreadChatsDialogsListener.onUpdateCountUnreadChatsDialogs(countUnreadChatsDialogs);
         }
     }
 }

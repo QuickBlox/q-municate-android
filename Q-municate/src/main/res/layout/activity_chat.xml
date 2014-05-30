@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical">
+
+    <ListView
+        android:id="@+id/messages_listview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingBottom="20dp"
+        android:transcriptMode="alwaysScroll" />
+
+    <include layout="@layout/view_input_message_layout" />
+
+    <include layout="@layout/view_smiles_pager" />
+
+</LinearLayout>

@@ -1,7 +1,5 @@
 package com.quickblox.qmunicate.model;
 
-import org.jivesoftware.smack.XMPPException;
-
 public abstract class Chat {
 
     protected String name;

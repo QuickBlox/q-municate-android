@@ -14,7 +14,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.tables.ChatMessagesTable;
+import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -41,11 +41,11 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_private_chat_message_left, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_chat_message_left, null, true);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_private_chat_message_right, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_chat_message_right, null, true);
         }
 
         ViewHolder holder = new ViewHolder();
@@ -63,21 +63,17 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         return view;
     }
 
-    private boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
-    }
-
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
-        final ViewHolder holder = (ViewHolder) view.getTag();
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
         String avatarUrl;
 
-        String body = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessagesTable.Cols.ATTACH_FILE_ID));
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
-        long time = cursor.getLong(cursor.getColumnIndex(ChatMessagesTable.Cols.TIME));
+        String body = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.ATTACH_FILE_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
+        long time = cursor.getLong(cursor.getColumnIndex(ChatMessageTable.Cols.TIME));
 
-        holder.attachImageView.setVisibility(View.GONE);
+        viewHolder.attachImageView.setVisibility(View.GONE);
 
         if (isOwnMessage(senderId)) {
             avatarUrl = getAvatarUrlForCurrentUser();
@@ -86,23 +82,17 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         }
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            holder.messageTextView.setVisibility(View.GONE);
-            displayAttachImage(attachUrl, holder.pleaseWaitTextView, holder.attachImageView,
-                    holder.progressBar);
+            viewHolder.messageTextView.setVisibility(View.GONE);
+            displayAttachImage(attachUrl, viewHolder.pleaseWaitTextView, viewHolder.attachImageView,
+                    viewHolder.progressBar);
         } else {
-            holder.messageTextView.setVisibility(View.VISIBLE);
-            holder.attachImageView.setVisibility(View.GONE);
-            holder.messageTextView.setText(body);
+            viewHolder.messageTextView.setVisibility(View.VISIBLE);
+            viewHolder.attachImageView.setVisibility(View.GONE);
+            viewHolder.messageTextView.setText(body);
         }
-        holder.timeTextView.setText(DateUtils.longToMessageDate(time));
+        viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        displayAvatarImage(avatarUrl, holder.avatarImageView);
-    }
-
-    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-            final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
+        displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
     @Override
@@ -120,18 +110,28 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         return getItemViewType(cursor);
     }
 
+    @Override
+    public int getViewTypeCount() {
+        return Consts.MESSAGES_TYPE_COUNT;
+    }
+
+    private boolean isOwnMessage(int senderId) {
+        return senderId == currentUser.getId();
+    }
+
+    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
+                                    final ImageView attachImageView, final ProgressBar progressBar) {
+        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
+                progressBar));
+    }
+
     private int getItemViewType(Cursor cursor) {
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessagesTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             return Consts.LEFT_CHAT_MESSAGE_TYPE_1;
         } else {
             return Consts.RIGHT_CHAT_MESSAGE_TYPE_2;
         }
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return Consts.MESSAGES_TYPE_COUNT;
     }
 
     private static class ViewHolder {
@@ -152,7 +152,7 @@ public class PrivateChatMessagesAdapter extends BaseCursorAdapter implements Rec
         private Bitmap loadedImageBitmap;
 
         public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
-                final ProgressBar progressBar) {
+                                  final ProgressBar progressBar) {
             this.pleaseWaitTextView = pleaseWaitTextView;
             this.attachImageView = attachImageView;
             this.progressBar = progressBar;

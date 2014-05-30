@@ -34,7 +34,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textSize="@dimen/text_size" />
+                android:textSize="@dimen/text_size"
+                android:maxLines="2"
+                android:text="reggh 65365  66 tij ij jgrt imomdjctikdxtjuim jtrivyrctji 46mn65j vmc 46km i "
+                android:ellipsize="end" />
 
             <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
                 android:id="@+id/last_message_textview"
