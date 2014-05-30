@@ -75,9 +75,14 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void hideProgress() {
-        if (progress != null) {
-            progress.dismissAllowingStateLoss();
+        try{
+            if (progress != null && !progress.isDetached()) {
+                progress.dismissAllowingStateLoss();
+            }
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
         }
+
     }
 
     public void addAction(String action, Command command) {
