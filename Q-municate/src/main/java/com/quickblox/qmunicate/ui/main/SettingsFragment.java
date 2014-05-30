@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.quickblox.module.messages.QBMessages;
+import com.quickblox.module.messages.model.QBSubscription;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -26,6 +29,7 @@ import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.TipsManager;
 import com.quickblox.qmunicate.utils.Utils;
+
 
 public class SettingsFragment extends BaseFragment {
 
