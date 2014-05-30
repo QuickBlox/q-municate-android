@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class NewChatActivity extends BaseActivity implements AdapterView.OnItemClickListener, NewChatCounterFriendsListener {
+public class NewDialogActivity extends BaseActivity implements AdapterView.OnItemClickListener, NewDialogCounterFriendsListener {
 
     private ListView friendsListView;
     private TextView countSelectedFriendsTextView;
@@ -38,14 +38,14 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
     private boolean closeWithoutRedirect;
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, NewChatActivity.class);
+        Intent intent = new Intent(context, NewDialogActivity.class);
         context.startActivity(intent);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_chat);
+        setContentView(R.layout.activity_new_dialog);
 
         activity = this;
         initUI();
@@ -111,7 +111,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
 
     private void startAction() {
         actionMode = startActionMode(new ActionModeCallback());
-        View view = getLayoutInflater().inflate(R.layout.action_mode_new_chat, null);
+        View view = getLayoutInflater().inflate(R.layout.action_mode_new_dialog, null);
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         createGroupChatTextView = (TextView) view.findViewById(R.id.create_group_chat_textview);
         actionMode.setCustomView(view);
@@ -136,7 +136,7 @@ public class NewChatActivity extends BaseActivity implements AdapterView.OnItemC
             if (!closeWithoutRedirect) {
                 List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
                 Collections.sort(membersList, new SimpleComparator());
-                GroupChatActivity.start(activity, (ArrayList<Friend>) membersList);
+                GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
                 finish();
                 actionMode = null;
                 closeWithoutRedirect = false;

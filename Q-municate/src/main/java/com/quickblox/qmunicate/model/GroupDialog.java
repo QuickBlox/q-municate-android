@@ -3,11 +3,11 @@ package com.quickblox.qmunicate.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class GroupChat extends Chat implements Serializable {
+public class GroupDialog extends Chat implements Serializable {
     private List<Friend> opponents;
-    private List<ChatMessage> messages;
+    private List<DialogMessage> messages;
 
-    public GroupChat(String name, Integer avatarId) {
+    public GroupDialog(String name, Integer avatarId) {
         this.name = name;
         this.avatarId = avatarId;
     }
@@ -44,11 +44,11 @@ public class GroupChat extends Chat implements Serializable {
         return opponents;
     }
 
-    public List<ChatMessage> getMessages() {
+    public List<DialogMessage> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<ChatMessage> messages) {
+    public void setMessages(List<DialogMessage> messages) {
         this.messages = messages;
     }
 
@@ -57,8 +57,8 @@ public class GroupChat extends Chat implements Serializable {
     }
 
     @Override
-    public ChatMessage getLastMessage() {
-        ChatMessage message = new ChatMessage();
+    public DialogMessage getLastMessage() {
+        DialogMessage message = new DialogMessage();
         message.setBody(this.lastMessage);
         return message;
     }

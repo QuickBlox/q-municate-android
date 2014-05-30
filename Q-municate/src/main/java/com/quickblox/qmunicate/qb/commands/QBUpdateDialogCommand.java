@@ -9,11 +9,11 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-public class QBUpdateChatDialogCommand extends ServiceCommand {
+public class QBUpdateDialogCommand extends ServiceCommand {
 
     private QBChatHelper chatHelper;
 
-    public QBUpdateChatDialogCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBUpdateDialogCommand(Context context, QBChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;
@@ -22,7 +22,7 @@ public class QBUpdateChatDialogCommand extends ServiceCommand {
     public static void start(Context context, Object chatId, String lastMessage, int countMessage) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_CHAT_ID, (java.io.Serializable) chatId);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, (java.io.Serializable) chatId);
         intent.putExtra(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE, lastMessage);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE, countMessage);
         context.startService(intent);
@@ -30,10 +30,10 @@ public class QBUpdateChatDialogCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        Object chatId = extras.getInt(QBServiceConsts.EXTRA_CHAT_ID);
+        Object chatId = extras.getInt(QBServiceConsts.EXTRA_ROOM_JID_ID);
         String lastMessage = extras.getString(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE);
         int countMessage = extras.getInt(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE);
-        chatHelper.updateLoadedChatDialog(chatId, lastMessage, countMessage);
+//        chatHelper.updateLoadedChatDialog(chatId, lastMessage, countMessage);
         return null;
     }
 }

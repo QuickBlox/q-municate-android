@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:background="@drawable/list_item_background_selector">
 
-    <include layout="@layout/list_item_chat_friend" />
+    <include layout="@layout/list_item_dialog_friend" />
 
     <CheckBox
         android:id="@+id/time_textview"

@@ -41,6 +41,6 @@
     <color name="screen_call_background_color">#333333</color>
     <color name="screen_call_timer_text_color">#999999</color>
 
-    <color name="chat_message_name_color">#0d70b3</color>
+    <color name="dlg_message_name_color">#0d70b3</color>
 
 </resources>

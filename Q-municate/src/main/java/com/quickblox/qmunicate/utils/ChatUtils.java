@@ -3,10 +3,8 @@ package com.quickblox.qmunicate.utils;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.model.Friend;
@@ -26,11 +24,7 @@ public class ChatUtils {
     private static final String PROPERTY_ROOM_JID = "room_jid";
     private static final String PROPERTY_DIALOG_ID = "_id";
 
-    private static final int PRIVATE_DIALOG_ORDINAL = 1;
-    private static final int GROUP_DIALOG_ORDINAL = 2;
-    private static final int PUBLIC_DIALOG_ORDINAL = 3;
-
-    public static int getOccupantIdFromList(List<Integer> occupantsIdsList) {
+    public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = App.getInstance().getUser();
         int resultId = Consts.ZERO_VALUE;
         for (Integer id : occupantsIdsList) {
@@ -41,16 +35,7 @@ public class ChatUtils {
         return resultId;
     }
 
-    public static String getAttachUrlFromQBChatMessage(QBChatMessage chatMessage) {
-        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
-        if (!attachmentsList.isEmpty()) {
-            return attachmentsList.get(attachmentsList.size() - 1).getUrl();
-        }
-        return Consts.EMPTY_STRING;
-    }
-
-    public static String getAttachUrlFromQBChatMessage(QBHistoryMessage chatMessage) {
-        List<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(chatMessage.getAttachments());
+    public static String getAttachUrlFromMessage(ArrayList<QBAttachment> attachmentsList) {
         if (!attachmentsList.isEmpty()) {
             return attachmentsList.get(attachmentsList.size() - 1).getUrl();
         }
@@ -66,14 +51,14 @@ public class ChatUtils {
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
-        dialog.setOccupantsIds(getOccupantIdsFromString(occupantsIds));
+        dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
         dialog.setType(parseByCode(Integer.parseInt(dialogTypeCode)));
         dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
         return dialog;
     }
 
-    public static ArrayList<Integer> getOccupantIdsFromString(String occupantIds) {
+    public static ArrayList<Integer> getOccupantsIdsListFromString(String occupantIds) {
         ArrayList<Integer> occupantIdsList = new ArrayList<Integer>();
         String[] occupantIdsArray = occupantIds.split(OCCUPANT_IDS_DIVIDER);
         for (String occupantId : occupantIdsArray) {
@@ -82,34 +67,18 @@ public class ChatUtils {
         return occupantIdsList;
     }
 
-    public static QBDialogType getQBDialogTypeByOrdinal(final int ordinal) {
-        switch (ordinal) {
-            case PRIVATE_DIALOG_ORDINAL:
-                return QBDialogType.PRIVATE;
-            case GROUP_DIALOG_ORDINAL:
-                return QBDialogType.GROUP;
-            case PUBLIC_DIALOG_ORDINAL:
-                return QBDialogType.PUBLIC_GROUP;
-        }
-        return null;
-    }
-
-    public static int getOrdinalByQBDialogType(QBDialogType type) {
-        switch (type) {
-            case PRIVATE:
-                return PRIVATE_DIALOG_ORDINAL;
-            case GROUP:
-                return GROUP_DIALOG_ORDINAL;
-            case PUBLIC_GROUP:
-                return PUBLIC_DIALOG_ORDINAL;
-        }
-        return Consts.ZERO_VALUE;
+    public static ArrayList<Integer> getOccupantIdsWithUserList(List<Integer> friendIdsList) {
+        QBUser user = App.getInstance().getUser();
+        ArrayList<Integer> occupantIdsList = new ArrayList<Integer>(friendIdsList);
+        occupantIdsList.add(user.getId());
+        return occupantIdsList;
     }
 
     public static QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getDialogId());
         String roomJid = dialog.getRoomJid();
-        String occupantsIds = occupantIdsToStringFromArray(getOccupantsStringArray(dialog.getOccupants()));
+        String occupantsIds = getOccupantsIdsStringFromArray(getOccupantsIdsArrayFromList(
+                dialog.getOccupants()));
         String dialogName = dialog.getName();
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
@@ -122,7 +91,7 @@ public class ChatUtils {
         return message;
     }
 
-    public static String occupantIdsToStringFromArray(String[] occupantsArray) {
+    public static String getOccupantsIdsStringFromArray(String[] occupantsArray) {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantsArray);
     }
 
@@ -130,16 +99,7 @@ public class ChatUtils {
         return chatMessage.getProperty(PROPERTY_DIALOG_ID) != null;
     }
 
-    public static boolean isGroupMessageByChatId(Object chatId) {
-        if (chatId instanceof String) {
-            return true;
-        } else if (chatId instanceof Integer) {
-            return false;
-        }
-        return false;
-    }
-
-    public static String[] getOccupantsStringArray(ArrayList<Integer> occupantsList) {
+    public static String[] getOccupantsIdsArrayFromList(ArrayList<Integer> occupantsList) {
         String[] occupantsArray = new String[occupantsList.size()];
         for (int i = 0; i < occupantsList.size(); i++) {
             occupantsArray[i] = String.valueOf(occupantsList.get(i));

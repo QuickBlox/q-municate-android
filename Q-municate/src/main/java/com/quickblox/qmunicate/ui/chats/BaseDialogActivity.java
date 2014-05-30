@@ -38,7 +38,7 @@ import com.quickblox.qmunicate.utils.SizeUtility;
 import java.io.File;
 import java.nio.charset.Charset;
 
-public abstract class BaseChatActivity extends BaseFragmentActivity implements SwitchViewListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener {
 
     protected static final float SMILES_SIZE_IN_DIPS = 220;
 
@@ -56,7 +56,7 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
     protected int layoutResID;
     protected ImageHelper imageHelper;
 
-    public BaseChatActivity(int layoutResID) {
+    public BaseDialogActivity(int layoutResID) {
         this.layoutResID = layoutResID;
     }
 
@@ -144,9 +144,9 @@ public abstract class BaseChatActivity extends BaseFragmentActivity implements S
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, Object chatId) {
+    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId) {
         showProgress();
-        QBLoadDialogMessagesCommand.start(this, dialog, chatId);
+        QBLoadDialogMessagesCommand.start(this, dialog, roomJidId);
     }
 
     private void initUI() {

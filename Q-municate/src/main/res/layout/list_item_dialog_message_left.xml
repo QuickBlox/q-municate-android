@@ -54,7 +54,7 @@
         <ImageView
             android:id="@+id/attach_imageview"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/chat_attach_image_height"
+            android:layout_height="@dimen/dlg_attach_image_height"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:clickable="true"

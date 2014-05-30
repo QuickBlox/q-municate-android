@@ -63,23 +63,23 @@
     <string name="frd_chat">Chat</string>
     <string name="frd_mobile">MOBILE</string>
 
-    // Chat
-    <string name="cht_message">Message</string>
-    <string name="cht_hint_message">Type a message</string>
+    // Dialog
+    <string name="dlg_message">Message</string>
+    <string name="dlg_hint_message">Type a message</string>
 
-    // Group Chat
-    <string name="gch_ctx_menu_reply">Reply</string>
-    <string name="gch_ctx_menu_prv_message">Private Message</string>
-    <string name="gch_ctx_menu_video_call">Video Call</string>
-    <string name="gch_ctx_menu_profile">View Profile</string>
+    // Group Dialog
+    <string name="gdl_ctx_menu_reply">Reply</string>
+    <string name="gdl_ctx_menu_prv_message">Private Message</string>
+    <string name="gdl_ctx_menu_video_call">Video Call</string>
+    <string name="gdl_ctx_menu_profile">View Profile</string>
 
-    // Group Chat Details
-    <string name="gcd_title">Group Details</string>
-    <string name="gcd_leave_group">Leave group</string>
+    // Group Dialog Details
+    <string name="gdd_title">Group Details</string>
+    <string name="gdd_leave_group">Leave group</string>
 
-    // New Chat
-    <string name="nch_title">New Chat</string>
-    <string name="nch_ac_mode_title">Create Group Chat</string>
+    // New Dialog
+    <string name="ndl_title">New Dialog</string>
+    <string name="ndl_ac_mode_title">Create Group Dialog</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>

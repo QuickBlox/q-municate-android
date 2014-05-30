@@ -7,22 +7,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
+import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.DateUtils;
 
-public class GroupChatMessagesAdapter extends BaseCursorAdapter {
+public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
-    public GroupChatMessagesAdapter(Context context, Cursor cursor) {
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.list_item_chat_message_left, null, true);
+        View view = layoutInflater.inflate(R.layout.list_item_dialog_message_left, null, true);
 
         ViewHolder holder = new ViewHolder();
 
@@ -44,8 +44,8 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
         String senderName;
         String avatarUrl;
 
-        String body = cursor.getString(cursor.getColumnIndex(ChatMessageTable.Cols.BODY));
-        int senderId = cursor.getInt(cursor.getColumnIndex(ChatMessageTable.Cols.SENDER_ID));
+        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
 
         if(senderId == currentUser.getId()) {
             senderName = currentUser.getFullName();
@@ -56,7 +56,7 @@ public class GroupChatMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForFriend(senderFriend);
         }
 
-        long time = cursor.getLong(cursor.getColumnIndex(ChatMessageTable.Cols.TIME));
+        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
 
         holder.messageTextView.setText(body);
         holder.nameTextView.setText(senderName);
