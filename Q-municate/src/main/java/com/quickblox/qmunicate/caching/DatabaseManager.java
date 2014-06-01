@@ -13,7 +13,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.caching.tables.DialogTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.model.Dialog;
 import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
@@ -115,32 +114,20 @@ public class DatabaseManager {
         }
     }
 
-    public static void updateTempDialog(Context context, Dialog dialog, String roomJidId) {
-        unreadMessagesCount = Consts.ZERO_VALUE;
-        ContentValues values;
-        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
-        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            values = getContentValuesForUpdateTempDialogTable(dialog);
-            resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-        }
-    }
-
     public static Cursor getAllDialogs(Context context) {
         return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
     }
 
-    public static Dialog createTempDialogByRoomJidId(Context context, String roomJidId) {
-        Dialog dialog = new Dialog();
-        dialog.setRoomJidId(roomJidId);
+    public static QBDialog createTempDialogByRoomJidId(Context context, String roomJidId) {
+        QBDialog dialog = new QBDialog();
+        dialog.setRoomJid(roomJidId);
         Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
         dialog.setName(opponentFriend.getFullname());
         ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(opponentFriend.getId());
         dialog.setOccupantsIds(occupantsIdsList);
         dialog.setType(QBDialogType.PRIVATE);
-        createTempDialog(context, dialog, roomJidId);
+        saveDialog(context, dialog, roomJidId);
         return dialog;
     }
 
@@ -231,7 +218,11 @@ public class DatabaseManager {
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
                 Friend friend = DatabaseManager.getFriendById(context, senderId);
-                message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+                if(friend == null) {
+                    message = context.getResources().getString(R.string.user_created_room, senderId);
+                } else {
+                    message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+                }
             }
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,
@@ -272,25 +263,6 @@ public class DatabaseManager {
         return values;
     }
 
-    private static void createTempDialog(Context context, Dialog dialog, String roomJidId) {
-        unreadMessagesCount = Consts.ZERO_VALUE;
-        ContentValues values;
-        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
-        if (cursor.getCount() == Consts.ZERO_VALUE) {
-            values = getContentValuesForCreateTempDialogTable(dialog, roomJidId);
-            resolver.insert(DialogTable.CONTENT_URI, values);
-        }
-    }
-
-    private static ContentValues getContentValuesForUpdateTempDialogTable(Dialog dialog) {
-        ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        return values;
-    }
-
     private static ContentValues getContentValuesForUpdateDialogTable(QBDialog dialog) {
         ContentValues values = new ContentValues();
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
@@ -311,20 +283,6 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupants());
-        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);
-        values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
-        values.put(DialogTable.Cols.TYPE, dialog.getType().name());
-        return values;
-    }
-
-    private static ContentValues getContentValuesForCreateTempDialogTable(Dialog dialog, String roomJidId) {
-        ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
-        values.put(DialogTable.Cols.ROOM_JID_ID, roomJidId);
-        values.put(DialogTable.Cols.NAME, dialog.getName());
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
-        String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupantsIds());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().name());

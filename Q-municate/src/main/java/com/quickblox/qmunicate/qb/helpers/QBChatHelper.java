@@ -25,7 +25,6 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.model.Dialog;
 import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -104,10 +103,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public void updateDialog(QBDialog dialog, String roomJidId) {
         saveDialogToCache(dialog, roomJidId);
-    }
-
-    public void updateTempDialog(Dialog dialog, String roomJidId) {
-        updateTempDialogToCache(dialog, roomJidId);
     }
 
     public void init() {
@@ -192,8 +187,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
-        deleteMessagesByRoomJidId(roomJidId);
-        saveChatMessagesToCache(dialogMessagesList, roomJidId);
+        if(dialogMessagesList != null) {
+            deleteMessagesByRoomJidId(roomJidId);
+            saveChatMessagesToCache(dialogMessagesList, roomJidId);
+        }
         return dialogMessagesList;
     }
 
@@ -220,10 +217,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private void saveDialogToCache(QBDialog dialog, String roomJidId) {
         DatabaseManager.saveDialog(context, dialog, roomJidId);
-    }
-
-    private void updateTempDialogToCache(Dialog dialog, String roomJidId) {
-        DatabaseManager.updateTempDialog(context, dialog, roomJidId);
     }
 
     private void notifyFriendAboutInvitation(QBDialog dialog,

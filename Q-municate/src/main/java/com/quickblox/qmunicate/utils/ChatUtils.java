@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.utils;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBChatMessage;
@@ -9,8 +8,6 @@ import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.model.Dialog;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.util.ArrayList;
