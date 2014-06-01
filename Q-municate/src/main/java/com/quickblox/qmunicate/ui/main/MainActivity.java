@@ -118,6 +118,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         }
 
         checkGCMRegistration();
+        loadChatsDialogs();
     }
 
     private void initPrefValues() {
@@ -154,7 +155,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onResume();
         gsmHelper.checkPlayServices();
         addActions();
-        loadChatsDialogs();
     }
 
     private void addActions() {

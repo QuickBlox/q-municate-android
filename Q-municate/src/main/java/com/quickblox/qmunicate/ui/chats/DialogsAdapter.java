@@ -42,7 +42,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        QBDialog dialog = DatabaseManager.getQBDialogFromCursor(cursor);
+        QBDialog dialog = DatabaseManager.getDialogFromCursor(cursor);
 
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());

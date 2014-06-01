@@ -22,6 +22,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
+import com.quickblox.qmunicate.model.Dialog;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
@@ -74,12 +75,18 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private QBDialog getDialogByRoomJidId() {
-        return DatabaseManager.getQBDialogByRoomJidId(this, roomJidId);
+        return DatabaseManager.getDialogByRoomJidId(this, roomJidId);
+    }
+
+    private void createTempDialog() {
+        DatabaseManager.createTempDialogByRoomJidId(this, roomJidId);
     }
 
     private void initStartLoadDialogMessages() {
         if (dialog != null) {
             startLoadDialogMessages(dialog, roomJidId);
+        } else {
+            createTempDialog();
         }
     }
 
@@ -112,18 +119,25 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void startUpdateChatDialog() {
-        QBUpdateDialogCommand.start(this, getQBDialog(), roomJidId);
+        if (dialog != null) {
+            QBUpdateDialogCommand.start(this, getDialog(), roomJidId);
+        } else {
+            QBUpdateDialogCommand.start(this, getTempDialog(), roomJidId, true);
+        }
     }
 
-    private QBDialog getQBDialog() {
+    private QBDialog getDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        QBDialog dialog;
-        if (this.dialog.getDialogId() != null) {
-            dialog = new QBDialog(this.dialog.getDialogId());
-        } else {
-            dialog = new QBDialog(null);
-        }
+        dialog.setLastMessage(lastMessage);
+        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        return dialog;
+    }
+
+    private Dialog getTempDialog() {
+        Dialog dialog = new Dialog();
+        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
         dialog.setLastMessage(lastMessage);
         dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
         return dialog;

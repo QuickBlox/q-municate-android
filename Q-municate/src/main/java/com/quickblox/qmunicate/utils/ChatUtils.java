@@ -1,12 +1,16 @@
 package com.quickblox.qmunicate.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBChatMessage;
+import com.quickblox.module.chat.QBMessage;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.Dialog;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.util.ArrayList;
@@ -42,7 +46,7 @@ public class ChatUtils {
         return Consts.EMPTY_STRING;
     }
 
-    public static QBDialog parseDialogFromMessage(QBChatMessage chatMessage) {
+    public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage) {
         String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -54,6 +58,7 @@ public class ChatUtils {
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
         dialog.setType(parseByCode(Integer.parseInt(dialogTypeCode)));
+        dialog.setLastMessage(lastMessage);
         dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
         return dialog;
     }
@@ -67,7 +72,7 @@ public class ChatUtils {
         return occupantIdsList;
     }
 
-    public static ArrayList<Integer> getOccupantIdsWithUserList(List<Integer> friendIdsList) {
+    public static ArrayList<Integer> getOccupantIdsWithUser(List<Integer> friendIdsList) {
         QBUser user = App.getInstance().getUser();
         ArrayList<Integer> occupantIdsList = new ArrayList<Integer>(friendIdsList);
         occupantIdsList.add(user.getId());

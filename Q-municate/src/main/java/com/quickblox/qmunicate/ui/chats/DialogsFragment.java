@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,11 +18,9 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
-import com.quickblox.qmunicate.utils.Consts;
 
 public class DialogsFragment extends BaseFragment {
 
@@ -53,7 +52,6 @@ public class DialogsFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         addActions();
-        loadChatsDialogs();
     }
 
     @Override
@@ -82,7 +80,7 @@ public class DialogsFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
                 Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
-                QBDialog dialog = DatabaseManager.getQBDialogFromCursor(selectedChatCursor);
+                QBDialog dialog = DatabaseManager.getDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
                 } else {
@@ -95,7 +93,11 @@ public class DialogsFragment extends BaseFragment {
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
         Friend occupant = dialogsAdapter.getOccupantById(occupantId);
-        PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        if (!TextUtils.isEmpty(dialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        } else {
+            PrivateDialogActivity.start(baseActivity, occupant, null);
+        }
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
@@ -107,10 +109,6 @@ public class DialogsFragment extends BaseFragment {
                 new LoadChatsDialogsSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
-    }
-
-    private void loadChatsDialogs() {
-//        QBLoadDialogsCommand.start(baseActivity);
     }
 
     private void initChatsDialogs() {

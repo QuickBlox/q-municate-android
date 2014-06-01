@@ -163,9 +163,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private void initListeners() {
         messageEditText.addTextChangedListener(new SimpleTextWatcher() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                super.onTextChanged(s, start, before, count);
-                if (TextUtils.isEmpty(s)) {
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
                     sendButton.setVisibility(View.GONE);
                     attachButton.setVisibility(View.VISIBLE);
                 } else {
