@@ -63,9 +63,12 @@ public class ChangePasswordDialog extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        checkFields();
+    }
+
+    private void checkFields(){
         AlertDialog dialog = (AlertDialog)getDialog();
         final Button yesButton = dialog == null ? null : dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-
         if(yesButton != null){
             yesButton.setOnTouchListener(new View.OnTouchListener() {
                 @Override
