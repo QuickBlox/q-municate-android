@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="@color/green"
+    android:background="@drawable/badge_crouton"
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingBottom="5dp"
@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="@dimen/text_size"
         android:textColor="@color/black"
         android:textStyle="bold" />
 
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textSize="@dimen/text_size"
         android:textColor="@color/dark_gray" />
 
 </LinearLayout>

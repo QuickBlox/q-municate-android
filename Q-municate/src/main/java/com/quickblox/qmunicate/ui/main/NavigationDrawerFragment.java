@@ -241,7 +241,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void clearCache() {
         DatabaseManager.deleteAllFriends(baseActivity);
         DatabaseManager.deleteAllMessages(baseActivity);
-        DatabaseManager.deleteAllChats(baseActivity);
+        DatabaseManager.deleteAllDialogs(baseActivity);
         // TODO SF clear something else
     }
 

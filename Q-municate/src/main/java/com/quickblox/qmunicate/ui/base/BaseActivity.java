@@ -26,6 +26,7 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -172,6 +173,11 @@ public abstract class BaseActivity extends Activity {
                 QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     protected void onConnectedToService() {
     }
 
@@ -194,11 +200,6 @@ public abstract class BaseActivity extends Activity {
         transaction.commit();
     }
 
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     private FragmentTransaction buildTransaction() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -210,7 +211,7 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void execute(Bundle bundle) {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            ErrorUtils.logError(e);
+            ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
         }
     }
@@ -235,10 +236,9 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null) {
+            if (extras != null && MainActivity.isNeedToShowCrouton) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-                Log.i("Message", "Sender: " + sender + ", Message: " + message);
                 showNewMessageAlert(sender, message);
             }
         }

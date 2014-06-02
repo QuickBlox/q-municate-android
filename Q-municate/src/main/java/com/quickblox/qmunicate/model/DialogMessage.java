@@ -1,6 +1,6 @@
 package com.quickblox.qmunicate.model;
 
-public class ChatMessage {
+public class DialogMessage {
 
     private String id;
     private String body;
@@ -8,8 +8,7 @@ public class ChatMessage {
     private int senderId;
     private boolean incoming;
 
-    public ChatMessage(String id, String body, long time, int senderId,
-            boolean incoming) {
+    public DialogMessage(String id, String body, long time, int senderId, boolean incoming) {
         this.id = id;
         this.body = body;
         this.time = time;
@@ -17,7 +16,7 @@ public class ChatMessage {
         this.incoming = incoming;
     }
 
-    public ChatMessage() {
+    public DialogMessage() {
     }
 
     public int getSenderId() {

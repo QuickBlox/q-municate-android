@@ -74,26 +74,26 @@
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".ui.chats.NewChatActivity"
+            android:name=".ui.chats.NewDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/nch_title"
+            android:label="@string/ndl_title"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".ui.chats.PrivateChatActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName=".ui.main.MainActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".ui.chats.GroupChatActivity"
+            android:name=".ui.chats.PrivateDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".ui.chats.GroupChatDetailsActivity"
+            android:name=".ui.chats.GroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/gcd_title"
-            android:parentActivityName=".ui.chats.GroupChatActivity"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.chats.GroupDialogDetailsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/gdd_title"
+            android:parentActivityName=".ui.chats.GroupDialogActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.profile.ProfileActivity"

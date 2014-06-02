@@ -14,7 +14,7 @@ public abstract class Chat {
 
     public abstract int getAvatarId();
 
-    public abstract ChatMessage getLastMessage();
+    public abstract DialogMessage getLastMessage();
 
     public void setLastMessage(String lastMessage){
         this.lastMessage = lastMessage;

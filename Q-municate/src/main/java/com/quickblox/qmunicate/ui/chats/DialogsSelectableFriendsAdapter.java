@@ -3,16 +3,13 @@ package com.quickblox.qmunicate.ui.chats;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.quickblox.internal.core.helper.Lo;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
@@ -23,22 +20,22 @@ import com.quickblox.qmunicate.utils.TextViewHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatSelectableFriendsAdapter extends BaseCursorAdapter {
+public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private NewChatCounterFriendsListener counterChangedListener;
+    private NewDialogCounterFriendsListener counterChangedListener;
     private int counterFriends;
     private String searchCharacters;
     private List<Friend> selectedFriends;
 
-    public ChatSelectableFriendsAdapter(Context context, Cursor cursor) {
+    public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         this.context = context;
         selectedFriends = new ArrayList<Friend>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
-    public void setCounterChangedListener(NewChatCounterFriendsListener listener) {
+    public void setCounterChangedListener(NewDialogCounterFriendsListener listener) {
         counterChangedListener = listener;
     }
 

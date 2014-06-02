@@ -8,10 +8,12 @@ import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.qmunicate.caching.tables.ChatMessageTable;
-import com.quickblox.qmunicate.caching.tables.ChatTable;
+import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
+import com.quickblox.qmunicate.caching.tables.DialogTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
-import com.quickblox.qmunicate.model.ChatMessageCache;
+import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
+
+    private static int unreadMessagesCount;
 
     public static void saveFriends(Context context, List<Friend> friendsList) {
         for (Friend friend : friendsList) {
@@ -38,42 +42,116 @@ public class DatabaseManager {
         } else {
             resolver.insert(FriendTable.CONTENT_URI, values);
         }
+        cursor.close();
     }
 
-    public static void saveChats(Context context, List<QBDialog> dialogsList) {
-        for (QBDialog dialog : dialogsList) {
-            saveDialog(context, dialog);
-        }
+    public static boolean isFriendInBase(Context context, int searchId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + searchId, null, null);
+        return cursor.getCount() > Consts.ZERO_VALUE;
     }
 
-    public static void saveDialog(Context context, QBDialog dialog) {
-        ContentValues values = getContentValuesChatTable(dialog);
-        String condition = ChatTable.Cols.DIALOG_ID + "='" + dialog.getDialogId() + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(ChatTable.CONTENT_URI, null, condition, null, null);
-        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
-            resolver.update(ChatTable.CONTENT_URI, values, condition, null);
+    public static Cursor getFriendsByFullname(Context context, String fullname) {
+        Cursor cursor;
+        String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
+        if (TextUtils.isEmpty(fullname)) {
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
         } else {
-            resolver.insert(ChatTable.CONTENT_URI, values);
+            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                    FriendTable.Cols.FULLNAME + " like '%" + fullname + "%'", null, sorting);
+        }
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
+    public static Cursor getAllFriends(Context context) {
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null,
+                FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+    }
+
+    public static void deleteAllFriends(Context context) {
+        context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
+    }
+
+    public static void saveDialogs(Context context, List<QBDialog> dialogsList) {
+        for (QBDialog dialog : dialogsList) {
+            if (dialog.getType().equals(QBDialogType.PRIVATE)) {
+                String roomJidId = ChatUtils.getOccupantIdFromList(
+                        dialog.getOccupants()) + Consts.EMPTY_STRING;
+                saveDialog(context, dialog, roomJidId);
+            } else {
+                saveDialog(context, dialog, dialog.getRoomJid());
+            }
         }
     }
 
-    public static QBDialog getQBDialogFromCursor(Cursor cursor) {
-        String dialogId = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.DIALOG_ID));
-        String roomJid = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.JID_ID));
-        String name = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.NAME));
-        String occupantsIds = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.OCCUPANTS_IDS));
-        int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.COUNT_UNREAD_MESSAGES));
-        String lastMessage = cursor.getString(cursor.getColumnIndex(ChatTable.Cols.LAST_MESSAGE));
-        int ordinalType = cursor.getInt(cursor.getColumnIndex(ChatTable.Cols.ORDINAL_TYPE));
+    public static QBDialog getDialogByRoomJidId(Context context, String roomJidId) {
+        QBDialog dialog = null;
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
+            if (!TextUtils.isEmpty(dialogId)) {
+                dialog = getDialogFromCursor(cursor);
+            }
+        }
+        cursor.close();
+        return dialog;
+    }
+
+    public static void saveDialog(Context context, QBDialog dialog, String roomJidId) {
+        unreadMessagesCount = Consts.ZERO_VALUE;
+        ContentValues values;
+        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
+        if (cursor != null && cursor.getCount() > Consts.ZERO_VALUE) {
+            values = getContentValuesForUpdateDialogTable(dialog);
+            resolver.update(DialogTable.CONTENT_URI, values, condition, null);
+        } else {
+            values = getContentValuesForCreateDialogTable(dialog, roomJidId);
+            resolver.insert(DialogTable.CONTENT_URI, values);
+        }
+        cursor.close();
+    }
+
+    public static Cursor getAllDialogs(Context context) {
+        return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
+                DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
+    }
+
+    public static QBDialog createTempDialogByRoomJidId(Context context, String roomJidId) {
+        QBDialog dialog = new QBDialog();
+        dialog.setRoomJid(roomJidId);
+        Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
+        dialog.setName(opponentFriend.getFullname());
+        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(opponentFriend.getId());
+        dialog.setOccupantsIds(occupantsIdsList);
+        dialog.setType(QBDialogType.PRIVATE);
+        saveDialog(context, dialog, roomJidId);
+        return dialog;
+    }
+
+    public static QBDialog getDialogFromCursor(Cursor cursor) {
+        String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
+        String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
+        String name = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.NAME));
+        String occupantsIdsString = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.OCCUPANTS_IDS));
+        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListFromString(occupantsIdsString);
+        int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(
+                DialogTable.Cols.COUNT_UNREAD_MESSAGES));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE));
+        String type = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.TYPE));
 
         QBDialog dialog = new QBDialog(dialogId);
-        dialog.setRoomJid(roomJid);
+        dialog.setRoomJid(roomJidId);
         dialog.setName(name);
-        dialog.setOccupantsIds(ChatUtils.getOccupantIdsFromString(occupantsIds));
+        dialog.setOccupantsIds(occupantsIdsList);
         dialog.setUnreadMessageCount(countUnreadMessages);
         dialog.setLastMessage(lastMessage);
-        dialog.setType(ChatUtils.getQBDialogTypeByOrdinal(ordinalType));
+        dialog.setType(QBDialogType.valueOf(type));
 
         return dialog;
     }
@@ -109,116 +187,69 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static boolean searchFriendInBase(Context context, int searchId) {
-        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                FriendTable.Cols.ID + " = " + searchId, null, null);
-        return cursor.getCount() > Consts.ZERO_VALUE;
-    }
-
-    public static Cursor getFriends(Context context, String fullname) {
-        Cursor cursor;
-        String sorting = FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC";
-        if (TextUtils.isEmpty(fullname)) {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null, sorting);
-        } else {
-            cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                    FriendTable.Cols.FULLNAME + " like '%" + fullname + "%'", null, sorting);
-        }
-        if (cursor != null) {
-            cursor.moveToFirst();
-        }
-        return cursor;
-    }
-
-    public static Cursor getAllChats(Context context) {
-        return context.getContentResolver().query(ChatTable.CONTENT_URI, null, null, null,
-                ChatTable.Cols.ID + " ORDER BY " + ChatTable.Cols.NAME + " COLLATE NOCASE ASC");
-    }
-
     public static int getCountUnreadDialogs(Context context) {
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
-                ChatTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
         return cursor.getCount();
     }
 
-    public static boolean isChatDialogInBase(Context context, String dialogId) {
-        Cursor cursor = context.getContentResolver().query(ChatTable.CONTENT_URI, null,
-                ChatTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
-        return cursor.getCount() > Consts.ZERO_VALUE;
-    }
-
-    public static Cursor getAllFriends(Context context) {
-        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, null, null,
-                FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
-    }
-
-    public static void deleteAllFriends(Context context) {
-        context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
-    }
-
-    public static Cursor getAllGroupChatMessagesByGroupId(Context context, String groupId) {
-        return context.getContentResolver().query(ChatMessageTable.CONTENT_URI, null,
-                ChatMessageTable.Cols.GROUP_ID + " = " + "'" + groupId + "'", null, null);
-    }
-
-    public static Cursor getAllPrivateChatMessagesByChatId(Context context, int chatId) {
-        return context.getContentResolver().query(ChatMessageTable.CONTENT_URI, null,
-                ChatMessageTable.Cols.CHAT_ID + " = " + chatId, null, null);
+    public static Cursor getAllDialogMessagesByRoomJidId(Context context, String roomJidId) {
+        return context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
+                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
     }
 
     public static void deleteAllMessages(Context context) {
-        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI, null, null);
+        context.getContentResolver().delete(DialogMessageTable.CONTENT_URI, null, null);
     }
 
-    public static void deleteAllChats(Context context) {
-        context.getContentResolver().delete(ChatTable.CONTENT_URI, null, null);
+    public static void deleteAllDialogs(Context context) {
+        context.getContentResolver().delete(DialogTable.CONTENT_URI, null, null);
     }
 
-    public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList, Object chatId) {
-        for (QBHistoryMessage message : messagesList) {
-            String body = message.getBody();
-            int senderId = message.getSenderId();
+    public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
+                                        String roomJidId) {
+        for (QBHistoryMessage historyMessage : messagesList) {
+            String message = historyMessage.getBody();
+            int senderId = historyMessage.getSenderId();
             String attachURL;
 
-            if (TextUtils.isEmpty(body)) {
-                attachURL = ChatUtils.getAttachUrlFromQBChatMessage(message);
+            if (TextUtils.isEmpty(message)) {
+                attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
             } else {
                 attachURL = Consts.EMPTY_STRING;
             }
 
-            ChatMessageCache chatMessageCache = null;
-            if (chatId instanceof String) {
-                chatMessageCache = new ChatMessageCache(body, senderId, (String) chatId, attachURL);
-            } else if (chatId instanceof Integer) {
-                chatMessageCache = new ChatMessageCache(body, senderId, (Integer) chatId, attachURL);
+            if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
+                Friend friend = DatabaseManager.getFriendById(context, senderId);
+                if(friend == null) {
+                    message = context.getResources().getString(R.string.user_created_room, senderId);
+                } else {
+                    message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+                }
             }
 
-            saveChatMessage(context, chatMessageCache);
+            DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,
+                    attachURL, historyMessage.getDateSent());
+
+            saveChatMessage(context, dialogMessageCache);
         }
     }
 
-    public static void saveChatMessage(Context context, ChatMessageCache chatMessageCache) {
+    public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {
+        unreadMessagesCount++;
         ContentValues values = new ContentValues();
-        values.put(ChatMessageTable.Cols.BODY, chatMessageCache.getMessage());
-        values.put(ChatMessageTable.Cols.SENDER_ID, chatMessageCache.getSenderId());
-        values.put(ChatMessageTable.Cols.TIME, System.currentTimeMillis());
-        values.put(ChatMessageTable.Cols.ATTACH_FILE_ID, chatMessageCache.getAttachUrl());
-        if (chatMessageCache.getRoomJid() != null) {
-            values.put(ChatMessageTable.Cols.GROUP_ID, chatMessageCache.getRoomJid());
-        } else if (chatMessageCache.getChatId() != null) {
-            values.put(ChatMessageTable.Cols.CHAT_ID, chatMessageCache.getChatId());
-        }
-        context.getContentResolver().insert(ChatMessageTable.CONTENT_URI, values);
+        values.put(DialogMessageTable.Cols.ROOM_JID_ID, dialogMessageCache.getRoomJidId());
+        values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
+        values.put(DialogMessageTable.Cols.BODY, dialogMessageCache.getMessage());
+        values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
+        values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
+        context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
+        updateUnreadMessagesCount(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage());
     }
 
-    public static void deleteMessagesByChatId(Context context, int chatId) {
-        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI,
-                ChatMessageTable.Cols.CHAT_ID + " = " + chatId, null);
-    }
-
-    public static void deleteMessagesByGroupId(Context context, String groupId) {
-        context.getContentResolver().delete(ChatMessageTable.CONTENT_URI,
-                ChatMessageTable.Cols.GROUP_ID + " = '" + groupId + "'", null);
+    public static void deleteMessagesByRoomJidId(Context context, String roomJidId) {
+        context.getContentResolver().delete(DialogMessageTable.CONTENT_URI,
+                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null);
     }
 
     private static ContentValues getContentValuesFriendTable(Friend friend) {
@@ -235,17 +266,39 @@ public class DatabaseManager {
         return values;
     }
 
-    private static ContentValues getContentValuesChatTable(QBDialog dialog) {
+    private static ContentValues getContentValuesForUpdateDialogTable(QBDialog dialog) {
         ContentValues values = new ContentValues();
-        values.put(ChatTable.Cols.DIALOG_ID, dialog.getDialogId());
-        values.put(ChatTable.Cols.JID_ID, dialog.getRoomJid());
-        values.put(ChatTable.Cols.NAME, dialog.getName());
-        values.put(ChatTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        values.put(ChatTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
-        String occupantsIds = ChatUtils.occupantIdsToStringFromArray(ChatUtils.getOccupantsStringArray(dialog.getOccupants()));
-        values.put(ChatTable.Cols.OCCUPANTS_IDS, occupantsIds);
-        values.put(ChatTable.Cols.ORDINAL_TYPE, ChatUtils.getOrdinalByQBDialogType(dialog.getType()));
+        if (!TextUtils.isEmpty(dialog.getDialogId())) {
+            values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
+        }
+        if (!TextUtils.isEmpty(dialog.getLastMessage())) {
+            values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
+        }
+        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;
+    }
+
+    private static ContentValues getContentValuesForCreateDialogTable(QBDialog dialog, String roomJidId) {
+        ContentValues values = new ContentValues();
+        values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
+        values.put(DialogTable.Cols.ROOM_JID_ID, roomJidId);
+        values.put(DialogTable.Cols.NAME, dialog.getName());
+        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
+        values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
+        String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupants());
+        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);
+        values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
+        values.put(DialogTable.Cols.TYPE, dialog.getType().name());
+        return values;
+    }
+
+    private static void updateUnreadMessagesCount(Context context, String roomJidId, String lastMessage) {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, unreadMessagesCount);
+        values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
+        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
+        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
     }
 
     private static List<Friend> getFriendListFromCursor(Cursor cursor) {

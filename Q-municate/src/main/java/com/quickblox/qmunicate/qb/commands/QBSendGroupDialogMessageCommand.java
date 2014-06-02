@@ -10,11 +10,11 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
-public class QBSendGroupChatMessageCommand extends ServiceCommand {
+public class QBSendGroupDialogMessageCommand extends ServiceCommand {
 
     private QBChatHelper chatHelper;
 
-    public QBSendGroupChatMessageCommand(Context context, QBChatHelper ChatHelper, String successAction,
+    public QBSendGroupDialogMessageCommand(Context context, QBChatHelper ChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = ChatHelper;

@@ -38,6 +38,6 @@
     <dimen name="corners_middle_value">10dp</dimen>
     <dimen name="corners_big_value">15dp</dimen>
 
-    <dimen name="chat_avatar_new_message_wh">30dp</dimen>
-    <dimen name="chat_attach_image_height">200dp</dimen>
+    <dimen name="dlg_avatar_new_message_wh">30dp</dimen>
+    <dimen name="dlg_attach_image_height">200dp</dimen>
 </resources>

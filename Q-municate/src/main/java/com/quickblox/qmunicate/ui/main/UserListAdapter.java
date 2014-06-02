@@ -6,14 +6,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
-import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.TextViewHelper;
 
 import java.util.List;
@@ -53,7 +51,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             }
         });
 
-        if (DatabaseManager.searchFriendInBase(baseActivity, user.getId())) {
+        if (DatabaseManager.isFriendInBase(baseActivity, user.getId())) {
             holder.addFriendButton.setVisibility(View.INVISIBLE);
         } else {
             holder.addFriendButton.setVisibility(View.VISIBLE);
