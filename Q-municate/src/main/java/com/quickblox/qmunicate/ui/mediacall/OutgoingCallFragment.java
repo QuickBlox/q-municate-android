@@ -272,7 +272,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             } else {
                 qbVideoChat.disposeConnection();
             }
-            qbVideoChat.clean();
         }
         if (signalingChannel != null) {
             signalingChannel.close();
