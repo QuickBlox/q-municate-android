@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +36,7 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
     private List<Friend> friendsArrayList;
     private DialogsSelectableFriendsAdapter friendsAdapter;
     private ActionMode actionMode;
-    private boolean closeWithoutRedirect;
+    private boolean isNeedToCloseWithoutRedirect;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewDialogActivity.class);
@@ -58,37 +59,28 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
         initListView();
     }
 
-    private void initListView() {
-        friendsListView.setAdapter(friendsAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
-        friendsListView.setOnItemClickListener(this);
+    private void initUI() {
+        friendsListView = _findViewById(R.id.chat_friends_listview);
     }
 
     private Cursor getAllFriends() {
         return DatabaseManager.getAllFriends(this);
     }
 
-    private void updateFriendListAdapter() {
-        Collections.sort(friendsArrayList, new SimpleComparator());
-        friendsAdapter.notifyDataSetChanged();
-    }
-
     private void initListeners() {
         friendsListView.setOnItemClickListener(this);
     }
 
-    private void initUI() {
-        friendsListView = _findViewById(R.id.chat_friends_listview);
+    private void initListView() {
+        friendsListView.setAdapter(friendsAdapter);
+        friendsListView.setSelector(R.drawable.list_item_background_selector);
+        friendsListView.setOnItemClickListener(this);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onBackPressed() {
+        isNeedToCloseWithoutRedirect = true;
+        super.onBackPressed();
     }
 
     @Override
@@ -99,14 +91,14 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
     public void onCounterFriendsChanged(int valueCounter) {
         if (actionMode != null) {
             if (valueCounter == Consts.ZERO_VALUE) {
-                closeWithoutRedirect = true;
+                isNeedToCloseWithoutRedirect = true;
                 actionMode.finish();
                 return;
             }
         } else {
             startAction();
         }
-        countSelectedFriendsTextView.setText(valueCounter + "");
+        countSelectedFriendsTextView.setText(valueCounter + Consts.EMPTY_STRING);
     }
 
     private void startAction() {
@@ -115,6 +107,34 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         createGroupChatTextView = (TextView) view.findViewById(R.id.create_group_chat_textview);
         actionMode.setCustomView(view);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            isNeedToCloseWithoutRedirect = true;
+            actionMode.finish();
+            return true;
+        } else {
+            isNeedToCloseWithoutRedirect = false;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                isNeedToCloseWithoutRedirect = true;
+                navigateToParent();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void updateFriendListAdapter() {
+        Collections.sort(friendsArrayList, new SimpleComparator());
+        friendsAdapter.notifyDataSetChanged();
     }
 
     public static class SimpleComparator implements Comparator<Friend> {
@@ -133,16 +153,17 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            if (!closeWithoutRedirect) {
+            if (isNeedToCloseWithoutRedirect) {
+                isNeedToCloseWithoutRedirect = false;
+                actionMode = null;
+                finish();
+            } else {
+                isNeedToCloseWithoutRedirect = false;
                 List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
                 Collections.sort(membersList, new SimpleComparator());
                 GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
                 finish();
                 actionMode = null;
-                closeWithoutRedirect = false;
-            } else {
-                actionMode = null;
-                closeWithoutRedirect = false;
             }
         }
     }
