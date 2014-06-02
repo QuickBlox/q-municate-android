@@ -9,6 +9,9 @@ import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class QBAddFriendsCommand extends ServiceCommand {
 
     private QBFriendListHelper friendListHelper;
@@ -19,17 +22,17 @@ public class QBAddFriendsCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, Integer[] userIdsArray) {
+    public static void start(Context context, List<Integer> userIdsArray) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, userIdsArray);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) userIdsArray);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        Integer[] userIds = (Integer[]) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+        ArrayList<Integer> userIds = extras.getIntegerArrayList(QBServiceConsts.EXTRA_FRIENDS);
 
-        for (Integer userId : userIds) {
+        for (int userId : userIds) {
             friendListHelper.inviteFriend(userId);
         }
 
