@@ -71,6 +71,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         initActionBar();
 
         registerForContextMenu(messagesListView);
+
+        initStartLoadDialogMessages();
     }
 
     protected void addActions() {
@@ -128,8 +130,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
+        long dateSent = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
         dialog.setLastMessage(lastMessage);
-        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }
 
@@ -219,7 +223,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         addActions();
-        startLoadDialogMessages(dialog, roomJidId);
+    }
+
+    private void initStartLoadDialogMessages() {
+        if (messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+        } else if (!messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
+        }
     }
 
     private class CreateChatSuccessAction implements Command {

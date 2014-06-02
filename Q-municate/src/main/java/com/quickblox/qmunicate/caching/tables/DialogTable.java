@@ -19,6 +19,7 @@ public class DialogTable {
         public static final String NAME = "name";
         public static final String COUNT_UNREAD_MESSAGES = "count_unread_messages";
         public static final String LAST_MESSAGE = "last_message";
+        public static final String LAST_DATE_SENT = "last_date_sent";
         public static final String OCCUPANTS_IDS = "occupants_ids";
         public static final String TYPE = "type";
     }

@@ -124,6 +124,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
+    public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";

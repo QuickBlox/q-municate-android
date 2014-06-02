@@ -90,7 +90,7 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
     @Override
     public void onCounterFriendsChanged(int valueCounter) {
         if (actionMode != null) {
-            if (valueCounter == Consts.ZERO_VALUE) {
+            if (valueCounter == Consts.ZERO_INT_VALUE) {
                 isNeedToCloseWithoutRedirect = true;
                 actionMode.finish();
                 return;

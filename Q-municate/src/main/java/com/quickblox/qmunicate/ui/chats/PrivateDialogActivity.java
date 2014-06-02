@@ -82,8 +82,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initStartLoadDialogMessages() {
-        if (dialog != null) {
-            startLoadDialogMessages(dialog, roomJidId);
+        if (dialog != null && messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+        } else if (dialog != null && !messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
         } else {
             createTempDialog();
         }
@@ -127,7 +129,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
         dialog.setLastMessage(lastMessage);
-        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }
 

@@ -180,15 +180,18 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return chatDialogsList;
     }
 
-    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog,
-                                                    String roomJidId) throws QBResponseException {
+    public List<QBHistoryMessage> getDialogMessages(QBDialog dialog, String roomJidId,
+            long lastDateLoad) throws QBResponseException {
         Bundle bundle = new Bundle();
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
+        if (lastDateLoad != Consts.ZERO_LONG_VALUE) {
+            customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
+                    lastDateLoad);
+        }
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
-        if(dialogMessagesList != null) {
-            deleteMessagesByRoomJidId(roomJidId);
+        if (dialogMessagesList != null) {
             saveChatMessagesToCache(dialogMessagesList, roomJidId);
         }
         return dialogMessagesList;
@@ -289,10 +292,11 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+            long time = DateUtils.getCurrentTime();
 
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
-                        context.getResources().getString(R.string.user_created_room, friend.getFullname()));
+                        context.getResources().getString(R.string.user_created_room, friend.getFullname()), time);
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
@@ -300,7 +304,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
             String attachUrl = getAttachUrlIfExists(chatMessage);
             String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-            long time = DateUtils.getCurrentTime();
 
             saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
             notifyMessageReceived(chatMessage, friend);

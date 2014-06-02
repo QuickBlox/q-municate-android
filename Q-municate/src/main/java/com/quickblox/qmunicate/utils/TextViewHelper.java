@@ -15,7 +15,7 @@ public class TextViewHelper {
         String stringTextViewLowerCase = stringTextView.toLowerCase();
 
         int startSpan;
-        int endSpan = Consts.ZERO_VALUE;
+        int endSpan = Consts.ZERO_INT_VALUE;
 
         Spannable spanRange = new SpannableString(stringTextView);
 

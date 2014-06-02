@@ -90,7 +90,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
-            progressBar.setProgress(Consts.ZERO_VALUE);
+            progressBar.setProgress(Consts.ZERO_INT_VALUE);
             progressBar.setVisibility(View.VISIBLE);
             pleaseWaitTextView.setVisibility(View.VISIBLE);
         }

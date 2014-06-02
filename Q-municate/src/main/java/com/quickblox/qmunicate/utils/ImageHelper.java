@@ -58,7 +58,7 @@ public class ImageHelper {
         try {
             Bitmap bitmap = resizeBitmap(origBitmap, origBitmap.getWidth(), origBitmap.getHeight());
             bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, Consts.ZERO_VALUE, bos);
+            bitmap.compress(Bitmap.CompressFormat.PNG, Consts.ZERO_INT_VALUE, bos);
             byte[] bitmapData = bos.toByteArray();
             fos = new FileOutputStream(tempFile);
             fos.write(bitmapData);
