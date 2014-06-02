@@ -2,12 +2,12 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
@@ -15,22 +15,19 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
-import com.quickblox.qmunicate.utils.TextViewHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
-    private Context context;
+
     private LayoutInflater layoutInflater;
     private NewDialogCounterFriendsListener counterChangedListener;
     private int counterFriends;
-    private String searchCharacters;
     private List<Friend> selectedFriends;
 
     public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
-        this.context = context;
         selectedFriends = new ArrayList<Friend>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -41,61 +38,59 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder viewHolder;
         View view = layoutInflater.inflate(R.layout.list_item_chat_friend_selectable, null);
-        holder = new ViewHolder();
+        viewHolder = new ViewHolder();
 
-        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
-        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
-        holder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
-        holder.statusMessageTextView = (TextView) view.findViewById(R.id.statusMessageTextView);
-        holder.selectFriendCheckBox = (CheckBox) view.findViewById(R.id.time_textview);
+        viewHolder.contentRelativeLayout = (RelativeLayout) view.findViewById(R.id.contentRelativeLayout);
+        viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+        viewHolder.avatarImageView.setOval(true);
+        viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+        viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
+        viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.statusMessageTextView);
+        viewHolder.selectFriendCheckBox = (CheckBox) view.findViewById(R.id.selected_friend_checkbox);
 
-        view.setTag(holder);
+        view.setTag(viewHolder);
         return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder holder = (ViewHolder) view.getTag();
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         Friend friend = DatabaseManager.getFriendFromCursor(cursor);
 
-        holder.nameTextView.setText(friend.getFullname());
-        holder.statusMessageTextView.setText(friend.getStatus());
-        // TODO All fields
-        holder.nameTextView.setText(friend.getFullname());
-        holder.selectFriendCheckBox.setChecked(friend.isSelected());
-        holder.selectFriendCheckBox.setTag(friend);
+        viewHolder.nameTextView.setText(friend.getFullname());
+        viewHolder.statusMessageTextView.setText(friend.getStatus());
+        viewHolder.nameTextView.setText(friend.getFullname());
+        viewHolder.selectFriendCheckBox.setChecked(friend.isSelected());
+        viewHolder.selectFriendCheckBox.setTag(friend);
         if (friend.isOnline()) {
-            holder.onlineImageView.setVisibility(View.VISIBLE);
+            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
-            holder.onlineImageView.setVisibility(View.INVISIBLE);
+            viewHolder.onlineImageView.setVisibility(View.INVISIBLE);
         }
-        holder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                CheckBox cb = (CheckBox) v;
-                Friend friend = (Friend) cb.getTag();
-                friend.setSelected(cb.isChecked());
-                notifyCounterChanged(cb.isChecked());
-                if(cb.isChecked()){
+        viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                CheckBox checkBox = (CheckBox) view;
+                Friend friend = (Friend) checkBox.getTag();
+                friend.setSelected(checkBox.isChecked());
+                notifyCounterChanged(checkBox.isChecked());
+                if (checkBox.isChecked()) {
                     selectedFriends.add(friend);
-                } else if (selectedFriends.contains(friend)){
+                } else if (selectedFriends.contains(friend)) {
                     selectedFriends.remove(friend);
                 }
+                viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(
+                        viewHolder.selectFriendCheckBox.isChecked()));
             }
         });
+
         String avatarUrl = getAvatarUrlForFriend(friend);
-        displayAvatarImage(avatarUrl, holder.avatarImageView);
+        displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
 
-        if (!TextUtils.isEmpty(searchCharacters)) {
-            TextViewHelper.changeTextColorView(context, holder.nameTextView, searchCharacters);
-        }
-    }
-
-    public void setSearchCharacters(String searchCharacters) {
-        this.searchCharacters = searchCharacters;
+        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(
+                viewHolder.selectFriendCheckBox.isChecked()));
     }
 
     private void notifyCounterChanged(boolean isIncrease) {
@@ -103,8 +98,9 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         counterChangedListener.onCounterFriendsChanged(counterFriends);
     }
 
-    public ArrayList<Friend> getSelectedFriends() {
-        return (ArrayList<Friend>)selectedFriends;
+    private int getBackgroundColorItem(boolean isSelect) {
+        return isSelect ? resources.getColor(R.color.list_item_background_pressed_color) : resources.getColor(
+                R.color.white);
     }
 
     private void changeCounter(boolean isIncrease) {
@@ -115,7 +111,13 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         }
     }
 
+    public ArrayList<Friend> getSelectedFriends() {
+        return (ArrayList<Friend>) selectedFriends;
+    }
+
     private static class ViewHolder {
+
+        RelativeLayout contentRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
         ImageView onlineImageView;

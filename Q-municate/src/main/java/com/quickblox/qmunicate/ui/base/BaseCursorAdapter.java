@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.base;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import java.io.File;
 public abstract class BaseCursorAdapter extends CursorAdapter implements ReceiveFileListener {
 
     protected final Context context;
+    protected final Resources resources;
     protected final LayoutInflater layoutInflater;
 
     protected QBUser currentUser;
@@ -39,6 +41,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     public BaseCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
         super(context, cursor, autoRequery);
         this.context = context;
+        resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
         currentUser = App.getInstance().getUser();
         currentLoginType = App.getInstance().getUserLoginType();

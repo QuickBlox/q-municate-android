@@ -47,7 +47,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
 
-
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
