@@ -145,8 +145,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onFileLoaded(QBFile file);
 
     protected void startLoadDialogMessages(QBDialog dialog, String roomJidId, long lastDateLoad) {
-//        showProgress();
-        QBLoadDialogMessagesCommand.start(this, dialog, roomJidId, lastDateLoad);
+        if (dialog != null) {
+            QBLoadDialogMessagesCommand.start(this, dialog, roomJidId, lastDateLoad);
+        }
     }
 
     private void initUI() {
@@ -210,7 +211,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-//            hideProgress();
         }
     }
 

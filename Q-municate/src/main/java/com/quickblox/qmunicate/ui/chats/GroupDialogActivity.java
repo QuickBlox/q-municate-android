@@ -145,6 +145,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             roomJidId = dialog.getRoomJid();
             QBJoinGroupChatCommand.start(this, roomJidId);
         } else {
+            showProgress();
             friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             groupName = createChatName();
             QBCreateGroupDialogCommand.start(this, groupName, friendList);
@@ -237,6 +238,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         @Override
         public void execute(Bundle bundle) {
+            hideProgress();
             dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupName = dialog.getName();
             roomJidId = dialog.getRoomJid();

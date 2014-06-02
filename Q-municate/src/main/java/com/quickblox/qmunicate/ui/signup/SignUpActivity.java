@@ -17,6 +17,7 @@ import android.widget.EditText;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -150,6 +151,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
+            DatabaseManager.clearAllCache(SignUpActivity.this);
             MainActivity.start(SignUpActivity.this);
             finish();
         }

@@ -320,4 +320,11 @@ public class DatabaseManager {
         }
         return null;
     }
+
+    public static void clearAllCache(Context context) {
+        DatabaseManager.deleteAllFriends(context);
+        DatabaseManager.deleteAllMessages(context);
+        DatabaseManager.deleteAllDialogs(context);
+        // TODO SF clear something else
+    }
 }
