@@ -98,7 +98,7 @@ public class QBServiceConsts {
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
-    public static final String EXTRA_CHAT_ID = "chat_id";
+    public static final String EXTRA_ROOM_JID_ID = "room_jid_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
@@ -119,7 +119,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
-    public static final String EXTRA_GROUP_CHAT = "group_chat";
+    public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";

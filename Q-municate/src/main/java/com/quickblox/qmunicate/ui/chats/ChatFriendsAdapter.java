@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.model.ChatMessage;
-import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.model.DialogMessage;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
@@ -20,7 +18,7 @@ import java.util.List;
 public class ChatFriendsAdapter extends /*ArrayAdapter<Friend>*/BaseCursorAdapter {
     private Context context;
     private LayoutInflater layoutInflater;
-    private List <ChatMessage> opponentMessages;
+    private List <DialogMessage> opponentMessages;
 
 //    public ChatFriendsAdapter(Context context, int textViewResourceId, List<Friend> list) {
 //        super(context, textViewResourceId, list);
@@ -28,7 +26,7 @@ public class ChatFriendsAdapter extends /*ArrayAdapter<Friend>*/BaseCursorAdapte
 //        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 //    }
 
-    public ChatFriendsAdapter(Context context, Cursor cursor, List<ChatMessage> list) {
+    public ChatFriendsAdapter(Context context, Cursor cursor, List<DialogMessage> list) {
         super(context, cursor, true);
         this.opponentMessages = list;
     }
@@ -39,7 +37,7 @@ public class ChatFriendsAdapter extends /*ArrayAdapter<Friend>*/BaseCursorAdapte
 //        Friend data = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_chat_friend, null);
+            convertView = layoutInflater.inflate(R.layout.list_item_dialog_friend, null);
             holder = new ViewHolder();
 
             holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);

@@ -25,7 +25,7 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="center"
         android:layout_marginRight="10dp"
-        android:text="@string/nch_ac_mode_title"
+        android:text="@string/ndl_ac_mode_title"
         android:textAllCaps="true"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/actionMenuTextColor"

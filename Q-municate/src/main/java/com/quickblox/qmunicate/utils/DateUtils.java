@@ -1,22 +1,20 @@
 package com.quickblox.qmunicate.utils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 
 public class DateUtils {
 
-    public static long dateToLong(Date date) {
-        return date.getTime();
-    }
-
-    public static Date longToDate(long dateLong) {
-        return new Date(dateLong);
-    }
+    private static long MILLIS_VALUE = 1000;
 
     public static String longToMessageDate(long dateLong) {
-        Date date = new Date(dateLong);
-        String dateString =  new SimpleDateFormat("yyyy-MM-dd").format(date);
-        String timeString = new SimpleDateFormat("hh:mm:ss").format(date);
-        return dateString + "\n" + timeString;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dateLong * MILLIS_VALUE);
+        String timeString = new SimpleDateFormat("hh:mm").format(calendar.getTime());
+        return timeString;
+    }
+
+    public static long getCurrentTime() {
+        return Calendar.getInstance().getTimeInMillis() / MILLIS_VALUE;
     }
 }

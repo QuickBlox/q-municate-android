@@ -12,11 +12,11 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 import java.util.List;
 
-public class QBLoadChatsDialogsCommand extends ServiceCommand {
+public class QBLoadDialogsCommand extends ServiceCommand {
 
     private QBChatHelper chatHelper;
 
-    public QBLoadChatsDialogsCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBLoadDialogsCommand(Context context, QBChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;
@@ -29,7 +29,7 @@ public class QBLoadChatsDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogsList  = chatHelper.getChatsDialogs();
+        List<QBDialog> dialogsList  = chatHelper.getDialogs();
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_CHATS_DIALOGS, (java.io.Serializable) dialogsList);
         return bundle;

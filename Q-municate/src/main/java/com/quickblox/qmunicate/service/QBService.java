@@ -12,14 +12,14 @@ import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
-import com.quickblox.qmunicate.qb.commands.QBCreateGroupChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadChatsDialogsCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
@@ -34,11 +34,11 @@ import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutRestCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
-import com.quickblox.qmunicate.qb.commands.QBSendGroupChatMessageCommand;
+import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpRestCommand;
-import com.quickblox.qmunicate.qb.commands.QBUpdateChatDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
@@ -126,7 +126,7 @@ public class QBService extends Service {
     }
 
     private void registerCreateGroupChatCommand() {
-        QBCreateGroupChatCommand createGroupChatCommand = new QBCreateGroupChatCommand(this, chatHelper,
+        QBCreateGroupDialogCommand createGroupChatCommand = new QBCreateGroupDialogCommand(this, chatHelper,
                 QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, createGroupChatCommand);
@@ -172,7 +172,7 @@ public class QBService extends Service {
     }
 
     private void registerSendGroupMessageCommand() {
-        QBSendGroupChatMessageCommand sendMessageCommand = new QBSendGroupChatMessageCommand(this, chatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
+        QBSendGroupDialogMessageCommand sendMessageCommand = new QBSendGroupDialogMessageCommand(this, chatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.SEND_MESSAGE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, sendMessageCommand);
     }
@@ -292,13 +292,13 @@ public class QBService extends Service {
     }
 
     private void registerLoadChatsDialogsCommand() {
-        QBLoadChatsDialogsCommand chatsDialogsCommand = new QBLoadChatsDialogsCommand(this, chatHelper,
+        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
     }
 
     private void registerUpdateChatDialogCommand() {
-        QBUpdateChatDialogCommand updateChatDialogCommand = new QBUpdateChatDialogCommand(this, chatHelper,
+        QBUpdateDialogCommand updateChatDialogCommand = new QBUpdateDialogCommand(this, chatHelper,
                 QBServiceConsts.UPDATE_CHAT_DIALOG_SUCCESS_ACTION, QBServiceConsts.UPDATE_CHAT_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, updateChatDialogCommand);
     }
