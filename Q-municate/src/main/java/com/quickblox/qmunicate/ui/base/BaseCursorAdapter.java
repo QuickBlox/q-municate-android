@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -111,7 +112,8 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
             return new View.OnClickListener() {
 
                 @Override
-                public void onClick(View v) {
+                public void onClick(View view) {
+                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
                     new ReceiveImageFileTask(BaseCursorAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);
                 }
