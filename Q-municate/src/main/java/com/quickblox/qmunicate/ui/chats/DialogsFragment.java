@@ -21,6 +21,8 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.TipsManager;
 
 public class DialogsFragment extends BaseFragment {
 
@@ -44,7 +46,7 @@ public class DialogsFragment extends BaseFragment {
         initUI(view);
         initListeners();
         initChatsDialogs();
-
+        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_chats_list));
         return view;
     }
 
