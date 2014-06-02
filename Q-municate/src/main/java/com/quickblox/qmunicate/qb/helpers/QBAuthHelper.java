@@ -2,6 +2,8 @@ package com.quickblox.qmunicate.qb.helpers;
 
 import android.content.Context;
 
+import android.content.Intent;
+import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
@@ -11,6 +13,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 
+import com.quickblox.qmunicate.utils.Consts;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
@@ -20,9 +23,11 @@ public class QBAuthHelper extends BaseHelper {
     private String TAG = QBAuthHelper.class.getSimpleName();
 
     private QBUser user;
+    private Context context;
 
     public QBAuthHelper(Context context) {
         super(context);
+        this.context = context;
     }
 
     public QBUser login(QBUser user) throws QBResponseException, XMPPException {
@@ -66,8 +71,16 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
         String password = user.getPassword();
-        this.user = QBUsers.updateUser(user);
-        this.user.setPassword(password);
+        try{
+            this.user = QBUsers.updateUser(user);
+            this.user.setPassword(password);
+        } catch(Exception e){
+            e.printStackTrace();
+            Intent intent = new Intent(Consts.WRONG_EMAIL);
+            context.sendBroadcast(intent);
+            Log.i("Server email", "wrong");
+        }
+
 
         return this.user;
     }

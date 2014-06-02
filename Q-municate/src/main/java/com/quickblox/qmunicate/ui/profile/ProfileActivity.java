@@ -1,9 +1,12 @@
 package com.quickblox.qmunicate.ui.profile;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -61,11 +64,13 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private String fullnameCurrent;
     private String emailCurrent;
     private String statusCurrent;
-    private String fullnameOld;
-    private String emailOld;
-    private String statusOld;
+    private static String fullnameOld;
+    private static String emailOld;
+    private static String statusOld;
+    private static boolean isCurrentMailIncorrect;
 
     private QBUser user;
+    private ErrorReceiver receiver;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
     private boolean closeActionMode;
@@ -118,7 +123,12 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         emailEditText.setText(user.getEmail());
         String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, "");
         statusMessageEditText.setText(status);
-        updateOldUserData();
+        if(!isCurrentMailIncorrect){
+            updateOldUserData();
+        } else {
+            recoverUserData();
+        }
+
     }
 
 
@@ -184,6 +194,18 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver();
+    }
+
+    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             fullNameEditText.setText(user.getFullName());
@@ -245,11 +267,22 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     public void changeEmailOnClick() {
+        isCurrentMailIncorrect = false;
         initChangingEditText(emailEditText);
     }
 
     public void changeStatusOnClick() {
         initChangingEditText(statusMessageEditText);
+    }
+
+    private void registerReceiver(){
+        receiver = new ErrorReceiver();
+        IntentFilter filter = new IntentFilter(Consts.WRONG_EMAIL);
+        registerReceiver(receiver, filter);
+    }
+
+    private void unregisterReceiver(){
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -316,11 +349,27 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusOld = statusMessageEditText.getText().toString();
     }
 
+    private void recoverUserData() {
+        fullNameEditText.setText(fullnameOld);
+        emailEditText.setText(emailOld);
+        statusMessageEditText.setText(statusOld);
+    }
+
     private class TextWatcherListener extends SimpleTextWatcher {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             startAction();
+        }
+    }
+
+    private class ErrorReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction() != null && intent.getAction().equals(Consts.WRONG_EMAIL)){
+                emailEditText.setTextColor(Color.RED);
+                isCurrentMailIncorrect = true;
+            }
         }
     }
 
@@ -347,7 +396,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-            updateOldUserData();
+//            updateOldUserData();
             hideProgress();
         }
     }
