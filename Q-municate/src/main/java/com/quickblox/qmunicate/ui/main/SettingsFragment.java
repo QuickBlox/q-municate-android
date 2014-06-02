@@ -139,7 +139,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private boolean getPushNotifications() {
-        return App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
+        return !App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
     }
 
     private class LogoutSuccessAction implements Command {
