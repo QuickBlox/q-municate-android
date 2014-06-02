@@ -17,17 +17,12 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
@@ -37,9 +32,7 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 public abstract class BaseActivity extends Activity {
 
@@ -80,7 +73,7 @@ public abstract class BaseActivity extends Activity {
                 progress.dismissAllowingStateLoss();
             }
         } catch (NullPointerException npe){
-            npe.printStackTrace();
+            ErrorUtils.logError(npe);
         }
     }
 
