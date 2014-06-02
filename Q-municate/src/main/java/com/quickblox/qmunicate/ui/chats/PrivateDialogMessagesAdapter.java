@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
@@ -21,21 +18,14 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
-import com.quickblox.qmunicate.utils.ImageHelper;
-import com.quickblox.qmunicate.utils.ReceiveFileListener;
-import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
-import java.io.File;
-
-public class PrivateDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
+public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
 
     private Friend opponentFriend;
-    private ImageHelper imageHelper;
 
     public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
-        imageHelper = new ImageHelper((android.app.Activity) context);
     }
 
     @Override
@@ -96,15 +86,6 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter implements R
     }
 
     @Override
-    public void onCachedImageFileReceived(File imageFile) {
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-        imageHelper.showFullImage(context, absolutePath);
-    }
-
-    @Override
     public int getItemViewType(int position) {
         Cursor cursor = (Cursor) getItem(position);
         return getItemViewType(cursor);
@@ -142,54 +123,5 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter implements R
         TextView timeTextView;
         ProgressBar progressBar;
         TextView pleaseWaitTextView;
-    }
-
-    private class SimpleImageLoading extends SimpleImageLoadingListener {
-
-        private TextView pleaseWaitTextView;
-        private ImageView attachImageView;
-        private ProgressBar progressBar;
-        private Bitmap loadedImageBitmap;
-
-        public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
-                                  final ProgressBar progressBar) {
-            this.pleaseWaitTextView = pleaseWaitTextView;
-            this.attachImageView = attachImageView;
-            this.progressBar = progressBar;
-        }
-
-        @Override
-        public void onLoadingStarted(String imageUri, View view) {
-            progressBar.setProgress(Consts.ZERO_VALUE);
-            progressBar.setVisibility(View.VISIBLE);
-            pleaseWaitTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            progressBar.setVisibility(View.GONE);
-            pleaseWaitTextView.setVisibility(View.GONE);
-        }
-
-        @Override
-        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImageBitmap) {
-            progressBar.setVisibility(View.GONE);
-            pleaseWaitTextView.setVisibility(View.GONE);
-            attachImageView.setVisibility(View.VISIBLE);
-            attachImageView.setImageBitmap(loadedImageBitmap);
-            attachImageView.setOnClickListener(receiveImageFileOnClickListener());
-            this.loadedImageBitmap = loadedImageBitmap;
-        }
-
-        private View.OnClickListener receiveImageFileOnClickListener() {
-            return new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    new ReceiveImageFileTask(PrivateDialogMessagesAdapter.this).execute(imageHelper,
-                            loadedImageBitmap, false);
-                }
-            };
-        }
     }
 }

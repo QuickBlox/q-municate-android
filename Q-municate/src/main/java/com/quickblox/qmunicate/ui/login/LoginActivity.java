@@ -29,6 +29,7 @@ import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.TipsManager;
 
 public class LoginActivity extends BaseActivity {
 

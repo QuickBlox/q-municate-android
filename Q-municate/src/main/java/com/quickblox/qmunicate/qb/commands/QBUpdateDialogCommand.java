@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -19,21 +20,19 @@ public class QBUpdateDialogCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, Object chatId, String lastMessage, int countMessage) {
+    public static void start(Context context, QBDialog dialog, String roomJidId) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, (java.io.Serializable) chatId);
-        intent.putExtra(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE, lastMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE, countMessage);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, roomJidId);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        Object chatId = extras.getInt(QBServiceConsts.EXTRA_ROOM_JID_ID);
-        String lastMessage = extras.getString(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE);
-        int countMessage = extras.getInt(QBServiceConsts.EXTRA_DIALOG_COUNT_UNREAD_MESSAGE);
-//        chatHelper.updateLoadedChatDialog(chatId, lastMessage, countMessage);
+        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        chatHelper.updateDialog(dialog, roomJidId);
         return null;
     }
 }

@@ -20,7 +20,7 @@ import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.chats.ChatsDialogsFragment;
+import com.quickblox.qmunicate.ui.chats.DialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.Consts;
@@ -32,6 +32,7 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public static boolean isNeedToShowCrouton = false;
     public static final int ID_FRIEND_LIST_FRAGMENT = 0;
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
@@ -84,7 +85,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 fragment = FriendsListFragment.newInstance();
                 break;
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = ChatsDialogsFragment.newInstance();
+                fragment = DialogsFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:
                 fragment = InviteFriendsFragment.newInstance();
@@ -101,6 +102,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        isNeedToShowCrouton = true;
         useDoubleBackPressed = true;
 
         initPrefValues();
@@ -118,6 +120,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         }
 
         checkGCMRegistration();
+        loadChatsDialogs();
     }
 
     private void initPrefValues() {
@@ -154,7 +157,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onResume();
         gsmHelper.checkPlayServices();
         addActions();
-        loadChatsDialogs();
     }
 
     private void addActions() {

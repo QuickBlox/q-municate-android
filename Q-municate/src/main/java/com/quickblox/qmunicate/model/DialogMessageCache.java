@@ -6,12 +6,26 @@ public class DialogMessageCache {
     private Integer senderId;
     private String message;
     private String attachUrl;
+    private long time;
 
-    public DialogMessageCache(String roomJidId, int senderId, String message, String attachUrl) {
+    public DialogMessageCache(String roomJidId, int senderId, String message, String attachUrl, long time) {
         this.roomJidId = roomJidId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
+        this.time = time;
+    }
+
+    public void setSenderId(Integer senderId) {
+        this.senderId = senderId;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public String getMessage() {
