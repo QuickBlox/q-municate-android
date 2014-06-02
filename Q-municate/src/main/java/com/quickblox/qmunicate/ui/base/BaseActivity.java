@@ -17,29 +17,23 @@ import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 public abstract class BaseActivity extends Activity {
 
@@ -175,6 +169,11 @@ public abstract class BaseActivity extends Activity {
                 QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     protected void onConnectedToService() {
     }
 
@@ -195,11 +194,6 @@ public abstract class BaseActivity extends Activity {
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);
         transaction.commit();
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private FragmentTransaction buildTransaction() {
@@ -238,10 +232,9 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null) {
+            if (extras != null && MainActivity.getInstance() != null) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-                Log.i("Message", "Sender: " + sender + ", Message: " + message);
                 showNewMessageAlert(sender, message);
             }
         }

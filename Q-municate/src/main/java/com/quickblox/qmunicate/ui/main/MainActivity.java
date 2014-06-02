@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public static final int ID_SETTINGS_FRAGMENT = 3;
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    private static MainActivity instance;
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -46,9 +46,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
 
+
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
+    }
+
+    public static MainActivity getInstance() {
+        return instance;
     }
 
     @Override
@@ -101,6 +106,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        instance = this;
         useDoubleBackPressed = true;
 
         initPrefValues();

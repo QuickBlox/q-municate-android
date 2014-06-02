@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.main;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
@@ -224,6 +226,10 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        InputMethodManager inputManager = (InputMethodManager) baseActivity.
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(baseActivity.getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
         return false;
     }
 

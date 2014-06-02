@@ -42,6 +42,7 @@ public class DatabaseManager {
         } else {
             resolver.insert(FriendTable.CONTENT_URI, values);
         }
+        cursor.close();
     }
 
     public static boolean isFriendInBase(Context context, int searchId) {
@@ -96,6 +97,7 @@ public class DatabaseManager {
                 dialog = getDialogFromCursor(cursor);
             }
         }
+        cursor.close();
         return dialog;
     }
 
@@ -112,6 +114,7 @@ public class DatabaseManager {
             values = getContentValuesForCreateDialogTable(dialog, roomJidId);
             resolver.insert(DialogTable.CONTENT_URI, values);
         }
+        cursor.close();
     }
 
     public static Cursor getAllDialogs(Context context) {
