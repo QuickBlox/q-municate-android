@@ -291,7 +291,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
 
             if (ChatUtils.isNotificationMessage(chatMessage)) {
-                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, context.getResources().getString(R.string.user_created_room, friend.getFullname()));
+                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
+                        context.getResources().getString(R.string.user_created_room, friend.getFullname()));
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());

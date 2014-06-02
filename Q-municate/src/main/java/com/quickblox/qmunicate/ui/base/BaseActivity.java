@@ -232,7 +232,7 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.getInstance() != null) {
+            if (extras != null && MainActivity.isNeedToShowCrouton) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);

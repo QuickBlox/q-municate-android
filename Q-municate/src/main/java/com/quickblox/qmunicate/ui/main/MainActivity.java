@@ -32,13 +32,14 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    public static boolean isNeedToShowCrouton = false;
     public static final int ID_FRIEND_LIST_FRAGMENT = 0;
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static MainActivity instance;
+
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -50,10 +51,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
-    }
-
-    public static MainActivity getInstance() {
-        return instance;
     }
 
     @Override
@@ -106,7 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        instance = this;
+        isNeedToShowCrouton = true;
         useDoubleBackPressed = true;
 
         initPrefValues();
