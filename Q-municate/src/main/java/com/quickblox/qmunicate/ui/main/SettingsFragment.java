@@ -124,7 +124,6 @@ public class SettingsFragment extends BaseFragment {
 
     private void changePassword() {
         changePasswordDialog.show(getFragmentManager(), null);
-
     }
 
     private void logout() {

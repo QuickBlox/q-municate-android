@@ -37,10 +37,7 @@ public class ChangePasswordDialog extends DialogFragment {
         oldPassword = (EditText) rootView.findViewById(R.id.oldPassword);
         newPassword = (EditText) rootView.findViewById(R.id.newPassword);
         confirmPassword = (EditText) rootView.findViewById(R.id.confirmPassword);
-
         activity = (BaseActivity) getActivity();
-
-
         return DialogUtils.createDialog(getActivity(), R.string.cpd_title, rootView,
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -50,8 +47,6 @@ public class ChangePasswordDialog extends DialogFragment {
                 }, null
         );
     }
-
-
 
     private void changePassword() {
         String oldPasswordText = oldPassword.getText().toString();

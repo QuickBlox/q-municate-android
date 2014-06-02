@@ -82,7 +82,6 @@ public abstract class BaseActivity extends Activity {
         } catch (NullPointerException npe){
             npe.printStackTrace();
         }
-
     }
 
     public void addAction(String action, Command command) {

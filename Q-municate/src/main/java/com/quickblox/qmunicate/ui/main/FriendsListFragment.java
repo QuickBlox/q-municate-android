@@ -246,7 +246,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if(selectedItem.getCount() != 0){
             FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
         }
-
     }
 
     public MenuItem getSearchItem() {
