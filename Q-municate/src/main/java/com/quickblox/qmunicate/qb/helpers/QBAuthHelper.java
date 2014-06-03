@@ -25,7 +25,6 @@ public class QBAuthHelper extends BaseHelper {
     private String TAG = QBAuthHelper.class.getSimpleName();
 
     private QBUser user;
-    private Context context;
 
     public QBAuthHelper(Context context) {
         super(context);

@@ -1,9 +1,7 @@
 package com.quickblox.qmunicate.ui.profile;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -45,7 +43,6 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements ReceiveFileListener, View.OnClickListener {
 
