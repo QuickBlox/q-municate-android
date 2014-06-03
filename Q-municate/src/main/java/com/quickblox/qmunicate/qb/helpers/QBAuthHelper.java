@@ -4,6 +4,7 @@ import android.content.Context;
 
 import android.content.Intent;
 import android.util.Log;
+
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
@@ -14,6 +15,7 @@ import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 
 import com.quickblox.qmunicate.utils.Consts;
+
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
@@ -71,16 +73,8 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
         String password = user.getPassword();
-        try{
-            this.user = QBUsers.updateUser(user);
-            this.user.setPassword(password);
-        } catch(Exception e){
-            e.printStackTrace();
-            Intent intent = new Intent(Consts.WRONG_EMAIL);
-            context.sendBroadcast(intent);
-            Log.i("Server email", "wrong");
-        }
-
+        this.user = QBUsers.updateUser(user);
+        this.user.setPassword(password);
 
         return this.user;
     }

@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
@@ -70,7 +71,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private static boolean isCurrentMailIncorrect;
 
     private QBUser user;
-    private ErrorReceiver receiver;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
     private boolean closeActionMode;
@@ -108,7 +108,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    private void initListeners(){
+    private void initListeners() {
         avatarTextView.setOnClickListener(this);
         changeAvatarLinearLayout.setOnClickListener(this);
         avatarImageView.setOnClickListener(this);
@@ -123,18 +123,17 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         emailEditText.setText(user.getEmail());
         String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, "");
         statusMessageEditText.setText(status);
-        if(!isCurrentMailIncorrect){
+        if (!isCurrentMailIncorrect) {
             updateOldUserData();
         } else {
             recoverUserData();
         }
-
     }
 
 
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
     }
 
     private void tryLoadAvatar() {
@@ -170,7 +169,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.avatar_textview:
                 changeAvatarOnClick();
                 break;
@@ -189,20 +188,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             case R.id.changeStatusLinearLayout:
                 changeStatusOnClick();
                 break;
-
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver();
     }
 
     @Override
@@ -240,10 +226,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             } catch (FileNotFoundException e) {
                 ErrorUtils.logError(e);
             }
-            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent,
-                    Consts.AVATAR_BITMAP_SIZE,
-                    Consts.AVATAR_BITMAP_SIZE,
-                    false);
+            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent, Consts.AVATAR_BITMAP_SIZE,
+                    Consts.AVATAR_BITMAP_SIZE, false);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
         }
@@ -279,16 +263,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         initChangingEditText(statusMessageEditText);
     }
 
-    private void registerReceiver(){
-        receiver = new ErrorReceiver();
-        IntentFilter filter = new IntentFilter(Consts.WRONG_EMAIL);
-        registerReceiver(receiver, filter);
-    }
-
-    private void unregisterReceiver(){
-        unregisterReceiver(receiver);
-    }
-
     @Override
     public void onCachedImageFileReceived(File imageFile) {
         String status = statusMessageEditText.getText().toString();
@@ -315,8 +289,10 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void trySaveUserData() {
         try {
             saveChanges(fullnameCurrent, emailCurrent);
-        } catch (IOException e) {
+        } catch (Exception e) {
             ErrorUtils.logError(e);
+            Intent intent = new Intent(Consts.WRONG_EMAIL);
+            sendBroadcast(intent);
         }
     }
 
@@ -367,13 +343,23 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         }
     }
 
-    private class ErrorReceiver extends BroadcastReceiver{
+    private class ErrorReceiver extends BroadcastReceiver {
+
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction() != null && intent.getAction().equals(Consts.WRONG_EMAIL)){
-                emailEditText.setTextColor(Color.RED);
-                isCurrentMailIncorrect = true;
+            if (intent.getAction() != null && intent.getAction().equals(Consts.WRONG_EMAIL)) {
+
             }
+        }
+    }
+
+    public class UpdateUserFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            emailEditText.setTextColor(Color.RED);
+            isCurrentMailIncorrect = true;
+            hideProgress();
         }
     }
 
@@ -400,7 +386,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-//            updateOldUserData();
+            updateOldUserData();
             hideProgress();
         }
     }
