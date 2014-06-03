@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
@@ -50,7 +51,7 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String avatarUrl;
+        String avatarUrl = null;
         String senderName;
 
         String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
@@ -65,8 +66,12 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
-            senderName = senderFriend.getFullname();
-            avatarUrl = getAvatarUrlForFriend(senderFriend);
+            if(senderFriend != null) {
+                senderName = senderFriend.getFullname();
+                avatarUrl = getAvatarUrlForFriend(senderFriend);
+            } else{
+                senderName = senderId + Consts.EMPTY_STRING;
+            }
         }
         viewHolder.nameTextView.setText(senderName);
 

@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.base;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import java.io.File;
 public abstract class BaseCursorAdapter extends CursorAdapter implements ReceiveFileListener {
 
     protected final Context context;
+    protected final Resources resources;
     protected final LayoutInflater layoutInflater;
 
     protected QBUser currentUser;
@@ -39,6 +41,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     public BaseCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
         super(context, cursor, autoRequery);
         this.context = context;
+        resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
         currentUser = App.getInstance().getUser();
         currentLoginType = App.getInstance().getUserLoginType();
@@ -55,7 +58,9 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        if(uri != null) {
+            ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        }
     }
 
     protected String getAvatarUrlForCurrentUser() {
@@ -87,7 +92,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
-            progressBar.setProgress(Consts.ZERO_VALUE);
+            progressBar.setProgress(Consts.ZERO_INT_VALUE);
             progressBar.setVisibility(View.VISIBLE);
             pleaseWaitTextView.setVisibility(View.VISIBLE);
         }

@@ -317,7 +317,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_VALUE && emailCurrent.length() > Consts.ZERO_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE && emailCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
