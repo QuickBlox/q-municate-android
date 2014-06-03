@@ -58,7 +58,9 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        if(uri != null) {
+            ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        }
     }
 
     protected String getAvatarUrlForCurrentUser() {
@@ -90,7 +92,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
-            progressBar.setProgress(Consts.ZERO_VALUE);
+            progressBar.setProgress(Consts.ZERO_INT_VALUE);
             progressBar.setVisibility(View.VISIBLE);
             pleaseWaitTextView.setVisibility(View.VISIBLE);
         }

@@ -146,7 +146,7 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int token = ContentDescriptor.URI_MATCHER.match(uri);
 
-        int result = Consts.ZERO_VALUE;
+        int result = Consts.ZERO_INT_VALUE;
 
         switch (token) {
             case FriendTable.PATH_TOKEN: {
@@ -172,7 +172,7 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int token = ContentDescriptor.URI_MATCHER.match(uri);
 
-        int result = Consts.ZERO_VALUE;
+        int result = Consts.ZERO_INT_VALUE;
 
         switch (token) {
             case FriendTable.PATH_TOKEN: {
