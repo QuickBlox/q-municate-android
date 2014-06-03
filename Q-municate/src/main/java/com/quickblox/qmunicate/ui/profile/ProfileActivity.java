@@ -240,6 +240,10 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             } catch (FileNotFoundException e) {
                 ErrorUtils.logError(e);
             }
+            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent,
+                    Consts.AVATAR_BITMAP_SIZE,
+                    Consts.AVATAR_BITMAP_SIZE,
+                    false);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
         }
