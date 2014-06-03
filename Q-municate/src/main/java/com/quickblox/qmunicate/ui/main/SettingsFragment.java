@@ -135,7 +135,7 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void savePushNotification(boolean value) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, value);
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, !value);
     }
 
     private boolean getPushNotifications() {

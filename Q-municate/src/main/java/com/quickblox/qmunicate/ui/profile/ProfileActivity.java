@@ -282,15 +282,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     private void updateUserData() {
         if (isUserDataChanged(fullnameCurrent, emailCurrent, statusCurrent)) {
-            trySaveUserData();
-        }
-    }
-
-    private void trySaveUserData() {
-        try {
             saveChanges(fullnameCurrent, emailCurrent);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
         }
     }
 
@@ -299,7 +291,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
                 .equals(statusOld);
     }
 
-    private void saveChanges(final String fullname, final String email) throws IOException {
+    private void saveChanges(final String fullname, final String email) {
         if (!isUserDataCorrect()) {
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
