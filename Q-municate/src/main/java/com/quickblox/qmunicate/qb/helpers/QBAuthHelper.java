@@ -2,6 +2,9 @@ package com.quickblox.qmunicate.qb.helpers;
 
 import android.content.Context;
 
+import android.content.Intent;
+import android.util.Log;
+
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
@@ -10,6 +13,8 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
+
+import com.quickblox.qmunicate.utils.Consts;
 
 import org.jivesoftware.smack.XMPPException;
 
