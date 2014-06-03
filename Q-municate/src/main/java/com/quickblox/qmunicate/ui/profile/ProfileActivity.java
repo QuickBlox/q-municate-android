@@ -305,7 +305,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             return;
         }
         showProgress();
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, false);
         user.setFullName(fullname);
         user.setEmail(email);
 
