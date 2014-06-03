@@ -43,6 +43,8 @@ import java.util.List;
 
 public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerListener {
 
+    private static String propertyDateSent = "date_sent";
+
     private QBChatService chatService;
     private QBUser user;
     private QBPrivateChatManager privateChatManager;
@@ -174,8 +176,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
         List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
                 bundle);
-        // TODO SF now not used.
-        //        deleteDialogs();
         saveDialogsToCache(chatDialogsList);
         return chatDialogsList;
     }
@@ -192,7 +192,11 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
         if (dialogMessagesList != null) {
-            saveChatMessagesToCache(dialogMessagesList, roomJidId);
+            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+                saveChatMessagesToCache(dialogMessagesList, roomJidId, false);
+            } else {
+                saveChatMessagesToCache(dialogMessagesList, roomJidId, true);
+            }
         }
         return dialogMessagesList;
     }
@@ -237,8 +241,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         DatabaseManager.deleteMessagesByRoomJidId(context, roomJidId);
     }
 
-    private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId);
+    private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId, boolean isGroupMessage) {
+        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isGroupMessage);
     }
 
     private void deleteDialogs() {
@@ -292,7 +296,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-            long time = DateUtils.getCurrentTime();
+
+            long time = Integer.parseInt(chatMessage.getProperty(propertyDateSent).toString());
+            String attachUrl = getAttachUrlIfExists(chatMessage);
+            String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
 
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
@@ -300,13 +307,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
+            } else {
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
+                notifyMessageReceived(chatMessage, friend);
             }
-
-            String attachUrl = getAttachUrlIfExists(chatMessage);
-            String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-
-            saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
-            notifyMessageReceived(chatMessage, friend);
         }
     }
 
@@ -316,7 +320,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = getAttachUrlIfExists(chatMessage);
-            long time = DateUtils.getCurrentTime();
+            long time = Integer.parseInt(chatMessage.getProperty(propertyDateSent).toString());
             saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
             if (!chatMessage.getSenderId().equals(user.getId())) {
                 // TODO IS handle logic when friend is not in the friend list

@@ -212,7 +212,7 @@ public class DatabaseManager {
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
-                                        String roomJidId) {
+                                        String roomJidId, boolean isGroupMessage) {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
@@ -225,11 +225,15 @@ public class DatabaseManager {
             }
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
-                Friend friend = DatabaseManager.getFriendById(context, senderId);
-                if(friend == null) {
-                    message = context.getResources().getString(R.string.user_created_room, senderId);
+                if(isGroupMessage) {
+                    Friend friend = DatabaseManager.getFriendById(context, senderId);
+                    if(friend == null) {
+                        message = context.getResources().getString(R.string.user_created_room, senderId);
+                    } else {
+                        message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+                    }
                 } else {
-                    message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+                    return;
                 }
             }
 
