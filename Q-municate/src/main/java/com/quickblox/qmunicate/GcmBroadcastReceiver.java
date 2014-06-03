@@ -18,10 +18,8 @@ public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
         isPushForbidden = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS,
                 false);
         if (isPushForbidden) {
-            Log.i("Pusher", "Stopped");
             return;
         }
-        Log.i("Pusher", "Resumed");
         ComponentName comp = new ComponentName(context.getPackageName(), GCMIntentService.class.getName());
         startWakefulService(context, (intent.setComponent(comp)));
         setResultCode(Activity.RESULT_OK);
