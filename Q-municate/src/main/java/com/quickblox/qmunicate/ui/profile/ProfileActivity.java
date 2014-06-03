@@ -130,21 +130,16 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         }
     }
 
-
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
         addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
     }
 
     private void tryLoadAvatar() {
-        try {
-            loadAvatar();
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(this, e);
-        }
+        loadAvatar();
     }
 
-    private void loadAvatar() throws BaseServiceException {
+    private void loadAvatar() {
         String url = null;
         if (getLoginType() == LoginType.FACEBOOK) {
             changeAvatarLinearLayout.setClickable(false);
@@ -309,7 +304,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE && emailCurrent.length() > Consts.ZERO_INT_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE && emailCurrent
+                .length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
