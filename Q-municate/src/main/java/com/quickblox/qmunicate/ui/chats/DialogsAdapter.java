@@ -77,6 +77,11 @@ public class DialogsAdapter extends BaseCursorAdapter {
         return friend;
     }
 
+    @Override
+    protected void onContentChanged() {
+        super.onContentChanged();
+    }
+
     private static class ViewHolder {
 
         public RoundedImageView avatarImageView;

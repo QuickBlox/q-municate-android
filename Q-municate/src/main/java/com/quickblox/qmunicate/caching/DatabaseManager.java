@@ -233,7 +233,7 @@ public class DatabaseManager {
             }
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,
-                    attachURL, historyMessage.getDateSent());
+                    attachURL, historyMessage.getDateSent(), false);
 
             saveChatMessage(context, dialogMessageCache);
         }
