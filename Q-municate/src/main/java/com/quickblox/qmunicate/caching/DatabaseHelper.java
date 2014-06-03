@@ -53,7 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(DialogMessageTable.Cols.SENDER_ID).append(" TEXT, ")
                 .append(DialogMessageTable.Cols.BODY).append(" TEXT, ")
                 .append(DialogMessageTable.Cols.TIME).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT");
+                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(DialogMessageTable.Cols.IS_READ).append(" TEXT");
         createTable(db, DialogMessageTable.TABLE_NAME, dialogMessageTableFields.toString());
     }
 

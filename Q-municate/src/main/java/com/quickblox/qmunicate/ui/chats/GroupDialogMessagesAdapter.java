@@ -10,10 +10,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
@@ -22,8 +24,11 @@ import com.quickblox.qmunicate.utils.DateUtils;
 
 public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor) {
+    private QBDialog dialog;
+
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog) {
         super(context, cursor, true);
+        this.dialog = dialog;
     }
 
     @Override
@@ -92,6 +97,16 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
     private boolean isOwnMessage(int senderId) {
         return senderId == currentUser.getId();
     }
+
+//    @Override
+//    protected void onContentChanged() {
+//        super.onContentChanged();
+//        if(dialog.getUnreadMessageCount() > Consts.ZERO_INT_VALUE) {
+//            Cursor cursor = getCursor();
+//            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+//            QBUpdateStatusMessageCommand.start(context, messageId, true);
+//        }
+//    }
 
     private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
                                     final ImageView attachImageView, final ProgressBar progressBar) {
