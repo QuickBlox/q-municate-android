@@ -28,7 +28,6 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBAuthHelper(Context context) {
         super(context);
-        this.context = context;
     }
 
     public QBUser login(QBUser user) throws QBResponseException, XMPPException {
