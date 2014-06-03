@@ -144,9 +144,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId) {
-        showProgress();
-        QBLoadDialogMessagesCommand.start(this, dialog, roomJidId);
+    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId, long lastDateLoad) {
+        if (dialog != null) {
+            QBLoadDialogMessagesCommand.start(this, dialog, roomJidId, lastDateLoad);
+        }
     }
 
     private void initUI() {
@@ -183,12 +184,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private boolean isSmilesLayoutShowing() {
-        return smilesLayout.getHeight() != Consts.ZERO_VALUE;
+        return smilesLayout.getHeight() != Consts.ZERO_INT_VALUE;
     }
 
     private void hideView(View view) {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-        params.height = Consts.ZERO_VALUE;
+        params.height = Consts.ZERO_INT_VALUE;
         view.setLayoutParams(params);
     }
 
@@ -210,7 +211,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            hideProgress();
         }
     }
 
@@ -234,9 +234,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void onSmileClick() {
             int smilesLayoutHeight = getSmileLayoutSizeInPixels();
             if (isSmilesLayoutShowing()) {
-                smilesAnimator.animateHeightFrom(smilesLayoutHeight, Consts.ZERO_VALUE);
+                smilesAnimator.animateHeightFrom(smilesLayoutHeight, Consts.ZERO_INT_VALUE);
             } else {
-                smilesAnimator.animateHeightFrom(Consts.ZERO_VALUE, smilesLayoutHeight);
+                smilesAnimator.animateHeightFrom(Consts.ZERO_INT_VALUE, smilesLayoutHeight);
             }
         }
     }

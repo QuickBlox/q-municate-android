@@ -68,13 +68,13 @@ public class GCMIntentService extends IntentService {
 
         Intent intent = new Intent(this, SplashActivity.class);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, Consts.ZERO_VALUE, intent,
-                Consts.ZERO_VALUE);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, Consts.ZERO_INT_VALUE, intent,
+                Consts.ZERO_INT_VALUE);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
                 R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
                 new NotificationCompat.BigTextStyle().bigText(msg)).setContentText(msg).setVibrate(
-                new long[]{Consts.ZERO_VALUE, VIBRATOR_DURATION});
+                new long[]{Consts.ZERO_INT_VALUE, VIBRATOR_DURATION});
 
         mBuilder.setAutoCancel(true);
         mBuilder.setContentIntent(contentIntent);

@@ -238,13 +238,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void clearCache() {
-        DatabaseManager.deleteAllFriends(baseActivity);
-        DatabaseManager.deleteAllMessages(baseActivity);
-        DatabaseManager.deleteAllDialogs(baseActivity);
-        // TODO SF clear something else
-    }
-
     private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
@@ -298,7 +291,6 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
-            clearCache();
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }

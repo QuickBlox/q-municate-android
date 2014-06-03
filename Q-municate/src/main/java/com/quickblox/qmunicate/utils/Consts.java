@@ -24,7 +24,8 @@ public class Consts {
     public static final int CHATS_DIALOGS_PER_PAGE = 100;
     public static final int DIALOG_MESSAGES_PER_PAGE = 100;
 
-    public static final int ZERO_VALUE = 0;
+    public static final int ZERO_INT_VALUE = 0;
+    public static final long ZERO_LONG_VALUE = 0L;
     public static final String EMPTY_STRING = "";
 
     public static final int LEFT_CHAT_MESSAGE_TYPE_1 = 0;
