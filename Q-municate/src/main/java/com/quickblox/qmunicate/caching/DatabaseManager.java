@@ -226,12 +226,7 @@ public class DatabaseManager {
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
                 if(isGroupMessage) {
-                    Friend friend = DatabaseManager.getFriendById(context, senderId);
-                    if(friend == null) {
-                        message = context.getResources().getString(R.string.user_created_room, senderId);
-                    } else {
-                        message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
-                    }
+                    message = getMessageForNotification(context, senderId);
                 } else {
                     return;
                 }
@@ -242,6 +237,17 @@ public class DatabaseManager {
 
             saveChatMessage(context, dialogMessageCache);
         }
+    }
+
+    private static String getMessageForNotification(Context context, int senderId) {
+        String message;
+        Friend friend = DatabaseManager.getFriendById(context, senderId);
+        if(friend == null) {
+            message = context.getResources().getString(R.string.user_created_room, senderId);
+        } else {
+            message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
+        }
+        return message;
     }
 
     public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {

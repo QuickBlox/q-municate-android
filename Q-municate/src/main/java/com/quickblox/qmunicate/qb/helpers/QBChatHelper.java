@@ -192,11 +192,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
         if (dialogMessagesList != null) {
-            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
-                saveChatMessagesToCache(dialogMessagesList, roomJidId, false);
-            } else {
-                saveChatMessagesToCache(dialogMessagesList, roomJidId, true);
-            }
+            boolean isPrivate = QBDialogType.PRIVATE.equals(dialog.getType());
+            saveChatMessagesToCache(dialogMessagesList, roomJidId, isPrivate);
         }
         return dialogMessagesList;
     }

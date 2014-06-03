@@ -229,7 +229,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void initStartLoadDialogMessages() {
         if (messagesAdapter.isEmpty()) {
             startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
-        } else if (!messagesAdapter.isEmpty()) {
+        } else {
             startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
         }
     }
