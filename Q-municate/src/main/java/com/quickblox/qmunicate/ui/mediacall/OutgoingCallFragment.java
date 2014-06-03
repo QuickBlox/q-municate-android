@@ -366,8 +366,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                     public void run() {
                         ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
                         switch (state) {
-                            case CALL:
-                            case ACCEPT: {
+                            case SEND_CALL:
+                            case SEND_ACCEPT: {
                                 stopCall(true, STOP_TYPE.CLOSED);
                                 break;
                             }
@@ -400,7 +400,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
         @Override
         public void run() {
-            stopCall(true, STOP_TYPE.CLOSED);
+            if (isExistActivity()) {
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        stopCall(true, STOP_TYPE.CLOSED);
+                    }
+                });
+            }
         }
     }
 }

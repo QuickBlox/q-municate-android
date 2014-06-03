@@ -15,9 +15,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
@@ -103,7 +103,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    private void initListeners(){
+    private void initListeners() {
         avatarTextView.setOnClickListener(this);
         changeAvatarLinearLayout.setOnClickListener(this);
         avatarImageView.setOnClickListener(this);
@@ -160,7 +160,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.avatar_textview:
                 changeAvatarOnClick();
                 break;
@@ -179,7 +179,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             case R.id.changeStatusLinearLayout:
                 changeStatusOnClick();
                 break;
-
         }
     }
 
