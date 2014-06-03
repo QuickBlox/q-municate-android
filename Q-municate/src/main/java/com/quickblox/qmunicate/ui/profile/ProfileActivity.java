@@ -291,8 +291,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             saveChanges(fullnameCurrent, emailCurrent);
         } catch (Exception e) {
             ErrorUtils.logError(e);
-            Intent intent = new Intent(Consts.WRONG_EMAIL);
-            sendBroadcast(intent);
         }
     }
 
@@ -340,16 +338,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             startAction();
-        }
-    }
-
-    private class ErrorReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() != null && intent.getAction().equals(Consts.WRONG_EMAIL)) {
-
-            }
         }
     }
 

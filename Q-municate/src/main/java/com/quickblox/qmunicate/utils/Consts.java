@@ -56,7 +56,6 @@ public class Consts {
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String ACCEPTED_CALL = "accepted_call";
-    public static final String WRONG_EMAIL = "wrong_email";
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int AVATAR_BITMAP_SIZE = 70;
     public static final int SECOND = 1000;
