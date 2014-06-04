@@ -15,6 +15,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
@@ -39,6 +40,11 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private ChatMessageHandler messageHandler;
 
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
+        if (!friend.isOnline()) {
+            String callMsg = context.getResources().getString(R.string.dlg_offline_call,
+                    App.getInstance().getUser().getFullName());
+            QBSendPushCommand.start(context, callMsg, friend.getId());
+        }
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.EXTRA_FRIEND, friend);
         intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.OUTGOING);

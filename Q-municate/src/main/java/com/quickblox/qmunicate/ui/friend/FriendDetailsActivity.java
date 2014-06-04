@@ -18,7 +18,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
-import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
@@ -151,10 +150,9 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        /*if (friend.getId() != App.getInstance().getUser().getId()) {
+        if (friend.getId() != App.getInstance().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
-        }*/
-        QBSendPushCommand.start(this, " " + App.getInstance().getUser() + " is calling you", friend.getId());
+        }
     }
 
     public void voiceCallClickListener(View view) {

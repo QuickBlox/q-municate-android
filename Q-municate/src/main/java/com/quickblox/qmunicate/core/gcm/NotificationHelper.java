@@ -11,9 +11,6 @@ import com.quickblox.qmunicate.model.PushMessage;
 
 import java.util.List;
 
-/**
- * Created by vadim on 14.03.14.
- */
 public class NotificationHelper {
 
     public static final String ACTION_VIDEO_CALL = "com.quickblox.qmunicate.VIDEO_CALL";

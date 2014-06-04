@@ -56,14 +56,20 @@ public class GSMHelper {
     public boolean isDeviceRegisteredWithUser(QBUser user) {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         String registrationId = prefsHelper.getPref(PrefsHelper.PREF_REG_ID, Consts.EMPTY_STRING);
-        int registeredUserId = prefsHelper.getPref(PrefsHelper.PREF_REG_USER_ID,
-                Consts.NOT_INITIALIZED_VALUE);
+
+        boolean userSavedInPreference = isUserSavedInPreference(prefsHelper);
 
         int registeredVersion = prefsHelper.getPref(PrefsHelper.PREF_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = Utils.getAppVersionCode(activity);
+        boolean currAppVersionRegistered = registeredVersion == currentVersion;
+        return (!registrationId.isEmpty()) && (userSavedInPreference) &&
+                (currAppVersionRegistered);
+    }
 
-        return (!registrationId.isEmpty()) && (Consts.NOT_INITIALIZED_VALUE != registeredUserId) &&
-                (registeredVersion == currentVersion);
+    private boolean isUserSavedInPreference(PrefsHelper prefsHelper) {
+        int registeredUserId = prefsHelper.getPref(PrefsHelper.PREF_REG_USER_ID,
+                Consts.NOT_INITIALIZED_VALUE);
+        return Consts.NOT_INITIALIZED_VALUE != registeredUserId;
     }
 
     //TODO VF will be defined throw core qb

@@ -27,7 +27,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     private Context context;
 
     public QBGCMRegistrationTask(Activity activity) {
-        super(activity, -1, false);
+        super(activity, Consts.NOT_INITIALIZED_VALUE, false);
     }
 
     @Override
@@ -44,16 +44,16 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         Bundle registration = new Bundle();
         String registrationId = getRegistrationId(gcm);
         registration.putString(PrefsHelper.PREF_REG_ID, registrationId);
-        QBSubscription qbSubscription = subscribeToPushNotifications(registrationId);
-        if (qbSubscription != null) {
-            registration.putInt(PrefsHelper.PREF_SUBSCRIPTION_ID, qbSubscription.getId());
+        QBSubscription subscription = subscribeToPushNotifications(registrationId);
+        if (subscription != null) {
+            registration.putInt(PrefsHelper.PREF_SUBSCRIPTION_ID, subscription.getId());
         }
         return registration;
     }
 
     private String getRegistrationId(GoogleCloudMessaging gcm) throws IOException {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        String registrationId = prefsHelper.getPref(PrefsHelper.PREF_GCM_SENDER_ID, "");
+        String registrationId = prefsHelper.getPref(PrefsHelper.PREF_GCM_SENDER_ID, Consts.EMPTY_STRING);
         if (registrationId.isEmpty()) {
             registrationId = gcm.register(PrefsHelper.PREF_GCM_SENDER_ID);
         }
@@ -61,23 +61,31 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     }
 
     private QBSubscription subscribeToPushNotifications(String regId) throws QBResponseException {
-        String deviceId;
-        final TelephonyManager mTelephony = (TelephonyManager) activityRef.get().getSystemService(
+        String deviceId = getDeviceIdForMobile(activityRef.get());
+        if (deviceId == null) {
+            deviceId = getDeviceIdForTablet(activityRef.get());
+        }
+        QBSubscription subscription = null;
+        ArrayList<QBSubscription> subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
+                QBEnvironment.DEVELOPMENT);
+        if (!subscriptions.isEmpty()) {
+            subscription = subscriptions.get(0);
+        }
+        return subscription;
+    }
+
+    private String getDeviceIdForMobile(Context context) {
+        final TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(
                 Context.TELEPHONY_SERVICE);
-        if (mTelephony.getDeviceId() != null) {
-            deviceId = mTelephony.getDeviceId(); //*** use for mobiles
-        } else {
-            deviceId = Settings.Secure.getString(
-                    activityRef.get().getApplicationContext().getContentResolver(),
-                    Settings.Secure.ANDROID_ID); //*** use for tablets
+        if (telephonyManager == null) {
+            return null;
         }
-        QBSubscription qbSubscription = null;
-        ArrayList<QBSubscription> qbSubscriptions = QBMessages.subscribeToPushNotificationsTask(regId,
-                deviceId, QBEnvironment.DEVELOPMENT);
-        if (!qbSubscriptions.isEmpty()) {
-            qbSubscription = qbSubscriptions.get(0);
-        }
-        return qbSubscription;
+        return telephonyManager.getDeviceId();
+    }
+
+    private String getDeviceIdForTablet(Context context) {
+        return Settings.Secure.getString(context.getApplicationContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID); //*** use for tablets
     }
 
     private void storeRegistration(Context context, Bundle registration) {
