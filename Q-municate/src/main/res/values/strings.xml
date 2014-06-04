@@ -78,7 +78,7 @@
     <string name="gdd_leave_group">Leave group</string>
 
     // New Dialog
-    <string name="ndl_title">New Dialog</string>
+    <string name="ndl_title">New Group Chat</string>
     <string name="ndl_ac_mode_title">Create Group Dialog</string>
 
     // Preferences

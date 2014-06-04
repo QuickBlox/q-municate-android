@@ -39,6 +39,7 @@ import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
@@ -116,6 +117,7 @@ public class QBService extends Service {
         registerLoadChatsDialogsCommand();
         registerUpdateChatDialogCommand();
         registerLoadDialogMessagesCommand();
+        registerUpdateStatusMessageCommand();
     }
 
     private void registerJoinGroupChat() {
@@ -307,6 +309,12 @@ public class QBService extends Service {
         QBLoadDialogMessagesCommand loadDialogMessagesCommand = new QBLoadDialogMessagesCommand(this, chatHelper,
                 QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, loadDialogMessagesCommand);
+    }
+
+    private void registerUpdateStatusMessageCommand() {
+        QBUpdateStatusMessageCommand updateStatusMessageCommand = new QBUpdateStatusMessageCommand(this, chatHelper,
+                QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION, QBServiceConsts.UPDATE_STATUS_MESSAGE_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, updateStatusMessageCommand);
     }
 
     @Override

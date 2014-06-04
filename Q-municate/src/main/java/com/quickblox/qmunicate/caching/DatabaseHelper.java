@@ -50,10 +50,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dialogMessageTableFields
                 .append(DialogMessageTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
                 .append(DialogMessageTable.Cols.ROOM_JID_ID).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.SENDER_ID).append(" TEXT, ")
+                .append(DialogMessageTable.Cols.SENDER_ID).append(" INTEGER, ")
                 .append(DialogMessageTable.Cols.BODY).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.TIME).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT");
+                .append(DialogMessageTable.Cols.TIME).append(" LONG, ")
+                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(DialogMessageTable.Cols.IS_READ).append(" INTEGER");
         createTable(db, DialogMessageTable.TABLE_NAME, dialogMessageTableFields.toString());
     }
 
@@ -64,9 +65,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(DialogTable.Cols.DIALOG_ID).append(" TEXT, ")
                 .append(DialogTable.Cols.ROOM_JID_ID).append(" TEXT, ")
                 .append(DialogTable.Cols.NAME).append(" TEXT, ")
-                .append(DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" TEXT, ")
+                .append(DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" INTEGER, ")
                 .append(DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ")
-                .append(DialogTable.Cols.LAST_DATE_SENT).append(" TEXT, ")
+                .append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ")
                 .append(DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ")
                 .append(DialogTable.Cols.TYPE).append(" TEXT");
         createTable(db, DialogTable.TABLE_NAME, dialogTableFields.toString());

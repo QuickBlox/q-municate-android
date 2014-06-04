@@ -20,5 +20,6 @@ public class DialogMessageTable {
         public static final String BODY = "body";
         public static final String TIME = "time";
         public static final String ATTACH_FILE_ID = "attach_file_id";
+        public static final String IS_READ = "is_read";
     }
 }

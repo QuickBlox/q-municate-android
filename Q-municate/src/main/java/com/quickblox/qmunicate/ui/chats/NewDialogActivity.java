@@ -137,6 +137,12 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
         friendsAdapter.notifyDataSetChanged();
     }
 
+    private void startDialog() {
+        List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
+        Collections.sort(membersList, new SimpleComparator());
+        GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
+    }
+
     public static class SimpleComparator implements Comparator<Friend> {
 
         public int compare(Friend friend1, Friend friend2) {
@@ -153,18 +159,12 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            if (isNeedToCloseWithoutRedirect) {
-                isNeedToCloseWithoutRedirect = false;
-                actionMode = null;
-                finish();
-            } else {
-                isNeedToCloseWithoutRedirect = false;
-                List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
-                Collections.sort(membersList, new SimpleComparator());
-                GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
-                finish();
-                actionMode = null;
+            if (!isNeedToCloseWithoutRedirect) {
+                startDialog();
             }
+            isNeedToCloseWithoutRedirect = false;
+            actionMode = null;
+            finish();
         }
     }
 }
