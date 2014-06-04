@@ -138,15 +138,9 @@ public class NewDialogActivity extends BaseActivity implements AdapterView.OnIte
     }
 
     private void startDialog() {
-        int oneOpponent = 1;
         List<Friend> membersList = new ArrayList<Friend>(friendsAdapter.getSelectedFriends());
-        if (membersList.size() == oneOpponent) {
-            int firstFriendIndex = 0;
-            PrivateDialogActivity.start(NewDialogActivity.this, membersList.get(firstFriendIndex), null);
-        } else {
-            Collections.sort(membersList, new SimpleComparator());
-            GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
-        }
+        Collections.sort(membersList, new SimpleComparator());
+        GroupDialogActivity.start(activity, (ArrayList<Friend>) membersList);
     }
 
     public static class SimpleComparator implements Comparator<Friend> {

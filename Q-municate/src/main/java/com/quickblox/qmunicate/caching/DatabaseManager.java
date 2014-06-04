@@ -319,7 +319,9 @@ public class DatabaseManager {
     public static int getCountUnreadMessagesByRoomJid(Context context, String roomJidId) {
         Cursor cursor = context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
                 DialogMessageTable.Cols.IS_READ + " = 0 AND " + DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
-        return cursor.getCount();
+        int countMessages = cursor.getCount();
+        cursor.close();
+        return countMessages;
     }
 
     private static List<Friend> getFriendListFromCursor(Cursor cursor) {
