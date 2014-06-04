@@ -33,6 +33,7 @@ public class QBServiceConsts {
     public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
     public static final String LOAD_CHATS_DIALOGS_AND_JOIN_ACTION = "load_chats_dialogs_and_join_action";
     public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
+    public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
@@ -93,6 +94,8 @@ public class QBServiceConsts {
     public static final String UPDATE_CHAT_DIALOG_FAIL_ACTION = "update_chat_dialog_fail_action";
     public static final String LOAD_DIALOG_MESSAGES_SUCCESS_ACTION = "load_dialog_messages_load_success_action";
     public static final String LOAD_DIALOG_MESSAGES_FAIL_ACTION = "load_dialog_messages_load_fail_action";
+    public static final String UPDATE_STATUS_MESSAGE_SUCCESS_ACTION = "update_status_message_success_action";
+    public static final String UPDATE_STATUS_MESSAGE_FAIL_ACTION = "update_status_message_fail_action";
     public static final String SEND_PUSH_MESSAGES_SUCCESS_ACTION = "send_push_message_success_action";
     public static final String SEND_PUSH_MESSAGES_FAIL_ACTION = "send_push_message_fail_action";
 
@@ -128,6 +131,8 @@ public class QBServiceConsts {
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
+    public static final String EXTRA_MESSAGE_ID = "message_id";
+    public static final String EXTRA_STATUS_MESSAGE = "status_message";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";

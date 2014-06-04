@@ -5,18 +5,19 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
+import android.util.Log;
+
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
-    private boolean isPushAllowed;
 
-    public GcmBroadcastReceiver(){
-        isPushAllowed = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
-    }
+    private boolean isPushForbidden;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(!isPushAllowed){
+        isPushForbidden = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS,
+                false);
+        if (isPushForbidden) {
             return;
         }
         ComponentName comp = new ComponentName(context.getPackageName(), GCMIntentService.class.getName());

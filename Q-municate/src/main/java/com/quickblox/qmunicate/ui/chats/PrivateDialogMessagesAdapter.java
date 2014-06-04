@@ -10,9 +10,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
@@ -22,10 +24,12 @@ import com.quickblox.qmunicate.utils.DateUtils;
 public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
 
     private Friend opponentFriend;
+    private QBDialog dialog;
 
-    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend) {
+    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
+        this.dialog = dialog;
     }
 
     @Override
@@ -81,6 +85,12 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
             viewHolder.messageTextView.setText(body);
         }
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
+
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        if(dialog != null && !isRead) {
+            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+            QBUpdateStatusMessageCommand.start(context, messageId, true);
+        }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }

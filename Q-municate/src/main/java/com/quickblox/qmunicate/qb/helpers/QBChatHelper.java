@@ -43,6 +43,8 @@ import java.util.List;
 
 public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerListener {
 
+    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
+
     private static String propertyDateSent = "date_sent";
 
     private QBChatService chatService;
@@ -68,7 +70,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String attachUrl = Consts.EMPTY_STRING;
         long time = DateUtils.getCurrentTime();
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl, time));
+        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
+                time, true));
+    }
+
+    private QBChatMessage getQBChatMessage(String body) {
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody(body);
+        return chatMessage;
     }
 
     public void saveMessageToCache(DialogMessageCache dialogMessageCache) {
@@ -86,6 +95,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         roomChat.sendMessage(chatMessage);
     }
 
+    private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
+        QBChatMessage chatMessage = new QBChatMessage();
+        QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
+        attachment.setUrl(qbFile.getPublicUrl());
+        chatMessage.addAttachment(attachment);
+        return chatMessage;
+    }
+
     public void sendPrivateMessageWithAttachImage(
             QBFile file) throws XMPPException, SmackException.NotConnectedException {
         QBChatMessage chatMessage = getQBChatMessageWithImage(file);
@@ -95,7 +112,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String attachUrl = file.getPublicUrl();
         long time = DateUtils.getCurrentTime();
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl, time));
+        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
+                time, true));
     }
 
     @Override
@@ -104,7 +122,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public void updateDialog(QBDialog dialog, String roomJidId) {
-        saveDialogToCache(dialog, roomJidId);
+        DatabaseManager.updateDialog(context, roomJidId, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
     }
 
     public void init() {
@@ -119,7 +138,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public QBDialog createRoomChat(String roomName,
-                                   List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
+            List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
         QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
         joinRoomChat(dialog.getRoomJid());
@@ -137,6 +156,24 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
+    private void inviteFriendsToRoom(QBDialog dialog,
+            List<Integer> friendIdsList) throws XMPPException, SmackException {
+        for (Integer friendId : friendIdsList) {
+            notifyFriendAboutInvitation(dialog, friendId);
+        }
+    }
+
+    private void saveDialogToCache(QBDialog dialog, String roomJidId) {
+        DatabaseManager.saveDialog(context, dialog, roomJidId);
+    }
+
+    private void notifyFriendAboutInvitation(QBDialog dialog,
+            Integer friendId) throws XMPPException, SmackException {
+        QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
+        QBChatMessage message = ChatUtils.createRoomNotificationMessage(dialog);
+        chat.sendMessage(message);
+    }
+
     public QBFile loadAttachFile(File inputFile) {
         QBFile file = null;
         try {
@@ -147,18 +184,20 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return file;
     }
 
-    public void login(QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
         }
         if (!chatService.isLoggedIn()) {
             chatService.login(user);
+            chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
             this.user = user;
         }
     }
 
-    public void logout() throws QBResponseException, SmackException.NotConnectedException {
+    public synchronized void logout() throws QBResponseException, SmackException.NotConnectedException {
+        chatService.stopAutoSendPresence();
         chatService.logout();
     }
 
@@ -167,7 +206,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public boolean isLoggedIn() {
-        return chatService.isLoggedIn();
+        return chatService != null && chatService.isLoggedIn();
     }
 
     public List<QBDialog> getDialogs() throws QBResponseException {
@@ -178,6 +217,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 bundle);
         saveDialogsToCache(chatDialogsList);
         return chatDialogsList;
+    }
+
+    private void saveDialogsToCache(List<QBDialog> dialogsList) {
+        DatabaseManager.saveDialogs(context, dialogsList);
     }
 
     public List<QBHistoryMessage> getDialogMessages(QBDialog dialog, String roomJidId,
@@ -198,48 +241,17 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return dialogMessagesList;
     }
 
-    private QBChatMessage getQBChatMessage(String body) {
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody(body);
-        return chatMessage;
+    private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId,
+            boolean isPrivate) {
+        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isPrivate);
     }
 
-    private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
-        QBChatMessage chatMessage = new QBChatMessage();
-        QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
-        attachment.setUrl(qbFile.getPublicUrl());
-        chatMessage.addAttachment(attachment);
-        return chatMessage;
-    }
-
-    private void inviteFriendsToRoom(QBDialog dialog,
-                                     List<Integer> friendIdsList) throws XMPPException, SmackException {
-        for (Integer friendId : friendIdsList) {
-            notifyFriendAboutInvitation(dialog, friendId);
-        }
-    }
-
-    private void saveDialogToCache(QBDialog dialog, String roomJidId) {
-        DatabaseManager.saveDialog(context, dialog, roomJidId);
-    }
-
-    private void notifyFriendAboutInvitation(QBDialog dialog,
-                                             Integer friendId) throws XMPPException, SmackException {
-        QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
-        QBChatMessage message = ChatUtils.createRoomNotificationMessage(dialog);
-        chat.sendMessage(message);
-    }
-
-    private void saveDialogsToCache(List<QBDialog> dialogsList) {
-        DatabaseManager.saveDialogs(context, dialogsList);
+    public void updateStatusMessage(String messageId, boolean isRead) {
+        DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
 
     private void deleteMessagesByRoomJidId(String roomJidId) {
         DatabaseManager.deleteMessagesByRoomJidId(context, roomJidId);
-    }
-
-    private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId, boolean isGroupMessage) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isGroupMessage);
     }
 
     private void deleteDialogs() {
@@ -274,8 +286,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = Consts.EMPTY_STRING;
         if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = ChatUtils.getAttachUrlFromMessage(
-                    new ArrayList<QBAttachment>(chatMessage.getAttachments()));
+            attachURL = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(
+                    chatMessage.getAttachments()));
         }
         return attachURL;
     }
@@ -300,12 +312,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
-                        context.getResources().getString(R.string.user_created_room, friend.getFullname()), time);
+                        context.getResources().getString(R.string.user_created_room, friend.getFullname()),
+                        time);
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
             } else {
-                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
                 notifyMessageReceived(chatMessage, friend);
             }
         }
@@ -318,7 +332,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = getAttachUrlIfExists(chatMessage);
             long time = Integer.parseInt(chatMessage.getProperty(propertyDateSent).toString());
-            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time));
+            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(),
+                    chatMessage.getBody(), attachUrl, time, false));
             if (!chatMessage.getSenderId().equals(user.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend);

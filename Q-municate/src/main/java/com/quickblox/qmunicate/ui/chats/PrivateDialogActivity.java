@@ -147,7 +147,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend);
+        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
