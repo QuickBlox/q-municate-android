@@ -85,6 +85,7 @@ public class SettingsFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
     }
 
     private void initListeners() {
