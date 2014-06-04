@@ -242,8 +242,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId,
-            boolean isGroupMessage) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isGroupMessage);
+            boolean isPrivate) {
+        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isPrivate);
     }
 
     public void updateStatusMessage(String messageId, boolean isRead) {
