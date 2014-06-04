@@ -25,7 +25,7 @@ import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
-import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -139,7 +139,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupName = dialog.getName();
             roomJidId = dialog.getRoomJid();
-            QBJoinGroupChatCommand.start(this, roomJidId);
+            QBJoinGroupDialogCommand.start(this, roomJidId);
         } else {
             friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             groupName = createChatName();
@@ -202,7 +202,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
                 navigateToParent();
                 return true;
             case R.id.action_group_details:
-                //                GroupChatDetailsActivity.start(this);
+                GroupDialogDetailsActivity.start(this, dialog.getRoomJid());
                 return true;
         }
         return super.onOptionsItemSelected(item);

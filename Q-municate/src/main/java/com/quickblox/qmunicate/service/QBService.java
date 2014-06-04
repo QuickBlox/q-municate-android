@@ -11,6 +11,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
+import com.quickblox.qmunicate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
@@ -18,10 +19,12 @@ import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
@@ -39,6 +42,7 @@ import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
@@ -109,6 +113,10 @@ public class QBService extends Service {
         registerJoinGroupChat();
         registerSendMessageCommand();
         registerSendGroupMessageCommand();
+        registerLoadGroupDialogCommand();
+        registerLeaveGroupDialogCommand();
+        registerAddFriendsToGroupCommand();
+        registerUpdateGroupNameCommand();
 
         registerGetFileCommand();
         registerLoadAttachFileCommand();
@@ -118,8 +126,36 @@ public class QBService extends Service {
         registerLoadDialogMessagesCommand();
     }
 
+    private void registerUpdateGroupNameCommand() {
+        QBUpdateGroupNameCommand updateGroupNameCommand = new QBUpdateGroupNameCommand(this, chatHelper,
+                QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION,
+                QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, updateGroupNameCommand);
+    }
+
+    private void registerAddFriendsToGroupCommand() {
+        QBAddFriendsToGroupCommand addFriendsToGroupCommand = new QBAddFriendsToGroupCommand(this, chatHelper,
+                QBServiceConsts.ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION,
+                QBServiceConsts.ADD_FRIENDS_TO_GROUP_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_TO_GROUP_ACTION, addFriendsToGroupCommand);
+    }
+
+    private void registerLeaveGroupDialogCommand() {
+        QBLeaveGroupDialogCommand leaveGroupDialogCommand = new QBLeaveGroupDialogCommand(this, chatHelper,
+                QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION,
+                QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LEAVE_GROUP_DIALOG_ACTION, leaveGroupDialogCommand);
+    }
+
+    private void registerLoadGroupDialogCommand() {
+        QBLoadGroupDialogCommand loadGroupDialogCommand = new QBLoadGroupDialogCommand(this, chatHelper,
+                QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION,
+                QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, loadGroupDialogCommand);
+    }
+
     private void registerJoinGroupChat() {
-        QBJoinGroupChatCommand joinGroupChatCommand = new QBJoinGroupChatCommand(this, chatHelper,
+        QBJoinGroupDialogCommand joinGroupChatCommand = new QBJoinGroupDialogCommand(this, chatHelper,
                 QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);

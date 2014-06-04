@@ -30,7 +30,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginTop="5dp"
-                android:text="FC Metallist"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:textSize="20sp" />
 
             <TextView
@@ -38,16 +39,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="27 participants"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/messages_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="3458 messages"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -74,6 +65,7 @@
             android:src="@drawable/badge_online" />
 
         <TextView
+            android:id="@+id/online_participants_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="4/27 online"

@@ -6,7 +6,9 @@ import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Friend implements Serializable {
 
@@ -51,6 +53,14 @@ public class Friend implements Serializable {
             friends.add(new Friend(user));
         }
         return friends;
+    }
+
+    public static Map<Integer, Friend> createFriendMap(List<QBUser> userList) {
+        Map<Integer, Friend> friendMap = new HashMap<Integer, Friend>();
+        for (QBUser user : userList) {
+            friendMap.put(user.getId(), new Friend(user));
+        }
+        return friendMap;
     }
 
     @Override

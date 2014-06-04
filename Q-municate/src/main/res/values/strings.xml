@@ -76,6 +76,8 @@
     // Group Dialog Details
     <string name="gdd_title">Group Details</string>
     <string name="gdd_leave_group">Leave group</string>
+    <string name="gdd_participants">%1$d participants</string>
+    <string name="gdd_online_participants">%1$d/%2$d online</string>
 
     // New Dialog
     <string name="ndl_title">New Dialog</string>
@@ -102,6 +104,9 @@
     <string name="prf_status_message">Status Message</string>
     <string name="prf_edit_status">Edit Status</string>
     <string name="prf_done">Done</string>
+
+    // Add Friends To Group Dialog
+    <string name="afg_title">Add Friends</string>
 
     // Invite Friends
     <string name="inf_header_label">Let your other friends know about \n Qmunication by sending them private invitations</string>
@@ -143,6 +148,7 @@
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
     <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
+    <string name="dlg_leave_group">Leave Group</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

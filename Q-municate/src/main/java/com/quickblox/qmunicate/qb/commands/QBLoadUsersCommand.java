@@ -36,10 +36,12 @@ public class QBLoadUsersCommand extends ServiceCommand {
         requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(Consts.FL_FRIENDS_PER_PAGE);
 
-        Bundle params = new Bundle();
-        List<QBUser> users = QBUsers.getUsersByFullName(constraint, requestBuilder, params);
+        Bundle requestParams = new Bundle();
+        List<QBUser> users = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         List<Friend> friendsList = Friend.createFriendList(users);
         friendsList.remove(new Friend(App.getInstance().getUser()));
+
+        Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendsList);
         return params;
     }

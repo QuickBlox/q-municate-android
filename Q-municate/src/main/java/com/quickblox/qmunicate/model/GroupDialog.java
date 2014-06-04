@@ -1,65 +1,65 @@
 package com.quickblox.qmunicate.model;
 
-import java.io.Serializable;
-import java.util.List;
+import com.quickblox.module.chat.model.QBDialog;
 
-public class GroupDialog extends Chat implements Serializable {
-    private List<Friend> opponents;
-    private List<DialogMessage> messages;
+import java.util.ArrayList;
 
-    public GroupDialog(String name, Integer avatarId) {
-        this.name = name;
-        this.avatarId = avatarId;
+public class GroupDialog extends Dialog {
+
+    private String roomJid;
+    private ArrayList<Friend> occupantList;
+    private int unreadMessageCount;
+
+    public GroupDialog(String id) {
+        super(id);
+    }
+
+    public GroupDialog(QBDialog dialog) {
+        super(dialog);
+        roomJid = dialog.getRoomJid();
+        occupantList = new ArrayList<Friend>();
     }
 
     @Override
-    public String getId() {
-        return "1";
+    public DialogType getType() {
+        return DialogType.GROUP;
     }
 
-    @Override
-    public ChatType getType() {
-        return ChatType.GROUP;
+    public String getRoomJid() {
+        return roomJid;
     }
 
-    @Override
-    public String getName() {
-        return name;
+    public void setRoomJid(String roomJid) {
+        this.roomJid = roomJid;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<Friend> getOccupantList() {
+        return occupantList;
     }
 
-    @Override
-    public int getAvatarId() {
-        return 0;
+    public void setOccupantList(ArrayList<Friend> occupantList) {
+        this.occupantList = occupantList;
     }
 
-    public void setAvatarId(int avatarId) {
-        this.avatarId = avatarId;
+    public int getUnreadMessageCount() {
+        return unreadMessageCount;
     }
 
-    public List<Friend> getOpponentsList() {
-        return opponents;
+    public void setUnreadMessageCount(int unreadMessageCount) {
+        this.unreadMessageCount = unreadMessageCount;
     }
 
-    public List<DialogMessage> getMessages() {
-        return messages;
+    public int getOccupantsCount() {
+        return occupantList.size();
     }
 
-    public void setMessages(List<DialogMessage> messages) {
-        this.messages = messages;
-    }
-
-    public void setOpponents(List<Friend> opponents) {
-        this.opponents = opponents;
-    }
-
-    @Override
-    public DialogMessage getLastMessage() {
-        DialogMessage message = new DialogMessage();
-        message.setBody(this.lastMessage);
-        return message;
+    public int getOnlineOccupantsCount() {
+        int onlineOccupantsCount = 0;
+        for (Friend friend : occupantList) {
+            if (friend.isOnline()) {
+                onlineOccupantsCount++;
+            }
+        }
+        return onlineOccupantsCount;
     }
 }
