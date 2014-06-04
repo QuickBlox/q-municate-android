@@ -91,12 +91,10 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         }
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        if(dialog != null) {
-            boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > 0;
-            if(!isRead) {
-                String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-                QBUpdateStatusMessageCommand.start(context, messageId, true);
-            }
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        if(dialog != null && !isRead) {
+            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+            QBUpdateStatusMessageCommand.start(context, messageId, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
