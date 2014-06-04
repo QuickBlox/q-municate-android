@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +28,6 @@ import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
-import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -190,9 +188,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     }
 
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+    }
+
     public void sendMessageOnClick(View view) {
         QBSendGroupDialogMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText(Consts.EMPTY_STRING);
+        scrollListView();
     }
 
     @Override
@@ -226,6 +229,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         addActions();
+        scrollListView();
     }
 
     private void initStartLoadDialogMessages() {

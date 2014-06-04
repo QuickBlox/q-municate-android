@@ -91,22 +91,20 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         }
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
+        if(dialog != null) {
+            boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > 0;
+            if(!isRead) {
+                String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+                QBUpdateStatusMessageCommand.start(context, messageId, true);
+            }
+        }
+
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
     private boolean isOwnMessage(int senderId) {
         return senderId == currentUser.getId();
     }
-
-//    @Override
-//    protected void onContentChanged() {
-//        super.onContentChanged();
-//        if(dialog.getUnreadMessageCount() > Consts.ZERO_INT_VALUE) {
-//            Cursor cursor = getCursor();
-//            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-//            QBUpdateStatusMessageCommand.start(context, messageId, true);
-//        }
-//    }
 
     private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
                                     final ImageView attachImageView, final ProgressBar progressBar) {
