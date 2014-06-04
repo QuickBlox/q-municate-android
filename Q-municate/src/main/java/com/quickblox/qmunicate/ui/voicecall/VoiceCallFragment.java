@@ -57,8 +57,8 @@ public class VoiceCallFragment extends OutgoingCallFragment {
     }
 
     private void muteSound() {
-        if (qbVideoChat != null) {
-            qbVideoChat.muteSound(!qbVideoChat.isSoundMute());
+        if (videoChat != null) {
+            videoChat.muteSound(!videoChat.isSoundMute());
         }
     }
 

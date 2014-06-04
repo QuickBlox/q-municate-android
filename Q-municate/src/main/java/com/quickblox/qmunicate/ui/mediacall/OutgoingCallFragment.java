@@ -44,7 +44,7 @@ import java.util.TimerTask;
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();
-    protected QBVideoChat qbVideoChat;
+    protected QBVideoChat videoChat;
     protected Friend opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescription remoteSessionDescription;
@@ -121,8 +121,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onPause() {
         super.onPause();
-        if (qbVideoChat != null) {
-            qbVideoChat.onActivityPause();
+        if (videoChat != null) {
+            videoChat.onActivityPause();
         }
     }
 
@@ -139,8 +139,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void reInitChatIfExist(View rootView) {
         VideoStreamsView videoView = (VideoStreamsView) rootView.findViewById(R.id.ownVideoScreenImageView);
-        if (qbVideoChat != null && videoView != null) {
-            qbVideoChat.setVideoView(videoView);
+        if (videoChat != null && videoView != null) {
+            videoChat.setVideoView(videoView);
         }
     }
 
@@ -182,22 +182,22 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onResume() {
         super.onResume();
-        if (qbVideoChat != null) {
-            qbVideoChat.onActivityResume();
+        if (videoChat != null) {
+            videoChat.onActivityResume();
         }
     }
 
     public void initChat(QBSignalingChannel signalingChannel) {
-        if (qbVideoChat != null) {
+        if (videoChat != null) {
             return;
         }
         VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
-        qbVideoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
-        qbVideoChat.setMediaCaptureCallback(new MediaCapturerHandler());
+        videoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
+        videoChat.setMediaCaptureCallback(new MediaCapturerHandler());
         signalingMessageHandler = new VideoChatMessageHandler();
         signalingChannel.addSignalingListener(signalingMessageHandler);
         if (remoteSessionDescription != null) {
-            qbVideoChat.setRemoteSessionDescription(remoteSessionDescription);
+            videoChat.setRemoteSessionDescription(remoteSessionDescription);
         }
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
             startCall();
@@ -207,7 +207,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             callConfig.setCallStreamType(call_type);
             callConfig.setSessionDescription(remoteSessionDescription);
             callConfig.setDevicePlatform(remotePlatform);
-            qbVideoChat.accept(callConfig);
+            videoChat.accept(callConfig);
             onConnectionEstablished();
         }
     }
@@ -234,8 +234,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void muteMicrophone() {
-        if (qbVideoChat != null) {
-            qbVideoChat.muteMicrophone(!qbVideoChat.isMicrophoneMute());
+        if (videoChat != null) {
+            videoChat.muteMicrophone(!videoChat.isMicrophoneMute());
         }
     }
 
@@ -246,7 +246,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             if (!opponent.isOnline()) {
                 QBSendPushCommand.start(getActivity(), Consts.DEFAULT_CALL_MESSAGE, opponent.getId());
             }
-            qbVideoChat.call(userOpponent, sender, call_type);
+            videoChat.call(userOpponent, sender, call_type);
             callTimer = new Timer();
             callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
         }
@@ -274,11 +274,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void stopCall(boolean sendStop, STOP_TYPE stopType) {
         cancelCallTimer();
-        if (qbVideoChat != null) {
+        if (videoChat != null) {
             if (sendStop) {
-                qbVideoChat.stopCall();
+                videoChat.stopCall();
             } else {
-                qbVideoChat.disposeConnection();
+                videoChat.disposeConnection();
             }
         }
         if (signalingChannel != null) {
