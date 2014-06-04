@@ -10,6 +10,11 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
+
 public class QBLoginChatCommand extends ServiceCommand {
 
     private QBAuthHelper authHelper;
@@ -29,7 +34,16 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        chatHelper.login(authHelper.getUser());
+        // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
+        tryLogin();
         return extras;
+    }
+
+    private void tryLogin() throws XMPPException, IOException, SmackException {
+        while (!chatHelper.isLoggedIn()) {
+            try {
+                chatHelper.login(authHelper.getUser());
+            } catch (SmackException.ResourceBindingNotOfferedException ignore) { /* NOP */ }
+        }
     }
 }
