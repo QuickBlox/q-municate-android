@@ -42,10 +42,12 @@ public class Consts {
     public static final float CIRCL_SHADOW_DX = 0.0f;
     public static final float CIRCL_SHADOW_DY = 2.0f;
 
-    public static final String FRIEND_CLASS_NAME = "Friend";
+    public static final String EXTRA_FRIEND = "Friend";
     public static final String FRIEND_FIELD_USER_ID = "user_id";
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";
     public static final String SUBSCRIPTION_ID = "subscription_id";
+    public static final String PUSH_MESSAGE = "message";
+    public static final String PROPERTY_REG_USER_ID = "registered_push_user";
     public static final String USER = "user";
     public static final String USER_NAME = "user_name";
     public static final String CALL_DIRECTION_TYPE_EXTRA = "call_type_direction";
@@ -60,6 +62,7 @@ public class Consts {
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int SECOND = 1000;
     public static final String DEFAULT_WEB_ROOM = "test";
+    public static final String DEFAULT_CALL_MESSAGE = "";
 
     public static enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING

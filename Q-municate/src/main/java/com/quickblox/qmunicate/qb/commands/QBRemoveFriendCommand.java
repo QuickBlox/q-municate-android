@@ -32,15 +32,16 @@ public class QBRemoveFriendCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
+        //TODO VF Implementation will be changed
         Friend friend = (Friend) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
         builder.eq(Consts.FRIEND_FIELD_USER_ID, App.getInstance().getUser().getId());
         builder.eq(Consts.FRIEND_FIELD_FRIEND_ID, friend.getId());
 
-        List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.FRIEND_CLASS_NAME, builder);
+        List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.EXTRA_FRIEND, builder);
 
-        QBCustomObjects.deleteObject(Consts.FRIEND_CLASS_NAME, objects.get(0).getCustomObjectId());
+        QBCustomObjects.deleteObject(Consts.EXTRA_FRIEND, objects.get(0).getCustomObjectId());
 
         return null;
     }

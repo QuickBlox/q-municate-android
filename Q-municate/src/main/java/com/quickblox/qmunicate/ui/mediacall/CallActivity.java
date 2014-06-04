@@ -14,18 +14,20 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
+import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallFragment;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.Utils;
 
 public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private QBUser opponent;
+    private Friend opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private WebRTC.MEDIA_STREAM call_type;
@@ -36,9 +38,9 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private ChatMessageHandler messageHandler;
 
-    public static void start(Context context, QBUser friend, WebRTC.MEDIA_STREAM callType) {
+    public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
         Intent intent = new Intent(context, CallActivity.class);
-        intent.putExtra(Consts.USER, friend);
+        intent.putExtra(Consts.EXTRA_FRIEND, friend);
         intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.OUTGOING);
         intent.putExtra(Consts.CALL_TYPE_EXTRA, callType);
         context.startActivity(intent);
@@ -115,7 +117,8 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
 
     private void reject() {
         if (signalingChannel != null && opponent != null) {
-            ConnectionConfig connectionConfig = new ConnectionConfig(opponent, sessionId);
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            ConnectionConfig connectionConfig = new ConnectionConfig(userOpponent, sessionId);
             signalingChannel.sendReject(connectionConfig);
             signalingChannel.close();
         }
@@ -137,7 +140,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
         sessionId = extras.getString(WebRTC.SESSION_ID_EXTENSION, "");
-        opponent = (QBUser) extras.getSerializable(Consts.USER);
+        opponent = (Friend) extras.getSerializable(Consts.EXTRA_FRIEND);
         if (call_direction_type != null) {
             if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
                 sessionDescriptionWrapper = extras.getParcelable(Consts.REMOTE_DESCRIPTION);
@@ -155,7 +158,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
                 call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, call_direction_type);
-        bundle.putSerializable(Consts.USER, opponent);
+        bundle.putSerializable(Consts.EXTRA_FRIEND, opponent);
         bundle.putSerializable(Consts.CALL_TYPE_EXTRA, call_type);
         outgoingCallFragment.setArguments(bundle);
         setCurrentFragment(outgoingCallFragment);
@@ -173,7 +176,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
         }
     }
 
-    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser opponentId,
+    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, Friend opponentId,
             WebRTC.MEDIA_STREAM callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
@@ -186,7 +189,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     private void showIncomingFragment() {
         playIncomingRingtone();
         IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
-                opponent.getFullName());
+                opponent.getFullname());
         setCurrentFragment(incomingCallFragment);
     }
 

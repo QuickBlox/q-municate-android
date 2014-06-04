@@ -26,11 +26,14 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
+import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.Utils;
 
 import org.webrtc.SessionDescription;
 
@@ -42,7 +45,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();
     protected QBVideoChat qbVideoChat;
-    protected QBUser opponent;
+    protected Friend opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescription remoteSessionDescription;
     private boolean bounded;
@@ -72,12 +75,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     protected abstract int getContentView();
 
-    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
+    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, Friend friend,
             Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
             QBSignalingChannel.PLATFORM platform,
             QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
-        args.putSerializable(Consts.USER, user);
+        args.putSerializable(Consts.EXTRA_FRIEND, friend);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
         args.putSerializable(WebRTC.ORIENTATION_EXTENSION, deviceOrientation);
@@ -152,7 +155,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
-        opponent = (QBUser) getArguments().getSerializable(Consts.USER);
+        opponent = (Friend) getArguments().getSerializable(Consts.EXTRA_FRIEND);
         call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
                 WebRTC.PLATFORM_EXTENSION);
@@ -199,7 +202,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
             startCall();
         } else {
-            CallConfig callConfig = new CallConfig(opponent, sessionId, deviceOrientation);
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            CallConfig callConfig = new CallConfig(userOpponent, sessionId, deviceOrientation);
             callConfig.setCallStreamType(call_type);
             callConfig.setSessionDescription(remoteSessionDescription);
             callConfig.setDevicePlatform(remotePlatform);
@@ -238,7 +242,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private void startCall() {
         QBUser sender = App.getInstance().getUser();
         if (sender != null) {
-            qbVideoChat.call(opponent, sender, call_type);
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            if (!opponent.isOnline()) {
+                QBSendPushCommand.start(getActivity(), Consts.DEFAULT_CALL_MESSAGE, opponent.getId());
+            }
+            qbVideoChat.call(userOpponent, sender, call_type);
             callTimer = new Timer();
             callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
         }

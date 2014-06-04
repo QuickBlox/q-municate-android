@@ -30,7 +30,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
     @Override
     protected void postInit(View rootView) {
         if (opponent != null) {
-            ((TextView) rootView.findViewById(R.id.name_textview)).setText(opponent.getFullName());
+            ((TextView) rootView.findViewById(R.id.name_textview)).setText(opponent.getFullname());
         }
         timeTextView = (TextView) rootView.findViewById(R.id.timerTextView);
         rootView.findViewById(R.id.muteDynamicButton).setOnClickListener(this);
