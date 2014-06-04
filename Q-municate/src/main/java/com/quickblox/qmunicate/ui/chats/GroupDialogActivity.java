@@ -171,7 +171,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId());
+        return new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
@@ -188,9 +188,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     }
 
+    private void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+    }
+
     public void sendMessageOnClick(View view) {
         QBSendGroupDialogMessageCommand.start(this, messageEditText.getText().toString(), null);
         messageEditText.setText(Consts.EMPTY_STRING);
+        scrollListView();
     }
 
     @Override
@@ -224,6 +229,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         addActions();
+        scrollListView();
     }
 
     private void initStartLoadDialogMessages() {

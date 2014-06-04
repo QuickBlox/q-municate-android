@@ -7,13 +7,24 @@ public class DialogMessageCache {
     private String message;
     private String attachUrl;
     private long time;
+    private boolean isRead;
 
-    public DialogMessageCache(String roomJidId, int senderId, String message, String attachUrl, long time) {
+    public DialogMessageCache(String roomJidId, Integer senderId, String message, String attachUrl, long time,
+            boolean isRead) {
         this.roomJidId = roomJidId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
+        this.isRead = isRead;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
     }
 
     public void setSenderId(Integer senderId) {
