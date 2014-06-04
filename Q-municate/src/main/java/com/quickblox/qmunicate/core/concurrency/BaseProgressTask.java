@@ -4,19 +4,18 @@ import android.app.Activity;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.utils.Consts;
 
 public abstract class BaseProgressTask<Params, Progress, Result> extends BaseErrorAsyncTask<Params, Progress, Result> {
 
     protected ProgressDialog progress;
 
     protected BaseProgressTask(Activity activity) {
-        this(activity, R.string.dlg_wait_please);
+        this(activity, R.string.dlg_wait_please, true);
     }
 
-    protected BaseProgressTask(Activity activity, int messageId) {
+    protected BaseProgressTask(Activity activity, int messageId, boolean showDialog) {
         super(activity);
-        if (messageId != Consts.NOT_INITIALIZED_VALUE) {
+        if (showDialog) {
             progress = ProgressDialog.newInstance(messageId);
         }
     }

@@ -143,7 +143,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
                 return;
             }
             int subscriptionId = gsmHelper.getSubscriptionId();
-            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
+            if (Consts.NOT_INITIALIZED_VALUE == subscriptionId) {
                 gsmHelper.subscribeToPushNotifications();
             }
         } else {

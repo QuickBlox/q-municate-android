@@ -1,15 +1,13 @@
 package com.quickblox.qmunicate.core.gcm;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.qb.tasks.QBGCMRegistrationTask;
+import com.quickblox.qmunicate.core.gcm.tasks.QBGCMRegistrationTask;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
@@ -19,9 +17,6 @@ public class GSMHelper {
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private final static String TAG = GSMHelper.class.getSimpleName();
     private GoogleCloudMessaging gcm;
-    private SharedPreferences prefs;
-    private Context context;
-    private String regid;
     private Activity activity;
 
     public GSMHelper(Activity activity) {
@@ -54,16 +49,7 @@ public class GSMHelper {
 
     public String getRegistrationId() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        String registrationId = prefsHelper.getPref(Consts.PROPERTY_REG_ID, "");
-        if (registrationId.isEmpty()) {
-            return "";
-        }
-
-        int registeredVersion = prefsHelper.getPref(Consts.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = Utils.getAppVersionCode(activity);
-        if (registeredVersion != currentVersion) {
-            return "";
-        }
+        String registrationId = prefsHelper.getPref(PrefsHelper.PREF_REG_ID, Consts.EMPTY_STRING);
         return registrationId;
     }
 

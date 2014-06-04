@@ -1,11 +1,10 @@
-package com.quickblox.qmunicate.qb.tasks;
+package com.quickblox.qmunicate.core.gcm.tasks;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.internal.core.exception.QBResponseException;
@@ -22,14 +21,13 @@ import com.quickblox.qmunicate.utils.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// TODO VF move to com.quickblox.qmunicate.core.gcm
 public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging, Void, Bundle> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
     private Context context;
 
     public QBGCMRegistrationTask(Activity activity) {
-        super(activity, -1);
+        super(activity, -1, false);
     }
 
     @Override
@@ -62,13 +60,8 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         return registrationId;
     }
 
-    // TODO VF remove comments
-
     private QBSubscription subscribeToPushNotifications(String regId) throws QBResponseException {
-        Log.d(TAG, "subscribing...");
-
         String deviceId;
-
         final TelephonyManager mTelephony = (TelephonyManager) activityRef.get().getSystemService(
                 Context.TELEPHONY_SERVICE);
         if (mTelephony.getDeviceId() != null) {
@@ -90,14 +83,17 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
     private void storeRegistration(Context context, Bundle registration) {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         int appVersion = Utils.getAppVersionCode(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
         prefsHelper.savePref(PrefsHelper.PREF_REG_ID, registration.getString(PrefsHelper.PREF_REG_ID));
         QBUser user = App.getInstance().getUser();
         if (user != null) {
             prefsHelper.savePref(PrefsHelper.PREF_REG_USER_ID, user.getId());
         }
-        prefsHelper.savePref(PrefsHelper.PREF_SUBSCRIPTION_ID, registration.getInt(
-                PrefsHelper.PREF_SUBSCRIPTION_ID, Consts.NOT_INITIALIZED_VALUE));
+
+        int subscriptionId = registration.getInt(PrefsHelper.PREF_SUBSCRIPTION_ID,
+                Consts.NOT_INITIALIZED_VALUE);
+        if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
+            prefsHelper.savePref(PrefsHelper.PREF_SUBSCRIPTION_ID, subscriptionId);
+        }
         prefsHelper.savePref(PrefsHelper.PREF_APP_VERSION, appVersion);
     }
 }
