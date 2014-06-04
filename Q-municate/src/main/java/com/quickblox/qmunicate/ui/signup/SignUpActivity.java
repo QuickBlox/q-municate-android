@@ -105,31 +105,11 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             } catch (FileNotFoundException e) {
                 ErrorUtils.showError(this, e);
             }
+            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent, Consts.AVATAR_BITMAP_SIZE,
+                    Consts.AVATAR_BITMAP_SIZE, false);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void saveAvatar(Bundle extras) {
-        File image = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
-        ImageHelper imageHelper = new ImageHelper(this);
-        Bitmap imageBitmap = getBitmapFromFile(image);
-
-        new ReceiveImageFileTask(this).execute(imageHelper, imageBitmap, true);
-    }
-
-    private Bitmap getBitmapFromFile(File image) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap imageBitmap = null;
-        try {
-            imageBitmap = BitmapFactory.decodeStream(new FileInputStream(image), null, options);
-            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, Consts.AVATAR_BITMAP_SIZE,
-                    Consts.AVATAR_BITMAP_SIZE, false);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return imageBitmap;
     }
 
     public void changeAvatarOnClickListener(View view) {

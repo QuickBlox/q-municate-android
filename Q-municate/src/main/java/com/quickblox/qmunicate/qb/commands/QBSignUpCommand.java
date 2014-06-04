@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.qb.commands;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
@@ -22,10 +21,5 @@ public class QBSignUpCommand extends CompositeServiceCommand {
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, image);
         context.startService(intent);
-    }
-
-    @Override
-    protected Bundle perform(Bundle extras) throws Exception {
-        return super.perform(extras);
     }
 }
