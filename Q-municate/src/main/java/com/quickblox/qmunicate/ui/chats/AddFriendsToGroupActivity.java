@@ -58,11 +58,11 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     }
 
     private ArrayList<Integer> getFriendIds(List<Friend> friendList) {
-        ArrayList<Integer> friendIds = new ArrayList<Integer>();
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
         for (Friend friend : friendList) {
-            friendIds.add(friend.getId());
+            friendIdsList.add(friend.getId());
         }
-        return friendIds;
+        return friendIdsList;
     }
 
     private class AddFriendsToGroupSuccessCommand implements Command {

@@ -301,7 +301,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
-    public List<Integer> getRoomOnlineParticipants(String roomJid) throws XMPPException {
+    public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
         return new ArrayList<Integer>(roomChatManager.getRoom(roomJid).getOnlineRoomUserIds());
     }
 

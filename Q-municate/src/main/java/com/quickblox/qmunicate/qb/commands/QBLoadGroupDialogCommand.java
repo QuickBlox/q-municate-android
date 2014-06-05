@@ -16,6 +16,7 @@ import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,17 +45,17 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
         GroupDialog groupDialog = new GroupDialog(dialog);
 
-        List<Integer> participantIds = dialog.getOccupants();
-        List<Integer> onlineParticipantIds = chatHelper.getRoomOnlineParticipants(roomJid);
+        List<Integer> participantIdsList = dialog.getOccupants();
+        List<Integer> onlineParticipantIdsList = chatHelper.getRoomOnlineParticipantList(roomJid);
 
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(Consts.FL_FRIENDS_PER_PAGE);
 
         Bundle requestParams = new Bundle();
-        List<QBUser> users = QBUsers.getUsersByIDs(participantIds, requestBuilder, requestParams);
-        Map<Integer, Friend> friendMap = Friend.createFriendMap(users);
-        for (Integer onlineParticipantId : onlineParticipantIds) {
+        List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
+        Map<Integer, Friend> friendMap = FriendUtils.createFriendMap(userList);
+        for (Integer onlineParticipantId : onlineParticipantIdsList) {
             friendMap.get(onlineParticipantId).setOnline(true);
         }
 

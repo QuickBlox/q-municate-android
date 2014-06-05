@@ -106,7 +106,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         return new GroupDialogOccupantsAdapter(this, groupDialog.getOccupantList());
     }
 
-    private void leaveGroup() {
+    private void showLeaveGroupDialog() {
         ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
@@ -152,7 +152,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
                 AddFriendsToGroupActivity.start(this, groupDialog);
                 return true;
             case R.id.action_leave:
-                leaveGroup();
+                showLeaveGroupDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -203,7 +203,6 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     private void updateOldUserData() {
         groupNameOld = groupNameEditText.getText().toString();
     }
-
 
     private class GroupNameTextWatcherListener extends SimpleTextWatcher {
 

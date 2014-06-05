@@ -15,10 +15,10 @@ import com.quickblox.qmunicate.model.InviteFriend;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendsUtils {
+public class InviteFriendUtils {
     private Context context;
 
-    public FriendsUtils(Context context) {
+    public InviteFriendUtils(Context context) {
         this.context = context;
     }
 
