@@ -31,8 +31,11 @@ public class QBServiceConsts {
     public static final String LOAD_CHATS_DIALOGS_ACTION = "chats_dialogs_load_action";
     public static final String UPDATE_CHAT_DIALOG_ACTION = "update_chat_dialog_action";
     public static final String JOIN_GROUP_CHAT_ACTION = "join_group_chat_action";
-    public static final String LOAD_CHATS_DIALOGS_AND_JOIN_ACTION = "load_chats_dialogs_and_join_action";
     public static final String LOAD_DIALOG_MESSAGES_ACTION = "load_dialog_messages_action";
+    public static final String LOAD_GROUP_DIALOG_ACTION = "load_group_dialog_action";
+    public static final String LEAVE_GROUP_DIALOG_ACTION = "leave_group_group_action";
+    public static final String ADD_FRIENDS_TO_GROUP_ACTION = "add_friends_to_group_action";
+    public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
     public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
 
@@ -98,13 +101,21 @@ public class QBServiceConsts {
     public static final String UPDATE_STATUS_MESSAGE_FAIL_ACTION = "update_status_message_fail_action";
     public static final String SEND_PUSH_MESSAGES_SUCCESS_ACTION = "send_push_message_success_action";
     public static final String SEND_PUSH_MESSAGES_FAIL_ACTION = "send_push_message_fail_action";
+    public static final String LOAD_GROUP_DIALOG_SUCCESS_ACTION = "load_group_dialog_success_action";
+    public static final String LOAD_GROUP_DIALOG_FAIL_ACTION = "load_group_dialog_fail_action";
+    public static final String LEAVE_GROUP_DIALOG_SUCCESS_ACTION = "leave_group_dialog_success_action";
+    public static final String LEAVE_GROUP_DIALOG_FAIL_ACTION = "leave_group_dialog_fail_action";
+    public static final String ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION = "add_friends_to_group_success_action";
+    public static final String ADD_FRIENDS_TO_GROUP_FAIL_ACTION = "add_friends_to_group_fail_action";
+    public static final String UPDATE_GROUP_NAME_SUCCESS_ACTION = "update_group_name_success_action";
+    public static final String UPDATE_GROUP_NAME_FAIL_ACTION = "update_group_name_fail_action";
 
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
-    public static final String EXTRA_ROOM_JID_ID = "room_jid_id";
+    public static final String EXTRA_ROOM_JID = "room_jid_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
@@ -130,6 +141,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
+    public static final String EXTRA_GROUP_NAME = "group_name";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
     public static final String EXTRA_MESSAGE_ID = "message_id";
     public static final String EXTRA_STATUS_MESSAGE = "status_message";

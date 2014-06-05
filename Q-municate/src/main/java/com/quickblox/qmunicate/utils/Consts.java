@@ -15,9 +15,6 @@ public class Consts {
     public static final String QB_DOMAIN = "api.stage.quickblox.com";
 
     // Friend list consts
-    public static final int FL_START_LOAD_DELAY = 0;
-    public static final int FL_UPDATE_DATA_PERIOD = 30000;
-    public static final int FL_ONLINE_STATUS_TIMEOUT = 15;
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 100;
 

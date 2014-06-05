@@ -13,6 +13,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.List;
 
@@ -36,11 +37,13 @@ public class QBLoadUsersCommand extends ServiceCommand {
         requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(Consts.FL_FRIENDS_PER_PAGE);
 
+        Bundle requestParams = new Bundle();
+        List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
+        List<Friend> friendList = FriendUtils.createFriendList(userList);
+        friendList.remove(FriendUtils.createFriend(App.getInstance().getUser()));
+
         Bundle params = new Bundle();
-        List<QBUser> users = QBUsers.getUsersByFullName(constraint, requestBuilder, params);
-        List<Friend> friendsList = Friend.createFriendList(users);
-        friendsList.remove(new Friend(App.getInstance().getUser()));
-        params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendsList);
+        params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendList);
         return params;
     }
 }

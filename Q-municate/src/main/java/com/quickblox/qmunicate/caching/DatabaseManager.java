@@ -70,6 +70,27 @@ public class DatabaseManager {
                 FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
     }
 
+    public static List<Friend> getAllFriendsList(Context context) {
+        List<Friend> friendList = new ArrayList<Friend>();
+        Cursor cursor = getAllFriends(context);
+        while (cursor.moveToNext()) {
+            friendList.add(getFriendFromCursor(cursor));
+        }
+        cursor.close();
+        return friendList;
+    }
+
+    public static Cursor getFriendsFilteredByIds(Context context, List<Integer> friendIdsList) {
+        String selection = prepareFriendsFilter(friendIdsList);
+        return context.getContentResolver().query(FriendTable.CONTENT_URI, null, selection, null,
+                FriendTable.Cols.ID + " ORDER BY " + FriendTable.Cols.FULLNAME + " COLLATE NOCASE ASC");
+    }
+
+    private static String prepareFriendsFilter(List<Integer> friendIdsList) {
+        String condition = String.format("('%s')", TextUtils.join("','", friendIdsList));
+        return FriendTable.Cols.ID + " NOT IN " + condition;
+    }
+
     public static void deleteAllFriends(Context context) {
         context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
     }
@@ -95,8 +116,9 @@ public class DatabaseManager {
             if (!TextUtils.isEmpty(dialogId)) {
                 dialog = getDialogFromCursor(cursor);
             }
+            cursor.close();
         }
-        cursor.close();
+
         return dialog;
     }
 
@@ -125,7 +147,8 @@ public class DatabaseManager {
         dialog.setRoomJid(roomJidId);
         Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
         dialog.setName(opponentFriend.getFullname());
-        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(opponentFriend.getId());
+        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(
+                opponentFriend.getId());
         dialog.setOccupantsIds(occupantsIdsList);
         dialog.setType(QBDialogType.PRIVATE);
         dialog.setLastMessageDateSent(DateUtils.getCurrentTime());
@@ -142,8 +165,7 @@ public class DatabaseManager {
         int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES));
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE));
-        long dateSent = cursor.getLong(cursor.getColumnIndex(
-                DialogTable.Cols.LAST_DATE_SENT));
+        long dateSent = cursor.getLong(cursor.getColumnIndex(DialogTable.Cols.LAST_DATE_SENT));
         String type = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.TYPE));
 
         QBDialog dialog = new QBDialog(dialogId);
@@ -209,7 +231,7 @@ public class DatabaseManager {
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
-                                        String roomJidId, boolean isPrivate) {
+            String roomJidId, boolean isPrivate) {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
@@ -222,7 +244,7 @@ public class DatabaseManager {
             }
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
-                if(isPrivate) {
+                if (isPrivate) {
                     return;
                 } else {
                     message = getMessageForNotification(context, senderId);
@@ -239,7 +261,7 @@ public class DatabaseManager {
     private static String getMessageForNotification(Context context, int senderId) {
         String message;
         Friend friend = DatabaseManager.getFriendById(context, senderId);
-        if(friend == null) {
+        if (friend == null) {
             message = context.getResources().getString(R.string.user_created_room, senderId);
         } else {
             message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
@@ -256,7 +278,8 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
-        updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(), dialogMessageCache.getTime());
+        updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
+                dialogMessageCache.getTime());
     }
 
     public static void deleteMessagesByRoomJidId(Context context, String roomJidId) {
@@ -283,6 +306,9 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
         }
+        values.put(DialogTable.Cols.NAME, dialog.getName());
+        values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
+                dialog.getOccupants()));
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
@@ -299,8 +325,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
-        String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupants());
-        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);
+        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().name());
         return values;
@@ -309,7 +334,8 @@ public class DatabaseManager {
     public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context, roomJidId));
+        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,
+                roomJidId));
         values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
@@ -318,7 +344,8 @@ public class DatabaseManager {
 
     public static int getCountUnreadMessagesByRoomJid(Context context, String roomJidId) {
         Cursor cursor = context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.IS_READ + " = 0 AND " + DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+                DialogMessageTable.Cols.IS_READ + " = 0 AND " + DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'",
+                null, null);
         int countMessages = cursor.getCount();
         cursor.close();
         return countMessages;
@@ -357,5 +384,10 @@ public class DatabaseManager {
             cursor.close();
             updateDialog(context, roomJidId, message, time);
         }
+    }
+
+    public static void deleteDialogByRoomJid(Context context, String roomJid) {
+        context.getContentResolver().delete(DialogTable.CONTENT_URI,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null);
     }
 }

@@ -19,7 +19,7 @@ import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.ui.base.QMLoaderHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
-import com.quickblox.qmunicate.utils.FriendsUtils;
+import com.quickblox.qmunicate.utils.InviteFriendUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     public Activity activity;
     private LoaderHelper<List<QBUser>> loaderHelper;
     private FacebookHelper facebookHelper;
-    private FriendsUtils friendsUtils;
+    private InviteFriendUtils inviteFriendUtils;
     private List<QBUser> users;
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
@@ -45,7 +45,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         this.facebookHelper = facebookHelper;
         this.facebookHelper.loginWithFacebook();
 
-        friendsUtils = new FriendsUtils(activity);
+        inviteFriendUtils = new InviteFriendUtils(activity);
         users = new ArrayList<QBUser>();
     }
 
@@ -161,7 +161,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         @Override
         protected Void doInBackground(Void... params) {
             expectedFriendsCallbacks++;
-            friendsContactsList = friendsUtils.getContactsWithEmail();
+            friendsContactsList = inviteFriendUtils.getContactsWithEmail();
             startUserListLoader(false, friendsContactsList);
             return null;
         }

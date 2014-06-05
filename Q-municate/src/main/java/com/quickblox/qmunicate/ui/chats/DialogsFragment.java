@@ -86,7 +86,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+        GroupDialogActivity.start(baseActivity, dialog.getRoomJid());
     }
 
     private Cursor getAllChats() {

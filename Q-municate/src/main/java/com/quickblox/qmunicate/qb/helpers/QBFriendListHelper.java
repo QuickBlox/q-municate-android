@@ -19,6 +19,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.FriendUtils;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -87,7 +88,7 @@ public class QBFriendListHelper extends BaseHelper {
 
     private Friend loadFriend(int userId) throws QBResponseException {
         QBUser user = QBUsers.getUser(new QBUser(userId));
-        return new Friend(user);
+        return FriendUtils.createFriend(user);
     }
 
     public void confirmInvitation(
@@ -115,7 +116,7 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void updateFriends(Collection<Integer> userIds) throws QBResponseException {
         List<QBUser> users = loadUsers(userIds);
-        List<Friend> friends = Friend.createFriendList(users);
+        List<Friend> friends = FriendUtils.createFriendList(users);
         fillFriendsWithRosterData(friends);
 
         DatabaseManager.saveFriends(context, friends);

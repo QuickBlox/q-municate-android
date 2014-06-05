@@ -16,7 +16,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
-import com.quickblox.qmunicate.qb.commands.QBJoinGroupChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -170,7 +170,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private void joinGroupDialogs(List<QBDialog> dialogsList) {
         List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
-        QBJoinGroupChatCommand.start(this, roomJidList);
+        QBJoinGroupDialogCommand.start(this, roomJidList);
     }
 
     private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {

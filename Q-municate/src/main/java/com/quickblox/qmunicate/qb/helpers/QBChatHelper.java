@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
+import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBHistoryMessage;
@@ -189,7 +190,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
         }
-        if (!chatService.isLoggedIn()) {
+        if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
             this.user = user;
@@ -298,6 +299,52 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         } catch (Exception e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
+        return new ArrayList<Integer>(roomChatManager.getRoom(roomJid).getOnlineRoomUserIds());
+    }
+
+    public void leaveRoomChat(
+            String roomJid) throws XMPPException, SmackException.NotConnectedException, QBResponseException {
+        roomChatManager.getRoom(roomJid).leave();
+
+        List<Integer> userIdsList = new ArrayList<Integer>();
+        userIdsList.add(user.getId());
+        removeUsersFromRoom(roomJid, userIdsList);
+
+        DatabaseManager.deleteDialogByRoomJid(context, roomJid);
+    }
+
+    public void addUsersToRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
+        QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
+
+        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
+        requestBuilder.push(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
+                userIdsList.toArray());
+        updateDialog(dialog.getDialogId(), dialog.getName(), requestBuilder);
+    }
+
+    public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
+        QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
+
+        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
+        requestBuilder.pullAll(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
+                userIdsList.toArray());
+        updateDialog(dialog.getDialogId(), dialog.getName(), requestBuilder);
+    }
+
+    public void updateRoomName(String roomJid, String newName) throws QBResponseException {
+        QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
+
+        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
+        updateDialog(dialog.getDialogId(), newName, requestBuilder);
+    }
+
+    private void updateDialog(String dialogId, String newName,
+            QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
+        QBDialog updatedDialog = roomChatManager.updateDialog(dialogId, newName, requestBuilder);
+        DatabaseManager.saveDialog(context, updatedDialog, updatedDialog.getRoomJid());
     }
 
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
