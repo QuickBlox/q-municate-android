@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.login;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
@@ -50,12 +52,14 @@ public class LoginActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        useDoubleBackPressed = true;
+//        useDoubleBackPressed = true;
+//        ActionBar actionBar = getActionBar();
+//        actionBar.setHomeButtonEnabled(true);
 
         emailEditText = _findViewById(R.id.email_edittext);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, true);
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
                 false);
         rememberMeCheckBox.setChecked(isRememberMe);
@@ -90,6 +94,9 @@ public class LoginActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.login_menu, menu);
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayShowHomeEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         return true;
     }
 
@@ -99,6 +106,9 @@ public class LoginActivity extends BaseActivity {
             case R.id.action_register:
                 SignUpActivity.start(LoginActivity.this);
                 finish();
+                return true;
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -202,5 +212,11 @@ public class LoginActivity extends BaseActivity {
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
             DialogUtils.show(LoginActivity.this, getString(R.string.dlg_check_email, emailText));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        LandingActivity.start(this);
+        finish();
     }
 }
