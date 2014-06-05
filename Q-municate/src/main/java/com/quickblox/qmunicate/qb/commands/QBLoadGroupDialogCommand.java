@@ -33,13 +33,13 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
 
     public static void start(Context context, String roomJid) {
         Intent intent = new Intent(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, roomJid);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
 
         QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
         GroupDialog groupDialog = new GroupDialog(dialog);

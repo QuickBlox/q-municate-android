@@ -23,8 +23,8 @@ import java.util.Comparator;
 public abstract class BaseSelectableFriendListActivity extends BaseActivity implements NewDialogCounterFriendsListener {
 
     protected DialogsSelectableFriendsAdapter friendsAdapter;
-    private ListView friendsListView;
-    private TextView countSelectedFriendsTextView;
+    protected ListView friendsListView;
+    protected TextView countSelectedFriendsTextView;
     private ActionMode actionMode;
     private boolean isNeedToCloseWithoutRedirect;
 
@@ -59,7 +59,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseActivity impl
     @Override
     public void onCounterFriendsChanged(int valueCounter) {
         if (actionMode != null) {
-            if (valueCounter == Consts.ZERO_VALUE) {
+            if (valueCounter == Consts.ZERO_INT_VALUE) {
                 isNeedToCloseWithoutRedirect = true;
                 actionMode.finish();
                 return;
@@ -72,10 +72,12 @@ public abstract class BaseSelectableFriendListActivity extends BaseActivity impl
 
     private void startAction() {
         actionMode = startActionMode(new ActionModeCallback());
-        View view = getLayoutInflater().inflate(R.layout.action_mode_new_dialog, null);
+        View view = getActionModeView();
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         actionMode.setCustomView(view);
     }
+
+    protected abstract View getActionModeView();
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {

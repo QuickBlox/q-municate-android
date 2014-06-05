@@ -312,6 +312,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         List<Integer> userIdsList = new ArrayList<Integer>();
         userIdsList.add(user.getId());
         removeUsersFromRoom(roomJid, userIdsList);
+
+        DatabaseManager.deleteDialogByRoomJid(context, roomJid);
     }
 
     public void addUsersToRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
@@ -327,7 +329,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
-        requestBuilder.pullAll(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS, userIdsList);
+        requestBuilder.pullAll(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
+                userIdsList.toArray());
         updateDialog(dialog.getDialogId(), dialog.getName(), requestBuilder);
     }
 

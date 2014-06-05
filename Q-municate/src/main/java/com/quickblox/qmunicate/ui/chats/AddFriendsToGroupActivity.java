@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
@@ -30,22 +32,29 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
         addActions();
     }
 
     @Override
     protected Cursor getFriends() {
+        dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
         return DatabaseManager.getFriendsFilteredByIds(this, getFriendIds(dialog.getOccupantList()));
     }
 
     @Override
+    protected View getActionModeView() {
+        return getLayoutInflater().inflate(R.layout.action_mode_add_friends, null);
+    }
+
+    @Override
     protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
-        QBAddFriendsToGroupCommand.start(this, dialog.getRoomJid(), getFriendIds(dialog.getOccupantList()));
+        showProgress();
+        QBAddFriendsToGroupCommand.start(this, dialog.getRoomJid(), getFriendIds(selectedFriends));
     }
 
     private void addActions() {
-        addAction(QBServiceConsts.ADD_FRIENDS_TO_GROUP_ACTION, new AddFriendsToGroupSuccessCommand());
+        addAction(QBServiceConsts.ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION, new AddFriendsToGroupSuccessCommand());
+        updateBroadcastActionList();
     }
 
     private ArrayList<Integer> getFriendIds(List<Friend> friendList) {
@@ -60,6 +69,7 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
 
         @Override
         public void execute(Bundle bundle) {
+            hideProgress();
             finish();
         }
     }

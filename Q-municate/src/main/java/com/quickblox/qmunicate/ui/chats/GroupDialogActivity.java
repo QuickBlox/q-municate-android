@@ -145,7 +145,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             groupName = dialog.getName();
         } else {
             showProgress();
-            friendList = (ArrayList<Friend>) extras.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+            friendList = (ArrayList<Friend>) getIntent().getSerializableExtra(EXTRA_FRIENDS);
             groupName = createChatName();
             QBCreateGroupDialogCommand.start(this, groupName, friendList);
         }

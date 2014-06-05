@@ -23,14 +23,14 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
 
     public static void start(Context context, String roomJid, ArrayList<Integer> friendIdsList) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_TO_GROUP_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, roomJid);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendIdsList);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
 

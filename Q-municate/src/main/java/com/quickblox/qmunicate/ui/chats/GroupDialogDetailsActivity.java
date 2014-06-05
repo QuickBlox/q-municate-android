@@ -4,13 +4,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -52,7 +50,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
 
     public static void start(Context context, String jid) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, jid);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, jid);
         context.startActivity(intent);
     }
 
@@ -60,11 +58,10 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
-        jid = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        jid = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
         groupDialog = new GroupDialog(DatabaseManager.getDialogByRoomJidId(this, jid));
 
         initUI();
-        initTextChangedListeners();
         initUIWithData();
         addActions();
     }
@@ -122,8 +119,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
     private void initTextChangedListeners() {
-        TextWatcher textWatcherListener = new TextWatcherListener();
-        groupNameEditText.addTextChangedListener(textWatcherListener);
+        groupNameEditText.addTextChangedListener(new GroupNameTextWatcherListener());
     }
 
     @Override
@@ -169,15 +165,6 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         actionMode = startActionMode(new ActionModeCallback());
     }
 
-    public void changeGroupNameOnClick(View view) {
-        initChangingEditText(groupNameEditText);
-    }
-
-    private void initChangingEditText(EditText editText) {
-        editText.setEnabled(true);
-        editText.requestFocus();
-    }
-
     private void updateCurrentUserData() {
         groupNameCurrent = groupNameEditText.getText().toString();
     }
@@ -210,7 +197,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
     private boolean isUserDataCorrect() {
-        return groupNameCurrent.length() > Consts.ZERO_VALUE;
+        return groupNameCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
@@ -218,11 +205,13 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
 
-    private class TextWatcherListener extends SimpleTextWatcher {
+    private class GroupNameTextWatcherListener extends SimpleTextWatcher {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            startAction();
+            if (!groupNameOld.equals(s.toString())) {
+                startAction();
+            }
         }
     }
 
@@ -250,6 +239,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
             groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
 
             initUIWithData();
+            initTextChangedListeners();
             initListView();
             hideProgress();
         }

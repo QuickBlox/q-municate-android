@@ -27,7 +27,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, roomJidId);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJidId);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
         context.startService(intent);
     }
@@ -35,7 +35,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
         List<QBHistoryMessage> dialogMessagesList = chatHelper.getDialogMessages(dialog, roomJidId, lastDateLoad);
         Bundle bundle = new Bundle();
