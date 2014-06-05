@@ -209,7 +209,7 @@ public class DatabaseManager {
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
-                                        String roomJidId, boolean isGroupMessage) {
+                                        String roomJidId, boolean isPrivate) {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
@@ -222,10 +222,10 @@ public class DatabaseManager {
             }
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
-                if(isGroupMessage) {
-                    message = getMessageForNotification(context, senderId);
-                } else {
+                if(isPrivate) {
                     return;
+                } else {
+                    message = getMessageForNotification(context, senderId);
                 }
             }
 

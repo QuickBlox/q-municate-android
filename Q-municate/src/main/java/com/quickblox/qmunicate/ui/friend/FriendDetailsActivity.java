@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -28,7 +27,6 @@ import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.ErrorUtils;
 
 public class FriendDetailsActivity extends BaseActivity {
 
@@ -128,9 +126,10 @@ public class FriendDetailsActivity extends BaseActivity {
             case android.R.id.home:
                 navigateToParent();
                 return true;
-//            case R.id.action_delete:
-//                showRemoveUserDialog();
-//                return true;
+            //TODO implement
+            //            case R.id.action_delete:
+            //                showRemoveUserDialog();
+            //                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -153,12 +152,8 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
-            QBUser qbUser = new QBUser(friend.getId());
-            qbUser.setFullName(friend.getFullname());
-            CallActivity.start(FriendDetailsActivity.this, qbUser, callType);
-        } else if (!friend.isOnline()) {
-            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        if (friend.getId() != App.getInstance().getUser().getId()) {
+            CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }
 

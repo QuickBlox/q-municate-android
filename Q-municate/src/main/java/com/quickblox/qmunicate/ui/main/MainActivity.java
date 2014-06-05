@@ -138,14 +138,13 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            String registrationId = gsmHelper.getRegistrationId();
-            Log.i(TAG, "registrationId=" + registrationId);
-            if (registrationId.isEmpty()) {
+            if (!gsmHelper.isDeviceRegisteredWithUser(App.getInstance().getUser())) {
                 gsmHelper.registerInBackground();
+                return;
             }
             int subscriptionId = gsmHelper.getSubscriptionId();
-            if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
-                gsmHelper.subscribeToPushNotifications(registrationId);
+            if (Consts.NOT_INITIALIZED_VALUE == subscriptionId) {
+                gsmHelper.subscribeToPushNotifications();
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");

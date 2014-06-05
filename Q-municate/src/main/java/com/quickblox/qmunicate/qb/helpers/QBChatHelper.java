@@ -43,6 +43,8 @@ import java.util.List;
 
 public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerListener {
 
+    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
+
     private static String propertyDateSent = "date_sent";
 
     private QBChatService chatService;
@@ -182,18 +184,20 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return file;
     }
 
-    public void login(QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
         }
         if (!chatService.isLoggedIn()) {
             chatService.login(user);
+            chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
             this.user = user;
         }
     }
 
-    public void logout() throws QBResponseException, SmackException.NotConnectedException {
+    public synchronized void logout() throws QBResponseException, SmackException.NotConnectedException {
+        chatService.stopAutoSendPresence();
         chatService.logout();
     }
 
@@ -202,7 +206,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     public boolean isLoggedIn() {
-        return chatService.isLoggedIn();
+        return chatService != null && chatService.isLoggedIn();
     }
 
     public List<QBDialog> getDialogs() throws QBResponseException {
@@ -238,8 +242,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String roomJidId,
-            boolean isGroupMessage) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isGroupMessage);
+            boolean isPrivate) {
+        DatabaseManager.saveChatMessages(context, dialogMessagesList, roomJidId, isPrivate);
     }
 
     public void updateStatusMessage(String messageId, boolean isRead) {
