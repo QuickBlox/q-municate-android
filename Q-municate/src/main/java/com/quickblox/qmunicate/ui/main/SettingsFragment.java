@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,11 +134,11 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void savePushNotification(boolean value) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, value);
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, !value);
     }
 
     private boolean getPushNotifications() {
-        return App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
+        return !App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_NOTIFICATIONS, false);
     }
 
     private class LogoutSuccessAction implements Command {

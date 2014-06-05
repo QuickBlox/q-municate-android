@@ -80,7 +80,7 @@
     <string name="gdd_online_participants">%1$d/%2$d online</string>
 
     // New Dialog
-    <string name="ndl_title">New Dialog</string>
+    <string name="ndl_title">New Group Chat</string>
     <string name="ndl_ac_mode_title">Create Group Dialog</string>
 
     // Preferences
@@ -149,6 +149,7 @@
     <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_leave_group">Leave Group</string>
+    <string name="dlg_offline_call"> %1$s is calling you !</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

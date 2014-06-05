@@ -16,7 +16,6 @@ import android.widget.BaseAdapter;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -29,7 +28,6 @@ import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
@@ -63,7 +61,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         roomJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
 
-        if(dialog == null) {
+        if (dialog == null) {
             dialog = getDialogByRoomJidId();
         }
 
@@ -82,8 +80,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initStartLoadDialogMessages() {
-        if (dialog != null) {
-            startLoadDialogMessages(dialog, roomJidId);
+        if (dialog != null && messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+        } else if (dialog != null && !messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
         } else {
             createTempDialog();
         }
@@ -127,7 +127,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
         dialog.setLastMessage(lastMessage);
-        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }
 
@@ -147,7 +147,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     protected BaseAdapter getMessagesAdapter() {
-        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend);
+        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
@@ -193,12 +193,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.isOnline() && friend.getId() != App.getInstance().getUser().getId()) {
-            QBUser qbUser = new QBUser(friend.getId());
-            qbUser.setFullName(friend.getFullname());
-            CallActivity.start(PrivateDialogActivity.this, qbUser, callType);
-        } else if (!friend.isOnline()) {
-            ErrorUtils.showError(this, getString(R.string.frd_offline_user));
+        if (friend.getId() != App.getInstance().getUser().getId()) {
+            CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
     }
 

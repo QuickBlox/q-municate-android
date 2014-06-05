@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -15,9 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
@@ -41,7 +42,6 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class ProfileActivity extends BaseActivity implements ReceiveFileListener, View.OnClickListener {
 
@@ -61,9 +61,10 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private String fullnameCurrent;
     private String emailCurrent;
     private String statusCurrent;
-    private String fullnameOld;
-    private String emailOld;
-    private String statusOld;
+    private static String fullnameOld;
+    private static String emailOld;
+    private static String statusOld;
+    private static boolean isCurrentMailIncorrect;
 
     private QBUser user;
     private boolean isNeedUpdateAvatar;
@@ -103,7 +104,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
 
-    private void initListeners(){
+    private void initListeners() {
         avatarTextView.setOnClickListener(this);
         changeAvatarLinearLayout.setOnClickListener(this);
         avatarImageView.setOnClickListener(this);
@@ -118,24 +119,23 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         emailEditText.setText(user.getEmail());
         String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, "");
         statusMessageEditText.setText(status);
-        updateOldUserData();
-    }
-
-
-    private void initBroadcastActionList() {
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, failAction);
-    }
-
-    private void tryLoadAvatar() {
-        try {
-            loadAvatar();
-        } catch (BaseServiceException e) {
-            ErrorUtils.showError(this, e);
+        if (!isCurrentMailIncorrect) {
+            updateOldUserData();
+        } else {
+            recoverUserData();
         }
     }
 
-    private void loadAvatar() throws BaseServiceException {
+    private void initBroadcastActionList() {
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
+    }
+
+    private void tryLoadAvatar() {
+        loadAvatar();
+    }
+
+    private void loadAvatar() {
         String url = null;
         if (getLoginType() == LoginType.FACEBOOK) {
             changeAvatarLinearLayout.setClickable(false);
@@ -160,7 +160,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.avatar_textview:
                 changeAvatarOnClick();
                 break;
@@ -179,7 +179,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             case R.id.changeStatusLinearLayout:
                 changeStatusOnClick();
                 break;
-
         }
     }
 
@@ -218,6 +217,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             } catch (FileNotFoundException e) {
                 ErrorUtils.logError(e);
             }
+            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent, Consts.AVATAR_BITMAP_SIZE,
+                    Consts.AVATAR_BITMAP_SIZE, false);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
         }
@@ -245,6 +246,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     public void changeEmailOnClick() {
+        isCurrentMailIncorrect = false;
         initChangingEditText(emailEditText);
     }
 
@@ -271,15 +273,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     private void updateUserData() {
         if (isUserDataChanged(fullnameCurrent, emailCurrent, statusCurrent)) {
-            trySaveUserData();
-        }
-    }
-
-    private void trySaveUserData() {
-        try {
             saveChanges(fullnameCurrent, emailCurrent);
-        } catch (IOException e) {
-            ErrorUtils.logError(e);
         }
     }
 
@@ -288,13 +282,12 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
                 .equals(statusOld);
     }
 
-    private void saveChanges(final String fullname, final String email) throws IOException {
+    private void saveChanges(final String fullname, final String email) {
         if (!isUserDataCorrect()) {
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
         }
         showProgress();
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, false);
         user.setFullName(fullname);
         user.setEmail(email);
 
@@ -307,7 +300,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_VALUE && emailCurrent.length() > Consts.ZERO_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE && emailCurrent
+                .length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
@@ -316,11 +310,27 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         statusOld = statusMessageEditText.getText().toString();
     }
 
+    private void recoverUserData() {
+        fullNameEditText.setText(fullnameOld);
+        emailEditText.setText(emailOld);
+        statusMessageEditText.setText(statusOld);
+    }
+
     private class TextWatcherListener extends SimpleTextWatcher {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             startAction();
+        }
+    }
+
+    public class UpdateUserFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            emailEditText.setTextColor(Color.RED);
+            isCurrentMailIncorrect = true;
+            hideProgress();
         }
     }
 

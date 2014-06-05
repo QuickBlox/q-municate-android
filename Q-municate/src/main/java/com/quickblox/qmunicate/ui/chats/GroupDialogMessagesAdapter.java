@@ -10,19 +10,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor) {
+    private QBDialog dialog;
+
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog) {
         super(context, cursor, true);
+        this.dialog = dialog;
     }
 
     @Override
@@ -50,7 +56,7 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        String avatarUrl;
+        String avatarUrl = null;
         String senderName;
 
         String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
@@ -65,8 +71,12 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
-            senderName = senderFriend.getFullname();
-            avatarUrl = getAvatarUrlForFriend(senderFriend);
+            if(senderFriend != null) {
+                senderName = senderFriend.getFullname();
+                avatarUrl = getAvatarUrlForFriend(senderFriend);
+            } else{
+                senderName = senderId + Consts.EMPTY_STRING;
+            }
         }
         viewHolder.nameTextView.setText(senderName);
 
@@ -80,6 +90,12 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
             viewHolder.messageTextView.setText(body);
         }
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
+
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        if(dialog != null && !isRead) {
+            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+            QBUpdateStatusMessageCommand.start(context, messageId, true);
+        }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }

@@ -27,7 +27,7 @@ public class ChatUtils {
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = App.getInstance().getUser();
-        int resultId = Consts.ZERO_VALUE;
+        int resultId = Consts.ZERO_INT_VALUE;
         for (Integer id : occupantsIdsList) {
             if (!id.equals(user.getId())) {
                 resultId = id;
@@ -43,7 +43,7 @@ public class ChatUtils {
         return Consts.EMPTY_STRING;
     }
 
-    public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage) {
+    public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
         String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -56,7 +56,8 @@ public class ChatUtils {
         dialog.setName(dialogName);
         dialog.setType(parseByCode(Integer.parseInt(dialogTypeCode)));
         dialog.setLastMessage(lastMessage);
-        dialog.setUnreadMessageCount(Consts.ZERO_VALUE);
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }
 

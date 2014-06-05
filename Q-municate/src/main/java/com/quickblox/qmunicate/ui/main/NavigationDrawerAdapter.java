@@ -48,7 +48,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
 
     @Override
     public void onUpdateCountUnreadDialogs(int count) {
-        if (count > Consts.ZERO_VALUE) {
+        if (count > Consts.ZERO_INT_VALUE) {
             counterUnreadChatsDialogs.setVisibility(View.VISIBLE);
             counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
         } else {

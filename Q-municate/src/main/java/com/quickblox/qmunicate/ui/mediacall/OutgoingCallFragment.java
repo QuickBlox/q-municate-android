@@ -26,11 +26,14 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
+import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.Utils;
 
 import org.webrtc.SessionDescription;
 
@@ -41,8 +44,8 @@ import java.util.TimerTask;
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();
-    protected QBVideoChat qbVideoChat;
-    protected QBUser opponent;
+    protected QBVideoChat videoChat;
+    protected Friend opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescription remoteSessionDescription;
     private boolean bounded;
@@ -72,12 +75,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     protected abstract int getContentView();
 
-    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, QBUser user,
+    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, Friend friend,
             Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
             QBSignalingChannel.PLATFORM platform,
             QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
-        args.putSerializable(Consts.USER, user);
+        args.putSerializable(Consts.EXTRA_FRIEND, friend);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
         args.putSerializable(WebRTC.ORIENTATION_EXTENSION, deviceOrientation);
@@ -118,8 +121,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onPause() {
         super.onPause();
-        if (qbVideoChat != null) {
-            qbVideoChat.onActivityPause();
+        if (videoChat != null) {
+            videoChat.onActivityPause();
         }
     }
 
@@ -136,8 +139,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void reInitChatIfExist(View rootView) {
         VideoStreamsView videoView = (VideoStreamsView) rootView.findViewById(R.id.ownVideoScreenImageView);
-        if (qbVideoChat != null && videoView != null) {
-            qbVideoChat.setVideoView(videoView);
+        if (videoChat != null && videoView != null) {
+            videoChat.setVideoView(videoView);
         }
     }
 
@@ -152,7 +155,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
-        opponent = (QBUser) getArguments().getSerializable(Consts.USER);
+        opponent = (Friend) getArguments().getSerializable(Consts.EXTRA_FRIEND);
         call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
                 WebRTC.PLATFORM_EXTENSION);
@@ -179,31 +182,32 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onResume() {
         super.onResume();
-        if (qbVideoChat != null) {
-            qbVideoChat.onActivityResume();
+        if (videoChat != null) {
+            videoChat.onActivityResume();
         }
     }
 
     public void initChat(QBSignalingChannel signalingChannel) {
-        if (qbVideoChat != null) {
+        if (videoChat != null) {
             return;
         }
         VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
-        qbVideoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
-        qbVideoChat.setMediaCaptureCallback(new MediaCapturerHandler());
+        videoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
+        videoChat.setMediaCaptureCallback(new MediaCapturerHandler());
         signalingMessageHandler = new VideoChatMessageHandler();
         signalingChannel.addSignalingListener(signalingMessageHandler);
         if (remoteSessionDescription != null) {
-            qbVideoChat.setRemoteSessionDescription(remoteSessionDescription);
+            videoChat.setRemoteSessionDescription(remoteSessionDescription);
         }
         if (Consts.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
             startCall();
         } else {
-            CallConfig callConfig = new CallConfig(opponent, sessionId, deviceOrientation);
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            CallConfig callConfig = new CallConfig(userOpponent, sessionId, deviceOrientation);
             callConfig.setCallStreamType(call_type);
             callConfig.setSessionDescription(remoteSessionDescription);
             callConfig.setDevicePlatform(remotePlatform);
-            qbVideoChat.accept(callConfig);
+            videoChat.accept(callConfig);
             onConnectionEstablished();
         }
     }
@@ -230,15 +234,19 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void muteMicrophone() {
-        if (qbVideoChat != null) {
-            qbVideoChat.muteMicrophone(!qbVideoChat.isMicrophoneMute());
+        if (videoChat != null) {
+            videoChat.muteMicrophone(!videoChat.isMicrophoneMute());
         }
     }
 
     private void startCall() {
         QBUser sender = App.getInstance().getUser();
         if (sender != null) {
-            qbVideoChat.call(opponent, sender, call_type);
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            if (!opponent.isOnline()) {
+                QBSendPushCommand.start(getActivity(), Consts.DEFAULT_CALL_MESSAGE, opponent.getId());
+            }
+            videoChat.call(userOpponent, sender, call_type);
             callTimer = new Timer();
             callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
         }
@@ -266,11 +274,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void stopCall(boolean sendStop, STOP_TYPE stopType) {
         cancelCallTimer();
-        if (qbVideoChat != null) {
+        if (videoChat != null) {
             if (sendStop) {
-                qbVideoChat.stopCall();
+                videoChat.stopCall();
             } else {
-                qbVideoChat.disposeConnection();
+                videoChat.disposeConnection();
             }
         }
         if (signalingChannel != null) {
@@ -366,8 +374,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                     public void run() {
                         ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
                         switch (state) {
-                            case CALL:
-                            case ACCEPT: {
+                            case SEND_CALL:
+                            case SEND_ACCEPT: {
                                 stopCall(true, STOP_TYPE.CLOSED);
                                 break;
                             }
@@ -400,7 +408,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
         @Override
         public void run() {
-            stopCall(true, STOP_TYPE.CLOSED);
+            if (isExistActivity()) {
+                getBaseActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        stopCall(true, STOP_TYPE.CLOSED);
+                    }
+                });
+            }
         }
     }
 }

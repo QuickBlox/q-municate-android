@@ -16,9 +16,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.TipsManager;
@@ -45,29 +43,10 @@ public class DialogsFragment extends BaseFragment {
         initUI(view);
         initListeners();
         initChatsDialogs();
-        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_chats_list));
+
+        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
+
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        addActions();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.dialogs_list_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                NewDialogActivity.start(baseActivity);
-                break;
-        }
-        return true;
     }
 
     private void initUI(View view) {
@@ -91,6 +70,11 @@ public class DialogsFragment extends BaseFragment {
         });
     }
 
+    private void initChatsDialogs() {
+        dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
+        dialogsListView.setAdapter(dialogsAdapter);
+    }
+
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
         Friend occupant = dialogsAdapter.getOccupantById(occupantId);
@@ -105,29 +89,22 @@ public class DialogsFragment extends BaseFragment {
         GroupDialogActivity.start(baseActivity, dialog.getRoomJid());
     }
 
-    private void addActions() {
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
-                new LoadChatsDialogsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        baseActivity.updateBroadcastActionList();
-    }
-
-    private void initChatsDialogs() {
-        dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
-        dialogsListView.setAdapter(dialogsAdapter);
-    }
-
     private Cursor getAllChats() {
         return DatabaseManager.getAllDialogs(baseActivity);
     }
 
-    private class LoadChatsDialogsSuccessAction implements Command {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.dialogs_list_menu, menu);
+    }
 
-        @Override
-        public void execute(Bundle bundle) {
-            // TODO SF now not used
-            // List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            // initChatsDialogs();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                NewDialogActivity.start(baseActivity);
+                break;
         }
+        return true;
     }
 }
