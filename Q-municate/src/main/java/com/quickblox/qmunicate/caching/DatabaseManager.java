@@ -296,6 +296,9 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
         }
+        values.put(DialogTable.Cols.NAME, dialog.getName());
+        values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
+                dialog.getOccupants()));
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
@@ -310,8 +313,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
-        String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupants());
-        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);
+        String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().name());
         return values;
@@ -324,18 +326,5 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
         resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-    }
-
-    public static QBDialog getDialogByJid(Context context, String jid) {
-        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + jid + "'", null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            QBDialog dialog = getDialogFromCursor(cursor);
-            //GroupDialog dialog = getGroupDialogFromCursor(context, cursor);
-            cursor.close();
-            return dialog;
-        } else {
-            return null;
-        }
     }
 }

@@ -4,37 +4,51 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextWatcher;
+import android.view.ActionMode;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupDialog;
 import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadGroupDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
+import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.io.IOException;
 
 public class GroupDialogDetailsActivity extends BaseActivity {
 
-    private TextView nameTextView;
+    private EditText groupNameEditText;
     private TextView participantsTextView;
     private ListView friendsListView;
     private TextView onlineParticipantsTextView;
 
-    private String jid;
-    private GroupDialog dialog;
+    private String groupNameCurrent;
+    private String groupNameOld;
 
-    private GroupDialogOccupantsAdapter friendsAdapter;
+    private String jid;
+    private GroupDialog groupDialog;
+
+    private Object actionMode;
+    private boolean closeActionMode;
 
     public static void start(Context context, String jid) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -47,9 +61,10 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
         jid = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_ROOM_JID_ID);
-        dialog = new GroupDialog(DatabaseManager.getDialogByRoomJidId(this, jid));
+        groupDialog = new GroupDialog(DatabaseManager.getDialogByRoomJidId(this, jid));
 
         initUI();
+        initTextChangedListeners();
         initUIWithData();
         addActions();
     }
@@ -62,37 +77,66 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
     private void initUI() {
-        nameTextView = _findViewById(R.id.name_textview);
+        groupNameEditText = _findViewById(R.id.name_textview);
         participantsTextView = _findViewById(R.id.participants_textview);
         friendsListView = _findViewById(R.id.chat_friends_listview);
         onlineParticipantsTextView = _findViewById(R.id.online_participants_textview);
     }
 
     private void initUIWithData() {
-        nameTextView.setText(dialog.getName());
-        participantsTextView.setText(getString(R.string.gdd_participants, dialog.getOccupantsCount()));
+        groupNameEditText.setText(groupDialog.getName());
+        participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
         onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
-                dialog.getOnlineOccupantsCount(), dialog.getOccupantsCount()));
+                groupDialog.getOnlineOccupantsCount(), groupDialog.getOccupantsCount()));
+        updateOldUserData();
     }
 
     private void initListView() {
-        friendsAdapter = getFriendsAdapter();
-        friendsListView.setAdapter(friendsAdapter);
+        friendsListView.setAdapter(getFriendsAdapter());
     }
 
     private void addActions() {
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION, new LoadGroupDialogSuccessAction());
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
+        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION, new UpdateGroupNameSuccessAction());
+        addAction(QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
-    private void updateFriendListAdapter() {
-        Collections.sort(dialog.getOccupantList(), new SimpleComparator());
-        friendsAdapter.notifyDataSetChanged();
+    protected GroupDialogOccupantsAdapter getFriendsAdapter() {
+        return new GroupDialogOccupantsAdapter(this, groupDialog.getOccupantList());
     }
 
-    protected GroupDialogOccupantsAdapter getFriendsAdapter() {
-        return new GroupDialogOccupantsAdapter(this, dialog.getOccupantList());
+    private void leaveGroup() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showProgress();
+                QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, jid);
+            }
+        });
+        dialog.show(getFragmentManager(), null);
+    }
+
+    private void initTextChangedListeners() {
+        TextWatcher textWatcherListener = new TextWatcherListener();
+        groupNameEditText.addTextChangedListener(textWatcherListener);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            groupNameEditText.setText(groupDialog.getName());
+            closeActionMode = true;
+            ((ActionMode) actionMode).finish();
+            return true;
+        } else {
+            closeActionMode = false;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
@@ -109,7 +153,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
                 navigateToParent();
                 return true;
             case R.id.action_add:
-                AddFriendsToGroupActivity.start(this, dialog);
+                AddFriendsToGroupActivity.start(this, groupDialog);
                 return true;
             case R.id.action_leave:
                 leaveGroup();
@@ -118,22 +162,84 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void leaveGroup() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                showProgress();
-                QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, jid);
-            }
-        });
-        dialog.show(getFragmentManager(), null);
+    private void startAction() {
+        if (actionMode != null) {
+            return;
+        }
+        actionMode = startActionMode(new ActionModeCallback());
     }
 
-    private class SimpleComparator implements Comparator<Friend> {
+    public void changeGroupNameOnClick(View view) {
+        initChangingEditText(groupNameEditText);
+    }
 
-        public int compare(Friend friend1, Friend friend2) {
-            return (friend1.getEmail()).compareTo(friend2.getEmail());
+    private void initChangingEditText(EditText editText) {
+        editText.setEnabled(true);
+        editText.requestFocus();
+    }
+
+    private void updateCurrentUserData() {
+        groupNameCurrent = groupNameEditText.getText().toString();
+    }
+
+    private void updateUserData() {
+        if (isGroupDataChanged(groupNameCurrent)) {
+            trySaveUserData();
+        }
+    }
+
+    private void trySaveUserData() {
+        try {
+            saveChanges(groupNameCurrent);
+        } catch (IOException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    private boolean isGroupDataChanged(String groupName) {
+        return !groupName.equals(groupNameOld);
+    }
+
+    private void saveChanges(final String groupNameCurrent) throws IOException {
+        if (!isUserDataCorrect()) {
+            DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
+            return;
+        }
+        showProgress();
+        QBUpdateGroupNameCommand.start(this, groupDialog.getRoomJid(), groupNameCurrent);
+    }
+
+    private boolean isUserDataCorrect() {
+        return groupNameCurrent.length() > Consts.ZERO_VALUE;
+    }
+
+    private void updateOldUserData() {
+        groupNameOld = groupNameEditText.getText().toString();
+    }
+
+
+    private class TextWatcherListener extends SimpleTextWatcher {
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            startAction();
+        }
+    }
+
+    private class ActionModeCallback extends SimpleActionModeCallback {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            if (!closeActionMode) {
+                updateCurrentUserData();
+                updateUserData();
+            }
+            actionMode = null;
         }
     }
 
@@ -141,7 +247,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            dialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
+            groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
 
             initUIWithData();
             initListView();
@@ -154,7 +260,17 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            // TODO navigate to chat list
+            MainActivity.start(GroupDialogDetailsActivity.this);
+            finish();
+        }
+    }
+
+    private class UpdateGroupNameSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            updateOldUserData();
+            hideProgress();
         }
     }
 }

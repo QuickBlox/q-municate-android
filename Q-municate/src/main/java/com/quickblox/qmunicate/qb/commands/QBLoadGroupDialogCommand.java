@@ -41,7 +41,7 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_ID);
 
-        QBDialog dialog = DatabaseManager.getDialogByJid(context, roomJid);
+        QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
         GroupDialog groupDialog = new GroupDialog(dialog);
 
         List<Integer> participantIds = dialog.getOccupants();

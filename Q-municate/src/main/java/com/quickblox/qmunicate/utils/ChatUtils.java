@@ -79,8 +79,7 @@ public class ChatUtils {
     public static QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getDialogId());
         String roomJid = dialog.getRoomJid();
-        String occupantsIds = getOccupantsIdsStringFromArray(getOccupantsIdsArrayFromList(
-                dialog.getOccupants()));
+        String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
@@ -93,8 +92,8 @@ public class ChatUtils {
         return message;
     }
 
-    public static String getOccupantsIdsStringFromArray(String[] occupantsArray) {
-        return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantsArray);
+    public static String getOccupantsIdsStringFromList(List<Integer> occupantIdsList) {
+        return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantIdsList);
     }
 
     public static boolean isNotificationMessage(QBChatMessage chatMessage) {
