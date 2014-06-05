@@ -56,9 +56,8 @@ public class LoginActivity extends BaseActivity {
         emailEditText = _findViewById(R.id.email_edittext);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, true);
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
-                false);
+                true);
         rememberMeCheckBox.setChecked(isRememberMe);
 
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
