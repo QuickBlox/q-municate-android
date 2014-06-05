@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -105,9 +106,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             } catch (FileNotFoundException e) {
                 ErrorUtils.showError(this, e);
             }
-            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent, Consts.AVATAR_BITMAP_SIZE,
-                    Consts.AVATAR_BITMAP_SIZE, false);
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

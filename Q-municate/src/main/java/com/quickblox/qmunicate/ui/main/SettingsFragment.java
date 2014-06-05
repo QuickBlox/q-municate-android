@@ -64,7 +64,7 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
+//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
 
         return rootView;
     }

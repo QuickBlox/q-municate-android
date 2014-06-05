@@ -130,8 +130,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
         initFriendsList();
-        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
-                new FriendsListTipButtonClicker(this));
+//        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
+//                new FriendsListTipButtonClicker(this));
         return rootView;
     }
 
