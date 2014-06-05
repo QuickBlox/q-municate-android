@@ -186,7 +186,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
     private boolean isUserDataCorrect() {
-        return TextUtils.isEmpty(groupNameCurrent);
+        return !TextUtils.isEmpty(groupNameCurrent);
     }
 
     private void updateOldUserData() {
