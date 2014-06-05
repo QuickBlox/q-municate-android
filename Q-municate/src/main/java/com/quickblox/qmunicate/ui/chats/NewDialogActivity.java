@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.ui.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
@@ -24,8 +23,8 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected View getActionModeView() {
-        return getLayoutInflater().inflate(R.layout.action_mode_new_dialog, null);
+    protected int getActionModeLayoutId() {
+        return R.layout.action_mode_new_dialog;
     }
 
     @Override

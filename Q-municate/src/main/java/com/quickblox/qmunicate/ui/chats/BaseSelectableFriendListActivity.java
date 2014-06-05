@@ -72,12 +72,12 @@ public abstract class BaseSelectableFriendListActivity extends BaseActivity impl
 
     private void startAction() {
         actionMode = startActionMode(new ActionModeCallback());
-        View view = getActionModeView();
+        View view = getLayoutInflater().inflate(getActionModeLayoutId(), null);
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         actionMode.setCustomView(view);
     }
 
-    protected abstract View getActionModeView();
+    protected abstract int getActionModeLayoutId();
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {

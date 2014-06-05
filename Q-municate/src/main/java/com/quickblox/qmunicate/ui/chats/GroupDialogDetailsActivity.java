@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -26,11 +27,7 @@ import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
-import com.quickblox.qmunicate.utils.ErrorUtils;
-
-import java.io.IOException;
 
 public class GroupDialogDetailsActivity extends BaseActivity {
 
@@ -171,15 +168,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
 
     private void updateUserData() {
         if (isGroupDataChanged(groupNameCurrent)) {
-            trySaveUserData();
-        }
-    }
-
-    private void trySaveUserData() {
-        try {
             saveChanges(groupNameCurrent);
-        } catch (IOException e) {
-            ErrorUtils.logError(e);
         }
     }
 
@@ -187,7 +176,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         return !groupName.equals(groupNameOld);
     }
 
-    private void saveChanges(final String groupNameCurrent) throws IOException {
+    private void saveChanges(final String groupNameCurrent) {
         if (!isUserDataCorrect()) {
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
@@ -197,7 +186,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
     }
 
     private boolean isUserDataCorrect() {
-        return groupNameCurrent.length() > Consts.ZERO_INT_VALUE;
+        return TextUtils.isEmpty(groupNameCurrent);
     }
 
     private void updateOldUserData() {

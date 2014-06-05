@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
@@ -42,8 +41,8 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     }
 
     @Override
-    protected View getActionModeView() {
-        return getLayoutInflater().inflate(R.layout.action_mode_add_friends, null);
+    protected int getActionModeLayoutId() {
+        return R.layout.action_mode_add_friends;
     }
 
     @Override
