@@ -142,6 +142,7 @@ public class DatabaseManager {
         int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES));
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE));
+        Integer lastMessageUserId = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE_USER_ID));
         long dateSent = cursor.getLong(cursor.getColumnIndex(
                 DialogTable.Cols.LAST_DATE_SENT));
         String type = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.TYPE));
@@ -152,6 +153,7 @@ public class DatabaseManager {
         dialog.setOccupantsIds(occupantsIdsList);
         dialog.setUnreadMessageCount(countUnreadMessages);
         dialog.setLastMessage(lastMessage);
+        dialog.setLastMessageUserId(lastMessageUserId);
         dialog.setLastMessageDateSent(dateSent);
         dialog.setType(QBDialogType.valueOf(type));
 
@@ -286,6 +288,9 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
+        if (dialog.getLastMessageUserId() != null) {
+            values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
+        }
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;
@@ -298,6 +303,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
+        values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String[] occupantsIdsArray = ChatUtils.getOccupantsIdsArrayFromList(dialog.getOccupants());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromArray(occupantsIdsArray);

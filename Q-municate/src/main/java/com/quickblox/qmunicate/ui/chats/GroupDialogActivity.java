@@ -80,8 +80,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -103,8 +101,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         removeAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -64,7 +65,11 @@ public class DialogsAdapter extends BaseCursorAdapter {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
+        if (dialog.getLastMessage() == null && dialog.getLastMessageUserId() != Consts.ZERO_INT_VALUE) {
+            viewHolder.lastMessageTextView.setText(resources.getString(R.string.dlg_attached_last_message));
+        } else {
+            viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
+        }
     }
 
     public Friend getOccupantById(int occupantId) {

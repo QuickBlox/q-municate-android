@@ -80,6 +80,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onPause() {
         super.onPause();
         onUpdateChatDialog();
+        hideSmileLayoit();
     }
 
     public void initSmileWidgets() {
@@ -98,16 +99,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void showLastListItem() {
         if (isSmilesLayoutShowing()) {
-            hideView(smilesLayout);
-            chatEditText.switchSmileIcon();
+            hideSmileLayoit();
         }
+    }
+
+    private void hideSmileLayoit() {
+        hideView(smilesLayout);
+        chatEditText.switchSmileIcon();
     }
 
     protected void addActions() {
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -183,7 +186,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         registerReceiver(smileSelectedBroadcastReceiver, filter);
     }
 
-    private boolean isSmilesLayoutShowing() {
+    protected boolean isSmilesLayoutShowing() {
         return smilesLayout.getHeight() != Consts.ZERO_INT_VALUE;
     }
 
@@ -204,13 +207,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             onFileLoaded(file);
             hideProgress();
-        }
-    }
-
-    public class LoadDialogMessagesSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
         }
     }
 

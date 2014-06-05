@@ -79,7 +79,7 @@
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
-    <string name="ndl_ac_mode_title">Create Group Dialog</string>
+    <string name="ndl_ac_mode_title">Create Group Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -144,6 +144,8 @@
     <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_offline_call"> %1$s is calling you !</string>
+    <string name="dlg_attached_last_message">Attachment</string>
+    <string name="dlg_no_message_yet">No message yet</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
