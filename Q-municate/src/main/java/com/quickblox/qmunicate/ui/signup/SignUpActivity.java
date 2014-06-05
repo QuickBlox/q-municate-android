@@ -14,17 +14,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -33,6 +36,7 @@ import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class SignUpActivity extends BaseActivity implements ReceiveFileListener {
@@ -69,6 +73,8 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
         addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
         addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UserUpdateSuccessAction());
+        updateBroadcastActionList();
     }
 
     @Override
@@ -100,7 +106,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             } catch (FileNotFoundException e) {
                 ErrorUtils.showError(this, e);
             }
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -144,16 +150,26 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
     }
 
-    private class SignUpSuccessAction implements Command {
+    private class UserUpdateSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
-            DatabaseManager.clearAllCache(SignUpActivity.this);
             MainActivity.start(SignUpActivity.this);
             finish();
+        }
+    }
+
+    private class SignUpSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            File image = (File) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
+            DatabaseManager.clearAllCache(SignUpActivity.this);
+            QBUpdateUserCommand.start(SignUpActivity.this, user, image, null);
         }
     }
 }

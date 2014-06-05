@@ -64,7 +64,7 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
+//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
 
         return rootView;
     }
@@ -85,6 +85,7 @@ public class SettingsFragment extends BaseFragment {
         baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
     }
 
     private void initListeners() {
