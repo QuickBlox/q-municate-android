@@ -52,9 +52,6 @@ public class LoginActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-//        useDoubleBackPressed = true;
-//        ActionBar actionBar = getActionBar();
-//        actionBar.setHomeButtonEnabled(true);
 
         emailEditText = _findViewById(R.id.email_edittext);
         passwordEditText = _findViewById(R.id.password_edittext);
