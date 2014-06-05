@@ -78,6 +78,10 @@ public abstract class BaseActivity extends Activity {
         broadcastCommandMap.put(action, command);
     }
 
+    public boolean hasAction(String action){
+        return broadcastCommandMap.containsKey(action);
+    }
+
     public void removeAction(String action) {
         broadcastCommandMap.remove(action);
     }

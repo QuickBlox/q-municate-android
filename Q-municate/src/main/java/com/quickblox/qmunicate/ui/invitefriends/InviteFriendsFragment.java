@@ -84,7 +84,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         initHeaderUI(header);
 
         initListeners();
-        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_invite_friends));
+//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_invite_friends));
 
 
 

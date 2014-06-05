@@ -44,7 +44,7 @@ public class DialogsFragment extends BaseFragment {
         initListeners();
         initChatsDialogs();
 
-        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
+//        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
 
         return view;
     }
