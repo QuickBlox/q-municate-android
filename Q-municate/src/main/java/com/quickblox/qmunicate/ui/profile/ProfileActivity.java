@@ -271,6 +271,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void updateUserData() {
         if (isUserDataChanged(fullnameCurrent, emailCurrent, statusCurrent)) {
             saveChanges(fullnameCurrent, emailCurrent);
+        } else {
+            emailEditText.setTextColor(Color.BLACK);
         }
     }
 
@@ -355,6 +357,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().setUser(user);
             updateOldUserData();
+            emailEditText.setTextColor(Color.BLACK);
             hideProgress();
         }
     }
