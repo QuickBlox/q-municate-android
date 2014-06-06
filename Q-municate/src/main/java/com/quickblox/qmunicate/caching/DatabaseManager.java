@@ -4,7 +4,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
@@ -276,7 +278,7 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
-        context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
+        Uri uri = context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
         updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
                 dialogMessageCache.getTime());
     }

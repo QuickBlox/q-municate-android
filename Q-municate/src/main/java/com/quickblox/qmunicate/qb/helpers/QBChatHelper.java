@@ -368,11 +368,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
-            } else {
-                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
-                        chatMessage.getBody(), attachUrl, time, false));
-                notifyMessageReceived(chatMessage, friend);
             }
+            saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+                    chatMessage.getBody(), attachUrl, time, false));
+            notifyMessageReceived(chatMessage, friend);
         }
     }
 
@@ -382,8 +381,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = getAttachUrlIfExists(chatMessage);
+            String roomJid = roomChat.getJid();
             long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
-            saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(),
+            saveMessageToCache(new DialogMessageCache(roomJid, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
             if (!chatMessage.getSenderId().equals(user.getId())) {
                 // TODO IS handle logic when friend is not in the friend list

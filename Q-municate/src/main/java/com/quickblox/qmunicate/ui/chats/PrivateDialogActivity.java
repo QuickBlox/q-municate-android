@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -127,7 +126,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initListView() {
-        messagesAdapter = getMessagesAdapter();
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog, this);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -139,10 +138,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initChat() {
         QBCreatePrivateChatCommand.start(this, opponentFriend);
-    }
-
-    protected BaseCursorAdapter getMessagesAdapter() {
-        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog, this);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {

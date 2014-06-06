@@ -69,7 +69,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(layoutResID);
 
         imageHelper = new ImageHelper(this);
-        messagesAdapter = getMessagesAdapter();
+
         initUI();
         initListeners();
         initSmileWidgets();
@@ -97,8 +97,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     public void attachButtonOnClick(View view) {
         imageHelper.getImage();
     }
-
-    protected abstract BaseCursorAdapter getMessagesAdapter();
 
     @Override
     public void showLastListItem() {

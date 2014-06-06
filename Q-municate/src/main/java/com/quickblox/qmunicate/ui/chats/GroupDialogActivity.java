@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -68,8 +67,16 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         if (getIntent().hasExtra(EXTRA_ROOM_JID)) {
             roomJid = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
+        if (roomJid != null) {
+            dialog = DatabaseManager.getDialogByRoomJidId(this, roomJid);
+            groupName = dialog.getName();
+        }
 
         initListView();
+        initChat();
+        initActionBar();
+        initStartLoadDialogMessages();
+
         registerForContextMenu(messagesListView);
     }
 
@@ -132,10 +139,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initChat() {
-        if (roomJid != null) {
-            dialog = DatabaseManager.getDialogByRoomJidId(this, roomJid);
-            groupName = dialog.getName();
-        } else {
+        if (roomJid == null) {
             showProgress();
             friendList = (ArrayList<Friend>) getIntent().getSerializableExtra(EXTRA_FRIENDS);
             groupName = createChatName();
@@ -144,7 +148,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initListView() {
-        messagesAdapter = getMessagesAdapter();
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog, this);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -161,10 +165,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return userFullname + "," + friendsFullnames;
     }
 
-    protected BaseCursorAdapter getMessagesAdapter() {
-        return new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog, this);
-    }
-
     private Cursor getAllDialogMessagesByRoomJidId() {
         return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJid);
     }
@@ -176,7 +176,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
-
     }
 
     public void sendMessageOnClick(View view) {
@@ -215,10 +214,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        initChat();
-        initStartLoadDialogMessages();
+        scrollListView();
         addActions();
-        initActionBar();
     }
 
     private void initStartLoadDialogMessages() {
