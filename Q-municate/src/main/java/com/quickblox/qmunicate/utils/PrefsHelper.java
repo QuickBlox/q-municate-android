@@ -54,7 +54,7 @@ public class PrefsHelper {
             editor.putLong(key, (Long) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
-        } else {
+        } else if (value != null){
             throw new RuntimeException("Attempting to save non-primitive preference");
         }
 
