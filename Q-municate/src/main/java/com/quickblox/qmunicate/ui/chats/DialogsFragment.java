@@ -44,7 +44,7 @@ public class DialogsFragment extends BaseFragment {
         initListeners();
         initChatsDialogs();
 
-        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
+//        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
 
         return view;
     }
@@ -86,7 +86,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+        GroupDialogActivity.start(baseActivity, dialog.getRoomJid());
     }
 
     private Cursor getAllChats() {

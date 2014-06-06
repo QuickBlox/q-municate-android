@@ -23,14 +23,14 @@ public class QBUpdateDialogCommand extends ServiceCommand {
     public static void start(Context context, QBDialog dialog, String roomJidId) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_ID, roomJidId);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJidId);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID_ID);
+        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         chatHelper.updateDialog(dialog, roomJidId);
         return null;

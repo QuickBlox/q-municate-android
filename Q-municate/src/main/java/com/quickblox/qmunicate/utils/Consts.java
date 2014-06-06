@@ -15,9 +15,6 @@ public class Consts {
     public static final String QB_DOMAIN = "api.stage.quickblox.com";
 
     // Friend list consts
-    public static final int FL_START_LOAD_DELAY = 0;
-    public static final int FL_UPDATE_DATA_PERIOD = 30000;
-    public static final int FL_ONLINE_STATUS_TIMEOUT = 15;
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 100;
 
@@ -60,7 +57,6 @@ public class Consts {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String ACCEPTED_CALL = "accepted_call";
     public static final int NOT_INITIALIZED_VALUE = -1;
-    public static final int AVATAR_BITMAP_SIZE = 70;
     public static final int SECOND = 1000;
     public static final String DEFAULT_WEB_ROOM = "test";
     public static final String DEFAULT_CALL_MESSAGE = "";

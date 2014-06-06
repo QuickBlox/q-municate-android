@@ -130,8 +130,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         initUI(rootView, layoutInflater);
         initGlobalSearchButton(layoutInflater);
         initFriendsList();
-        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
-                new FriendsListTipButtonClicker(this));
+//        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
+//                new FriendsListTipButtonClicker(this));
         return rootView;
     }
 
@@ -245,7 +245,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
-        if(selectedItem.getCount() != Consts.ZERO_INT_VALUE){
+        if(selectedItem.getCount() != Consts.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()){
             FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
         }
     }

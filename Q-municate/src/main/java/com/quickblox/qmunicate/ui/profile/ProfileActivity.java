@@ -20,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -217,9 +216,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             } catch (FileNotFoundException e) {
                 ErrorUtils.logError(e);
             }
-            avatarBitmapCurrent = Bitmap.createScaledBitmap(avatarBitmapCurrent, Consts.AVATAR_BITMAP_SIZE,
-                    Consts.AVATAR_BITMAP_SIZE, false);
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
             startAction();
         }
         super.onActivityResult(requestCode, resultCode, data);

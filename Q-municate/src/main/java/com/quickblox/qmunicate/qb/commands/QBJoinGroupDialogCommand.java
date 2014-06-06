@@ -12,11 +12,11 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBJoinGroupChatCommand extends ServiceCommand {
+public class QBJoinGroupDialogCommand extends ServiceCommand {
 
     private QBChatHelper chatHelper;
 
-    public QBJoinGroupChatCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBJoinGroupDialogCommand(Context context, QBChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;

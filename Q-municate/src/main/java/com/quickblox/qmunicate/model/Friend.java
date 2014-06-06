@@ -1,12 +1,9 @@
 package com.quickblox.qmunicate.model;
 
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.OnlineStatusHelper;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Friend implements Serializable {
 
@@ -22,15 +19,6 @@ public class Friend implements Serializable {
 
     private boolean selected;
 
-    public Friend(QBUser user) {
-        this.id = user.getId();
-        this.fullname = user.getFullName();
-        this.email = user.getEmail();
-        this.phone = user.getPhone();
-        this.fileId = user.getFileId();
-        this.avatarUrl = user.getWebsite();
-    }
-
     public Friend() {
     }
 
@@ -43,14 +31,6 @@ public class Friend implements Serializable {
         this.fileId = fileId;
         this.avatarUrl = avatarUrl;
         this.type = type;
-    }
-
-    public static List<Friend> createFriendList(List<QBUser> userList) {
-        List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : userList) {
-            friends.add(new Friend(user));
-        }
-        return friends;
     }
 
     @Override
