@@ -2,7 +2,6 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -50,7 +49,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
             viewHolder.userCountTextView.setVisibility(View.GONE);
-            viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_user);
+            displayAvatarImage(getAvatarUrlForFriend(occupant), viewHolder.avatarImageView);
         } else {
             viewHolder.nameTextView.setText(dialog.getName());
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);

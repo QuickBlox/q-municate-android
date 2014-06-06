@@ -15,6 +15,6 @@ public class DateUtils {
     }
 
     public static long getCurrentTime() {
-        return Calendar.getInstance().getTimeInMillis() / MILLIS_VALUE;
+        return System.currentTimeMillis() * MILLIS_VALUE;
     }
 }

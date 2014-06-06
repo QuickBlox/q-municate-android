@@ -23,6 +23,7 @@ import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
@@ -38,7 +39,7 @@ import com.quickblox.qmunicate.utils.SizeUtility;
 import java.io.File;
 import java.nio.charset.Charset;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener {
 
     protected static final float SMILES_SIZE_IN_DIPS = 220;
 
@@ -55,6 +56,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected SmileSelectedBroadcastReceiver smileSelectedBroadcastReceiver;
     protected int layoutResID;
     protected ImageHelper imageHelper;
+    protected BaseCursorAdapter messagesAdapter;
 
     public BaseDialogActivity(int layoutResID) {
         this.layoutResID = layoutResID;
@@ -67,7 +69,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(layoutResID);
 
         imageHelper = new ImageHelper(this);
-
+        messagesAdapter = getMessagesAdapter();
         initUI();
         initListeners();
         initSmileWidgets();
@@ -80,7 +82,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onPause() {
         super.onPause();
         onUpdateChatDialog();
-        hideSmileLayoit();
+        hideSmileLayout();
     }
 
     public void initSmileWidgets() {
@@ -96,14 +98,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         imageHelper.getImage();
     }
 
+    protected abstract BaseCursorAdapter getMessagesAdapter();
+
     @Override
     public void showLastListItem() {
         if (isSmilesLayoutShowing()) {
-            hideSmileLayoit();
+            hideSmileLayout();
         }
     }
 
-    private void hideSmileLayoit() {
+    private void hideSmileLayout() {
         hideView(smilesLayout);
         chatEditText.switchSmileIcon();
     }
@@ -194,6 +198,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
         params.height = Consts.ZERO_INT_VALUE;
         view.setLayoutParams(params);
+    }
+
+    @Override
+    public void onScrollToBottom() {
+        scrollListView();
+    }
+
+    protected void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     private int getSmileLayoutSizeInPixels() {

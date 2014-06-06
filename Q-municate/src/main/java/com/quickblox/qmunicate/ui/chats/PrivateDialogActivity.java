@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.BaseAdapter;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
@@ -26,6 +25,7 @@ import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -36,7 +36,6 @@ import java.io.FileNotFoundException;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
-    private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
     private QBDialog dialog;
 
@@ -113,10 +112,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
     }
 
-    private void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
-    }
-
     private void startUpdateChatDialog() {
         if (dialog != null) {
             QBUpdateDialogCommand.start(this, getDialog(), roomJidId);
@@ -146,8 +141,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         QBCreatePrivateChatCommand.start(this, opponentFriend);
     }
 
-    protected BaseAdapter getMessagesAdapter() {
-        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog);
+    protected BaseCursorAdapter getMessagesAdapter() {
+        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog, this);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {

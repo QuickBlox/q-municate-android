@@ -69,15 +69,17 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = Consts.EMPTY_STRING;
-        long time = DateUtils.getCurrentTime();
+        long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
 
         saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
                 time, true));
     }
 
     private QBChatMessage getQBChatMessage(String body) {
+        long time = DateUtils.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
+        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
         return chatMessage;
     }
 
@@ -97,10 +99,12 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
+        long time = DateUtils.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
+        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
         return chatMessage;
     }
 
@@ -111,7 +115,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = file.getPublicUrl();
-        long time = DateUtils.getCurrentTime();
+        long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
 
         saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
                 time, true));
@@ -353,7 +357,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
 
-            long time = Integer.parseInt(chatMessage.getProperty(propertyDateSent).toString());
+            long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             String attachUrl = getAttachUrlIfExists(chatMessage);
             String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
 
@@ -378,7 +382,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = getAttachUrlIfExists(chatMessage);
-            long time = Integer.parseInt(chatMessage.getProperty(propertyDateSent).toString());
+            long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             saveMessageToCache(new DialogMessageCache(roomChat.getJid(), chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
             if (!chatMessage.getSenderId().equals(user.getId())) {

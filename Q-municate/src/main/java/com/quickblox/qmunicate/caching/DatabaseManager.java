@@ -247,11 +247,7 @@ public class DatabaseManager {
             }
 
             if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
-                if (isPrivate) {
-                    return;
-                } else {
-                    message = getMessageForNotification(context, senderId);
-                }
+                message = getMessageForNotification(context, senderId);
             }
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,

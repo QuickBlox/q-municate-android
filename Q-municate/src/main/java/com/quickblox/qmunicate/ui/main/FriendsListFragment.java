@@ -141,7 +141,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if (!isImportInitialized) {
             addActionsAddFriends();
         }
-        QBLoadFriendListCommand.start(baseActivity);
     }
 
     private void addActionsAddFriends() {

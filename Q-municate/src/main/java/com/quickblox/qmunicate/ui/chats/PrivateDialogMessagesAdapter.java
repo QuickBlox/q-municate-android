@@ -26,10 +26,11 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
     private Friend opponentFriend;
     private QBDialog dialog;
 
-    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog) {
+    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
         this.dialog = dialog;
+        this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override
