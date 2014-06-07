@@ -26,7 +26,7 @@ public abstract class BaseErrorAsyncTask<Params, Progress, Result> extends BaseA
 
         if (e instanceof QBResponseException) {
             ErrorUtils.showError(parentActivity, e);
-            DialogUtils.show(parentActivity, e.getMessage());
+            DialogUtils.showLong(parentActivity, e.getMessage());
         }
     }
 

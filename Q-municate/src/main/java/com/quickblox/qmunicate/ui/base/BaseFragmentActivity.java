@@ -39,6 +39,8 @@ public class BaseFragmentActivity extends FragmentActivity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
+    public static boolean isNeedToSaveSession = false;
+
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
     protected BroadcastReceiver messageBroadcastReceiver;

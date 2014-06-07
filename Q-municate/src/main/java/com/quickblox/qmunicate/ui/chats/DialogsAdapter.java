@@ -49,7 +49,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
             Friend occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullname());
             viewHolder.userCountTextView.setVisibility(View.GONE);
-            viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_user);
+            displayAvatarImage(getAvatarUrlForFriend(occupant), viewHolder.avatarImageView);
         } else {
             viewHolder.nameTextView.setText(dialog.getName());
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);
@@ -64,7 +64,11 @@ public class DialogsAdapter extends BaseCursorAdapter {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
+        if (dialog.getLastMessage() == null && dialog.getLastMessageUserId() != Consts.ZERO_INT_VALUE) {
+            viewHolder.lastMessageTextView.setText(resources.getString(R.string.dlg_attached_last_message));
+        } else {
+            viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
+        }
     }
 
     public Friend getOccupantById(int occupantId) {

@@ -169,7 +169,7 @@ public class FriendDetailsActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            DialogUtils.show(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
+            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
             finish();
         }
     }

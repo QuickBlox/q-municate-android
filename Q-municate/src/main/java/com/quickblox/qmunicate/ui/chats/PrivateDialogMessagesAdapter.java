@@ -26,10 +26,11 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
     private Friend opponentFriend;
     private QBDialog dialog;
 
-    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog) {
+    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor, true);
         this.opponentFriend = opponentFriend;
         this.dialog = dialog;
+        this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override
@@ -87,7 +88,7 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if(dialog != null && !isRead) {
+        if(!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }

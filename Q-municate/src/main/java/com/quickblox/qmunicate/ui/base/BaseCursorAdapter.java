@@ -21,6 +21,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
+import com.quickblox.qmunicate.ui.chats.ScrollMessagesListener;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -37,6 +38,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     protected QBUser currentUser;
     protected LoginType currentLoginType;
     protected ImageHelper imageHelper;
+    protected ScrollMessagesListener scrollMessagesListener;
 
     public BaseCursorAdapter(Context context, Cursor cursor, boolean autoRequery) {
         super(context, cursor, autoRequery);
@@ -109,6 +111,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
             attachImageView.setImageBitmap(loadedImageBitmap);
             attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             this.loadedImageBitmap = loadedImageBitmap;
+            scrollMessagesListener.onScrollToBottom();
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {
@@ -116,6 +119,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
                 @Override
                 public void onClick(View view) {
+                    BaseFragmentActivity.isNeedToSaveSession = true;
                     view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
                     new ReceiveImageFileTask(BaseCursorAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);

@@ -1,6 +1,5 @@
 package com.quickblox.qmunicate.ui.login;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,10 +28,10 @@ import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-import com.quickblox.qmunicate.utils.TipsManager;
 
 public class LoginActivity extends BaseActivity {
 
@@ -53,19 +52,14 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailEditText = _findViewById(R.id.email_edittext);
-        passwordEditText = _findViewById(R.id.password_edittext);
-        rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
+        initUI();
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
                 true);
         rememberMeCheckBox.setChecked(isRememberMe);
-
-        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
-        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, failAction);
-
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+
+        initListeners();
+        addActions();
     }
 
     @Override
@@ -75,15 +69,53 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        facebookHelper.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
         facebookHelper.onActivityStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        LandingActivity.start(this);
+        finish();
+    }
+
+    public void loginOnClickListener(View view) {
+        String userEmail = emailEditText.getText().toString();
+        String userPassword = passwordEditText.getText().toString();
+
+        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
+        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
+
+        if (isEmailEntered && isPasswordEntered) {
+            login(userEmail, userPassword);
+        } else {
+            DialogUtils.showLong(LoginActivity.this, getString(R.string.dlg_not_all_fields_entered));
+        }
+    }
+
+    public void loginFacebookOnClickListener(View view) {
+        saveLoginType(LoginType.FACEBOOK);
+        facebookHelper.loginWithFacebook();
+    }
+
+    public void forgotPasswordOnClickListener(View view) {
+        String userEmail = emailEditText.getText().toString();
+
+        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
+
+        if (isEmailEntered) {
+            showProgress();
+            QBResetPasswordCommand.start(this, userEmail);
+        } else {
+            DialogUtils.showLong(this, getString(R.string.dlg_empty_email));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        facebookHelper.onSaveInstanceState(outState);
     }
 
     @Override
@@ -117,18 +149,28 @@ public class LoginActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void loginOnClickListener(View view) {
-        String userEmail = emailEditText.getText().toString();
-        String userPassword = passwordEditText.getText().toString();
+    private void initUI() {
+        emailEditText = _findViewById(R.id.email_edittext);
+        passwordEditText = _findViewById(R.id.password_edittext);
+        rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
+    }
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
+    private void initListeners() {
+        emailEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                emailEditText.setError(null);
+            }
+        });
+    }
 
-        if (isEmailEntered && isPasswordEntered) {
-            login(userEmail, userPassword);
-        } else {
-            DialogUtils.show(LoginActivity.this, getString(R.string.dlg_not_all_fields_entered));
-        }
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new LoginFailAction());
+        addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
+        addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, failAction);
+        updateBroadcastActionList();
     }
 
     private void login(String userEmail, String userPassword) {
@@ -140,24 +182,6 @@ public class LoginActivity extends BaseActivity {
 
     private void saveLoginType(LoginType type) {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
-    }
-
-    public void loginFacebookOnClickListener(View view) {
-        saveLoginType(LoginType.FACEBOOK);
-        facebookHelper.loginWithFacebook();
-    }
-
-    public void forgotPasswordOnClickListener(View view) {
-        String userEmail = emailEditText.getText().toString();
-
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-
-        if (isEmailEntered) {
-            showProgress();
-            QBResetPasswordCommand.start(this, userEmail);
-        } else {
-            DialogUtils.show(this, getString(R.string.dlg_empty_email));
-        }
     }
 
     private void saveRememberMe(boolean value) {
@@ -200,19 +224,22 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
+    private class LoginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            emailEditText.setError(getResources().getString(R.string.lgn_error));
+        }
+    }
+
     private class ResetPasswordSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
-            DialogUtils.show(LoginActivity.this, getString(R.string.dlg_check_email, emailText));
+            DialogUtils.showLong(LoginActivity.this, getString(R.string.dlg_check_email, emailText));
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        LandingActivity.start(this);
-        finish();
     }
 }

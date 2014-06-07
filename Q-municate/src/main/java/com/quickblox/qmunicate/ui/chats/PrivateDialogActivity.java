@@ -12,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.BaseAdapter;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
@@ -36,7 +35,6 @@ import java.io.FileNotFoundException;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
-    private BaseAdapter messagesAdapter;
     private Friend opponentFriend;
     private QBDialog dialog;
 
@@ -76,7 +74,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void createTempDialog() {
-        DatabaseManager.createTempDialogByRoomJidId(this, roomJidId);
+        DatabaseManager.createTempPrivateDialogByRoomJidId(this, roomJidId);
     }
 
     private void initStartLoadDialogMessages() {
@@ -113,10 +111,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
     }
 
-    private void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
-    }
-
     private void startUpdateChatDialog() {
         if (dialog != null) {
             QBUpdateDialogCommand.start(this, getDialog(), roomJidId);
@@ -132,7 +126,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initListView() {
-        messagesAdapter = getMessagesAdapter();
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog, this);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -144,10 +138,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initChat() {
         QBCreatePrivateChatCommand.start(this, opponentFriend);
-    }
-
-    protected BaseAdapter getMessagesAdapter() {
-        return new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), opponentFriend, dialog);
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {

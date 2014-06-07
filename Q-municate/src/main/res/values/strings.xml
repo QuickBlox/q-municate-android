@@ -41,6 +41,7 @@
     <string name="lgn_login">Log In</string>
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
+    <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
 
     // Sing Up
     <string name="sup_fullname_hint">Full Name</string>
@@ -81,7 +82,7 @@
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
-    <string name="ndl_ac_mode_title">Create Group Dialog</string>
+    <string name="ndl_ac_mode_title">Create Group Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -150,6 +151,8 @@
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_leave_group">Leave Group</string>
     <string name="dlg_offline_call"> %1$s is calling you !</string>
+    <string name="dlg_attached_last_message">Attachment</string>
+    <string name="dlg_no_message_yet">No message yet</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

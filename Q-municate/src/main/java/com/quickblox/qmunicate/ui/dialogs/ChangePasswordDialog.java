@@ -83,13 +83,13 @@ public class ChangePasswordDialog extends DialogFragment {
                     boolean isConfirmPasswordEmpty = TextUtils.isEmpty(confirmPasswordText);
 
                     if (isOldPasswordEmpty || isNewPasswordEmpty || isConfirmPasswordEmpty) {
-                        DialogUtils.show(getActivity(), getString(R.string.dlg_not_all_fields_entered));
+                        DialogUtils.showLong(getActivity(), getString(R.string.dlg_not_all_fields_entered));
                         yesButton.setClickable(false);
                         return false;
                     }
 
                     if (!newPasswordText.equals(confirmPasswordText)) {
-                        DialogUtils.show(getActivity(), getString(R.string.dlg_passwords_not_equal));
+                        DialogUtils.showLong(getActivity(), getString(R.string.dlg_passwords_not_equal));
                         yesButton.setClickable(false);
                         return false;
                     }

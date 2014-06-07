@@ -23,6 +23,7 @@ import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
@@ -38,7 +39,7 @@ import com.quickblox.qmunicate.utils.SizeUtility;
 import java.io.File;
 import java.nio.charset.Charset;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener {
 
     protected static final float SMILES_SIZE_IN_DIPS = 220;
 
@@ -55,6 +56,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected SmileSelectedBroadcastReceiver smileSelectedBroadcastReceiver;
     protected int layoutResID;
     protected ImageHelper imageHelper;
+    protected BaseCursorAdapter messagesAdapter;
 
     public BaseDialogActivity(int layoutResID) {
         this.layoutResID = layoutResID;
@@ -80,6 +82,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onPause() {
         super.onPause();
         onUpdateChatDialog();
+        hideSmileLayout();
     }
 
     public void initSmileWidgets() {
@@ -92,22 +95,25 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     public void attachButtonOnClick(View view) {
+        isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
     @Override
     public void showLastListItem() {
         if (isSmilesLayoutShowing()) {
-            hideView(smilesLayout);
-            chatEditText.switchSmileIcon();
+            hideSmileLayout();
         }
+    }
+
+    private void hideSmileLayout() {
+        hideView(smilesLayout);
+        chatEditText.switchSmileIcon();
     }
 
     protected void addActions() {
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, new LoadDialogMessagesSuccessAction());
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -115,6 +121,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             onFileSelected(data.getData());
         }
@@ -183,7 +190,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         registerReceiver(smileSelectedBroadcastReceiver, filter);
     }
 
-    private boolean isSmilesLayoutShowing() {
+    protected boolean isSmilesLayoutShowing() {
         return smilesLayout.getHeight() != Consts.ZERO_INT_VALUE;
     }
 
@@ -191,6 +198,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
         params.height = Consts.ZERO_INT_VALUE;
         view.setLayoutParams(params);
+    }
+
+    @Override
+    public void onScrollToBottom() {
+        scrollListView();
+    }
+
+    protected void scrollListView() {
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     private int getSmileLayoutSizeInPixels() {
@@ -204,13 +220,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             onFileLoaded(file);
             hideProgress();
-        }
-    }
-
-    public class LoadDialogMessagesSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
         }
     }
 
