@@ -103,7 +103,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);
             } else {
-                DialogUtils.show(this, getString(R.string.dlg_wrong_signaling));
+                DialogUtils.showLong(this, getString(R.string.dlg_wrong_signaling));
                 finish();
             }
         }

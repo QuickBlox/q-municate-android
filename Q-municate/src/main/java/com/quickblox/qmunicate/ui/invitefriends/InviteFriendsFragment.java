@@ -238,14 +238,14 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private void performActionNext() {
         baseActivity.showProgress();
         if (friendsAdapter.isEmpty()) {
-            DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
+            DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
             baseActivity.hideProgress();
         } else {
             selectedFacebookFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE);
             selectedContactsFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_CONTACTS_TYPE);
 
             if (selectedFacebookFriendsArray.length == 0 && selectedContactsFriendsArray.length == 0) {
-                DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
+                DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
                 baseActivity.hideProgress();
                 return;
             }
@@ -310,7 +310,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             fromButton.setClickable(true);
             counterTextView.setVisibility(View.GONE);
             checkBox.setVisibility(View.GONE);
-            DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_no_friends));
+            DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends));
         }
     }
 
@@ -336,9 +336,9 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         public void onCompleted(Response response) {
             FacebookRequestError error = response.getError();
             if (error != null) {
-                DialogUtils.show(getActivity(), getResources().getString(R.string.facebook_exception) + error);
+                DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
             } else {
-                DialogUtils.show(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
+                DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
             }
             baseActivity.hideProgress();
         }

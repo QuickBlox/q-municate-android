@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutChatCommand;
+import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 
@@ -14,7 +15,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
 
-    public void onActivityDestroyed(Activity activity) {
+    public void onActivityStarted(Activity activity) {
     }
 
     public void onActivityResumed(Activity activity) {
@@ -22,22 +23,23 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             QBLoginChatCommand.start(activity);
         }
         ++numberOfActivitiesInForeground;
-
     }
 
     public void onActivityPaused(Activity activity) {
     }
 
+    public void onActivityStopped(Activity activity) {
+        --numberOfActivitiesInForeground;
+        if (numberOfActivitiesInForeground == 0 && !BaseFragmentActivity.isNeedToSaveSession) {
+            QBLogoutChatCommand.start(activity);
+            // TODO SF app was killed.
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+    }
+
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
     }
 
-    public void onActivityStarted(Activity activity) {
-    }
-
-    public void onActivityStopped(Activity activity) {
-        --numberOfActivitiesInForeground;
-        if (numberOfActivitiesInForeground == 0) {
-            QBLogoutChatCommand.start(activity);
-        }
+    public void onActivityDestroyed(Activity activity) {
     }
 }

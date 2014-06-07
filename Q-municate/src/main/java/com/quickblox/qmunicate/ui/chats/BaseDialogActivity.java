@@ -95,6 +95,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     public void attachButtonOnClick(View view) {
+        isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
@@ -120,6 +121,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             onFileSelected(data.getData());
         }

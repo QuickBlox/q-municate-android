@@ -41,6 +41,7 @@
     <string name="lgn_login">Log In</string>
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
+    <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
 
     // Sing Up
     <string name="sup_fullname_hint">Full Name</string>

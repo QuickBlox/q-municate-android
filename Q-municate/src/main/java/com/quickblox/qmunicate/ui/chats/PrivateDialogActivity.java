@@ -74,7 +74,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void createTempDialog() {
-        DatabaseManager.createTempDialogByRoomJidId(this, roomJidId);
+        DatabaseManager.createTempPrivateDialogByRoomJidId(this, roomJidId);
     }
 
     private void initStartLoadDialogMessages() {

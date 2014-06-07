@@ -31,6 +31,7 @@ public class ChatUtils {
         for (Integer id : occupantsIdsList) {
             if (!id.equals(user.getId())) {
                 resultId = id;
+                break;
             }
         }
         return resultId;

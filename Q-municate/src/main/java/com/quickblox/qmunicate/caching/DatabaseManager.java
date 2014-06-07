@@ -4,9 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
@@ -113,6 +111,7 @@ public class DatabaseManager {
         QBDialog dialog = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+
         if (cursor != null && cursor.moveToFirst()) {
             String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
             if (!TextUtils.isEmpty(dialogId)) {
@@ -144,7 +143,7 @@ public class DatabaseManager {
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
     }
 
-    public static QBDialog createTempDialogByRoomJidId(Context context, String roomJidId) {
+    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId) {
         QBDialog dialog = new QBDialog();
         dialog.setRoomJid(roomJidId);
         Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
@@ -278,9 +277,28 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
-        Uri uri = context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
-        updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
-                dialogMessageCache.getTime());
+        context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
+
+        if(isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
+            updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
+                    dialogMessageCache.getTime());
+        } else {
+            createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId());
+            updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
+                    dialogMessageCache.getTime());
+        }
+    }
+
+    public static boolean isDialogByRoomJidId(Context context, String roomJidId) {
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+
+        if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
+            cursor.close();
+            return true;
+        }
+
+        return false;
     }
 
     public static void deleteMessagesByRoomJidId(Context context, String roomJidId) {

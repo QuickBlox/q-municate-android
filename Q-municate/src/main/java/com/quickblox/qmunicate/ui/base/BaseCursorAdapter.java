@@ -121,6 +121,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
                 @Override
                 public void onClick(View view) {
+                    BaseFragmentActivity.isNeedToSaveSession = true;
                     view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
                     new ReceiveImageFileTask(BaseCursorAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);

@@ -64,18 +64,21 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getIntent().hasExtra(EXTRA_ROOM_JID)) {
             roomJid = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
+
         if (roomJid != null) {
             dialog = DatabaseManager.getDialogByRoomJidId(this, roomJid);
             groupName = dialog.getName();
+            initListView();
+            initStartLoadDialogMessages();
+        } else {
+            initChat();
         }
 
-        initListView();
-        initChat();
         initActionBar();
-        initStartLoadDialogMessages();
 
         registerForContextMenu(messagesListView);
     }
@@ -139,12 +142,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initChat() {
-        if (roomJid == null) {
-            showProgress();
-            friendList = (ArrayList<Friend>) getIntent().getSerializableExtra(EXTRA_FRIENDS);
-            groupName = createChatName();
-            QBCreateGroupDialogCommand.start(this, groupName, friendList);
-        }
+        showProgress();
+        friendList = (ArrayList<Friend>) getIntent().getSerializableExtra(EXTRA_FRIENDS);
+        groupName = createChatName();
+        QBCreateGroupDialogCommand.start(this, groupName, friendList);
     }
 
     private void initListView() {
@@ -214,7 +215,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        scrollListView();
         addActions();
     }
 

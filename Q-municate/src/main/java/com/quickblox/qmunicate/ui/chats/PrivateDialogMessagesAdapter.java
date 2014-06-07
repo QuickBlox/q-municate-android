@@ -88,7 +88,7 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if(dialog != null && !isRead) {
+        if(!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }

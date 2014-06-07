@@ -356,19 +356,20 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-
-            long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
-            String attachUrl = getAttachUrlIfExists(chatMessage);
-            String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-
+            long time;
             if (ChatUtils.isNotificationMessage(chatMessage)) {
+                time = DateUtils.getCurrentTime();
                 QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
                         context.getResources().getString(R.string.user_created_room, friend.getFullname()),
                         time);
                 chatMessage.setBody(dialog.getLastMessage());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
+            } else {
+                time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             }
+            String attachUrl = getAttachUrlIfExists(chatMessage);
+            String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
             saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
             notifyMessageReceived(chatMessage, friend);

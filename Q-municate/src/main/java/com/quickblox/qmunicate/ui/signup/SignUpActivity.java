@@ -26,17 +26,17 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-import com.quickblox.qmunicate.utils.ReceiveFileListener;
-import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.ReceiveFileListener;
+import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class SignUpActivity extends BaseActivity implements ReceiveFileListener {
@@ -60,21 +60,15 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        initUI();
+
         useDoubleBackPressed = true;
-
-        fullnameEditText = _findViewById(R.id.fullname_edittext);
-        emailEditText = _findViewById(R.id.email_edittext);
-        passwordEditText = _findViewById(R.id.password_edittext);
-        avatarImageView = _findViewById(R.id.avatar_imageview);
-        avatarImageView.setOval(true);
-
         qbUser = new QBUser();
         imageHelper = new ImageHelper(this);
 
-        addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
-        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UserUpdateSuccessAction());
-        updateBroadcastActionList();
+        initListeners();
+        addActions();
     }
 
     @Override
@@ -137,7 +131,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
         } else {
-            DialogUtils.show(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
+            DialogUtils.showLong(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
     }
 
@@ -150,6 +144,48 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
     }
 
+    private void initUI() {
+        fullnameEditText = _findViewById(R.id.fullname_edittext);
+        emailEditText = _findViewById(R.id.email_edittext);
+        passwordEditText = _findViewById(R.id.password_edittext);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
+    }
+
+    private void initListeners() {
+        emailEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                clearErrors();
+            }
+        });
+        fullnameEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                clearErrors();
+            }
+        });
+    }
+
+    private void clearErrors() {
+        fullnameEditText.setError(null);
+        emailEditText.setError(null);
+    }
+
+    private void setErrors(String errors) {
+        emailEditText.setError(errors);
+        fullnameEditText.setError(errors);
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.SIGNUP_SUCCESS_ACTION, new SignUpSuccessAction());
+        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, new SignUpFailAction());
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UserUpdateSuccessAction());
+        updateBroadcastActionList();
+    }
+
     private class UserUpdateSuccessAction implements Command {
 
         @Override
@@ -158,6 +194,16 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             App.getInstance().setUser(user);
             MainActivity.start(SignUpActivity.this);
             finish();
+        }
+    }
+
+    private class SignUpFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            setErrors(exception.getMessage());
+            hideProgress();
         }
     }
 
