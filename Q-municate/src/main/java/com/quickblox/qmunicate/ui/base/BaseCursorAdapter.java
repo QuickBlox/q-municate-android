@@ -60,9 +60,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
-        if(uri != null) {
-            ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
-        }
+        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
     }
 
     protected String getAvatarUrlForCurrentUser() {

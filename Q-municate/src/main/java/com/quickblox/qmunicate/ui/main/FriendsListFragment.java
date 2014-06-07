@@ -62,15 +62,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        addActionsAddFriend();
+        addActions();
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // TODO SF temp
-        // emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -283,8 +276,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
             isHideSearchView = true;
-            // TODO SF temp
-            //            emptyListTextView.setVisibility(View.GONE);
+            emptyListTextView.setVisibility(View.GONE);
             return true;
         }
 
@@ -296,8 +288,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
             if (isHideSearchView) {
                 isHideSearchView = false;
-                // TODO SF temp
-                //                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
                 friendsListAdapter.setSearchCharacters(null);
                 friendsListAdapter.setFilterQueryProvider(null);
                 friendsListView.removeFooterView(globalSearchLayout);
@@ -351,6 +342,16 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public void execute(Bundle bundle) {
             importFriendsFinished();
             DialogUtils.showLong(baseActivity, getResources().getString(R.string.dlg_no_friends_for_import));
+        }
+    }
+
+    private class LoadFriendsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            if (getActivity() != null) {
+                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+            }
         }
     }
 }
