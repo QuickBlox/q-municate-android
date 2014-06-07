@@ -128,7 +128,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public void updateDialog(QBDialog dialog, String roomJidId) {
         DatabaseManager.updateDialog(context, roomJidId, dialog.getLastMessage(),
-                dialog.getLastMessageDateSent());
+                dialog.getLastMessageDateSent(), dialog.getLastMessageUserId());
     }
 
     public void init() {

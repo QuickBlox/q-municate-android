@@ -279,14 +279,12 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
-        if(isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
-            updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
-                    dialogMessageCache.getTime());
-        } else {
+        if(!isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
             createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId());
-            updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
-                    dialogMessageCache.getTime());
         }
+
+        updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
+                dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
     }
 
     public static boolean isDialogByRoomJidId(Context context, String roomJidId) {
@@ -354,12 +352,13 @@ public class DatabaseManager {
         return values;
     }
 
-    public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent) {
+    public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent, long lastSenderId) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,
                 roomJidId));
         values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
+        values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, lastSenderId);
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
         resolver.update(DialogTable.CONTENT_URI, values, condition, null);
@@ -402,10 +401,11 @@ public class DatabaseManager {
             String roomJidId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ROOM_JID_ID));
             String message = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+            long lastSenderId = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
             values.put(DialogMessageTable.Cols.IS_READ, isRead);
             resolver.update(DialogMessageTable.CONTENT_URI, values, condition, null);
             cursor.close();
-            updateDialog(context, roomJidId, message, time);
+            updateDialog(context, roomJidId, message, time, lastSenderId);
         }
     }
 
