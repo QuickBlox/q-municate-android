@@ -53,11 +53,11 @@ public class QBLoadUsersCommand extends ServiceCommand {
     private class UserComparator implements Comparator<QBUser> {
 
         @Override
-        public int compare(QBUser lhs, QBUser rhs) {
-            if (lhs.getFullName() == null || rhs.getFullName() == null) {
+        public int compare(QBUser first, QBUser second) {
+            if (first.getFullName() == null || second.getFullName() == null) {
                 return 0;
             }
-            return String.CASE_INSENSITIVE_ORDER.compare(lhs.getFullName(), rhs.getFullName());
+            return String.CASE_INSENSITIVE_ORDER.compare(first.getFullName(), second.getFullName());
         }
     }
 }
