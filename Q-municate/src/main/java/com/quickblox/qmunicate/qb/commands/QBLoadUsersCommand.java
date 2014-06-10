@@ -14,9 +14,9 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
-import com.quickblox.qmunicate.utils.UserComparator;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class QBLoadUsersCommand extends ServiceCommand {
@@ -48,5 +48,16 @@ public class QBLoadUsersCommand extends ServiceCommand {
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendList);
         return params;
+    }
+
+    private class UserComparator implements Comparator<QBUser> {
+
+        @Override
+        public int compare(QBUser lhs, QBUser rhs) {
+            if (lhs.getFullName() == null || rhs.getFullName() == null) {
+                return 0;
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(lhs.getFullName(), rhs.getFullName());
+        }
     }
 }
