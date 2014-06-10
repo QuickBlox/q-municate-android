@@ -398,12 +398,10 @@ public class QBService extends Service {
     }
 
     private void startAsync(final ServiceCommand command, final Intent intent) {
-        if(threadPool.getActiveCount() >= NUMBER_OF_CORES){
-            initThreads();
-        }
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "executing with resultAction=" + intent.getAction());
                 command.execute(intent.getExtras());
             }
         });

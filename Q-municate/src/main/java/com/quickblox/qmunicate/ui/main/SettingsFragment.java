@@ -145,6 +145,7 @@ public class SettingsFragment extends BaseFragment {
     private class LogoutSuccessAction implements Command {
         @Override
         public void execute(Bundle bundle) {
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IS_LOGINED, false);
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }

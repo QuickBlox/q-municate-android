@@ -57,6 +57,7 @@ public class Consts {
     public static final String PROPERTY_APP_VERSION = "appVersion";
     public static final String ACCEPTED_CALL = "accepted_call";
     public static final int NOT_INITIALIZED_VALUE = -1;
+    public static final int LOGIN_TIMEOUT = 40000;
     public static final int SECOND = 1000;
     public static final String DEFAULT_WEB_ROOM = "test";
     public static final String DEFAULT_CALL_MESSAGE = "";
