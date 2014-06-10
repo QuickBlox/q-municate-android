@@ -14,7 +14,9 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
+import com.quickblox.qmunicate.utils.UserComparator;
 
+import java.util.Collections;
 import java.util.List;
 
 public class QBLoadUsersCommand extends ServiceCommand {
@@ -39,6 +41,7 @@ public class QBLoadUsersCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
+        Collections.sort(userList, new UserComparator());
         List<Friend> friendList = FriendUtils.createFriendList(userList);
         friendList.remove(FriendUtils.createFriend(App.getInstance().getUser()));
 
