@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.ui.landing;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -17,6 +16,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
+import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -36,18 +36,48 @@ public class LandingActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
+    public void signUpOnClickListener(View view) {
+        SignUpActivity.start(LandingActivity.this);
+        finish();
+    }
+
+    public void connectFacebookOnClickListener(View view) {
+        saveLoginType(LoginType.FACEBOOK);
+        facebookHelper.loginWithFacebook();
+    }
+
+    private void saveLoginType(LoginType type) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
+    }
+
+    public void loginOnClickListener(View view) {
+        LoginActivity.start(LandingActivity.this);
+        finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
-        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+        addActions();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initVersionName();
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UserUpdateSuccessAction());
+        updateBroadcastActionList();
+    }
+
+    private void initVersionName() {
+        TextView versionView = _findViewById(R.id.version);
+        versionView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
     }
 
     @Override
@@ -62,11 +92,6 @@ public class LandingActivity extends BaseActivity {
         facebookHelper.onActivityStop();
     }
 
-    private void initVersionName() {
-        TextView versionView = _findViewById(R.id.version);
-        versionView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -79,23 +104,14 @@ public class LandingActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    public void signUpOnClickListener(View view) {
-        SignUpActivity.start(LandingActivity.this);
+    private String getAvatarUrl(QBUser user) {
+        return this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
+    }
+
+    private void startMainActivity(QBUser user) {
+        App.getInstance().setUser(user);
+        MainActivity.start(LandingActivity.this);
         finish();
-    }
-
-    public void connectFacebookOnClickListener(View view) {
-        saveLoginType(LoginType.FACEBOOK);
-        facebookHelper.loginWithFacebook();
-    }
-
-    public void loginOnClickListener(View view) {
-        LoginActivity.start(LandingActivity.this);
-        finish();
-    }
-
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
@@ -110,13 +126,14 @@ public class LandingActivity extends BaseActivity {
         }
     }
 
-    // TODO SF must be removed to BaseAuthorizationActivity
-    private QBUser getUserWithAvatar(QBUser user) {
-        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
-                && TextUtils.isEmpty(user.getWebsite())) {
-            user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+    private class UserUpdateSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            startMainActivity(user);
         }
-        return user;
     }
 
     private class SocialLoginSuccessAction implements Command {
@@ -124,11 +141,9 @@ public class LandingActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(getUserWithAvatar(user));
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            user.setWebsite(getAvatarUrl(user));
             DatabaseManager.clearAllCache(LandingActivity.this);
-            MainActivity.start(LandingActivity.this);
-            finish();
+            QBUpdateUserCommand.start(LandingActivity.this, user, null, null);
         }
     }
 }

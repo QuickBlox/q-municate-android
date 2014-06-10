@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -187,12 +188,21 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         updateBroadcastActionList();
     }
 
+    // TODO SF must be removed to BaseAuthorizationActivity
+    private QBUser getUserWithAvatar(QBUser user) {
+        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
+                && TextUtils.isEmpty(user.getWebsite())) {
+            user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+        }
+        return user;
+    }
+
     private class UserUpdateSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            App.getInstance().setUser(getUserWithAvatar(user));
             MainActivity.start(SignUpActivity.this);
             finish();
         }

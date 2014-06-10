@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,12 +65,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     }
 
     protected String getAvatarUrlForCurrentUser() {
-        if (currentLoginType == LoginType.FACEBOOK) {
-            return context.getString(R.string.inf_url_to_facebook_avatar, currentUser.getFacebookId());
-        } else if (currentLoginType == LoginType.EMAIL) {
-            return currentUser.getWebsite();
-        }
-        return null;
+        return currentUser.getWebsite();
     }
 
     protected String getAvatarUrlForFriend(Friend friend) {
