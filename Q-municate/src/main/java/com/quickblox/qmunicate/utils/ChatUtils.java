@@ -6,6 +6,7 @@ import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBMessage;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.model.Friend;
@@ -116,6 +117,16 @@ public class ChatUtils {
         occupantsIdsList.add(user.getId());
         occupantsIdsList.add(opponentId);
         return occupantsIdsList;
+    }
+
+    public static List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
+        List<String> roomJidList = new ArrayList<String>();
+        for (QBDialog dialog : dialogsList) {
+            if (dialog.getType() != QBDialogType.PRIVATE) {
+                roomJidList.add(dialog.getRoomJid());
+            }
+        }
+        return roomJidList;
     }
 
     public static ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {

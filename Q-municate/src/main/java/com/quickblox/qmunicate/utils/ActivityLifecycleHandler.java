@@ -6,11 +6,13 @@ import android.os.Bundle;
 
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutChatCommand;
-import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
+import com.quickblox.qmunicate.ui.base.QBLogeable;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 
+    private static final boolean SHOULD_START_MULTICHAT = true;
     private int numberOfActivitiesInForeground;
+    private boolean chatDestroyed = false;
 
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
@@ -19,8 +21,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     public void onActivityResumed(Activity activity) {
-        if (numberOfActivitiesInForeground == 0) {
-            QBLoginChatCommand.start(activity);
+        if (numberOfActivitiesInForeground == 0 && chatDestroyed) {
+            QBLoginChatCommand.start(activity, SHOULD_START_MULTICHAT);
         }
         ++numberOfActivitiesInForeground;
     }
@@ -30,10 +32,13 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     public void onActivityStopped(Activity activity) {
         --numberOfActivitiesInForeground;
-        if (numberOfActivitiesInForeground == 0 && !BaseFragmentActivity.isNeedToSaveSession) {
-            QBLogoutChatCommand.start(activity);
+        if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
+            chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
+            if (chatDestroyed) {
+                QBLogoutChatCommand.start(activity);
+            }
             // TODO SF app was killed.
-            android.os.Process.killProcess(android.os.Process.myPid());
+            //android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 

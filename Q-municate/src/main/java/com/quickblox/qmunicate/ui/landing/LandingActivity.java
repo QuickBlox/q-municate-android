@@ -41,7 +41,7 @@ public class LandingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
-
+        canPerformLogout.set(false);
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
 
@@ -112,8 +112,8 @@ public class LandingActivity extends BaseActivity {
 
     // TODO SF must be removed to BaseAuthorizationActivity
     private QBUser getUserWithAvatar(QBUser user) {
-        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
-                && TextUtils.isEmpty(user.getWebsite())) {
+        if (App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK) && TextUtils.isEmpty(
+                user.getWebsite())) {
             user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
         }
         return user;

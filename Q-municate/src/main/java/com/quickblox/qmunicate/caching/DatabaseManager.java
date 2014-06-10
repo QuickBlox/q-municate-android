@@ -157,6 +157,21 @@ public class DatabaseManager {
         return dialog;
     }
 
+    public static List<QBDialog> getDialogs(Context context) {
+        Cursor allDialogsCursor = getAllDialogs(context);
+        List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());
+        if (allDialogsCursor != null) {
+            if (allDialogsCursor.getCount() > Consts.ZERO_INT_VALUE) {
+                while (allDialogsCursor.moveToNext()) {
+                    dialogs.add(getDialogFromCursor(allDialogsCursor));
+                }
+            }
+            allDialogsCursor.close();
+        }
+        return dialogs;
+    }
+
+
     public static QBDialog getDialogFromCursor(Cursor cursor) {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
         String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
@@ -166,9 +181,9 @@ public class DatabaseManager {
         int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES));
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE));
-        Integer lastMessageUserId = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.LAST_MESSAGE_USER_ID));
-        long dateSent = cursor.getLong(cursor.getColumnIndex(
-                DialogTable.Cols.LAST_DATE_SENT));
+        Integer lastMessageUserId = cursor.getInt(cursor.getColumnIndex(
+                DialogTable.Cols.LAST_MESSAGE_USER_ID));
+        long dateSent = cursor.getLong(cursor.getColumnIndex(DialogTable.Cols.LAST_DATE_SENT));
         String type = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.TYPE));
 
         QBDialog dialog = new QBDialog(dialogId);
@@ -223,7 +238,8 @@ public class DatabaseManager {
 
     public static Cursor getAllDialogMessagesByRoomJidId(Context context, String roomJidId) {
         return context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null,
+                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllMessages(Context context) {
@@ -279,7 +295,7 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
-        if(!isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
+        if (!isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
             createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId());
         }
 
@@ -352,7 +368,8 @@ public class DatabaseManager {
         return values;
     }
 
-    public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent, long lastSenderId) {
+    public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent,
+            long lastSenderId) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,

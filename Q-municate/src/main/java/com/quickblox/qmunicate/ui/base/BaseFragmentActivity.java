@@ -35,7 +35,7 @@ import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class BaseFragmentActivity extends FragmentActivity {
+public class BaseFragmentActivity extends FragmentActivity implements QBLogeable {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
@@ -163,11 +163,11 @@ public class BaseFragmentActivity extends FragmentActivity {
     }
 
     public void hideProgress() {
-        try{
+        try {
             if (progress != null && !progress.isDetached()) {
                 progress.dismissAllowingStateLoss();
             }
-        } catch (NullPointerException npe){
+        } catch (NullPointerException npe) {
             ErrorUtils.logError(npe);
         }
     }
@@ -206,6 +206,11 @@ public class BaseFragmentActivity extends FragmentActivity {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
+    }
+
+    @Override
+    public boolean isCanPerformLogoutInOnStop() {
+        return true;
     }
 
     public class FailAction implements Command {

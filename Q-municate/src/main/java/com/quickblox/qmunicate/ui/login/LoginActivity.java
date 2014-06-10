@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
@@ -27,7 +25,6 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
@@ -51,10 +48,9 @@ public class LoginActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        canPerformLogout.set(false);
         initUI();
-        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
-                true);
+        boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, true);
         rememberMeCheckBox.setChecked(isRememberMe);
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -79,6 +75,7 @@ public class LoginActivity extends BaseActivity {
         LandingActivity.start(this);
         finish();
     }
+
 
     public void loginOnClickListener(View view) {
         String userEmail = emailEditText.getText().toString();
@@ -199,8 +196,8 @@ public class LoginActivity extends BaseActivity {
 
     // TODO SF must be removed to BaseAuthorizationActivity
     private QBUser getUserWithAvatar(QBUser user) {
-        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
-                && TextUtils.isEmpty(user.getWebsite())) {
+        if (App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK) && TextUtils.isEmpty(
+                user.getWebsite())) {
             user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
         }
         return user;

@@ -85,6 +85,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     protected void addActions() {
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_ACTION, new CreateChatSuccessAction());
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
@@ -149,7 +150,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog, this);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog,
+                this);
         messagesListView.setAdapter(messagesAdapter);
     }
 

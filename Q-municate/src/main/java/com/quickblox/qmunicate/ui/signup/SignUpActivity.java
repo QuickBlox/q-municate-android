@@ -62,6 +62,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
         initUI();
 
+        canPerformLogout.set(false);
         useDoubleBackPressed = true;
         qbUser = new QBUser();
         imageHelper = new ImageHelper(this);
@@ -98,7 +99,8 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             } catch (FileNotFoundException e) {
                 ErrorUtils.showError(this, e);
             }
-            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
+                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
