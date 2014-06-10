@@ -223,7 +223,7 @@ public class DatabaseManager {
 
     public static Cursor getAllDialogMessagesByRoomJidId(Context context, String roomJidId) {
         return context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+                DialogMessageTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllMessages(Context context) {
