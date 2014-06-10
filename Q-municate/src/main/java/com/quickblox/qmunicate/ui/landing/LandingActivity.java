@@ -1,3 +1,7 @@
+package com.quickblox.qmunicate.ui.landing;
+
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -69,7 +73,6 @@ public class LandingActivity extends BaseActivity {
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UserUpdateSuccessAction());
         updateBroadcastActionList();
     }
 
@@ -102,10 +105,6 @@ public class LandingActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
-    private String getAvatarUrl(QBUser user) {
-        return this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
-    }
-
     private void startMainActivity(QBUser user) {
         App.getInstance().setUser(user);
         MainActivity.start(LandingActivity.this);
@@ -124,24 +123,13 @@ public class LandingActivity extends BaseActivity {
         }
     }
 
-    private class UserUpdateSuccessAction implements Command {
+    private class SocialLoginSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             startMainActivity(user);
-        }
-    }
-
-    private class SocialLoginSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            user.setWebsite(getAvatarUrl(user));
-            DatabaseManager.clearAllCache(LandingActivity.this);
-            QBUpdateUserCommand.start(LandingActivity.this, user, null, null);
         }
     }
 }
