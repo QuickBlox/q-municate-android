@@ -79,11 +79,16 @@ public class QBService extends Service {
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
-        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
-                KEEP_ALIVE_TIME_UNIT, threadQueue);
+        initThreads();
 
         initHelpers();
         initCommands();
+    }
+
+    private void initThreads(){
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
+                KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPool.allowCoreThreadTimeOut(true);
     }
 
     private void initHelpers() {
@@ -393,6 +398,9 @@ public class QBService extends Service {
     }
 
     private void startAsync(final ServiceCommand command, final Intent intent) {
+        if(threadPool.getActiveCount() >= NUMBER_OF_CORES){
+            initThreads();
+        }
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
