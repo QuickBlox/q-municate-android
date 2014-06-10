@@ -25,6 +25,7 @@ public class PrefsHelper {
 
     public static final String PREF_REG_ID = "registration_id";
     public static final String PREF_APP_VERSION = "appVersion";
+    public static final String PREF_RECEIVE_PUSH = "receive_push";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;

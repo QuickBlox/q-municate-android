@@ -65,7 +65,6 @@ public class GCMIntentService extends IntentService {
 
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         Intent intent = new Intent(this, SplashActivity.class);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, Consts.ZERO_INT_VALUE, intent,

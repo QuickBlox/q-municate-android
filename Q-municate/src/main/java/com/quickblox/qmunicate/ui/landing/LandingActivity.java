@@ -1,7 +1,3 @@
-package com.quickblox.qmunicate.ui.landing;
-
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -61,6 +57,8 @@ public class LandingActivity extends BaseActivity {
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
+        canPerformLogout.set(false);
+        
         addActions();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());

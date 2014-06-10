@@ -32,12 +32,15 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends Activity implements QBLogeable {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
+
+    public static final String CAN_PERFORM_LOGOUT = "can_perform_logout";
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
@@ -48,6 +51,7 @@ public abstract class BaseActivity extends Activity {
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
@@ -78,7 +82,7 @@ public abstract class BaseActivity extends Activity {
         broadcastCommandMap.put(action, command);
     }
 
-    public boolean hasAction(String action){
+    public boolean hasAction(String action) {
         return broadcastCommandMap.containsKey(action);
     }
 
@@ -93,10 +97,19 @@ public abstract class BaseActivity extends Activity {
         Crouton.show(this, newMessageView);
     }
 
+    //This method is used for logout action when Actvity is going to background
+    @Override
+    public boolean isCanPerformLogoutInOnStop() {
+        return canPerformLogout.get();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
+        if (savedInstanceState != null && savedInstanceState.containsKey(CAN_PERFORM_LOGOUT)) {
+            canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
+        }
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
         messageBroadcastReceiver = new MessageBroadcastReceiver();
@@ -179,6 +192,12 @@ public abstract class BaseActivity extends Activity {
     }
 
     protected void onConnectedToService() {
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
+        super.onSaveInstanceState(outState);
     }
 
     protected void navigateToParent() {

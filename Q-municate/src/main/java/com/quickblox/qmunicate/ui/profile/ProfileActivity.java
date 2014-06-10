@@ -110,7 +110,8 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         loadAvatar();
         fullNameEditText.setText(user.getFullName());
         emailTextView.setText(user.getEmail());
-        String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS, Consts.EMPTY_STRING);
+        String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS,
+                Consts.EMPTY_STRING);
         statusMessageEditText.setText(status);
     }
 
@@ -133,11 +134,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.avatar_textview:
-                changeAvatarOnClick();
-                break;
             case R.id.changeAvatarLinearLayout:
-                changeAvatarOnClick();
-                break;
             case R.id.avatar_imageview:
                 changeAvatarOnClick();
                 break;
@@ -185,9 +182,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             } catch (FileNotFoundException e) {
                 ErrorUtils.logError(e);
             }
-            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
+                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
             startAction();
         }
+        canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -199,6 +198,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     public void changeAvatarOnClick() {
+        canPerformLogout.set(false);
         BaseFragmentActivity.isNeedToSaveSession = true;
         imageHelper.getImage();
     }
@@ -239,8 +239,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private boolean isUserDataChanged(String fullname, String status) {
-        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !status
-                .equals(statusOld);
+        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !status.equals(statusOld);
     }
 
     private void saveChanges(final String fullname) {

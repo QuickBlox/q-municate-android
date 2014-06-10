@@ -89,6 +89,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
         actionBar.hide();
         mediaPlayer = App.getInstance().getMediaPlayer();

@@ -32,7 +32,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseActivity impl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_group_friendlist);
-
+        initBase();
         initUI();
         initListView();
     }
@@ -75,6 +75,10 @@ public abstract class BaseSelectableFriendListActivity extends BaseActivity impl
         View view = getLayoutInflater().inflate(getActionModeLayoutId(), null);
         countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
         actionMode.setCustomView(view);
+    }
+
+    private void initBase() {
+        canPerformLogout.set(false);
     }
 
     protected abstract int getActionModeLayoutId();
