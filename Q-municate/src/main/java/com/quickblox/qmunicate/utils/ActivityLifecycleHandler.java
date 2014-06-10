@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutChatCommand;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
@@ -30,7 +31,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     public void onActivityStopped(Activity activity) {
         --numberOfActivitiesInForeground;
-        if (numberOfActivitiesInForeground == 0 && !BaseFragmentActivity.isNeedToSaveSession) {
+        boolean isLogined = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IS_LOGINED, false);
+        if (numberOfActivitiesInForeground == 0 && isLogined && !BaseFragmentActivity.isNeedToSaveSession) {
             QBLogoutChatCommand.start(activity);
             // TODO SF app was killed.
             android.os.Process.killProcess(android.os.Process.myPid());
