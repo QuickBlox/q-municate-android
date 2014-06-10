@@ -119,22 +119,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.login_menu, menu);
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_register:
-                SignUpActivity.start(LoginActivity.this);
-                finish();
-                return true;
             case android.R.id.home:
                 onBackPressed();
                 return true;
@@ -150,7 +136,9 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void initUI() {
-        emailEditText = _findViewById(R.id.email_edittext);
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
     }
@@ -201,10 +189,21 @@ public class LoginActivity extends BaseActivity {
             if (session.isOpened()) {
                 showProgress();
                 saveLoginType(LoginType.FACEBOOK);
+                // TODO SF must be
+                // QBUser user = FacebookHelper.getCurrentFacebookUser(session);
                 QBLoginRestWithSocialCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }
         }
+    }
+
+    // TODO SF must be removed to BaseAuthorizationActivity
+    private QBUser getUserWithAvatar(QBUser user) {
+        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
+                && TextUtils.isEmpty(user.getWebsite())) {
+            user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+        }
+        return user;
     }
 
     private class LoginSuccessAction implements Command {
@@ -212,7 +211,7 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            App.getInstance().setUser(getUserWithAvatar(user));
             if (rememberMeCheckBox.isChecked()) {
                 saveRememberMe(true);
                 saveUserCredentials(user);

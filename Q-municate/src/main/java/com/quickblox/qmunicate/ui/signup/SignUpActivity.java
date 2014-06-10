@@ -8,8 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -24,7 +22,8 @@ import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
+import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -72,25 +71,24 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.registration_menu, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_login:
-                LoginActivity.start(this);
-                finish();
+            case android.R.id.home:
+                onBackPressed();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        LandingActivity.start(this);
+        finish();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        BaseFragmentActivity.isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
             Uri originalUri = data.getData();
@@ -106,6 +104,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     }
 
     public void changeAvatarOnClickListener(View view) {
+        BaseFragmentActivity.isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
@@ -145,8 +144,10 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     }
 
     private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         fullnameEditText = _findViewById(R.id.fullname_edittext);
-        emailEditText = _findViewById(R.id.email_edittext);
+        emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);

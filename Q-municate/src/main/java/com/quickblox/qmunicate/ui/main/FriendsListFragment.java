@@ -252,6 +252,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private void addToFriendList(final Friend friend) {
         baseActivity.showProgress();
         QBAddFriendCommand.start(baseActivity, friend);
+        KeyboardUtils.hideKeyboard(baseActivity);
     }
 
     private void startUsersListLoader(String newText) {

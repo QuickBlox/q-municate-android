@@ -49,14 +49,8 @@ public class SplashActivity extends BaseActivity {
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
                 false);
 
-        boolean isLandingShown = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LANDING_SHOWN,
-                false);
-
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
-        } else if (isLandingShown) {
-            LoginActivity.start(SplashActivity.this);
-            finish();
         } else {
             LandingActivity.start(SplashActivity.this);
             finish();

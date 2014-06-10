@@ -6,7 +6,7 @@
     android:padding="20dp">
 
     <EditText
-        android:id="@+id/email_edittext"
+        android:id="@+id/email_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/lgn_email_hint"

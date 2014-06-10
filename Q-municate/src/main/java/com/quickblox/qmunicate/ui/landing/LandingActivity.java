@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.landing;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,7 +48,6 @@ public class LandingActivity extends BaseActivity {
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initVersionName();
-        saveLandingShown();
     }
 
     @Override
@@ -60,10 +60,6 @@ public class LandingActivity extends BaseActivity {
     public void onStop() {
         super.onStop();
         facebookHelper.onActivityStop();
-    }
-
-    private void saveLandingShown() {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LANDING_SHOWN, true);
     }
 
     private void initVersionName() {
@@ -114,12 +110,21 @@ public class LandingActivity extends BaseActivity {
         }
     }
 
+    // TODO SF must be removed to BaseAuthorizationActivity
+    private QBUser getUserWithAvatar(QBUser user) {
+        if(App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK)
+                && TextUtils.isEmpty(user.getWebsite())) {
+            user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+        }
+        return user;
+    }
+
     private class SocialLoginSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            App.getInstance().setUser(getUserWithAvatar(user));
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             DatabaseManager.clearAllCache(LandingActivity.this);
             MainActivity.start(LandingActivity.this);
