@@ -214,6 +214,7 @@ public class LoginActivity extends BaseActivity {
                 saveUserCredentials(user);
             }
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IS_LOGINED, true);
             DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();

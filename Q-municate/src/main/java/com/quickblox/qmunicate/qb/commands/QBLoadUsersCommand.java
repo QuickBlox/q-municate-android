@@ -15,6 +15,8 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class QBLoadUsersCommand extends ServiceCommand {
@@ -39,11 +41,23 @@ public class QBLoadUsersCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
+        Collections.sort(userList, new UserComparator());
         List<Friend> friendList = FriendUtils.createFriendList(userList);
         friendList.remove(FriendUtils.createFriend(App.getInstance().getUser()));
 
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendList);
         return params;
+    }
+
+    private class UserComparator implements Comparator<QBUser> {
+
+        @Override
+        public int compare(QBUser first, QBUser second) {
+            if (first.getFullName() == null || second.getFullName() == null) {
+                return 0;
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(first.getFullName(), second.getFullName());
+        }
     }
 }
