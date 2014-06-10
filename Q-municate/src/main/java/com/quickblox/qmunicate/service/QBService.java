@@ -19,7 +19,6 @@ import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBJoinAllGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
@@ -86,7 +85,7 @@ public class QBService extends Service {
         initCommands();
     }
 
-    private void initThreads(){
+    private void initThreads() {
         threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
                 KEEP_ALIVE_TIME_UNIT, threadQueue);
         threadPool.allowCoreThreadTimeOut(true);
@@ -307,18 +306,6 @@ public class QBService extends Service {
 
         addLoginChatAndInitCommands(loginCommand);
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, loginCommand);
-    }
-
-    private void registerJoinCommand() {
-        QBJoinAllGroupDialogCommand joinAllGroupDialogCommand = new QBJoinAllGroupDialogCommand(this,
-                authHelper, chatHelper, QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
-                QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
-        ServiceCommand loginCommand = new QBLoginChatCommand(this, authHelper, chatHelper,
-                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
-        ServiceCommand joinGroupsCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-        joinAllGroupDialogCommand.addCommand(loginCommand);
-        joinAllGroupDialogCommand.addCommand(joinGroupsCommand);
-        serviceCommandMap.put(QBServiceConsts.LOGIN_ACTION, joinAllGroupDialogCommand);
     }
 
     private void registerLoginCommand() {
