@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
@@ -32,14 +33,12 @@ import java.util.List;
 
 public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-    public static boolean isNeedToShowCrouton = false;
     public static final int ID_FRIEND_LIST_FRAGMENT = 0;
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
-
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    public static boolean isNeedToShowCrouton = false;
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -120,6 +119,7 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         }
 
         checkGCMRegistration();
+        loadFriendsList();
         loadChatsDialogs();
     }
 
@@ -151,6 +151,14 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         }
     }
 
+    private void loadFriendsList() {
+        QBLoadFriendListCommand.start(this);
+    }
+
+    private void loadChatsDialogs() {
+        QBLoadDialogsCommand.start(this);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -162,10 +170,6 @@ public class MainActivity extends BaseActivity implements NavigationDrawerFragme
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsDialogsSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         updateBroadcastActionList();
-    }
-
-    private void loadChatsDialogs() {
-        QBLoadDialogsCommand.start(this);
     }
 
     private void joinGroupDialogs(List<QBDialog> dialogsList) {

@@ -37,6 +37,7 @@ public class QBVideoChatHelper extends BaseHelper {
     }
 
     public void init() {
+        lo.g("init videochat");
         signalingListener = new VideoSignalingListener();
         QBChatService.getInstance().getSignalingManager().addSignalingManagerListener(
                 new SignalingManagerListener());

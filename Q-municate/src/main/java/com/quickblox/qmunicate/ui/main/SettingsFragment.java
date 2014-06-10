@@ -155,7 +155,7 @@ public class SettingsFragment extends BaseFragment {
         @Override
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();
-            DialogUtils.show(baseActivity, getString(R.string.dlg_password_changed));
+            DialogUtils.showLong(baseActivity, getString(R.string.dlg_password_changed));
         }
     }
 }

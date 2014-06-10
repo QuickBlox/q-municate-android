@@ -26,9 +26,10 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
     private QBDialog dialog;
 
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog) {
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor, true);
         this.dialog = dialog;
+        this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override

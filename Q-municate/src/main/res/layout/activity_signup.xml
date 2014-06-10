@@ -13,7 +13,7 @@
         android:maxLength="128" />
 
     <EditText
-        android:id="@+id/email_edittext"
+        android:id="@+id/email_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

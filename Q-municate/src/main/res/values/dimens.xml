@@ -39,5 +39,8 @@
     <dimen name="corners_big_value">15dp</dimen>
 
     <dimen name="dlg_avatar_new_message_wh">30dp</dimen>
-    <dimen name="dlg_attach_image_height">200dp</dimen>
+
+    <dimen name="smile_height">30dp</dimen>
+    <dimen name="smile_width">30dp</dimen>
+
 </resources>
