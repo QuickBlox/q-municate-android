@@ -9,7 +9,7 @@
     android:paddingRight="20dp">
 
     <LinearLayout
-        android:id="@+id/changeAvatarLinearLayout"
+        android:id="@+id/change_avatar_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
@@ -50,20 +50,19 @@
         android:textColor="@android:color/darker_gray" />
 
     <RelativeLayout
-        android:id="@+id/changeFullNameRelativeLayout"
+        android:id="@+id/change_fullname_relativelayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
         android:clickable="true"
-        android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
         <EditText
-            android:id="@+id/fullNameEditText"
+            android:id="@+id/fullname_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/changeFullNameTextView"
+            android:layout_toLeftOf="@+id/change_fullname_textview"
             android:background="@null"
             android:clickable="false"
             android:focusableInTouchMode="true"
@@ -74,7 +73,7 @@
             android:textSize="@dimen/text_size" />
 
         <TextView
-            android:id="@+id/changeFullNameTextView"
+            android:id="@+id/change_fullname_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -87,36 +86,36 @@
 
     </RelativeLayout>
 
-    <TextView
-        style="?android:attr/listSeparatorTextViewStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/prf_email"
-        android:textColor="@android:color/darker_gray" />
-
-    <RelativeLayout
-        android:id="@+id/changeEmailRelativeLayout"
+    <LinearLayout
+        android:id="@+id/email_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
-        android:paddingBottom="10dp"
+        android:orientation="vertical"
         android:paddingTop="10dp">
 
         <TextView
-            android:id="@+id/email_textview"
+            android:id="@+id/label_email_textview"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:text="@string/prf_email"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/email_textview"
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:background="@null"
             android:clickable="false"
             android:ellipsize="end"
             android:singleLine="true"
-            android:duplicateParentState="true"
             android:textColor="@android:color/black"
             android:textSize="@dimen/text_size" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <TextView
         style="?android:attr/listSeparatorTextViewStyle"

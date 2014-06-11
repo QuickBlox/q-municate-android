@@ -288,15 +288,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return messageBody;
     }
 
-    private String getAttachUrlIfExists(QBChatMessage chatMessage) {
-        String attachURL = Consts.EMPTY_STRING;
-        if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(
-                    chatMessage.getAttachments()));
-        }
-        return attachURL;
-    }
-
     private void tryJoinRoomChat(String roomJid) {
         try {
             joinRoomChat(roomJid);
@@ -368,7 +359,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             } else {
                 time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             }
-            String attachUrl = getAttachUrlIfExists(chatMessage);
+            String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
             saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
@@ -381,7 +372,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-            String attachUrl = getAttachUrlIfExists(chatMessage);
+            String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String roomJid = roomChat.getJid();
             long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             saveMessageToCache(new DialogMessageCache(roomJid, chatMessage.getSenderId(),
