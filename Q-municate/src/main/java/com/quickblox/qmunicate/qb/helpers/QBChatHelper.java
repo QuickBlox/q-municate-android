@@ -156,9 +156,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         roomChat = roomChatManager.getRoom(roomJidId);
         if (roomChat == null) {
             roomChat = roomChatManager.createRoom(roomJidId);
-            roomChat.addMessageListener(roomChatMessageListener);
-            roomChat.join();
         }
+        roomChat.addMessageListener(roomChatMessageListener);
+        roomChat.join();
     }
 
     private void inviteFriendsToRoom(QBDialog dialog,

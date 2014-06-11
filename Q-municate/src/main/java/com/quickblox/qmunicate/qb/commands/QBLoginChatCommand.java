@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.caching.DatabaseManager;
@@ -24,6 +25,7 @@ import java.util.List;
 public class QBLoginChatCommand extends ServiceCommand {
 
     public static final String SHOULD_START_MULTICHATS = "start_multichats";
+    private static final String TAG = QBLoginChatCommand.class.getSimpleName();
 
     private QBAuthHelper authHelper;
     private QBChatHelper chatHelper;
@@ -45,21 +47,16 @@ public class QBLoginChatCommand extends ServiceCommand {
         Bundle bundle = new Bundle();
         bundle.putBoolean(SHOULD_START_MULTICHATS, shouldStartMultiChat);
         Intent intent = new Intent(QBServiceConsts.LOGIN_CHAT_ACTION, null, context, QBService.class);
+        intent.putExtras(bundle);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        if (extras != null) {
-            shouldStartMultiChat = extras.getBoolean(SHOULD_START_MULTICHATS, false);
-        }
         // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
         tryLogin();
         if (!chatHelper.isLoggedIn()) {
             throw new Exception();
-        }
-        if (shouldStartMultiChat) {
-            execJoin(extras);
         }
         return extras;
     }
@@ -79,6 +76,7 @@ public class QBLoginChatCommand extends ServiceCommand {
     private Bundle execJoin(Bundle extras) throws Exception {
         List<QBDialog> dialogs = DatabaseManager.getDialogs(context);
         List<String> roomJidListFromDialogs = ChatUtils.getRoomJidListFromDialogs(dialogs);
+        Log.i(TAG, "execJoin" + roomJidListFromDialogs.size() + " " + roomJidListFromDialogs.toString());
         for (String roomJid : roomJidListFromDialogs) {
             chatHelper.joinRoomChat(roomJid);
         }

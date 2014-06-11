@@ -26,6 +26,7 @@ import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestCommand;
@@ -133,6 +134,7 @@ public class QBService extends Service {
         registerLoadDialogMessagesCommand();
         registerUpdateStatusMessageCommand();
         registerSendPUshCommand();
+        registerLoginAndJoinGroupChat();
     }
 
     private void registerUpdateGroupNameCommand() {
@@ -168,6 +170,19 @@ public class QBService extends Service {
                 QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION, QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);
     }
+
+    private void registerLoginAndJoinGroupChat() {
+        QBLoginAndJoinDialogsCommand joinGroupChatsCommand = new QBLoginAndJoinDialogsCommand(this,
+                QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION,
+                QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION);
+        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
+        joinGroupChatsCommand.addCommand(loginChatCommand);
+
+        ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+        joinGroupChatsCommand.addCommand(joinChatCommand);
+        serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, joinGroupChatsCommand);
+    }
+
 
     private void registerCreateGroupChatCommand() {
         QBCreateGroupDialogCommand createGroupChatCommand = new QBCreateGroupDialogCommand(this, chatHelper,

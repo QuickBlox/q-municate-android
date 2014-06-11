@@ -52,6 +52,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
+
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
@@ -145,6 +146,16 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected void onStop() {
         super.onStop();
         unbindService();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
     }
 
     @Override

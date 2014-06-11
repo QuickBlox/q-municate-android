@@ -20,7 +20,7 @@ import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
@@ -31,7 +31,7 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     public static final int ID_FRIEND_LIST_FRAGMENT = 0;
     public static final int ID_CHATS_LIST_FRAGMENT = 1;

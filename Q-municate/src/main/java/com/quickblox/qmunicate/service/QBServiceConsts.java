@@ -109,7 +109,8 @@ public class QBServiceConsts {
     public static final String ADD_FRIENDS_TO_GROUP_FAIL_ACTION = "add_friends_to_group_fail_action";
     public static final String UPDATE_GROUP_NAME_SUCCESS_ACTION = "update_group_name_success_action";
     public static final String UPDATE_GROUP_NAME_FAIL_ACTION = "update_group_name_fail_action";
-
+    public static final String LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION = "login_and_join_chats_sucess_action";
+    public static final String LOGIN_AND_JOIN_CHATS_FAIL_ACTION = "login_and_join_chats_fail_action";
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
@@ -148,4 +149,5 @@ public class QBServiceConsts {
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
+    public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
 }
