@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -34,6 +35,7 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.KeyboardUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -45,6 +47,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     private LinearLayout changeAvatarLinearLayout;
     private RelativeLayout changeFullNameRelativeLayout;
+    private LinearLayout emailLinearLayout;
     private LinearLayout changeStatusLinearLayout;
     private RoundedImageView avatarImageView;
     private EditText fullNameEditText;
@@ -87,13 +90,14 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     }
 
     private void initUI() {
-        changeAvatarLinearLayout = _findViewById(R.id.changeAvatarLinearLayout);
+        changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
         avatarTextView = _findViewById(R.id.avatar_textview);
-        changeFullNameRelativeLayout = _findViewById(R.id.changeFullNameRelativeLayout);
+        changeFullNameRelativeLayout = _findViewById(R.id.change_fullname_relativelayout);
+        emailLinearLayout = _findViewById(R.id.email_linearlayout);
         changeStatusLinearLayout = _findViewById(R.id.changeStatusLinearLayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
-        fullNameEditText = _findViewById(R.id.fullNameEditText);
+        fullNameEditText = _findViewById(R.id.fullname_edittext);
         emailTextView = _findViewById(R.id.email_textview);
         statusMessageEditText = _findViewById(R.id.statusMessageEditText);
     }
@@ -109,7 +113,12 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void initUIWithUsersData() {
         loadAvatar();
         fullNameEditText.setText(user.getFullName());
-        emailTextView.setText(user.getEmail());
+        if(TextUtils.isEmpty(user.getEmail())) {
+            emailLinearLayout.setVisibility(View.GONE);
+        } else {
+            emailLinearLayout.setVisibility(View.VISIBLE);
+            emailTextView.setText(user.getEmail());
+        }
         String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS,
                 Consts.EMPTY_STRING);
         statusMessageEditText.setText(status);
@@ -134,11 +143,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.avatar_textview:
-            case R.id.changeAvatarLinearLayout:
+            case R.id.change_avatar_linearlayout:
             case R.id.avatar_imageview:
                 changeAvatarOnClick();
                 break;
-            case R.id.changeFullNameRelativeLayout:
+            case R.id.change_fullname_relativelayout:
                 changeFullNameOnClick();
                 break;
             case R.id.changeStatusLinearLayout:
@@ -212,6 +221,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         editText.requestFocus();
     }
 
+    private void stopChangingEditText(EditText editText){
+        editText.setEnabled(false);
+        KeyboardUtils.hideKeyboard(this);
+    }
+
     public void changeStatusOnClick() {
         initChangingEditText(statusMessageEditText);
     }
@@ -256,11 +270,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             String status = statusMessageEditText.getText().toString();
             QBUpdateUserCommand.start(this, user, null, status);
         }
+        stopChangingEditText(fullNameEditText);
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE && emailCurrent
-                .length() > Consts.ZERO_INT_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {

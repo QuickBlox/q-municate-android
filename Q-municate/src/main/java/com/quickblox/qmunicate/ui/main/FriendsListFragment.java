@@ -54,6 +54,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private Cursor friendsCursor;
     private SearchOnActionExpandListener searchListener;
     private MenuItem searchItem;
+    private SearchView searchView;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -72,7 +73,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         searchListener = new SearchOnActionExpandListener();
         searchItem = menu.findItem(R.id.action_search);
         searchItem.setOnActionExpandListener(searchListener);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
 
@@ -253,6 +254,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.showProgress();
         QBAddFriendCommand.start(baseActivity, friend);
         KeyboardUtils.hideKeyboard(baseActivity);
+        searchView.clearFocus();
     }
 
     private void startUsersListLoader(String newText) {

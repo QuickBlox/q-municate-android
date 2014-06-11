@@ -316,8 +316,11 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION);
         QBLoginRestWithSocialCommand loginRestCommand = new QBLoginRestWithSocialCommand(this, authHelper,
                 QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, QBServiceConsts.LOGIN_REST_FAIL_ACTION);
+        QBUpdateUserCommand updateUserCommand = new QBUpdateUserCommand(this, authHelper, friendListHelper,
+                QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION);
 
         loginCommand.addCommand(loginRestCommand);
+        loginCommand.addCommand(updateUserCommand);
 
         addLoginChatAndInitCommands(loginCommand);
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, loginCommand);

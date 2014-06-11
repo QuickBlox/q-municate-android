@@ -60,6 +60,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
         } else {
             authHelper.updateUser(user, file);
         }
-        friendListHelper.sendStatus(status);
+        // TODO SF temp
+		// friendListHelper.sendStatus(status);
     }
 }

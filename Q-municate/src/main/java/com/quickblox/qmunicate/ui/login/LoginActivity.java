@@ -194,21 +194,12 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    // TODO SF must be removed to BaseAuthorizationActivity
-    private QBUser getUserWithAvatar(QBUser user) {
-        if (App.getInstance().getUserLoginType().equals(LoginType.FACEBOOK) && TextUtils.isEmpty(
-                user.getWebsite())) {
-            user.setWebsite(this.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
-        }
-        return user;
-    }
-
     private class LoginSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(getUserWithAvatar(user));
+            App.getInstance().setUser(user);
             if (rememberMeCheckBox.isChecked()) {
                 saveRememberMe(true);
                 saveUserCredentials(user);

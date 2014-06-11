@@ -3,8 +3,10 @@ package com.quickblox.qmunicate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -37,7 +39,15 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-        extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        if(TextUtils.isEmpty(user.getWebsite())) {
+            QBUser newUser = new QBUser();
+            newUser.setId(user.getId());
+            newUser.setPassword(user.getPassword());
+            newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+            extras.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
+        } else {
+            extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        }
         return extras;
     }
 }

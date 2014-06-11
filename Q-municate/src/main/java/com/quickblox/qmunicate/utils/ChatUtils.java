@@ -136,4 +136,13 @@ public class ChatUtils {
         }
         return friendIdsList;
     }
+
+    public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
+        String attachURL = Consts.EMPTY_STRING;
+        if (TextUtils.isEmpty(chatMessage.getBody())) {
+            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(
+                    chatMessage.getAttachments()));
+        }
+        return attachURL;
+    }
 }
