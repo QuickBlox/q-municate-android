@@ -77,6 +77,7 @@ public class ChangePasswordDialog extends DialogFragment {
                     String oldPasswordText = oldPassword.getText().toString();
                     String newPasswordText = newPassword.getText().toString();
                     String confirmPasswordText = confirmPassword.getText().toString();
+                    QBUser user = App.getInstance().getUser();
 
                     boolean isOldPasswordEmpty = TextUtils.isEmpty(oldPasswordText);
                     boolean isNewPasswordEmpty = TextUtils.isEmpty(newPasswordText);
@@ -90,6 +91,12 @@ public class ChangePasswordDialog extends DialogFragment {
 
                     if (!newPasswordText.equals(confirmPasswordText)) {
                         DialogUtils.showLong(getActivity(), getString(R.string.dlg_passwords_not_equal));
+                        yesButton.setClickable(false);
+                        return false;
+                    }
+
+                    if(!user.getPassword().equals(oldPasswordText)){
+                        DialogUtils.showLong(getActivity(), getString(R.string.dlg_old_password_wrong));
                         yesButton.setClickable(false);
                         return false;
                     }
