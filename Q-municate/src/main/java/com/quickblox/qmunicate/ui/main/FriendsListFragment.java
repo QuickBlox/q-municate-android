@@ -287,12 +287,10 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
             state = State.FRIENDS_LIST;
-
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
-
+            emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
             if (isHideSearchView) {
                 isHideSearchView = false;
-                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
                 friendsListAdapter.setSearchCharacters(null);
                 friendsListAdapter.setFilterQueryProvider(null);
                 friendsListView.removeFooterView(globalSearchLayout);
