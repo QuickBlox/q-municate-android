@@ -64,11 +64,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        if (dialog.getLastMessage() == null && dialog.getLastMessageUserId() != Consts.ZERO_INT_VALUE) {
-            viewHolder.lastMessageTextView.setText(resources.getString(R.string.dlg_attached_last_message));
-        } else {
-            viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
-        }
+        viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
     }
 
     public Friend getOccupantById(int occupantId) {

@@ -129,10 +129,10 @@ public class DatabaseManager {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
-            values = getContentValuesForUpdateDialogTable(dialog);
+            values = getContentValuesForUpdateDialogTable(context, dialog);
             resolver.update(DialogTable.CONTENT_URI, values, condition, null);
         } else {
-            values = getContentValuesForCreateDialogTable(dialog, roomJidId);
+            values = getContentValuesForCreateDialogTable(context, dialog, roomJidId);
             resolver.insert(DialogTable.CONTENT_URI, values);
         }
         cursor.close();
@@ -334,7 +334,7 @@ public class DatabaseManager {
         return values;
     }
 
-    private static ContentValues getContentValuesForUpdateDialogTable(QBDialog dialog) {
+    private static ContentValues getContentValuesForUpdateDialogTable(Context context, QBDialog dialog) {
         ContentValues values = new ContentValues();
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
@@ -345,21 +345,19 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
-        if (dialog.getLastMessageUserId() != null) {
-            values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
-        }
+        values.put(DialogTable.Cols.LAST_MESSAGE, TextUtils.isEmpty(dialog.getLastMessage()) ? context.getString(R.string.dlg_attached_last_message) : dialog.getLastMessage());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;
     }
 
-    private static ContentValues getContentValuesForCreateDialogTable(QBDialog dialog, String roomJidId) {
+    private static ContentValues getContentValuesForCreateDialogTable(Context context, QBDialog dialog, String roomJidId) {
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
         values.put(DialogTable.Cols.ROOM_JID_ID, roomJidId);
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
+        values.put(DialogTable.Cols.LAST_MESSAGE, TextUtils.isEmpty(dialog.getLastMessage()) ? context.getString(R.string.dlg_attached_last_message) : dialog.getLastMessage());
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());

@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 
 import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.facebook.Session;
@@ -70,6 +71,9 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
+        if(TextUtils.isEmpty(user.getWebsite())) {
+            return user;
+        }
         String password = user.getPassword();
         this.user = QBUsers.updateUser(user);
         this.user.setPassword(password);

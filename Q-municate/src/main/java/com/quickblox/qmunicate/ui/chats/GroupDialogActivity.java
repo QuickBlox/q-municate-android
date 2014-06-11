@@ -129,7 +129,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void startUpdateChatDialog() {
-        QBUpdateDialogCommand.start(this, getQBDialog(), roomJid);
+        QBDialog dialog = getQBDialog();
+        if(dialog != null) {
+            QBUpdateDialogCommand.start(this, getQBDialog(), roomJid);
+        }
     }
 
     private QBDialog getQBDialog() {
