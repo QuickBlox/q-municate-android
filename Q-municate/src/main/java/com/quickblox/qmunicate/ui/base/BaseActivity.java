@@ -149,16 +149,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onAttachFragment(Fragment fragment) {
-        super.onAttachFragment(fragment);
-    }
-
-    @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();

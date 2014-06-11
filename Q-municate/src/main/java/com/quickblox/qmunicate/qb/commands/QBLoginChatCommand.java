@@ -3,16 +3,13 @@ package com.quickblox.qmunicate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.module.chat.errors.QBChatErrors;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 
 import org.jivesoftware.smack.SmackException;
@@ -20,11 +17,9 @@ import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 public class QBLoginChatCommand extends ServiceCommand {
 
-    public static final String SHOULD_START_MULTICHATS = "start_multichats";
     private static final String TAG = QBLoginChatCommand.class.getSimpleName();
 
     private QBAuthHelper authHelper;
@@ -43,20 +38,12 @@ public class QBLoginChatCommand extends ServiceCommand {
         context.startService(intent);
     }
 
-    public static void start(Context context, boolean shouldStartMultiChat) {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(SHOULD_START_MULTICHATS, shouldStartMultiChat);
-        Intent intent = new Intent(QBServiceConsts.LOGIN_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtras(bundle);
-        context.startService(intent);
-    }
-
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
         tryLogin();
         if (!chatHelper.isLoggedIn()) {
-            throw new Exception();
+            throw new Exception(QBChatErrors.AUTHENTICATION_FAILED);
         }
         return extras;
     }
@@ -70,16 +57,5 @@ public class QBLoginChatCommand extends ServiceCommand {
                 chatHelper.login(authHelper.getUser());
             } catch (SmackException.ResourceBindingNotOfferedException ignore) { /* NOP */ }
         }
-    }
-
-
-    private Bundle execJoin(Bundle extras) throws Exception {
-        List<QBDialog> dialogs = DatabaseManager.getDialogs(context);
-        List<String> roomJidListFromDialogs = ChatUtils.getRoomJidListFromDialogs(dialogs);
-        Log.i(TAG, "execJoin" + roomJidListFromDialogs.size() + " " + roomJidListFromDialogs.toString());
-        for (String roomJid : roomJidListFromDialogs) {
-            chatHelper.joinRoomChat(roomJid);
-        }
-        return extras;
     }
 }

@@ -183,7 +183,6 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, joinGroupChatsCommand);
     }
 
-
     private void registerCreateGroupChatCommand() {
         QBCreateGroupDialogCommand createGroupChatCommand = new QBCreateGroupDialogCommand(this, chatHelper,
                 QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION,
