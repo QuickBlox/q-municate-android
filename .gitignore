@@ -38,3 +38,4 @@ local.properties
 
 # project structure
 /dependencies/QB-SDK
+/build/
