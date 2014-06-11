@@ -34,6 +34,7 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.KeyboardUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -212,6 +213,11 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         editText.requestFocus();
     }
 
+    private void stopChangingEditText(EditText editText){
+        editText.setEnabled(false);
+        KeyboardUtils.hideKeyboard(this);
+    }
+
     public void changeStatusOnClick() {
         initChangingEditText(statusMessageEditText);
     }
@@ -257,6 +263,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
             String status = statusMessageEditText.getText().toString();
             QBUpdateUserCommand.start(this, user, null, status);
         }
+        stopChangingEditText(fullNameEditText);
     }
 
     private boolean isUserDataCorrect() {
