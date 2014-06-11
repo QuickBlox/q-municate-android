@@ -1,0 +1,91 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_call_background_color"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/act_call_margin_top"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/act_call_name_size" />
+
+            <TextView
+                android:id="@+id/timerTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="00:00"
+                android:textColor="@color/screen_call_timer_text_color"
+                android:textSize="@dimen/act_call_name_size" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/avatar_imageview"
+            android:layout_width="@dimen/act_call_avatar_size"
+            android:layout_height="@dimen/act_call_avatar_size"
+            android:layout_alignParentTop="false"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/act_call_margin_top"
+            android:src="@drawable/placeholder_user" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/muteDynamicButton"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center|left"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_dynamic" />
+
+            <ImageButton
+                android:id="@+id/stopСallButton"
+                android:layout_width="@dimen/act_call_end_button_width"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_centerInParent="true"
+                android:background="@drawable/button_end_call_selector"
+                android:src="@drawable/ic_encall" />
+
+            <ImageButton
+                android:id="@+id/muteMicrophoneButton"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center|right"
+                android:background="@drawable/button_general_selector"
+                android:padding="5dp"
+                android:src="@drawable/ic_call_mute_a" />
+        </RelativeLayout>
+    </RelativeLayout>
+</LinearLayout>

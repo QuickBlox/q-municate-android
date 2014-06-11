@@ -1,0 +1,12 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <shape>
+            <solid android:color="@color/gray" />
+            <corners
+                android:bottomLeftRadius="@dimen/corners_big_value"
+                android:bottomRightRadius="@dimen/corners_big_value"
+                android:topLeftRadius="@dimen/corners_big_value"
+                android:topRightRadius="@dimen/corners_big_value" />
+        </shape>
+    </item>
+</selector>

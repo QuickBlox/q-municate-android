@@ -1,0 +1,70 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/fullname_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/sup_fullname_hint"
+        android:inputType="textPersonName"
+        android:maxLength="128" />
+
+    <EditText
+        android:id="@+id/email_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/sup_email_hint"
+        android:inputType="textEmailAddress"
+        android:maxLength="128" />
+
+    <EditText
+        android:id="@+id/password_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/lgn_password_hint"
+        android:inputType="textPassword"
+        android:maxLength="256" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:background="@drawable/button_general_selector"
+        android:clickable="true"
+        android:onClick="changeAvatarOnClickListener"
+        android:orientation="horizontal">
+
+        <com.quickblox.qmunicate.ui.views.RoundedImageView
+            android:id="@+id/avatar_imageview"
+            android:layout_width="@dimen/image_view_big_avatar_layout_width"
+            android:layout_height="@dimen/image_view_big_avatar_layout_height"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_user" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/sup_choose_user_picture"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:background="@drawable/button_sign_up_blue_selector"
+        android:onClick="signUpOnClickListener"
+        android:text="@string/sup_sign_up"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/button_text_size" />
+</LinearLayout>
+

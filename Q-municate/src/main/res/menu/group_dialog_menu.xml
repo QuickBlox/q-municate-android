@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_group_details"
+        android:icon="@drawable/ic_action_chat_info"
+        android:showAsAction="ifRoom"
+        android:title="@string/acb_chat_details_title"/>
+
+</menu>

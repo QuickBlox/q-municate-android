@@ -1,0 +1,158 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <LinearLayout
+        android:id="@+id/change_avatar_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_general_selector"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <com.quickblox.qmunicate.ui.views.RoundedImageView
+            android:id="@+id/avatar_imageview"
+            android:layout_width="@dimen/image_view_big_avatar_layout_width"
+            android:layout_height="@dimen/image_view_big_avatar_layout_height"
+            android:duplicateParentState="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_user" />
+
+        <TextView
+            android:id="@+id/avatar_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:paddingRight="70dp"
+            android:duplicateParentState="true"
+            android:text="@string/sup_choose_user_picture"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
+
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/prf_full_name"
+        android:textColor="@android:color/darker_gray" />
+
+    <RelativeLayout
+        android:id="@+id/change_fullname_relativelayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_general_selector"
+        android:clickable="true"
+        android:paddingTop="10dp">
+
+        <EditText
+            android:id="@+id/fullname_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/change_fullname_textview"
+            android:background="@null"
+            android:clickable="false"
+            android:focusableInTouchMode="true"
+            android:inputType="text"
+            android:singleLine="true"
+            android:duplicateParentState="true"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size" />
+
+        <TextView
+            android:id="@+id/change_fullname_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/button_general_selector"
+            android:clickable="false"
+            android:duplicateParentState="true"
+            android:text="@string/prf_change"
+            android:textColor="@color/link_text_color"
+            android:textSize="@dimen/text_size" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/email_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_general_selector"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/label_email_textview"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prf_email"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:id="@+id/email_textview"
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:background="@null"
+            android:clickable="false"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size" />
+
+    </LinearLayout>
+
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/prf_status_message"
+        android:visibility="gone"
+        android:textColor="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:id="@+id/changeStatusLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:clickable="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/statusMessageEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:clickable="false"
+            android:enabled="false"
+            android:duplicateParentState="true"
+            android:inputType="textMultiLine"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:clickable="false"
+            android:duplicateParentState="true"
+            android:text="@string/prf_edit_status"
+            android:textColor="@color/link_text_color"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
+</LinearLayout>

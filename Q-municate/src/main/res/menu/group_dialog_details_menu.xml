@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_add"
+        android:icon="@drawable/ic_action_add_friend"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/acb_add_friend_to_chat_title" />
+    <item
+        android:id="@+id/action_leave"
+        android:icon="@drawable/ic_action_leave_chat"
+        android:orderInCategory="100"
+        android:showAsAction="ifRoom"
+        android:title="@string/acb_leave_chat_title"/>
+</menu>
