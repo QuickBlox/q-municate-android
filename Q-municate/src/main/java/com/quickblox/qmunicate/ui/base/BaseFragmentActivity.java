@@ -208,6 +208,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         return transaction;
     }
 
+    protected void onFailAction(String action) {
+
+    }
+
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return true;
@@ -220,6 +224,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseFragmentActivity.this, e);
             hideProgress();
+            onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
 

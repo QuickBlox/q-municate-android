@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.service;
 
 public class QBServiceConsts {
 
+    public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
     public static final String ADD_FRIENDS_ACTION = "add_friendsList_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";

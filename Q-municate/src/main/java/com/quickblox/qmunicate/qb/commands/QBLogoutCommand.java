@@ -9,6 +9,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 public class QBLogoutCommand extends CompositeServiceCommand {
@@ -26,7 +27,11 @@ public class QBLogoutCommand extends CompositeServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        super.perform(extras);
+        try {
+            super.perform(extras);
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, e);
+        }
         resetFriendList();
         resetRememberMe();
         resetUserData();

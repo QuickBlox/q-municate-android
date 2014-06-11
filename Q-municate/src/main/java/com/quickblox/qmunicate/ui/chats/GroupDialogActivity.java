@@ -94,7 +94,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onUpdateChatDialog() {
-        if (!messagesAdapter.isEmpty()) {
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
             startUpdateChatDialog();
         }
     }
@@ -130,7 +130,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
-        if(dialog != null) {
+        if (dialog != null) {
             QBUpdateDialogCommand.start(this, getQBDialog(), roomJid);
         }
     }
@@ -221,6 +221,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         addActions();
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
+        if (QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION.equals(action)) {
+            finish();
+        }
     }
 
     private void initStartLoadDialogMessages() {

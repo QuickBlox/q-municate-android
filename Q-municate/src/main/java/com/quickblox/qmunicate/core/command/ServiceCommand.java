@@ -30,6 +30,7 @@ public abstract class ServiceCommand implements Command {
             ErrorUtils.logError(e);
             result = new Bundle();
             result.putSerializable(QBServiceConsts.EXTRA_ERROR, e);
+            result.putString(QBServiceConsts.COMMAND_ACTION, failAction);
             sendResult(result, failAction);
         }
     }
