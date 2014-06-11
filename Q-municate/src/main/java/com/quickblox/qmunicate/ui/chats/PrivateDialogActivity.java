@@ -33,11 +33,13 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private Friend opponentFriend;
     private QBDialog dialog;
-
+    private static String currentOpponent;
     private String roomJidId;
 
     public PrivateDialogActivity() {
@@ -188,9 +190,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
+    public static String getCurrentOpponent() {
+        return currentOpponent;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
+        currentOpponent = opponentFriend.getFullname();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentOpponent = null;
+        Crouton.cancelAllCroutons();
     }
 }

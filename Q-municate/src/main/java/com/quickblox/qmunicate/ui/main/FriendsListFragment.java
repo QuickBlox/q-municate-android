@@ -120,8 +120,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         initGlobalSearchButton(layoutInflater);
         initFriendsList();
 
-//        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
-//                new FriendsListTipButtonClicker(this));
+        //        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
+        //                new FriendsListTipButtonClicker(this));
 
         return rootView;
     }
@@ -205,8 +205,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     public void onClick(View view) {
                         startGlobalSearch();
                     }
-                }
-        );
+                });
     }
 
     private void initFriendsList() {
@@ -238,8 +237,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     public void onUserSelected(int position) {
                         addToFriendList(usersList.get(position));
                     }
-                }
-        );
+                });
 
         friendsTitle.setText(R.string.frl_all_users);
 

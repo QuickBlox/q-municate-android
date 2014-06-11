@@ -25,6 +25,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
@@ -243,9 +244,14 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.isNeedToShowCrouton) {
+            if (extras == null) {
+                return;
+            }
+            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+            boolean isNotCurrentOpponent = sender != null &&
+                    !sender.equals(PrivateDialogActivity.getCurrentOpponent());
+            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);
             }
         }
