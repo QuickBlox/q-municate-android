@@ -5,15 +5,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.base.BaseListAdapter;
-import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
 
-public class NavigationDrawerAdapter extends BaseListAdapter<String> {
+public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.UpdateCountUnreadDialogsListener {
+
+    private TextView counterUnreadChatsDialogs;
 
     public NavigationDrawerAdapter(BaseActivity activity, List<String> objects) {
         super(activity, objects);
@@ -21,7 +21,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder holder;
+        ViewHolder holder;
         final String data = getItem(position);
         String chatItem = resources.getStringArray(
                 R.array.nvd_items_array)[MainActivity.ID_CHATS_LIST_FRAGMENT];
@@ -38,13 +38,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> {
         }
 
         if (data.equals(chatItem)) {
-            int count = getCounterUnreadDialogs();
-            holder.unreadMessagesTextView.setText(count + Consts.EMPTY_STRING);
-            if (count > Consts.ZERO_INT_VALUE) {
-                holder.unreadMessagesTextView.setVisibility(View.VISIBLE);
-            } else {
-                holder.unreadMessagesTextView.setVisibility(View.GONE);
-            }
+            counterUnreadChatsDialogs = holder.unreadMessagesTextView;
         }
 
         holder.nameTextView.setText(data);
@@ -52,8 +46,14 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> {
         return convertView;
     }
 
-    private int getCounterUnreadDialogs() {
-        return DatabaseManager.getCountUnreadDialogs(baseActivity);
+    @Override
+    public void onUpdateCountUnreadDialogs(int count) {
+        if (count > Consts.ZERO_INT_VALUE) {
+            counterUnreadChatsDialogs.setVisibility(View.VISIBLE);
+            counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
+        } else {
+            counterUnreadChatsDialogs.setVisibility(View.GONE);
+        }
     }
 
     private static class ViewHolder {
