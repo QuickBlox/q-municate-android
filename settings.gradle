@@ -1,1 +1,1 @@
-include ':Q-municate', ':dependencies:facebook'
+include ':Q-municate', ':facebook'
