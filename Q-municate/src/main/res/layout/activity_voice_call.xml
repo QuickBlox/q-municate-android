@@ -61,7 +61,7 @@
                 style="@style/baseToggleBtn"
                 android:id="@+id/muteDynamicButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center|left"
                 android:background="@drawable/button_dynamic_selector"
                 android:padding="5dp" />
@@ -81,7 +81,7 @@
                 style="@style/baseToggleBtn"
                 android:id="@+id/muteMicrophoneButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center|right"
                 android:background="@drawable/button_microphone_selector"
                 android:padding="5dp" />
