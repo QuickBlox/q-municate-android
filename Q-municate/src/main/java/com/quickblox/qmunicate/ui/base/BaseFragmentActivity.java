@@ -53,7 +53,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected String currentOpponent;
-    protected List<String> currentOpponents;
     protected String roomJidId;
     private View newMessageView;
     private TextView newMessageTextView;
@@ -260,10 +259,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
             boolean isNotCurrentOpponent = sender != null &&
                     !sender.equals(currentOpponent);
-//            boolean isNotFromCurrentOpponents = sender != null &&
-//                    !currentOpponents.contains(sender);
             boolean isFromCurrentChat = jidId != null && jidId.equals(roomJidId);
-            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent/* && isNotFromCurrentOpponents*/ && !isFromCurrentChat) {
+            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent && !isFromCurrentChat) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);
             }
