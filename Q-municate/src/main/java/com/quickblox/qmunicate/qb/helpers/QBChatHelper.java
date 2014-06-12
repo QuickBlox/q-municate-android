@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
@@ -263,19 +264,21 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         DatabaseManager.deleteAllDialogs(context);
     }
 
-    private void notifyMessageReceived(QBChatMessage chatMessage, Friend friend) {
+    private void notifyMessageReceived(QBChatMessage chatMessage, Friend friend, String jidID) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
-
+        Log.i("Jidd", jidID);
         String fullname = friend.getFullname();
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
         }
+
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullname);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, jidID);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -360,10 +363,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             }
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
-            String roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-            saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+            String privateJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
+            saveMessageToCache(new DialogMessageCache(privateJidId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
-            notifyMessageReceived(chatMessage, friend);
+            notifyMessageReceived(chatMessage, friend, privateJidId);
         }
     }
 
@@ -379,7 +382,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                     chatMessage.getBody(), attachUrl, time, false));
             if (!chatMessage.getSenderId().equals(user.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
-                notifyMessageReceived(chatMessage, friend);
+                notifyMessageReceived(chatMessage, friend, roomJid);
             }
         }
     }

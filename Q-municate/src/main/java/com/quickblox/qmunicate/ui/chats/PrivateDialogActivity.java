@@ -39,8 +39,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private Friend opponentFriend;
     private QBDialog dialog;
-    private static String currentOpponent;
-    private String roomJidId;
 
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog);
@@ -190,7 +188,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
-    public static String getCurrentOpponent() {
+    public String getCurrentOpponent() {
         return currentOpponent;
     }
 

@@ -32,6 +32,7 @@ import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -51,6 +52,9 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    protected String currentOpponent;
+    protected List<String> currentOpponents;
+    protected String roomJidId;
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
@@ -253,9 +257,13 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
                 return;
             }
             String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+            String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
             boolean isNotCurrentOpponent = sender != null &&
-                    !sender.equals(PrivateDialogActivity.getCurrentOpponent());
-            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent) {
+                    !sender.equals(currentOpponent);
+//            boolean isNotFromCurrentOpponents = sender != null &&
+//                    !currentOpponents.contains(sender);
+            boolean isFromCurrentChat = jidId != null && jidId.equals(roomJidId);
+            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent/* && isNotFromCurrentOpponents*/ && !isFromCurrentChat) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);
             }

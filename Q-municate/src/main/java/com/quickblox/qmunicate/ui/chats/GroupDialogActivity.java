@@ -43,7 +43,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private QBDialog dialog;
     private ArrayList<Friend> friendList;
     private String groupName;
-    private String roomJid;
 
     public GroupDialogActivity() {
         super(R.layout.activity_dialog);
@@ -66,14 +65,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onCreate(savedInstanceState);
 
         if (getIntent().hasExtra(EXTRA_ROOM_JID)) {
-            roomJid = getIntent().getStringExtra(EXTRA_ROOM_JID);
+            roomJidId = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
 
-        if (roomJid != null) {
-            dialog = DatabaseManager.getDialogByRoomJidId(this, roomJid);
+        if (roomJidId != null) {
+            dialog = DatabaseManager.getDialogByRoomJidId(this, roomJidId);
             groupName = dialog.getName();
             initListView();
             initStartLoadDialogMessages();
+            fillOpponents();
         } else {
             initChat();
         }
@@ -90,6 +90,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
+    }
+
+    private void fillOpponents(){
+        friendList = (ArrayList<Friend>)DatabaseManager.getOccupantsByRoomJidId(this, roomJidId);
+        currentOpponents = new ArrayList<String>();
+        for(Friend friend : friendList){
+            currentOpponents.add(friend.getFullname());
+        }
     }
 
     @Override
@@ -131,7 +139,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getQBDialog(), roomJid);
+            QBUpdateDialogCommand.start(this, getQBDialog(), roomJidId);
         }
     }
 
@@ -172,7 +180,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
-        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJid);
+        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJidId);
     }
 
     @Override
@@ -233,9 +241,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void initStartLoadDialogMessages() {
         if (messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJid, Consts.ZERO_LONG_VALUE);
+            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
         } else {
-            startLoadDialogMessages(dialog, roomJid, dialog.getLastMessageDateSent());
+            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
         }
     }
 
@@ -245,7 +253,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         public void execute(Bundle bundle) {
             dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupName = dialog.getName();
-            roomJid = dialog.getRoomJid();
+            roomJidId = dialog.getRoomJid();
             initListView();
             hideProgress();
         }

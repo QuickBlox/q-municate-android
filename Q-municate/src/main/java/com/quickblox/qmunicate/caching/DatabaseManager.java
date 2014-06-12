@@ -202,13 +202,12 @@ public class DatabaseManager {
     public static Friend getFriendById(Context context, int friendId) {
         Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
                 FriendTable.Cols.ID + " = " + friendId, null, null);
+        Friend friend = null;
         if (cursor != null && cursor.moveToFirst()) {
-            Friend friend = getFriendFromCursor(cursor);
+            friend = getFriendFromCursor(cursor);
             cursor.close();
-            return friend;
-        } else {
-            return null;
         }
+        return friend;
     }
 
     public static Friend getFriendFromCursor(Cursor cursor) {
@@ -313,6 +312,28 @@ public class DatabaseManager {
         }
 
         return false;
+    }
+
+    public static List<Friend> getOccupantsByRoomJidId(Context context, String roomJidId) {
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
+
+
+        List<Friend> occupants = null;
+        if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
+            occupants = new ArrayList<Friend>();
+            cursor.moveToFirst();
+            String occupantsIDs = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.OCCUPANTS_IDS));
+            String[] occupantsIDsList = occupantsIDs.split(",");
+            for(String id : occupantsIDsList){
+                Friend occupant = getFriendById(context, Integer.parseInt(id));
+                if(occupant != null){
+                    occupants.add(occupant);
+                }
+            }
+            cursor.close();
+        }
+        return occupants;
     }
 
     public static void deleteMessagesByRoomJidId(Context context, String roomJidId) {
