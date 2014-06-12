@@ -268,7 +268,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
-        Log.i("Jidd", jidID);
         String fullname = friend.getFullname();
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);

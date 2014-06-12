@@ -52,8 +52,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
-    protected String currentOpponent;
-    protected String roomJidId;
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
@@ -216,6 +214,15 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
+    protected void onReceiveMessage(Intent intent){
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+            String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+            showNewMessageAlert(sender, message);
+        }
+    }
+
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return true;
@@ -251,19 +258,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            if (extras == null) {
-                return;
-            }
-            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-            String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
-            boolean isNotCurrentOpponent = sender != null &&
-                    !sender.equals(currentOpponent);
-            boolean isFromCurrentChat = jidId != null && jidId.equals(roomJidId);
-            if (MainActivity.isNeedToShowCrouton && isNotCurrentOpponent && !isFromCurrentChat) {
-                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                showNewMessageAlert(sender, message);
-            }
+            onReceiveMessage(intent);
         }
     }
 

@@ -25,6 +25,7 @@ import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -204,5 +205,18 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         super.onPause();
         currentOpponent = null;
         Crouton.cancelAllCroutons();
+    }
+
+    @Override
+    protected void onReceiveMessage(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if(extras == null){
+            return;
+        }
+        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+        boolean isNotCurrentOpponent = sender != null && !sender.equals(currentOpponent);
+        if (MainActivity.isNeedToShowCrouton && !isNotCurrentOpponent) {
+            super.onReceiveMessage(intent);
+        }
     }
 }

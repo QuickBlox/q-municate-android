@@ -171,7 +171,6 @@ public class DatabaseManager {
         return dialogs;
     }
 
-
     public static QBDialog getDialogFromCursor(Cursor cursor) {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
         String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
@@ -310,30 +309,7 @@ public class DatabaseManager {
             cursor.close();
             return true;
         }
-
         return false;
-    }
-
-    public static List<Friend> getOccupantsByRoomJidId(Context context, String roomJidId) {
-        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJidId + "'", null, null);
-
-
-        List<Friend> occupants = null;
-        if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
-            occupants = new ArrayList<Friend>();
-            cursor.moveToFirst();
-            String occupantsIDs = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.OCCUPANTS_IDS));
-            String[] occupantsIDsList = occupantsIDs.split(",");
-            for(String id : occupantsIDsList){
-                Friend occupant = getFriendById(context, Integer.parseInt(id));
-                if(occupant != null){
-                    occupants.add(occupant);
-                }
-            }
-            cursor.close();
-        }
-        return occupants;
     }
 
     public static void deleteMessagesByRoomJidId(Context context, String roomJidId) {

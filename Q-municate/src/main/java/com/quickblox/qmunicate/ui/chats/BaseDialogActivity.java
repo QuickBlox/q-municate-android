@@ -27,6 +27,7 @@ import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
+import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
 import com.quickblox.qmunicate.ui.views.smiles.ChatEditText;
@@ -48,6 +49,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected EditText messageEditText;
     protected ImageButton attachButton;
     protected ImageButton sendButton;
+    protected String currentOpponent;
+    protected String roomJidId;
 
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
