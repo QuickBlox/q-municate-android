@@ -242,7 +242,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         if (MainActivity.isNeedToShowCrouton && !isFromCurrentChat){
             super.onReceiveMessage(intent);
         }
-
     }
 
     private void initStartLoadDialogMessages() {
