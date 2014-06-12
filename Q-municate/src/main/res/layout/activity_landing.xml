@@ -12,7 +12,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_full"/>
+        android:src="@drawable/logo_full"
+        android:layout_marginBottom="5dp" />
 
     <RelativeLayout
         android:id="@+id/connect_facebook_button"

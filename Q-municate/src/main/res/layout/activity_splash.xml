@@ -21,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/logo_full_imageview"
         android:layout_centerHorizontal="true"
-        android:paddingTop="20dp"/>
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"/>
 
     <ImageView
         android:id="@+id/copyrightImageView"

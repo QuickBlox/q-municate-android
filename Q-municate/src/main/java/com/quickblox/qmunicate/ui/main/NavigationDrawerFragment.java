@@ -28,7 +28,8 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
-import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -46,14 +47,15 @@ public class NavigationDrawerFragment extends BaseFragment {
     private View fragmentContainerView;
     private TextView fullnameTextView;
     private ImageButton logoutButton;
+    private TextView counterUnreadChatsDialogsTextView;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
     private boolean isMissedMessage;
+    private NavigationDrawerAdapter navigationDrawerAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,15 +107,17 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         initUI(rootView);
         initListeners();
-
-        NavigationDrawerAdapter navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
-                getNavigationDrawerItems());
-        drawerListView.setAdapter(navigationDrawerAdapter);
+        initNavigationAdapter();
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        updateCountUnreadDialogsListener = navigationDrawerAdapter;
 
         return rootView;
+    }
+
+    private void initNavigationAdapter() {
+        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
+                getNavigationDrawerItems());
+        drawerListView.setAdapter(navigationDrawerAdapter);
     }
 
     private void initUI(View rootView) {
@@ -167,6 +171,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
+//        initUnreadChatsDialogsTextView();
     }
 
     private void addActions() {
@@ -183,6 +188,23 @@ public class NavigationDrawerFragment extends BaseFragment {
             fullnameTextView.setText(user.getFullName());
         }
         addActions();
+    }
+
+    private void initUnreadChatsDialogsTextView() {
+//        counterUnreadChatsDialogsTextView = navigationDrawerAdapter.getCounterUnreadChatsDialogs();
+        counterUnreadChatsDialogsTextView.setText(getCounterUnreadDialogs() + Consts.ZERO_INT_VALUE);
+        counterUnreadChatsDialogsTextView.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int inputCount) {
+                super.onTextChanged(charSequence, start, before, inputCount);
+                int count = Integer.parseInt(charSequence.toString());
+                if (count > Consts.ZERO_INT_VALUE) {
+                    counterUnreadChatsDialogsTextView.setVisibility(View.VISIBLE);
+                } else {
+                    counterUnreadChatsDialogsTextView.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 
     @Override
@@ -248,11 +270,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    public interface UpdateCountUnreadDialogsListener {
-
-        public void onUpdateCountUnreadDialogs(int count);
-    }
-
     private int getCounterUnreadDialogs() {
         return DatabaseManager.getCountUnreadDialogs(baseActivity);
     }
@@ -277,8 +294,6 @@ public class NavigationDrawerFragment extends BaseFragment {
                 userLearnedDrawer = true;
                 saveUserLearnedDrawer();
             }
-
-            updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
         }
 
         @Override
