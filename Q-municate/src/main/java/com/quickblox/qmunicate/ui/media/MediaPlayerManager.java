@@ -81,7 +81,7 @@ public class MediaPlayerManager {
             isPlaying = true;
         } catch (Exception e) {
             errorId = INVALID_SOURCE;
-            ErrorUtils.showError(context, e);
+            ErrorUtils.logError(e);
         }
         if (errorId != 0) {
             if (!catchException) {

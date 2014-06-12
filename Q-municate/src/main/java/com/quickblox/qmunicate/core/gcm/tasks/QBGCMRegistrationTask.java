@@ -15,6 +15,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
 
@@ -44,9 +45,9 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         Bundle registration = new Bundle();
         String registrationId = getRegistrationId(gcm);
         registration.putString(PrefsHelper.PREF_REG_ID, registrationId);
-        QBSubscription subscription = subscribeToPushNotifications(registrationId);
-        if (subscription != null) {
-            registration.putInt(PrefsHelper.PREF_SUBSCRIPTION_ID, subscription.getId());
+        boolean subscribed = subscribeToPushNotifications(registrationId);
+        if (subscribed) {
+            registration.putBoolean(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, subscribed);
         }
         return registration;
     }
@@ -60,18 +61,20 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         return registrationId;
     }
 
-    private QBSubscription subscribeToPushNotifications(String regId) throws QBResponseException {
+    private boolean subscribeToPushNotifications(String regId) {
         String deviceId = getDeviceIdForMobile(activityRef.get());
         if (deviceId == null) {
             deviceId = getDeviceIdForTablet(activityRef.get());
         }
-        QBSubscription subscription = null;
-        ArrayList<QBSubscription> subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
-                QBEnvironment.DEVELOPMENT);
-        if (!subscriptions.isEmpty()) {
-            subscription = subscriptions.get(0);
+
+        ArrayList<QBSubscription> subscriptions = null;
+        try {
+            subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
+                    QBEnvironment.DEVELOPMENT);
+        } catch (QBResponseException e) {
+            ErrorUtils.logError(e);
         }
-        return subscription;
+        return subscriptions != null;
     }
 
     private String getDeviceIdForMobile(Context context) {
@@ -97,11 +100,8 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
             prefsHelper.savePref(PrefsHelper.PREF_REG_USER_ID, user.getId());
         }
 
-        int subscriptionId = registration.getInt(PrefsHelper.PREF_SUBSCRIPTION_ID,
-                Consts.NOT_INITIALIZED_VALUE);
-        if (Consts.NOT_INITIALIZED_VALUE != subscriptionId) {
-            prefsHelper.savePref(PrefsHelper.PREF_SUBSCRIPTION_ID, subscriptionId);
-        }
+        prefsHelper.savePref(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, registration.getBoolean(
+                PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, false));
         prefsHelper.savePref(PrefsHelper.PREF_APP_VERSION, appVersion);
     }
 }

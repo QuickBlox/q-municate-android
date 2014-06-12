@@ -18,7 +18,6 @@ public class PrefsHelper {
     public static final String PREF_SIGN_UP_INITIALIZED = "sign_up_initialized";
     public static final String PREF_MISSED_MESSAGE = "missed_message";
     public static final String PREF_STATUS = "status";
-    public static final String PREF_SUBSCRIPTION_ID = "subscription_id";
     public static final String PREF_PUSH_MESSAGE = "message";
     public static final String PREF_REG_USER_ID = "registered_push_user";
     public static final String PREF_GCM_SENDER_ID = "265299067289";
@@ -26,6 +25,7 @@ public class PrefsHelper {
     public static final String PREF_REG_ID = "registration_id";
     public static final String PREF_APP_VERSION = "appVersion";
     public static final String PREF_RECEIVE_PUSH = "receive_push";
+    public static final String PREF_IS_SUBSCRIBED_ON_SERVER = "subscribed_on_server";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
@@ -55,7 +55,7 @@ public class PrefsHelper {
             editor.putLong(key, (Long) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
-        } else if (value != null){
+        } else if (value != null) {
             throw new RuntimeException("Attempting to save non-primitive preference");
         }
 
