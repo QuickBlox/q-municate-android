@@ -39,8 +39,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
-    public static final String CAN_PERFORM_LOGOUT = "can_perform_logout";
-
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
     protected BroadcastReceiver messageBroadcastReceiver;

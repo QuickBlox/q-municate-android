@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
@@ -99,15 +98,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         DatabaseManager.saveChatMessage(context, dialogMessageCache);
     }
 
-    public void sendGroupMessage(String message) throws XMPPException, SmackException.NotConnectedException {
+    public void sendGroupMessage(String message) throws Exception {
         QBChatMessage chatMessage = getQBChatMessage(message);
-        roomChat.sendMessage(chatMessage);
+        sendRoomMessage(chatMessage);
     }
 
-    public void sendGroupMessageWithAttachImage(
-            QBFile file) throws XMPPException, SmackException.NotConnectedException {
+    public void sendGroupMessageWithAttachImage(QBFile file) throws Exception {
         QBChatMessage chatMessage = getQBChatMessageWithImage(file);
-        roomChat.sendMessage(chatMessage);
+        sendRoomMessage(chatMessage);
     }
 
     private QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
@@ -118,6 +116,20 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         chatMessage.addAttachment(attachment);
         chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
         return chatMessage;
+    }
+
+    private void sendRoomMessage(QBChatMessage chatMessage) throws Exception {
+        String error = null;
+        try {
+            roomChat.sendMessage(chatMessage);
+        } catch (XMPPException e) {
+            error = context.getString(R.string.dlg_fail_send_msg);
+        } catch (SmackException.NotConnectedException e) {
+            error = context.getString(R.string.dlg_fail_connection);
+        }
+        if (error != null) {
+            throw new Exception(error);
+        }
     }
 
     public void sendPrivateMessageWithAttachImage(
@@ -191,13 +203,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         chat.sendMessage(message);
     }
 
-    public QBFile loadAttachFile(File inputFile) {
+    public QBFile loadAttachFile(File inputFile) throws Exception {
         QBFile file = null;
         try {
             file = QBContent.uploadFileTask(inputFile, true, (String) null);
-        } catch (QBResponseException e) {
-            ErrorUtils.logError(e);
+        } catch (QBResponseException exc) {
+            throw new Exception(context.getString(R.string.dlg_fail_upload_attach));
         }
+
         return file;
     }
 

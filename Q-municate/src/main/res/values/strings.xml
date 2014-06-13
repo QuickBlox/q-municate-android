@@ -155,6 +155,9 @@
     <string name="dlg_attached_last_message">Attachment</string>
     <string name="dlg_no_message_yet">No message yet</string>
     <string name="dlg_fail_create_groupchat">Errors occurred while creating group chat! Please, try later</string>
+    <string name="dlg_fail_send_msg">Errors occurred while sending msg! Please, try later</string>
+    <string name="dlg_fail_connection">Connection lost. Please try later</string>
+    <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>

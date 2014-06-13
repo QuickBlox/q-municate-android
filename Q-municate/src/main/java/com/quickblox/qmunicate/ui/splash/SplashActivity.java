@@ -33,6 +33,7 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         canPerformLogout.set(false);
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -51,8 +52,7 @@ public class SplashActivity extends BaseActivity {
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
         } else {
-            LandingActivity.start(SplashActivity.this);
-            finish();
+            startLanding();
         }
     }
 
@@ -80,6 +80,11 @@ public class SplashActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void startLanding() {
+        LandingActivity.start(SplashActivity.this);
+        finish();
+    }
+
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         QBLoginCommand.start(this, user);
@@ -100,6 +105,12 @@ public class SplashActivity extends BaseActivity {
                         session.getAccessToken(), null);
             }
         }
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
+        startLanding();
     }
 
     private class LoginSuccessAction implements Command {

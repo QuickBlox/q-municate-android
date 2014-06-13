@@ -97,7 +97,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     public void attachButtonOnClick(View view) {
-        isNeedToSaveSession = true;
+        canPerformLogout.set(false);
         imageHelper.getImage();
     }
 
@@ -114,6 +114,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void addActions() {
+        addAction(QBServiceConsts.SEND_MESSAGE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -123,7 +124,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        isNeedToSaveSession = false;
+        canPerformLogout.set(true);
         if (resultCode == RESULT_OK) {
             onFileSelected(data.getData());
         }
@@ -211,7 +212,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onReceiveMessage(Bundle extras) {
         String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         boolean isFromCurrentChat = jidId != null && jidId.equals(chatJidId);
-        if (!isFromCurrentChat){
+        if (!isFromCurrentChat) {
             super.onReceiveMessage(extras);
         }
     }
