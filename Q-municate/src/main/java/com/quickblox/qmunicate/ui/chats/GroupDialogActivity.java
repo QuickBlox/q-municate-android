@@ -65,11 +65,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onCreate(savedInstanceState);
 
         if (getIntent().hasExtra(EXTRA_ROOM_JID)) {
-            roomJidId = getIntent().getStringExtra(EXTRA_ROOM_JID);
+            chatJidId = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
 
-        if (roomJidId != null) {
-            dialog = DatabaseManager.getDialogByRoomJidId(this, roomJidId);
+        if (chatJidId != null) {
+            dialog = DatabaseManager.getDialogByRoomJidId(this, chatJidId);
             groupName = dialog.getName();
             initListView();
             initStartLoadDialogMessages();
@@ -130,7 +130,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getQBDialog(), roomJidId);
+            QBUpdateDialogCommand.start(this, getQBDialog(), chatJidId);
         }
     }
 
@@ -171,7 +171,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
-        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJidId);
+        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, chatJidId);
     }
 
     @Override
@@ -232,9 +232,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void initStartLoadDialogMessages() {
         if (messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         } else {
-            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
+            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
         }
     }
 
@@ -244,7 +244,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         public void execute(Bundle bundle) {
             dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupName = dialog.getName();
-            roomJidId = dialog.getRoomJid();
+            chatJidId = dialog.getRoomJid();
             initListView();
             hideProgress();
         }

@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -58,7 +57,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        roomJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
+        chatJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
 
         if (dialog == null) {
             dialog = getDialogByRoomJidId();
@@ -71,18 +70,18 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private QBDialog getDialogByRoomJidId() {
-        return DatabaseManager.getDialogByRoomJidId(this, roomJidId);
+        return DatabaseManager.getDialogByRoomJidId(this, chatJidId);
     }
 
     private void createTempDialog() {
-        DatabaseManager.createTempPrivateDialogByRoomJidId(this, roomJidId);
+        DatabaseManager.createTempPrivateDialogByRoomJidId(this, chatJidId);
     }
 
     private void initStartLoadDialogMessages() {
         if (dialog != null && messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         } else if (dialog != null && !messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
+            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
         } else {
             createTempDialog();
         }
@@ -114,7 +113,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void startUpdateChatDialog() {
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getDialog(), roomJidId);
+            QBUpdateDialogCommand.start(this, getDialog(), chatJidId);
         }
     }
 
@@ -142,7 +141,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
-        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJidId);
+        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, chatJidId);
     }
 
     @Override
