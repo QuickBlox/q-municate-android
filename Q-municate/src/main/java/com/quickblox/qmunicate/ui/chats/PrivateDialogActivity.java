@@ -206,17 +206,4 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         currentOpponent = null;
         Crouton.cancelAllCroutons();
     }
-
-    @Override
-    protected void onReceiveMessage(Intent intent) {
-        Bundle extras = intent.getExtras();
-        if(extras == null){
-            return;
-        }
-        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-        boolean isNotCurrentOpponent = sender != null && !sender.equals(currentOpponent);
-        if (MainActivity.isNeedToShowCrouton && !isNotCurrentOpponent) {
-            super.onReceiveMessage(intent);
-        }
-    }
 }

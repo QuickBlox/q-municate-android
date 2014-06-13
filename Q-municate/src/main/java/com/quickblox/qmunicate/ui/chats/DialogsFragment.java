@@ -73,6 +73,12 @@ public class DialogsFragment extends BaseFragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        Crouton.cancelAllCroutons();
+        super.onResume();
+    }
+
     private void initChatsDialogs() {
         dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
         dialogsListView.setAdapter(dialogsAdapter);

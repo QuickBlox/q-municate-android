@@ -256,7 +256,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.isNeedToShowCrouton) {
+            if (extras != null) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);

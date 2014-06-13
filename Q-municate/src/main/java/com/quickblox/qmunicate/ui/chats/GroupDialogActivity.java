@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -228,19 +227,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onFailAction(action);
         if (QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION.equals(action)) {
             finish();
-        }
-    }
-
-    @Override
-    protected void onReceiveMessage(Intent intent) {
-        Bundle extras = intent.getExtras();
-        if(extras == null){
-            return;
-        }
-        String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
-        boolean isFromCurrentChat = jidId != null && jidId.equals(roomJidId);
-        if (MainActivity.isNeedToShowCrouton && !isFromCurrentChat){
-            super.onReceiveMessage(intent);
         }
     }
 

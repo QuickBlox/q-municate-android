@@ -208,6 +208,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         scrollListView();
     }
 
+    @Override
+    protected void onReceiveMessage(Bundle extras) {
+        String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
+        boolean isFromCurrentChat = jidId != null && jidId.equals(roomJidId);
+        if (!isFromCurrentChat){
+            super.onReceiveMessage(extras);
+        }
+    }
+
     protected void scrollListView() {
         messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }

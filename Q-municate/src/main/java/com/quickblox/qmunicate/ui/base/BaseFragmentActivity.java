@@ -214,13 +214,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
-    protected void onReceiveMessage(Intent intent){
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-            String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-            showNewMessageAlert(sender, message);
-        }
+    protected void onReceiveMessage(Bundle extras) {
+        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        showNewMessageAlert(sender, message);
     }
 
     @Override
@@ -258,7 +255,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            onReceiveMessage(intent);
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                onReceiveMessage(extras);
+            }
         }
     }
 
