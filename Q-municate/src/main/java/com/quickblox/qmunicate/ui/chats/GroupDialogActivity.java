@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,13 +16,11 @@ import android.view.View;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -41,7 +38,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private static final String EXTRA_ROOM_JID = "extra_room_jid";
 
     private QBDialog dialog;
-    private ArrayList<Friend> friendList;
     private String groupName;
 
     public GroupDialogActivity() {
@@ -68,24 +64,13 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             chatJidId = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
 
-        if (chatJidId != null) {
-            dialog = DatabaseManager.getDialogByRoomJidId(this, chatJidId);
-            groupName = dialog.getName();
-            initListView();
-            initStartLoadDialogMessages();
-        } else {
-            initChat();
-        }
-
-        initActionBar();
+        initListView();
 
         registerForContextMenu(messagesListView);
     }
 
     protected void addActions() {
-        addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
         addAction(QBServiceConsts.LOGIN_CHAT_ACTION, new CreateChatSuccessAction());
-        addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -144,30 +129,24 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return dialog;
     }
 
-    private void initChat() {
-        showProgress();
-        friendList = (ArrayList<Friend>) getIntent().getSerializableExtra(EXTRA_FRIENDS);
-        groupName = createChatName();
-        QBCreateGroupDialogCommand.start(this, groupName, friendList);
+    private void updateChatData() {
+        dialog = DatabaseManager.getDialogByRoomJidId(this, chatJidId);
+        groupName = dialog.getName();
+        startLoadDialogMessages();
+
+        updateActionBar();
     }
 
     private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), dialog,
-                this);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByRoomJidId(), this);
         messagesListView.setAdapter(messagesAdapter);
     }
 
-    private void initActionBar() {
+    private void updateActionBar() {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(groupName);
         // TODO IS must be implemented soon
         actionBar.setSubtitle("some information");
-    }
-
-    private String createChatName() {
-        String userFullname = App.getInstance().getUser().getFullName();
-        String friendsFullnames = TextUtils.join(",", friendList);
-        return userFullname + "," + friendsFullnames;
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
@@ -220,17 +199,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         addActions();
+        updateChatData();
     }
 
-    @Override
-    protected void onFailAction(String action) {
-        super.onFailAction(action);
-        if (QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION.equals(action)) {
-            finish();
-        }
-    }
-
-    private void initStartLoadDialogMessages() {
+    private void startLoadDialogMessages() {
         if (messagesAdapter.isEmpty()) {
             startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         } else {

@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
@@ -24,11 +23,9 @@ import com.quickblox.qmunicate.utils.DateUtils;
 
 public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
-    private QBDialog dialog;
-
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor,
+            ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor, true);
-        this.dialog = dialog;
         this.scrollMessagesListener = scrollMessagesListener;
     }
 
@@ -72,10 +69,10 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
-            if(senderFriend != null) {
+            if (senderFriend != null) {
                 senderName = senderFriend.getFullname();
                 avatarUrl = getAvatarUrlForFriend(senderFriend);
-            } else{
+            } else {
                 senderName = senderId + Consts.EMPTY_STRING;
             }
         }
@@ -92,8 +89,9 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         }
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if(dialog != null && !isRead) {
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(
+                DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }
@@ -106,7 +104,7 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
     }
 
     private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-                                    final ImageView attachImageView, final ProgressBar progressBar) {
+            final ImageView attachImageView, final ProgressBar progressBar) {
         ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
                 progressBar));
     }

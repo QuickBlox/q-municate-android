@@ -26,7 +26,6 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -226,6 +225,10 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         return transaction;
     }
 
+    protected void onFailAction(String action) {
+
+    }
+
     public class FailAction implements Command {
 
         @Override
@@ -233,6 +236,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
+            onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
 

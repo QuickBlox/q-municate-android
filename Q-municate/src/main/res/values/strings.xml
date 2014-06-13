@@ -154,6 +154,7 @@
     <string name="dlg_offline_call"> %1$s is calling you !</string>
     <string name="dlg_attached_last_message">Attachment</string>
     <string name="dlg_no_message_yet">No message yet</string>
+    <string name="dlg_fail_create_groupchat">Errors occurred while creating group chat! Please, try later</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
