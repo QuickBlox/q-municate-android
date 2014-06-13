@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +79,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         private Bitmap loadedImageBitmap;
 
         public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
-                                  final ProgressBar progressBar) {
+                final ProgressBar progressBar) {
             this.pleaseWaitTextView = pleaseWaitTextView;
             this.attachImageView = attachImageView;
             this.progressBar = progressBar;
@@ -115,10 +114,11 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
                 @Override
                 public void onClick(View view) {
-                    BaseFragmentActivity.isNeedToSaveSession = true;
-                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
-                    new ReceiveImageFileTask(BaseCursorAdapter.this).execute(imageHelper,
-                            loadedImageBitmap, false);
+                    //TODO add listener to disable logout in stopped state
+                    view.startAnimation(AnimationUtils.loadAnimation(context,
+                            R.anim.chat_attached_file_click));
+                    new ReceiveImageFileTask(BaseCursorAdapter.this).execute(imageHelper, loadedImageBitmap,
+                            false);
                 }
             };
         }

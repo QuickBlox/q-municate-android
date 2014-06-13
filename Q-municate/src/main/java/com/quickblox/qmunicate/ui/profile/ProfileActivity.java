@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -113,7 +112,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void initUIWithUsersData() {
         loadAvatar();
         fullNameEditText.setText(user.getFullName());
-        if(TextUtils.isEmpty(user.getEmail())) {
+        if (TextUtils.isEmpty(user.getEmail())) {
             emailLinearLayout.setVisibility(View.GONE);
         } else {
             emailLinearLayout.setVisibility(View.VISIBLE);
@@ -181,7 +180,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        BaseFragmentActivity.isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
             Uri originalUri = data.getData();
@@ -208,7 +206,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     public void changeAvatarOnClick() {
         canPerformLogout.set(false);
-        BaseFragmentActivity.isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
@@ -221,7 +218,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         editText.requestFocus();
     }
 
-    private void stopChangingEditText(EditText editText){
+    private void stopChangingEditText(EditText editText) {
         editText.setEnabled(false);
         KeyboardUtils.hideKeyboard(this);
     }

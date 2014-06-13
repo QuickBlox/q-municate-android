@@ -18,12 +18,10 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
@@ -90,7 +88,6 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        BaseFragmentActivity.isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
             Uri originalUri = data.getData();
@@ -107,7 +104,6 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     }
 
     public void changeAvatarOnClickListener(View view) {
-        BaseFragmentActivity.isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
