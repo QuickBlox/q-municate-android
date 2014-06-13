@@ -8,7 +8,7 @@
     <dimen name="button_text_size">18sp</dimen>
     <dimen name="button_icon_margin">10dp</dimen>
 
-    <dimen name="button_fb_height">75dp</dimen>
+    <dimen name="button_fb_height">70dp</dimen>
 
     <dimen name="divider_height">1dip</dimen>
     <dimen name="divider_width">1dip</dimen>
