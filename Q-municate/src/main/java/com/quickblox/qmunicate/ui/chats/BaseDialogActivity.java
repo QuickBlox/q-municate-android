@@ -48,6 +48,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected EditText messageEditText;
     protected ImageButton attachButton;
     protected ImageButton sendButton;
+    protected String currentOpponent;
+    protected String chatJidId;
 
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
@@ -203,6 +205,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onScrollToBottom() {
         scrollListView();
+    }
+
+    @Override
+    protected void onReceiveMessage(Bundle extras) {
+        String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
+        boolean isFromCurrentChat = jidId != null && jidId.equals(chatJidId);
+        if (!isFromCurrentChat){
+            super.onReceiveMessage(extras);
+        }
     }
 
     protected void scrollListView() {

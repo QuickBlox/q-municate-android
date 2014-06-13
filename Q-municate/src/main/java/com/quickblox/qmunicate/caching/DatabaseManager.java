@@ -172,7 +172,6 @@ public class DatabaseManager {
         return dialogs;
     }
 
-
     public static QBDialog getDialogFromCursor(Cursor cursor) {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
         String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
@@ -203,13 +202,12 @@ public class DatabaseManager {
     public static Friend getFriendById(Context context, int friendId) {
         Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
                 FriendTable.Cols.ID + " = " + friendId, null, null);
+        Friend friend = null;
         if (cursor != null && cursor.moveToFirst()) {
-            Friend friend = getFriendFromCursor(cursor);
+            friend = getFriendFromCursor(cursor);
             cursor.close();
-            return friend;
-        } else {
-            return null;
         }
+        return friend;
     }
 
     public static Friend getFriendFromCursor(Cursor cursor) {
@@ -313,7 +311,6 @@ public class DatabaseManager {
             cursor.close();
             return true;
         }
-
         return false;
     }
 

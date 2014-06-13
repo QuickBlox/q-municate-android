@@ -37,7 +37,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static boolean isNeedToShowCrouton = false;
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -100,7 +99,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isNeedToShowCrouton = true;
         useDoubleBackPressed = true;
 
         initPrefValues();

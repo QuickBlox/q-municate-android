@@ -25,12 +25,14 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -212,6 +214,12 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
+    protected void onReceiveMessage(Bundle extras) {
+        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        showNewMessageAlert(sender, message);
+    }
+
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return true;
@@ -248,10 +256,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.isNeedToShowCrouton) {
-                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-                showNewMessageAlert(sender, message);
+            if (extras != null) {
+                onReceiveMessage(extras);
             }
         }
     }

@@ -33,12 +33,12 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private Friend opponentFriend;
     private QBDialog dialog;
-
-    private String roomJidId;
 
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog);
@@ -57,7 +57,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        roomJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
+        chatJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
 
         if (dialog == null) {
             dialog = getDialogByRoomJidId();
@@ -70,18 +70,18 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private QBDialog getDialogByRoomJidId() {
-        return DatabaseManager.getDialogByRoomJidId(this, roomJidId);
+        return DatabaseManager.getDialogByRoomJidId(this, chatJidId);
     }
 
     private void createTempDialog() {
-        DatabaseManager.createTempPrivateDialogByRoomJidId(this, roomJidId);
+        DatabaseManager.createTempPrivateDialogByRoomJidId(this, chatJidId);
     }
 
     private void initStartLoadDialogMessages() {
         if (dialog != null && messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJidId, Consts.ZERO_LONG_VALUE);
+            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         } else if (dialog != null && !messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, roomJidId, dialog.getLastMessageDateSent());
+            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
         } else {
             createTempDialog();
         }
@@ -113,7 +113,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void startUpdateChatDialog() {
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getDialog(), roomJidId);
+            QBUpdateDialogCommand.start(this, getDialog(), chatJidId);
         }
     }
 
@@ -141,7 +141,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private Cursor getAllDialogMessagesByRoomJidId() {
-        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, roomJidId);
+        return DatabaseManager.getAllDialogMessagesByRoomJidId(this, chatJidId);
     }
 
     @Override
@@ -188,9 +188,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
+    public String getCurrentOpponent() {
+        return currentOpponent;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
+        currentOpponent = opponentFriend.getFullname();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        currentOpponent = null;
+        Crouton.cancelAllCroutons();
     }
 }

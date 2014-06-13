@@ -21,6 +21,8 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.TipsManager;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 public class DialogsFragment extends BaseFragment {
 
     private ListView dialogsListView;
@@ -43,6 +45,7 @@ public class DialogsFragment extends BaseFragment {
         initUI(view);
         initListeners();
         initChatsDialogs();
+        Crouton.cancelAllCroutons();
 
 //        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
 
@@ -68,6 +71,12 @@ public class DialogsFragment extends BaseFragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        Crouton.cancelAllCroutons();
+        super.onResume();
     }
 
     private void initChatsDialogs() {
