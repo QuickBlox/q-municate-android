@@ -46,7 +46,7 @@
             android:layout_marginTop="@dimen/act_call_margin_top"
             android:src="@drawable/placeholder_user" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -54,38 +54,37 @@
             android:layout_alignParentStart="false"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="15dp"
-            android:gravity="center"
+            android:gravity="bottom"
             android:orientation="horizontal">
 
-            <ImageButton
+            <ToggleButton
+                style="@style/baseToggleBtn"
                 android:id="@+id/muteDynamicButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/act_call_end_button_height"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center|left"
-                android:background="@drawable/button_general_selector"
-                android:padding="5dp"
-                android:src="@drawable/ic_dynamic" />
+                android:background="@drawable/button_dynamic_selector"
+                android:padding="5dp" />
 
             <ImageButton
                 android:id="@+id/stopСallButton"
-                android:layout_width="@dimen/act_call_end_button_width"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_weight="1"
                 android:layout_centerInParent="true"
                 android:background="@drawable/button_end_call_selector"
                 android:src="@drawable/ic_encall" />
 
-            <ImageButton
+            <ToggleButton
+                style="@style/baseToggleBtn"
                 android:id="@+id/muteMicrophoneButton"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/act_call_end_button_height"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center|right"
-                android:background="@drawable/button_general_selector"
-                android:padding="5dp"
-                android:src="@drawable/ic_call_mute_a" />
-        </RelativeLayout>
+                android:background="@drawable/button_microphone_selector"
+                android:padding="5dp" />
+        </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

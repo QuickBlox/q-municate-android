@@ -24,7 +24,6 @@ import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -140,8 +139,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 gsmHelper.registerInBackground();
                 return;
             }
-            int subscriptionId = gsmHelper.getSubscriptionId();
-            if (Consts.NOT_INITIALIZED_VALUE == subscriptionId) {
+            boolean subscribed = gsmHelper.isSubscribed();
+            if (!subscribed) {
                 gsmHelper.subscribeToPushNotifications();
             }
         } else {

@@ -1,4 +1,5 @@
 <resources>
+
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
         <item name="android:actionModeStyle">@style/MyActionMode</item>
@@ -24,5 +25,11 @@
         <item name="android:actionModeCloseDrawable">@drawable/badge_action_mode</item>
         <item name="android:actionModeBackground">@drawable/badge_action_mode</item>
         <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="baseToggleBtn">
+
+        <item name="android:textOff"></item>
+        <item name="android:textOn"></item>
     </style>
 </resources>

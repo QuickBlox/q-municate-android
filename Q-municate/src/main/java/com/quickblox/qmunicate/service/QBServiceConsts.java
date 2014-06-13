@@ -39,6 +39,7 @@ public class QBServiceConsts {
     public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
     public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
+    public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
@@ -147,6 +148,7 @@ public class QBServiceConsts {
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
     public static final String EXTRA_MESSAGE_ID = "message_id";
     public static final String EXTRA_STATUS_MESSAGE = "status_message";
+    public static final String EXTRA_USER_ID = "user_id";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";

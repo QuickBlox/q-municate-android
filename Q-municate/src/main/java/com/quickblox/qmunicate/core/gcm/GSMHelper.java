@@ -40,11 +40,9 @@ public class GSMHelper {
         new QBGCMRegistrationTask(activity).execute(gcm);
     }
 
-    public int getSubscriptionId() {
+    public boolean isSubscribed() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        int subscriptionId = prefsHelper.getPref(PrefsHelper.PREF_SUBSCRIPTION_ID,
-                Consts.NOT_INITIALIZED_VALUE);
-        return subscriptionId;
+        return prefsHelper.getPref(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, false);
     }
 
     public String getRegistrationId() {

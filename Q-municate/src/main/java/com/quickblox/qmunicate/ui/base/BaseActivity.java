@@ -104,6 +104,18 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         return canPerformLogout.get();
     }
 
+    public void updateBroadcastActionList() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
+        IntentFilter intentFilter = new IntentFilter();
+        for (String commandName : broadcastCommandMap.keySet()) {
+            intentFilter.addAction(commandName);
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.GOT_CHAT_MESSAGE));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,12 +130,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         initUI();
     }
 
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -134,6 +140,12 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected void onResume() {
         super.onResume();
         updateBroadcastActionList();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -165,40 +177,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         }, DOUBLE_BACK_DELAY);
     }
 
-    private void unbindService() {
-        if (bounded) {
-            unbindService(serviceConnection);
-        }
-    }
-
-    private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-    }
-
-    public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
-        IntentFilter intentFilter = new IntentFilter();
-        for (String commandName : broadcastCommandMap.keySet()) {
-            intentFilter.addAction(commandName);
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     protected void onConnectedToService() {
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
-        super.onSaveInstanceState(outState);
     }
 
     protected void navigateToParent() {
@@ -218,6 +197,27 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);
         transaction.commit();
+    }
+
+    private void initUI() {
+        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+    }
+
+    private void unbindService() {
+        if (bounded) {
+            unbindService(serviceConnection);
+        }
+    }
+
+    private void unregisterBroadcastReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private FragmentTransaction buildTransaction() {

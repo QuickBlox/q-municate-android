@@ -24,6 +24,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
+import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
@@ -74,6 +75,16 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
         saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
                 time, true));
+    }
+
+    public QBUser getUserById(int userId) throws QBResponseException {
+        QBUser user = QBUsers.getUser(userId);
+        updateMessage(userId + Consts.EMPTY_STRING, user.getFullName());
+        return user;
+    }
+
+    private void updateMessage(String roomJidId, String fullname) {
+        DatabaseManager.updateMessageForFullname(context, roomJidId, fullname);
     }
 
     private QBChatMessage getQBChatMessage(String body) {

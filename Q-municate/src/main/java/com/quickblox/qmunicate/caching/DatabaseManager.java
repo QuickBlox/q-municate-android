@@ -15,6 +15,7 @@ import com.quickblox.qmunicate.caching.tables.DialogTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBGetUserByIdCommand;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
@@ -276,6 +277,7 @@ public class DatabaseManager {
         String message;
         Friend friend = DatabaseManager.getFriendById(context, senderId);
         if (friend == null) {
+            QBGetUserByIdCommand.start(context, senderId);
             message = context.getResources().getString(R.string.user_created_room, senderId);
         } else {
             message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
@@ -374,6 +376,24 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
         resolver.update(DialogTable.CONTENT_URI, values, condition, null);
+    }
+
+    public static void updateDialogForLastMessage(Context context, String roomJidId, String lastMessage) {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
+        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
+        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
+    }
+
+    public static void updateMessageForFullname(Context context, String roomJidId, String fullname) {
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        String message = context.getResources().getString(R.string.user_created_room, fullname);
+        values.put(DialogMessageTable.Cols.BODY, message);
+        String condition = DialogMessageTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
+        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
+        updateDialogForLastMessage(context, roomJidId, message);
     }
 
     public static int getCountUnreadMessagesByRoomJid(Context context, String roomJidId) {
