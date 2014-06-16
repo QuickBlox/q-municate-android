@@ -152,7 +152,7 @@ public class LoginActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new LoginFailAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -209,15 +209,6 @@ public class LoginActivity extends BaseActivity {
             DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();
-        }
-    }
-
-    private class LoginFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideProgress();
-            emailEditText.setError(getResources().getString(R.string.lgn_error));
         }
     }
 

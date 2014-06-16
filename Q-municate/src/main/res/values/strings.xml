@@ -158,6 +158,7 @@
     <string name="dlg_fail_send_msg">Errors occurred while sending msg! Please, try later</string>
     <string name="dlg_fail_connection">Connection lost. Please try later</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
+    <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
 
     // Change Password Dialog
     <string name="cpd_title">Change Password</string>
