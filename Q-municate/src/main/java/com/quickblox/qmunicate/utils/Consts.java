@@ -25,7 +25,7 @@ public class Consts {
     public static final long ZERO_LONG_VALUE = 0L;
     public static final String EMPTY_STRING = "";
 
-    public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 7000;
+    public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
 
     public static final int LEFT_CHAT_MESSAGE_TYPE_1 = 0;
     public static final int RIGHT_CHAT_MESSAGE_TYPE_2 = 1;
