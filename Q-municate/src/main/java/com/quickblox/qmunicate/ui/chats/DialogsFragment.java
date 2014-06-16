@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
@@ -27,6 +28,7 @@ public class DialogsFragment extends BaseFragment {
 
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
+    private TextView emptyListTextView;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -55,6 +57,7 @@ public class DialogsFragment extends BaseFragment {
     private void initUI(View view) {
         setHasOptionsMenu(true);
         dialogsListView = (ListView) view.findViewById(R.id.chats_listview);
+        emptyListTextView = (TextView) view.findViewById(R.id.empty_list_textview);
     }
 
     private void initListeners() {
@@ -73,9 +76,14 @@ public class DialogsFragment extends BaseFragment {
         });
     }
 
+    private void checkVisibilityEmptyLabel() {
+        emptyListTextView.setVisibility(dialogsAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     public void onResume() {
         Crouton.cancelAllCroutons();
+        checkVisibilityEmptyLabel();
         super.onResume();
     }
 
