@@ -323,8 +323,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            ErrorUtils.showError(baseActivity, e);
+            String notFoundError = getResources().getString(R.string.frl_not_found_users);
+            ErrorUtils.showError(baseActivity, notFoundError);
         }
     }
 

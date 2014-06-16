@@ -56,6 +56,7 @@
     <string name="frl_friends">Friends</string>
     <string name="frl_all_users">All Users</string>
     <string name="frl_no_friends">Currently there are no friends.\nYou can search friends or invite them via Invite screen.</string>
+    <string name="frl_not_found_users">Sorry… no users</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
