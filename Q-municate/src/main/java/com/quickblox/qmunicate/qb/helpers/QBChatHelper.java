@@ -230,7 +230,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
-            QBChatService.setDefaultPacketReplyTimeout(7 * 1000);
+            QBChatService.setDefaultPacketReplyTimeout(Consts.DEFAULT_PACKET_REPLY_TIMEOUT);
             chatService = QBChatService.getInstance();
         }
         if (!chatService.isLoggedIn() && user != null) {
