@@ -19,14 +19,9 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
-import com.quickblox.qmunicate.utils.TipsManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -142,28 +137,10 @@ public class DialogsFragment extends BaseFragment {
         baseActivity.updateBroadcastActionList();
     }
 
-    private void joinGroupDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
-        QBJoinGroupDialogCommand.start(baseActivity, roomJidList);
-    }
-
-    private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
-    }
-
     private class LoadChatsDialogsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
-                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            joinGroupDialogs(dialogsList);
             isChatsListLoaded = true;
             if (baseActivity != null) {
                 checkVisibilityEmptyLabel();

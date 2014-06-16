@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBChatMessage;
@@ -9,6 +10,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.util.ArrayList;
@@ -79,20 +81,22 @@ public class ChatUtils {
         return occupantIdsList;
     }
 
-    public static QBChatMessage createRoomNotificationMessage(QBDialog dialog) {
+    public static QBChatMessage createRoomNotificationMessage(Context context, QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getDialogId());
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
-        QBChatMessage message = new QBChatMessage();
-        message.setProperty(PROPERTY_DIALOG_ID, dialogId);
-        message.setProperty(PROPERTY_ROOM_JID, roomJid);
-        message.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
-        message.setProperty(PROPERTY_ROOM_NAME, dialogName);
-        message.setProperty(PROPERTY_DIALOG_TYPE_CODE, dialogTypeCode);
-        return message;
+        QBUser user = App.getInstance().getUser();
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
+        chatMessage.setProperty(PROPERTY_DIALOG_ID, dialogId);
+        chatMessage.setProperty(PROPERTY_ROOM_JID, roomJid);
+        chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
+        chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
+        chatMessage.setProperty(PROPERTY_DIALOG_TYPE_CODE, dialogTypeCode);
+        return chatMessage;
     }
 
     public static String getOccupantsIdsStringFromList(List<Integer> occupantIdsList) {
@@ -119,16 +123,6 @@ public class ChatUtils {
         return occupantsIdsList;
     }
 
-    public static List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
-    }
-
     public static ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
         for (Friend friend : friendList) {
@@ -144,5 +138,15 @@ public class ChatUtils {
                     chatMessage.getAttachments()));
         }
         return attachURL;
+    }
+
+    public static List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
+        List<String> roomJidList = new ArrayList<String>();
+        for (QBDialog dialog : dialogsList) {
+            if (dialog.getType() != QBDialogType.PRIVATE) {
+                roomJidList.add(dialog.getRoomJid());
+            }
+        }
+        return roomJidList;
     }
 }

@@ -15,7 +15,6 @@ import com.quickblox.qmunicate.caching.tables.DialogTable;
 import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBGetUserByIdCommand;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
@@ -262,27 +261,11 @@ public class DatabaseManager {
                 attachURL = Consts.EMPTY_STRING;
             }
 
-            if (TextUtils.isEmpty(message) && TextUtils.isEmpty(attachURL)) {
-                message = getMessageForNotification(context, senderId);
-            }
-
             DialogMessageCache dialogMessageCache = new DialogMessageCache(roomJidId, senderId, message,
                     attachURL, historyMessage.getDateSent(), true);
 
             saveChatMessage(context, dialogMessageCache);
         }
-    }
-
-    private static String getMessageForNotification(Context context, int senderId) {
-        String message;
-        Friend friend = DatabaseManager.getFriendById(context, senderId);
-        if (friend == null) {
-            QBGetUserByIdCommand.start(context, senderId);
-            message = context.getResources().getString(R.string.user_created_room, senderId);
-        } else {
-            message = context.getResources().getString(R.string.user_created_room, friend.getFullname());
-        }
-        return message;
     }
 
     public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {
@@ -344,7 +327,7 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
-        values.put(DialogTable.Cols.LAST_MESSAGE, TextUtils.isEmpty(dialog.getLastMessage()) ? context.getString(R.string.dlg_attached_last_message) : dialog.getLastMessage());
+        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent()));
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;
@@ -356,13 +339,18 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.ROOM_JID_ID, roomJidId);
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        values.put(DialogTable.Cols.LAST_MESSAGE, TextUtils.isEmpty(dialog.getLastMessage()) ? context.getString(R.string.dlg_attached_last_message) : dialog.getLastMessage());
+        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent()));
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().name());
         return values;
+    }
+
+    private static String getLastMessage(Context context, String lastMessage, long lastDateSent) {
+        return (TextUtils.isEmpty(lastMessage) && lastDateSent != Consts.ZERO_INT_VALUE)
+                ? context.getString(R.string.dlg_attached_last_message) : lastMessage;
     }
 
     public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent,
@@ -376,24 +364,6 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
         resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-    }
-
-    public static void updateDialogForLastMessage(Context context, String roomJidId, String lastMessage) {
-        ContentResolver resolver = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
-        String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
-        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-    }
-
-    public static void updateMessageForFullname(Context context, String roomJidId, String fullname) {
-        ContentResolver resolver = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        String message = context.getResources().getString(R.string.user_created_room, fullname);
-        values.put(DialogMessageTable.Cols.BODY, message);
-        String condition = DialogMessageTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";
-        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-        updateDialogForLastMessage(context, roomJidId, message);
     }
 
     public static int getCountUnreadMessagesByRoomJid(Context context, String roomJidId) {
