@@ -68,6 +68,7 @@
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
+    <string name="dlg_no_chats">There are no chats yet.</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
