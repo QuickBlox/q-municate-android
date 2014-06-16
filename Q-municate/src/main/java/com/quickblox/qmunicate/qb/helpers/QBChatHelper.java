@@ -25,6 +25,7 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.DialogMessageCache;
@@ -50,6 +51,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private static String propertyDateSent = "date_sent";
     private static String propertySaveToHistory = "save_to_history";
     private static String valuePropertySaveToHistory = "1";
+    private static String propertyNotificationTypeCreating = "notification_type";
+    private static String valuePropertyNotificationTypeCreating = "1";
 
     private QBChatService chatService;
     private QBUser user;
@@ -75,16 +78,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
         saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
                 time, true));
-    }
-
-    public QBUser getUserById(int userId) throws QBResponseException {
-        QBUser user = QBUsers.getUser(userId);
-        updateMessage(userId + Consts.EMPTY_STRING, user.getFullName());
-        return user;
-    }
-
-    private void updateMessage(String roomJidId, String fullname) {
-        DatabaseManager.updateMessageForFullname(context, roomJidId, fullname);
     }
 
     private QBChatMessage getQBChatMessage(String body) {
@@ -134,7 +127,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             throw new Exception(error);
         }
     }
-
 
     private void sendRoomMessage(QBChatMessage chatMessage) throws Exception {
         String error = null;
@@ -216,10 +208,13 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private void notifyFriendAboutInvitation(QBDialog dialog,
             Integer friendId) throws XMPPException, SmackException {
         long time = DateUtils.getCurrentTime();
+        QBUser user = App.getInstance().getUser();
         QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(dialog);
+        chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
         chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
         chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
+        chatMessage.setProperty(propertyNotificationTypeCreating, valuePropertyNotificationTypeCreating);
         chat.sendMessage(chatMessage);
     }
 
@@ -396,10 +391,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             long time;
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 time = DateUtils.getCurrentTime();
-                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage,
-                        context.getResources().getString(R.string.user_created_room, friend.getFullname()),
+                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(),
                         time);
-                chatMessage.setBody(dialog.getLastMessage());
+                chatMessage.setBody(chatMessage.getBody());
                 tryJoinRoomChat(dialog.getRoomJid());
                 saveDialogToCache(dialog, dialog.getRoomJid());
             } else {
