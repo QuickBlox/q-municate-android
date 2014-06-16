@@ -55,7 +55,7 @@ public class QBLoginChatCommand extends ServiceCommand {
             currentTime = new Date().getTime();
             try {
                 chatHelper.login(authHelper.getUser());
-            } catch (SmackException.ResourceBindingNotOfferedException ignore) { /* NOP */ }
+            } catch (SmackException ignore) { /* NOP */ }
         }
     }
 }
