@@ -172,12 +172,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void hideProgress() {
-        try {
-            if (progress != null && !progress.isDetached()) {
-                progress.dismissAllowingStateLoss();
-            }
-        } catch (NullPointerException npe) {
-            ErrorUtils.logError(npe);
+        if (progress != null && progress.getActivity() != null) {
+            progress.dismissAllowingStateLoss();
         }
     }
 

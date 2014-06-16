@@ -63,10 +63,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         super(context);
     }
 
-    public void sendPrivateMessage(
-            String message) throws XMPPException, SmackException.NotConnectedException {
+    public void sendPrivateMessage(String message) throws Exception {
         QBChatMessage chatMessage = getQBChatMessage(message);
-        privateChat.sendMessage(chatMessage);
+        sendPrivateMessage(chatMessage);
 
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = Consts.EMPTY_STRING;
@@ -118,6 +117,21 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return chatMessage;
     }
 
+    private void sendPrivateMessage(QBChatMessage chatMessage) throws Exception {
+        String error = null;
+        try {
+            privateChat.sendMessage(chatMessage);
+        } catch (XMPPException e) {
+            error = context.getString(R.string.dlg_fail_send_msg);
+        } catch (SmackException.NotConnectedException e) {
+            error = context.getString(R.string.dlg_fail_connection);
+        }
+        if (error != null) {
+            throw new Exception(error);
+        }
+    }
+
+
     private void sendRoomMessage(QBChatMessage chatMessage) throws Exception {
         String error = null;
         try {
@@ -132,10 +146,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
-    public void sendPrivateMessageWithAttachImage(
-            QBFile file) throws XMPPException, SmackException.NotConnectedException {
+    public void sendPrivateMessageWithAttachImage(QBFile file) throws Exception {
         QBChatMessage chatMessage = getQBChatMessageWithImage(file);
-        privateChat.sendMessage(chatMessage);
+        sendPrivateMessage(chatMessage);
 
         String roomJidId = opponentId + Consts.EMPTY_STRING;
         String attachUrl = file.getPublicUrl();
