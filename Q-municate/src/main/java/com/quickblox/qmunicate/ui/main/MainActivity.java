@@ -160,38 +160,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
-        addActions();
-    }
-
-    private void addActions() {
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsDialogsSuccessAction());
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
-    }
-
-    private void joinGroupDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
-        QBJoinGroupDialogCommand.start(this, roomJidList);
-    }
-
-    private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
-    }
-
-    private class LoadChatsDialogsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
-                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            joinGroupDialogs(dialogsList);
-        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

@@ -48,6 +48,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
 
     private static String propertyDateSent = "date_sent";
+    private static String propertySaveToHistory = "save_to_history";
+    private static String valuePropertySaveToHistory = "1";
 
     private QBChatService chatService;
     private QBUser user;
@@ -90,6 +92,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
         chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
         return chatMessage;
     }
 
@@ -114,6 +117,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
         chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
         return chatMessage;
     }
 
@@ -211,9 +215,12 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
             Integer friendId) throws XMPPException, SmackException {
+        long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
-        QBChatMessage message = ChatUtils.createRoomNotificationMessage(dialog);
-        chat.sendMessage(message);
+        QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(dialog);
+        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
+        chat.sendMessage(chatMessage);
     }
 
     public QBFile loadAttachFile(File inputFile) throws Exception {
