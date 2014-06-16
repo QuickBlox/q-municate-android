@@ -55,6 +55,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private SearchOnActionExpandListener searchListener;
     private MenuItem searchItem;
     private SearchView searchView;
+    private static boolean isFriendsListLoaded = false;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -217,6 +218,9 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
         friendsListView.setOnItemClickListener(this);
+        if(isFriendsListLoaded) {
+            checkVisibilityEmptyLabel();
+        }
     }
 
     private void startGlobalSearch() {
@@ -271,6 +275,18 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.hideProgress();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(isFriendsListLoaded) {
+            checkVisibilityEmptyLabel();
+        }
+    }
+
+    private void checkVisibilityEmptyLabel() {
+        emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
@@ -286,7 +302,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public boolean onMenuItemActionCollapse(MenuItem item) {
             state = State.FRIENDS_LIST;
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
-            emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
             if (isHideSearchView) {
                 isHideSearchView = false;
                 friendsListAdapter.setSearchCharacters(null);
@@ -296,7 +311,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 positionCounter--;
                 initFriendsList();
             }
-
             return true;
         }
     }
@@ -349,7 +363,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            if (getActivity() != null) {
+            isFriendsListLoaded = true;
+            if (baseActivity != null) {
                 emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
             }
         }
