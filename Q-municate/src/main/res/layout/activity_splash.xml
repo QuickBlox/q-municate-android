@@ -9,10 +9,9 @@
         android:id="@+id/logo_full_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_full"/>
+        android:src="@drawable/ic_launcher"
+        android:layout_centerInParent="true" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleLarge"
@@ -24,13 +23,4 @@
         android:paddingTop="10dp"
         android:paddingBottom="10dp"/>
 
-    <ImageView
-        android:id="@+id/copyrightImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:paddingBottom="20dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/powerf_by_qb"/>
 </RelativeLayout>
