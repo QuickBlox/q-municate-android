@@ -17,7 +17,6 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
@@ -92,7 +91,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void loginFacebookOnClickListener(View view) {
-        saveLoginType(LoginType.FACEBOOK);
         facebookHelper.loginWithFacebook();
     }
 
@@ -161,12 +159,7 @@ public class LoginActivity extends BaseActivity {
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         showProgress();
-        saveLoginType(LoginType.EMAIL);
         QBLoginCommand.start(this, user);
-    }
-
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
     }
 
     private void saveRememberMe(boolean value) {
@@ -185,7 +178,6 @@ public class LoginActivity extends BaseActivity {
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                saveLoginType(LoginType.FACEBOOK);
                 // TODO SF must be
                 // QBUser user = FacebookHelper.getCurrentFacebookUser(session);
                 QBLoginRestWithSocialCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
@@ -205,7 +197,6 @@ public class LoginActivity extends BaseActivity {
                 saveUserCredentials(user);
             }
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IS_LOGINED, true);
             DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();

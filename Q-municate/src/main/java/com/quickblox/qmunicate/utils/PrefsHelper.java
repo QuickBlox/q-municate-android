@@ -55,6 +55,8 @@ public class PrefsHelper {
             editor.putLong(key, (Long) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
+        } else if (value instanceof Enum) {
+            editor.putString(key, value.toString());
         } else if (value != null) {
             throw new RuntimeException("Attempting to save non-primitive preference");
         }

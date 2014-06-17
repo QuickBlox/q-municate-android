@@ -19,6 +19,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.utils.AppSession;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -91,9 +92,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private LoginType getLoginType() {
-        int defValue = LoginType.EMAIL.ordinal();
-        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
-        return LoginType.values()[value];
+        return AppSession.getActiveSession().getLoginType();
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

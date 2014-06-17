@@ -10,7 +10,6 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.core.TransferProtocol;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.utils.ActivityLifecycleHandler;
 import com.quickblox.qmunicate.utils.Consts;
@@ -39,11 +38,10 @@ public class App extends Application {
     public void initImageLoader(Context context) {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
                 .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS)
-                .denyCacheImageMultipleSizesInMemory()
-                .discCacheFileNameGenerator(new HashCodeFileNameGeneratorWithoutToken())
+                .denyCacheImageMultipleSizesInMemory().discCacheFileNameGenerator(
+                        new HashCodeFileNameGeneratorWithoutToken())
                         // TODO IS Remove for release app
-                .writeDebugLogs()
-                .build();
+                .writeDebugLogs().build();
         ImageLoader.getInstance().init(config);
     }
 
@@ -61,12 +59,6 @@ public class App extends Application {
 
     public void setUser(QBUser user) {
         this.user = user;
-    }
-
-    public LoginType getUserLoginType() {
-        int defValue = LoginType.EMAIL.ordinal();
-        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
-        return LoginType.values()[value];
     }
 
     private void initApplication() {
