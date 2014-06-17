@@ -17,7 +17,6 @@ import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +142,7 @@ public class DatabaseManager {
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
     }
 
-    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId) {
+    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId, String lastMessage, long dateSent, int lastSenderId) {
         QBDialog dialog = new QBDialog();
         dialog.setRoomJid(roomJidId);
         Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
@@ -152,7 +151,10 @@ public class DatabaseManager {
                 opponentFriend.getId());
         dialog.setOccupantsIds(occupantsIdsList);
         dialog.setType(QBDialogType.PRIVATE);
-        dialog.setLastMessageDateSent(DateUtils.getCurrentTime());
+        dialog.setLastMessage(lastMessage);
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
+        dialog.setLastMessageUserId(lastSenderId);
         saveDialog(context, dialog, roomJidId);
         return dialog;
     }
@@ -279,7 +281,8 @@ public class DatabaseManager {
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
         if (!isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
-            createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId());
+            createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId(),
+                    dialogMessageCache.getMessage(), dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
         }
 
         updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),

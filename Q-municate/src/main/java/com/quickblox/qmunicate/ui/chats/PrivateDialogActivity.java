@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.App;
@@ -27,6 +28,7 @@ import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
@@ -73,8 +75,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return DatabaseManager.getDialogByRoomJidId(this, chatJidId);
     }
 
-    private void createTempDialog() {
-        DatabaseManager.createTempPrivateDialogByRoomJidId(this, chatJidId);
+    private void createTempDialog(QBDialog dialog) {
+        DatabaseManager.createTempPrivateDialogByRoomJidId(this, chatJidId, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent(), dialog.getLastMessageUserId());
     }
 
     private void initStartLoadDialogMessages() {
@@ -82,8 +85,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         } else if (dialog != null && !messagesAdapter.isEmpty()) {
             startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
-        } else {
-            createTempDialog();
         }
     }
 
@@ -114,14 +115,23 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private void startUpdateChatDialog() {
         if (dialog != null) {
             QBUpdateDialogCommand.start(this, getDialog(), chatJidId);
+        } else if (dialog == null && !messagesAdapter.isEmpty()){
+            createTempDialog(getDialog());
         }
     }
 
     private QBDialog getDialog() {
+        if (dialog == null) {
+            dialog = new QBDialog();
+        }
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
         String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
+        Integer senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         dialog.setLastMessage(lastMessage);
+        dialog.setLastMessageDateSent(DateUtils.getCurrentTime());
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
+        dialog.setLastMessageUserId(senderId);
+        dialog.setType(QBDialogType.PRIVATE);
         return dialog;
     }
 
@@ -186,10 +196,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         if (friend.getId() != App.getInstance().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
-    }
-
-    public String getCurrentOpponent() {
-        return currentOpponent;
     }
 
     @Override
