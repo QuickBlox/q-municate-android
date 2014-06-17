@@ -66,12 +66,9 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void logout() throws QBResponseException {
+        AppSession.getActiveSession().clear();
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
-        AppSession activeSession = AppSession.getActiveSession();
-        if (activeSession != null) {
-            activeSession.clear();
-        }
         user = null;
     }
 

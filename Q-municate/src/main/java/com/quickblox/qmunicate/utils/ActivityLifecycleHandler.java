@@ -42,8 +42,12 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             --numberOfActivitiesInForeground;
         }
         lo.g("onActivityStopped" + numberOfActivitiesInForeground);
-        boolean isLogedIn = isLogedIn();
-        if (numberOfActivitiesInForeground == 0 && isLogedIn && activity instanceof QBLogeable) {
+
+        if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
+            boolean isLogedIn = isLogedIn();
+            if (!isLogedIn) {
+                return;
+            }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity);

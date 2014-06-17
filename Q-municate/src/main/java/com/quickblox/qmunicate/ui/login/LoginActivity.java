@@ -15,7 +15,6 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
@@ -150,7 +149,7 @@ public class LoginActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new LoginFailAction());
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -197,9 +196,18 @@ public class LoginActivity extends BaseActivity {
                 saveUserCredentials(user);
             }
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();
+        }
+    }
+
+
+    private class LoginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            emailEditText.setError(getResources().getString(R.string.lgn_error));
         }
     }
 

@@ -32,14 +32,14 @@ public class QBLogoutCommand extends CompositeServiceCommand {
         } catch (Exception e) {
             ErrorUtils.logError(TAG, e);
         }
-        resetFriendList();
+        resetCacheData();
         resetRememberMe();
         resetUserData();
         return extras;
     }
 
-    private void resetFriendList() {
-        DatabaseManager.deleteAllFriends(context);
+    private void resetCacheData() {
+        DatabaseManager.clearAllCache(context);
     }
 
     private void resetRememberMe() {
