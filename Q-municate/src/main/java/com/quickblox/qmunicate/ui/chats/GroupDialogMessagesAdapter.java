@@ -31,19 +31,20 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.list_item_dialog_message_left, null, true);
+        View view = layoutInflater.inflate(R.layout.list_item_dialog_opponent_message_type, null, true);
 
         ViewHolder holder = new ViewHolder();
 
         holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         holder.avatarImageView.setOval(true);
+        holder.avatarImageView.setVisibility(View.VISIBLE);
         holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+        holder.nameTextView.setVisibility(View.VISIBLE);
         holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
         holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         holder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
-        holder.nameTextView.setVisibility(View.VISIBLE);
 
         view.setTag(holder);
 

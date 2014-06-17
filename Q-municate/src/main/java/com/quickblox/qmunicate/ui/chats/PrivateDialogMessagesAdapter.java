@@ -10,26 +10,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
-import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
 
-    private Friend opponentFriend;
-    private QBDialog dialog;
-
-    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, Friend opponentFriend, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
+    public PrivateDialogMessagesAdapter(Context context, Cursor cursor, ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor, true);
-        this.opponentFriend = opponentFriend;
-        this.dialog = dialog;
         this.scrollMessagesListener = scrollMessagesListener;
     }
 
@@ -38,22 +30,20 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         View view;
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_dialog_message_left, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message_type, null, true);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_dialog_message_right, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_dialog_opponent_message_type, null, true);
         }
 
-        ViewHolder holder = new ViewHolder();
+        ViewHolder viewHolder = new ViewHolder();
 
-        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
-        holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
-        holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
-        holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
-        holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
-        holder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
+        viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
+        viewHolder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
+        viewHolder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        viewHolder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
 
-        view.setTag(holder);
+        view.setTag(viewHolder);
 
         return view;
     }
@@ -61,20 +51,12 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String avatarUrl;
 
         String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
         String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
 
         viewHolder.attachImageView.setVisibility(View.GONE);
-
-        if (isOwnMessage(senderId)) {
-            avatarUrl = getAvatarUrlForCurrentUser();
-        } else {
-            avatarUrl = getAvatarUrlForFriend(opponentFriend);
-        }
 
         if (!TextUtils.isEmpty(attachUrl)) {
             viewHolder.messageTextView.setVisibility(View.GONE);
@@ -88,12 +70,10 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if(!isRead) {
+        if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }
-
-        displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
     @Override
@@ -120,15 +100,14 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
     private int getItemViewType(Cursor cursor) {
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            return Consts.LEFT_CHAT_MESSAGE_TYPE_1;
+            return Consts.OWN_CHAT_MESSAGE_TYPE;
         } else {
-            return Consts.RIGHT_CHAT_MESSAGE_TYPE_2;
+            return Consts.OPPONENT_CHAT_MESSAGE_TYPE;
         }
     }
 
     private static class ViewHolder {
 
-        RoundedImageView avatarImageView;
         ChatTextView messageTextView;
         ImageView attachImageView;
         TextView timeTextView;
