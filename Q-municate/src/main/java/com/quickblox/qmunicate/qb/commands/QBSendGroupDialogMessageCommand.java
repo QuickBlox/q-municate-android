@@ -20,8 +20,9 @@ public class QBSendGroupDialogMessageCommand extends ServiceCommand {
         this.chatHelper = ChatHelper;
     }
 
-    public static void start(Context context, String message, QBFile file) {
+    public static void start(Context context, String roomJidId, String message, QBFile file) {
         Intent intent = new Intent(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJidId);
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, message);
         intent.putExtra(QBServiceConsts.EXTRA_QBFILE, file);
         context.startService(intent);
@@ -29,13 +30,14 @@ public class QBSendGroupDialogMessageCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
+        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
         if(file == null) {
-            chatHelper.sendGroupMessage(message);
+            chatHelper.sendGroupMessage(roomJidId, message);
         } else {
-            chatHelper.sendGroupMessageWithAttachImage(file);
+            chatHelper.sendGroupMessageWithAttachImage(roomJidId, file);
         }
 
         return null;

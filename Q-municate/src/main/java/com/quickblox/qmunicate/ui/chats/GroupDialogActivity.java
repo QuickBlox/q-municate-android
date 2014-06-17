@@ -109,7 +109,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, null, file);
+        QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, chatJidId, null, file);
     }
 
     private void startUpdateChatDialog() {
@@ -163,7 +163,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendGroupDialogMessageCommand.start(this, messageEditText.getText().toString(), null);
+        QBSendGroupDialogMessageCommand.start(this, chatJidId, messageEditText.getText().toString(), null);
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
