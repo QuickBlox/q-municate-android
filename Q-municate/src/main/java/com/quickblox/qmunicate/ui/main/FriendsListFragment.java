@@ -224,7 +224,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(state.equals(State.GLOBAL_LIST) && isNeedToHideSearchView) {
+                if(state.equals(State.GLOBAL_LIST) && isNeedToHideSearchView
+                        || state.equals(State.FRIENDS_LIST) && isFriendsListLoaded && !isNeedToHideSearchView) {
                     checkVisibilityEmptyLabel();
                 }
             }
@@ -376,7 +377,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public void execute(Bundle bundle) {
             isFriendsListLoaded = true;
             if (baseActivity != null) {
-                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+                checkVisibilityEmptyLabel();
             }
         }
     }
