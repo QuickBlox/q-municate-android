@@ -6,37 +6,37 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
-import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
-public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
+public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public PrivateDialogMessagesAdapter(Context context, Cursor cursor, ScrollMessagesListener scrollMessagesListener) {
-        super(context, cursor, true);
+        super(context, cursor);
         this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message_type, null, true);
-        } else {
-            view = layoutInflater.inflate(R.layout.list_item_dialog_opponent_message_type, null, true);
-        }
-
         ViewHolder viewHolder = new ViewHolder();
 
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        if (isOwnMessage(senderId)) {
+            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message, null, true);
+        } else {
+            view = layoutInflater.inflate(R.layout.list_item_private_dialog_opponent_message, null, true);
+        }
+
+        viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
         viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         viewHolder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
@@ -59,11 +59,11 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         viewHolder.attachImageView.setVisibility(View.GONE);
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.messageTextView.setVisibility(View.GONE);
+            viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
             displayAttachImage(attachUrl, viewHolder.pleaseWaitTextView, viewHolder.attachImageView,
                     viewHolder.progressBar);
         } else {
-            viewHolder.messageTextView.setVisibility(View.VISIBLE);
+            viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
             viewHolder.attachImageView.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(body);
         }
@@ -76,38 +76,9 @@ public class PrivateDialogMessagesAdapter extends BaseCursorAdapter {
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
-        return getItemViewType(cursor);
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return Consts.MESSAGES_TYPE_COUNT;
-    }
-
-    private boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
-    }
-
-    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-                                    final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
-    }
-
-    private int getItemViewType(Cursor cursor) {
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        if (isOwnMessage(senderId)) {
-            return Consts.OWN_CHAT_MESSAGE_TYPE;
-        } else {
-            return Consts.OPPONENT_CHAT_MESSAGE_TYPE;
-        }
-    }
-
     private static class ViewHolder {
 
+        LinearLayout textMessageLinearLayout;
         ChatTextView messageTextView;
         ImageView attachImageView;
         TextView timeTextView;

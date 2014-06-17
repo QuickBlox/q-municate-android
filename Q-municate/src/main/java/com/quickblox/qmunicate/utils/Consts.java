@@ -27,8 +27,8 @@ public class Consts {
 
     public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
 
-    public static final int OPPONENT_CHAT_MESSAGE_TYPE = 0;
-    public static final int OWN_CHAT_MESSAGE_TYPE = 1;
+    public static final int OPPONENT_DIALOG_MESSAGE_TYPE = 0;
+    public static final int OWN_DIALOG_MESSAGE_TYPE = 1;
     public static final int MESSAGES_TYPE_COUNT = 2;
 
     public static final String ENCODING_UTF8 = "UTF-8";

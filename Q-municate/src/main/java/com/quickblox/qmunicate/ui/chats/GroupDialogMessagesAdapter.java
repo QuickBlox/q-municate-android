@@ -6,47 +6,53 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
-import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
-public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
+public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public GroupDialogMessagesAdapter(Context context, Cursor cursor,
-            ScrollMessagesListener scrollMessagesListener) {
-        super(context, cursor, true);
+                                      ScrollMessagesListener scrollMessagesListener) {
+        super(context, cursor);
         this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.list_item_dialog_opponent_message_type, null, true);
+        View view;
+        ViewHolder viewHolder = new ViewHolder();
 
-        ViewHolder holder = new ViewHolder();
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        if (isOwnMessage(senderId)) {
+            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message, null, true);
+        } else {
+            view = layoutInflater.inflate(R.layout.list_item_group_dialog_opponent_message, null, true);
+            viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+            viewHolder.avatarImageView.setOval(true);
+            viewHolder.avatarImageView.setVisibility(View.VISIBLE);
+            viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+            viewHolder.nameTextView.setVisibility(View.VISIBLE);
+        }
 
-        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
-        holder.avatarImageView.setVisibility(View.VISIBLE);
-        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
-        holder.nameTextView.setVisibility(View.VISIBLE);
-        holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
-        holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
-        holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
-        holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
-        holder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
+        viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
+        viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
+        viewHolder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
+        viewHolder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
+        viewHolder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
 
-        view.setTag(holder);
+        view.setTag(viewHolder);
 
         return view;
     }
@@ -66,7 +72,6 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         viewHolder.attachImageView.setVisibility(View.GONE);
 
         if (isOwnMessage(senderId)) {
-            senderName = currentUser.getFullName();
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
@@ -76,15 +81,16 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
             } else {
                 senderName = senderId + Consts.EMPTY_STRING;
             }
+            viewHolder.nameTextView.setTextColor(getTextColor(senderId));
+            viewHolder.nameTextView.setText(senderName);
         }
-        viewHolder.nameTextView.setText(senderName);
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.messageTextView.setVisibility(View.GONE);
+            viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
             displayAttachImage(attachUrl, viewHolder.pleaseWaitTextView, viewHolder.attachImageView,
                     viewHolder.progressBar);
         } else {
-            viewHolder.messageTextView.setVisibility(View.VISIBLE);
+            viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
             viewHolder.attachImageView.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(body);
         }
@@ -100,20 +106,11 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
-    private boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
-    }
-
-    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-            final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
-    }
-
     private static class ViewHolder {
 
         RoundedImageView avatarImageView;
         TextView nameTextView;
+        LinearLayout textMessageLinearLayout;
         ChatTextView messageTextView;
         ImageView attachImageView;
         TextView timeTextView;
