@@ -27,8 +27,8 @@ public class Consts {
 
     public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
 
-    public static final int LEFT_CHAT_MESSAGE_TYPE_1 = 0;
-    public static final int RIGHT_CHAT_MESSAGE_TYPE_2 = 1;
+    public static final int OPPONENT_DIALOG_MESSAGE_TYPE = 0;
+    public static final int OWN_DIALOG_MESSAGE_TYPE = 1;
     public static final int MESSAGES_TYPE_COUNT = 2;
 
     public static final String ENCODING_UTF8 = "UTF-8";
@@ -53,6 +53,9 @@ public class Consts {
     public static final String CALL_TYPE_EXTRA = "call_type";
     public static final String REMOTE_DESCRIPTION = "session_description";
     public static final String GCM_SENDER_ID = "265299067289";
+
+    public static final int CHAT_ATTACH_WIDTH = 250;
+    public static final int CHAT_ATTACH_HEIGHT = 200;
 
     // TODO VF rename and move these consts to PrefsHelper
     public static final String PROPERTY_REG_ID = "registration_id";

@@ -1,20 +1,29 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
-    android:orientation="vertical"
-    android:focusableInTouchMode="true">
+    android:background="@color/white"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/messages_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingBottom="20dp"
-        android:transcriptMode="alwaysScroll" />
+        android:divider="@null"
+        android:dividerHeight="10dp"
+        android:paddingBottom="5dp"
+        android:transcriptMode="alwaysScroll"/>
 
-    <include layout="@layout/view_input_message_layout" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray"
+        android:layout_marginBottom="5dp"/>
 
-    <include layout="@layout/view_smiles_pager" />
+    <include layout="@layout/view_input_message_layout"/>
+
+    <include layout="@layout/view_smiles_pager"/>
 
 </LinearLayout>
