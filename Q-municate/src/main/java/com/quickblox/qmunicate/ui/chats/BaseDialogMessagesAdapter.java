@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
@@ -43,10 +43,11 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter {
         return senderId == currentUser.getId();
     }
 
-    protected void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-                                      final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
+    protected void displayAttachImage(String uri, final ImageView attachImageView, final RelativeLayout progressRelativeLayout,
+                                      final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar, boolean isOwnMessage) {
+        ImageLoader.getInstance().displayImage(uri, attachImageView, Consts.UIL_DEFAULT_DISPLAY_OPTIONS,
+                new SimpleImageLoading(attachImageView, progressRelativeLayout, verticalProgressBar, centeredProgressBar, isOwnMessage),
+                new SimpleImageLoadingProgressListener(verticalProgressBar));
     }
 
     protected int getTextColor(Integer senderId) {

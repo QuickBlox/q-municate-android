@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
@@ -22,6 +24,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.chats.ScrollMessagesListener;
+import com.quickblox.qmunicate.ui.views.MaskGenerator;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -71,42 +74,75 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         return friend.getAvatarUrl();
     }
 
+    private void hideAttachmentBackground(ImageView imageAttachment) {
+        int sdk = android.os.Build.VERSION.SDK_INT;
+        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            imageAttachment.setBackgroundDrawable(null);
+        } else {
+            imageAttachment.setBackground(null);
+        }
+        imageAttachment.setPadding(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
+    }
+
+    @Override
+    public void onCachedImageFileReceived(File imageFile) {
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
+        imageHelper.showFullImage(context, absolutePath);
+    }
+
     public class SimpleImageLoading extends SimpleImageLoadingListener {
 
-        private TextView pleaseWaitTextView;
+        private RelativeLayout progressRelativeLayout;
         private ImageView attachImageView;
-        private ProgressBar progressBar;
+        private ProgressBar verticalProgressBar;
+        private ProgressBar centeredProgressBar;
         private Bitmap loadedImageBitmap;
+        private boolean isOwnMessage;
 
-        public SimpleImageLoading(final TextView pleaseWaitTextView, final ImageView attachImageView,
-                final ProgressBar progressBar) {
-            this.pleaseWaitTextView = pleaseWaitTextView;
+        public SimpleImageLoading(final ImageView attachImageView, final RelativeLayout progressRelativeLayout,
+                                  final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar, boolean isOwnMessage) {
+            this.progressRelativeLayout = progressRelativeLayout;
             this.attachImageView = attachImageView;
-            this.progressBar = progressBar;
+            this.verticalProgressBar = verticalProgressBar;
+            this.centeredProgressBar = centeredProgressBar;
+            this.isOwnMessage = isOwnMessage;
         }
 
         @Override
         public void onLoadingStarted(String imageUri, View view) {
-            progressBar.setProgress(Consts.ZERO_INT_VALUE);
-            progressBar.setVisibility(View.VISIBLE);
-            pleaseWaitTextView.setVisibility(View.VISIBLE);
+            verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+            verticalProgressBar.setVisibility(View.VISIBLE);
+            centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+            centeredProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            progressBar.setVisibility(View.GONE);
-            pleaseWaitTextView.setVisibility(View.GONE);
+            verticalProgressBar.setVisibility(View.GONE);
+            centeredProgressBar.setVisibility(View.GONE);
+            progressRelativeLayout.setVisibility(View.GONE);
         }
 
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImageBitmap) {
-            progressBar.setVisibility(View.GONE);
-            pleaseWaitTextView.setVisibility(View.GONE);
+            verticalProgressBar.setVisibility(View.GONE);
+            centeredProgressBar.setVisibility(View.GONE);
+            if (progressRelativeLayout != null) {
+                progressRelativeLayout.setVisibility(View.GONE);
+            }
             attachImageView.setVisibility(View.VISIBLE);
-            attachImageView.setImageBitmap(loadedImageBitmap);
             attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             this.loadedImageBitmap = loadedImageBitmap;
             scrollMessagesListener.onScrollToBottom();
+            Bitmap backgroundBitmap = BitmapFactory.decodeResource(resources,
+                    isOwnMessage ? R.drawable.right_bubble
+                            : R.drawable.left_bubble
+            );
+            hideAttachmentBackground(attachImageView);
+            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap, loadedImageBitmap));
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {
@@ -124,12 +160,18 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         }
     }
 
-    @Override
-    public void onCachedImageFileReceived(File imageFile) {
-    }
+    public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {
 
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-        imageHelper.showFullImage(context, absolutePath);
+        private ProgressBar verticalProgressBar;
+
+        public SimpleImageLoadingProgressListener(ProgressBar verticalProgressBar) {
+            this.verticalProgressBar = verticalProgressBar;
+        }
+
+        @Override
+        public void onProgressUpdate(String imageUri, View view, int current,
+                                     int total) {
+            verticalProgressBar.setProgress(Math.round(100.0f * current / total));
+        }
     }
 }

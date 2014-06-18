@@ -45,4 +45,7 @@
     <dimen name="smile_height">30dp</dimen>
     <dimen name="smile_width">30dp</dimen>
 
+    <dimen name="chat_attach_width">250dp</dimen>
+    <dimen name="chat_attach_height">200dp</dimen>
+
 </resources>

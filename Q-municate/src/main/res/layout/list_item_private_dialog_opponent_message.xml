@@ -12,13 +12,29 @@
         android:layout_alignParentLeft="true"
         android:orientation="vertical">
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
+        <RelativeLayout
+            android:id="@+id/progress_relativelayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="false"
-            android:max="100"
-            android:visibility="gone"/>
+            android:layout_height="wrap_content">
+
+            <ProgressBar
+                android:id="@+id/vertical_progressbar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/chat_attach_width"
+                android:layout_height="@dimen/chat_attach_height"
+                android:max="100"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/centered_progressbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="false"
+                android:max="100"
+                android:visibility="gone" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/text_message_linearlayout"
@@ -52,23 +68,13 @@
             android:id="@+id/attach_imageview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:adjustViewBounds="true"
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:paddingRight="5dp"
-            android:paddingTop="5dp"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:src="@null"
-            android:visibility="gone"/>
-
-        <TextView
-            android:id="@+id/please_wait_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:text="@string/uploading_file"
-            android:textColor="@color/white"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
     </LinearLayout>
 

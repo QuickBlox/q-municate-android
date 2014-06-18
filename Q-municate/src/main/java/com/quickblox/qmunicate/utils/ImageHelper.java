@@ -75,7 +75,7 @@ public class ImageHelper {
         return tempFile.getAbsolutePath();
     }
 
-    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
+    public static Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
         return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
     }
 

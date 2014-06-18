@@ -54,6 +54,9 @@ public class Consts {
     public static final String REMOTE_DESCRIPTION = "session_description";
     public static final String GCM_SENDER_ID = "265299067289";
 
+    public static final int CHAT_ATTACH_WIDTH = 250;
+    public static final int CHAT_ATTACH_HEIGHT = 200;
+
     // TODO VF rename and move these consts to PrefsHelper
     public static final String PROPERTY_REG_ID = "registration_id";
     public static final String PROPERTY_APP_VERSION = "appVersion";
