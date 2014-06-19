@@ -82,7 +82,8 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         } else {
             imageAttachment.setBackground(null);
         }
-        imageAttachment.setPadding(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
+        imageAttachment.setPadding(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE,
+                Consts.ZERO_INT_VALUE);
     }
 
     @Override
@@ -103,8 +104,9 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         private Bitmap loadedImageBitmap;
         private boolean isOwnMessage;
 
-        public SimpleImageLoading(final ImageView attachImageView, final RelativeLayout progressRelativeLayout,
-                                  final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar, boolean isOwnMessage) {
+        public SimpleImageLoading(final ImageView attachImageView,
+                final RelativeLayout progressRelativeLayout, final ProgressBar verticalProgressBar,
+                final ProgressBar centeredProgressBar, boolean isOwnMessage) {
             this.progressRelativeLayout = progressRelativeLayout;
             this.attachImageView = attachImageView;
             this.verticalProgressBar = verticalProgressBar;
@@ -139,11 +141,10 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
             this.loadedImageBitmap = loadedImageBitmap;
             scrollMessagesListener.onScrollToBottom();
             Bitmap backgroundBitmap = BitmapFactory.decodeResource(resources,
-                    isOwnMessage ? R.drawable.right_bubble
-                            : R.drawable.left_bubble
-            );
+                    isOwnMessage ? R.drawable.right_bubble : R.drawable.left_bubble);
             hideAttachmentBackground(attachImageView);
-            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap, loadedImageBitmap));
+            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap,
+                    loadedImageBitmap));
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {
@@ -170,8 +171,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         }
 
         @Override
-        public void onProgressUpdate(String imageUri, View view, int current,
-                                     int total) {
+        public void onProgressUpdate(String imageUri, View view, int current, int total) {
             verticalProgressBar.setProgress(Math.round(100.0f * current / total));
         }
     }
