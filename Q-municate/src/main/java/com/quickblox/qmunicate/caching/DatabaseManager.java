@@ -362,7 +362,7 @@ public class DatabaseManager {
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,
                 roomJidId));
-        values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
+        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, lastMessage, dateSent));
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, lastSenderId);
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.ROOM_JID_ID + "='" + roomJidId + "'";

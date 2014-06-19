@@ -18,10 +18,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/button_general_selector"
-            android:padding="5dp"
             android:onClick="attachButtonOnClick"
+            android:padding="5dp"
             android:src="@drawable/ic_photo"
-            android:visibility="visible" />
+            android:visibility="visible"/>
 
         <ImageButton
             android:id="@+id/send_button"
@@ -31,7 +31,7 @@
             android:onClick="sendMessageOnClick"
             android:padding="5dp"
             android:src="@drawable/ic_send_message"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
     </LinearLayout>
 
@@ -45,6 +45,6 @@
         android:focusable="true"
         android:gravity="center_vertical|right|left"
         android:hint="@string/dlg_hint_message"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"/>
 
 </RelativeLayout>
