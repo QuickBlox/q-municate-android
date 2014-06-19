@@ -1,47 +1,49 @@
-package com.quickblox.qmunicate.utils;
+package com.quickblox.qmunicate.model;
 
 import com.quickblox.qmunicate.App;
-import com.quickblox.qmunicate.model.LoginType;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.io.Serializable;
 
 public class AppSession implements Serializable {
 
-    private static AppSession INSTANCE;
+    private static AppSession activeSession;
     private final LoginType loginType;
-    private final String userEmail;
+    private static final Object lock = new Object();
+    private final int userId;
 
-    private AppSession(LoginType loginType, String userEmail) {
+    private AppSession(LoginType loginType, int userId) {
         this.loginType = loginType;
-        this.userEmail = userEmail;
+        this.userId = userId;
         save();
     }
 
-    public static void startSession(LoginType loginType, String userMail) {
-        INSTANCE = new AppSession(loginType, userMail);
+    public static void startSession(LoginType loginType, int userId) {
+        activeSession = new AppSession(loginType, userId);
     }
 
-    public void clear() {
+    public void closeAndClear() {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         helper.delete(PrefsHelper.PREF_USER_EMAIL);
         helper.delete(PrefsHelper.PREF_LOGIN_TYPE);
+        activeSession = null;
     }
 
     public void save() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         prefsHelper.savePref(PrefsHelper.PREF_LOGIN_TYPE, loginType.toString());
-        prefsHelper.savePref(PrefsHelper.PREF_USER_EMAIL, userEmail);
+        prefsHelper.savePref(PrefsHelper.PREF_USER_ID, userId);
     }
 
     public static AppSession getActiveSession() {
-        if (INSTANCE == null) {
-            INSTANCE = load();
+        synchronized (lock) {
+            return activeSession;
         }
-        return INSTANCE;
     }
 
     public boolean isSessionExist() {
-        return loginType != null && userEmail != null;
+        return loginType != null && userId != Consts.NOT_INITIALIZED_VALUE;
     }
 
     public LoginType getLoginType() {
@@ -51,8 +53,8 @@ public class AppSession implements Serializable {
     public static AppSession load() {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         String loginTypeRaw = helper.getPref(PrefsHelper.PREF_LOGIN_TYPE, LoginType.EMAIL.toString());
-        String userMail = helper.getPref(PrefsHelper.PREF_USER_EMAIL, null);
+        int userId = helper.getPref(PrefsHelper.PREF_USER_ID, Consts.NOT_INITIALIZED_VALUE);
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
-        return new AppSession(loginType, userMail);
+        return new AppSession(loginType, userId);
     }
 }

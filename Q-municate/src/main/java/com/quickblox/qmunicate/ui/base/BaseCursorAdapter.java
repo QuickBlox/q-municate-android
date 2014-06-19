@@ -22,7 +22,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.chats.ScrollMessagesListener;
-import com.quickblox.qmunicate.utils.AppSession;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -47,7 +47,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
         currentUser = App.getInstance().getUser();
-        currentLoginType = AppSession.getActiveSession().getLoginType();
+        currentLoginType = AppSessionHelper.getSession().getLoginType();
         imageHelper = new ImageHelper((android.app.Activity) context);
     }
 

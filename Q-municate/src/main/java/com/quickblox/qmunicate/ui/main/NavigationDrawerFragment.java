@@ -87,8 +87,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         selectItem(currentSelectedPosition);
 
         countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     @Override
@@ -201,8 +201,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void initNavigationAdapter() {
-        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
-                getNavigationDrawerItems());
+        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
         updateCountUnreadDialogsListener = navigationDrawerAdapter;
     }
@@ -228,6 +227,7 @@ public class NavigationDrawerFragment extends BaseFragment {
             }
         });
     }
+
 
     private List<String> getNavigationDrawerItems() {
         String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
@@ -285,7 +285,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
-                                       int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+                int openDrawerContentDescRes, int closeDrawerContentDescRes) {
             super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes,
                     closeDrawerContentDescRes);
         }

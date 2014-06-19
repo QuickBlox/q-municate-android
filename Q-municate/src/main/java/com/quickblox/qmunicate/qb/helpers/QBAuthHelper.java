@@ -12,8 +12,8 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
-import com.quickblox.qmunicate.utils.AppSession;
 
 import java.io.File;
 
@@ -33,7 +33,7 @@ public class QBAuthHelper extends BaseHelper {
             String password = user.getPassword();
             this.user = QBUsers.signIn(user);
             this.user.setPassword(password);
-            AppSession.startSession(LoginType.EMAIL, user.getEmail());
+            AppSession.startSession(LoginType.EMAIL, this.user.getId());
         } catch (QBResponseException exc) {
             throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
         }
@@ -46,7 +46,7 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-        AppSession.startSession(LoginType.FACEBOOK, user.getEmail());
+        AppSession.startSession(LoginType.FACEBOOK, user.getId());
         return user;
     }
 
@@ -66,7 +66,10 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void logout() throws QBResponseException {
-        AppSession.getActiveSession().clear();
+        AppSession activeSession = AppSession.getActiveSession();
+        if (activeSession != null) {
+            activeSession.closeAndClear();
+        }
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
         user = null;

@@ -18,7 +18,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.utils.AppSession;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -37,7 +37,7 @@ public class SplashActivity extends BaseActivity {
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        if (facebookHelper.isSessionOpened() && getLoginType() == LoginType.FACEBOOK) {
+        if (isFacebookSessionAlreadyExist()) {
             return;
         }
 
@@ -54,6 +54,10 @@ public class SplashActivity extends BaseActivity {
         } else {
             startLanding();
         }
+    }
+
+    public boolean isFacebookSessionAlreadyExist() {
+        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getLoginType());
     }
 
     @Override
@@ -91,14 +95,14 @@ public class SplashActivity extends BaseActivity {
     }
 
     private LoginType getLoginType() {
-        return AppSession.getActiveSession().getLoginType();
+        return AppSessionHelper.getSession().getLoginType();
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened() && getLoginType() == LoginType.FACEBOOK) {
+            if (session.isOpened() && LoginType.FACEBOOK.equals(getLoginType())) {
                 QBLoginRestWithSocialCommand.start(SplashActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }

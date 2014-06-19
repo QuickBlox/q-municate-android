@@ -10,6 +10,7 @@ public class PrefsHelper {
     public static final String PREF_REMEMBER_ME = "remember_me";
     public static final String PREF_LOGIN_TYPE = "login_type";
     public static final String PREF_USER_EMAIL = "email";
+    public static final String PREF_USER_ID = "user_id";
     public static final String PREF_IS_LOGINED = "is_logined";
     public static final String PREF_USER_PASSWORD = "password";
     public static final String PREF_PUSH_NOTIFICATIONS = "push_notifications";

@@ -20,7 +20,7 @@ public abstract class ServiceCommand implements Command {
         this.failAction = failAction;
     }
 
-    public void execute(Bundle bundle) {
+    public void execute(Bundle bundle) throws Exception {
         Bundle result;
         try {
             result = perform(bundle);
@@ -32,6 +32,7 @@ public abstract class ServiceCommand implements Command {
             result.putSerializable(QBServiceConsts.EXTRA_ERROR, e);
             result.putString(QBServiceConsts.COMMAND_ACTION, failAction);
             sendResult(result, failAction);
+            throw e;
         }
     }
 

@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 public class Utils {
 
@@ -30,6 +32,16 @@ public class Utils {
             ErrorUtils.logError(e);
         }
         return null;
+    }
+
+    public static boolean isTokenDestroyedError(QBResponseException e) {
+        List<String> errors = e.getErrors();
+        for (String error : errors) {
+            if (Consts.TOKEN_REQUIRED_ERROR.equals(error)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void closeOutputStream(OutputStream outputStream) {

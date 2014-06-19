@@ -5,6 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.helper.Lo;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.qmunicate.ui.base.QBLogeable;
@@ -58,7 +59,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     private boolean isLogedIn() {
-        AppSession activeSession = AppSession.getActiveSession();
+        AppSession activeSession = AppSessionHelper.getSession();
         return activeSession.isSessionExist();
     }
 

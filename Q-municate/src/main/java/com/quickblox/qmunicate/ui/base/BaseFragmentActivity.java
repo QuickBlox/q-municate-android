@@ -248,7 +248,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
                 Command command = broadcastCommandMap.get(action);
                 if (command != null) {
                     Log.d("STEPS", "executing " + action);
-                    command.execute(intent.getExtras());
+                    try {
+                        command.execute(intent.getExtras());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
