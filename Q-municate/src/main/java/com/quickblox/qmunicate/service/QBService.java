@@ -448,7 +448,7 @@ public class QBService extends Service {
 
     public void refreshSession() {
         if (LoginType.EMAIL.equals(AppSessionHelper.getSession().getLoginType())) {
-            QBLoginRestCommand.start(this, App.getInstance().getUser());
+            QBLoginRestCommand.start(this, AppSessionHelper.getSession().getUser());
         } else {
             QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);

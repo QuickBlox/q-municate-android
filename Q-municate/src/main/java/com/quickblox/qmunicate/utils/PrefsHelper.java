@@ -27,6 +27,7 @@ public class PrefsHelper {
     public static final String PREF_APP_VERSION = "appVersion";
     public static final String PREF_RECEIVE_PUSH = "receive_push";
     public static final String PREF_IS_SUBSCRIBED_ON_SERVER = "subscribed_on_server";
+    public static final String PREF_USER_FULL_NAME = "full_name";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;

@@ -16,6 +16,8 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
@@ -31,11 +33,13 @@ import com.quickblox.qmunicate.utils.PrefsHelper;
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String STARTED_LOGIN_TYPE = "started_login_type";
 
     private EditText emailEditText;
     private EditText passwordEditText;
     private CheckBox rememberMeCheckBox;
     private FacebookHelper facebookHelper;
+    private LoginType startedLoginType = LoginType.EMAIL;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -46,6 +50,9 @@ public class LoginActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
+            startedLoginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
+        }
         canPerformLogout.set(false);
         initUI();
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, true);
@@ -90,6 +97,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     public void loginFacebookOnClickListener(View view) {
+        startedLoginType = LoginType.FACEBOOK;
         facebookHelper.loginWithFacebook();
     }
 
@@ -109,6 +117,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putSerializable(STARTED_LOGIN_TYPE, startedLoginType);
         facebookHelper.onSaveInstanceState(outState);
     }
 
@@ -190,7 +199,7 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            AppSession.startSession(startedLoginType, user);
             if (rememberMeCheckBox.isChecked()) {
                 saveRememberMe(true);
                 saveUserCredentials(user);

@@ -11,6 +11,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
@@ -57,7 +58,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     public boolean isFacebookSessionAlreadyExist() {
-        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getLoginType());
+        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
     }
 
     @Override
@@ -94,7 +95,7 @@ public class SplashActivity extends BaseActivity {
         QBLoginCommand.start(this, user);
     }
 
-    private LoginType getLoginType() {
+    private LoginType getCurrentLoginType() {
         return AppSessionHelper.getSession().getLoginType();
     }
 
@@ -102,7 +103,7 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened() && LoginType.FACEBOOK.equals(getLoginType())) {
+            if (session.isOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType())) {
                 QBLoginRestWithSocialCommand.start(SplashActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }
@@ -120,7 +121,7 @@ public class SplashActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            AppSession.startSession(getCurrentLoginType(), user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             MainActivity.start(SplashActivity.this);
             finish();

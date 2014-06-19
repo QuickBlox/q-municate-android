@@ -13,7 +13,6 @@ import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.AppSession;
-import com.quickblox.qmunicate.model.LoginType;
 
 import java.io.File;
 
@@ -33,7 +32,6 @@ public class QBAuthHelper extends BaseHelper {
             String password = user.getPassword();
             this.user = QBUsers.signIn(user);
             this.user.setPassword(password);
-            AppSession.startSession(LoginType.EMAIL, this.user.getId());
         } catch (QBResponseException exc) {
             throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
         }
@@ -46,7 +44,6 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-        AppSession.startSession(LoginType.FACEBOOK, user.getId());
         return user;
     }
 

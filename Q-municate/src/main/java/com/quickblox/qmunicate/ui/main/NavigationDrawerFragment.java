@@ -33,6 +33,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -120,7 +121,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         if (user != null) {
             fullnameTextView.setText(user.getFullName());
         }

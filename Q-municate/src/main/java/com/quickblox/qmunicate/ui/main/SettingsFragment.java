@@ -21,6 +21,7 @@ import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
@@ -48,8 +49,7 @@ public class SettingsFragment extends BaseFragment {
         logout = (Button) rootView.findViewById(R.id.logout);
 
         pushNotification.setChecked(getPushNotifications());
-        App app = App.getInstance();
-        QBUser user = app.getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         if (user == null || null == user.getFacebookId()) {
             rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
         } else {

@@ -12,6 +12,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class QBRemoveFriendCommand extends ServiceCommand {
         Friend friend = (Friend) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
-        builder.eq(Consts.FRIEND_FIELD_USER_ID, App.getInstance().getUser().getId());
+        builder.eq(Consts.FRIEND_FIELD_USER_ID, AppSessionHelper.getSession().getUser().getId());
         builder.eq(Consts.FRIEND_FIELD_FRIEND_ID, friend.getId());
 
         List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.EXTRA_FRIEND, builder);

@@ -29,7 +29,7 @@ public class ChatUtils {
     private static final String PROPERTY_DIALOG_ID = "_id";
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         int resultId = Consts.ZERO_INT_VALUE;
         for (Integer id : occupantsIdsList) {
             if (!id.equals(user.getId())) {
@@ -75,7 +75,7 @@ public class ChatUtils {
     }
 
     public static ArrayList<Integer> getOccupantIdsWithUser(List<Integer> friendIdsList) {
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         ArrayList<Integer> occupantIdsList = new ArrayList<Integer>(friendIdsList);
         occupantIdsList.add(user.getId());
         return occupantIdsList;
@@ -88,7 +88,7 @@ public class ChatUtils {
         String dialogName = dialog.getName();
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
         chatMessage.setProperty(PROPERTY_DIALOG_ID, dialogId);
@@ -116,7 +116,7 @@ public class ChatUtils {
     }
 
     public static ArrayList<Integer> getOccupantsIdsListForCreatePrivateDialog(int opponentId) {
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
         occupantsIdsList.add(user.getId());
         occupantsIdsList.add(opponentId);
