@@ -44,7 +44,6 @@ public class Consts {
     public static final String EXTRA_FRIEND = "Friend";
     public static final String FRIEND_FIELD_USER_ID = "user_id";
     public static final String FRIEND_FIELD_FRIEND_ID = "FriendID";
-    public static final String SUBSCRIPTION_ID = "subscription_id";
     public static final String PUSH_MESSAGE = "message";
     public static final String PROPERTY_REG_USER_ID = "registered_push_user";
     public static final String USER = "user";
@@ -52,7 +51,6 @@ public class Consts {
     public static final String CALL_DIRECTION_TYPE_EXTRA = "call_type_direction";
     public static final String CALL_TYPE_EXTRA = "call_type";
     public static final String REMOTE_DESCRIPTION = "session_description";
-    public static final String GCM_SENDER_ID = "265299067289";
 
     public static final int CHAT_ATTACH_WIDTH = 250;
     public static final int CHAT_ATTACH_HEIGHT = 200;
@@ -64,8 +62,9 @@ public class Consts {
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int LOGIN_TIMEOUT = 40000;
     public static final int SECOND = 1000;
-    public static final String DEFAULT_WEB_ROOM = "test";
     public static final String DEFAULT_CALL_MESSAGE = "";
+    public static final String TOKEN_REQUIRED_ERROR = "Token is required";
+    public static final String SESSION_DOES_NOT_EXIST = "base Required session does not exist";
 
     public static enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING

@@ -93,7 +93,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public void sendGroupMessage(String roomJidId, String message) throws Exception {
         roomChat = roomChatManager.getRoom(roomJidId);
-        if(roomChat == null) {
+        if (roomChat == null) {
             return;
         }
         QBChatMessage chatMessage = getQBChatMessage(message);
@@ -102,7 +102,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws Exception {
         roomChat = roomChatManager.getRoom(roomJidId);
-        if(roomChat == null) {
+        if (roomChat == null) {
             return;
         }
         QBChatMessage chatMessage = getQBChatMessageWithImage(file);
@@ -404,13 +404,16 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+            if (friend == null) {
+                friend = new Friend();
+                friend.setFullname(Consts.EMPTY_STRING + chatMessage.getSenderId());
+            }
             long time;
             String roomJidId;
             String attachUrl = null;
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 time = DateUtils.getCurrentTime();
-                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(),
-                        time);
+                QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
                 roomJidId = dialog.getRoomJid();
                 tryJoinRoomChat(roomJidId);
                 saveDialogToCache(dialog, roomJidId);

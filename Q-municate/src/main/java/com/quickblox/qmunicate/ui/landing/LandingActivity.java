@@ -12,11 +12,10 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
-import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
@@ -42,13 +41,9 @@ public class LandingActivity extends BaseActivity {
     }
 
     public void connectFacebookOnClickListener(View view) {
-        saveLoginType(LoginType.FACEBOOK);
         facebookHelper.loginWithFacebook();
     }
 
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
-    }
 
     public void loginOnClickListener(View view) {
         LoginActivity.start(LandingActivity.this);
@@ -62,7 +57,7 @@ public class LandingActivity extends BaseActivity {
         useDoubleBackPressed = true;
 
         canPerformLogout.set(false);
-        
+
         addActions();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
@@ -106,7 +101,6 @@ public class LandingActivity extends BaseActivity {
     }
 
     private void startMainActivity(QBUser user) {
-        App.getInstance().setUser(user);
         MainActivity.start(LandingActivity.this);
         finish();
     }
@@ -129,6 +123,7 @@ public class LandingActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            AppSession.startSession(LoginType.FACEBOOK, user);
             startMainActivity(user);
         }
     }

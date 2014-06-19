@@ -10,6 +10,7 @@ public class PrefsHelper {
     public static final String PREF_REMEMBER_ME = "remember_me";
     public static final String PREF_LOGIN_TYPE = "login_type";
     public static final String PREF_USER_EMAIL = "email";
+    public static final String PREF_USER_ID = "user_id";
     public static final String PREF_IS_LOGINED = "is_logined";
     public static final String PREF_USER_PASSWORD = "password";
     public static final String PREF_PUSH_NOTIFICATIONS = "push_notifications";
@@ -26,6 +27,7 @@ public class PrefsHelper {
     public static final String PREF_APP_VERSION = "appVersion";
     public static final String PREF_RECEIVE_PUSH = "receive_push";
     public static final String PREF_IS_SUBSCRIBED_ON_SERVER = "subscribed_on_server";
+    public static final String PREF_USER_FULL_NAME = "full_name";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
@@ -55,6 +57,8 @@ public class PrefsHelper {
             editor.putLong(key, (Long) value);
         } else if (value instanceof String) {
             editor.putString(key, (String) value);
+        } else if (value instanceof Enum) {
+            editor.putString(key, value.toString());
         } else if (value != null) {
             throw new RuntimeException("Attempting to save non-primitive preference");
         }

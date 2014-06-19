@@ -142,10 +142,16 @@ public class DatabaseManager {
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
     }
 
-    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId, String lastMessage, long dateSent, int lastSenderId) {
+    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId,
+            String lastMessage, long dateSent, int lastSenderId) {
         QBDialog dialog = new QBDialog();
         dialog.setRoomJid(roomJidId);
         Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
+        if (opponentFriend == null) {
+            opponentFriend = new Friend();
+            opponentFriend.setId(Integer.parseInt(roomJidId));
+            opponentFriend.setFullname(roomJidId);
+        }
         dialog.setName(opponentFriend.getFullname());
         ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(
                 opponentFriend.getId());
@@ -282,7 +288,8 @@ public class DatabaseManager {
 
         if (!isDialogByRoomJidId(context, dialogMessageCache.getRoomJidId())) {
             createTempPrivateDialogByRoomJidId(context, dialogMessageCache.getRoomJidId(),
-                    dialogMessageCache.getMessage(), dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
+                    dialogMessageCache.getMessage(), dialogMessageCache.getTime(),
+                    dialogMessageCache.getSenderId());
         }
 
         updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
@@ -330,19 +337,22 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
-        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent()));
+        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent()));
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;
     }
 
-    private static ContentValues getContentValuesForCreateDialogTable(Context context, QBDialog dialog, String roomJidId) {
+    private static ContentValues getContentValuesForCreateDialogTable(Context context, QBDialog dialog,
+            String roomJidId) {
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
         values.put(DialogTable.Cols.ROOM_JID_ID, roomJidId);
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent()));
+        values.put(DialogTable.Cols.LAST_MESSAGE, getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent()));
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
@@ -352,8 +362,8 @@ public class DatabaseManager {
     }
 
     private static String getLastMessage(Context context, String lastMessage, long lastDateSent) {
-        return (TextUtils.isEmpty(lastMessage) && lastDateSent != Consts.ZERO_INT_VALUE)
-                ? context.getString(R.string.dlg_attached_last_message) : lastMessage;
+        return (TextUtils.isEmpty(lastMessage) && lastDateSent != Consts.ZERO_INT_VALUE) ? context.getString(
+                R.string.dlg_attached_last_message) : lastMessage;
     }
 
     public static void updateDialog(Context context, String roomJidId, String lastMessage, long dateSent,

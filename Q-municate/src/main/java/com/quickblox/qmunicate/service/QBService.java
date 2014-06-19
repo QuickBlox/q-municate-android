@@ -6,9 +6,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.facebook.Session;
+import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsToGroupCommand;
@@ -51,6 +56,9 @@ import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
+import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.qmunicate.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -424,9 +432,27 @@ public class QBService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, "executing with resultAction=" + intent.getAction());
-                command.execute(intent.getExtras());
+                try {
+                    command.execute(intent.getExtras());
+                } catch (QBResponseException e) {
+                    ErrorUtils.logError(e);
+                    if (Utils.isTokenDestroyedError(e) && AppSessionHelper.getSession().isSessionExist()) {
+                        refreshSession();
+                    }
+                } catch (Exception e) {
+
+                }
             }
         });
+    }
+
+    public void refreshSession() {
+        if (LoginType.EMAIL.equals(AppSessionHelper.getSession().getLoginType())) {
+            QBLoginRestCommand.start(this, AppSessionHelper.getSession().getUser());
+        } else {
+            QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
+                    Session.getActiveSession().getAccessToken(), null);
+        }
     }
 
     public QBVideoChatHelper getVideoChatHelper() {

@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     private String createChatName(ArrayList<Friend> friendList) {
-        String userFullname = App.getInstance().getUser().getFullName();
+        String userFullname = AppSessionHelper.getSession().getUser().getFullName();
         String friendsFullnames = TextUtils.join(",", friendList);
         return userFullname + "," + friendsFullnames;
     }
@@ -83,6 +83,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog.getRoomJid() != null) {
                 GroupDialogActivity.start(NewDialogActivity.this, dialog.getRoomJid());
+                finish();
             } else {
                 ErrorUtils.showError(NewDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));
             }

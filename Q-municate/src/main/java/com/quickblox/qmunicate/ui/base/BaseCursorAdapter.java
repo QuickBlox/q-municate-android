@@ -27,6 +27,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.chats.ScrollMessagesListener;
 import com.quickblox.qmunicate.ui.views.MaskGenerator;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -50,8 +51,8 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         this.context = context;
         resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
-        currentUser = App.getInstance().getUser();
-        currentLoginType = App.getInstance().getUserLoginType();
+        currentUser = AppSessionHelper.getSession().getUser();
+        currentLoginType = AppSessionHelper.getSession().getLoginType();
         imageHelper = new ImageHelper((android.app.Activity) context);
     }
 
@@ -177,8 +178,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         }
 
         @Override
-        public void onProgressUpdate(String imageUri, View view, int current,
-                                     int total) {
+        public void onProgressUpdate(String imageUri, View view, int current, int total) {
             verticalProgressBar.setProgress(Math.round(100.0f * current / total));
         }
     }

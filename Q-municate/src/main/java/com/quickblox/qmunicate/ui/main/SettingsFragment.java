@@ -10,8 +10,6 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.quickblox.module.messages.QBMessages;
-import com.quickblox.module.messages.model.QBSubscription;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -23,9 +21,9 @@ import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-import com.quickblox.qmunicate.utils.TipsManager;
 import com.quickblox.qmunicate.utils.Utils;
 
 
@@ -51,8 +49,7 @@ public class SettingsFragment extends BaseFragment {
         logout = (Button) rootView.findViewById(R.id.logout);
 
         pushNotification.setChecked(getPushNotifications());
-        App app = App.getInstance();
-        QBUser user = app.getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         if (user == null || null == user.getFacebookId()) {
             rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
         } else {
@@ -64,7 +61,7 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
+        //        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
 
         return rootView;
     }
@@ -82,7 +79,8 @@ public class SettingsFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
 
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
+        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION,
+                new ChangePasswordSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
@@ -143,15 +141,16 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private class LogoutSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IS_LOGINED, false);
             LoginActivity.start(baseActivity);
             baseActivity.finish();
         }
     }
 
     private class ChangePasswordSuccessAction implements Command {
+
         @Override
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();

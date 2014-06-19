@@ -12,6 +12,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 
 import java.io.File;
 
@@ -43,7 +44,6 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-
         return user;
     }
 
@@ -63,6 +63,10 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void logout() throws QBResponseException {
+        AppSession activeSession = AppSession.getActiveSession();
+        if (activeSession != null) {
+            activeSession.closeAndClear();
+        }
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
         user = null;

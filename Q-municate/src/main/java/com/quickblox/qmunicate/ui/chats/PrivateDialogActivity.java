@@ -17,7 +17,6 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
@@ -27,6 +26,7 @@ import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -115,7 +115,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private void startUpdateChatDialog() {
         if (dialog != null) {
             QBUpdateDialogCommand.start(this, getDialog(), chatJidId);
-        } else if (dialog == null && !messagesAdapter.isEmpty()){
+        } else if (dialog == null && !messagesAdapter.isEmpty()) {
             createTempDialog(getDialog());
         }
     }
@@ -196,7 +196,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != App.getInstance().getUser().getId()) {
+        if (friend.getId() != AppSessionHelper.getSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
     }
