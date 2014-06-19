@@ -10,6 +10,7 @@
     <string name="acb_add_friend_to_chat_title">Add friend to Chat</string>
     <string name="acb_leave_chat_title">Leave Chat</string>
     <string name="acb_chat_details_title">Chat details</string>
+    <string name="acb_chat_attach_title">Add attach</string>
 
     // Navigation Drawer
     <string name="nvd_title_friends">Friends</string>
