@@ -46,11 +46,13 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.nameTextView.setVisibility(View.VISIBLE);
         }
 
+        viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
+        viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
         viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
         viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
         viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
-        viewHolder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
+        viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
         viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
         viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
         viewHolder.centeredProgressBar =  (ProgressBar) view.findViewById(R.id.centered_progressbar);
@@ -73,7 +75,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
         boolean isOwnMessage = isOwnMessage(senderId);
 
-        viewHolder.attachImageView.setVisibility(View.GONE);
+        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
 
         if (isOwnMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
@@ -90,16 +92,18 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         }
 
         if (!TextUtils.isEmpty(attachUrl)) {
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
             viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
             viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
             displayAttachImage(attachUrl, viewHolder.attachImageView, viewHolder.progressRelativeLayout,
-                    viewHolder.verticalProgressBar, viewHolder.centeredProgressBar, isOwnMessage);
+                    viewHolder.attachMessageRelativeLayout, viewHolder.verticalProgressBar,
+                    viewHolder.centeredProgressBar, isOwnMessage);
         } else {
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
             viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
-            viewHolder.attachImageView.setVisibility(View.GONE);
+            viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(body);
         }
-        viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
         boolean isRead = cursor.getInt(cursor.getColumnIndex(
                 DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
@@ -114,12 +118,14 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private static class ViewHolder {
 
         RelativeLayout progressRelativeLayout;
+        RelativeLayout attachMessageRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
         LinearLayout textMessageLinearLayout;
         ChatTextView messageTextView;
         ImageView attachImageView;
-        TextView timeTextView;
+        TextView timeTextMessageTextView;
+        TextView timeAttachMessageTextView;
         ProgressBar verticalProgressBar;
         ProgressBar centeredProgressBar;
     }

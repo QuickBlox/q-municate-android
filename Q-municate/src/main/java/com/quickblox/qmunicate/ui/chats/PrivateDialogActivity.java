@@ -182,6 +182,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             case android.R.id.home:
                 navigateToParent();
                 return true;
+            case R.id.action_attach:
+                attachButtonOnClick();
+                return true;
             case R.id.action_audio_call:
                 callToUser(opponentFriend, WebRTC.MEDIA_STREAM.AUDIO);
                 return true;

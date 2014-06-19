@@ -73,14 +73,6 @@ public class App extends Application {
         instance = this;
         QBChatService.setDebugEnabled(true);
         initImageLoader(this);
-
-        // TODO temp
-        QBSettings.getInstance().setServerApiDomain("api.stage.quickblox.com");
-        QBSettings.getInstance().setChatServerDomain("chatstage.quickblox.com");
-        QBSettings.getInstance().setContentBucketName("blobs-test-oz");
-        QBSettings.getInstance().setTransferProtocol(TransferProtocol.HTTP);
-        //
-
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY, Consts.QB_AUTH_SECRET);
         prefsHelper = new PrefsHelper(this);
         soundPlayer = new MediaPlayerManager(this);

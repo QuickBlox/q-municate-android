@@ -46,7 +46,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ChatEditText chatEditText;
     protected ListView messagesListView;
     protected EditText messageEditText;
-    protected ImageButton attachButton;
     protected ImageButton sendButton;
     protected String currentOpponent;
     protected String chatJidId;
@@ -59,6 +58,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
+    protected boolean isNewMessage;
 
     public BaseDialogActivity(int layoutResID) {
         this.layoutResID = layoutResID;
@@ -96,7 +96,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         smilesAnimator = new HeightAnimator(chatEditText, smilesLayout);
     }
 
-    public void attachButtonOnClick(View view) {
+    protected void attachButtonOnClick() {
         canPerformLogout.set(false);
         imageHelper.getImage();
     }
@@ -126,6 +126,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
         if (resultCode == RESULT_OK) {
+            isNewMessage = true;
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -167,8 +168,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         chatEditText = (ChatEditText) findViewById(R.id.message_edittext);
         messagesListView = (ListView) findViewById(R.id.messages_listview);
         messageEditText = _findViewById(R.id.message_edittext);
-        attachButton = _findViewById(R.id.attach_button);
         sendButton = _findViewById(R.id.send_button);
+        sendButton.setEnabled(false);
     }
 
     private void initListeners() {
@@ -177,11 +178,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 super.onTextChanged(charSequence, start, before, count);
                 if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
-                    sendButton.setVisibility(View.GONE);
-                    attachButton.setVisibility(View.VISIBLE);
+                    sendButton.setEnabled(false);
                 } else {
-                    sendButton.setVisibility(View.VISIBLE);
-                    attachButton.setVisibility(View.GONE);
+                    sendButton.setEnabled(true);
                 }
             }
         });
@@ -218,7 +217,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        if (isNewMessage) {
+            isNewMessage = false;
+            messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        }
     }
 
     private int getSmileLayoutSizeInPixels() {
