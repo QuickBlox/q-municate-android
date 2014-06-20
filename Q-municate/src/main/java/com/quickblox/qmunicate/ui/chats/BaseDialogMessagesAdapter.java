@@ -44,9 +44,10 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter {
     }
 
     protected void displayAttachImage(String uri, final ImageView attachImageView, final RelativeLayout progressRelativeLayout,
-                                      final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar, boolean isOwnMessage) {
+                                      final RelativeLayout attachMessageRelativeLayout, final ProgressBar verticalProgressBar,
+                                      final ProgressBar centeredProgressBar, boolean isOwnMessage) {
         ImageLoader.getInstance().displayImage(uri, attachImageView, Consts.UIL_DEFAULT_DISPLAY_OPTIONS,
-                new SimpleImageLoading(attachImageView, progressRelativeLayout, verticalProgressBar, centeredProgressBar, isOwnMessage),
+                new SimpleImageLoading(attachImageView, progressRelativeLayout, attachMessageRelativeLayout, verticalProgressBar, centeredProgressBar, isOwnMessage),
                 new SimpleImageLoadingProgressListener(verticalProgressBar));
     }
 

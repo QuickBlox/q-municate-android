@@ -1,10 +1,12 @@
 package com.quickblox.qmunicate.ui.base;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,15 +77,14 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         return friend.getAvatarUrl();
     }
 
-    private void hideAttachmentBackground(ImageView imageAttachment) {
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void hideAttachmentBackground(ImageView attachImageView) {
         int sdk = android.os.Build.VERSION.SDK_INT;
         if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            imageAttachment.setBackgroundDrawable(null);
+            attachImageView.setBackgroundDrawable(null);
         } else {
-            imageAttachment.setBackground(null);
+            attachImageView.setBackground(null);
         }
-        imageAttachment.setPadding(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE,
-                Consts.ZERO_INT_VALUE);
     }
 
     @Override
@@ -98,16 +99,18 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
     public class SimpleImageLoading extends SimpleImageLoadingListener {
 
         private RelativeLayout progressRelativeLayout;
+        private RelativeLayout attachMessageRelativeLayout;
         private ImageView attachImageView;
         private ProgressBar verticalProgressBar;
         private ProgressBar centeredProgressBar;
         private Bitmap loadedImageBitmap;
         private boolean isOwnMessage;
 
-        public SimpleImageLoading(final ImageView attachImageView,
-                final RelativeLayout progressRelativeLayout, final ProgressBar verticalProgressBar,
-                final ProgressBar centeredProgressBar, boolean isOwnMessage) {
+        public SimpleImageLoading(final ImageView attachImageView, final RelativeLayout progressRelativeLayout,
+                                  final RelativeLayout attachMessageRelativeLayout, final ProgressBar verticalProgressBar,
+                                  final ProgressBar centeredProgressBar, boolean isOwnMessage) {
             this.progressRelativeLayout = progressRelativeLayout;
+            this.attachMessageRelativeLayout = attachMessageRelativeLayout;
             this.attachImageView = attachImageView;
             this.verticalProgressBar = verticalProgressBar;
             this.centeredProgressBar = centeredProgressBar;
@@ -131,20 +134,24 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
 
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImageBitmap) {
+            Bitmap backgroundBitmap;
             verticalProgressBar.setVisibility(View.GONE);
             centeredProgressBar.setVisibility(View.GONE);
             if (progressRelativeLayout != null) {
                 progressRelativeLayout.setVisibility(View.GONE);
             }
+            if(isOwnMessage) {
+                backgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.right_bubble);
+            } else {
+                backgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.left_bubble);
+            }
+            attachMessageRelativeLayout.setVisibility(View.VISIBLE);
             attachImageView.setVisibility(View.VISIBLE);
             attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             this.loadedImageBitmap = loadedImageBitmap;
             scrollMessagesListener.onScrollToBottom();
-            Bitmap backgroundBitmap = BitmapFactory.decodeResource(resources,
-                    isOwnMessage ? R.drawable.right_bubble : R.drawable.left_bubble);
             hideAttachmentBackground(attachImageView);
-            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap,
-                    loadedImageBitmap));
+            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap, loadedImageBitmap));
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {

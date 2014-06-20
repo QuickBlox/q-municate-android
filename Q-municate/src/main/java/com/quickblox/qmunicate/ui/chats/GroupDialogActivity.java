@@ -181,6 +181,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             case android.R.id.home:
                 navigateToParent();
                 return true;
+            case R.id.action_attach:
+                attachButtonOnClick();
+                return true;
             case R.id.action_group_details:
                 GroupDialogDetailsActivity.start(this, dialog.getRoomJid());
                 return true;

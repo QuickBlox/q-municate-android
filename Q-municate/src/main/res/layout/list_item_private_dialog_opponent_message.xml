@@ -42,7 +42,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/left_bubble"
             android:orientation="horizontal"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:visibility="gone">
 
             <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
                 android:id="@+id/message_textview"
@@ -56,7 +57,7 @@
                 android:textSize="@dimen/text_size_small"/>
 
             <TextView
-                android:id="@+id/time_textview"
+                android:id="@+id/time_text_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|top"
@@ -64,17 +65,36 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/attach_imageview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:adjustViewBounds="true"
-            android:clickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:scaleType="fitCenter"
-            android:src="@null"
-            android:visibility="gone" />
+        <RelativeLayout
+            android:id="@+id/attach_message_relativelayout"
+            android:layout_width="@dimen/chat_attach_width"
+            android:layout_height="@dimen/chat_attach_height"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/attach_imageview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:scaleType="fitCenter"
+                android:src="@null" />
+
+            <TextView
+                android:id="@+id/time_attach_message_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="10dp"
+                android:background="@drawable/badge_attach_message_time"
+                android:textColor="@color/gray" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
