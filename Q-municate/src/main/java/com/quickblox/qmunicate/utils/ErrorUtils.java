@@ -1,13 +1,15 @@
 package com.quickblox.qmunicate.utils;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 public class ErrorUtils {
 
     public static void showError(Context context, Exception e) {
-        Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
+        String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : Consts.EMPTY_STRING;
+        Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
         e.printStackTrace();
     }
 
@@ -16,7 +18,8 @@ public class ErrorUtils {
     }
 
     public static void logError(String tag, Exception e) {
-        Log.e(tag, e.getMessage());
+        String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : Consts.EMPTY_STRING;
+        Log.e(tag, errorMsg, e);
     }
 
     public static void logError(Exception e) {
