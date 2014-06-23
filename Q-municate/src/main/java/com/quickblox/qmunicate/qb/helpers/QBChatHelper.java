@@ -293,10 +293,16 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
         }
+
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
+
+        boolean isPrivate = QBDialogType.PRIVATE.equals(dialog.getType());
+
         if (dialogMessagesList != null) {
-            boolean isPrivate = QBDialogType.PRIVATE.equals(dialog.getType());
+            // TODO SF temp
+            deleteMessagesByRoomJidId(roomJidId);
+            //---
             saveChatMessagesToCache(dialogMessagesList, roomJidId, isPrivate);
         }
         return dialogMessagesList;
@@ -417,15 +423,20 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 roomJidId = dialog.getRoomJid();
                 tryJoinRoomChat(roomJidId);
                 saveDialogToCache(dialog, roomJidId);
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
+                dialog.setType(QBDialogType.PRIVATE);
                 saveDialogToCache(dialog, chatMessage.getSenderId() + Consts.EMPTY_STRING);
+                saveMessageToCache(new DialogMessageCache(chatMessage.getSenderId() + Consts.EMPTY_STRING, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
             } else {
                 time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
                 attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
                 roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
             }
             String privateJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-            saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, false));
             notifyMessageReceived(chatMessage, friend, privateJidId);
         }
     }
