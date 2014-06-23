@@ -9,7 +9,6 @@ import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 
@@ -48,7 +47,6 @@ public class ChatUtils {
     }
 
     public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
-        final int COUNT_START_VALUE = 1;
         String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -62,7 +60,7 @@ public class ChatUtils {
         dialog.setType(parseByCode(Integer.parseInt(dialogTypeCode)));
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageDateSent(dateSent);
-        dialog.setUnreadMessageCount(COUNT_START_VALUE);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }
 

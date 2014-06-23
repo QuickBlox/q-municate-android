@@ -290,7 +290,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onResume() {
         super.onResume();
-        if(isFriendsListLoaded) {
+        if(isFriendsListLoaded && !isNeedToHideSearchView) {
             checkVisibilityEmptyLabel();
         }
     }
