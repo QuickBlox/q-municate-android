@@ -115,7 +115,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getQBDialog(), chatJidId);
+            QBUpdateDialogCommand.start(this, dialog, chatJidId);
         }
     }
 
@@ -207,11 +207,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void startLoadDialogMessages() {
         // TODO SF temp
-//        if (messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
-//        } else {
-//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
-//        }
+        //        if (messagesAdapter.isEmpty()) {
+        startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
+        //        } else {
+        //            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
+        //        }
         //---
     }
 

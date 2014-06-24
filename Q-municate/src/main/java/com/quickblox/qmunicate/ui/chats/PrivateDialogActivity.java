@@ -59,20 +59,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        chatJidId = opponentFriend.getId() + Consts.EMPTY_STRING;
-
-        if (dialog == null) {
-            dialog = getDialogByRoomJidId();
-        }
+        chatJidId = dialog.getDialogId();
 
         initListView();
         initActionBar();
         initChat();
         initStartLoadDialogMessages();
-    }
-
-    private QBDialog getDialogByRoomJidId() {
-        return DatabaseManager.getDialogByRoomJidId(this, chatJidId);
     }
 
     private void createTempDialog(QBDialog dialog) {
@@ -82,11 +74,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initStartLoadDialogMessages() {
         // TODO SF temp
-//        if (dialog != null && messagesAdapter.isEmpty()) {
-//            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
-//        } else if (dialog != null && !messagesAdapter.isEmpty()) {
-//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
-//        }
+        //        if (dialog != null && messagesAdapter.isEmpty()) {
+        //            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
+        //        } else if (dialog != null && !messagesAdapter.isEmpty()) {
+        //            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
+        //        }
         if (dialog != null) {
             startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
         }
@@ -112,15 +104,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, file);
+        QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, opponentFriend.getId(), file);
         scrollListView();
     }
 
     private void startUpdateChatDialog() {
         if (dialog != null) {
             QBUpdateDialogCommand.start(this, getDialog(), chatJidId);
-        } else if (dialog == null && !messagesAdapter.isEmpty()) {
-            createTempDialog(getDialog());
         }
     }
 
@@ -168,7 +158,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(), null);
+        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(),
+                opponentFriend.getId(), null);
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }

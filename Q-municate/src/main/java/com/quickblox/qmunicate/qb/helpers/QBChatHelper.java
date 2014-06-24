@@ -46,8 +46,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
 
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
 
-    private static String propertyDateSent = "date_sent";
-    private static String propertySaveToHistory = "save_to_history";
+    private static String PROPERTY_DATE_SENT = "date_sent";
+    private static String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
     private static String valuePropertySaveToHistory = "1";
     private static String valuePropertyNotSaveToHistory = "0";
     private static String propertyNotificationTypeCreating = "notification_type";
@@ -67,13 +67,31 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         super(context);
     }
 
-    public void sendPrivateMessage(String message) throws Exception {
-        QBChatMessage chatMessage = getQBChatMessage(message);
+    public void sendPrivateMessage(String message, int userId) throws Exception {
+        sendPrivateMessage(null, message, userId);
+    }
+
+    public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws Exception {
+        sendPrivateMessage(file, null, userId);
+    }
+
+    private void sendPrivateMessage(QBFile file, String message, int userId) throws Exception {
+        privateChat = privateChatManager.getChat(userId);
+        if (privateChat == null) {
+            throw new Exception("Private chat was not created!");
+        }
+
+        QBChatMessage chatMessage = null;
+        if (file != null) {
+            chatMessage = getQBChatMessageWithImage(file);
+        } else {
+            chatMessage = getQBChatMessage(message);
+        }
         sendPrivateMessage(chatMessage);
 
-        String roomJidId = opponentId + Consts.EMPTY_STRING;
-        String attachUrl = Consts.EMPTY_STRING;
-        long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
+        String roomJidId = privateChat.getRestModel().getDialogId();
+        String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
+        long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
 
         saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
                 time, true));
@@ -83,8 +101,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         long time = DateUtils.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
-        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, valuePropertySaveToHistory);
         return chatMessage;
     }
 
@@ -116,8 +134,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
         attachment.setUrl(qbFile.getPublicUrl());
         chatMessage.addAttachment(attachment);
-        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
-        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, valuePropertySaveToHistory);
         return chatMessage;
     }
 
@@ -149,25 +167,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         }
     }
 
-    public void sendPrivateMessageWithAttachImage(QBFile file) throws Exception {
-        QBChatMessage chatMessage = getQBChatMessageWithImage(file);
-        sendPrivateMessage(chatMessage);
-
-        String roomJidId = opponentId + Consts.EMPTY_STRING;
-        String attachUrl = file.getPublicUrl();
-        long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
-
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
-                time, true));
-    }
 
     @Override
     public void chatCreated(QBPrivateChat privateChat, boolean createdLocally) {
         privateChat.addMessageListener(privateChatMessageListener);
     }
 
-    public void updateDialog(QBDialog dialog, String roomJidId) {
-        DatabaseManager.updateDialog(context, roomJidId, dialog.getLastMessage(),
+    public void updateDialog(QBDialog dialog, String dialogId) {
+        DatabaseManager.updateDialog(context, dialog.getDialogId(), dialog.getLastMessage(),
                 dialog.getLastMessageDateSent(), dialog.getLastMessageUserId());
     }
 
@@ -177,34 +184,57 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         roomChatManager = chatService.getRoomChatManager();
     }
 
-    public void createPrivateChat(int opponentId) {
-        privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);
+    public QBDialog createPrivateChat(int opponentId) throws QBResponseException {
+        //TODO check if chat exists in chat manager cache
+        privateChat = privateChatManager.createChatByRestServer(opponentId, privateChatMessageListener);
+        QBDialog dialog = privateChat.getRestModel();
+        saveDialogToCache(dialog, dialog.getRoomJid());
         this.opponentId = opponentId;
+        return dialog;
+    }
+
+    private QBDialog getExistPrivateDialog(int opponentId) {
+        List<QBDialog> dialogsByOpponent = DatabaseManager.getDialogsByOpponent(context, opponentId,
+                QBDialogType.PRIVATE);
+        if (!dialogsByOpponent.isEmpty()) {
+            return dialogsByOpponent.get(0);
+        } else {
+            return null;
+        }
     }
 
     public QBDialog createRoomChat(String roomName,
             List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
         QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
-        joinRoomChat(dialog.getRoomJid());
+        joinRoomChat(dialog);
         inviteFriendsToRoom(dialog, friendIdsList);
         saveDialogToCache(dialog, dialog.getRoomJid());
         return dialog;
     }
 
-    public void joinRoomChat(String roomJidId) throws XMPPException, SmackException {
-        roomChat = roomChatManager.getRoom(roomJidId);
+  /*  private void createRoomChatIfNotExist(){
+        roomChat = roomChatManager.getRoom(dialog.getRoomJid());
+    }*/
+
+    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException {
+        roomChat = roomChatManager.getRoom(dialog.getRoomJid());
         if (roomChat == null) {
-            roomChat = roomChatManager.createRoom(roomJidId);
+            roomChat = roomChatManager.createRoom(dialog.getRoomJid());
+            roomChat.setRestModel(dialog);
+            roomChat.addMessageListener(roomChatMessageListener);
         }
-        roomChat.addMessageListener(roomChatMessageListener);
         roomChat.join();
     }
 
     private void inviteFriendsToRoom(QBDialog dialog,
             List<Integer> friendIdsList) throws XMPPException, SmackException {
         for (Integer friendId : friendIdsList) {
-            notifyFriendAboutInvitation(dialog, friendId);
+            try {
+                notifyFriendAboutInvitation(dialog, friendId);
+            } catch (QBResponseException responseException) {
+
+            }
         }
     }
 
@@ -213,18 +243,14 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
-            Integer friendId) throws XMPPException, SmackException {
+            Integer friendId) throws XMPPException, SmackException, QBResponseException {
         long time = DateUtils.getCurrentTime();
-        QBPrivateChat chat = privateChatManager.createChat(friendId, true, privateChatMessageListener);
+        QBPrivateChat chat = privateChatManager.createChat(friendId, privateChatMessageListener);
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
-        String roomJidId = chat.getModel().getDialogId();
-        String attachUrl = Consts.EMPTY_STRING;
-        chatMessage.setProperty(propertyDateSent, time + Consts.EMPTY_STRING);
-        chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         chatMessage.setProperty(propertyNotificationTypeCreating, valuePropertyNotificationTypeCreating);
         chat.sendMessage(chatMessage);
-        saveMessageToCache(new DialogMessageCache(roomJidId, user.getId(), chatMessage.getBody(), attachUrl,
-                time, true));
+        chat.close(); // To avoid saving chat in private chat manager cache
     }
 
     public QBFile loadAttachFile(File inputFile) throws Exception {
@@ -271,9 +297,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 bundle);
 
         if (!chatDialogsList.isEmpty()) {
-            List<String> roomJidList = ChatUtils.getRoomJidListFromDialogs(chatDialogsList);
-            for (String roomJid : roomJidList) {
-                joinRoomChat(roomJid);
+            for (QBDialog dialog : chatDialogsList) {
+                joinRoomChat(dialog);
             }
             saveDialogsToCache(chatDialogsList);
         }
@@ -352,9 +377,9 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return messageBody;
     }
 
-    private void tryJoinRoomChat(String roomJid) {
+    private void tryJoinRoomChat(QBDialog dialog) {
         try {
-            joinRoomChat(roomJid);
+            joinRoomChat(dialog);
         } catch (Exception e) {
             ErrorUtils.logError(e);
         }
@@ -422,22 +447,19 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 time = DateUtils.getCurrentTime();
                 QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
                 roomJidId = dialog.getRoomJid();
-                tryJoinRoomChat(roomJidId);
+                tryJoinRoomChat(dialog);
                 saveDialogToCache(dialog, roomJidId);
-                saveMessageToCache(new DialogMessageCache(chatMessage.getSenderId() + Consts.EMPTY_STRING, chatMessage.getSenderId(),
-                        chatMessage.getBody(), attachUrl, time, false));
             } else {
-                time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
+                time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
                 attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
                 String dialogId = chatMessage.getProperty(
                         com.quickblox.internal.module.chat.Consts.DIALOG_ID);
                 roomJidId = !TextUtils.isEmpty(dialogId) ? dialogId : chatMessage
                         .getSenderId() + Consts.EMPTY_STRING;
-                roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time, false));
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
+                notifyMessageReceived(chatMessage, friend, roomJidId);
             }
-            String privateJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-            notifyMessageReceived(chatMessage, friend, privateJidId);
         }
     }
 
@@ -447,8 +469,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
-            String roomJid = roomChat.getJid();
-            long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
+            String roomJid = chatMessage.getProperty(com.quickblox.internal.module.chat.Consts.DIALOG_ID);
+            long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
             saveMessageToCache(new DialogMessageCache(roomJid, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
             if (!chatMessage.getSenderId().equals(user.getId())) {

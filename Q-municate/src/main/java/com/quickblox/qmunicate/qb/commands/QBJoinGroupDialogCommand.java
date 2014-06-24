@@ -10,7 +10,6 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.utils.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,26 +32,26 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
         context.startService(intent);
     }
 
-    public static void start(Context context, List<String> roomJidList) {
+    public static void start(Context context, List<QBDialog> roomJidList) {
         Intent intent = new Intent(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_LIST, new ArrayList<String>(roomJidList));
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_LIST, new ArrayList<QBDialog>(roomJidList));
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        List<String> roomJidList = null;
+        List<QBDialog> dialogs = null;
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
-            roomJidList = (ArrayList<String>) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_LIST);
+            dialogs = (ArrayList<QBDialog>) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_LIST);
         } else {
-            List<QBDialog> dialogs = DatabaseManager.getDialogs(context);
-            roomJidList = ChatUtils.getRoomJidListFromDialogs(dialogs);
+            dialogs = DatabaseManager.getDialogs(context);
         }
 
-        for (String roomJid : roomJidList) {
-            chatHelper.joinRoomChat(roomJid);
+        if (dialogs != null && !dialogs.isEmpty()) {
+            for (QBDialog dialog : dialogs) {
+                chatHelper.joinRoomChat(dialog);
+            }
         }
-
         return extras;
     }
 }

@@ -20,22 +20,24 @@ public class QBSendPrivateChatMessageCommand extends ServiceCommand {
         this.qbChatHelper = qbChatHelper;
     }
 
-    public static void start(Context context, String message, QBFile file) {
+    public static void start(Context context, String message, int userId, QBFile file) {
         Intent intent = new Intent(QBServiceConsts.SEND_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, message);
         intent.putExtra(QBServiceConsts.EXTRA_QBFILE, file);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ID, userId);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        int userId = extras.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
-        if(file == null) {
-            qbChatHelper.sendPrivateMessage(message);
+        if (file == null) {
+            qbChatHelper.sendPrivateMessage(message, userId);
         } else {
-            qbChatHelper.sendPrivateMessageWithAttachImage(file);
+            qbChatHelper.sendPrivateMessageWithAttachImage(file, userId);
         }
 
         return null;

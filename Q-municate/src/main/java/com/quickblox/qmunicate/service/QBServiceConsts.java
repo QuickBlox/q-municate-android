@@ -122,6 +122,7 @@ public class QBServiceConsts {
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
+    public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String EXTRA_FRIENDS = "friends";
     public static final String EXTRA_FILE = "file";
     public static final String EXTRA_QBFILE = "qb_file";
