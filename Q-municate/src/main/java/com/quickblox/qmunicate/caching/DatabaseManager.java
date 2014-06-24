@@ -142,29 +142,6 @@ public class DatabaseManager {
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
     }
 
-    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId,
-            String lastMessage, long dateSent, int lastSenderId) {
-        QBDialog dialog = new QBDialog();
-        dialog.setRoomJid(roomJidId);
-        Friend opponentFriend = getFriendById(context, Integer.parseInt(roomJidId));
-        if (opponentFriend == null) {
-            opponentFriend = new Friend();
-            opponentFriend.setId(Integer.parseInt(roomJidId));
-            opponentFriend.setFullname(roomJidId);
-        }
-        dialog.setName(opponentFriend.getFullname());
-        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(
-                opponentFriend.getId());
-        dialog.setOccupantsIds(occupantsIdsList);
-        dialog.setType(QBDialogType.PRIVATE);
-        dialog.setLastMessage(lastMessage);
-        dialog.setLastMessageDateSent(dateSent);
-        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
-        dialog.setLastMessageUserId(lastSenderId);
-        saveDialog(context, dialog, roomJidId);
-        return dialog;
-    }
-
     public static List<QBDialog> getDialogs(Context context) {
         Cursor allDialogsCursor = getAllDialogs(context);
         List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());
@@ -294,6 +271,29 @@ public class DatabaseManager {
 
         updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
                 dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
+    }
+
+    public static QBDialog createTempPrivateDialogByRoomJidId(Context context, String roomJidId,
+            String lastMessage, long dateSent, int lastSenderId) {
+        QBDialog dialog = new QBDialog();
+        dialog.setRoomJid(roomJidId);
+        Friend opponentFriend = DatabaseManager.getFriendById(context, Integer.parseInt(roomJidId));
+        if (opponentFriend == null) {
+            opponentFriend = new Friend();
+            opponentFriend.setId(Integer.parseInt(roomJidId));
+            opponentFriend.setFullname(roomJidId);
+        }
+        dialog.setName(opponentFriend.getFullname());
+        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(
+                opponentFriend.getId());
+        dialog.setOccupantsIds(occupantsIdsList);
+        dialog.setType(QBDialogType.PRIVATE);
+        dialog.setLastMessage(lastMessage);
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
+        dialog.setLastMessageUserId(lastSenderId);
+        DatabaseManager.saveDialog(context, dialog, roomJidId);
+        return dialog;
     }
 
     public static boolean isDialogByRoomJidId(Context context, String roomJidId) {

@@ -290,7 +290,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onResume() {
         super.onResume();
-        if(isFriendsListLoaded) {
+        if(isFriendsListLoaded && !isNeedToHideSearchView) {
             checkVisibilityEmptyLabel();
         }
     }
@@ -375,9 +375,10 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
+            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
-            if (baseActivity != null) {
-                checkVisibilityEmptyLabel();
+            if (baseActivity != null && friendsList.isEmpty()) {
+                emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
     }

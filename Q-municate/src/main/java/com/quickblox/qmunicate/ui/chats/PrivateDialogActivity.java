@@ -81,10 +81,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initStartLoadDialogMessages() {
-        if (dialog != null && messagesAdapter.isEmpty()) {
+        // TODO SF temp
+//        if (dialog != null && messagesAdapter.isEmpty()) {
+//            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
+//        } else if (dialog != null && !messagesAdapter.isEmpty()) {
+//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
+//        }
+        if (dialog != null) {
             startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
-        } else if (dialog != null && !messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
         }
     }
 

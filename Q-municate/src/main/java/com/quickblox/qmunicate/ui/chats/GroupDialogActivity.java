@@ -206,11 +206,13 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void startLoadDialogMessages() {
-        if (messagesAdapter.isEmpty()) {
+        // TODO SF temp
+//        if (messagesAdapter.isEmpty()) {
             startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
-        } else {
-            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
-        }
+//        } else {
+//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
+//        }
+        //---
     }
 
     private class CreateChatSuccessAction implements Command {

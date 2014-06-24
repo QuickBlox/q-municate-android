@@ -49,6 +49,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     private static String propertyDateSent = "date_sent";
     private static String propertySaveToHistory = "save_to_history";
     private static String valuePropertySaveToHistory = "1";
+    private static String valuePropertyNotSaveToHistory = "0";
     private static String propertyNotificationTypeCreating = "notification_type";
     private static String valuePropertyNotificationTypeCreating = "1";
 
@@ -176,11 +177,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         roomChatManager = chatService.getRoomChatManager();
     }
 
-    public void createPrivateChat(int opponentId) throws QBResponseException {
-        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
-        if (privateChat == null) {
-            privateChat = privateChatManager.createChat(opponentId, true, privateChatMessageListener);
-        }
+    public void createPrivateChat(int opponentId) {
+        privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);
         this.opponentId = opponentId;
     }
 
@@ -204,7 +202,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void inviteFriendsToRoom(QBDialog dialog,
-            List<Integer> friendIdsList) throws XMPPException, SmackException, QBResponseException {
+            List<Integer> friendIdsList) throws XMPPException, SmackException {
         for (Integer friendId : friendIdsList) {
             notifyFriendAboutInvitation(dialog, friendId);
         }
@@ -215,7 +213,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
     }
 
     private void notifyFriendAboutInvitation(QBDialog dialog,
-            Integer friendId) throws XMPPException, SmackException, QBResponseException {
+            Integer friendId) throws XMPPException, SmackException {
         long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = privateChatManager.createChat(friendId, true, privateChatMessageListener);
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
@@ -296,10 +294,16 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
         }
+
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, bundle);
+
+        boolean isPrivate = QBDialogType.PRIVATE.equals(dialog.getType());
+
         if (dialogMessagesList != null) {
-            boolean isPrivate = QBDialogType.PRIVATE.equals(dialog.getType());
+            // TODO SF temp
+            deleteMessagesByRoomJidId(roomJidId);
+            //---
             saveChatMessagesToCache(dialogMessagesList, roomJidId, isPrivate);
         }
         return dialogMessagesList;
@@ -420,7 +424,8 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                 roomJidId = dialog.getRoomJid();
                 tryJoinRoomChat(roomJidId);
                 saveDialogToCache(dialog, roomJidId);
-                saveDialogToCache(dialog, chatMessage.getSenderId() + Consts.EMPTY_STRING);
+                saveMessageToCache(new DialogMessageCache(chatMessage.getSenderId() + Consts.EMPTY_STRING, chatMessage.getSenderId(),
+                        chatMessage.getBody(), attachUrl, time, false));
             } else {
                 time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
                 attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
@@ -428,10 +433,10 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
                         com.quickblox.internal.module.chat.Consts.DIALOG_ID);
                 roomJidId = !TextUtils.isEmpty(dialogId) ? dialogId : chatMessage
                         .getSenderId() + Consts.EMPTY_STRING;
+                roomJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
+                saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(), chatMessage.getBody(), attachUrl, time, false));
             }
             String privateJidId = chatMessage.getSenderId() + Consts.EMPTY_STRING;
-            saveMessageToCache(new DialogMessageCache(roomJidId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, false));
             notifyMessageReceived(chatMessage, friend, privateJidId);
         }
     }
