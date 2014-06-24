@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Qmunicate</string>
+    <string name="app_name">Q-municate</string>
 
     // ActionBar
     <string name="acb_search_title">Search</string>
@@ -120,19 +120,22 @@
     <string name="inf_from_contacts">(invite via Email)</string>
     <string name="inf_send">Send</string>
     <string name="inf_choose_email_provider">Choose an email provider:</string>
-    <string name="inf_subject_of_invitation">Qmunicate</string>
-    <string name="inf_body_of_invitation">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
+    <string name="inf_subject_of_invitation">Q-municate</string>
+    <string name="inf_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
     <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
-    <string name="inf_fb_wall_param_name">Qmunicate</string>
-    <string name="inf_fb_wall_param_description">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
-    <string name="inf_fb_wall_param_link">http://qmunicate.com/</string>
+    <string name="inf_fb_wall_param_name">Q-municate</string>
+    <string name="inf_fb_wall_param_description">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
+    <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
-    <string name="dlg_not_all_fields_entered">Not all required fields entered</string>
+    <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
+    <string name="dlg_not_fullname_field_entered">Please enter fullname</string>
+    <string name="dlg_not_email_field_entered">Please enter email</string>
+    <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_check_email">Mail was sent to %1$s</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
     <string name="dlg_old_password_wrong">Wrong current password</string>
@@ -151,7 +154,7 @@
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
-    <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
+    <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_leave_group">Leave Group</string>
     <string name="dlg_offline_call"> %1$s is calling you !</string>
@@ -285,7 +288,7 @@
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
-    <string name="prefs_name">Qmunicate</string>
+    <string name="prefs_name">Q-municate</string>
     <string name="search_hint">Search</string>
     <string name="push_title">QMUN: Missed messages</string>
     <string name="frd_offline_user">User must be online</string>

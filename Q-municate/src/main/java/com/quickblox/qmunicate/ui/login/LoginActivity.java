@@ -81,19 +81,43 @@ public class LoginActivity extends BaseActivity {
         finish();
     }
 
-
     public void loginOnClickListener(View view) {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
+        if (isValidUserDate(userEmail, userPassword)) {
+            login(userEmail, userPassword);
+        }
+    }
+
+    private boolean isValidUserDate(String emailText, String passwordText) {
+        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
 
         if (isEmailEntered && isPasswordEntered) {
-            login(userEmail, userPassword);
+            return true;
+        } else if (!isEmailEntered && !isPasswordEntered) {
+            setErrors(getString(R.string.dlg_not_all_fields_entered));
         } else {
-            DialogUtils.showLong(LoginActivity.this, getString(R.string.dlg_not_all_fields_entered));
+            setErrors(isEmailEntered, isPasswordEntered);
         }
+
+        return false;
+    }
+
+    private void clearErrors() {
+        emailEditText.setError(null);
+        passwordEditText.setError(null);
+    }
+
+    private void setErrors(String errors) {
+        emailEditText.setError(errors);
+        passwordEditText.setError(errors);
+    }
+
+    private void setErrors(boolean isEmailEntered, boolean isPasswordEntered) {
+        emailEditText.setError(isEmailEntered ? null : getString(R.string.dlg_not_email_field_entered));
+        passwordEditText.setError(isPasswordEntered ? null : getString(R.string.dlg_not_password_field_entered));
     }
 
     public void loginFacebookOnClickListener(View view) {
@@ -151,7 +175,14 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 super.onTextChanged(charSequence, start, before, count);
-                emailEditText.setError(null);
+                clearErrors();
+            }
+        });
+        passwordEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                clearErrors();
             }
         });
     }
@@ -216,7 +247,7 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            emailEditText.setError(getResources().getString(R.string.lgn_error));
+            setErrors(getResources().getString(R.string.lgn_error));
         }
     }
 

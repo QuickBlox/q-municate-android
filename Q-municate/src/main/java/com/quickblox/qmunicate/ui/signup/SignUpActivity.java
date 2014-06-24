@@ -113,11 +113,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         String emailText = emailEditText.getText().toString();
         String passwordText = passwordEditText.getText().toString();
 
-        boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
-        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
-
-        if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
+        if (isValidUserDate(fullNameText, emailText, passwordText)) {
             qbUser.setFullName(fullNameText);
             qbUser.setEmail(emailText);
             qbUser.setPassword(passwordText);
@@ -129,9 +125,23 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             } else {
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
-        } else {
-            DialogUtils.showLong(SignUpActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
+    }
+
+    private boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
+        boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
+        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
+
+        if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
+            return true;
+        } else if (!isFullNameEntered && !isEmailEntered && !isPasswordEntered) {
+            setErrors(getString(R.string.dlg_not_all_fields_entered));
+        } else {
+            setErrors(isFullNameEntered, isEmailEntered, isPasswordEntered);
+        }
+
+        return false;
     }
 
     public void onCachedImageFileReceived(File imageFile) {
@@ -168,16 +178,31 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                 clearErrors();
             }
         });
+        passwordEditText.addTextChangedListener(new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                super.onTextChanged(charSequence, start, before, count);
+                clearErrors();
+            }
+        });
     }
 
     private void clearErrors() {
         fullnameEditText.setError(null);
         emailEditText.setError(null);
+        passwordEditText.setError(null);
     }
 
     private void setErrors(String errors) {
-        emailEditText.setError(errors);
         fullnameEditText.setError(errors);
+        emailEditText.setError(errors);
+        passwordEditText.setError(errors);
+    }
+
+    private void setErrors(boolean isFullNameEntered, boolean isEmailEntered, boolean isPasswordEntered) {
+        fullnameEditText.setError(isFullNameEntered ? null : getString(R.string.dlg_not_fullname_field_entered));
+        emailEditText.setError(isEmailEntered ? null : getString(R.string.dlg_not_email_field_entered));
+        passwordEditText.setError(isPasswordEntered ? null : getString(R.string.dlg_not_password_field_entered));
     }
 
     private void addActions() {
