@@ -25,10 +25,10 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.ValidationUtils;
 
 public class LoginActivity extends BaseActivity {
 
@@ -40,6 +40,7 @@ public class LoginActivity extends BaseActivity {
     private CheckBox rememberMeCheckBox;
     private FacebookHelper facebookHelper;
     private LoginType startedLoginType = LoginType.EMAIL;
+    private ValidationUtils validationUtils;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -59,7 +60,6 @@ public class LoginActivity extends BaseActivity {
         rememberMeCheckBox.setChecked(isRememberMe);
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        initListeners();
         addActions();
     }
 
@@ -81,18 +81,12 @@ public class LoginActivity extends BaseActivity {
         finish();
     }
 
-
     public void loginOnClickListener(View view) {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-
-        if (isEmailEntered && isPasswordEntered) {
+        if (validationUtils.isValidUserDate(userEmail, userPassword)) {
             login(userEmail, userPassword);
-        } else {
-            DialogUtils.showLong(LoginActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
     }
 
@@ -144,16 +138,7 @@ public class LoginActivity extends BaseActivity {
         emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-    }
-
-    private void initListeners() {
-        emailEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                super.onTextChanged(charSequence, start, before, count);
-                emailEditText.setError(null);
-            }
-        });
+        validationUtils = new ValidationUtils(LoginActivity.this, emailEditText, passwordEditText);
     }
 
     private void addActions() {
@@ -210,13 +195,12 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-
     private class LoginFailAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            emailEditText.setError(getResources().getString(R.string.lgn_error));
+            validationUtils.setError(getResources().getString(R.string.lgn_error));
         }
     }
 
