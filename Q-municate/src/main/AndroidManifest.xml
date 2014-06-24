@@ -108,6 +108,12 @@
             android:label="@string/afg_title"
             android:parentActivityName=".ui.chats.GroupDialogDetailsActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.feedback.FeedbackDetailsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/fdb_feedback_details_title"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

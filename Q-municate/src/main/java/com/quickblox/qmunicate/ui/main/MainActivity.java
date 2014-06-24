@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
+import com.quickblox.qmunicate.ui.feedback.FeedbackFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
@@ -29,6 +30,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
+    public static final int ID_FEEDBACK_FRAGMENT = 4;
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
@@ -82,6 +85,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 break;
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
+                break;
+            case ID_FEEDBACK_FRAGMENT:
+                fragment = FeedbackFragment.newInstance();
                 break;
         }
         setCurrentFragment(fragment);

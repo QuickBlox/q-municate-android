@@ -18,6 +18,7 @@
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
     <string name="nvd_title_invite_friends">Invite Friends</string>
+    <string name="nvd_title_feedback_type">Type of Feedback</string>
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
 
@@ -26,6 +27,7 @@
         <item>Chats</item>
         <item>Invite Friends</item>
         <item>Settings</item>
+        <item>Give Feedback</item>
     </string-array>
 
     // Landing
@@ -128,6 +130,19 @@
     <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
+
+    // Feedback
+    <string name="fdb_feedback_type_header">Please select the nature of your feedback</string>
+    <string name="fdb_feedback_details_title">Feedback Description</string>
+    <string name="fdb_feedback_details_header">Please write in email the steps to make the bug or error appear again.
+        Let us know how often it occurs and if it give an error code. We need to know this in order to find the source of the problem. Please give us as many details as possible. </string>
+    <string name="fdb_bug_type">Bug</string>
+    <string name="fdb_improvement_type">Improvement</string>
+    <string name="fdb_suggestion_type">Suggestion</string>
+    <string name="fdb_next_step">Next step</string>
+    <string name="fdb_send_email">Send Email</string>
+    <string name="fdb_support_email">anton.dyachenko@quickblox.com</string>
+    <string name="fdb_choose_email_provider">Choose an email provider:</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
