@@ -100,9 +100,10 @@ public class QBFriendListHelper extends BaseHelper {
         roster.unsubscribe(friend.getId());
     }
 
-    public void updateFriendList() throws QBResponseException {
+    public List<Integer> updateFriendList() throws QBResponseException {
         List<Integer> userIds = getUserIdsFromRoster();
         updateFriends(userIds);
+        return userIds;
     }
 
     private List<Integer> getUserIdsFromRoster() {
