@@ -25,10 +25,10 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.ValidationUtils;
 
 public class LoginActivity extends BaseActivity {
 
@@ -40,6 +40,7 @@ public class LoginActivity extends BaseActivity {
     private CheckBox rememberMeCheckBox;
     private FacebookHelper facebookHelper;
     private LoginType startedLoginType = LoginType.EMAIL;
+    private ValidationUtils validationUtils;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -59,7 +60,6 @@ public class LoginActivity extends BaseActivity {
         rememberMeCheckBox.setChecked(isRememberMe);
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        initListeners();
         addActions();
     }
 
@@ -85,39 +85,9 @@ public class LoginActivity extends BaseActivity {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        if (isValidUserDate(userEmail, userPassword)) {
+        if (validationUtils.isValidUserDate(userEmail, userPassword)) {
             login(userEmail, userPassword);
         }
-    }
-
-    private boolean isValidUserDate(String emailText, String passwordText) {
-        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
-
-        if (isEmailEntered && isPasswordEntered) {
-            return true;
-        } else if (!isEmailEntered && !isPasswordEntered) {
-            setErrors(getString(R.string.dlg_not_all_fields_entered));
-        } else {
-            setErrors(isEmailEntered, isPasswordEntered);
-        }
-
-        return false;
-    }
-
-    private void clearErrors() {
-        emailEditText.setError(null);
-        passwordEditText.setError(null);
-    }
-
-    private void setErrors(String errors) {
-        emailEditText.setError(errors);
-        passwordEditText.setError(errors);
-    }
-
-    private void setErrors(boolean isEmailEntered, boolean isPasswordEntered) {
-        emailEditText.setError(isEmailEntered ? null : getString(R.string.dlg_not_email_field_entered));
-        passwordEditText.setError(isPasswordEntered ? null : getString(R.string.dlg_not_password_field_entered));
     }
 
     public void loginFacebookOnClickListener(View view) {
@@ -168,23 +138,7 @@ public class LoginActivity extends BaseActivity {
         emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-    }
-
-    private void initListeners() {
-        emailEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                super.onTextChanged(charSequence, start, before, count);
-                clearErrors();
-            }
-        });
-        passwordEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                super.onTextChanged(charSequence, start, before, count);
-                clearErrors();
-            }
-        });
+        validationUtils = new ValidationUtils(LoginActivity.this, emailEditText, passwordEditText);
     }
 
     private void addActions() {
@@ -241,13 +195,12 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-
     private class LoginFailAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            setErrors(getResources().getString(R.string.lgn_error));
+            validationUtils.setError(getResources().getString(R.string.lgn_error));
         }
     }
 
