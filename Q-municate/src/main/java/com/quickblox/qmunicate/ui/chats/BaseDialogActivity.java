@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -18,6 +19,7 @@ import android.widget.ListView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
@@ -48,7 +50,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected EditText messageEditText;
     protected ImageButton sendButton;
     protected String currentOpponent;
-    protected String chatJidId;
+    protected String dialogId;
 
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
@@ -122,6 +124,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onUpdateChatDialog();
 
+    protected Cursor getAllDialogMessagesByDialogId() {
+        return DatabaseManager.getAllDialogMessagesByDialogId(this, dialogId);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
@@ -155,9 +161,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId, long lastDateLoad) {
+    protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (dialog != null) {
-            QBLoadDialogMessagesCommand.start(this, dialog, roomJidId, lastDateLoad);
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
         }
     }
 
@@ -210,7 +216,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onReceiveMessage(Bundle extras) {
         String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
-        boolean isFromCurrentChat = jidId != null && jidId.equals(chatJidId);
+        boolean isFromCurrentChat = jidId != null && jidId.equals(dialogId);
         if (!isFromCurrentChat) {
             super.onReceiveMessage(extras);
         }

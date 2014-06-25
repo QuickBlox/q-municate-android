@@ -9,7 +9,6 @@ import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
@@ -52,9 +51,12 @@ import com.quickblox.qmunicate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
+import com.quickblox.qmunicate.qb.helpers.BaseHelper;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
 import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -69,6 +71,13 @@ import java.util.concurrent.TimeUnit;
 
 public class QBService extends Service {
 
+    public static final int AUTH_HELPER = 1;
+    public static final int PRIVATE_CHAT_HELPER = 2;
+    public static final int MULTI_CHAT_HELPER = 3;
+    public static final int FRIEND_LIST_HELPER = 4;
+    public static final int VIDEO_CHAT_HELPER = 5;
+    public static final int CHAT_REST_HELPER = 6;
+
     private static final String TAG = QBService.class.getSimpleName();
 
     private static final int KEEP_ALIVE_TIME = 1;
@@ -81,10 +90,12 @@ public class QBService extends Service {
     private Map<String, ServiceCommand> serviceCommandMap = new HashMap<String, ServiceCommand>();
     private ThreadPoolExecutor threadPool;
 
-    private QBChatHelper chatHelper;
+    private QBPrivateChatHelper chatHelper;
     private QBAuthHelper authHelper;
     private QBVideoChatHelper videoChatHelper;
     private QBFriendListHelper friendListHelper;
+
+    private Map<Integer, BaseHelper> helpers = new HashMap<Integer, BaseHelper>();
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -101,10 +112,18 @@ public class QBService extends Service {
     }
 
     private void initHelpers() {
+        QBChatRestHelper chatRestHelper = new QBChatRestHelper(this);
+        helpers.put(CHAT_REST_HELPER, chatRestHelper);
         authHelper = new QBAuthHelper(this);
-        chatHelper = new QBChatHelper(this);
+        helpers.put(AUTH_HELPER, authHelper);
+        chatHelper = new QBPrivateChatHelper(this);
+        helpers.put(PRIVATE_CHAT_HELPER, chatHelper);
+        QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
+        helpers.put(MULTI_CHAT_HELPER, multiChatHelper);
         friendListHelper = new QBFriendListHelper(this);
+        helpers.put(FRIEND_LIST_HELPER, friendListHelper);
         videoChatHelper = new QBVideoChatHelper(this);
+        helpers.put(VIDEO_CHAT_HELPER, videoChatHelper);
     }
 
     private void initCommands() {
@@ -146,35 +165,40 @@ public class QBService extends Service {
     }
 
     private void registerUpdateGroupNameCommand() {
-        QBUpdateGroupNameCommand updateGroupNameCommand = new QBUpdateGroupNameCommand(this, chatHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBUpdateGroupNameCommand updateGroupNameCommand = new QBUpdateGroupNameCommand(this, multiChatHelper,
                 QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, updateGroupNameCommand);
     }
 
     private void registerAddFriendsToGroupCommand() {
-        QBAddFriendsToGroupCommand addFriendsToGroupCommand = new QBAddFriendsToGroupCommand(this, chatHelper,
-                QBServiceConsts.ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBAddFriendsToGroupCommand addFriendsToGroupCommand = new QBAddFriendsToGroupCommand(this,
+                multiChatHelper, QBServiceConsts.ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION,
                 QBServiceConsts.ADD_FRIENDS_TO_GROUP_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_TO_GROUP_ACTION, addFriendsToGroupCommand);
     }
 
     private void registerLeaveGroupDialogCommand() {
-        QBLeaveGroupDialogCommand leaveGroupDialogCommand = new QBLeaveGroupDialogCommand(this, chatHelper,
-                QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBLeaveGroupDialogCommand leaveGroupDialogCommand = new QBLeaveGroupDialogCommand(this,
+                multiChatHelper, QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION,
                 QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LEAVE_GROUP_DIALOG_ACTION, leaveGroupDialogCommand);
     }
 
     private void registerLoadGroupDialogCommand() {
-        QBLoadGroupDialogCommand loadGroupDialogCommand = new QBLoadGroupDialogCommand(this, chatHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBLoadGroupDialogCommand loadGroupDialogCommand = new QBLoadGroupDialogCommand(this, multiChatHelper,
                 QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, loadGroupDialogCommand);
     }
 
     private void registerJoinGroupChat() {
-        QBJoinGroupDialogCommand joinGroupChatCommand = new QBJoinGroupDialogCommand(this, chatHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBJoinGroupDialogCommand joinGroupChatCommand = new QBJoinGroupDialogCommand(this, multiChatHelper,
                 QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION, QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);
     }
@@ -192,8 +216,9 @@ public class QBService extends Service {
     }
 
     private void registerCreateGroupChatCommand() {
-        QBCreateGroupDialogCommand createGroupChatCommand = new QBCreateGroupDialogCommand(this, chatHelper,
-                QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBCreateGroupDialogCommand createGroupChatCommand = new QBCreateGroupDialogCommand(this,
+                multiChatHelper, QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, createGroupChatCommand);
     }
@@ -206,13 +231,15 @@ public class QBService extends Service {
     }
 
     private void registerLoginChatCommand() {
-        ServiceCommand loginCommand = new QBLoginChatCommand(this, authHelper, chatHelper,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        ServiceCommand loginCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginCommand);
     }
 
     private void registerLogoutChatCommand() {
-        ServiceCommand logoutCommand = new QBLogoutChatCommand(this, chatHelper,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        ServiceCommand logoutCommand = new QBLogoutChatCommand(this, chatRestHelper,
                 QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGOUT_CHAT_ACTION, logoutCommand);
     }
@@ -238,8 +265,9 @@ public class QBService extends Service {
     }
 
     private void registerSendGroupMessageCommand() {
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
         QBSendGroupDialogMessageCommand sendMessageCommand = new QBSendGroupDialogMessageCommand(this,
-                chatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
+                multiChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.SEND_MESSAGE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, sendMessageCommand);
     }
@@ -295,8 +323,9 @@ public class QBService extends Service {
     private void registerLogoutCommand() {
         QBLogoutCommand logoutCommand = new QBLogoutCommand(this, QBServiceConsts.LOGOUT_SUCCESS_ACTION,
                 QBServiceConsts.LOGOUT_FAIL_ACTION);
-        QBLogoutAndDestroyChatCommand logoutChatCommand = new QBLogoutAndDestroyChatCommand(this, chatHelper,
-                QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBLogoutAndDestroyChatCommand logoutChatCommand = new QBLogoutAndDestroyChatCommand(this,
+                chatRestHelper, QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_FAIL_ACTION);
         QBLogoutRestCommand logoutRestCommand = new QBLogoutRestCommand(this, authHelper,
                 QBServiceConsts.LOGOUT_REST_SUCCESS_ACTION, QBServiceConsts.LOGOUT_REST_FAIL_ACTION);
@@ -346,9 +375,12 @@ public class QBService extends Service {
     }
 
     private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand) {
-        QBInitChatCommand initChatCommand = new QBInitChatCommand(this, chatHelper,
+        QBPrivateChatHelper chatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBInitChatCommand initChatCommand = new QBInitChatCommand(this, chatHelper, multiChatHelper,
                 QBServiceConsts.INIT_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_CHAT_FAIL_ACTION);
-        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, authHelper, chatHelper,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
                 QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
@@ -363,7 +395,8 @@ public class QBService extends Service {
     }
 
     private void registerLoadChatsDialogsCommand() {
-        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatHelper,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatRestHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
@@ -377,6 +410,7 @@ public class QBService extends Service {
     }
 
     private void registerLoadDialogMessagesCommand() {
+        QBChatRestHelper chatHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
         QBLoadDialogMessagesCommand loadDialogMessagesCommand = new QBLoadDialogMessagesCommand(this,
                 chatHelper, QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
@@ -415,16 +449,8 @@ public class QBService extends Service {
         return binder;
     }
 
-    public QBChatHelper getChatHelper() {
-        return chatHelper;
-    }
-
-    public QBAuthHelper getAuthHelper() {
-        return authHelper;
-    }
-
-    public QBFriendListHelper getFriendListHelper() {
-        return friendListHelper;
+    public BaseHelper getHelper(int helperId) {
+        return helpers.get(helperId);
     }
 
     private void startAsync(final ServiceCommand command, final Intent intent) {

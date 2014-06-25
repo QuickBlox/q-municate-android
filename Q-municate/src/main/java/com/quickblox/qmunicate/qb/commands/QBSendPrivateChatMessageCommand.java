@@ -6,18 +6,18 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendPrivateChatMessageCommand extends ServiceCommand {
 
-    private QBChatHelper qbChatHelper;
+    private QBPrivateChatHelper qbPrivateChatHelper;
 
-    public QBSendPrivateChatMessageCommand(Context context, QBChatHelper qbChatHelper, String successAction,
+    public QBSendPrivateChatMessageCommand(Context context, QBPrivateChatHelper qbPrivateChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.qbChatHelper = qbChatHelper;
+        this.qbPrivateChatHelper = qbPrivateChatHelper;
     }
 
     public static void start(Context context, String message, int userId, QBFile file) {
@@ -35,9 +35,9 @@ public class QBSendPrivateChatMessageCommand extends ServiceCommand {
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
         if (file == null) {
-            qbChatHelper.sendPrivateMessage(message, userId);
+            qbPrivateChatHelper.sendPrivateMessage(message, userId);
         } else {
-            qbChatHelper.sendPrivateMessageWithAttachImage(file, userId);
+            qbPrivateChatHelper.sendPrivateMessageWithAttachImage(file, userId);
         }
 
         return null;

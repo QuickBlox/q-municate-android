@@ -185,7 +185,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         broadcastCommandMap.remove(action);
     }
 
-    protected void onConnectedToService() {
+    protected void onConnectedToService(QBService service) {
     }
 
     protected void navigateToParent() {
@@ -275,7 +275,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         public void onServiceConnected(ComponentName name, IBinder binder) {
             bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService();
+            onConnectedToService(service);
         }
 
         @Override

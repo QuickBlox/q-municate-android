@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -16,9 +16,9 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
 
     private static final String TAG = QBLoadAttachFileCommand.class.getSimpleName();
 
-    private final QBChatHelper chatHelper;
+    private final QBPrivateChatHelper chatHelper;
 
-    public QBLoadAttachFileCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBLoadAttachFileCommand(Context context, QBPrivateChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;

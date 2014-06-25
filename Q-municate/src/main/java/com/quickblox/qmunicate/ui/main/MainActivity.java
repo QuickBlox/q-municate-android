@@ -10,11 +10,16 @@ import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
+import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
@@ -22,6 +27,8 @@ import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+
+import java.util.ArrayList;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -108,9 +115,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
+        initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
         loadChatsDialogs();
+    }
+
+    private void initBroadcastActionList() {
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadDialogsSuccessAction());
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
     }
 
     private void initPrefValues() {
@@ -153,6 +166,18 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
+    }
+
+    private class LoadDialogsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            ArrayList<QBDialog> dialogs = (ArrayList<QBDialog>) bundle.getSerializable(
+                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
+            QBJoinGroupDialogCommand.start(MainActivity.this, dialogs);
+            //TODO may be move this in command to execute async
+            DatabaseManager.saveDialogs(MainActivity.this, dialogs);
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

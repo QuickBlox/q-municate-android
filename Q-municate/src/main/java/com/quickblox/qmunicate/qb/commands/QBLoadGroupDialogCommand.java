@@ -12,7 +12,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.GroupDialog;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -24,12 +24,12 @@ import java.util.Map;
 
 public class QBLoadGroupDialogCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBLoadGroupDialogCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBLoadGroupDialogCommand(Context context, QBMultiChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.multiChatHelper = chatHelper;
     }
 
     public static void start(Context context, String roomJid) {
@@ -42,11 +42,11 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
 
-        QBDialog dialog = DatabaseManager.getDialogByRoomJidId(context, roomJid);
+        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, roomJid);
         GroupDialog groupDialog = new GroupDialog(dialog);
 
         List<Integer> participantIdsList = dialog.getOccupants();
-        List<Integer> onlineParticipantIdsList = chatHelper.getRoomOnlineParticipantList(roomJid);
+        List<Integer> onlineParticipantIdsList = multiChatHelper.getRoomOnlineParticipantList(roomJid);
 
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);

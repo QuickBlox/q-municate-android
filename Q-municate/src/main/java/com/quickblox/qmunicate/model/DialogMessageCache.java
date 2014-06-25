@@ -9,6 +9,8 @@ public class DialogMessageCache {
     private long time;
     private boolean isRead;
 
+    private String dialogId;
+
     public DialogMessageCache(String roomJidId, Integer senderId, String message, String attachUrl, long time,
             boolean isRead) {
         this.roomJidId = roomJidId;
@@ -69,5 +71,13 @@ public class DialogMessageCache {
 
     public void setRoomJidId(String roomJidId) {
         this.roomJidId = roomJidId;
+    }
+
+    public String getDialogId() {
+        return dialogId;
+    }
+
+    public void setDialogId(String dialogId) {
+        this.dialogId = dialogId;
     }
 }

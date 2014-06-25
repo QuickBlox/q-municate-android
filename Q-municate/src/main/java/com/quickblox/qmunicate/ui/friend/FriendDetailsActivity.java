@@ -30,6 +30,7 @@ import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.List;
 
@@ -192,7 +193,12 @@ public class FriendDetailsActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) throws Exception {
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);
+            if (dialog != null) {
+                PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);
+                finish();
+            } else {
+                ErrorUtils.showError(FriendDetailsActivity.this, getString(R.string.dlg_fail_create_chat));
+            }
         }
     }
 

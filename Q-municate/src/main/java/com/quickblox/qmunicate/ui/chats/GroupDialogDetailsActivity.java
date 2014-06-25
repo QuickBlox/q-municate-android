@@ -56,7 +56,7 @@ public class GroupDialogDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
         jid = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
-        groupDialog = new GroupDialog(DatabaseManager.getDialogByRoomJidId(this, jid));
+        groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(this, jid));
 
         initUI();
         initUIWithData();

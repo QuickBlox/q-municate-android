@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -16,12 +16,12 @@ import java.util.List;
 
 public class QBJoinGroupDialogCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBJoinGroupDialogCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBJoinGroupDialogCommand(Context context, QBMultiChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
     public static void start(Context context, String roomJid) {
@@ -48,9 +48,7 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
         }
 
         if (dialogs != null && !dialogs.isEmpty()) {
-            for (QBDialog dialog : dialogs) {
-                chatHelper.joinRoomChat(dialog);
-            }
+            multiChatHelper.tryJoinRoomChats(dialogs);
         }
         return extras;
     }
