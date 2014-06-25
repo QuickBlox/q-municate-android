@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.main;
 
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -50,11 +51,12 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private View friendsListViewTitle;
     private FriendsListCursorAdapter friendsListAdapter;
     private int positionCounter;
-    private boolean isHideSearchView;
+    private boolean isNeedToHideSearchView;
     private Cursor friendsCursor;
     private SearchOnActionExpandListener searchListener;
     private MenuItem searchItem;
     private SearchView searchView;
+    private static boolean isFriendsListLoaded = false;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -154,7 +156,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
         friendsListAdapter.setFilterQueryProvider(this);
-        if (state == State.FRIENDS_LIST && isHideSearchView) {
+        if (state == State.FRIENDS_LIST && isNeedToHideSearchView) {
             friendsListAdapter.getFilter().filter(newText);
             friendsListAdapter.setSearchCharacters(newText);
         } else if (state == State.GLOBAL_LIST) {
@@ -205,7 +207,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                     public void onClick(View view) {
                         startGlobalSearch();
                     }
-                });
+                }
+        );
     }
 
     private void initFriendsList() {
@@ -217,6 +220,19 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
         friendsListView.setOnItemClickListener(this);
+        friendsListAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if(state.equals(State.GLOBAL_LIST) && isNeedToHideSearchView
+                        || state.equals(State.FRIENDS_LIST) && isFriendsListLoaded && !isNeedToHideSearchView) {
+                    checkVisibilityEmptyLabel();
+                }
+            }
+        });
+        if(isFriendsListLoaded) {
+            checkVisibilityEmptyLabel();
+        }
     }
 
     private void startGlobalSearch() {
@@ -271,13 +287,25 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.hideProgress();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(isFriendsListLoaded && !isNeedToHideSearchView) {
+            checkVisibilityEmptyLabel();
+        }
+    }
+
+    private void checkVisibilityEmptyLabel() {
+        emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
-            isHideSearchView = true;
+            isNeedToHideSearchView = true;
             emptyListTextView.setVisibility(View.GONE);
             return true;
         }
@@ -286,9 +314,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public boolean onMenuItemActionCollapse(MenuItem item) {
             state = State.FRIENDS_LIST;
             baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
-            emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
-            if (isHideSearchView) {
-                isHideSearchView = false;
+            if (isNeedToHideSearchView) {
+                isNeedToHideSearchView = false;
                 friendsListAdapter.setSearchCharacters(null);
                 friendsListAdapter.setFilterQueryProvider(null);
                 friendsListView.removeFooterView(globalSearchLayout);
@@ -296,7 +323,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 positionCounter--;
                 initFriendsList();
             }
-
             return true;
         }
     }
@@ -323,8 +349,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            ErrorUtils.showError(baseActivity, e);
+            String notFoundError = getResources().getString(R.string.frl_not_found_users);
+            ErrorUtils.showError(baseActivity, notFoundError);
         }
     }
 
@@ -349,8 +375,10 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            if (getActivity() != null) {
-                emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+            isFriendsListLoaded = true;
+            if (baseActivity != null && friendsList.isEmpty()) {
+                emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
     }

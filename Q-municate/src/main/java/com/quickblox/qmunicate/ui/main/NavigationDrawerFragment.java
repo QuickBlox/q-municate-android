@@ -33,6 +33,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -87,8 +88,8 @@ public class NavigationDrawerFragment extends BaseFragment {
         selectItem(currentSelectedPosition);
 
         countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     @Override
@@ -120,7 +121,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         if (user != null) {
             fullnameTextView.setText(user.getFullName());
         }
@@ -201,8 +202,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private void initNavigationAdapter() {
-        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
-                getNavigationDrawerItems());
+        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
         updateCountUnreadDialogsListener = navigationDrawerAdapter;
     }
@@ -228,6 +228,7 @@ public class NavigationDrawerFragment extends BaseFragment {
             }
         });
     }
+
 
     private List<String> getNavigationDrawerItems() {
         String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
@@ -285,7 +286,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
-                                       int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+                int openDrawerContentDescRes, int closeDrawerContentDescRes) {
             super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes,
                     closeDrawerContentDescRes);
         }

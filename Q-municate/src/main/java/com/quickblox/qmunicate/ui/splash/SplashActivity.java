@@ -10,8 +10,8 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
@@ -19,6 +19,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -33,10 +34,11 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.activity_splash);
         canPerformLogout.set(false);
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        if (facebookHelper.isSessionOpened() && getLoginType() == LoginType.FACEBOOK) {
+        if (isFacebookSessionAlreadyExist()) {
             return;
         }
 
@@ -51,9 +53,12 @@ public class SplashActivity extends BaseActivity {
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
             login(userEmail, userPassword);
         } else {
-            LandingActivity.start(SplashActivity.this);
-            finish();
+            startLanding();
         }
+    }
+
+    public boolean isFacebookSessionAlreadyExist() {
+        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
     }
 
     @Override
@@ -80,26 +85,35 @@ public class SplashActivity extends BaseActivity {
         facebookHelper.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void startLanding() {
+        LandingActivity.start(SplashActivity.this);
+        finish();
+    }
+
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         QBLoginCommand.start(this, user);
     }
 
-    private LoginType getLoginType() {
-        int defValue = LoginType.EMAIL.ordinal();
-        int value = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_LOGIN_TYPE, defValue);
-        return LoginType.values()[value];
+    private LoginType getCurrentLoginType() {
+        return AppSessionHelper.getSession().getLoginType();
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened() && getLoginType() == LoginType.FACEBOOK) {
+            if (session.isOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType())) {
                 QBLoginRestWithSocialCommand.start(SplashActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }
         }
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
+        startLanding();
     }
 
     private class LoginSuccessAction implements Command {
@@ -107,9 +121,8 @@ public class SplashActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            AppSession.startSession(getCurrentLoginType(), user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            DatabaseManager.clearAllCache(SplashActivity.this);
             MainActivity.start(SplashActivity.this);
             finish();
         }

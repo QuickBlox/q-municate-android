@@ -27,10 +27,10 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -79,7 +79,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         useDoubleBackPressed = false;
-        user = App.getInstance().getUser();
+        user = AppSessionHelper.getSession().getUser();
         imageHelper = new ImageHelper(this);
 
         initUI();
@@ -113,7 +113,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
     private void initUIWithUsersData() {
         loadAvatar();
         fullNameEditText.setText(user.getFullName());
-        if(TextUtils.isEmpty(user.getEmail())) {
+        if (TextUtils.isEmpty(user.getEmail())) {
             emailLinearLayout.setVisibility(View.GONE);
         } else {
             emailLinearLayout.setVisibility(View.VISIBLE);
@@ -181,7 +181,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        BaseFragmentActivity.isNeedToSaveSession = false;
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
             Uri originalUri = data.getData();
@@ -208,7 +207,6 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
 
     public void changeAvatarOnClick() {
         canPerformLogout.set(false);
-        BaseFragmentActivity.isNeedToSaveSession = true;
         imageHelper.getImage();
     }
 
@@ -221,7 +219,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         editText.requestFocus();
     }
 
-    private void stopChangingEditText(EditText editText){
+    private void stopChangingEditText(EditText editText) {
         editText.setEnabled(false);
         KeyboardUtils.hideKeyboard(this);
     }
@@ -322,7 +320,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            AppSessionHelper.getSession().updateUser(user);
             updateOldUserData();
             hideProgress();
         }

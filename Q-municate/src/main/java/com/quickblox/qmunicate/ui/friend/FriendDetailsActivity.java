@@ -25,6 +25,7 @@ import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
@@ -152,7 +153,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != App.getInstance().getUser().getId()) {
+        if (friend.getId() != AppSessionHelper.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }

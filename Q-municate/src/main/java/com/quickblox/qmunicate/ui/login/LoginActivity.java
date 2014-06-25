@@ -15,8 +15,8 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
@@ -25,19 +25,22 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
+import com.quickblox.qmunicate.utils.ValidationUtils;
 
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
+    private static final String STARTED_LOGIN_TYPE = "started_login_type";
 
     private EditText emailEditText;
     private EditText passwordEditText;
     private CheckBox rememberMeCheckBox;
     private FacebookHelper facebookHelper;
+    private LoginType startedLoginType = LoginType.EMAIL;
+    private ValidationUtils validationUtils;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -48,13 +51,15 @@ public class LoginActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
+            startedLoginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
+        }
         canPerformLogout.set(false);
         initUI();
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, true);
         rememberMeCheckBox.setChecked(isRememberMe);
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        initListeners();
         addActions();
     }
 
@@ -76,23 +81,17 @@ public class LoginActivity extends BaseActivity {
         finish();
     }
 
-
     public void loginOnClickListener(View view) {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
-
-        if (isEmailEntered && isPasswordEntered) {
+        if (validationUtils.isValidUserDate(userEmail, userPassword)) {
             login(userEmail, userPassword);
-        } else {
-            DialogUtils.showLong(LoginActivity.this, getString(R.string.dlg_not_all_fields_entered));
         }
     }
 
     public void loginFacebookOnClickListener(View view) {
-        saveLoginType(LoginType.FACEBOOK);
+        startedLoginType = LoginType.FACEBOOK;
         facebookHelper.loginWithFacebook();
     }
 
@@ -112,6 +111,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putSerializable(STARTED_LOGIN_TYPE, startedLoginType);
         facebookHelper.onSaveInstanceState(outState);
     }
 
@@ -138,16 +138,7 @@ public class LoginActivity extends BaseActivity {
         emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-    }
-
-    private void initListeners() {
-        emailEditText.addTextChangedListener(new SimpleTextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                super.onTextChanged(charSequence, start, before, count);
-                emailEditText.setError(null);
-            }
-        });
+        validationUtils = new ValidationUtils(LoginActivity.this, emailEditText, passwordEditText);
     }
 
     private void addActions() {
@@ -161,12 +152,7 @@ public class LoginActivity extends BaseActivity {
     private void login(String userEmail, String userPassword) {
         QBUser user = new QBUser(null, userPassword, userEmail);
         showProgress();
-        saveLoginType(LoginType.EMAIL);
         QBLoginCommand.start(this, user);
-    }
-
-    private void saveLoginType(LoginType type) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_LOGIN_TYPE, type.ordinal());
     }
 
     private void saveRememberMe(boolean value) {
@@ -185,7 +171,6 @@ public class LoginActivity extends BaseActivity {
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                saveLoginType(LoginType.FACEBOOK);
                 // TODO SF must be
                 // QBUser user = FacebookHelper.getCurrentFacebookUser(session);
                 QBLoginRestWithSocialCommand.start(LoginActivity.this, QBProvider.FACEBOOK,
@@ -199,14 +184,12 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            App.getInstance().setUser(user);
+            AppSession.startSession(startedLoginType, user);
             if (rememberMeCheckBox.isChecked()) {
                 saveRememberMe(true);
                 saveUserCredentials(user);
             }
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IS_LOGINED, true);
-            DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();
         }
@@ -217,7 +200,7 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            emailEditText.setError(getResources().getString(R.string.lgn_error));
+            validationUtils.setError(getResources().getString(R.string.lgn_error));
         }
     }
 

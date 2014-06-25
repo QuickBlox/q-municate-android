@@ -18,6 +18,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
 public class ChangePasswordDialog extends DialogFragment {
@@ -54,7 +55,7 @@ public class ChangePasswordDialog extends DialogFragment {
         String oldPasswordText = oldPassword.getText().toString();
         String newPasswordText = newPassword.getText().toString();
 
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSessionHelper.getSession().getUser();
         user.setOldPassword(oldPasswordText);
         user.setPassword(newPasswordText);
         activity.showProgress();
@@ -77,7 +78,7 @@ public class ChangePasswordDialog extends DialogFragment {
                     String oldPasswordText = oldPassword.getText().toString();
                     String newPasswordText = newPassword.getText().toString();
                     String confirmPasswordText = confirmPassword.getText().toString();
-                    QBUser user = App.getInstance().getUser();
+                    QBUser user = AppSessionHelper.getSession().getUser();
 
                     boolean isOldPasswordEmpty = TextUtils.isEmpty(oldPasswordText);
                     boolean isNewPasswordEmpty = TextUtils.isEmpty(newPasswordText);

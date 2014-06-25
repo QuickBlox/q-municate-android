@@ -1,10 +1,7 @@
 package com.quickblox.qmunicate.qb.helpers;
 
 import android.content.Context;
-
-import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
@@ -14,10 +11,8 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-
-import com.quickblox.qmunicate.utils.Consts;
-
-import org.jivesoftware.smack.XMPPException;
+import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 
 import java.io.File;
 
@@ -31,25 +26,28 @@ public class QBAuthHelper extends BaseHelper {
         super(context);
     }
 
-    public QBUser login(QBUser user) throws QBResponseException, XMPPException {
-        QBAuth.createSession();
-        String password = user.getPassword();
-        this.user = QBUsers.signIn(user);
-        this.user.setPassword(password);
+    public QBUser login(QBUser user) throws QBResponseException {
+        try {
+            QBAuth.createSession();
+            String password = user.getPassword();
+            this.user = QBUsers.signIn(user);
+            this.user.setPassword(password);
+        } catch (QBResponseException exc) {
+            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
+        }
 
         return this.user;
     }
 
     public QBUser login(String socialProvider, String accessToken,
-            String accessTokenSecret) throws QBResponseException, XMPPException {
+            String accessTokenSecret) throws QBResponseException {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-
         return user;
     }
 
-    public QBUser signup(QBUser user, File file) throws QBResponseException, XMPPException {
+    public QBUser signup(QBUser user, File file) throws QBResponseException {
         QBAuth.createSession();
         String password = user.getPassword();
         user.setOldPassword(password);
@@ -65,13 +63,17 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void logout() throws QBResponseException {
+        AppSession activeSession = AppSession.getActiveSession();
+        if (activeSession != null) {
+            activeSession.closeAndClear();
+        }
         Session.getActiveSession().closeAndClearTokenInformation();
         QBAuth.deleteSession();
         user = null;
     }
 
     public QBUser updateUser(QBUser user) throws QBResponseException {
-        if(TextUtils.isEmpty(user.getWebsite())) {
+        if (TextUtils.isEmpty(user.getWebsite())) {
             return user;
         }
         String password = user.getPassword();

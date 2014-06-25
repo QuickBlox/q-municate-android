@@ -6,49 +6,58 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
-import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
-public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
+public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
-    private QBDialog dialog;
-
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor, QBDialog dialog, ScrollMessagesListener scrollMessagesListener) {
-        super(context, cursor, true);
-        this.dialog = dialog;
+    public GroupDialogMessagesAdapter(Context context, Cursor cursor,
+                                      ScrollMessagesListener scrollMessagesListener) {
+        super(context, cursor);
         this.scrollMessagesListener = scrollMessagesListener;
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = layoutInflater.inflate(R.layout.list_item_dialog_message_left, null, true);
+        View view;
+        ViewHolder viewHolder = new ViewHolder();
 
-        ViewHolder holder = new ViewHolder();
+        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        if (isOwnMessage(senderId)) {
+            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message, null, true);
+        } else {
+            view = layoutInflater.inflate(R.layout.list_item_group_dialog_opponent_message, null, true);
+            viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
+            viewHolder.avatarImageView.setOval(true);
+            viewHolder.avatarImageView.setVisibility(View.VISIBLE);
+            viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
+            viewHolder.nameTextView.setVisibility(View.VISIBLE);
+        }
 
-        holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
-        holder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
-        holder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
-        holder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
-        holder.timeTextView = (TextView) view.findViewById(R.id.time_textview);
-        holder.progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
-        holder.pleaseWaitTextView = (TextView) view.findViewById(R.id.please_wait_textview);
-        holder.nameTextView.setVisibility(View.VISIBLE);
+        viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
+        viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
+        viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
+        viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
+        viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
+        viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
+        viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
+        viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+        viewHolder.centeredProgressBar =  (ProgressBar) view.findViewById(R.id.centered_progressbar);
 
-        view.setTag(holder);
+        view.setTag(viewHolder);
 
         return view;
     }
@@ -64,36 +73,41 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+        boolean isOwnMessage = isOwnMessage(senderId);
 
-        viewHolder.attachImageView.setVisibility(View.GONE);
+        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
 
-        if (isOwnMessage(senderId)) {
-            senderName = currentUser.getFullName();
+        if (isOwnMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
-            if(senderFriend != null) {
+            if (senderFriend != null) {
                 senderName = senderFriend.getFullname();
                 avatarUrl = getAvatarUrlForFriend(senderFriend);
-            } else{
+            } else {
                 senderName = senderId + Consts.EMPTY_STRING;
             }
+            viewHolder.nameTextView.setTextColor(getTextColor(senderId));
+            viewHolder.nameTextView.setText(senderName);
         }
-        viewHolder.nameTextView.setText(senderName);
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.messageTextView.setVisibility(View.GONE);
-            displayAttachImage(attachUrl, viewHolder.pleaseWaitTextView, viewHolder.attachImageView,
-                    viewHolder.progressBar);
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
+            viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
+            viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
+            displayAttachImage(attachUrl, viewHolder.attachImageView, viewHolder.progressRelativeLayout,
+                    viewHolder.attachMessageRelativeLayout, viewHolder.verticalProgressBar,
+                    viewHolder.centeredProgressBar, isOwnMessage);
         } else {
-            viewHolder.messageTextView.setVisibility(View.VISIBLE);
-            viewHolder.attachImageView.setVisibility(View.GONE);
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
+            viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
+            viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(body);
         }
-        viewHolder.timeTextView.setText(DateUtils.longToMessageDate(time));
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if(dialog != null && !isRead) {
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(
+                DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }
@@ -101,24 +115,18 @@ public class GroupDialogMessagesAdapter extends BaseCursorAdapter {
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
 
-    private boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
-    }
-
-    private void displayAttachImage(String uri, final TextView pleaseWaitTextView,
-                                    final ImageView attachImageView, final ProgressBar progressBar) {
-        ImageLoader.getInstance().loadImage(uri, new SimpleImageLoading(pleaseWaitTextView, attachImageView,
-                progressBar));
-    }
-
     private static class ViewHolder {
 
+        RelativeLayout progressRelativeLayout;
+        RelativeLayout attachMessageRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
+        LinearLayout textMessageLinearLayout;
         ChatTextView messageTextView;
         ImageView attachImageView;
-        TextView timeTextView;
-        ProgressBar progressBar;
-        TextView pleaseWaitTextView;
+        TextView timeTextMessageTextView;
+        TextView timeAttachMessageTextView;
+        ProgressBar verticalProgressBar;
+        ProgressBar centeredProgressBar;
     }
 }

@@ -26,7 +26,6 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -39,8 +38,6 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 public abstract class BaseActivity extends Activity implements QBLogeable {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
-
-    public static final String CAN_PERFORM_LOGOUT = "can_perform_logout";
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
@@ -226,6 +223,10 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         return transaction;
     }
 
+    protected void onFailAction(String action) {
+
+    }
+
     public class FailAction implements Command {
 
         @Override
@@ -233,6 +234,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
+            onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
 
@@ -245,7 +247,11 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
                 Command command = broadcastCommandMap.get(action);
                 if (command != null) {
                     Log.d("STEPS", "executing " + action);
-                    command.execute(intent.getExtras());
+                    try {
+                        command.execute(intent.getExtras());
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         }

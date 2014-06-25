@@ -4,42 +4,23 @@
     android:layout_height="@dimen/chat_input_message_height"
     android:background="@color/white">
 
-    <LinearLayout
-        android:id="@+id/attach_linearlayout"
+    <ImageButton
+        android:id="@+id/send_button"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/chat_input_message_height"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/attach_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
-            android:padding="5dp"
-            android:onClick="attachButtonOnClick"
-            android:src="@drawable/ic_photo"
-            android:visibility="visible" />
-
-        <ImageButton
-            android:id="@+id/send_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
-            android:onClick="sendMessageOnClick"
-            android:padding="5dp"
-            android:src="@drawable/ic_send_message"
-            android:visibility="gone" />
-
-    </LinearLayout>
+        android:background="@drawable/button_general_selector"
+        android:onClick="sendMessageOnClick"
+        android:padding="5dp"
+        android:src="@drawable/ic_send_message"
+        android:layout_centerVertical="true" />
 
     <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
         android:id="@+id/message_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/attach_linearlayout"
+        android:layout_toLeftOf="@+id/send_button"
         android:autoLink="all"
         android:clickable="true"
         android:focusable="true"

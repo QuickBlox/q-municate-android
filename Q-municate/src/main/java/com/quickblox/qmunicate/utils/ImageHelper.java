@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
-
-import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -58,9 +57,8 @@ public class ImageHelper {
         ByteArrayOutputStream bos = null;
         FileOutputStream fos = null;
         try {
-            Bitmap bitmap = resizeBitmap(origBitmap, origBitmap.getWidth(), origBitmap.getHeight());
             bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, Consts.ZERO_INT_VALUE, bos);
+            origBitmap.compress(Bitmap.CompressFormat.PNG, Consts.ZERO_INT_VALUE, bos);
             byte[] bitmapData = bos.toByteArray();
             fos = new FileOutputStream(tempFile);
             fos.write(bitmapData);
@@ -75,38 +73,32 @@ public class ImageHelper {
         return tempFile.getAbsolutePath();
     }
 
-    private Bitmap resizeBitmap(Bitmap inputBitmap, int newWidth, int newHeight) {
-        return Bitmap.createScaledBitmap(inputBitmap, newWidth, newHeight, true);
-    }
-
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {
-        int preferredWidth = 300;
-
+        final int preferredWidth = 300;
         int origWidth = origBitmap.getWidth();
         int origHeight = origBitmap.getHeight();
-
-        int destHeight, destWidth;
-
-        if (origWidth <= preferredWidth || origHeight <= preferredWidth) {
-            destWidth = origWidth;
-            destHeight = origHeight;
-        } else {
-            destWidth = 300;
-            destHeight = origHeight / (origWidth / destWidth);
-        }
-
         File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
-
-        Bitmap bitmap = resizeBitmap(origBitmap, destWidth, destHeight);
+        Bitmap bitmap = getScaledBitmap(origBitmap, origWidth, origHeight, preferredWidth);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos);
         byte[] bitmapData = bos.toByteArray();
-
         FileOutputStream fos = new FileOutputStream(tempFile);
         fos.write(bitmapData);
         fos.close();
-
+        bos.close();
         return tempFile;
+    }
+
+    public static Bitmap getScaledBitmap(Bitmap bitmapOrg, int width, int height, int preferredWidth) {
+        int newWidth = preferredWidth;
+        int newHeight = preferredWidth;
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        Bitmap resizedBitmap = Bitmap.createBitmap(bitmapOrg, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE,
+                width, height, matrix, true);
+        return resizedBitmap;
     }
 }

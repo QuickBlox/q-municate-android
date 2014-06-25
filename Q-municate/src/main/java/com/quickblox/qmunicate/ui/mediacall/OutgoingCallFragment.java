@@ -30,6 +30,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -240,7 +241,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-        QBUser sender = App.getInstance().getUser();
+        QBUser sender = AppSessionHelper.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
             if (!opponent.isOnline()) {
