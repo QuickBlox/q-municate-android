@@ -50,6 +50,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         sendPrivateMessage(file, null, userId);
     }
 
+    //TODO add dialodId to save in cache
     private void sendPrivateMessage(QBFile file, String message, int userId) throws Exception {
         QBChatMessage chatMessage;
         if (file != null) {
