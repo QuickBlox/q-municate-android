@@ -20,13 +20,13 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -199,7 +199,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSessionHelper.getSession().getUser().getId()) {
+        if (friend.getId() != AppSession.getActiveSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
     }

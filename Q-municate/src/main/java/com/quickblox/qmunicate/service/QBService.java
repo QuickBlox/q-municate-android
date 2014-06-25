@@ -13,6 +13,7 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
@@ -56,7 +57,6 @@ import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.Utils;
 
@@ -436,7 +436,7 @@ public class QBService extends Service {
                     command.execute(intent.getExtras());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
-                    if (Utils.isTokenDestroyedError(e) && AppSessionHelper.getSession().isSessionExist()) {
+                    if (Utils.isTokenDestroyedError(e) && AppSession.getActiveSession().isSessionExist()) {
                         refreshSession();
                     }
                 } catch (Exception e) {
@@ -447,8 +447,8 @@ public class QBService extends Service {
     }
 
     public void refreshSession() {
-        if (LoginType.EMAIL.equals(AppSessionHelper.getSession().getLoginType())) {
-            QBLoginRestCommand.start(this, AppSessionHelper.getSession().getUser());
+        if (LoginType.EMAIL.equals(AppSession.getActiveSession().getLoginType())) {
+            QBLoginRestCommand.start(this, AppSession.getActiveSession().getUser());
         } else {
             QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);

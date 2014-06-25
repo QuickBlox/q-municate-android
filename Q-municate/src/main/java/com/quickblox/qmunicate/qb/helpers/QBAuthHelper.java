@@ -96,10 +96,6 @@ public class QBAuthHelper extends BaseHelper {
         QBUsers.resetPassword(email);
     }
 
-    public QBUser getUser() {
-        return user;
-    }
-
     public boolean isLoggedIn() {
         return user != null;
     }

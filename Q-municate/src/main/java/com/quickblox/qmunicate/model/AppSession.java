@@ -12,7 +12,7 @@ public class AppSession implements Serializable {
     private static AppSession activeSession;
     private final LoginType loginType;
     private static final Object lock = new Object();
-    private QBUser user;
+    private static QBUser user;
 
     private AppSession(LoginType loginType, QBUser user) {
         this.loginType = loginType;
@@ -75,5 +75,15 @@ public class AppSession implements Serializable {
         qbUser.setFullName(userFullName);
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
         return new AppSession(loginType, qbUser);
+    }
+
+    public static  void saveRememberMe(boolean value) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
+    }
+
+    public static  void saveUserCredentials(QBUser user) {
+        PrefsHelper helper = App.getInstance().getPrefsHelper();
+        helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
+        helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 }

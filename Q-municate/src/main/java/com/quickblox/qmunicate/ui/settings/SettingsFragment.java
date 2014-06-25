@@ -14,13 +14,13 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
 
@@ -43,7 +43,7 @@ public class SettingsFragment extends BaseFragment {
         initUI(rootView);
 
         pushNotificationSwitch.setChecked(getPushNotifications());
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getActiveSession().getUser();
         if (user == null || null == user.getFacebookId()) {
             rootView.findViewById(R.id.change_password_linearlyout).setVisibility(View.VISIBLE);
         } else {

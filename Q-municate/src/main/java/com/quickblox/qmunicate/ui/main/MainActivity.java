@@ -13,6 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
@@ -22,7 +23,6 @@ import com.quickblox.qmunicate.ui.friends.FriendsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.settings.SettingsFragment;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -136,7 +136,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser(AppSessionHelper.getSession().getUser())) {
+            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getActiveSession().getUser())) {
                 gsmHelper.registerInBackground();
                 return;
             }

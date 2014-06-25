@@ -11,10 +11,11 @@ import android.widget.EditText;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ValidationUtils;
 
@@ -47,7 +48,7 @@ public class ChangePasswordActivity extends BaseActivity {
         String oldPasswordText = oldPasswordEditText.getText().toString();
         String newPasswordText = newPasswordEditText.getText().toString();
         if (validationUtils.isValidChangePasswordData(oldPasswordText, newPasswordText)) {
-            QBUser user = AppSessionHelper.getSession().getUser();
+            QBUser user = AppSession.getActiveSession().getUser();
             user.setOldPassword(oldPasswordText);
             user.setPassword(newPasswordText);
             showProgress();
@@ -82,11 +83,24 @@ public class ChangePasswordActivity extends BaseActivity {
         updateBroadcastActionList();
     }
 
+    private void clearFields() {
+        oldPasswordEditText.setText(Consts.EMPTY_STRING);
+        newPasswordEditText.setText(Consts.EMPTY_STRING);
+    }
+
+    private void saveUserCredentials(QBUser user) {
+        user.setPassword(newPasswordEditText.getText().toString());
+        AppSession.saveUserCredentials(user);
+    }
+
     private class ChangePasswordSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            saveUserCredentials(user);
             hideProgress();
+            clearFields();
             DialogUtils.showLong(ChangePasswordActivity.this, getString(R.string.dlg_password_changed));
         }
     }

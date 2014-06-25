@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.model.AppSession;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -31,6 +33,7 @@ public class QBLoginRestCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         user = authHelper.login(user);
         extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        AppSession.startSession(LoginType.EMAIL, user);
         return extras;
     }
 }

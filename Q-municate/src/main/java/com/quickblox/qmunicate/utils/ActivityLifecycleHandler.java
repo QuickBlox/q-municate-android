@@ -59,8 +59,12 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     private boolean isLogedIn() {
-        AppSession activeSession = AppSessionHelper.getSession();
-        return activeSession.isSessionExist();
+        AppSession activeSession = AppSession.getActiveSession();
+        if(activeSession != null) {
+            return activeSession.isSessionExist();
+        } else {
+            return false;
+        }
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {

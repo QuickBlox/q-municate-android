@@ -6,6 +6,7 @@ import android.widget.EditText;
 
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 public class ValidationUtils extends SimpleTextWatcher {
@@ -65,7 +66,7 @@ public class ValidationUtils extends SimpleTextWatcher {
     }
 
     public boolean isValidChangePasswordData(String oldPasswordText, String newPasswordText) {
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getActiveSession().getUser();
 
         boolean isOldPasswordEntered = !TextUtils.isEmpty(oldPasswordText);
         boolean isNewPasswordEntered = !TextUtils.isEmpty(newPasswordText);

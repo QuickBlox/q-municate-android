@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
@@ -21,14 +20,11 @@ import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
-import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.settings.ChangePasswordActivity;
-import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.ValidationUtils;
@@ -154,16 +150,6 @@ public class LoginActivity extends BaseActivity {
         QBLoginCommand.start(this, user);
     }
 
-    private void saveRememberMe(boolean value) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
-    }
-
-    private void saveUserCredentials(QBUser user) {
-        PrefsHelper helper = App.getInstance().getPrefsHelper();
-        helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
-        helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
-    }
-
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
@@ -181,10 +167,9 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.startSession(startedLoginType, user);
             if (rememberMeCheckBox.isChecked()) {
-                saveRememberMe(true);
-                saveUserCredentials(user);
+                AppSession.saveRememberMe(true);
+                AppSession.saveUserCredentials(user);
             }
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             MainActivity.start(LoginActivity.this);

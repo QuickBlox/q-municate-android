@@ -24,13 +24,13 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -79,7 +79,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         useDoubleBackPressed = false;
-        user = AppSessionHelper.getSession().getUser();
+        user = AppSession.getActiveSession().getUser();
         imageHelper = new ImageHelper(this);
 
         initUI();
@@ -320,7 +320,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSessionHelper.getSession().updateUser(user);
+            AppSession.getActiveSession().updateUser(user);
             updateOldUserData();
             hideProgress();
         }

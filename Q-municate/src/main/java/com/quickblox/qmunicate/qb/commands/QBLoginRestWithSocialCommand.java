@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.model.AppSession;
+import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -45,8 +47,10 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
             newUser.setPassword(user.getPassword());
             newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
             extras.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
+            AppSession.startSession(LoginType.FACEBOOK, newUser);
         } else {
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+            AppSession.startSession(LoginType.FACEBOOK, user);
         }
         return extras;
     }

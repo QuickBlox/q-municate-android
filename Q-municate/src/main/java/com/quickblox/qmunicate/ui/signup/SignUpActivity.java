@@ -185,6 +185,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         public void execute(Bundle bundle) {
             File image = (File) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            AppSession.saveUserCredentials(user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
             QBUpdateUserCommand.start(SignUpActivity.this, user, image, null);
         }

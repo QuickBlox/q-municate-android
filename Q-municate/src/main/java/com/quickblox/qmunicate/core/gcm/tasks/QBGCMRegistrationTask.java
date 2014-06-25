@@ -14,7 +14,7 @@ import com.quickblox.module.messages.model.QBSubscription;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.concurrency.BaseProgressTask;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
@@ -96,7 +96,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         int appVersion = Utils.getAppVersionCode(context);
         prefsHelper.savePref(PrefsHelper.PREF_REG_ID, registration.getString(PrefsHelper.PREF_REG_ID));
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getActiveSession().getUser();
         if (user != null) {
             prefsHelper.savePref(PrefsHelper.PREF_REG_USER_ID, user.getId());
         }
