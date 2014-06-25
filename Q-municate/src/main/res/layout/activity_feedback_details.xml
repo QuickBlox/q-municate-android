@@ -18,10 +18,11 @@
         android:id="@+id/feedback_description_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:background="@color/white"
         android:gravity="top"
         android:padding="10dp"
+        android:hint="@string/fdb_hint_feedback_description"
         android:textColor="@color/black"
         android:textSize="@dimen/text_size" />
 

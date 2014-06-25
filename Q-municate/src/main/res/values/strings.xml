@@ -143,6 +143,7 @@
     <string name="fdb_send_email">Send Email</string>
     <string name="fdb_support_email">anton.dyachenko@quickblox.com</string>
     <string name="fdb_choose_email_provider">Choose an email provider:</string>
+    <string name="fdb_hint_feedback_description">Type a description</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>

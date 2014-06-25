@@ -32,13 +32,8 @@ public class FeedbackFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_feedback, container, false);
 
         initUI(view);
-        initListeners();
 
         return view;
-    }
-
-    private void initListeners() {
-
     }
 
     private void initUI(View view) {

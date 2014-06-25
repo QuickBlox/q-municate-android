@@ -34,6 +34,8 @@ public class FeedbackDetailsActivity extends BaseActivity {
     }
 
     private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         feedbackDescriptionEditText = _findViewById(R.id.feedback_description_edittext);
     }
 
