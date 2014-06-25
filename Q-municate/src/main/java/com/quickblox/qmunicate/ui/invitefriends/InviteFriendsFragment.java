@@ -337,7 +337,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         public void onCompleted(Response response) {
             FacebookRequestError error = response.getError();
             if (error != null) {
-                Log.e(getString(R.string.facebook_exception), error);
+                Log.e(getString(R.string.facebook_exception), error.toString());
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
             } else {
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
