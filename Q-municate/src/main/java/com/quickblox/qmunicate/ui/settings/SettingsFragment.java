@@ -43,7 +43,7 @@ public class SettingsFragment extends BaseFragment {
         initUI(rootView);
 
         pushNotificationSwitch.setChecked(getPushNotifications());
-        QBUser user = AppSession.getActiveSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         if (user == null || null == user.getFacebookId()) {
             rootView.findViewById(R.id.change_password_linearlyout).setVisibility(View.VISIBLE);
         } else {

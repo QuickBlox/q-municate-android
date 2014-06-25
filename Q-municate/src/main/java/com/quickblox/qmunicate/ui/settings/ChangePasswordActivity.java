@@ -48,7 +48,7 @@ public class ChangePasswordActivity extends BaseActivity {
         String oldPasswordText = oldPasswordEditText.getText().toString();
         String newPasswordText = newPasswordEditText.getText().toString();
         if (validationUtils.isValidChangePasswordData(oldPasswordText, newPasswordText)) {
-            QBUser user = AppSession.getActiveSession().getUser();
+            QBUser user = AppSession.getSession().getUser();
             user.setOldPassword(oldPasswordText);
             user.setPassword(newPasswordText);
             showProgress();

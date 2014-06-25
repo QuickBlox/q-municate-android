@@ -66,7 +66,7 @@ public class ValidationUtils extends SimpleTextWatcher {
     }
 
     public boolean isValidChangePasswordData(String oldPasswordText, String newPasswordText) {
-        QBUser user = AppSession.getActiveSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
 
         boolean isOldPasswordEntered = !TextUtils.isEmpty(oldPasswordText);
         boolean isNewPasswordEntered = !TextUtils.isEmpty(newPasswordText);

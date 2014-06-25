@@ -43,7 +43,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (!friend.isOnline()) {
             String callMsg = context.getResources().getString(R.string.dlg_offline_call,
-                    AppSession.getActiveSession().getUser().getFullName());
+                    AppSession.getSession().getUser().getFullName());
             QBSendPushCommand.start(context, callMsg, friend.getId());
         }
         Intent intent = new Intent(context, CallActivity.class);

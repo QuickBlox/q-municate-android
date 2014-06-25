@@ -75,7 +75,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String attachUrl = Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getActiveSession().getUser().getId(), chatMessage.getBody(), attachUrl,
+        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getSession().getUser().getId(), chatMessage.getBody(), attachUrl,
                 time, true));
     }
 
@@ -157,7 +157,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         String attachUrl = file.getPublicUrl();
         long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
 
-        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getActiveSession().getUser().getId(), chatMessage.getBody(), attachUrl,
+        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getSession().getUser().getId(), chatMessage.getBody(), attachUrl,
                 time, true));
     }
 
@@ -223,7 +223,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         chatMessage.setProperty(propertySaveToHistory, valuePropertySaveToHistory);
         chatMessage.setProperty(propertyNotificationTypeCreating, valuePropertyNotificationTypeCreating);
         chat.sendMessage(chatMessage);
-        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getActiveSession().getUser().getId(), chatMessage.getBody(), attachUrl,
+        saveMessageToCache(new DialogMessageCache(roomJidId, AppSession.getSession().getUser().getId(), chatMessage.getBody(), attachUrl,
                 time, true));
     }
 
@@ -246,7 +246,6 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
-            AppSession.saveUserCredentials(user);
         }
     }
 
@@ -369,7 +368,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         roomChatManager.getRoom(roomJid).leave();
 
         List<Integer> userIdsList = new ArrayList<Integer>();
-        userIdsList.add(AppSession.getActiveSession().getUser().getId());
+        userIdsList.add(AppSession.getSession().getUser().getId());
         removeUsersFromRoom(roomJid, userIdsList);
 
         DatabaseManager.deleteDialogByRoomJid(context, roomJid);
@@ -447,7 +446,7 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
             long time = Long.parseLong(chatMessage.getProperty(propertyDateSent).toString());
             saveMessageToCache(new DialogMessageCache(roomJid, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, false));
-            if (!chatMessage.getSenderId().equals(AppSession.getActiveSession().getUser().getId())) {
+            if (!chatMessage.getSenderId().equals(AppSession.getSession().getUser().getId())) {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend, roomJid);
             }

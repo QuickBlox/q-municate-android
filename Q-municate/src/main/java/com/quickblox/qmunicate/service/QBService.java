@@ -9,10 +9,9 @@ import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
@@ -436,7 +435,7 @@ public class QBService extends Service {
                     command.execute(intent.getExtras());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
-                    if (Utils.isTokenDestroyedError(e) && AppSession.getActiveSession().isSessionExist()) {
+                    if (Utils.isTokenDestroyedError(e) && AppSession.getSession().isSessionExist()) {
                         refreshSession();
                     }
                 } catch (Exception e) {
@@ -447,8 +446,8 @@ public class QBService extends Service {
     }
 
     public void refreshSession() {
-        if (LoginType.EMAIL.equals(AppSession.getActiveSession().getLoginType())) {
-            QBLoginRestCommand.start(this, AppSession.getActiveSession().getUser());
+        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
+            QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
             QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);

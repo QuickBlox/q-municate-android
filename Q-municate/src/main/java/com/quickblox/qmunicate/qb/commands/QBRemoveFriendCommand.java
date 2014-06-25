@@ -36,7 +36,7 @@ public class QBRemoveFriendCommand extends ServiceCommand {
         Friend friend = (Friend) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
-        builder.eq(Consts.FRIEND_FIELD_USER_ID, AppSession.getActiveSession().getUser().getId());
+        builder.eq(Consts.FRIEND_FIELD_USER_ID, AppSession.getSession().getUser().getId());
         builder.eq(Consts.FRIEND_FIELD_FRIEND_ID, friend.getId());
 
         List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.EXTRA_FRIEND, builder);

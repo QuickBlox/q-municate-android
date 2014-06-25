@@ -199,7 +199,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSession.getActiveSession().getUser().getId()) {
+        if (friend.getId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
     }

@@ -70,7 +70,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     private String createChatName(ArrayList<Friend> friendList) {
-        String userFullname = AppSession.getActiveSession().getUser().getFullName();
+        String userFullname = AppSession.getSession().getUser().getFullName();
         String friendsFullnames = TextUtils.join(",", friendList);
         return userFullname + "," + friendsFullnames;
     }

@@ -50,8 +50,8 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         this.context = context;
         resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
-        currentUser = AppSession.getActiveSession().getUser();
-        currentLoginType = AppSession.getActiveSession().getLoginType();
+        currentUser = AppSession.getSession().getUser();
+        currentLoginType = AppSession.getSession().getLoginType();
         imageHelper = new ImageHelper((android.app.Activity) context);
     }
 

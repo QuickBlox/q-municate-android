@@ -95,7 +95,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private LoginType getCurrentLoginType() {
-        return AppSession.getActiveSession().getLoginType();
+        return AppSession.getSession().getLoginType();
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

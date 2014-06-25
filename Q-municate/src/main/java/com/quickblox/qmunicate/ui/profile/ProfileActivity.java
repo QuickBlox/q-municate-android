@@ -79,7 +79,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         useDoubleBackPressed = false;
-        user = AppSession.getActiveSession().getUser();
+        user = AppSession.getSession().getUser();
         imageHelper = new ImageHelper(this);
 
         initUI();
@@ -320,7 +320,7 @@ public class ProfileActivity extends BaseActivity implements ReceiveFileListener
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.getActiveSession().updateUser(user);
+            AppSession.getSession().updateUser(user);
             updateOldUserData();
             hideProgress();
         }

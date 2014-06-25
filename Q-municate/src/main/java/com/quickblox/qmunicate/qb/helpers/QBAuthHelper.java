@@ -63,7 +63,7 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     public void logout() throws QBResponseException {
-        AppSession activeSession = AppSession.getActiveSession();
+        AppSession activeSession = AppSession.getSession();
         if (activeSession != null) {
             activeSession.closeAndClear();
         }

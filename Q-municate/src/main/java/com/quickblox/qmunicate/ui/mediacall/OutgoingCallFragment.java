@@ -241,7 +241,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-        QBUser sender = AppSession.getActiveSession().getUser();
+        QBUser sender = AppSession.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
             if (!opponent.isOnline()) {

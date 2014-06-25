@@ -121,7 +121,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        QBUser user = AppSession.getActiveSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         if (user != null) {
             fullnameTextView.setText(user.getFullName());
         }

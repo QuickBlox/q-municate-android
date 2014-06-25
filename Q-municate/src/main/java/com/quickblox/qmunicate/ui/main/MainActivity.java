@@ -136,7 +136,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getActiveSession().getUser())) {
+            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getSession().getUser())) {
                 gsmHelper.registerInBackground();
                 return;
             }

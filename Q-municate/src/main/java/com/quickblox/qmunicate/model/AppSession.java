@@ -41,7 +41,7 @@ public class AppSession implements Serializable {
         saveUser(user, prefsHelper);
     }
 
-    public static AppSession getActiveSession() {
+    private static AppSession getActiveSession() {
         synchronized (lock) {
             return activeSession;
         }
@@ -85,5 +85,13 @@ public class AppSession implements Serializable {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
         helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
+    }
+
+    public static AppSession getSession() {
+        AppSession activeSession = AppSession.getActiveSession();
+        if (activeSession == null) {
+            activeSession = AppSession.load();
+        }
+        return activeSession;
     }
 }

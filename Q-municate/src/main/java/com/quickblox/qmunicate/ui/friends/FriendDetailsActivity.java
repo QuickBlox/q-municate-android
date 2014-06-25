@@ -151,7 +151,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSession.getActiveSession().getUser().getId()) {
+        if (friend.getId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }

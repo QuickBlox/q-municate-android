@@ -96,7 +96,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         int appVersion = Utils.getAppVersionCode(context);
         prefsHelper.savePref(PrefsHelper.PREF_REG_ID, registration.getString(PrefsHelper.PREF_REG_ID));
-        QBUser user = AppSession.getActiveSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         if (user != null) {
             prefsHelper.savePref(PrefsHelper.PREF_REG_USER_ID, user.getId());
         }
