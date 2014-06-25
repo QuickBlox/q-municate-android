@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.settings;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,23 +17,20 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.dialogs.ChangePasswordDialog;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
-import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
 
-
 public class SettingsFragment extends BaseFragment {
 
-    private Button profile;
-    private Switch pushNotification;
-    private Button changePassword;
-    private Button logout;
-    private ChangePasswordDialog changePasswordDialog;
+    private Button profileButton;
+    private Switch pushNotificationSwitch;
+    private Button changePasswordButton;
+    private Button logoutButton;
+    private TextView versionView;
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -43,20 +40,16 @@ public class SettingsFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        profile = (Button) rootView.findViewById(R.id.profile);
-        pushNotification = (Switch) rootView.findViewById(R.id.pushNotification);
-        changePassword = (Button) rootView.findViewById(R.id.changePassword);
-        logout = (Button) rootView.findViewById(R.id.logout);
+        initUI(rootView);
 
-        pushNotification.setChecked(getPushNotifications());
+        pushNotificationSwitch.setChecked(getPushNotifications());
         QBUser user = AppSessionHelper.getSession().getUser();
         if (user == null || null == user.getFacebookId()) {
-            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.VISIBLE);
+            rootView.findViewById(R.id.change_password_linearlyout).setVisibility(View.VISIBLE);
         } else {
-            rootView.findViewById(R.id.changePasswordLayout).setVisibility(View.GONE);
+            rootView.findViewById(R.id.change_password_linearlyout).setVisibility(View.GONE);
         }
 
-        TextView versionView = (TextView) rootView.findViewById(R.id.version);
         versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
 
         initListeners();
@@ -66,49 +59,56 @@ public class SettingsFragment extends BaseFragment {
         return rootView;
     }
 
+    private void initUI(View rootView) {
+        profileButton = (Button) rootView.findViewById(R.id.profile_button);
+        pushNotificationSwitch = (Switch) rootView.findViewById(R.id.push_notification_switch);
+        changePasswordButton = (Button) rootView.findViewById(R.id.change_password_button);
+        logoutButton = (Button) rootView.findViewById(R.id.logout_button);
+        versionView = (TextView) rootView.findViewById(R.id.version_textview);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         title = getString(R.string.nvd_title_settings);
-        changePasswordDialog = ChangePasswordDialog.newInstance();
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        addActions();
+    }
 
+    private void addActions() {
         baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION,
-                new ChangePasswordSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
-        baseActivity.addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
     }
 
     private void initListeners() {
-        profile.setOnClickListener(new View.OnClickListener() {
+        profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ProfileActivity.start(baseActivity);
             }
         });
 
-        pushNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        pushNotificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 savePushNotification(isChecked);
             }
         });
 
-        changePassword.setOnClickListener(new View.OnClickListener() {
+        changePasswordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changePassword();
+                startChangePasswordActivity();
             }
         });
 
-        logout.setOnClickListener(new View.OnClickListener() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 logout();
@@ -116,8 +116,8 @@ public class SettingsFragment extends BaseFragment {
         });
     }
 
-    private void changePassword() {
-        changePasswordDialog.show(getFragmentManager(), null);
+    private void startChangePasswordActivity() {
+        ChangePasswordActivity.start(baseActivity);
     }
 
     private void logout() {
@@ -146,15 +146,6 @@ public class SettingsFragment extends BaseFragment {
         public void execute(Bundle bundle) {
             LoginActivity.start(baseActivity);
             baseActivity.finish();
-        }
-    }
-
-    private class ChangePasswordSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
-            DialogUtils.showLong(baseActivity, getString(R.string.dlg_password_changed));
         }
     }
 }

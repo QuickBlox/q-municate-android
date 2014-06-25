@@ -10,14 +10,10 @@ import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
 import com.facebook.RequestAsyncTask;
-import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
-import com.facebook.model.GraphUser;
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.model.FacebookUser;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -128,23 +124,5 @@ public class FacebookHelper {
             }
         }
         return true;
-    }
-
-    public static QBUser getUser(Session session) {
-        final QBUser user = new QBUser();
-
-        Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
-
-            @Override
-            public void onCompleted(GraphUser graphUser, Response response) {
-                if (graphUser != null) {
-                    user.setId(Integer.parseInt(graphUser.getId()));
-                    user.setFullName(graphUser.getName());
-                    user.setLogin(graphUser.getUsername());
-                }
-            }
-        });
-
-        return user;
     }
 }

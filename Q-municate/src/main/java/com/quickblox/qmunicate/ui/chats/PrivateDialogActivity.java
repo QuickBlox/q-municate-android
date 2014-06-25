@@ -113,7 +113,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onFileLoaded(QBFile file) {
         QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, file);
-        scrollListView();
     }
 
     private void startUpdateChatDialog() {

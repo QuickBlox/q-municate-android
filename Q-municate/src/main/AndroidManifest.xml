@@ -64,7 +64,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.friend.FriendDetailsActivity"
+            android:name=".ui.friends.FriendDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/frd_title"
             android:parentActivityName=".ui.main.MainActivity"
@@ -113,6 +113,18 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/fdb_feedback_details_title"
             android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.settings.ChangePasswordActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/cpw_change_password_title"
+            android:parentActivityName=".ui.main.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.forgotpassword.ForgotPasswordActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/fpw_forgot_password_title"
+            android:parentActivityName=".ui.login.LoginActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

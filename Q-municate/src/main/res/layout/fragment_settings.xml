@@ -7,7 +7,7 @@
     android:paddingRight="20dp">
 
     <Button
-        android:id="@+id/profile"
+        android:id="@+id/profile_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
@@ -20,7 +20,7 @@
     <include layout="@layout/view_separator_gray" />
 
     <Switch
-        android:id="@+id/pushNotification"
+        android:id="@+id/push_notification_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="14dp"
@@ -29,7 +29,7 @@
         android:textSize="@dimen/text_size" />
 
     <LinearLayout
-        android:id="@+id/changePasswordLayout"
+        android:id="@+id/change_password_linearlyout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -37,7 +37,7 @@
         <include layout="@layout/view_separator_gray" />
 
         <Button
-            android:id="@+id/changePassword"
+            android:id="@+id/change_password_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_general_selector"
@@ -51,7 +51,7 @@
     <include layout="@layout/view_separator_gray" />
 
     <Button
-        android:id="@+id/logout"
+        android:id="@+id/logout_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_general_selector"
@@ -69,7 +69,7 @@
         <include layout="@layout/view_separator_gray" />
 
         <TextView
-            android:id="@+id/version"
+            android:id="@+id/version_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"

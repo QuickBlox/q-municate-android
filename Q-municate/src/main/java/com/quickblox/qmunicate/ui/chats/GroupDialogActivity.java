@@ -203,6 +203,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onResume();
         addActions();
         updateChatData();
+        scrollListView();
     }
 
     private void startLoadDialogMessages() {

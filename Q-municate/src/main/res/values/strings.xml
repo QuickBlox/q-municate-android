@@ -46,6 +46,13 @@
     <string name="lgn_remember_me">Remember Me</string>
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
 
+    // Forgot Password
+    <string name="fpw_forgot_password_title">Forgot Password</string>
+    <string name="fpw_email">Email</string>
+    <string name="fpw_reset_password">Reset Password</string>
+    <string name="fpw_not_email_field_entered">Please enter email</string>
+    <string name="fpw_email_was_sent">Mail was sent to %1$s</string>
+
     // Sing Up
     <string name="sup_fullname_hint">Full Name</string>
     <string name="sup_email_hint">Email</string>
@@ -102,6 +109,14 @@
     <string name="stn_push_notifivation">Push Notification</string>
     <string name="stn_version">Version %1$s</string>
 
+    // Change Password
+    <string name="cpw_change_password_title">Change Password</string>
+    <string name="cpw_change">Change</string>
+    <string name="cpw_old_password">Old Password</string>
+    <string name="cpw_new_password">New Password</string>
+    <string name="cpw_not_old_password_field_entered">Please enter old password</string>
+    <string name="cpw_not_new_password_field_entered">Please enter new password</string>
+
     // Profile
     <string name="prf_full_name">Full Name</string>
     <string name="prf_change">Change</string>
@@ -152,9 +167,8 @@
     <string name="dlg_not_fullname_field_entered">Please enter fullname</string>
     <string name="dlg_not_email_field_entered">Please enter email</string>
     <string name="dlg_not_password_field_entered">Please enter password</string>
-    <string name="dlg_check_email">Mail was sent to %1$s</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
-    <string name="dlg_old_password_wrong">Wrong current password</string>
+    <string name="dlg_old_password_wrong">Wrong old password</string>
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
@@ -181,12 +195,6 @@
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
-
-    // Change Password Dialog
-    <string name="cpd_title">Change Password</string>
-    <string name="cpd_old_password">Old Password</string>
-    <string name="cpd_new_password">New Password</string>
-    <string name="cpd_confirm_password">Confirm Password</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
