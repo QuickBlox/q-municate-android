@@ -47,10 +47,8 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
             newUser.setPassword(user.getPassword());
             newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
             extras.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
-            AppSession.startSession(LoginType.FACEBOOK, newUser);
         } else {
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
-            AppSession.startSession(LoginType.FACEBOOK, user);
         }
         return extras;
     }

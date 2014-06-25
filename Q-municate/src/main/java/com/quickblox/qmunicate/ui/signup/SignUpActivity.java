@@ -163,7 +163,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.startSession(LoginType.EMAIL, user);
+            AppSession.getSession().updateUser(user);
             MainActivity.start(SignUpActivity.this);
             finish();
         }

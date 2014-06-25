@@ -238,12 +238,18 @@ public class QBChatHelper extends BaseHelper implements QBPrivateChatManagerList
         return file;
     }
 
-    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
+        if(chatService != null) {
+            logout();
+            destroy();
+        }
+
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
         }
-        if (!chatService.isLoggedIn() && user != null) {
+
+        if (user != null) {
             chatService.login(user);
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
         }

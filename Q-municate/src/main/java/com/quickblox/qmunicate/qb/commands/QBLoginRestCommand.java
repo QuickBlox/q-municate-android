@@ -33,7 +33,6 @@ public class QBLoginRestCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         user = authHelper.login(user);
         extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
-        AppSession.startSession(LoginType.EMAIL, user);
         return extras;
     }
 }
