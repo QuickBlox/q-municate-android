@@ -9,10 +9,10 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.utils.EmailUtils;
 
-public class FeedbackDetailsActivity extends BaseActivity {
+public class FeedbackDetailsActivity extends BaseLogeableActivity {
 
     public static final String FEEDBACK_TYPE = "feedback_type";
 
@@ -29,6 +29,7 @@ public class FeedbackDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback_details);
+        canPerformLogout.set(false);
         feedbackType = getIntent().getExtras().getString(FEEDBACK_TYPE);
         initUI();
     }

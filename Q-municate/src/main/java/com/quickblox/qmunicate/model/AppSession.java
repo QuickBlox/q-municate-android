@@ -12,7 +12,7 @@ public class AppSession implements Serializable {
     private static AppSession activeSession;
     private final LoginType loginType;
     private static final Object lock = new Object();
-    private static QBUser user;
+    private QBUser user;
 
     private AppSession(LoginType loginType, QBUser user) {
         this.loginType = loginType;
