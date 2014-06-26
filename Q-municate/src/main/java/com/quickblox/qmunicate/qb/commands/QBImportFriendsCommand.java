@@ -12,18 +12,18 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QBAddFriendsCommand extends ServiceCommand {
+public class QBImportFriendsCommand extends ServiceCommand {
 
     private QBFriendListHelper friendListHelper;
 
-    public QBAddFriendsCommand(Context context, QBFriendListHelper friendListHelper, String successAction,
-            String failAction) {
+    public QBImportFriendsCommand(Context context, QBFriendListHelper friendListHelper, String successAction,
+                                  String failAction) {
         super(context, successAction, failAction);
         this.friendListHelper = friendListHelper;
     }
 
     public static void start(Context context, List<Integer> userIdsArray) {
-        Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.IMPORT_FRIENDS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) userIdsArray);
         context.startService(intent);
     }

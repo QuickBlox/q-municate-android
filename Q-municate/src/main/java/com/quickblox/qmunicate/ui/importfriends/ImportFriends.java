@@ -15,11 +15,11 @@ import com.quickblox.qmunicate.core.ui.LoaderManager;
 import com.quickblox.qmunicate.core.ui.LoaderResult;
 import com.quickblox.qmunicate.core.ui.OnLoadFinishedListener;
 import com.quickblox.qmunicate.model.InviteFriend;
-import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
+import com.quickblox.qmunicate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.qmunicate.ui.base.QMLoaderHelper;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.EmailUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
-import com.quickblox.qmunicate.utils.InviteFriendUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,6 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     public Activity activity;
     private LoaderHelper<List<QBUser>> loaderHelper;
     private FacebookHelper facebookHelper;
-    private InviteFriendUtils inviteFriendUtils;
     private List<QBUser> users;
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
@@ -45,7 +44,6 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         this.facebookHelper = facebookHelper;
         this.facebookHelper.loginWithFacebook();
 
-        inviteFriendUtils = new InviteFriendUtils(activity);
         users = new ArrayList<QBUser>();
     }
 
@@ -76,7 +74,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
     public void fiendsReceived() {
         realFriendsCallbacks++;
         if (realFriendsCallbacks == expectedFriendsCallbacks) {
-            QBAddFriendsCommand.start(activity, getSelectedUsersList());
+            QBImportFriendsCommand.start(activity, getSelectedUsersList());
         }
     }
 
@@ -161,7 +159,7 @@ public class ImportFriends implements OnLoadFinishedListener<List<QBUser>>, Load
         @Override
         protected Void doInBackground(Void... params) {
             expectedFriendsCallbacks++;
-            friendsContactsList = inviteFriendUtils.getContactsWithEmail();
+            friendsContactsList = EmailUtils.getContactsWithEmail(activity);
             startUserListLoader(false, friendsContactsList);
             return null;
         }

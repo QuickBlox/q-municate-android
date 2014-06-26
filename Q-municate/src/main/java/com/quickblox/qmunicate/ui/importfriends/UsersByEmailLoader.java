@@ -9,10 +9,10 @@ import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.ui.BaseLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UsersByEmailLoader extends BaseLoader<List<QBUser>> {
+
     public static final int ID = 5;
     private static List<String> idsList;
 

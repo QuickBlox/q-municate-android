@@ -4,7 +4,7 @@ public class QBServiceConsts {
 
     public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
-    public static final String ADD_FRIENDS_ACTION = "add_friendsList_action";
+    public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";
     public static final String GET_FILE_ACTION = "get_file_action";
     public static final String LOGIN_ACTION = "login_action";
@@ -42,9 +42,9 @@ public class QBServiceConsts {
     public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
-    public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
     public static final String ADD_FRIEND_FAIL_ACTION = "add_friend_fail_action";
-    public static final String ADD_FRIENDS_FAIL_ACTION = "add_friendsList_fail_action";
+    public static final String IMPORT_FRIENDS_SUCCESS_ACTION = "import_friends_success_action";
+    public static final String IMPORT_FRIENDS_FAIL_ACTION = "import_friends_fail_action";
     public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change_password_success_action";
     public static final String CHANGE_PASSWORD_FAIL_ACTION = "change_password_fail_action";
     public static final String GET_FILE_SUCCESS_ACTION = "get_file_success_action";
