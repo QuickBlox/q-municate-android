@@ -10,10 +10,10 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     private String createChatName(ArrayList<Friend> friendList) {
-        String userFullname = AppSessionHelper.getSession().getUser().getFullName();
+        String userFullname = AppSession.getSession().getUser().getFullName();
         String friendsFullnames = TextUtils.join(",", friendList);
         return userFullname + "," + friendsFullnames;
     }

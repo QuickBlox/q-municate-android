@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.friends;
 
 import android.text.TextUtils;
 import android.view.View;

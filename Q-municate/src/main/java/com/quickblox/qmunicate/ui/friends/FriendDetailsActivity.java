@@ -1,6 +1,5 @@
-package com.quickblox.qmunicate.ui.friend;
+package com.quickblox.qmunicate.ui.friends;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,9 +13,9 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -25,7 +24,6 @@ import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
@@ -51,6 +49,7 @@ public class FriendDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
+        canPerformLogout.set(true);
         friend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_FRIEND);
         initUI();
         initUIWithFriendsData();
@@ -153,7 +152,7 @@ public class FriendDetailsActivity extends BaseActivity {
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSessionHelper.getSession().getUser().getId()) {
+        if (friend.getId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }

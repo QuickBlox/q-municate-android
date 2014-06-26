@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.friends;
 
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -27,7 +27,6 @@ import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.friend.FriendDetailsActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;

@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.main;
+package com.quickblox.qmunicate.ui.friends;
 
 import android.content.Context;
 import android.database.Cursor;

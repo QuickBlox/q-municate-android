@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.signup;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -48,6 +49,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     private Bitmap avatarBitmapCurrent;
     private QBUser qbUser;
     private ValidationUtils validationUtils;
+    private Resources resources;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SignUpActivity.class);
@@ -58,6 +60,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        resources = getResources();
 
         initUI();
 
@@ -143,7 +146,9 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         passwordEditText = _findViewById(R.id.password_edittext);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
-        validationUtils = new ValidationUtils(SignUpActivity.this, fullnameEditText, emailEditText, passwordEditText);
+        validationUtils = new ValidationUtils(SignUpActivity.this, new EditText[]{fullnameEditText, emailEditText, passwordEditText},
+                new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources.getString(R.string.dlg_not_email_field_entered),
+                        resources.getString(R.string.dlg_not_password_field_entered)});
     }
 
     private void addActions() {
@@ -158,7 +163,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.startSession(LoginType.EMAIL, user);
+            AppSession.getSession().updateUser(user);
             MainActivity.start(SignUpActivity.this);
             finish();
         }
@@ -180,6 +185,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         public void execute(Bundle bundle) {
             File image = (File) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            AppSession.saveUserCredentials(user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
             QBUpdateUserCommand.start(SignUpActivity.this, user, image, null);
         }

@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/header_feedback_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="@string/fdb_feedback_type_header"
+        android:textColor="@color/dark_gray"
+        android:textSize="@dimen/text_size" />
+
+    <RadioGroup
+        android:id="@+id/feedback_types_radiogroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:divider="?android:attr/dividerHorizontal"
+        android:padding="10dp"
+        android:showDividers="middle|beginning|end">
+
+        <RadioButton
+            android:id="@+id/bug_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:padding="10dp"
+            android:text="@string/fdb_bug_type"
+            android:textSize="@dimen/text_size" />
+
+        <RadioButton
+            android:id="@+id/improvement_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/fdb_improvement_type"
+            android:textSize="@dimen/text_size" />
+
+        <RadioButton
+            android:id="@+id/suggestion_radiobutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/fdb_suggestion_type"
+            android:textSize="@dimen/text_size" />
+
+    </RadioGroup>
+
+</LinearLayout>

@@ -13,13 +13,16 @@ import com.facebook.SessionState;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
+import com.quickblox.qmunicate.ui.feedback.FeedbackFragment;
+import com.quickblox.qmunicate.ui.friends.FriendsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
+import com.quickblox.qmunicate.ui.settings.SettingsFragment;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
@@ -29,6 +32,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
+    public static final int ID_FEEDBACK_FRAGMENT = 4;
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
@@ -83,6 +88,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
+            case ID_FEEDBACK_FRAGMENT:
+                fragment = FeedbackFragment.newInstance();
+                break;
         }
         setCurrentFragment(fragment);
     }
@@ -128,7 +136,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser(AppSessionHelper.getSession().getUser())) {
+            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getSession().getUser())) {
                 gsmHelper.registerInBackground();
                 return;
             }

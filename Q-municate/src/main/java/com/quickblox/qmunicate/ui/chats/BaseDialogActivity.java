@@ -19,7 +19,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -58,7 +58,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
-    protected boolean isNewMessage;
+    protected boolean isNeedToScrollMessages;
 
     public BaseDialogActivity(int layoutResID) {
         this.layoutResID = layoutResID;
@@ -78,6 +78,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initSmiles();
 
         addActions();
+
+        isNeedToScrollMessages = true;
     }
 
     @Override
@@ -126,7 +128,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
         if (resultCode == RESULT_OK) {
-            isNewMessage = true;
+            isNeedToScrollMessages = true;
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -217,8 +219,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-        if (isNewMessage) {
-            isNewMessage = false;
+        if (isNeedToScrollMessages) {
+            isNeedToScrollMessages = false;
             messagesListView.setSelection(messagesAdapter.getCount() - 1);
         }
     }

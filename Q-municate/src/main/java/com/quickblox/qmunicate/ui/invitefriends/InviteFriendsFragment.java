@@ -321,7 +321,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void sendInviteToContacts() {
-        inviteFriendUtils.sendEmail(selectedContactsFriendsArray);
+        EmailUtils.sendInviteEmail(baseActivity, selectedContactsFriendsArray);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

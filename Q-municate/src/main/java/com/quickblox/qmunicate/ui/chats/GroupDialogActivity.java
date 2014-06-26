@@ -65,6 +65,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
 
         initListView();
+        startLoadDialogMessages();
 
         registerForContextMenu(messagesListView);
     }
@@ -132,7 +133,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void updateChatData() {
         dialog = DatabaseManager.getDialogByRoomJidId(this, chatJidId);
         groupName = dialog.getName();
-        startLoadDialogMessages();
 
         updateActionBar();
     }
@@ -203,6 +203,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onResume();
         addActions();
         updateChatData();
+        scrollListView();
     }
 
     private void startLoadDialogMessages() {

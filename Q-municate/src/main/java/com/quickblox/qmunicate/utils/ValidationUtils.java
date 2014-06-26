@@ -4,32 +4,21 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.widget.EditText;
 
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 public class ValidationUtils extends SimpleTextWatcher {
 
     private Context context;
-    private EditText fullnameEditText;
-    private EditText emailEditText;
-    private EditText passwordEditText;
     private EditText[] fieldsArray;
+    private String[] fieldsErrorArray;
 
-    public ValidationUtils(Context context, EditText emailEditText, EditText passwordEditText) {
+    public ValidationUtils(Context context, EditText[] fieldsArray, String[] fieldsErrorArray) {
         this.context = context;
-        this.emailEditText = emailEditText;
-        this.passwordEditText = passwordEditText;
-        fieldsArray = new EditText[]{emailEditText, passwordEditText};
-        initListeners();
-    }
-
-    public ValidationUtils(Context context, EditText fullnameEditText, EditText emailEditText,
-                           EditText passwordEditText) {
-        this.context = context;
-        this.fullnameEditText = fullnameEditText;
-        this.emailEditText = emailEditText;
-        this.passwordEditText = passwordEditText;
-        fieldsArray = new EditText[]{fullnameEditText, emailEditText, passwordEditText};
+        this.fieldsArray = fieldsArray;
+        this.fieldsErrorArray = fieldsErrorArray;
         initListeners();
     }
 
@@ -55,7 +44,7 @@ public class ValidationUtils extends SimpleTextWatcher {
         } else if (!isFullNameEntered && !isEmailEntered && !isPasswordEntered) {
             setError(context.getString(R.string.dlg_not_all_fields_entered));
         } else {
-            setErrors(isFullNameEntered, isEmailEntered, isPasswordEntered);
+            setErrors(new boolean[]{isFullNameEntered, isEmailEntered, isPasswordEntered});
         }
 
         return false;
@@ -70,7 +59,40 @@ public class ValidationUtils extends SimpleTextWatcher {
         } else if (!isEmailEntered && !isPasswordEntered) {
             setError(context.getString(R.string.dlg_not_all_fields_entered));
         } else {
-            setErrors(isEmailEntered, isPasswordEntered);
+            setErrors(new boolean[]{isEmailEntered, isPasswordEntered});
+        }
+
+        return false;
+    }
+
+    public boolean isValidChangePasswordData(String oldPasswordText, String newPasswordText) {
+        QBUser user = AppSession.getSession().getUser();
+
+        boolean isOldPasswordEntered = !TextUtils.isEmpty(oldPasswordText);
+        boolean isNewPasswordEntered = !TextUtils.isEmpty(newPasswordText);
+
+        if (isOldPasswordEntered && isNewPasswordEntered) {
+            if (!user.getPassword().equals(oldPasswordText)) {
+                setError(0, context.getString(R.string.dlg_old_password_wrong));
+            } else {
+                return true;
+            }
+        } else if (!isOldPasswordEntered && !isNewPasswordEntered) {
+            setError(context.getString(R.string.dlg_not_all_fields_entered));
+        } else {
+            setErrors(new boolean[]{isOldPasswordEntered, isNewPasswordEntered});
+        }
+
+        return false;
+    }
+
+    public boolean isValidForgotPasswordData(String emailText) {
+        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+
+        if (isEmailEntered) {
+            return true;
+        } else {
+            setErrors(new boolean[]{isEmailEntered});
         }
 
         return false;
@@ -82,13 +104,13 @@ public class ValidationUtils extends SimpleTextWatcher {
         }
     }
 
-    private void setErrors(boolean isFullNameEntered, boolean isEmailEntered, boolean isPasswordEntered) {
-        fullnameEditText.setError(isFullNameEntered ? null : context.getString(R.string.dlg_not_fullname_field_entered));
-        setErrors(isEmailEntered, isPasswordEntered);
+    private void setError(int index, String error) {
+        fieldsArray[index].setError(error);
     }
 
-    private void setErrors(boolean isEmailEntered, boolean isPasswordEntered) {
-        emailEditText.setError(isEmailEntered ? null : context.getString(R.string.dlg_not_email_field_entered));
-        passwordEditText.setError(isPasswordEntered ? null : context.getString(R.string.dlg_not_password_field_entered));
+    private void setErrors(boolean[] isFieldsEnteredArray) {
+        for (int i = 0; i < fieldsArray.length; i++) {
+            fieldsArray[i].setError(isFieldsEnteredArray[i] ? null : fieldsErrorArray[i]);
+        }
     }
 }
