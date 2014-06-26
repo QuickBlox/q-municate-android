@@ -21,8 +21,8 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -62,7 +62,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
-    protected boolean isNewMessage;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
 
@@ -127,7 +126,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void addActions() {
-        addAction(QBServiceConsts.SEND_MESSAGE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -239,8 +237,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onReceiveMessage(Bundle extras) {
-        String jidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
-        boolean isFromCurrentChat = jidId != null && jidId.equals(dialogId);
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
         if (!isFromCurrentChat) {
             super.onReceiveMessage(extras);
         }

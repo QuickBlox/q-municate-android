@@ -131,7 +131,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, Friend friend, String jidID) {
+    protected void notifyMessageReceived(QBChatMessage chatMessage, Friend friend, String dialogId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
@@ -144,7 +144,7 @@ public abstract class BaseChatHelper extends BaseHelper {
 
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
         intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullname);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, jidID);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }

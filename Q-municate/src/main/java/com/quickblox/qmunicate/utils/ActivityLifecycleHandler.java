@@ -27,7 +27,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
         if (numberOfActivitiesInForeground == 0 && chatDestroyed) {
-            boolean canLogin = chatDestroyed && AppSessionHelper.getSession().isSessionExist();
+            boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
                 QBLoginAndJoinDialogsCommand.start(activity);
             }

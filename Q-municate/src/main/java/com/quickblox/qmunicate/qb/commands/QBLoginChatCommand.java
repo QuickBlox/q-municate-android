@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.errors.QBChatErrors;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.AppSession;
@@ -24,14 +23,11 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     private static final String TAG = QBLoginChatCommand.class.getSimpleName();
 
-    private QBAuthHelper authHelper;
     private QBChatRestHelper chatRestHelper;
-    private boolean shouldStartMultiChat;
 
     public QBLoginChatCommand(Context context, QBAuthHelper authHelper, QBChatRestHelper chatRestHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.authHelper = authHelper;
         this.chatRestHelper = chatRestHelper;
     }
 
@@ -56,7 +52,7 @@ public class QBLoginChatCommand extends ServiceCommand {
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < Consts.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
-                chatHelper.login(AppSession.getSession().getUser());
+                chatRestHelper.login(AppSession.getSession().getUser());
             } catch (SmackException ignore) { /* NOP */ }
         }
     }

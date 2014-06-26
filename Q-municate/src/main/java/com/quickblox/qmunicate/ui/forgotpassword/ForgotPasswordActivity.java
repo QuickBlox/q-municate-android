@@ -33,7 +33,6 @@ public class ForgotPasswordActivity extends BaseActivity {
         setContentView(R.layout.activity_forgot_password);
 
         resources = getResources();
-        canPerformLogout.set(false);
 
         initUI();
 
@@ -79,7 +78,8 @@ public class ForgotPasswordActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             hideProgress();
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
-            DialogUtils.showLong(ForgotPasswordActivity.this, getString(R.string.fpw_email_was_sent, emailText));
+            DialogUtils.showLong(ForgotPasswordActivity.this, getString(R.string.fpw_email_was_sent,
+                    emailText));
         }
     }
 
