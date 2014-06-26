@@ -62,14 +62,13 @@ public class QBChatRestHelper extends BaseHelper {
     public List<QBHistoryMessage> getDialogMessages(QBDialog dialog,
             long lastDateLoad) throws QBResponseException {
         Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-        customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
-        if (lastDateLoad != Consts.ZERO_LONG_VALUE) {
+        /*QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);*/
+       /* if (lastDateLoad != Consts.ZERO_LONG_VALUE) {
             customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
-        }
-        List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
-                customObjectRequestBuilder, bundle);
+        }*/
+        List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, null, bundle);
         return dialogMessagesList;
     }
 }

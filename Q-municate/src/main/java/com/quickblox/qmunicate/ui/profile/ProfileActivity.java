@@ -26,7 +26,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
@@ -43,7 +43,7 @@ import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class ProfileActivity extends BaseActivity implements ReceiveFileListener, View.OnClickListener {
+public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileListener, View.OnClickListener {
 
     private LinearLayout changeAvatarLinearLayout;
     private RelativeLayout changeFullNameRelativeLayout;

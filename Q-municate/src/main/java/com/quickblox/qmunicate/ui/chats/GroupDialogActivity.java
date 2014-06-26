@@ -14,17 +14,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
-import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
+import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
@@ -37,11 +39,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private static final String EXTRA_FRIENDS = "extra_friends";
     private static final String EXTRA_ROOM_JID = "extra_room_jid";
 
-    private QBDialog dialog;
     private String groupName;
 
     public GroupDialogActivity() {
-        super(R.layout.activity_dialog);
+        super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
     }
 
     public static void start(Context context, ArrayList<Friend> friends) {
@@ -50,9 +51,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         context.startActivity(intent);
     }
 
-    public static void start(Context context, String roomJid) {
+    public static void start(Context context, QBDialog qbDialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(EXTRA_ROOM_JID, roomJid);
+        intent.putExtra(EXTRA_ROOM_JID, qbDialog.getDialogId());
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         context.startActivity(intent);
     }
 
@@ -64,13 +66,13 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             dialogId = getIntent().getStringExtra(EXTRA_ROOM_JID);
         }
 
+        dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         initListView();
 
         registerForContextMenu(messagesListView);
     }
 
     protected void addActions() {
-        addAction(QBServiceConsts.LOGIN_CHAT_ACTION, new CreateChatSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, new LoadAttachFileSuccessAction());
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
@@ -90,8 +92,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     protected void removeActions() {
-        removeAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
     }
@@ -109,7 +109,18 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, dialogId, null, file);
+        try {
+            ((QBMultiChatHelper) chatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+        } catch (QBResponseException e) {
+            ErrorUtils.showError(this, e);
+        }
+        //TODO make in command if will be low perfomance
+        //QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, dialogId, null, file);
+    }
+
+    @Override
+    protected Bundle generateBundleToInitDialog() {
+        return null;
     }
 
     private void startUpdateChatDialog() {
@@ -159,7 +170,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendGroupDialogMessageCommand.start(this, dialogId, messageEditText.getText().toString(), null);
+        try {
+            ((QBMultiChatHelper) chatHelper).sendGroupMessage(dialog.getRoomJid(),
+                    messageEditText.getText().toString());
+        } catch (QBResponseException e) {
+            ErrorUtils.showError(this, e);
+        }
+        //QBSendGroupDialogMessageCommand.start(this, dialog.getRoomJid(), messageEditText.getText().toString(),
+        //      null); TODO make async if will be low perfomance
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
@@ -209,17 +227,5 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         //            startLoadDialogMessages(dialog, dialogId, dialog.getLastMessageDateSent());
         //        }
         //---
-    }
-
-    private class CreateChatSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            groupName = dialog.getName();
-            dialogId = dialog.getRoomJid();
-            initListView();
-            hideProgress();
-        }
     }
 }

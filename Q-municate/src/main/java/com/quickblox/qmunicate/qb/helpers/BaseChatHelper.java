@@ -2,10 +2,12 @@ package com.quickblox.qmunicate.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPrivateChat;
@@ -31,10 +33,10 @@ import org.jivesoftware.smack.XMPPException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class BaseChatHelper extends BaseHelper {
+public abstract class BaseChatHelper extends BaseHelper {
 
     protected QBChatService chatService;
-    protected QBUser user;
+    protected QBUser chatCreator;
     protected static String PROPERTY_DATE_SENT = "date_sent";
     protected static String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
     protected static String VALUE_SAVE_TO_HISTORY = "1";
@@ -57,12 +59,19 @@ public class BaseChatHelper extends BaseHelper {
         DatabaseManager.saveChatMessage(context, dialogMessageCache);
     }
 
-    public void init() {
-        chatService = QBChatService.getInstance();
+    /*
+    Call this method when you want start chating by existing dialog
+     */
+    public abstract QBChat createChatLocally(QBDialog dialogId, Bundle additional);
+
+    public abstract void closeChat(QBDialog dialogId, Bundle additional);
+
+    public void init(QBChatService chatService, QBUser chatCreator) {
+        this.chatService = chatService;
         privateChatManager = chatService.getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
+        this.chatCreator = chatCreator;
     }
-
 
     protected void addNotificationChatListener(QBNotificationChatListener notificationChatListener) {
         notificationChatListeners.add(notificationChatListener);
@@ -101,14 +110,13 @@ public class BaseChatHelper extends BaseHelper {
     }
 
     protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
-            int dialogId) throws QBResponseException {
+            String dialogId) throws QBResponseException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
             throw new QBResponseException("Private chat was not created!");
         }
-        if (dialogId != Consts.NOT_INITIALIZED_VALUE) {
-            chatMessage.setProperty(com.quickblox.internal.module.chat.Consts.DIALOG_ID, String.valueOf(
-                    dialogId));
+        if (!TextUtils.isEmpty(dialogId)) {
+            chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
         }
         String error = null;
         try {

@@ -24,6 +24,8 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
+import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
+import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
@@ -61,8 +63,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
     protected boolean isNewMessage;
+    protected QBDialog dialog;
 
-    public BaseDialogActivity(int layoutResID) {
+    protected BaseChatHelper chatHelper;
+
+    private int chatHelperIdentifier;
+
+    public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
+        this.chatHelperIdentifier = chatHelperIdentifier;
         this.layoutResID = layoutResID;
     }
 
@@ -73,7 +81,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(layoutResID);
 
         imageHelper = new ImageHelper(this);
-
         initUI();
         initListeners();
         initSmileWidgets();
@@ -142,6 +149,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(smileSelectedBroadcastReceiver);
+        if (chatHelper != null) {
+            chatHelper.closeChat(dialog, generateBundleToInitDialog());
+        }
         removeActions();
     }
 
@@ -166,6 +176,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
         }
     }
+
+    @Override
+    protected void onConnectedToService(QBService service) {
+        if (chatHelper == null) {
+            chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
+            chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+        }
+    }
+
+    protected abstract Bundle generateBundleToInitDialog();
 
     private void initUI() {
         smilesLayout = findViewById(R.id.smiles_linearlayout);

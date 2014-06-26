@@ -22,7 +22,7 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.PrivateDialogActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
@@ -34,7 +34,7 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.List;
 
-public class FriendDetailsActivity extends BaseActivity {
+public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private RoundedImageView avatarImageView;
     private TextView nameTextView;

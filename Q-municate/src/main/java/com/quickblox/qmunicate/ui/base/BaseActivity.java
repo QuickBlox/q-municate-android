@@ -31,11 +31,10 @@ import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public abstract class BaseActivity extends Activity implements QBLogeable {
+public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
@@ -48,7 +47,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
-    protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
     private View newMessageView;
     private TextView newMessageTextView;
@@ -95,11 +93,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         Crouton.show(this, newMessageView);
     }
 
-    //This method is used for logout action when Actvity is going to background
-    @Override
-    public boolean isCanPerformLogoutInOnStop() {
-        return canPerformLogout.get();
-    }
 
     public void updateBroadcastActionList() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
@@ -117,9 +110,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
-        if (savedInstanceState != null && savedInstanceState.containsKey(CAN_PERFORM_LOGOUT)) {
-            canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
-        }
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
         messageBroadcastReceiver = new MessageBroadcastReceiver();
@@ -137,12 +127,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected void onResume() {
         super.onResume();
         updateBroadcastActionList();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
-        super.onSaveInstanceState(outState);
     }
 
     @Override

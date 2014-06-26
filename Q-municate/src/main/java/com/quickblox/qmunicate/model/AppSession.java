@@ -28,6 +28,7 @@ public class AppSession implements Serializable {
         PrefsHelper helper = App.getInstance().getPrefsHelper();
         helper.delete(PrefsHelper.PREF_USER_EMAIL);
         helper.delete(PrefsHelper.PREF_LOGIN_TYPE);
+        helper.delete(PrefsHelper.PREF_USER_ID);
         activeSession = null;
     }
 

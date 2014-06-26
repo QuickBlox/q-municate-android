@@ -139,7 +139,7 @@ public class DatabaseManager {
 
     public static void saveDialog(Context context, QBDialog dialog) {
         ContentValues values;
-        String condition = DialogTable.Cols.DIALOG_ID + "='" + dialog.getId() + "'";
+        String condition = DialogTable.Cols.DIALOG_ID + "='" + dialog.getDialogId() + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
@@ -270,7 +270,7 @@ public class DatabaseManager {
 
     public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {
         ContentValues values = new ContentValues();
-        values.put(DialogMessageTable.Cols.DIALOG_ID, dialogMessageCache.getRoomJidId());
+        values.put(DialogMessageTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
         values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
         values.put(DialogMessageTable.Cols.BODY, dialogMessageCache.getMessage());
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
@@ -278,13 +278,13 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
-        if (!isDialogById(context, dialogMessageCache.getRoomJidId())) {
-            createPrivateDialogIfNotExistByRoomJidId(context, dialogMessageCache.getRoomJidId(),
+        /*if (!isExistDialogById(context, dialogMessageCache.getDialogId())) {
+            createPrivateDialogIfNotExistByRoomJidId(context, dialogMessageCache.getDialogId(),
                     dialogMessageCache.getMessage(), dialogMessageCache.getTime(),
                     dialogMessageCache.getSenderId());
-        }
+        }*/
 
-        updateDialog(context, dialogMessageCache.getRoomJidId(), dialogMessageCache.getMessage(),
+        updateDialog(context, dialogMessageCache.getDialogId(), dialogMessageCache.getMessage(),
                 dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
     }
 
@@ -292,7 +292,7 @@ public class DatabaseManager {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
         values.put(DialogTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
-        values.put(DialogTable.Cols.ROOM_JID_ID, dialogMessageCache.getRoomJidId());
+        values.put(DialogTable.Cols.ROOM_JID_ID, dialogMessageCache.getDialogId());
         Uri uri = resolver.insert(DialogTable.CONTENT_URI, values);
         return uri != null;
     }
@@ -333,7 +333,7 @@ public class DatabaseManager {
         DatabaseManager.saveChatMessages(context, dialogMessagesList, dialogId);
     }
 
-    public static boolean isDialogById(Context context, String dialogId) {
+    public static boolean isExistDialogById(Context context, String dialogId) {
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
 

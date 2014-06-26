@@ -53,7 +53,6 @@ public class LoginActivity extends BaseActivity {
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
             startedLoginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
-        canPerformLogout.set(false);
         initUI();
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, true);
         rememberMeCheckBox.setChecked(isRememberMe);

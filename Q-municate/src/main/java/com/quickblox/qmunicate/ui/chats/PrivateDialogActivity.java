@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
@@ -20,7 +21,6 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -29,6 +29,7 @@ import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
@@ -40,11 +41,9 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private Friend opponentFriend;
-    private QBDialog dialog;
-    private QBPrivateChatHelper chatHelper;
 
     public PrivateDialogActivity() {
-        super(R.layout.activity_dialog);
+        super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
     }
 
     public static void start(Context context, Friend opponent, QBDialog dialog) {
@@ -99,7 +98,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onFileLoaded(QBFile file) {
-        QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, opponentFriend.getId(), file);
+        try {
+            ((QBPrivateChatHelper) chatHelper).sendPrivateMessageWithAttachImage(file,
+                    opponentFriend.getId());
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+        //TODO call in command if it shuold be async
+        //QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, opponentFriend.getId(), file);
         scrollListView();
     }
 
@@ -142,8 +148,15 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     public void sendMessageOnClick(View view) {
-        QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(),
-                opponentFriend.getId(), null);
+        try {
+            ((QBPrivateChatHelper) chatHelper).sendPrivateMessage(messageEditText.getText().toString(),
+                    opponentFriend.getId());
+        } catch (QBResponseException exc) {
+            ErrorUtils.showError(this, exc);
+        }
+        //TODO call in command if it shuold be async
+        /*QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(),
+                opponentFriend.getId(), null);*/
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
@@ -156,11 +169,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onConnectedToService(QBService service) {
-        if (chatHelper == null) {
-            chatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-            chatHelper.createPrivateChatLocally(opponentFriend.getId(), dialog);
-        }
+    protected Bundle generateBundleToInitDialog() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getId());
+        return bundle;
     }
 
     @Override

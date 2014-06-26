@@ -25,7 +25,7 @@ public class ChatUtils {
     private static final String PROPERTY_ROOM_NAME = "name";
     private static final String PROPERTY_DIALOG_TYPE_CODE = "type";
     private static final String PROPERTY_ROOM_JID = "room_jid";
-    private static final String PROPERTY_DIALOG_ID = "_id";
+    public static final String PROPERTY_DIALOG_ID = "_id";
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
 
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
@@ -51,7 +51,7 @@ public class ChatUtils {
     }
 
     public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
-        String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
+        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);

@@ -22,14 +22,14 @@ import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.utils.DialogUtils;
 
-public class GroupDialogDetailsActivity extends BaseActivity {
+public class GroupDialogDetailsActivity extends BaseLogeableActivity {
 
     private EditText groupNameEditText;
     private TextView participantsTextView;
