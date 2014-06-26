@@ -91,12 +91,9 @@ public class ImageHelper {
     }
 
     public static Bitmap getScaledBitmap(Bitmap bitmapOrg, int width, int height, int preferredWidth) {
-        int newWidth = preferredWidth;
-        int newHeight = preferredWidth;
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
+        float scaleValue = ((float) preferredWidth) / width;
         Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
+        matrix.postScale(scaleValue, scaleValue);
         Bitmap resizedBitmap = Bitmap.createBitmap(bitmapOrg, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE,
                 width, height, matrix, true);
         return resizedBitmap;
