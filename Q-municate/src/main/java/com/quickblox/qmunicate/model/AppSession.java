@@ -1,5 +1,7 @@
 package com.quickblox.qmunicate.model;
 
+import android.text.TextUtils;
+
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.utils.Consts;
@@ -13,15 +15,17 @@ public class AppSession implements Serializable {
     private final LoginType loginType;
     private static final Object lock = new Object();
     private QBUser user;
+    private String sessionToken;
 
-    private AppSession(LoginType loginType, QBUser user) {
+    private AppSession(LoginType loginType, QBUser user, String sessionToken) {
         this.loginType = loginType;
         this.user = user;
+        this.sessionToken = sessionToken;
         save();
     }
 
-    public static void startSession(LoginType loginType, QBUser user) {
-        activeSession = new AppSession(loginType, user);
+    public static void startSession(LoginType loginType, QBUser user, String sessionToken) {
+        activeSession = new AppSession(loginType, user, sessionToken);
     }
 
     public void closeAndClear() {
@@ -38,6 +42,7 @@ public class AppSession implements Serializable {
     public void save() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         prefsHelper.savePref(PrefsHelper.PREF_LOGIN_TYPE, loginType.toString());
+        prefsHelper.savePref(PrefsHelper.PREF_SESSION_TOKEN, sessionToken);
         saveUser(user, prefsHelper);
     }
 
@@ -54,11 +59,13 @@ public class AppSession implements Serializable {
 
     private void saveUser(QBUser user, PrefsHelper prefsHelper) {
         prefsHelper.savePref(PrefsHelper.PREF_USER_ID, user.getId());
+        prefsHelper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
         prefsHelper.savePref(PrefsHelper.PREF_USER_FULL_NAME, user.getFullName());
+        prefsHelper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
     public boolean isSessionExist() {
-        return loginType != null && user.getId() != Consts.NOT_INITIALIZED_VALUE;
+        return loginType != null && !TextUtils.isEmpty(sessionToken);
     }
 
     public LoginType getLoginType() {
@@ -70,21 +77,16 @@ public class AppSession implements Serializable {
         String loginTypeRaw = helper.getPref(PrefsHelper.PREF_LOGIN_TYPE, LoginType.EMAIL.toString());
         int userId = helper.getPref(PrefsHelper.PREF_USER_ID, Consts.NOT_INITIALIZED_VALUE);
         String userFullName = helper.getPref(PrefsHelper.PREF_USER_FULL_NAME, Consts.EMPTY_STRING);
+        String sessionToken = helper.getPref(PrefsHelper.PREF_SESSION_TOKEN, Consts.EMPTY_STRING);
         QBUser qbUser = new QBUser();
         qbUser.setId(userId);
         qbUser.setFullName(userFullName);
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
-        return new AppSession(loginType, qbUser);
+        return new AppSession(loginType, qbUser, sessionToken);
     }
 
-    public static  void saveRememberMe(boolean value) {
+    public static void saveRememberMe(boolean value) {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
-    }
-
-    public static  void saveUserCredentials(QBUser user) {
-        PrefsHelper helper = App.getInstance().getPrefsHelper();
-        helper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
-        helper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
     public static AppSession getSession() {

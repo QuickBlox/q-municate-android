@@ -73,8 +73,9 @@ public class ChangePasswordActivity extends BaseActivity {
         oldPasswordEditText = _findViewById(R.id.old_password_edittext);
         newPasswordEditText = _findViewById(R.id.new_password_edittext);
         validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
-                new String[]{resources.getString(R.string.cpw_not_old_password_field_entered),
-                        resources.getString(R.string.cpw_not_new_password_field_entered)});
+                new String[]{resources.getString(R.string.cpw_not_old_password_field_entered), resources
+                        .getString(R.string.cpw_not_new_password_field_entered)}
+        );
     }
 
     private void addActions() {
@@ -90,7 +91,7 @@ public class ChangePasswordActivity extends BaseActivity {
 
     private void saveUserCredentials(QBUser user) {
         user.setPassword(newPasswordEditText.getText().toString());
-        AppSession.saveUserCredentials(user);
+        AppSession.getSession().updateUser(user);
     }
 
     private class ChangePasswordSuccessAction implements Command {
