@@ -21,7 +21,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
@@ -64,6 +64,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected BaseCursorAdapter messagesAdapter;
     protected boolean isNewMessage;
     protected QBDialog dialog;
+    protected boolean isNeedToScrollMessages;
 
     protected BaseChatHelper chatHelper;
 
@@ -81,12 +82,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(layoutResID);
 
         imageHelper = new ImageHelper(this);
+
         initUI();
         initListeners();
         initSmileWidgets();
         initSmiles();
 
         addActions();
+
+        isNeedToScrollMessages = true;
     }
 
     @Override
@@ -139,7 +143,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
         if (resultCode == RESULT_OK) {
-            isNewMessage = true;
+            isNeedToScrollMessages = true;
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -243,8 +247,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-        if (isNewMessage) {
-            isNewMessage = false;
+        if (isNeedToScrollMessages) {
+            isNeedToScrollMessages = false;
             messagesListView.setSelection(messagesAdapter.getCount() - 1);
         }
     }

@@ -81,7 +81,8 @@ public class Consts {
     public static final String FB_WALL_PARAM_PLACE = "place";
     public static final String FB_WALL_PARAM_TAGS = "tags";
     public static final String FB_WALL_PARAM_FEED = "me/feed";
-    public static final String INVITE_TYPE_OF_EMAIL = "message/rfc822";
+
+    public static final String TYPE_OF_EMAIL = "message/rfc822";
 
     // Universal Image Loader
     public static final DisplayImageOptions UIL_DEFAULT_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()

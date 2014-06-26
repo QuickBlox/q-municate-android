@@ -68,6 +68,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         initListView();
+        startLoadDialogMessages();
 
         registerForContextMenu(messagesListView);
     }
@@ -143,7 +144,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void updateChatData() {
         dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
         groupName = dialog.getName();
-        startLoadDialogMessages();
 
         updateActionBar();
     }
@@ -217,6 +217,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onResume();
         addActions();
         updateChatData();
+        scrollListView();
     }
 
     private void startLoadDialogMessages() {

@@ -19,14 +19,17 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -68,11 +71,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initStartLoadDialogMessages() {
         // TODO SF temp
-        //        if (dialog != null && messagesAdapter.isEmpty()) {
-        //            startLoadDialogMessages(dialog, dialogId, Consts.ZERO_LONG_VALUE);
-        //        } else if (dialog != null && !messagesAdapter.isEmpty()) {
-        //            startLoadDialogMessages(dialog, dialogId, dialog.getLastMessageDateSent());
-        //        }
+//        if (dialog != null && messagesAdapter.isEmpty()) {
+//            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
+//        } else if (dialog != null && !messagesAdapter.isEmpty()) {
+//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
+//        }
         if (dialog != null) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
         }
@@ -195,7 +198,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSessionHelper.getSession().getUser().getId()) {
+        if (friend.getId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }
     }

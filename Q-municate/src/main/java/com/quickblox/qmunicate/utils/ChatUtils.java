@@ -10,6 +10,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class ChatUtils {
     public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         int resultId = Consts.ZERO_INT_VALUE;
         for (Integer id : occupantsIdsList) {
             if (!id.equals(user.getId())) {
@@ -78,7 +79,7 @@ public class ChatUtils {
     }
 
     public static ArrayList<Integer> getOccupantIdsWithUser(List<Integer> friendIdsList) {
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         ArrayList<Integer> occupantIdsList = new ArrayList<Integer>(friendIdsList);
         occupantIdsList.add(user.getId());
         return occupantIdsList;
@@ -95,7 +96,7 @@ public class ChatUtils {
         String dialogName = dialog.getName();
         String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
 
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT);
@@ -128,7 +129,7 @@ public class ChatUtils {
     }
 
     public static ArrayList<Integer> getOccupantsIdsListForCreatePrivateDialog(int opponentId) {
-        QBUser user = AppSessionHelper.getSession().getUser();
+        QBUser user = AppSession.getSession().getUser();
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
         occupantsIdsList.add(user.getId());
         occupantsIdsList.add(opponentId);

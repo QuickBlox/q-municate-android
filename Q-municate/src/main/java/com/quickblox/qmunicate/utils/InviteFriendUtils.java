@@ -68,14 +68,4 @@ public class InviteFriendUtils {
 
         return friendsContactsList;
     }
-
-    public void sendEmail(String[] selectedFriends) {
-        Resources resources = context.getResources();
-        Intent intentEmail = new Intent(Intent.ACTION_SEND);
-        intentEmail.putExtra(Intent.EXTRA_EMAIL, selectedFriends);
-        intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.inf_subject_of_invitation));
-        intentEmail.putExtra(Intent.EXTRA_TEXT, resources.getText(R.string.inf_body_of_invitation));
-        intentEmail.setType(Consts.INVITE_TYPE_OF_EMAIL);
-        context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.inf_choose_email_provider)));
-    }
 }

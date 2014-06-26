@@ -12,15 +12,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
 public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
+
+    private RelativeLayout progressRelativeLayout;
+    private RelativeLayout attachMessageRelativeLayout;
+    private LinearLayout textMessageLinearLayout;
+    private ChatTextView messageTextView;
+    private ImageView attachImageView;
+    private TextView timeTextMessageTextView;
+    private TextView timeAttachMessageTextView;
+    private ProgressBar verticalProgressBar;
+    private ProgressBar centeredProgressBar;
 
     public PrivateDialogMessagesAdapter(Context context, Cursor cursor, ScrollMessagesListener scrollMessagesListener) {
         super(context, cursor);
@@ -30,7 +38,6 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
-        ViewHolder viewHolder = new ViewHolder();
 
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
@@ -39,25 +46,22 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             view = layoutInflater.inflate(R.layout.list_item_private_dialog_opponent_message, null, true);
         }
 
-        viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
-        viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
-        viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
-        viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
-        viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
-        viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
-        viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
-        viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
-        viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
-        viewHolder.centeredProgressBar =  (ProgressBar) view.findViewById(R.id.centered_progressbar);
-
-        view.setTag(viewHolder);
-
         return view;
     }
 
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
-        final ViewHolder viewHolder = (ViewHolder) view.getTag();
+
+        attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
+        timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
+        progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
+        textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
+        messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
+        timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
+        verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
+        verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+        centeredProgressBar =  (ProgressBar) view.findViewById(R.id.centered_progressbar);
 
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
@@ -65,20 +69,20 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
         boolean isOwnMessage = isOwnMessage(senderId);
 
-        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
+        attachMessageRelativeLayout.setVisibility(View.GONE);
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
-            viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
-            displayAttachImage(attachUrl, viewHolder.attachImageView, viewHolder.progressRelativeLayout,
-                    viewHolder.attachMessageRelativeLayout, viewHolder.verticalProgressBar,
-                    viewHolder.centeredProgressBar, isOwnMessage);
+            timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
+            textMessageLinearLayout.setVisibility(View.GONE);
+            progressRelativeLayout.setVisibility(View.VISIBLE);
+            displayAttachImage(attachUrl, attachImageView, progressRelativeLayout,
+                    attachMessageRelativeLayout, verticalProgressBar,
+                    centeredProgressBar, isOwnMessage);
         } else {
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
-            viewHolder.attachImageView.setVisibility(View.GONE);
-            viewHolder.messageTextView.setText(body);
+            timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
+            textMessageLinearLayout.setVisibility(View.VISIBLE);
+            attachImageView.setVisibility(View.GONE);
+            messageTextView.setText(body);
         }
 
         boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
@@ -86,18 +90,5 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, messageId, true);
         }
-    }
-
-    private static class ViewHolder {
-
-        RelativeLayout progressRelativeLayout;
-        RelativeLayout attachMessageRelativeLayout;
-        LinearLayout textMessageLinearLayout;
-        ChatTextView messageTextView;
-        ImageView attachImageView;
-        TextView timeTextMessageTextView;
-        TextView timeAttachMessageTextView;
-        ProgressBar verticalProgressBar;
-        ProgressBar centeredProgressBar;
     }
 }

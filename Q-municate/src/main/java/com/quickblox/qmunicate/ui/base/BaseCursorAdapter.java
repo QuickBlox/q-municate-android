@@ -21,13 +21,12 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.ui.chats.ScrollMessagesListener;
 import com.quickblox.qmunicate.ui.views.MaskGenerator;
-import com.quickblox.qmunicate.utils.AppSessionHelper;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -51,8 +50,8 @@ public abstract class BaseCursorAdapter extends CursorAdapter implements Receive
         this.context = context;
         resources = context.getResources();
         layoutInflater = LayoutInflater.from(context);
-        currentUser = AppSessionHelper.getSession().getUser();
-        currentLoginType = AppSessionHelper.getSession().getLoginType();
+        currentUser = AppSession.getSession().getUser();
+        currentLoginType = AppSession.getSession().getLoginType();
         imageHelper = new ImageHelper((android.app.Activity) context);
     }
 
