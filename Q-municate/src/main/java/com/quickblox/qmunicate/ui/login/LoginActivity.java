@@ -87,6 +87,7 @@ public class LoginActivity extends BaseActivity {
         String userPassword = passwordEditText.getText().toString();
 
         if (validationUtils.isValidUserDate(userEmail, userPassword)) {
+            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             login(userEmail, userPassword);
         }
     }
@@ -171,7 +172,6 @@ public class LoginActivity extends BaseActivity {
                 AppSession.saveRememberMe(true);
                 AppSession.saveUserCredentials(user);
             }
-            App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             MainActivity.start(LoginActivity.this);
             finish();
         }

@@ -108,7 +108,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         initNavigationDrawer();
 
-        if (!isImportInitialized && isSignUpInitialized) {
+        if (!isImportInitialized) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState,
                     new FacebookSessionStatusCallback());

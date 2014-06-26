@@ -43,7 +43,7 @@
             android:layout_marginLeft="@dimen/chat_babble_margin"
             android:background="@drawable/right_bubble"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="5dp"
             android:visibility="gone">
 
             <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
@@ -71,7 +71,7 @@
             android:layout_width="@dimen/chat_attach_width"
             android:layout_height="@dimen/chat_attach_height"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="5dp"
             android:visibility="gone">
 
             <ImageView
