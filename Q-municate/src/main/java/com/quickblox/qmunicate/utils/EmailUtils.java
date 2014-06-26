@@ -27,12 +27,11 @@ public class EmailUtils {
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.inf_choose_email_provider)));
     }
 
-    public static void sendFeedbackEmail(Context context, String feedbackType, String feedbackDescription) {
+    public static void sendFeedbackEmail(Context context, String feedbackType) {
         Resources resources = context.getResources();
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
         intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{resources.getText(R.string.fdb_support_email).toString()});
         intentEmail.putExtra(Intent.EXTRA_SUBJECT, feedbackType);
-        intentEmail.putExtra(Intent.EXTRA_TEXT, feedbackDescription);
         intentEmail.setType(Consts.TYPE_OF_EMAIL);
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.fdb_choose_email_provider)));
     }

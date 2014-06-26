@@ -2,20 +2,20 @@ package com.quickblox.qmunicate.ui.feedback;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.utils.EmailUtils;
 
 public class FeedbackFragment extends BaseFragment {
 
     private RadioGroup feedbackTypesRadioGroup;
+    private Button writeEmailButton;
 
     public static FeedbackFragment newInstance() {
         return new FeedbackFragment();
@@ -24,7 +24,7 @@ public class FeedbackFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        title = getString(R.string.nvd_title_feedback_type);
+        title = getString(R.string.nvd_title_feedback);
     }
 
     @Override
@@ -32,32 +32,24 @@ public class FeedbackFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_feedback, container, false);
 
         initUI(view);
+        initListeners();
 
         return view;
+    }
+
+    private void initListeners() {
+        writeEmailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EmailUtils.sendFeedbackEmail(baseActivity, getSelectedFeedbackType());
+            }
+        });
     }
 
     private void initUI(View view) {
         setHasOptionsMenu(true);
         feedbackTypesRadioGroup = (RadioGroup) view.findViewById(R.id.feedback_types_radiogroup);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.feedback_type_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_next_step:
-                startFeedbackDetailsActivity();
-                break;
-        }
-        return true;
-    }
-
-    private void startFeedbackDetailsActivity() {
-        FeedbackDetailsActivity.start(baseActivity, getSelectedFeedbackType());
+        writeEmailButton = (Button) view.findViewById(R.id.write_email_button);
     }
 
     private String getSelectedFeedbackType() {

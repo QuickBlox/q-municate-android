@@ -111,7 +111,7 @@
         <activity
             android:name=".ui.feedback.FeedbackDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/fdb_feedback_details_title"
+            android:label="@string/fdb_feedback_title"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
