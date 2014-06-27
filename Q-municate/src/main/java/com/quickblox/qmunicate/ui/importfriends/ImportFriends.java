@@ -27,6 +27,8 @@ public class ImportFriends {
         this.activity = activity;
         this.facebookHelper = facebookHelper;
         this.facebookHelper.loginWithFacebook();
+        friendsFacebookList = new ArrayList<InviteFriend>();
+        friendsContactsList = new ArrayList<InviteFriend>();
     }
 
     public void startGetFriendsListTask(boolean isGetFacebookFriends) {
@@ -40,6 +42,9 @@ public class ImportFriends {
     }
 
     private List<String> getIdsList(List<InviteFriend> friendsList) {
+        if(friendsList.isEmpty()) {
+            return new ArrayList<String>();
+        }
         List<String> idsList = new ArrayList<String>();
         for (InviteFriend friend : friendsList) {
             idsList.add(friend.getId());
@@ -60,7 +65,6 @@ public class ImportFriends {
 
             @Override
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
-                friendsFacebookList = new ArrayList<InviteFriend>();
                 for (com.facebook.model.GraphUser user : users) {
                     friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(),
                             InviteFriend.VIA_FACEBOOK_TYPE, null, false));

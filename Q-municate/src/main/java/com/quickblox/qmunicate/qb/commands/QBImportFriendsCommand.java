@@ -47,8 +47,16 @@ public class QBImportFriendsCommand extends ServiceCommand {
         requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(Consts.FL_FRIENDS_PER_PAGE);
 
-        List<QBUser> realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params);
-        List<QBUser> realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params);
+        List<QBUser> realFriendsFacebookList = null;
+        List<QBUser> realFriendsContactsList = null;
+
+        if(!friendsFacebookList.isEmpty()) {
+            realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params);
+        }
+
+        if(!friendsContactsList.isEmpty()) {
+            realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params);
+        }
 
         List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList, realFriendsContactsList);
 
