@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.ArrayList;
@@ -51,15 +51,17 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<QBUser> realFriendsFacebookList = null;
         List<QBUser> realFriendsContactsList = null;
 
-        if(!friendsFacebookList.isEmpty()) {
-            realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params);
+        if (!friendsFacebookList.isEmpty()) {
+            realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder,
+                    params);
         }
 
-        if(!friendsContactsList.isEmpty()) {
+        if (!friendsContactsList.isEmpty()) {
             realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params);
         }
 
-        List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList, realFriendsContactsList);
+        List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,
+                realFriendsContactsList);
 
         for (int userId : realFriendsList) {
             friendListHelper.inviteFriend(userId);
@@ -71,14 +73,15 @@ public class QBImportFriendsCommand extends ServiceCommand {
         return result;
     }
 
-    private List<Integer> getSelectedUsersList(List<QBUser> realFriendsFacebookList, List<QBUser> realFriendsContactsList) {
+    private List<Integer> getSelectedUsersList(List<QBUser> realFriendsFacebookList,
+            List<QBUser> realFriendsContactsList) {
         List<Integer> userIdsList = new ArrayList<Integer>();
 
-        if (!realFriendsFacebookList.isEmpty()) {
+        if (realFriendsFacebookList != null && !realFriendsFacebookList.isEmpty()) {
             userIdsList.addAll(FriendUtils.getFriendIdsList(realFriendsFacebookList));
         }
 
-        if (!realFriendsContactsList.isEmpty()) {
+        if (realFriendsContactsList != null && !realFriendsContactsList.isEmpty()) {
             userIdsList.addAll(FriendUtils.getFriendIdsList(realFriendsContactsList));
         }
 
