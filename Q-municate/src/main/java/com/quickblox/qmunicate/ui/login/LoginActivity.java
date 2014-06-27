@@ -135,8 +135,10 @@ public class LoginActivity extends BaseActivity {
         emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-        validationUtils = new ValidationUtils(LoginActivity.this, new EditText[] {emailEditText, passwordEditText},
-                new String[]{resources.getString(R.string.dlg_not_email_field_entered), resources.getString(R.string.dlg_not_password_field_entered)});
+        validationUtils = new ValidationUtils(LoginActivity.this,
+                new EditText[]{emailEditText, passwordEditText}, new String[]{resources.getString(
+                R.string.dlg_not_email_field_entered), resources.getString(
+                R.string.dlg_not_password_field_entered)});
     }
 
     private void addActions() {
@@ -170,7 +172,6 @@ public class LoginActivity extends BaseActivity {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             if (rememberMeCheckBox.isChecked()) {
                 AppSession.saveRememberMe(true);
-                AppSession.saveUserCredentials(user);
             }
             MainActivity.start(LoginActivity.this);
             finish();

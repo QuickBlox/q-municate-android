@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.invitefriends;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -334,6 +335,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         public void onCompleted(Response response) {
             FacebookRequestError error = response.getError();
             if (error != null) {
+                Log.e(getString(R.string.facebook_exception), error.toString());
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
             } else {
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));

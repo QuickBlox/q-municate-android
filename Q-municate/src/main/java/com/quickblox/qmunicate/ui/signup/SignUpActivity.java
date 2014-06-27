@@ -18,7 +18,6 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
-import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
@@ -147,9 +146,12 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         passwordEditText = _findViewById(R.id.password_edittext);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
-        validationUtils = new ValidationUtils(SignUpActivity.this, new EditText[]{fullnameEditText, emailEditText, passwordEditText},
-                new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources.getString(R.string.dlg_not_email_field_entered),
-                        resources.getString(R.string.dlg_not_password_field_entered)});
+        validationUtils = new ValidationUtils(SignUpActivity.this,
+                new EditText[]{fullnameEditText, emailEditText, passwordEditText},
+                new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources
+                        .getString(R.string.dlg_not_email_field_entered), resources.getString(
+                        R.string.dlg_not_password_field_entered)}
+        );
     }
 
     private void addActions() {
@@ -186,7 +188,6 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         public void execute(Bundle bundle) {
             File image = (File) bundle.getSerializable(QBServiceConsts.EXTRA_FILE);
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.saveUserCredentials(user);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, true);
             QBUpdateUserCommand.start(SignUpActivity.this, user, image, null);
         }

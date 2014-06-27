@@ -49,6 +49,7 @@ public class FriendDetailsActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
+        canPerformLogout.set(true);
         friend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_FRIEND);
         initUI();
         initUIWithFriendsData();

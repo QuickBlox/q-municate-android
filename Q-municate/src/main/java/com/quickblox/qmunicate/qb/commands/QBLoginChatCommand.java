@@ -52,7 +52,9 @@ public class QBLoginChatCommand extends ServiceCommand {
         long currentTime = startTime;
         while (!chatHelper.isLoggedIn() && (currentTime - startTime) < Consts.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
-            chatHelper.login(AppSession.getSession().getUser());
+            try {
+                chatHelper.login(AppSession.getSession().getUser());
+            } catch (SmackException ignore) { /* NOP */ }
         }
     }
 }
