@@ -32,6 +32,7 @@ public class EmailUtils {
         Intent intentEmail = new Intent(Intent.ACTION_SEND);
         intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{resources.getText(R.string.fdb_support_email).toString()});
         intentEmail.putExtra(Intent.EXTRA_SUBJECT, feedbackType);
+        intentEmail.putExtra(Intent.EXTRA_TEXT, (java.io.Serializable) DeviceInfoUtils.getDeviseInfoForFeedback());
         intentEmail.setType(Consts.TYPE_OF_EMAIL);
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.fdb_choose_email_provider)));
     }

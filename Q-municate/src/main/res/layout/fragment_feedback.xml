@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             android:button="@null"
+            android:checked="true"
             android:drawableRight="@android:drawable/btn_radio"
             android:gravity="left|center"
             android:padding="5dp"
