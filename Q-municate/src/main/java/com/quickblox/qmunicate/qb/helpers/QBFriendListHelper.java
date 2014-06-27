@@ -19,6 +19,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.FriendUtils;
 
 import org.jivesoftware.smack.SmackException;
@@ -151,6 +152,9 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void fillFriendOnlineStatus(Friend friend) {
         QBPresence presence = roster.getPresence(friend.getId());
+        if (presence == null) {
+            return;
+        }
         if (presence.getType() == QBPresence.Type.online) {
             friend.setOnline(true);
         } else {
@@ -204,6 +208,10 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void presenceChanged(QBPresence presence) {
             Friend friend = DatabaseManager.getFriendById(context, presence.getUserId());
+            if (friend == null) {
+                ErrorUtils.logError(TAG, "Could not find friend in DB by Id = " + friend.getId());
+                return;
+            }
             fillFriendOnlineStatus(friend);
             fillFriendStatus(friend);
             DatabaseManager.saveFriend(context, friend);

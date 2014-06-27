@@ -22,6 +22,11 @@ public class ErrorUtils {
         Log.e(tag, errorMsg, e);
     }
 
+    public static void logError(String tag, String msg) {
+        String errorMsg = !TextUtils.isEmpty(msg) ? msg : Consts.EMPTY_STRING;
+        Log.e(tag, errorMsg);
+    }
+
     public static void logError(Exception e) {
         e.printStackTrace();
     }
