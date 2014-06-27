@@ -169,6 +169,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         }
     }
 
+    //TODO will be defined when update dialog signaling will be integrated
     private void updateDialogByNotification(QBChatMessage chatMessage) {
 
     }

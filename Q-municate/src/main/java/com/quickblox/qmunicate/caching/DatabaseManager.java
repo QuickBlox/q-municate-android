@@ -278,12 +278,6 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
-        /*if (!isExistDialogById(context, dialogMessageCache.getDialogId())) {
-            createPrivateDialogIfNotExistByRoomJidId(context, dialogMessageCache.getDialogId(),
-                    dialogMessageCache.getMessage(), dialogMessageCache.getTime(),
-                    dialogMessageCache.getSenderId());
-        }*/
-
         updateDialog(context, dialogMessageCache.getDialogId(), dialogMessageCache.getMessage(),
                 dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
     }

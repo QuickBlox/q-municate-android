@@ -12,12 +12,12 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendPrivateChatMessageCommand extends ServiceCommand {
 
-    private QBPrivateChatHelper qbPrivateChatHelper;
+    private QBPrivateChatHelper privateChatHelper;
 
-    public QBSendPrivateChatMessageCommand(Context context, QBPrivateChatHelper qbPrivateChatHelper, String successAction,
-            String failAction) {
+    public QBSendPrivateChatMessageCommand(Context context, QBPrivateChatHelper privateChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.qbPrivateChatHelper = qbPrivateChatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context, String message, int userId, QBFile file) {
@@ -35,9 +35,9 @@ public class QBSendPrivateChatMessageCommand extends ServiceCommand {
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
         if (file == null) {
-            qbPrivateChatHelper.sendPrivateMessage(message, userId);
+            privateChatHelper.sendPrivateMessage(message, userId);
         } else {
-            qbPrivateChatHelper.sendPrivateMessageWithAttachImage(file, userId);
+            privateChatHelper.sendPrivateMessageWithAttachImage(file, userId);
         }
 
         return null;

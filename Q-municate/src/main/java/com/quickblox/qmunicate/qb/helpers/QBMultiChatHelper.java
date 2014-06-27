@@ -56,7 +56,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
         currentDialog = null;
     }
 
-
     public void sendGroupMessage(String roomJidId, String message) throws QBResponseException {
         QBChatMessage chatMessage = getQBChatMessage(message);
         sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
@@ -163,7 +162,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
         roomChat.join();
     }
 
-
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
         return new ArrayList<Integer>(roomChatManager.getRoom(roomJid).getOnlineRoomUserIds());
     }
@@ -224,6 +222,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
+    //TODO will be defined when update dialog signaling will be integrated
     private void updateDialogByNotification(QBChatMessage chatMessage) {
 
     }

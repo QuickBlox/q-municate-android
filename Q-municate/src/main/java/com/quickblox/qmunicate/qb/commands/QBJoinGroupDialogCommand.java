@@ -40,15 +40,15 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogs = null;
+        List<QBDialog> dialogList = null;
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
-            dialogs = (ArrayList<QBDialog>) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_LIST);
+            dialogList = (ArrayList<QBDialog>) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_LIST);
         } else {
-            dialogs = DatabaseManager.getDialogs(context);
+            dialogList = DatabaseManager.getDialogs(context);
         }
 
-        if (dialogs != null && !dialogs.isEmpty()) {
-            multiChatHelper.tryJoinRoomChats(dialogs);
+        if (dialogList != null && !dialogList.isEmpty()) {
+            multiChatHelper.tryJoinRoomChats(dialogList);
         }
         return extras;
     }

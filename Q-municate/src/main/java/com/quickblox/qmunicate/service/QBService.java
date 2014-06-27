@@ -1,7 +1,10 @@
 package com.quickblox.qmunicate.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -11,7 +14,6 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
@@ -26,6 +28,7 @@ import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
@@ -96,6 +99,7 @@ public class QBService extends Service {
     private QBFriendListHelper friendListHelper;
 
     private Map<Integer, BaseHelper> helpers = new HashMap<Integer, BaseHelper>();
+    private BroadcastReceiver broadcastReceiver = new LoginBroadcastReceiver();
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -116,6 +120,17 @@ public class QBService extends Service {
         helpers.put(CHAT_REST_HELPER, chatRestHelper);
         authHelper = new QBAuthHelper(this);
         helpers.put(AUTH_HELPER, authHelper);
+        chatHelper = new QBPrivateChatHelper(this);
+        helpers.put(PRIVATE_CHAT_HELPER, chatHelper);
+        QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
+        helpers.put(MULTI_CHAT_HELPER, multiChatHelper);
+        friendListHelper = new QBFriendListHelper(this);
+        helpers.put(FRIEND_LIST_HELPER, friendListHelper);
+        videoChatHelper = new QBVideoChatHelper(this);
+        helpers.put(VIDEO_CHAT_HELPER, videoChatHelper);
+    }
+
+    private void initChatHelpers() {
         chatHelper = new QBPrivateChatHelper(this);
         helpers.put(PRIVATE_CHAT_HELPER, chatHelper);
         QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
@@ -432,6 +447,23 @@ public class QBService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(QBServiceConsts.LOGIN_ACTION);
+        if (broadcastReceiver != null) {
+            registerReceiver(broadcastReceiver, filter);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action;
         if (intent != null && (action = intent.getAction()) != null) {
@@ -489,6 +521,17 @@ public class QBService extends Service {
 
         public QBService getService() {
             return QBService.this;
+        }
+    }
+
+    private class LoginBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (intent != null && (QBServiceConsts.LOGIN_ACTION.equals(action))) {
+                //TODO will be defined in next refactor
+            }
         }
     }
 }

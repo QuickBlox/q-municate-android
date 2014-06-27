@@ -180,10 +180,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private QBDialog getExistPrivateDialog(int opponentId) {
-        List<QBDialog> dialogsByOpponent = DatabaseManager.getDialogsByOpponent(this, opponentId,
+        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(this, opponentId,
                 QBDialogType.PRIVATE);
-        if (!dialogsByOpponent.isEmpty()) {
-            return dialogsByOpponent.get(0);
+        if (!dialogList.isEmpty()) {
+            return dialogList.get(0);
         } else {
             return null;
         }

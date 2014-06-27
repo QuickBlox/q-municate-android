@@ -16,12 +16,12 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
 
     private static final String TAG = QBLoadAttachFileCommand.class.getSimpleName();
 
-    private final QBPrivateChatHelper chatHelper;
+    private final QBPrivateChatHelper privateChatHelper;
 
-    public QBLoadAttachFileCommand(Context context, QBPrivateChatHelper chatHelper, String successAction,
-            String failAction) {
+    public QBLoadAttachFileCommand(Context context, QBPrivateChatHelper privateChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context, File file) {
@@ -34,7 +34,7 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        QBFile qbFile = chatHelper.loadAttachFile(file);
+        QBFile qbFile = privateChatHelper.loadAttachFile(file);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_ATTACH_FILE, qbFile);

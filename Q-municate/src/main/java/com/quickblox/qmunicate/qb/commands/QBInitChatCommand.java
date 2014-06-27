@@ -14,13 +14,13 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBInitChatCommand extends ServiceCommand {
 
-    private QBPrivateChatHelper chatHelper;
+    private QBPrivateChatHelper privateChatHelper;
     private QBMultiChatHelper multiChatHelper;
 
-    public QBInitChatCommand(Context context, QBPrivateChatHelper chatHelper,
+    public QBInitChatCommand(Context context, QBPrivateChatHelper privateChatHelper,
             QBMultiChatHelper multiChatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.privateChatHelper = privateChatHelper;
         this.multiChatHelper = multiChatHelper;
     }
 
@@ -32,7 +32,7 @@ public class QBInitChatCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
-        chatHelper.init(QBChatService.getInstance(), user);
+        privateChatHelper.init(QBChatService.getInstance(), user);
         multiChatHelper.init(QBChatService.getInstance(), user);
         return extras;
     }
