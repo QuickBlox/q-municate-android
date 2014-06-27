@@ -62,7 +62,8 @@ public class EmailUtils {
 
         Cursor cursor = contentResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, PROJECTION, filter, null, order);
 
-        if (cursor.moveToFirst()) {
+        if (cursor != null) {
+            cursor.moveToFirst();
             String id;
             String name;
             String email;
@@ -76,9 +77,8 @@ public class EmailUtils {
                 }
                 friendsContactsList.add(new InviteFriend(email, name, null, InviteFriend.VIA_CONTACTS_TYPE, uri, false));
             } while (cursor.moveToNext());
+            cursor.close();
         }
-
-        cursor.close();
 
         return friendsContactsList;
     }
