@@ -51,7 +51,6 @@ public class NavigationDrawerFragment extends BaseFragment {
     private ListView drawerListView;
     private TextView fullnameTextView;
     private ImageButton logoutButton;
-    private TextView counterUnreadChatsDialogsTextView;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
     private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
