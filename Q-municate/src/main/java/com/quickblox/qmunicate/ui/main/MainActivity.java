@@ -126,15 +126,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private boolean isImportInitialized() {
+        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
+        return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+    }
+
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadDialogsSuccessAction());
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
     }
 
-    private void initPrefValues() {
-        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-    }
 
     private void initNavigationDrawer() {
         navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(

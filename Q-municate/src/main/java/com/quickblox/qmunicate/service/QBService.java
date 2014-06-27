@@ -14,8 +14,6 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.commands.QBImportFriendsCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
@@ -24,11 +22,13 @@ import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBGetFileCommand;
+import com.quickblox.qmunicate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
@@ -93,7 +93,6 @@ public class QBService extends Service {
     private Map<String, ServiceCommand> serviceCommandMap = new HashMap<String, ServiceCommand>();
     private ThreadPoolExecutor threadPool;
 
-    private QBChatHelper chatHelper;
     private QBAuthHelper authHelper;
     private QBVideoChatHelper videoChatHelper;
     private QBFriendListHelper friendListHelper;
@@ -120,8 +119,8 @@ public class QBService extends Service {
         helpers.put(CHAT_REST_HELPER, chatRestHelper);
         authHelper = new QBAuthHelper(this);
         helpers.put(AUTH_HELPER, authHelper);
-        chatHelper = new QBPrivateChatHelper(this);
-        helpers.put(PRIVATE_CHAT_HELPER, chatHelper);
+        QBPrivateChatHelper privateChatHelper = new QBPrivateChatHelper(this);
+        helpers.put(PRIVATE_CHAT_HELPER, privateChatHelper);
         QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
         helpers.put(MULTI_CHAT_HELPER, multiChatHelper);
         friendListHelper = new QBFriendListHelper(this);
@@ -131,8 +130,8 @@ public class QBService extends Service {
     }
 
     private void initChatHelpers() {
-        chatHelper = new QBPrivateChatHelper(this);
-        helpers.put(PRIVATE_CHAT_HELPER, chatHelper);
+        QBPrivateChatHelper privateChatHelper = new QBPrivateChatHelper(this);
+        helpers.put(PRIVATE_CHAT_HELPER, privateChatHelper);
         QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
         helpers.put(MULTI_CHAT_HELPER, multiChatHelper);
         friendListHelper = new QBFriendListHelper(this);
@@ -239,8 +238,9 @@ public class QBService extends Service {
     }
 
     private void registerCreatePrivateChatCommand() {
-        QBCreatePrivateChatCommand createPrivateChatCommand = new QBCreatePrivateChatCommand(this, chatHelper,
-                QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION,
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBCreatePrivateChatCommand createPrivateChatCommand = new QBCreatePrivateChatCommand(this,
+                privateChatHelper, QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.CREATE_PRIVATE_CHAT_ACTION, createPrivateChatCommand);
     }
@@ -260,7 +260,8 @@ public class QBService extends Service {
     }
 
     private void registerLoadAttachFileCommand() {
-        ServiceCommand loadAttachFileCommand = new QBLoadAttachFileCommand(this, chatHelper,
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        ServiceCommand loadAttachFileCommand = new QBLoadAttachFileCommand(this, privateChatHelper,
                 QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_ATTACH_FILE_ACTION, loadAttachFileCommand);
@@ -273,8 +274,9 @@ public class QBService extends Service {
     }
 
     private void registerSendMessageCommand() {
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
         QBSendPrivateChatMessageCommand sendMessageCommand = new QBSendPrivateChatMessageCommand(this,
-                chatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
+                privateChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.SEND_MESSAGE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, sendMessageCommand);
     }
@@ -418,7 +420,8 @@ public class QBService extends Service {
     }
 
     private void registerUpdateChatDialogCommand() {
-        QBUpdateDialogCommand updateChatDialogCommand = new QBUpdateDialogCommand(this, chatHelper,
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBUpdateDialogCommand updateChatDialogCommand = new QBUpdateDialogCommand(this, privateChatHelper,
                 QBServiceConsts.UPDATE_CHAT_DIALOG_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_CHAT_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, updateChatDialogCommand);
@@ -433,8 +436,9 @@ public class QBService extends Service {
     }
 
     private void registerUpdateStatusMessageCommand() {
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
         QBUpdateStatusMessageCommand updateStatusMessageCommand = new QBUpdateStatusMessageCommand(this,
-                chatHelper, QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION,
+                privateChatHelper, QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_STATUS_MESSAGE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, updateStatusMessageCommand);
     }
@@ -528,10 +532,7 @@ public class QBService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (intent != null && (QBServiceConsts.LOGIN_ACTION.equals(action))) {
-                //TODO will be defined in next refactor
-            }
+            //TODO will be defined in next refactor
         }
     }
 }
