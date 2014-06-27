@@ -42,6 +42,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="@dimen/chat_attach_width"
                     android:layout_height="@dimen/chat_attach_height"
+                    android:padding="5dp"
                     android:max="100" />
 
                 <ProgressBar
@@ -61,7 +62,7 @@
                 android:layout_marginRight="@dimen/chat_babble_margin"
                 android:background="@drawable/left_bubble"
                 android:orientation="horizontal"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:visibility="gone">
 
                 <LinearLayout
@@ -108,9 +109,9 @@
             <RelativeLayout
                 android:id="@+id/attach_message_relativelayout"
                 android:layout_width="@dimen/chat_attach_width"
-                android:layout_height="@dimen/chat_attach_height"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="10dp"
+                android:padding="5dp"
                 android:visibility="gone">
 
                 <ImageView

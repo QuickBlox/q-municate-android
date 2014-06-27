@@ -186,8 +186,8 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void addActionsAddFriends() {
-        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ADD_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
         baseActivity.updateBroadcastActionList();
     }
 

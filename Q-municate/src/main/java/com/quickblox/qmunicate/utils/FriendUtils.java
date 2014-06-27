@@ -36,4 +36,12 @@ public class FriendUtils {
         }
         return friendMap;
     }
+
+    public static ArrayList<Integer> getFriendIdsList(List<QBUser> friendList) {
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
+        for (QBUser friend : friendList) {
+            friendIdsList.add(friend.getId());
+        }
+        return friendIdsList;
+    }
 }

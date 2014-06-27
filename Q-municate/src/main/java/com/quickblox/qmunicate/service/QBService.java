@@ -14,10 +14,11 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.qb.commands.QBImportFriendsCommand;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendCommand;
-import com.quickblox.qmunicate.qb.commands.QBAddFriendsCommand;
 import com.quickblox.qmunicate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBCreateGroupDialogCommand;
@@ -28,7 +29,6 @@ import com.quickblox.qmunicate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.qmunicate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLeaveGroupDialogCommand;
-import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
@@ -93,7 +93,7 @@ public class QBService extends Service {
     private Map<String, ServiceCommand> serviceCommandMap = new HashMap<String, ServiceCommand>();
     private ThreadPoolExecutor threadPool;
 
-    private QBPrivateChatHelper chatHelper;
+    private QBChatHelper chatHelper;
     private QBAuthHelper authHelper;
     private QBVideoChatHelper videoChatHelper;
     private QBFriendListHelper friendListHelper;
@@ -151,7 +151,7 @@ public class QBService extends Service {
         registerUpdateUserCommand();
 
         registerAddFriendCommand();
-        registerAddFriendsCommand();
+        registerImportFriendsCommand();
         registerRemoveFriendCommand();
         registerLoadFriendsCommand();
         registerLoadUsersCommand();
@@ -323,10 +323,10 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, addFriendCommand);
     }
 
-    private void registerAddFriendsCommand() {
-        QBAddFriendsCommand addFriendsCommand = new QBAddFriendsCommand(this, friendListHelper,
-                QBServiceConsts.ADD_FRIENDS_SUCCESS_ACTION, QBServiceConsts.ADD_FRIENDS_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.ADD_FRIENDS_ACTION, addFriendsCommand);
+    private void registerImportFriendsCommand() {
+        QBImportFriendsCommand importFriendsCommand = new QBImportFriendsCommand(this, friendListHelper,
+                QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.IMPORT_FRIENDS_ACTION, importFriendsCommand);
     }
 
     private void registerRemoveFriendCommand() {
