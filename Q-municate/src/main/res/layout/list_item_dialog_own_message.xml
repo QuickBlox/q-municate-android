@@ -23,6 +23,7 @@
                 android:layout_width="@dimen/chat_attach_width"
                 android:layout_height="@dimen/chat_attach_height"
                 android:max="100"
+                android:padding="5dp"
                 android:visibility="gone" />
 
             <ProgressBar
@@ -43,7 +44,7 @@
             android:layout_marginLeft="@dimen/chat_babble_margin"
             android:background="@drawable/right_bubble"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="5dp"
             android:visibility="gone">
 
             <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
@@ -61,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|top"
-                android:paddingRight="5dp"
+                android:paddingRight="10dp"
                 android:textColor="@color/light_gray" />
 
         </LinearLayout>
@@ -69,9 +70,9 @@
         <RelativeLayout
             android:id="@+id/attach_message_relativelayout"
             android:layout_width="@dimen/chat_attach_width"
-            android:layout_height="@dimen/chat_attach_height"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="5dp"
             android:visibility="gone">
 
             <ImageView
@@ -92,7 +93,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="10dp"
-                android:layout_marginRight="15dp"
+                android:layout_marginRight="20dp"
                 android:background="@drawable/badge_attach_message_time"
                 android:textColor="@color/gray" />
 

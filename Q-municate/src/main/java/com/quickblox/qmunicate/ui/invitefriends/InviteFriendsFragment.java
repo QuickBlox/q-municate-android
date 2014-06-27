@@ -46,7 +46,6 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private List<InviteFriend> friendsFacebookList;
     private List<InviteFriend> friendsContactsList;
     private InviteFriendsAdapter friendsAdapter;
-    private InviteFriendUtils inviteFriendUtils;
     private boolean isUpdateFacebookFriendsList = true;
     private String[] selectedFacebookFriendsArray;
     private String[] selectedContactsFriendsArray;
@@ -69,7 +68,6 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
         facebookSessionStatusCallback = new FacebookSessionStatusCallback();
         facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
-        inviteFriendUtils = new InviteFriendUtils(getActivity());
 
         friendsList = new ArrayList<InviteFriend>();
         friendsFacebookList = new ArrayList<InviteFriend>();
@@ -356,7 +354,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         @Override
         protected Void doInBackground(Void... params) {
             baseActivity.showProgress();
-            friendsContactsList = inviteFriendUtils.getContactsWithEmail();
+            friendsContactsList = EmailUtils.getContactsWithEmail(baseActivity);
             friendsList.addAll(friendsContactsList);
             return null;
         }

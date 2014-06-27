@@ -123,6 +123,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
             if (isNeedUpdateAvatar) {
                 new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
             } else {
+                App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
                 QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
             }
         }

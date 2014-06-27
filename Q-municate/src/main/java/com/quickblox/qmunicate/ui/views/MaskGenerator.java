@@ -18,10 +18,9 @@ public class MaskGenerator {
 
     public static Bitmap generateMask(Context context, Bitmap mask, Bitmap original) {
         int width = SizeUtility.dipToPixels(context, Consts.CHAT_ATTACH_WIDTH);
-        int height = SizeUtility.dipToPixels(context, Consts.CHAT_ATTACH_HEIGHT);
         original = ImageHelper.getScaledBitmap(original, original.getWidth(), original.getHeight(), width);
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        mask = getNinepatch(context.getResources(), mask, width, height);
+        Bitmap result = Bitmap.createBitmap(width, original.getHeight(), Bitmap.Config.ARGB_8888);
+        mask = getNinepatch(context.getResources(), mask, width, original.getHeight());
         Canvas canvas = new Canvas(result);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
