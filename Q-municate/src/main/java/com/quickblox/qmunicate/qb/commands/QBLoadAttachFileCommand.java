@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -16,12 +16,12 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
 
     private static final String TAG = QBLoadAttachFileCommand.class.getSimpleName();
 
-    private final QBChatHelper chatHelper;
+    private final QBPrivateChatHelper privateChatHelper;
 
-    public QBLoadAttachFileCommand(Context context, QBChatHelper chatHelper, String successAction,
-            String failAction) {
+    public QBLoadAttachFileCommand(Context context, QBPrivateChatHelper privateChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context, File file) {
@@ -34,7 +34,7 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        QBFile qbFile = chatHelper.loadAttachFile(file);
+        QBFile qbFile = privateChatHelper.loadAttachFile(file);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_ATTACH_FILE, qbFile);

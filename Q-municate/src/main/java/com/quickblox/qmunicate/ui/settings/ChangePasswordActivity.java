@@ -14,12 +14,12 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ValidationUtils;
 
-public class ChangePasswordActivity extends BaseActivity {
+public class ChangePasswordActivity extends BaseLogeableActivity {
 
     private EditText oldPasswordEditText;
     private EditText newPasswordEditText;

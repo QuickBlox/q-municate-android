@@ -4,12 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.errors.QBChatErrors;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
@@ -22,14 +21,14 @@ import java.util.Date;
 
 public class QBLoginChatCommand extends ServiceCommand {
 
-    private QBAuthHelper authHelper;
-    private QBChatHelper chatHelper;
+    private static final String TAG = QBLoginChatCommand.class.getSimpleName();
 
-    public QBLoginChatCommand(Context context, QBAuthHelper authHelper, QBChatHelper chatHelper,
+    private QBChatRestHelper chatRestHelper;
+
+    public QBLoginChatCommand(Context context, QBAuthHelper authHelper, QBChatRestHelper chatRestHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.authHelper = authHelper;
-        this.chatHelper = chatHelper;
+        this.chatRestHelper = chatRestHelper;
     }
 
     public static void start(Context context) {
@@ -41,19 +40,19 @@ public class QBLoginChatCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
         tryLogin();
-        if (!chatHelper.isLoggedIn()) {
+        if (!chatRestHelper.isLoggedIn()) {
             throw new Exception(QBChatErrors.AUTHENTICATION_FAILED);
         }
         return extras;
     }
 
-    private void tryLogin() throws XMPPException, IOException, SmackException, QBResponseException {
+    private void tryLogin() throws XMPPException, IOException, SmackException {
         long startTime = new Date().getTime();
         long currentTime = startTime;
-        while (!chatHelper.isLoggedIn() && (currentTime - startTime) < Consts.LOGIN_TIMEOUT) {
+        while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < Consts.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
-                chatHelper.login(AppSession.getSession().getUser());
+                chatRestHelper.login(AppSession.getSession().getUser());
             } catch (SmackException ignore) { /* NOP */ }
         }
     }

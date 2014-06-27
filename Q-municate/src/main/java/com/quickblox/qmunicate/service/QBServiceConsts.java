@@ -122,6 +122,7 @@ public class QBServiceConsts {
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
+    public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String EXTRA_FRIENDS = "friends";
     public static final String EXTRA_FRIENDS_FACEBOOK = "friends_facebook";
     public static final String EXTRA_FRIENDS_CONTACTS = "friends_contacts";
@@ -141,6 +142,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
+    public static final String EXTRA_DIALOG_ID = "dialog_id";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";

@@ -3,21 +3,20 @@ package com.quickblox.qmunicate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBLogoutChatCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBChatRestHelper chatRestHelper;
 
-    public QBLogoutChatCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBLogoutChatCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.chatRestHelper = chatRestHelper;
     }
 
     public static void start(Context context) {
@@ -27,7 +26,7 @@ public class QBLogoutChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        chatHelper.logout();
+        chatRestHelper.logout();
         return extras;
     }
 }

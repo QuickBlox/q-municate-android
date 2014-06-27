@@ -82,7 +82,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             hideProgress();
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog.getRoomJid() != null) {
-                GroupDialogActivity.start(NewDialogActivity.this, dialog.getRoomJid());
+                GroupDialogActivity.start(NewDialogActivity.this, dialog);
                 finish();
             } else {
                 ErrorUtils.showError(NewDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));

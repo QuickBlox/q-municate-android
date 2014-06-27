@@ -2,16 +2,17 @@ package com.quickblox.qmunicate.model;
 
 public class DialogMessageCache {
 
-    private String roomJidId;
     private Integer senderId;
     private String message;
     private String attachUrl;
     private long time;
     private boolean isRead;
 
-    public DialogMessageCache(String roomJidId, Integer senderId, String message, String attachUrl, long time,
+    private String dialogId;
+
+    public DialogMessageCache(String dialogId, Integer senderId, String message, String attachUrl, long time,
             boolean isRead) {
-        this.roomJidId = roomJidId;
+        this.dialogId = dialogId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
@@ -63,11 +64,11 @@ public class DialogMessageCache {
         this.attachUrl = attachUrl;
     }
 
-    public String getRoomJidId() {
-        return roomJidId;
+    public String getDialogId() {
+        return dialogId;
     }
 
-    public void setRoomJidId(String roomJidId) {
-        this.roomJidId = roomJidId;
+    public void setDialogId(String dialogId) {
+        this.dialogId = dialogId;
     }
 }

@@ -56,8 +56,6 @@ public class LandingActivity extends BaseActivity {
         setContentView(R.layout.activity_landing);
         useDoubleBackPressed = true;
 
-        canPerformLogout.set(false);
-
         addActions();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());

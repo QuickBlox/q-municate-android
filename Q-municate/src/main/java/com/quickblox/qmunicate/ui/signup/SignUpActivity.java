@@ -63,7 +63,6 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
         initUI();
 
-        canPerformLogout.set(false);
         useDoubleBackPressed = true;
         qbUser = new QBUser();
         imageHelper = new ImageHelper(this);

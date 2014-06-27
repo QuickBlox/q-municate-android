@@ -15,7 +15,7 @@ public class DialogMessageTable {
     public static class Cols {
 
         public static final String ID = "_id";
-        public static final String ROOM_JID_ID = "room_jid_id";
+        public static final String DIALOG_ID = "dialog_id";
         public static final String SENDER_ID = "sender_id";
         public static final String BODY = "body";
         public static final String TIME = "time";

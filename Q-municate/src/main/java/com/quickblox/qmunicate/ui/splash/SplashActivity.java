@@ -31,7 +31,6 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        canPerformLogout.set(false);
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
 

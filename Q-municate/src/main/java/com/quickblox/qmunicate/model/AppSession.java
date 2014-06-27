@@ -33,6 +33,7 @@ public class AppSession implements Serializable {
         helper.delete(PrefsHelper.PREF_USER_EMAIL);
         helper.delete(PrefsHelper.PREF_LOGIN_TYPE);
         helper.delete(PrefsHelper.PREF_SESSION_TOKEN);
+        helper.delete(PrefsHelper.PREF_USER_ID);
         activeSession = null;
     }
 

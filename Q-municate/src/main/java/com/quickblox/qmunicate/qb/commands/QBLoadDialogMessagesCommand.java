@@ -6,8 +6,9 @@ import android.os.Bundle;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
@@ -15,19 +16,18 @@ import java.util.List;
 
 public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBChatRestHelper chatRestHelper;
 
-    public QBLoadDialogMessagesCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBLoadDialogMessagesCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.chatRestHelper = chatRestHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, String roomJidId, long lastDateLoad) {
+    public static void start(Context context, QBDialog dialog, long lastDateLoad) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJidId);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
         context.startService(intent);
     }
@@ -35,11 +35,12 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
-        List<QBHistoryMessage> dialogMessagesList = chatHelper.getDialogMessages(dialog, roomJidId, lastDateLoad);
+        List<QBHistoryMessage> dialogMessagesList = chatRestHelper.getDialogMessages(dialog, lastDateLoad);
+        DatabaseManager.updateMessages(context, dialogMessagesList, dialog);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES, (java.io.Serializable) dialogMessagesList);
+        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
+                (java.io.Serializable) dialogMessagesList);
         return bundle;
     }
 }

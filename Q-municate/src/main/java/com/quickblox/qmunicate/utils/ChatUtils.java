@@ -26,7 +26,11 @@ public class ChatUtils {
     private static final String PROPERTY_ROOM_NAME = "name";
     private static final String PROPERTY_DIALOG_TYPE_CODE = "type";
     private static final String PROPERTY_ROOM_JID = "room_jid";
-    private static final String PROPERTY_DIALOG_ID = "_id";
+    public static final String PROPERTY_DIALOG_ID = "_id";
+    public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
+
+    public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
+    public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = AppSession.getSession().getUser();
@@ -48,7 +52,7 @@ public class ChatUtils {
     }
 
     public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
-        String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
+        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -82,6 +86,10 @@ public class ChatUtils {
     }
 
     public static QBChatMessage createRoomNotificationMessage(Context context, QBDialog dialog) {
+        return createChatNotificationMessage(context, dialog);
+    }
+
+    public static QBChatMessage createChatNotificationMessage(Context context, QBDialog dialog) {
         String dialogId = String.valueOf(dialog.getDialogId());
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
@@ -91,10 +99,15 @@ public class ChatUtils {
         QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT);
         chatMessage.setProperty(PROPERTY_DIALOG_ID, dialogId);
-        chatMessage.setProperty(PROPERTY_ROOM_JID, roomJid);
+        if (!TextUtils.isEmpty(roomJid)) {
+            chatMessage.setProperty(PROPERTY_ROOM_JID, roomJid);
+        }
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
-        chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
+        if (!TextUtils.isEmpty(dialogName)) {
+            chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
+        }
         chatMessage.setProperty(PROPERTY_DIALOG_TYPE_CODE, dialogTypeCode);
         return chatMessage;
     }
@@ -104,7 +117,7 @@ public class ChatUtils {
     }
 
     public static boolean isNotificationMessage(QBChatMessage chatMessage) {
-        return chatMessage.getProperty(PROPERTY_DIALOG_ID) != null;
+        return chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null;
     }
 
     public static String[] getOccupantsIdsArrayFromList(ArrayList<Integer> occupantsList) {
@@ -134,8 +147,7 @@ public class ChatUtils {
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = Consts.EMPTY_STRING;
         if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(
-                    chatMessage.getAttachments()));
+            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(chatMessage.getAttachments()));
         }
         return attachURL;
     }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.qmunicate.utils.Consts;
 
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public abstract class BaseSelectableFriendListActivity extends BaseActivity implements NewDialogCounterFriendsListener {
+public abstract class BaseSelectableFriendListActivity extends BaseLogeableActivity implements NewDialogCounterFriendsListener {
 
     protected DialogsSelectableFriendsAdapter friendsAdapter;
     protected ListView friendsListView;

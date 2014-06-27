@@ -6,18 +6,18 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendGroupDialogMessageCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBSendGroupDialogMessageCommand(Context context, QBChatHelper ChatHelper, String successAction,
-            String failAction) {
+    public QBSendGroupDialogMessageCommand(Context context, QBMultiChatHelper multiChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = ChatHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
     public static void start(Context context, String roomJidId, String message, QBFile file) {
@@ -34,10 +34,10 @@ public class QBSendGroupDialogMessageCommand extends ServiceCommand {
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
-        if(file == null) {
-            chatHelper.sendGroupMessage(roomJidId, message);
+        if (file == null) {
+            multiChatHelper.sendGroupMessage(roomJidId, message);
         } else {
-            chatHelper.sendGroupMessageWithAttachImage(roomJidId, file);
+            multiChatHelper.sendGroupMessageWithAttachImage(roomJidId, file);
         }
 
         return null;
