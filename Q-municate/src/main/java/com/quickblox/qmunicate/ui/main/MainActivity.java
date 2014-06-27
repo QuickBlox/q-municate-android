@@ -38,8 +38,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
-    private boolean isImportInitialized;
-    private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
 
     public static void start(Context context) {
@@ -102,13 +100,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         useDoubleBackPressed = true;
 
-        initPrefValues();
-
         gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
 
-        if (!isImportInitialized) {
+        if (!isImportInitialized()) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState,
                     new FacebookSessionStatusCallback());
@@ -121,10 +117,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         loadChatsDialogs();
     }
 
-    private void initPrefValues() {
+    private boolean isImportInitialized() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        isImportInitialized = prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-        isSignUpInitialized = prefsHelper.getPref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
+        return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
     }
 
     private void initNavigationDrawer() {
@@ -169,7 +164,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 importFriends.startGetFriendsListTask(true);
-            } else if (!(!session.isOpened() && !session.isClosed())) {
+            } else if (!(!session.isOpened() && !session.isClosed()) && !isImportInitialized()) {
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }

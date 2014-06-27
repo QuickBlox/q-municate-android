@@ -123,6 +123,8 @@ public class QBServiceConsts {
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
     public static final String EXTRA_FRIENDS = "friends";
+    public static final String EXTRA_FRIENDS_FACEBOOK = "friends_facebook";
+    public static final String EXTRA_FRIENDS_CONTACTS = "friends_contacts";
     public static final String EXTRA_FILE = "file";
     public static final String EXTRA_QBFILE = "qb_file";
     public static final String EXTRA_SOCIAL_PROVIDER = "social_provider";

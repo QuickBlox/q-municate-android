@@ -2,7 +2,9 @@ package com.quickblox.qmunicate.model;
 
 import android.net.Uri;
 
-public class InviteFriend {
+import java.io.Serializable;
+
+public class InviteFriend implements Serializable {
     public static final int VIA_FACEBOOK_TYPE = 0;
     public static final int VIA_CONTACTS_TYPE = 1;
 
