@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.errors.QBChatErrors;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.AppSession;
@@ -46,7 +47,7 @@ public class QBLoginChatCommand extends ServiceCommand {
         return extras;
     }
 
-    private void tryLogin() throws XMPPException, IOException, SmackException {
+    private void tryLogin() throws XMPPException, IOException, SmackException, QBResponseException {
         long startTime = new Date().getTime();
         long currentTime = startTime;
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < Consts.LOGIN_TIMEOUT) {
