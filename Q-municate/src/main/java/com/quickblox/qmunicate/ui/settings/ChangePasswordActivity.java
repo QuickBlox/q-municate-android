@@ -25,6 +25,9 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private EditText newPasswordEditText;
     private ValidationUtils validationUtils;
     private Resources resources;
+    private QBUser user;
+    private String oldPasswordText;
+    private String newPasswordText;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ChangePasswordActivity.class);
@@ -42,18 +45,23 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         initUI();
 
         addActions();
+
+        user = AppSession.getSession().getUser();
     }
 
     public void changePasswordOnClickListener(View view) {
-        String oldPasswordText = oldPasswordEditText.getText().toString();
-        String newPasswordText = newPasswordEditText.getText().toString();
+        oldPasswordText = oldPasswordEditText.getText().toString();
+        newPasswordText = newPasswordEditText.getText().toString();
         if (validationUtils.isValidChangePasswordData(oldPasswordText, newPasswordText)) {
-            QBUser user = AppSession.getSession().getUser();
-            user.setOldPassword(oldPasswordText);
-            user.setPassword(newPasswordText);
+            updatePasswords(oldPasswordText, newPasswordText);
             showProgress();
             QBChangePasswordCommand.start(this, user);
         }
+    }
+
+    private void updatePasswords(String oldPasswordText, String newPasswordText) {
+        user.setOldPassword(oldPasswordText);
+        user.setPassword(newPasswordText);
     }
 
     @Override
@@ -80,7 +88,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
-        addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
         updateBroadcastActionList();
     }
 
@@ -101,8 +109,20 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             saveUserCredentials(user);
             hideProgress();
-            clearFields();
             DialogUtils.showLong(ChangePasswordActivity.this, getString(R.string.dlg_password_changed));
+            finish();
+        }
+    }
+
+    private class ChangePasswordFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            hideProgress();
+            DialogUtils.showLong(ChangePasswordActivity.this, exception.getMessage());
+            updatePasswords(oldPasswordText, oldPasswordText);
+            clearFields();
         }
     }
 }
