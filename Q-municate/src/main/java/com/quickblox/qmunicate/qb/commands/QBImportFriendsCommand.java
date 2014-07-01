@@ -11,7 +11,6 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.ArrayList;
@@ -44,9 +43,7 @@ public class QBImportFriendsCommand extends ServiceCommand {
 
         Bundle params = new Bundle();
 
-        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(Consts.FL_FRIENDS_PAGE_NUM);
-        requestBuilder.setPerPage(Consts.FL_FRIENDS_PER_PAGE);
+        QBPagedRequestBuilder requestBuilder = null;
 
         List<QBUser> realFriendsFacebookList = null;
         List<QBUser> realFriendsContactsList = null;
