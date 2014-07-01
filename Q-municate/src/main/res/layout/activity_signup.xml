@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
     android:padding="20dp">
 
@@ -53,7 +54,7 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="5dp"
             android:text="@string/sup_choose_user_picture"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/gray"
             android:textSize="18sp" />
     </LinearLayout>
 
@@ -64,7 +65,6 @@
         android:background="@drawable/button_sign_up_blue_selector"
         android:onClick="signUpOnClickListener"
         android:text="@string/sup_sign_up"
-        android:textColor="@android:color/white"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_text_size" />
 </LinearLayout>
-
