@@ -87,6 +87,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         initUIWithUsersData();
         initBroadcastActionList();
         initTextChangedListeners();
+        updateOldUserData();
     }
 
     private void initUI() {
@@ -294,6 +295,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             DialogUtils.showLong(ProfileActivity.this, exception.getMessage());
+            user.setFullName(fullnameOld);
             hideProgress();
         }
     }
