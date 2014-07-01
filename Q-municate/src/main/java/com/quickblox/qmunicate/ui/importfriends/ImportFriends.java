@@ -5,7 +5,6 @@ import android.app.Activity;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
-import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.qmunicate.utils.Consts;
