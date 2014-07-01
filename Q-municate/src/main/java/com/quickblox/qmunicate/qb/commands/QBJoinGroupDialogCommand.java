@@ -32,9 +32,9 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
         context.startService(intent);
     }
 
-    public static void start(Context context, List<QBDialog> roomJidList) {
+    public static void start(Context context, ArrayList<QBDialog> dialogList) {
         Intent intent = new Intent(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_LIST, new ArrayList<QBDialog>(roomJidList));
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_LIST, dialogList);
         context.startService(intent);
     }
 
