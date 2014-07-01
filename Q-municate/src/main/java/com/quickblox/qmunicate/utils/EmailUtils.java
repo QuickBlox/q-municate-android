@@ -35,7 +35,7 @@ public class EmailUtils {
                 .toString()});
         intentEmail.putExtra(Intent.EXTRA_SUBJECT, feedbackType);
         intentEmail.putExtra(Intent.EXTRA_TEXT,
-                (java.io.Serializable) DeviceInfoUtils.getDeviseInfoForFeedback());
+                (java.io.Serializable) DeviceInfoUtils.getDeviseInfoForFeedback(context));
         intentEmail.setType(Consts.TYPE_OF_EMAIL);
         context.startActivity(Intent.createChooser(intentEmail, resources.getText(
                 R.string.fdb_choose_email_provider)));
