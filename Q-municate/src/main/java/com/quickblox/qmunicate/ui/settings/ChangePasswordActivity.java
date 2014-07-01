@@ -97,6 +97,10 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         newPasswordEditText.setText(Consts.EMPTY_STRING);
     }
 
+    private void clearFieldNewPassword() {
+        newPasswordEditText.setText(Consts.EMPTY_STRING);
+    }
+
     private void saveUserCredentials(QBUser user) {
         user.setPassword(newPasswordEditText.getText().toString());
         AppSession.getSession().updateUser(user);
@@ -122,7 +126,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
             hideProgress();
             DialogUtils.showLong(ChangePasswordActivity.this, exception.getMessage());
             updatePasswords(oldPasswordText, oldPasswordText);
-            clearFields();
+            clearFieldNewPassword();
         }
     }
 }
