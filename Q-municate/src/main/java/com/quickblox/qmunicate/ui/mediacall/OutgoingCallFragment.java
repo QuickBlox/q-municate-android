@@ -26,6 +26,7 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.service.QBService;
@@ -240,7 +241,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-        QBUser sender = App.getInstance().getUser();
+        QBUser sender = AppSession.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
             if (!opponent.isOnline()) {

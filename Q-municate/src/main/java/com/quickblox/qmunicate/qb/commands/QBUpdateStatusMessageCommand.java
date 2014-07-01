@@ -5,18 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBPrivateChatHelper privateChatHelper;
 
-    public QBUpdateStatusMessageCommand(Context context, QBChatHelper chatHelper, String successAction,
-                                        String failAction) {
+    public QBUpdateStatusMessageCommand(Context context, QBPrivateChatHelper privateChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context, String messageId, boolean isRead) {
@@ -31,7 +31,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         String messageId = extras.getString(QBServiceConsts.EXTRA_MESSAGE_ID);
         boolean isRead = extras.getBoolean(QBServiceConsts.EXTRA_STATUS_MESSAGE);
-        chatHelper.updateStatusMessage(messageId, isRead);
+        privateChatHelper.updateStatusMessage(messageId, isRead);
         return null;
     }
 }

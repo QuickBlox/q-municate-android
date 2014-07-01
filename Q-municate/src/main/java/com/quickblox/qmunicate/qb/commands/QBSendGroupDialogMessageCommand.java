@@ -6,22 +6,23 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendGroupDialogMessageCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBSendGroupDialogMessageCommand(Context context, QBChatHelper ChatHelper, String successAction,
-            String failAction) {
+    public QBSendGroupDialogMessageCommand(Context context, QBMultiChatHelper multiChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = ChatHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
-    public static void start(Context context, String message, QBFile file) {
+    public static void start(Context context, String roomJidId, String message, QBFile file) {
         Intent intent = new Intent(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJidId);
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, message);
         intent.putExtra(QBServiceConsts.EXTRA_QBFILE, file);
         context.startService(intent);
@@ -29,13 +30,14 @@ public class QBSendGroupDialogMessageCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
+        String roomJidId = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
-        if(file == null) {
-            chatHelper.sendGroupMessage(message);
+        if (file == null) {
+            multiChatHelper.sendGroupMessage(roomJidId, message);
         } else {
-            chatHelper.sendGroupMessageWithAttachImage(file);
+            multiChatHelper.sendGroupMessageWithAttachImage(roomJidId, file);
         }
 
         return null;

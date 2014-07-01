@@ -11,20 +11,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
-import com.quickblox.qmunicate.utils.TipsManager;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class DialogsFragment extends BaseFragment {
 
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
+    private TextView emptyListTextView;
+    private static boolean isChatsListLoaded = false;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -43,8 +49,11 @@ public class DialogsFragment extends BaseFragment {
         initUI(view);
         initListeners();
         initChatsDialogs();
+        Crouton.cancelAllCroutons();
 
-//        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
+        //        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
+
+        addActions();
 
         return view;
     }
@@ -52,6 +61,7 @@ public class DialogsFragment extends BaseFragment {
     private void initUI(View view) {
         setHasOptionsMenu(true);
         dialogsListView = (ListView) view.findViewById(R.id.chats_listview);
+        emptyListTextView = (TextView) view.findViewById(R.id.empty_list_textview);
     }
 
     private void initListeners() {
@@ -70,6 +80,19 @@ public class DialogsFragment extends BaseFragment {
         });
     }
 
+    private void checkVisibilityEmptyLabel() {
+        emptyListTextView.setVisibility(dialogsAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onResume() {
+        Crouton.cancelAllCroutons();
+        if (isChatsListLoaded) {
+            checkVisibilityEmptyLabel();
+        }
+        super.onResume();
+    }
+
     private void initChatsDialogs() {
         dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
         dialogsListView.setAdapter(dialogsAdapter);
@@ -86,7 +109,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog.getRoomJid());
+        GroupDialogActivity.start(baseActivity, dialog);
     }
 
     private Cursor getAllChats() {
@@ -106,5 +129,23 @@ public class DialogsFragment extends BaseFragment {
                 break;
         }
         return true;
+    }
+
+    private void addActions() {
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
+                new LoadChatsDialogsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
+    }
+
+    private class LoadChatsDialogsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            isChatsListLoaded = true;
+            if (baseActivity != null) {
+                checkVisibilityEmptyLabel();
+            }
+        }
     }
 }

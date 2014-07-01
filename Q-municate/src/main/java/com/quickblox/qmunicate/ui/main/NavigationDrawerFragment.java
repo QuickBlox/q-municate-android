@@ -2,11 +2,16 @@ package com.quickblox.qmunicate.ui.main;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
@@ -23,27 +28,27 @@ import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
-import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import java.util.Arrays;
 import java.util.List;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-
+    private static DrawerLayout drawerLayout;
+    private static View fragmentContainerView;
     private Resources resources;
-    private DrawerLayout drawerLayout;
     private ListView drawerListView;
-    private View fragmentContainerView;
     private TextView fullnameTextView;
     private ImageButton logoutButton;
 
@@ -54,6 +59,12 @@ public class NavigationDrawerFragment extends BaseFragment {
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
     private boolean isMissedMessage;
+    private NavigationDrawerAdapter navigationDrawerAdapter;
+    private BroadcastReceiver countUnreadDialogsBroadcastReceiver;
+
+    public static boolean isDrawerOpen() {
+        return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,29 +85,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         }
 
         selectItem(currentSelectedPosition);
-    }
 
-    private void initPrefValues() {
-        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
-        isMissedMessage = prefsHelper.getPref(PrefsHelper.PREF_MISSED_MESSAGE, false);
-    }
-
-    private void saveMissedMessageFlag(boolean isMissedMessage) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
-    }
-
-    private void selectItem(int position) {
-        currentSelectedPosition = position;
-        if (drawerListView != null) {
-            drawerListView.setItemChecked(position, true);
-        }
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
-        }
-        if (navigationDrawerCallbacks != null) {
-            navigationDrawerCallbacks.onNavigationDrawerItemSelected(position);
-        }
+        countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     @Override
@@ -105,55 +97,11 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         initUI(rootView);
         initListeners();
-
-        NavigationDrawerAdapter navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
-                getNavigationDrawerItems());
-        drawerListView.setAdapter(navigationDrawerAdapter);
+        initNavigationAdapter();
 
         drawerListView.setItemChecked(currentSelectedPosition, true);
-        updateCountUnreadDialogsListener = navigationDrawerAdapter;
 
         return rootView;
-    }
-
-    private void initUI(View rootView) {
-        drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
-        logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
-        fullnameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
-    }
-
-    private void initListeners() {
-        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-                selectItem(position);
-            }
-        });
-
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
-    }
-
-    private List<String> getNavigationDrawerItems() {
-        String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
-        return Arrays.asList(itemsArray);
-    }
-
-    private void logout() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                baseActivity.showProgress();
-                FacebookHelper.logout();
-                QBLogoutCommand.start(baseActivity);
-            }
-        });
-        dialog.show(getFragmentManager(), null);
     }
 
     @Override
@@ -169,16 +117,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    private void addActions() {
-        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
-        baseActivity.updateBroadcastActionList();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        QBUser user = App.getInstance().getUser();
+        QBUser user = AppSession.getSession().getUser();
         if (user != null) {
             fullnameTextView.setText(user.getFullName());
         }
@@ -208,10 +150,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
-    public boolean isDrawerOpen() {
-        return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
-    }
-
     public void setUp(int fragmentId, final DrawerLayout drawerLayout) {
         fragmentContainerView = baseActivity.findViewById(fragmentId);
         this.drawerLayout = drawerLayout;
@@ -239,8 +177,88 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerLayout.setDrawerListener(drawerToggle);
     }
 
+    private void initPrefValues() {
+        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
+        userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+        isMissedMessage = prefsHelper.getPref(PrefsHelper.PREF_MISSED_MESSAGE, false);
+    }
+
+    private void saveMissedMessageFlag(boolean isMissedMessage) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
+    }
+
+    private void selectItem(int position) {
+        currentSelectedPosition = position;
+        if (drawerListView != null) {
+            drawerListView.setItemChecked(position, true);
+        }
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(fragmentContainerView);
+        }
+        if (navigationDrawerCallbacks != null) {
+            navigationDrawerCallbacks.onNavigationDrawerItemSelected(position);
+        }
+    }
+
+    private void initNavigationAdapter() {
+        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
+        drawerListView.setAdapter(navigationDrawerAdapter);
+        updateCountUnreadDialogsListener = navigationDrawerAdapter;
+    }
+
+    private void initUI(View rootView) {
+        drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
+        logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
+        fullnameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
+    }
+
+    private void initListeners() {
+        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
+                selectItem(position);
+            }
+        });
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+    }
+
+
+    private List<String> getNavigationDrawerItems() {
+        String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
+        return Arrays.asList(itemsArray);
+    }
+
+    private void logout() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                baseActivity.showProgress();
+                FacebookHelper.logout();
+                QBLogoutCommand.start(baseActivity);
+            }
+        });
+        dialog.show(getFragmentManager(), null);
+    }
+
+    private void addActions() {
+        baseActivity.addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        baseActivity.addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
+        baseActivity.updateBroadcastActionList();
+    }
+
     private void saveUserLearnedDrawer() {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
+    }
+
+    private int getCounterUnreadDialogs() {
+        return DatabaseManager.getCountUnreadDialogs(baseActivity);
     }
 
     public interface NavigationDrawerCallbacks {
@@ -253,8 +271,15 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onUpdateCountUnreadDialogs(int count);
     }
 
-    private int getCounterUnreadDialogs() {
-        return DatabaseManager.getCountUnreadDialogs(baseActivity);
+    private class CountUnreadDialogsBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
+            }
+        }
     }
 
     private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {

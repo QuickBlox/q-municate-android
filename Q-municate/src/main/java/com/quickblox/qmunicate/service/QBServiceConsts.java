@@ -4,7 +4,7 @@ public class QBServiceConsts {
 
     public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
-    public static final String ADD_FRIENDS_ACTION = "add_friendsList_action";
+    public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";
     public static final String GET_FILE_ACTION = "get_file_action";
     public static final String LOGIN_ACTION = "login_action";
@@ -39,11 +39,12 @@ public class QBServiceConsts {
     public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
     public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
+    public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
 
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
-    public static final String ADD_FRIENDS_SUCCESS_ACTION = "add_friendsList_success_action";
     public static final String ADD_FRIEND_FAIL_ACTION = "add_friend_fail_action";
-    public static final String ADD_FRIENDS_FAIL_ACTION = "add_friendsList_fail_action";
+    public static final String IMPORT_FRIENDS_SUCCESS_ACTION = "import_friends_success_action";
+    public static final String IMPORT_FRIENDS_FAIL_ACTION = "import_friends_fail_action";
     public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change_password_success_action";
     public static final String CHANGE_PASSWORD_FAIL_ACTION = "change_password_fail_action";
     public static final String GET_FILE_SUCCESS_ACTION = "get_file_success_action";
@@ -121,7 +122,10 @@ public class QBServiceConsts {
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_FRIEND = "friend";
+    public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String EXTRA_FRIENDS = "friends";
+    public static final String EXTRA_FRIENDS_FACEBOOK = "friends_facebook";
+    public static final String EXTRA_FRIENDS_CONTACTS = "friends_contacts";
     public static final String EXTRA_FILE = "file";
     public static final String EXTRA_QBFILE = "qb_file";
     public static final String EXTRA_SOCIAL_PROVIDER = "social_provider";
@@ -138,6 +142,7 @@ public class QBServiceConsts {
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
+    public static final String EXTRA_DIALOG_ID = "dialog_id";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
@@ -147,6 +152,7 @@ public class QBServiceConsts {
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
     public static final String EXTRA_MESSAGE_ID = "message_id";
     public static final String EXTRA_STATUS_MESSAGE = "status_message";
+    public static final String EXTRA_USER_ID = "user_id";
 
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";

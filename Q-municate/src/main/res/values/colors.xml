@@ -13,8 +13,8 @@
     <color name="button_sign_up_pressed_green_color">#00851c</color>
     <color name="button_sign_up_normal_blue_color">#0077cb</color>
     <color name="button_sign_up_pressed_blue_color">#00538e</color>
-    <color name="button_facebook_normal_color">#3d5a98</color>
-    <color name="button_facebook_pressed_color">#2b3f6a</color>
+    <color name="button_facebook_normal_color">#3b5998</color>
+    <color name="button_facebook_pressed_color">#ff265198</color>
     <color name="button_log_in_normal_color">#00bf28</color>
     <color name="button_log_in_pressed_color">#00851c</color>
     <color name="button_null_background_pressed_color">#e4f4ff</color>

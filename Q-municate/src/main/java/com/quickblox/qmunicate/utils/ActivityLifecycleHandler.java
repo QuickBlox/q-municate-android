@@ -5,7 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.qmunicate.App;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.qmunicate.ui.base.QBLogeable;
@@ -25,20 +25,33 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     public void onActivityResumed(Activity activity) {
         lo.g("onActivityResumed" + numberOfActivitiesInForeground);
+        //Count only our app logeable activity
         if (numberOfActivitiesInForeground == 0 && chatDestroyed) {
-            QBLoginAndJoinDialogsCommand.start(activity);
+            boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
+            if (canLogin) {
+                QBLoginAndJoinDialogsCommand.start(activity);
+            }
         }
-        ++numberOfActivitiesInForeground;
+        if (activity instanceof QBLogeable) {
+            ++numberOfActivitiesInForeground;
+        }
     }
 
     public void onActivityPaused(Activity activity) {
     }
 
     public void onActivityStopped(Activity activity) {
-        --numberOfActivitiesInForeground;
+        //Count only our app logeable activity
+        if (activity instanceof QBLogeable) {
+            --numberOfActivitiesInForeground;
+        }
         lo.g("onActivityStopped" + numberOfActivitiesInForeground);
-        boolean isLogined = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IS_LOGINED, false);
-        if (numberOfActivitiesInForeground == 0 && isLogined && activity instanceof QBLogeable) {
+
+        if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
+            boolean isLogedIn = isLogedIn();
+            if (!isLogedIn) {
+                return;
+            }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity);
@@ -46,6 +59,11 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             // TODO SF app was killed.
             //android.os.Process.killProcess(android.os.Process.myPid());
         }
+    }
+
+    private boolean isLogedIn() {
+        AppSession activeSession = AppSession.getSession();
+        return activeSession.isSessionExist();
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {

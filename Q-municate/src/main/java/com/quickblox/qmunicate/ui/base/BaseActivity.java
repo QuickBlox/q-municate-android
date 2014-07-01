@@ -26,21 +26,17 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public abstract class BaseActivity extends Activity implements QBLogeable {
+public abstract class BaseActivity extends Activity {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
-
-    public static final String CAN_PERFORM_LOGOUT = "can_perform_logout";
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
@@ -51,7 +47,6 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
-    protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
     private View newMessageView;
     private TextView newMessageTextView;
@@ -98,30 +93,28 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         Crouton.show(this, newMessageView);
     }
 
-    //This method is used for logout action when Actvity is going to background
-    @Override
-    public boolean isCanPerformLogoutInOnStop() {
-        return canPerformLogout.get();
+
+    public void updateBroadcastActionList() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
+        IntentFilter intentFilter = new IntentFilter();
+        for (String commandName : broadcastCommandMap.keySet()) {
+            intentFilter.addAction(commandName);
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
-        if (savedInstanceState != null && savedInstanceState.containsKey(CAN_PERFORM_LOGOUT)) {
-            canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
-        }
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
         messageBroadcastReceiver = new MessageBroadcastReceiver();
         failAction = new FailAction();
         initUI();
-    }
-
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
     }
 
     @Override
@@ -165,40 +158,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         }, DOUBLE_BACK_DELAY);
     }
 
-    private void unbindService() {
-        if (bounded) {
-            unbindService(serviceConnection);
-        }
-    }
-
-    private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-    }
-
-    public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
-        IntentFilter intentFilter = new IntentFilter();
-        for (String commandName : broadcastCommandMap.keySet()) {
-            intentFilter.addAction(commandName);
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     protected void onConnectedToService() {
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
-        super.onSaveInstanceState(outState);
     }
 
     protected void navigateToParent() {
@@ -220,10 +180,35 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         transaction.commit();
     }
 
+    private void initUI() {
+        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+    }
+
+    private void unbindService() {
+        if (bounded) {
+            unbindService(serviceConnection);
+        }
+    }
+
+    private void unregisterBroadcastReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     private FragmentTransaction buildTransaction() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
+    }
+
+    protected void onFailAction(String action) {
+
     }
 
     public class FailAction implements Command {
@@ -233,6 +218,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
+            onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
 
@@ -245,7 +231,11 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
                 Command command = broadcastCommandMap.get(action);
                 if (command != null) {
                     Log.d("STEPS", "executing " + action);
-                    command.execute(intent.getExtras());
+                    try {
+                        command.execute(intent.getExtras());
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         }
@@ -256,7 +246,7 @@ public abstract class BaseActivity extends Activity implements QBLogeable {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.isNeedToShowCrouton) {
+            if (extras != null) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);

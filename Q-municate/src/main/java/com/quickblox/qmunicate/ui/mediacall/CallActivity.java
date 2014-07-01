@@ -14,6 +14,7 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -42,7 +43,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (!friend.isOnline()) {
             String callMsg = context.getResources().getString(R.string.dlg_offline_call,
-                    App.getInstance().getUser().getFullName());
+                    AppSession.getSession().getUser().getFullName());
             QBSendPushCommand.start(context, callMsg, friend.getId());
         }
         Intent intent = new Intent(context, CallActivity.class);
@@ -89,7 +90,6 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
         actionBar.hide();
         mediaPlayer = App.getInstance().getMediaPlayer();

@@ -40,11 +40,9 @@ public class GSMHelper {
         new QBGCMRegistrationTask(activity).execute(gcm);
     }
 
-    public int getSubscriptionId() {
+    public boolean isSubscribed() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        int subscriptionId = prefsHelper.getPref(PrefsHelper.PREF_SUBSCRIPTION_ID,
-                Consts.NOT_INITIALIZED_VALUE);
-        return subscriptionId;
+        return prefsHelper.getPref(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, false);
     }
 
     public String getRegistrationId() {
@@ -57,7 +55,7 @@ public class GSMHelper {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         String registrationId = prefsHelper.getPref(PrefsHelper.PREF_REG_ID, Consts.EMPTY_STRING);
 
-        boolean userSavedInPreference = isUserSavedInPreference(prefsHelper);
+        boolean userSavedInPreference = isUserSavedInPreference(prefsHelper, user);
 
         int registeredVersion = prefsHelper.getPref(PrefsHelper.PREF_APP_VERSION, Integer.MIN_VALUE);
         int currentVersion = Utils.getAppVersionCode(activity);
@@ -66,10 +64,10 @@ public class GSMHelper {
                 (currAppVersionRegistered);
     }
 
-    private boolean isUserSavedInPreference(PrefsHelper prefsHelper) {
+    private boolean isUserSavedInPreference(PrefsHelper prefsHelper, QBUser user) {
         int registeredUserId = prefsHelper.getPref(PrefsHelper.PREF_REG_USER_ID,
                 Consts.NOT_INITIALIZED_VALUE);
-        return Consts.NOT_INITIALIZED_VALUE != registeredUserId;
+        return user.getId() == registeredUserId;
     }
 
     //TODO VF will be defined throw core qb

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Qmunicate</string>
+    <string name="app_name">Q-municate</string>
 
     // ActionBar
     <string name="acb_search_title">Search</string>
@@ -10,6 +10,7 @@
     <string name="acb_add_friend_to_chat_title">Add friend to Chat</string>
     <string name="acb_leave_chat_title">Leave Chat</string>
     <string name="acb_chat_details_title">Chat details</string>
+    <string name="acb_chat_attach_title">Add attach</string>
 
     // Navigation Drawer
     <string name="nvd_title_friends">Friends</string>
@@ -17,6 +18,7 @@
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
     <string name="nvd_title_invite_friends">Invite Friends</string>
+    <string name="nvd_title_feedback">Feedback</string>
     <string name="nvd_open">Open navigation drawer</string>
     <string name="nvd_close">Close navigation drawer</string>
 
@@ -25,6 +27,7 @@
         <item>Chats</item>
         <item>Invite Friends</item>
         <item>Settings</item>
+        <item>Give Feedback</item>
     </string-array>
 
     // Landing
@@ -43,6 +46,13 @@
     <string name="lgn_remember_me">Remember Me</string>
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
 
+    // Forgot Password
+    <string name="fpw_forgot_password_title">Forgot Password</string>
+    <string name="fpw_email">Email</string>
+    <string name="fpw_reset_password">Reset Password</string>
+    <string name="fpw_not_email_field_entered">Please enter email</string>
+    <string name="fpw_email_was_sent">Mail was sent to %1$s</string>
+
     // Sing Up
     <string name="sup_fullname_hint">Full Name</string>
     <string name="sup_email_hint">Email</string>
@@ -56,6 +66,7 @@
     <string name="frl_friends">Friends</string>
     <string name="frl_all_users">All Users</string>
     <string name="frl_no_friends">Currently there are no friends.\nYou can search friends or invite them via Invite screen.</string>
+    <string name="frl_not_found_users">Sorry… no users</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -67,6 +78,7 @@
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
+    <string name="dlg_no_chats">There are no chats yet.</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
@@ -97,6 +109,14 @@
     <string name="stn_push_notifivation">Push Notification</string>
     <string name="stn_version">Version %1$s</string>
 
+    // Change Password
+    <string name="cpw_change_password_title">Change Password</string>
+    <string name="cpw_change">Change</string>
+    <string name="cpw_old_password">Old Password</string>
+    <string name="cpw_new_password">New Password</string>
+    <string name="cpw_not_old_password_field_entered">Please enter old password</string>
+    <string name="cpw_not_new_password_field_entered">Please enter new password</string>
+
     // Profile
     <string name="prf_full_name">Full Name</string>
     <string name="prf_change">Change</string>
@@ -117,22 +137,35 @@
     <string name="inf_from_contacts">(invite via Email)</string>
     <string name="inf_send">Send</string>
     <string name="inf_choose_email_provider">Choose an email provider:</string>
-    <string name="inf_subject_of_invitation">Qmunicate</string>
-    <string name="inf_body_of_invitation">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
+    <string name="inf_subject_of_invitation">Q-municate</string>
+    <string name="inf_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
     <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
-    <string name="inf_fb_wall_param_name">Qmunicate</string>
-    <string name="inf_fb_wall_param_description">Dear friend, use Qmunicate application to reach me!\nDownload it here: http://qmunicate.com/</string>
-    <string name="inf_fb_wall_param_link">http://qmunicate.com/</string>
+    <string name="inf_fb_wall_param_name">Q-municate</string>
+    <string name="inf_fb_wall_param_description">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
+    <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
+
+    // Feedback
+    <string name="fdb_feedback_title">Feedback Description</string>
+    <string name="fdb_feedback_label">Please write in email the steps to make the bug or error appear again.
+        Let us know how often it occurs and if it give an error code. We need to know this in order to find the source of the problem. Please give us as many details as possible. Thank you. </string>
+    <string name="fdb_bug_type">Bug</string>
+    <string name="fdb_improvement_type">Improvement</string>
+    <string name="fdb_suggestion_type">Suggestion</string>
+    <string name="fdb_support_email">anton.dyachenko@quickblox.com</string>
+    <string name="fdb_choose_email_provider">Choose an email provider:</string>
+    <string name="fdb_write_email">Write an Email</string>
 
     // Dialog Messages
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
-    <string name="dlg_not_all_fields_entered">Not all required fields entered</string>
-    <string name="dlg_check_email">Mail was sent to %1$s</string>
+    <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
+    <string name="dlg_not_fullname_field_entered">Please enter fullname</string>
+    <string name="dlg_not_email_field_entered">Please enter email</string>
+    <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
-    <string name="dlg_old_password_wrong">Wrong current password</string>
+    <string name="dlg_old_password_wrong">Wrong old password</string>
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
@@ -148,18 +181,18 @@
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
-    <string name="dlg_no_friends_for_import">There are no friends in Qmunicate app</string>
+    <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
     <string name="dlg_leave_group">Leave Group</string>
     <string name="dlg_offline_call"> %1$s is calling you !</string>
     <string name="dlg_attached_last_message">Attachment</string>
     <string name="dlg_no_message_yet">No message yet</string>
-
-    // Change Password Dialog
-    <string name="cpd_title">Change Password</string>
-    <string name="cpd_old_password">Old Password</string>
-    <string name="cpd_new_password">New Password</string>
-    <string name="cpd_confirm_password">Confirm Password</string>
+    <string name="dlg_fail_create_groupchat">Errors occurred while creating group chat! Please, try later</string>
+    <string name="dlg_fail_create_chat">Errors occurred while creating chat! Please, try later</string>
+    <string name="dlg_fail_send_msg">Errors occurred while sending msg! Please, try later</string>
+    <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
+    <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
+    <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
@@ -277,7 +310,7 @@
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
-    <string name="prefs_name">Qmunicate</string>
+    <string name="prefs_name">Q-municate</string>
     <string name="search_hint">Search</string>
     <string name="push_title">QMUN: Missed messages</string>
     <string name="frd_offline_user">User must be online</string>

@@ -6,36 +6,38 @@ import android.os.Bundle;
 
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBSendPrivateChatMessageCommand extends ServiceCommand {
 
-    private QBChatHelper qbChatHelper;
+    private QBPrivateChatHelper privateChatHelper;
 
-    public QBSendPrivateChatMessageCommand(Context context, QBChatHelper qbChatHelper, String successAction,
-            String failAction) {
+    public QBSendPrivateChatMessageCommand(Context context, QBPrivateChatHelper privateChatHelper,
+            String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.qbChatHelper = qbChatHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
-    public static void start(Context context, String message, QBFile file) {
+    public static void start(Context context, String message, int userId, QBFile file) {
         Intent intent = new Intent(QBServiceConsts.SEND_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, message);
         intent.putExtra(QBServiceConsts.EXTRA_QBFILE, file);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ID, userId);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        int userId = extras.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
         QBFile file = (QBFile) extras.getSerializable(QBServiceConsts.EXTRA_QBFILE);
 
-        if(file == null) {
-            qbChatHelper.sendPrivateMessage(message);
+        if (file == null) {
+            privateChatHelper.sendPrivateMessage(message, userId);
         } else {
-            qbChatHelper.sendPrivateMessageWithAttachImage(file);
+            privateChatHelper.sendPrivateMessageWithAttachImage(file, userId);
         }
 
         return null;

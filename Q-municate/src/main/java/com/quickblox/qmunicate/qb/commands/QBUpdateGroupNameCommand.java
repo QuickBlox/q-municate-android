@@ -5,18 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.qmunicate.core.command.ServiceCommand;
-import com.quickblox.qmunicate.qb.helpers.QBChatHelper;
+import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 
 public class QBUpdateGroupNameCommand extends ServiceCommand {
 
-    private QBChatHelper chatHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBUpdateGroupNameCommand(Context context, QBChatHelper chatHelper, String successAction,
+    public QBUpdateGroupNameCommand(Context context, QBMultiChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatHelper = chatHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
     public static void start(Context context, String roomJid, String newName) {
@@ -31,7 +31,7 @@ public class QBUpdateGroupNameCommand extends ServiceCommand {
         String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
         String newName = extras.getString(QBServiceConsts.EXTRA_GROUP_NAME);
 
-        chatHelper.updateRoomName(roomJid, newName);
+        multiChatHelper.updateRoomName(roomJid, newName);
 
         return extras;
     }

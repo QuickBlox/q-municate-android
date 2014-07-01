@@ -26,20 +26,18 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class BaseFragmentActivity extends FragmentActivity implements QBLogeable {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
-
-    public static boolean isNeedToSaveSession = false;
 
     protected final ProgressDialog progress;
     protected BroadcastReceiver broadcastReceiver;
@@ -50,6 +48,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
+
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
@@ -94,6 +94,9 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
+        if (savedInstanceState != null && savedInstanceState.containsKey(CAN_PERFORM_LOGOUT)) {
+            canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
+        }
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
         messageBroadcastReceiver = new MessageBroadcastReceiver();
@@ -131,6 +134,12 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         unbindService();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
+        super.onSaveInstanceState(outState);
+    }
+
     private void unbindService() {
         if (bounded) {
             unbindService(serviceConnection);
@@ -163,12 +172,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void hideProgress() {
-        try {
-            if (progress != null && !progress.isDetached()) {
-                progress.dismissAllowingStateLoss();
-            }
-        } catch (NullPointerException npe) {
-            ErrorUtils.logError(npe);
+        if (progress != null && progress.getActivity() != null) {
+            progress.dismissAllowingStateLoss();
         }
     }
 
@@ -180,7 +185,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         broadcastCommandMap.remove(action);
     }
 
-    protected void onConnectedToService() {
+    protected void onConnectedToService(QBService service) {
     }
 
     protected void navigateToParent() {
@@ -212,9 +217,15 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
+    protected void onReceiveMessage(Bundle extras) {
+        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        showNewMessageAlert(sender, message);
+    }
+
     @Override
     public boolean isCanPerformLogoutInOnStop() {
-        return true;
+        return canPerformLogout.get();
     }
 
     public class FailAction implements Command {
@@ -237,7 +248,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
                 Command command = broadcastCommandMap.get(action);
                 if (command != null) {
                     Log.d("STEPS", "executing " + action);
-                    command.execute(intent.getExtras());
+                    try {
+                        command.execute(intent.getExtras());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -248,10 +263,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null && MainActivity.isNeedToShowCrouton) {
-                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-                showNewMessageAlert(sender, message);
+            if (extras != null) {
+                onReceiveMessage(extras);
             }
         }
     }
@@ -262,7 +275,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         public void onServiceConnected(ComponentName name, IBinder binder) {
             bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService();
+            onConnectedToService(service);
         }
 
         @Override

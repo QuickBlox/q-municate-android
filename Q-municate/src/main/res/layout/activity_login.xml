@@ -80,9 +80,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="25dp"
+        android:background="@drawable/button_general_selector"
         android:clickable="true"
         android:onClick="forgotPasswordOnClickListener"
+        android:padding="5dp"
         android:text="@string/lgn_forgot_password"
         android:textColor="@color/gray"
         android:textSize="18sp" />
+
 </LinearLayout>

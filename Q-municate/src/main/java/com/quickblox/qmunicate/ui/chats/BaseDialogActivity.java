@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -18,10 +19,13 @@ import android.widget.ListView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.filetransfer.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.model.SerializableKeys;
+import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
+import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
+import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
@@ -46,8 +50,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ChatEditText chatEditText;
     protected ListView messagesListView;
     protected EditText messageEditText;
-    protected ImageButton attachButton;
     protected ImageButton sendButton;
+    protected String currentOpponent;
+    protected String dialogId;
 
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
@@ -57,8 +62,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
+    protected QBDialog dialog;
+    protected boolean isNeedToScrollMessages;
 
-    public BaseDialogActivity(int layoutResID) {
+    protected BaseChatHelper chatHelper;
+
+    private int chatHelperIdentifier;
+
+    public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
+        this.chatHelperIdentifier = chatHelperIdentifier;
         this.layoutResID = layoutResID;
     }
 
@@ -76,6 +88,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initSmiles();
 
         addActions();
+
+        isNeedToScrollMessages = true;
     }
 
     @Override
@@ -94,8 +108,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         smilesAnimator = new HeightAnimator(chatEditText, smilesLayout);
     }
 
-    public void attachButtonOnClick(View view) {
-        isNeedToSaveSession = true;
+    protected void attachButtonOnClick() {
+        canPerformLogout.set(false);
         imageHelper.getImage();
     }
 
@@ -119,10 +133,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onUpdateChatDialog();
 
+    protected Cursor getAllDialogMessagesByDialogId() {
+        return DatabaseManager.getAllDialogMessagesByDialogId(this, dialogId);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        isNeedToSaveSession = false;
+        canPerformLogout.set(true);
         if (resultCode == RESULT_OK) {
+            isNeedToScrollMessages = true;
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -132,6 +151,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(smileSelectedBroadcastReceiver);
+        if (chatHelper != null) {
+            chatHelper.closeChat(dialog, generateBundleToInitDialog());
+        }
         removeActions();
     }
 
@@ -151,11 +173,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onFileLoaded(QBFile file);
 
-    protected void startLoadDialogMessages(QBDialog dialog, String roomJidId, long lastDateLoad) {
+    protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (dialog != null) {
-            QBLoadDialogMessagesCommand.start(this, dialog, roomJidId, lastDateLoad);
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
         }
     }
+
+    @Override
+    protected void onConnectedToService(QBService service) {
+        if (chatHelper == null) {
+            chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
+            chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+        }
+    }
+
+    protected abstract Bundle generateBundleToInitDialog();
 
     private void initUI() {
         smilesLayout = findViewById(R.id.smiles_linearlayout);
@@ -164,8 +196,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         chatEditText = (ChatEditText) findViewById(R.id.message_edittext);
         messagesListView = (ListView) findViewById(R.id.messages_listview);
         messageEditText = _findViewById(R.id.message_edittext);
-        attachButton = _findViewById(R.id.attach_button);
         sendButton = _findViewById(R.id.send_button);
+        sendButton.setEnabled(false);
     }
 
     private void initListeners() {
@@ -174,11 +206,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 super.onTextChanged(charSequence, start, before, count);
                 if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
-                    sendButton.setVisibility(View.GONE);
-                    attachButton.setVisibility(View.VISIBLE);
+                    sendButton.setEnabled(false);
                 } else {
-                    sendButton.setVisibility(View.VISIBLE);
-                    attachButton.setVisibility(View.GONE);
+                    sendButton.setEnabled(true);
                 }
             }
         });
@@ -205,8 +235,20 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         scrollListView();
     }
 
+    @Override
+    protected void onReceiveMessage(Bundle extras) {
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
+        if (!isFromCurrentChat) {
+            super.onReceiveMessage(extras);
+        }
+    }
+
     protected void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        if (isNeedToScrollMessages) {
+            isNeedToScrollMessages = false;
+            messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        }
     }
 
     private int getSmileLayoutSizeInPixels() {

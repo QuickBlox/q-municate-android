@@ -11,25 +11,27 @@ import android.view.Menu;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.chats.DialogsFragment;
+import com.quickblox.qmunicate.ui.feedback.FeedbackFragment;
+import com.quickblox.qmunicate.ui.friends.FriendsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.ui.settings.SettingsFragment;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -37,13 +39,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_CHATS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
+    public static final int ID_FEEDBACK_FRAGMENT = 4;
+
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static boolean isNeedToShowCrouton = false;
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
-    private boolean isImportInitialized;
-    private boolean isSignUpInitialized;
     private GSMHelper gsmHelper;
 
     public static void start(Context context) {
@@ -92,6 +93,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             case ID_SETTINGS_FRAGMENT:
                 fragment = SettingsFragment.newInstance();
                 break;
+            case ID_FEEDBACK_FRAGMENT:
+                fragment = FeedbackFragment.newInstance();
+                break;
         }
         setCurrentFragment(fragment);
     }
@@ -101,16 +105,13 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isNeedToShowCrouton = true;
         useDoubleBackPressed = true;
-
-        initPrefValues();
 
         gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
 
-        if (!isImportInitialized && isSignUpInitialized) {
+        if (!isImportInitialized()) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState,
                     new FacebookSessionStatusCallback());
@@ -118,16 +119,22 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
+        initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
         loadChatsDialogs();
     }
 
-    private void initPrefValues() {
+    private boolean isImportInitialized() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
-        isImportInitialized = prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-        isSignUpInitialized = prefsHelper.getPref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
+        return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
     }
+
+    private void initBroadcastActionList() {
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadDialogsSuccessAction());
+        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
+    }
+
 
     private void initNavigationDrawer() {
         navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(
@@ -138,12 +145,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser(App.getInstance().getUser())) {
+            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getSession().getUser())) {
                 gsmHelper.registerInBackground();
                 return;
             }
-            int subscriptionId = gsmHelper.getSubscriptionId();
-            if (Consts.NOT_INITIALIZED_VALUE == subscriptionId) {
+            boolean subscribed = gsmHelper.isSubscribed();
+            if (!subscribed) {
                 gsmHelper.subscribeToPushNotifications();
             }
         } else {
@@ -163,37 +170,17 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
-        addActions();
     }
 
-    private void addActions() {
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadChatsDialogsSuccessAction());
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
-    }
-
-    private void joinGroupDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = getRoomJidListFromDialogs(dialogsList);
-        QBJoinGroupDialogCommand.start(this, roomJidList);
-    }
-
-    private List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
-    }
-
-    private class LoadChatsDialogsSuccessAction implements Command {
+    private class LoadDialogsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            List<QBDialog> dialogsList = (List<QBDialog>) bundle.getSerializable(
+            ArrayList<QBDialog> dialogs = (ArrayList<QBDialog>) bundle.getSerializable(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            joinGroupDialogs(dialogsList);
+            QBJoinGroupDialogCommand.start(MainActivity.this, dialogs);
+            //TODO may be move this in command to execute async
+            DatabaseManager.saveDialogs(MainActivity.this, dialogs);
         }
     }
 
@@ -203,7 +190,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 importFriends.startGetFriendsListTask(true);
-            } else if (!(!session.isOpened() && !session.isClosed())) {
+            } else if (!(!session.isOpened() && !session.isClosed()) && !isImportInitialized()) {
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
