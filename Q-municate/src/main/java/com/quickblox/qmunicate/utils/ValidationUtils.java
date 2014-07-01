@@ -113,4 +113,14 @@ public class ValidationUtils extends SimpleTextWatcher {
             fieldsArray[i].setError(isFieldsEnteredArray[i] ? null : fieldsErrorArray[i]);
         }
     }
+
+    public String getErrorMessageByCode(int errorCode) {
+        String errorMessage = "ERROR";
+        switch (errorCode) {
+            case 1:
+                errorMessage = "error 1";
+                break;
+        }
+        return errorMessage;
+    }
 }
