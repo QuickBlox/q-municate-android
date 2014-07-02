@@ -93,7 +93,6 @@ public abstract class BaseActivity extends Activity {
         Crouton.show(this, newMessageView);
     }
 
-
     public void updateBroadcastActionList() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
