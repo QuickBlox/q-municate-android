@@ -12,7 +12,6 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
 
@@ -26,52 +25,40 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
         QBUser user;
-//        try {
-            QBAuth.createSession();
-            String password = inputUser.getPassword();
-            user = QBUsers.signIn(inputUser);
-            String token = QBAuth.getBaseService().getToken();
-            user.setPassword(password);
-            AppSession.startSession(LoginType.EMAIL, user, token);
-//        } catch (Exception exc) {
-//            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
-//        }
+        QBAuth.createSession();
+        String password = inputUser.getPassword();
+        user = QBUsers.signIn(inputUser);
+        String token = QBAuth.getBaseService().getToken();
+        user.setPassword(password);
+        AppSession.startSession(LoginType.EMAIL, user, token);
         return user;
     }
 
     public QBUser login(String socialProvider, String accessToken,
-            String accessTokenSecret) throws QBResponseException {
+            String accessTokenSecret) throws QBResponseException, BaseServiceException {
         QBUser user;
-        try {
-            QBSession session = QBAuth.createSession();
-            user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
-            user.setPassword(session.getToken());
-            String token = QBAuth.getBaseService().getToken();
-            AppSession.startSession(LoginType.FACEBOOK, user, token);
-        } catch (Exception exc) {
-            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
-        }
+        QBSession session = QBAuth.createSession();
+        user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+        user.setPassword(session.getToken());
+        String token = QBAuth.getBaseService().getToken();
+        AppSession.startSession(LoginType.FACEBOOK, user, token);
         return user;
     }
 
     public QBUser signup(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
         QBUser user;
-//        try {
-            QBAuth.createSession();
-            String password = inputUser.getPassword();
-            inputUser.setOldPassword(password);
-            user = QBUsers.signUpSignInTask(inputUser);
-            if (null != file) {
-                QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-                user.setWebsite(qbFile.getPublicUrl());
-                user = QBUsers.updateUser(inputUser);
-            }
-            user.setPassword(password);
-            String token = QBAuth.getBaseService().getToken();
-            AppSession.startSession(LoginType.EMAIL, user, token);
-//        } catch (Exception exc) {
-//            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
-//        }
+        QBAuth.createSession();
+        String password = inputUser.getPassword();
+        inputUser.setOldPassword(password);
+        user = QBUsers.signUpSignInTask(inputUser);
+        if (null != file) {
+            QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
+            user.setWebsite(qbFile.getPublicUrl());
+            user = QBUsers.updateUser(inputUser);
+        }
+        user.setPassword(password);
+        String token = QBAuth.getBaseService().getToken();
+        AppSession.startSession(LoginType.EMAIL, user, token);
         return inputUser;
     }
 
