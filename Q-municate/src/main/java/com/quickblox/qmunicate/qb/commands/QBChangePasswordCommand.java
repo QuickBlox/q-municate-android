@@ -33,7 +33,6 @@ public class QBChangePasswordCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
 
         user = qbAuthHelper.updateUser(user);
-
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
 

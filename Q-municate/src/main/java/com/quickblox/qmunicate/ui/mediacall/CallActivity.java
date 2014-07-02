@@ -17,6 +17,8 @@ import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
+import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
+import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
@@ -99,7 +101,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     protected void onConnectedToService() {
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+            signalingChannel = ((QBVideoChatHelper)service.getHelper(QBService.VIDEO_CHAT_HELPER)).getSignalingChannel();
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);

@@ -19,19 +19,19 @@ public class QBUpdateGroupNameCommand extends ServiceCommand {
         this.multiChatHelper = multiChatHelper;
     }
 
-    public static void start(Context context, String roomJid, String newName) {
+    public static void start(Context context, String dialogId, String newName) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
         intent.putExtra(QBServiceConsts.EXTRA_GROUP_NAME, newName);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         String newName = extras.getString(QBServiceConsts.EXTRA_GROUP_NAME);
 
-        multiChatHelper.updateRoomName(roomJid, newName);
+        multiChatHelper.updateRoomName(dialogId, newName);
 
         return extras;
     }

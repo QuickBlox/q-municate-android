@@ -20,6 +20,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.DialogMessageCache;
+import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
@@ -177,8 +178,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
         DatabaseManager.deleteDialogByRoomJid(context, roomJid);
     }
 
-    public void addUsersToRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, roomJid);
+    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws QBResponseException {
+        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
         requestBuilder.push(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
@@ -195,8 +196,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
         updateDialog(dialog.getDialogId(), dialog.getName(), requestBuilder);
     }
 
-    public void updateRoomName(String roomJid, String newName) throws QBResponseException {
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, roomJid);
+    public void updateRoomName(String dialogId, String newName) throws QBResponseException {
+        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
         updateDialog(dialog.getDialogId(), newName, requestBuilder);

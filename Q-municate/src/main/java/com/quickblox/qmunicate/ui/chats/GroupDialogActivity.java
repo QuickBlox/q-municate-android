@@ -199,7 +199,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
                 attachButtonOnClick();
                 return true;
             case R.id.action_group_details:
-                GroupDialogDetailsActivity.start(this, dialog.getRoomJid());
+                GroupDialogDetailsActivity.start(this, dialog.getDialogId());
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -41,7 +41,6 @@ import com.quickblox.qmunicate.qb.commands.QBLoginRestCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoginWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutAndDestroyChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBLogoutChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutRestCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
@@ -156,7 +155,7 @@ public class QBService extends Service {
         registerLoadUsersCommand();
 
         registerLoginChatCommand();
-        registerLogoutChatCommand();
+        registerLogoutAndDestroyChatCommand();
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
         registerJoinGroupChat();
@@ -252,9 +251,9 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginCommand);
     }
 
-    private void registerLogoutChatCommand() {
+    private void registerLogoutAndDestroyChatCommand() {
         QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        ServiceCommand logoutCommand = new QBLogoutChatCommand(this, chatRestHelper,
+        ServiceCommand logoutCommand = new QBLogoutAndDestroyChatCommand(this, chatRestHelper,
                 QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGOUT_CHAT_ACTION, logoutCommand);
     }
@@ -340,10 +339,7 @@ public class QBService extends Service {
     private void registerLogoutCommand() {
         QBLogoutCommand logoutCommand = new QBLogoutCommand(this, QBServiceConsts.LOGOUT_SUCCESS_ACTION,
                 QBServiceConsts.LOGOUT_FAIL_ACTION);
-        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        QBLogoutAndDestroyChatCommand logoutChatCommand = new QBLogoutAndDestroyChatCommand(this,
-                chatRestHelper, QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION,
-                QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_FAIL_ACTION);
+        ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_CHAT_ACTION);
         QBLogoutRestCommand logoutRestCommand = new QBLogoutRestCommand(this, authHelper,
                 QBServiceConsts.LOGOUT_REST_SUCCESS_ACTION, QBServiceConsts.LOGOUT_REST_FAIL_ACTION);
 
@@ -515,10 +511,6 @@ public class QBService extends Service {
             QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);
         }
-    }
-
-    public QBVideoChatHelper getVideoChatHelper() {
-        return videoChatHelper;
     }
 
     public class QBServiceBinder extends Binder {
