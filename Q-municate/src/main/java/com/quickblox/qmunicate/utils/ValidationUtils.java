@@ -120,6 +120,7 @@ public class ValidationUtils extends SimpleTextWatcher {
         }
     }
 
+    // TODO SF temp method
     public String getErrorMessageByCode(int errorCode) {
         String errorMessage = "ERROR";
         switch (errorCode) {
