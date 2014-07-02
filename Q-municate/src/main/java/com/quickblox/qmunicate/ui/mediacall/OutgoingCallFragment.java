@@ -23,12 +23,12 @@ import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
 import com.quickblox.module.videochat_webrtc.signaling.SIGNAL_STATE;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
+import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.Consts;
@@ -293,10 +293,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
+        QBVideoChatHelper videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = service.getVideoChatHelper().getSignalingChannel();
+            signalingChannel = videoChatHelper.getSignalingChannel();
         } else {
-            signalingChannel = service.getVideoChatHelper().makeSignalingChannel(opponent.getId());
+            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getId());
         }
         if (signalingChannel != null && isExistActivity()) {
             initChat(signalingChannel);

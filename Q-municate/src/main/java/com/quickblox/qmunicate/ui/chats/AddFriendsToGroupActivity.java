@@ -48,7 +48,7 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
         showProgress();
-        QBAddFriendsToGroupCommand.start(this, dialog.getRoomJid(), getFriendIds(selectedFriends));
+        QBAddFriendsToGroupCommand.start(this, dialog.getId(), getFriendIds(selectedFriends));
     }
 
     private void addActions() {

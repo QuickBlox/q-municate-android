@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.qb.helpers;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
@@ -27,6 +28,7 @@ public class QBVideoChatHelper extends BaseHelper {
     private VideoSenderChannel signalingChannel;
 
     private QBSignalingChannel.SignalingListener signalingListener;
+    private Class<? extends Activity> activityClass;
 
     public QBVideoChatHelper(Context context) {
         super(context);
@@ -36,7 +38,8 @@ public class QBVideoChatHelper extends BaseHelper {
         return signalingChannel;
     }
 
-    public void init() {
+    public void init(Class<? extends Activity> activityClass) {
+        this.activityClass = activityClass;
         lo.g("init videochat");
         signalingListener = new VideoSignalingListener();
         QBChatService.getInstance().getSignalingManager().addSignalingManagerListener(
@@ -74,7 +77,7 @@ public class QBVideoChatHelper extends BaseHelper {
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
                     callConfig.getSessionDescription());
             lo.g("onCall" + callConfig.getCallStreamType().toString());
-            Intent intent = new Intent(context, CallActivity.class);
+            Intent intent = new Intent(context, activityClass);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
             intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
             intent.putExtra(WebRTC.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());

@@ -8,6 +8,7 @@ import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 
 public class QBInitVideoChatCommand extends ServiceCommand {
 
@@ -26,7 +27,7 @@ public class QBInitVideoChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        videoChatHelper.init();
+        videoChatHelper.init(CallActivity.class);
         return extras;
     }
 }

@@ -517,10 +517,6 @@ public class QBService extends Service {
         }
     }
 
-    public QBVideoChatHelper getVideoChatHelper() {
-        return videoChatHelper;
-    }
-
     public class QBServiceBinder extends Binder {
 
         public QBService getService() {
