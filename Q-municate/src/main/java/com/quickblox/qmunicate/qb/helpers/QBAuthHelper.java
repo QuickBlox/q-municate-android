@@ -73,7 +73,7 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
-        if (TextUtils.isEmpty(inputUser.getWebsite())) {
+        if (!TextUtils.isEmpty(inputUser.getFacebookId()) && TextUtils.isEmpty(inputUser.getWebsite())) {
             return inputUser;
         }
         String password = inputUser.getPassword();
