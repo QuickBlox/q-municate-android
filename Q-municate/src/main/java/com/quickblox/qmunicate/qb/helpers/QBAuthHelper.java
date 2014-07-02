@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.facebook.Session;
+import com.quickblox.internal.core.exception.BaseServiceException;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.auth.model.QBSession;
@@ -23,18 +24,18 @@ public class QBAuthHelper extends BaseHelper {
         super(context);
     }
 
-    public QBUser login(QBUser inputUser) throws QBResponseException {
+    public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
         QBUser user;
-        try {
+//        try {
             QBAuth.createSession();
             String password = inputUser.getPassword();
             user = QBUsers.signIn(inputUser);
             String token = QBAuth.getBaseService().getToken();
             user.setPassword(password);
             AppSession.startSession(LoginType.EMAIL, user, token);
-        } catch (Exception exc) {
-            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
-        }
+//        } catch (Exception exc) {
+//            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
+//        }
         return user;
     }
 
@@ -53,9 +54,9 @@ public class QBAuthHelper extends BaseHelper {
         return user;
     }
 
-    public QBUser signup(QBUser inputUser, File file) throws QBResponseException {
+    public QBUser signup(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
         QBUser user;
-        try {
+//        try {
             QBAuth.createSession();
             String password = inputUser.getPassword();
             inputUser.setOldPassword(password);
@@ -68,9 +69,9 @@ public class QBAuthHelper extends BaseHelper {
             user.setPassword(password);
             String token = QBAuth.getBaseService().getToken();
             AppSession.startSession(LoginType.EMAIL, user, token);
-        } catch (Exception exc) {
-            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
-        }
+//        } catch (Exception exc) {
+//            throw new QBResponseException(context.getString(R.string.dlg_fail_rest_login));
+//        }
         return inputUser;
     }
 

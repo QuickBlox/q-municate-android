@@ -176,6 +176,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
             validationUtils.setError(exception.getMessage());
             hideProgress();
         }

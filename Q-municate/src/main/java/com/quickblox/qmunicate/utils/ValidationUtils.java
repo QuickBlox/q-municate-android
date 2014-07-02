@@ -11,6 +11,12 @@ import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 
 public class ValidationUtils extends SimpleTextWatcher {
 
+    private final int UNAUTHORIZED_ERROR_CODE = 401;
+    private final int FULLNAME_IS_TOO_SHORT_ERROR_CODE = 422;
+    private final int EMAIL_SHOULD_LOOK_LIKE_AN_EMAIL_ADDRESS_ERROR_CODE = 422;
+    private final int PASSWORD_IS_TOO_SHORT_ERROR_CODE = 422;
+    private final int PASSWORD_SHOULD_CONTAIN_ALPHANUMERIC_AND_PUNCTUATION_CHARACTERS_ERROR_CODE = 422;
+
     private Context context;
     private EditText[] fieldsArray;
     private String[] fieldsErrorArray;
