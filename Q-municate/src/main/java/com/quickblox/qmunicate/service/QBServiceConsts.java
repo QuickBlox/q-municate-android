@@ -121,6 +121,7 @@ public class QBServiceConsts {
     public static final String EXTRA_ROOM_JID = "room_jid_id";
     public static final String EXTRA_USER = "qb_user";
     public static final String EXTRA_ERROR = "error";
+    public static final String EXTRA_ERROR_CODE = "error_code";
     public static final String EXTRA_FRIEND = "friend";
     public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String EXTRA_FRIENDS = "friends";

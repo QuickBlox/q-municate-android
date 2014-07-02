@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.chats;
 
 import android.database.Cursor;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -22,6 +23,9 @@ import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -87,14 +91,19 @@ public class DialogsFragment extends BaseFragment {
     @Override
     public void onResume() {
         Crouton.cancelAllCroutons();
-        if (isChatsListLoaded) {
-            checkVisibilityEmptyLabel();
-        }
+        checkVisibilityEmptyLabel();
         super.onResume();
     }
 
     private void initChatsDialogs() {
         dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
+        dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkVisibilityEmptyLabel();
+            }
+        });
         dialogsListView.setAdapter(dialogsAdapter);
     }
 
@@ -142,9 +151,11 @@ public class DialogsFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
+            ArrayList<QBDialog> dialogsList = (ArrayList<QBDialog>) bundle.getSerializable(
+                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
             isChatsListLoaded = true;
-            if (baseActivity != null) {
-                checkVisibilityEmptyLabel();
+            if (dialogsList.isEmpty()) {
+                emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
     }

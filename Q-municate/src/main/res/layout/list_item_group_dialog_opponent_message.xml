@@ -27,15 +27,13 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="false"
             android:layout_centerInParent="true"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/progress_relativelayout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:layout_height="wrap_content">
 
                 <ProgressBar
                     android:id="@+id/vertical_progressbar"
@@ -43,7 +41,8 @@
                     android:layout_width="@dimen/chat_attach_width"
                     android:layout_height="@dimen/chat_attach_height"
                     android:padding="5dp"
-                    android:max="100" />
+                    android:max="100"
+                    android:visibility="gone" />
 
                 <ProgressBar
                     android:id="@+id/centered_progressbar"
@@ -51,7 +50,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:indeterminate="false"
-                    android:max="100" />
+                    android:max="100"
+                    android:visibility="gone" />
 
             </RelativeLayout>
 
@@ -69,7 +69,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@drawable/left_bubble"
                     android:orientation="vertical"
                     android:padding="10dp">
 

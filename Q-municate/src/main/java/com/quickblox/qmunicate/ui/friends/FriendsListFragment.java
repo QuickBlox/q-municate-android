@@ -43,7 +43,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private LinearLayout globalSearchLayout;
     private State state;
     private String constraint;
-    private boolean isImportInitialized;
     private ListView friendsListView;
     private TextView friendsTitle;
     private TextView emptyListTextView;
@@ -64,7 +63,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        addActionsAddFriend();
         setHasOptionsMenu(true);
     }
 
@@ -113,9 +111,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        isImportInitialized = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_IMPORT_INITIALIZED,
-                false);
-
         initUI(rootView, layoutInflater);
         initListeners();
         initGlobalSearchButton(layoutInflater);
@@ -140,9 +135,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public void onStart() {
         super.onStart();
-        if (!isImportInitialized) {
-            addActionsAddFriends();
-        }
+        addActions();
     }
 
     @Override
@@ -176,18 +169,14 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         return searchItem;
     }
 
-    private void addActionsAddFriend() {
+    private void addActions() {
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
         baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
-        baseActivity.updateBroadcastActionList();
-    }
-
-    private void addActionsAddFriends() {
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new AddFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new AddFriendsFailAction());
+        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new ImportFriendsSuccessAction());
+        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
         baseActivity.updateBroadcastActionList();
     }
 
@@ -216,19 +205,18 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         }
         friendsCursor = getAllFriends();
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, friendsCursor);
-        friendsListView.setAdapter(friendsListAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
-        friendsListView.setOnItemClickListener(this);
         friendsListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
-                if(state.equals(State.GLOBAL_LIST) && isNeedToHideSearchView
-                        || state.equals(State.FRIENDS_LIST) && isFriendsListLoaded && !isNeedToHideSearchView) {
+                if(!isNeedToHideSearchView) {
                     checkVisibilityEmptyLabel();
                 }
             }
         });
+        friendsListView.setAdapter(friendsListAdapter);
+        friendsListView.setSelector(R.drawable.list_item_background_selector);
+        friendsListView.setOnItemClickListener(this);
         if(isFriendsListLoaded) {
             checkVisibilityEmptyLabel();
         }
@@ -282,6 +270,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void importFriendsFinished() {
+        isFriendsListLoaded = true;
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
         baseActivity.hideProgress();
     }
@@ -353,7 +342,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         }
     }
 
-    private class AddFriendsSuccessAction implements Command {
+    private class ImportFriendsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -361,7 +350,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         }
     }
 
-    private class AddFriendsFailAction implements Command {
+    private class ImportFriendsFailAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -376,7 +365,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public void execute(Bundle bundle) {
             List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
-            if (baseActivity != null && friendsList.isEmpty()) {
+            if (friendsList.isEmpty()) {
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }

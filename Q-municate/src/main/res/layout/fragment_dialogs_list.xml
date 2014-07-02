@@ -16,7 +16,6 @@
         android:padding="10dp"
         android:text="@string/dlg_no_chats"
         android:textColor="@color/dark_gray"
-        android:textSize="@dimen/text_size_small"
-        android:visibility="gone" />
+        android:textSize="@dimen/text_size_small" />
 
 </RelativeLayout>
