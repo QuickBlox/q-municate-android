@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
@@ -13,6 +14,7 @@ import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.ChatDialogUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QBJoinGroupDialogCommand extends ServiceCommand {
 
@@ -43,11 +45,15 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         ArrayList<ParcelableQBDialog> dialogList = null;
+        List<QBDialog> dialogs = null;
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
             dialogList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST);
+            dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);
         }
-        if (dialogList != null && !dialogList.isEmpty()) {
-            ArrayList<QBDialog> dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);
+        if(dialogs == null) {
+            dialogs = DatabaseManager.getDialogs(context);
+        }
+        if (dialogs != null && !dialogs.isEmpty()) {
             multiChatHelper.tryJoinRoomChats(dialogs);
         }
         return extras;

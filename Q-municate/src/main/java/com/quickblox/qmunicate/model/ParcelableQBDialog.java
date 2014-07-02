@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.Utils;
 
 //TODO VF maybe move this logic to Dialog class
@@ -22,19 +23,19 @@ public class ParcelableQBDialog implements Parcelable{
 
     @Override
     public int describeContents() {
-        return 0;
+        return Consts.NOT_INITIALIZED_VALUE;
     }
 
-    public ParcelableQBDialog(Parcel in) {
-        dialog = new QBDialog(in.readString());
-        dialog.setName(in.readString());
-        dialog.setType(QBDialogType.parseByCode(in.readInt()));
-        dialog.setRoomJid(in.readString());
-        dialog.setLastMessage(in.readString());
-        dialog.setLastMessageDateSent(in.readLong());
-        int[] occupants = new int[in.readInt()];
-        in.readIntArray(occupants);
-        dialog.setOccupantsIds(Utils.toArrayList(occupants));
+    public ParcelableQBDialog(Parcel inputParcel) {
+        dialog = new QBDialog(inputParcel.readString());
+        dialog.setName(inputParcel.readString());
+        dialog.setType(QBDialogType.parseByCode(inputParcel.readInt()));
+        dialog.setRoomJid(inputParcel.readString());
+        dialog.setLastMessage(inputParcel.readString());
+        dialog.setLastMessageDateSent(inputParcel.readLong());
+        int[] occupantArray = new int[inputParcel.readInt()];
+        inputParcel.readIntArray(occupantArray);
+        dialog.setOccupantsIds(Utils.toArrayList(occupantArray));
     }
 
     @Override
@@ -45,9 +46,9 @@ public class ParcelableQBDialog implements Parcelable{
         parcel.writeString(dialog.getRoomJid());
         parcel.writeString(dialog.getLastMessage());
         parcel.writeLong(dialog.getLastMessageDateSent());
-        int[] occupnats = Utils.toIntArray(dialog.getOccupants());
-        parcel.writeInt(occupnats.length);
-        parcel.writeIntArray(occupnats);
+        int[] occupantArray = Utils.toIntArray(dialog.getOccupants());
+        parcel.writeInt(occupantArray.length);
+        parcel.writeIntArray(occupantArray);
     }
 
     public static final Parcelable.Creator<ParcelableQBDialog> CREATOR = new Parcelable.Creator<ParcelableQBDialog>() {

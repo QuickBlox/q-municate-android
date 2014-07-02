@@ -36,10 +36,6 @@ public class QBChatRestHelper extends BaseHelper {
 
     public synchronized void login(
             QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
-        if (chatService != null) {
-            logout();
-            destroy();
-        }
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             chatService = QBChatService.getInstance();

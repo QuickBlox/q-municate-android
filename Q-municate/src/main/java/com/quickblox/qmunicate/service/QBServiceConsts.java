@@ -2,6 +2,8 @@ package com.quickblox.qmunicate.service;
 
 public class QBServiceConsts {
 
+
+    //main actions
     public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
     public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
@@ -40,7 +42,9 @@ public class QBServiceConsts {
     public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
     public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
+    public static final String RE_LOGIN_IN_CHAT_ACTION = "relogin_in_chat";
 
+    //success and fail actions
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIEND_FAIL_ACTION = "add_friend_fail_action";
     public static final String IMPORT_FRIENDS_SUCCESS_ACTION = "import_friends_success_action";
@@ -114,6 +118,8 @@ public class QBServiceConsts {
     public static final String LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION = "login_and_join_chats_sucess_action";
     public static final String LOGIN_AND_JOIN_CHATS_FAIL_ACTION = "login_and_join_chats_fail_action";
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
+    public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
+    public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";

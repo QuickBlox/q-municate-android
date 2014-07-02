@@ -65,20 +65,20 @@ public class Utils {
         return user;
     }
 
-    public static int[] toIntArray(List<Integer> list)  {
-        int[] ret = new int[list.size()];
+    public static int[] toIntArray(List<Integer> integerList)  {
+        int[] intArray = new int[integerList.size()];
         int i = 0;
-        for (Integer e : list)
-            ret[i++] = e.intValue();
-        return ret;
+        for (Integer e : integerList)
+            intArray[i++] = e.intValue();
+        return intArray;
     }
 
-    public static ArrayList<Integer> toArrayList(int[] items)  {
-        ArrayList<Integer> integers = new ArrayList<Integer>(items.length);
+    public static ArrayList<Integer> toArrayList(int[] itemArray)  {
+        ArrayList<Integer> integerList = new ArrayList<Integer>(itemArray.length);
         int i = 0;
-        for (int item : items) {
-            integers.add(item);
+        for (int item : itemArray) {
+            integerList.add(item);
         }
-        return integers;
+        return integerList;
     }
 }

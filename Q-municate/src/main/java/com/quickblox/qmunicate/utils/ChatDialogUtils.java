@@ -8,20 +8,20 @@ import java.util.List;
 
 public class ChatDialogUtils {
 
-    public static ArrayList<ParcelableQBDialog> dialogsToParcelableDialogs(List<QBDialog> dialogs){
-        ArrayList<ParcelableQBDialog> parcelableQBDialogs = new ArrayList<ParcelableQBDialog>(dialogs.size());
-        for (QBDialog dialog : dialogs) {
+    public static ArrayList<ParcelableQBDialog> dialogsToParcelableDialogs(List<QBDialog> dialogList){
+        ArrayList<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
+        for (QBDialog dialog : dialogList) {
             ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
-            parcelableQBDialogs.add(parcelableQBDialog);
+            parcelableDialogList.add(parcelableQBDialog);
         }
-        return parcelableQBDialogs;
+        return parcelableDialogList;
     }
 
-    public static ArrayList<QBDialog> parcelableDialogsToDialogs(List<ParcelableQBDialog> parcelableDialogs){
-        ArrayList<QBDialog> dialogs = new ArrayList<QBDialog>(parcelableDialogs.size());
-        for (ParcelableQBDialog parcelableDialog : parcelableDialogs) {
-            dialogs.add(parcelableDialog.getDialog());
+    public static ArrayList<QBDialog> parcelableDialogsToDialogs(List<ParcelableQBDialog> parcelableDialogList){
+        ArrayList<QBDialog> dialogList = new ArrayList<QBDialog>(parcelableDialogList.size());
+        for (ParcelableQBDialog parcelableDialog : parcelableDialogList) {
+            dialogList.add(parcelableDialog.getDialog());
         }
-        return dialogs;
+        return dialogList;
     }
 }
