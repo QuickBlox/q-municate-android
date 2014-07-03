@@ -56,7 +56,7 @@ Please note all these featureas are available in open source code, so you can cu
 
 ## Step by step guide
 ### Step 1. PreLogin page
-![PreLogin page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-18.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-18.png" height="400" />&nbsp;
 
 #### Available features:
 #### Buttons:
@@ -69,7 +69,7 @@ Please note all these featureas are available in open source code, so you can cu
 ###### Please note, that user will skip this page, if “Remember me” tick is set in the check box on Login page.
 
 ### Step 2. SignUp page
-![SignUp page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-30.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-30.png" height="400" />&nbsp;
 
 Sign Up Page allows to create new QM user.
 
@@ -113,7 +113,7 @@ public QBUser signup(QBUser inputUser, File file) throws QBResponseException, Ba
 ```
 
 ### Step 3. LogIn page
-![LogIn page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png" height="400" />&nbsp;
 
 User can login in the app via Facebook or login as a QuickBlox user.
 
@@ -128,15 +128,12 @@ If user signed up with Facebook, for user’s profile will be used FB avatar ima
 ```java
 public QBUser login(String socialProvider, String accessToken,
   String accessTokenSecret) throws QBResponseException, BaseServiceException {
-  
+  QBUser user;
   QBSession session = QBAuth.createSession();
-  
-  QBUser user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+  user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
   user.setPassword(session.getToken());
-  
   String token = QBAuth.getBaseService().getToken();
   AppSession.startSession(LoginType.FACEBOOK, user, token);
-  
   return user;
 }
 ```
@@ -167,8 +164,6 @@ User will be redirected to Friends screen (Main Page).
 Data validation will be done on the server.
 Tapping on Forgot password link a predefined email from the server will be sent which will include restore password link.
 Back button – if tapped, user is redirected to Prelogin Page 
-
-![Forgot password page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-53.png) &nbsp;
 
 #### Please find below how you can do it in code:
 
@@ -212,7 +207,7 @@ public void inviteFriend(int userId) throws Exception {
 ```
 
 ### Step 5. Friends page
-![Friends page](http://files.quickblox.com/Screenshot_2014-07-03-10-48-30.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-30.png" height="400" />&nbsp;
 
 User goes to Friends page, if correct credentials are entered
 Friends Page is used for list of user’s friends.
@@ -248,7 +243,7 @@ public void inviteFriend(int userId) throws Exception {
 ```
 
 #### Step 5.1. Side bar
-![Side bar](http://files.quickblox.com/Screenshot_2014-07-03-10-46-33.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-33.png" height="400" />&nbsp;
 
 * Friends page (Main page): 
 - A list of friends, listed in alphabetical order.
@@ -264,7 +259,8 @@ public void inviteFriend(int userId) throws Exception {
 - A page with app settings and preferences.
 
 #### Step 5.2. Search Bar
-![Search Bar](http://files.quickblox.com/Screenshot_2014-07-03-11-18-26.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-18-26.png" height="400" />&nbsp;
+
 Search icon on Friends page opens/hides search bar.
 
 #### Available features:
@@ -280,7 +276,7 @@ List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, r
 ```
 
 ### Step 6. Details Page
-![Details Page](http://files.quickblox.com/Screenshot_2014-07-03-10-48-51.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-51.png" height="400" />&nbsp;
 
 Details Page is used for friends profile information.
 
@@ -309,7 +305,7 @@ Friends profile page shows user’s information:
 - Back button returns to the previous screen (Main page)
  
 ### Step 7. Invite Friends
-![Invite Friends](http://files.quickblox.com/Screenshot_2014-07-03-10-46-06.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-06.png" height="400" />&nbsp;
 
 User can access Invite Friends page from the Side bar, to invitу his/her friends in the app.
 
@@ -358,7 +354,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
 ```
 
 ### Step 8. Chats page
-![Chats page](http://files.quickblox.com/Screenshot_2014-07-03-10-42-41.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-42-41.png" height="400" />&nbsp; 
 
 Chats Page shows scrollable chats list (private and group).
 
@@ -387,7 +383,7 @@ public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, Sm
 ```
 
 ### Step 8. New chat page
-![New chat page](http://files.quickblox.com/Screenshot_2014-07-03-10-37-55.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-37-55.png" height="400" />&nbsp; 
 
 New Chat Page allows to create new chat.
 
@@ -412,7 +408,7 @@ public QBDialog createRoomChat(String roomName,
 }
 ```
 ### Step 9. Private chat page
-![Private chat page](http://files.quickblox.com/Screenshot_2014-07-03-10-44-20.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-44-20.png" height="400" />&nbsp;
 
 Private Chat Page is used for messaging with a friend.
 
@@ -484,7 +480,7 @@ public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QB
 ```
 
 ### Step 10. Group chat page
-![Group chat page](http://files.quickblox.com/Screenshot_2014-07-03-10-40-23.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-40-23.png" height="400" />&nbsp; 
 
 Group Chat Page is used for messaging with friends.
 
@@ -553,7 +549,7 @@ public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throw
 
 ### Step 11. Calls
 ### Audio call
-![Audio call page](http://files.quickblox.com/Screenshot_2014-07-03-11-02-37.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-02-37.png" height="400" />&nbsp;
 
 #### Audio Call Page features:
 * This page is shown once user initiates an audio call
@@ -579,7 +575,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ```
 
 ### Video call
-![Video call page](http://files.quickblox.com/Screenshot_2014-07-03-11-02-14.png) &nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-02-14.png" height="400" />&nbsp; 
 
 ### Video Chat Page features:
 * This page is shown once user initiates a video call
@@ -604,7 +600,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ```
 
 ### Step 12. Settings Page
-![Settings page](http://files.quickblox.com/Screenshot_2014-07-03-10-46-47.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-47.png" height="400" />&nbsp;
 
 Settings Page allows user to change his/her profile and change other inapp controls.
 
@@ -624,7 +620,7 @@ Email –editable field
 * Possibility to change presence status will be excluded from the settings screen.
 
 ### Step 13. Profile Page
-![Profile page](http://files.quickblox.com/Screenshot_2014-07-03-10-47-43.png) &nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-47-43.png" height="400" />&nbsp;
 
 Profile page allows user to edit his/her profile info.
 
