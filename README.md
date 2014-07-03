@@ -116,7 +116,7 @@ public QBUser signup(QBUser inputUser, File file) throws QBResponseException, Ba
 ### Step 3. LogIn page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png" height="400" />&nbsp;
 
-User can login in the app via Facebook or login as a QuickBlox user.
+User can login in the app via Facebook or login as a QM user.
 
 #### 3.1. Connect with Facebook
 
