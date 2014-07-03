@@ -128,12 +128,15 @@ If user signed up with Facebook, for user’s profile will be used FB avatar ima
 ```java
 public QBUser login(String socialProvider, String accessToken,
   String accessTokenSecret) throws QBResponseException, BaseServiceException {
-  QBUser user;
+  
   QBSession session = QBAuth.createSession();
-  user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
+  
+  QBUser user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
   user.setPassword(session.getToken());
+  
   String token = QBAuth.getBaseService().getToken();
   AppSession.startSession(LoginType.FACEBOOK, user, token);
+  
   return user;
 }
 ```
