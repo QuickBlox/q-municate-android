@@ -448,7 +448,7 @@ Private Chat Page is used for messaging with a friend.
 * This page is a chat room for 1x1 chat
 * User types his message and sends it to chatroom – it appears on the left side of the screen in one color.
 * Friend’s messages will be shown in the right corner in another color.
-* Tapping on friend’s avatar or name opens Action Menu. (Chapter 4.9.4. Fig. 4.9.4-1)
+* Tapping on friend’s avatar or name opens Action Menu. 
 * Data set:
 - Page header:
 Friend’s full name
@@ -462,7 +462,7 @@ Timestamp – device time and date should be used
 * Buttons set:
 - VideoChat – starts videochat with current chat opponent
 - AudioChat- – starts audiochat with current chat opponent
-- Attachment menu – allows to add an attachment to a message (fig.4.9-2)
+- Attachment menu – allows to add an attachment to a message 
 - :) icon- opens Emoticons Tab
 - Send – sends whatever is entered in Message field
 - Message field – text/numeric/symbolic field 
@@ -544,7 +544,7 @@ Timestamp – device time and date should be used
 - Send – sends whatever is entered in Message field
 - Tapping on any friend’s name opens Action pop-up
 * Message field – text/numeric/symbolic field 512 chars max
-* Back button returns to the Chats page (chapter 4.6. Fig.4.6-1)
+* Back button returns to the Chats page 
 
 #### Please find below how you can do it in code:
 
