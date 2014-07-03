@@ -22,7 +22,7 @@ It is a step by step guide designed for all developer levels including beginners
 Q-municate is a fully fledged chat application using the Quickblox API.
 
 ## Q-municate application uses following QuickBlox modules:
-* [Chat (v 2.0.)](http://quickblox.com/developers/Chat#Chat_2.0)
+* [Chat (v 2.0.)](http://quickblox.com/modules/chat)
 * [Users](http://quickblox.com/modules/users/)
 * [Content](http://quickblox.com/modules/content/) 
 * [Custom objects](http://quickblox.com/modules/custom/)
