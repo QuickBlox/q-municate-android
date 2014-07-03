@@ -96,18 +96,25 @@ Remember me tick in the check box on Login page will be set automatically, so th
 ```java
 public QBUser signup(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
   QBUser user;
+  
   QBAuth.createSession();
+  
   String password = inputUser.getPassword();
   inputUser.setOldPassword(password);
   user = QBUsers.signUpSignInTask(inputUser);
+  
   if (null != file) {
     QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
     user.setWebsite(qbFile.getPublicUrl());
     user = QBUsers.updateUser(inputUser);
   }
+  
   user.setPassword(password);
+  
   String token = QBAuth.getBaseService().getToken();
+  
   AppSession.startSession(LoginType.EMAIL, user, token);
+  
   return inputUser;
 }
 ```
@@ -129,11 +136,16 @@ If user signed up with Facebook, for user’s profile will be used FB avatar ima
 public QBUser login(String socialProvider, String accessToken,
   String accessTokenSecret) throws QBResponseException, BaseServiceException {
   QBUser user;
+  
   QBSession session = QBAuth.createSession();
+  
   user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
   user.setPassword(session.getToken());
+  
   String token = QBAuth.getBaseService().getToken();
+  
   AppSession.startSession(LoginType.FACEBOOK, user, token);
+  
   return user;
 }
 ```
@@ -170,12 +182,18 @@ Back button – if tapped, user is redirected to Prelogin Page
 ```java
 public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
   QBUser user;
+  
   QBAuth.createSession();
+  
   String password = inputUser.getPassword();
   user = QBUsers.signIn(inputUser);
+  
   String token = QBAuth.getBaseService().getToken();
+  
   user.setPassword(password);
+  
   AppSession.startSession(LoginType.EMAIL, user, token);
+  
   return user;
 }
 ```
@@ -326,11 +344,13 @@ User can access Invite Friends page from the Side bar, to invitу his/her friend
 // send invite by e-mail
 public static void sendInviteEmail(Context context, String[] selectedFriends) {
   Resources resources = context.getResources();
+  
   Intent intentEmail = new Intent(Intent.ACTION_SEND);
   intentEmail.putExtra(Intent.EXTRA_EMAIL, selectedFriends);
   intentEmail.putExtra(Intent.EXTRA_SUBJECT, resources.getText(R.string.inf_subject_of_invitation));
   intentEmail.putExtra(Intent.EXTRA_TEXT, resources.getText(R.string.inf_body_of_invitation));
   intentEmail.setType(Consts.TYPE_OF_EMAIL);
+  
   context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.inf_choose_email_provider)));
 }
 
@@ -339,6 +359,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
   Session session = Session.getActiveSession();
   if (session != null) {
     Resources resources = activity.getResources();
+    
     Bundle postParams = new Bundle();
     postParams.putString(Consts.FB_WALL_PARAM_NAME, resources.getString(R.string.inf_fb_wall_param_name));
     postParams.putString(Consts.FB_WALL_PARAM_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));
@@ -346,7 +367,9 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
     postParams.putString(Consts.FB_WALL_PARAM_PICTURE, resources.getString(R.string.inf_fb_wall_param_picture));
     postParams.putString(Consts.FB_WALL_PARAM_PLACE, resources.getString(R.string.inf_fb_wall_param_place));
     postParams.putString(Consts.FB_WALL_PARAM_TAGS, TextUtils.join(",", selectedFriends));
+    
     Request request = new Request(session, Consts.FB_WALL_PARAM_FEED, postParams, HttpMethod.POST, requestCallback);
+    
     RequestAsyncTask task = new RequestAsyncTask(request);
     task.execute();
   }
@@ -375,9 +398,12 @@ Chats Page shows scrollable chats list (private and group).
 // loading Dialogs
 public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
  Bundle bundle = new Bundle();
+ 
  QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
  customObjectRequestBuilder.setPagesLimit(Consts.CHATS_DIALOGS_PER_PAGE);
+ 
  List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
+ 
  return chatDialogsList;
 }
 ```
@@ -400,10 +426,15 @@ New Chat Page allows to create new chat.
 public QBDialog createRoomChat(String roomName,
             List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
   ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
+  
   QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
+  
   joinRoomChat(dialog);
+  
   inviteFriendsToRoom(dialog, friendIdsList);
+  
   saveDialogToCache(context, dialog);
+  
   return dialog;
 }
 ```
@@ -442,31 +473,40 @@ Timestamp – device time and date should be used
 // creating Private Chat
 public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
   QBDialog dialog = privateChatManager.createDialog(opponentId);
+  
   saveDialogToCache(context, dialog);
+  
   try {
     notifyFriendCreatedPrivateChat(dialog, opponentId);
   } catch (Exception e) {
     ErrorUtils.logError(e);
   }
+  
   this.opponentId = opponentId;
+  
   return dialog;
 }
 
 // sending Private Message
 private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
   QBChatMessage chatMessage;
+  
   if (file != null) {
     chatMessage = getQBChatMessageWithImage(file);
   } else {
     chatMessage = getQBChatMessage(message);
   }
+  
   String dialogId = null;
   if (currentDialog != null) {
     dialogId = currentDialog.getDialogId();
   }
+  
   sendPrivateMessage(chatMessage, userId, dialogId);
+  
   String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
   long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
+  
   if (dialogId != null) {
     saveMessageToCache(new DialogMessageCache(dialogId, chatCreator.getId(), chatMessage.getBody(),
     attachUrl, time, true));
@@ -511,9 +551,13 @@ Timestamp – device time and date should be used
 public QBDialog createRoomChat(String roomName, List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
   ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
   QBDialog dialog = roomChatManager.createDialog(roomName, QBDialogType.GROUP, occupantIdsList);
+  
   joinRoomChat(dialog);
+  
   inviteFriendsToRoom(dialog, friendIdsList);
+  
   saveDialogToCache(context, dialog);
+  
   return dialog;
 }
 
@@ -521,13 +565,16 @@ public QBDialog createRoomChat(String roomName, List<Integer> friendIdsList) thr
 private void sendRoomMessage(QBChatMessage chatMessage, String roomJId,
             String dialogId) throws QBResponseException {
   roomChat = roomChatManager.getRoom(roomJId);
+  
   if (roomChat == null) {
     return;
   }
+  
   String error = null;
   if (!TextUtils.isEmpty(dialogId)) {
     chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
   }
+  
   try {
     roomChat.sendMessage(chatMessage);
   } catch (XMPPException e) {
@@ -535,6 +582,7 @@ private void sendRoomMessage(QBChatMessage chatMessage, String roomJId,
   } catch (SmackException.NotConnectedException e) {
     error = context.getString(R.string.dlg_fail_connection);
   }
+  
   if (error != null) {
     throw new QBResponseException(error);
   }
@@ -644,8 +692,10 @@ App will create round image from the center part of the selected image automatic
 // updating users
 public QBUser updateUser(QBUser user, File file) throws QBResponseException {
   QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
+  
   user.setWebsite(qbFile.getPublicUrl());
   user.setFileId(qbFile.getId());
+  
   return updateUser(user);
 }
 ```
