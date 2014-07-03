@@ -376,7 +376,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
 
 
 ### Step 8. Chats page
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-42-41.png" height="400" />&nbsp; 
+<img src="http://image.quickblox.com/c2c9d02df03583c36c6fef2668bf.injoit.png" height="400" />&nbsp; 
 
 Chats Page shows scrollable chats list (private and group).
 
