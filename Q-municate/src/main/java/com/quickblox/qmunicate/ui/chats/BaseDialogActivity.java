@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -104,6 +105,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         chatEditText.setSwitchViewListener(this);
         FragmentStatePagerAdapter adapter = new SmilesTabFragmentAdapter(getSupportFragmentManager());
         smilesViewPager.setAdapter(adapter);
+        smilesViewPager.setOffscreenPageLimit(1);
         smilesPagerIndicator.setViewPager(smilesViewPager);
         smilesAnimator = new HeightAnimator(chatEditText, smilesLayout);
     }
