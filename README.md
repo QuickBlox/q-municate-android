@@ -1,7 +1,7 @@
 # Q-municate 
 Q-municate is an open source code of chat application with full range of communication features on board (such as messaging, file transfer, push notifications, audio/video calls).
 
-We are inspired to give you chat application out of the box. You can customize this application depending of your needs.
+We are inspired to give you chat application out of the box. You can customize this application depending on your needs.
 QuickBlox is used for backend http://quickblox.com
 
 Find the source code and more information about Q-municate in our Developers section: http://quickblox.com/developers/q-municate
@@ -35,7 +35,7 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 * Participate in Private Chat
 * Participate in Group Chat
 * View list of all active chats with chat history (private chats and group chats)
-* View and edit group chat info (title, logo, add friend or leave a group chat
+* View and edit group chat info (title, logo, add friend or leave a group chat)
 * Allow users to edit their profile (set their own avatar and status (short text message))
 
 Please note all these featureas are available in open source code, so you can customize your app depending on your needs.
@@ -61,6 +61,7 @@ Please note all these featureas are available in open source code, so you can cu
 
 ###### Please note, that user will skip this page, if “Remember me” tick is set in the check box on Login page.
 
+
 ### Step 2. SignUp page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-30.png" height="400" />&nbsp;
 
@@ -69,7 +70,6 @@ Sign Up Page allows to create new QM user.
 #### Available features:
 #### Fields set:
 * Full name – text/numeric fields 3 chars min and 50 chars max
-02.07.14	
 (should contain alphanumeric and space characters only), mandatory
 * Email – text/numeric/symbolic fields 3 chars min - no border, mandatory (email symbols validation included)
 * Password – text/numeric/symbolic field 8-40 chars (should contain alphanumeric and punctuation characters only) , mandatory
@@ -81,7 +81,7 @@ Sign Up Page allows to create new QM user.
 Data validation will be done on the server. (Validation process is the same as for Login page) 
 * Back button - redirects user to Prelogin page
 
-When new user is registered in the system , Facebook and email import friends will be done.
+When new user is registered in the system , Facebook and email friends import will be done.
 Remember me tick in the check box on Login page will be set automatically, so there is no need for user to enter credentials during the next login.
 
 #### Please find below how you can do it in code:
@@ -111,6 +111,7 @@ public QBUser signup(QBUser inputUser, File file) throws QBResponseException, Ba
   return inputUser;
 }
 ```
+
 
 ### Step 3. LogIn page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png" height="400" />&nbsp;
@@ -191,6 +192,7 @@ public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceExc
 }
 ```
 
+
 ### Step 4. Import friends feature.
 
 An app will import all user’s friends by email and Facebook ID after the first app login.
@@ -201,10 +203,10 @@ Notification with text "Please wait, Qmunicate app is searching for your friends
 #### Please find below how you can do it in code:
 
 ```java
-// getting Q-municate users by existing facebook ids
+// retrieving Q-municate users by existing facebook ids
 realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params);
 …
-// getting Q-municate users by existing e-mails
+// retrieving Q-municate users by existing e-mails
 realFriendsContactsList = QBUsers.getUsersByEmails(friendsContactsList, requestBuilder, params);
 …
 
@@ -216,6 +218,7 @@ public void inviteFriend(int userId) throws Exception {
   }
 }
 ```
+
 
 ### Step 5. Friends page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-30.png" height="400" />&nbsp;
@@ -286,6 +289,7 @@ List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, r
 …
 ```
 
+
 ### Step 6. Details Page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-51.png" height="400" />&nbsp;
 
@@ -315,10 +319,11 @@ Friends profile page shows user’s information:
 ##### Back:
 - Back button returns to the previous screen (Main page)
  
+
 ### Step 7. Invite Friends
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-06.png" height="400" />&nbsp;
 
-User can access Invite Friends page from the Side bar, to invitу his/her friends in the app.
+User can access Invite Friends page from the Side bar, to invite his/her friends in the app.
 
 #### Invite Friends Page features:
 * Folding friends list from Facebook
@@ -328,13 +333,13 @@ User can access Invite Friends page from the Side bar, to invitу his/her friend
 * Check box beside each contact full name, to be able to add needed user(s) to the Friends list.
 * Next button adds selected friends to the Friends Page
 
-#### If Fecabook friends are selected- Fig.4.3-2 – Fecebook access pop-up message will appear.
+#### If Fecabook friends are selected- Facebook access pop-up message will appear.
 * Back button returns user to the Friends page
 
 #### Please find below how you can do it in code:
 
 ```java
-// send invite by e-mail
+// send invite via e-mail
 public static void sendInviteEmail(Context context, String[] selectedFriends) {
   Resources resources = context.getResources();
   
@@ -347,7 +352,7 @@ public static void sendInviteEmail(Context context, String[] selectedFriends) {
   context.startActivity(Intent.createChooser(intentEmail, resources.getText(R.string.inf_choose_email_provider)));
 }
 
-// send invite to Facebook wall
+// send invitation to Facebook wall
 public void postInviteToWall(Request.Callback requestCallback, String[] selectedFriends) {
   Session session = Session.getActiveSession();
   if (session != null) {
@@ -368,6 +373,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
   }
 }
 ```
+
 
 ### Step 8. Chats page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-42-41.png" height="400" />&nbsp; 
@@ -401,7 +407,8 @@ public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, Sm
 }
 ```
 
-### Step 8. New chat page
+
+### Step 9. New chat page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-37-55.png" height="400" />&nbsp; 
 
 New Chat Page allows to create new chat.
@@ -431,7 +438,8 @@ public QBDialog createRoomChat(String roomName,
   return dialog;
 }
 ```
-### Step 9. Private chat page
+
+### Step 10. Private chat page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-44-20.png" height="400" />&nbsp;
 
 Private Chat Page is used for messaging with a friend.
@@ -512,7 +520,8 @@ public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QB
 }
 ```
 
-### Step 10. Group chat page
+
+### Step 11. Group chat page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-40-23.png" height="400" />&nbsp; 
 
 Group Chat Page is used for messaging with friends.
@@ -588,7 +597,8 @@ public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throw
 }
 ```
 
-### Step 11. Calls
+
+### Step 12. Calls
 ### Audio call
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-11-02-37.png" height="400" />&nbsp;
 
@@ -640,7 +650,8 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 *** WebRTC.MEDIA_STREAM callType - type of call (WebRTC.MEDIA_STREAM.VIDEO or WebRTC.MEDIA_STREAM.AUDIO)
 ```
 
-### Step 12. Settings Page
+
+### Step 13. Settings Page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-47.png" height="400" />&nbsp;
 
 Settings Page allows user to change his/her profile and change other inapp controls.
@@ -660,7 +671,8 @@ Email –editable field
 * Back button navigates user back to Home Page
 * Possibility to change presence status will be excluded from the settings screen.
 
-### Step 13. Profile Page
+
+### Step 14. Profile Page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-47-43.png" height="400" />&nbsp;
 
 Profile page allows user to edit his/her profile info.
