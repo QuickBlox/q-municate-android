@@ -707,7 +707,7 @@ public QBUser updateUser(QBUser user, File file) throws QBResponseException {
 
 ### Important - how to build your own Chat app</h3>
 
-If you want to build your own iOS app using ChattAR as a basis, please do the following:<br />
+If you want to build your own iOS app using Q-municate as a basis, please do the following:<br />
 1) download the project from here (GIT)<br />
 2) register a QuickBlox account (if you don't have one yet): http://admin.quickblox.com/register<br />
 3) log in to QuickBlox admin panel [http://admin.quickblox.com/signin]http://admin.quickblox.com/signin<br />
