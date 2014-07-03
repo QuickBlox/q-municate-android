@@ -30,8 +30,8 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 
 ## It includes such features as:
 
-* Two sign-up methods – Facebook and QB (with email)
-* Login using email 
+* Two sign-up methods – Facebook and with email/password
+* Login using Facebook account and email/password
 * Auto search and import of user’s friends with QM accounts with help of friend’s Facebook credentials and email (for the first login)
 * Invite Facebook and QB friends from database (list view)
 * View Friends list
