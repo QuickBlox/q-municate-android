@@ -21,21 +21,21 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         this.multiChatHelper = chatHelper;
     }
 
-    public static void start(Context context, String roomJid, ArrayList<Integer> friendIdsList) {
+    public static void start(Context context, String dialogId, ArrayList<Integer> friendIdsList) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIENDS_TO_GROUP_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendIdsList);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
 
-        multiChatHelper.addUsersToRoom(roomJid, friendIdsList);
+        multiChatHelper.addUsersToRoom(dialogId, friendIdsList);
 
         return extras;
     }

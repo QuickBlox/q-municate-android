@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ListView
         android:id="@+id/friends_listview"
@@ -16,7 +17,6 @@
         android:padding="10dp"
         android:textSize="@dimen/text_size_small"
         android:text="@string/frl_no_friends"
-        android:textColor="@color/dark_gray"
-        android:visibility="gone" />
+        android:textColor="@color/dark_gray" />
 
 </RelativeLayout>

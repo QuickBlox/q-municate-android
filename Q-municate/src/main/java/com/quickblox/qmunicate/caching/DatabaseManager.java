@@ -154,7 +154,7 @@ public class DatabaseManager {
 
     public static Cursor getAllDialogs(Context context) {
         return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
-                DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.NAME + " COLLATE NOCASE ASC");
+                DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
     }
 
     public static List<QBDialog> getDialogs(Context context) {

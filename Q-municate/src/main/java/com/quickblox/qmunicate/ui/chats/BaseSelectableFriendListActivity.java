@@ -60,8 +60,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public void onCounterFriendsChanged(int valueCounter) {
         if (actionMode != null) {
             if (valueCounter == Consts.ZERO_INT_VALUE) {
-                isNeedToCloseWithoutRedirect = true;
-                actionMode.finish();
+                closeActionModeWithRedirect(true);
                 return;
             }
         } else {
@@ -77,6 +76,16 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         actionMode.setCustomView(view);
     }
 
+    public void actionModeTextOnClickListener(View view) {
+        closeActionModeWithRedirect(false);
+        view.getBackground().setAlpha(50);
+    }
+
+    private void closeActionModeWithRedirect(boolean isNeedToCloseWithoutRedirect) {
+        this.isNeedToCloseWithoutRedirect = isNeedToCloseWithoutRedirect;
+        actionMode.finish();
+    }
+
     private void initBase() {
         canPerformLogout.set(false);
     }
@@ -86,8 +95,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            isNeedToCloseWithoutRedirect = true;
-            actionMode.finish();
+            closeActionModeWithRedirect(true);
             return true;
         } else {
             isNeedToCloseWithoutRedirect = false;

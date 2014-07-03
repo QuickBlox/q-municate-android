@@ -4,13 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ChatDialogUtils;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
@@ -29,9 +30,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogsList = chatRestHelper.getDialogs();
+        ArrayList<ParcelableQBDialog> dialogsList = ChatDialogUtils.dialogsToParcelableDialogs(chatRestHelper.getDialogs());
         Bundle bundle = new Bundle();
-        bundle.putSerializable(QBServiceConsts.EXTRA_CHATS_DIALOGS, (java.io.Serializable) dialogsList);
+        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS,  dialogsList);
         return bundle;
     }
 }

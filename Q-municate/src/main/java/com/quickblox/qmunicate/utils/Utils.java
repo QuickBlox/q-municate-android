@@ -10,6 +10,7 @@ import com.quickblox.qmunicate.model.Friend;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -62,5 +63,22 @@ public class Utils {
         user.setId(friend.getId());
         user.setFullName(friend.getFullname());
         return user;
+    }
+
+    public static int[] toIntArray(List<Integer> integerList)  {
+        int[] intArray = new int[integerList.size()];
+        int i = 0;
+        for (Integer e : integerList)
+            intArray[i++] = e.intValue();
+        return intArray;
+    }
+
+    public static ArrayList<Integer> toArrayList(int[] itemArray)  {
+        ArrayList<Integer> integerList = new ArrayList<Integer>(itemArray.length);
+        int i = 0;
+        for (int item : itemArray) {
+            integerList.add(item);
+        }
+        return integerList;
     }
 }

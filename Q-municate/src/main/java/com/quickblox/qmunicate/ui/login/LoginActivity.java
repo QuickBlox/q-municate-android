@@ -181,8 +181,10 @@ public class LoginActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
+            validationUtils.setError(exception.getMessage());
             hideProgress();
-            validationUtils.setError(getResources().getString(R.string.lgn_error));
         }
     }
 }

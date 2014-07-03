@@ -7,9 +7,11 @@ import android.os.Bundle;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
+import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.utils.ChatDialogUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,23 +34,27 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
         context.startService(intent);
     }
 
-    public static void start(Context context, List<QBDialog> roomJidList) {
+    public static void start(Context context, ArrayList<ParcelableQBDialog> dialogList) {
         Intent intent = new Intent(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID_LIST, new ArrayList<QBDialog>(roomJidList));
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST, dialogList);
+        intent.putExtras(bundle);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogList = null;
+        ArrayList<ParcelableQBDialog> dialogList = null;
+        List<QBDialog> dialogs = null;
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
-            dialogList = (ArrayList<QBDialog>) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID_LIST);
-        } else {
-            dialogList = DatabaseManager.getDialogs(context);
+            dialogList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST);
+            dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);
         }
-
-        if (dialogList != null && !dialogList.isEmpty()) {
-            multiChatHelper.tryJoinRoomChats(dialogList);
+        if(dialogs == null) {
+            dialogs = DatabaseManager.getDialogs(context);
+        }
+        if (dialogs != null && !dialogs.isEmpty()) {
+            multiChatHelper.tryJoinRoomChats(dialogs);
         }
         return extras;
     }

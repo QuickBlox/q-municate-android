@@ -26,15 +26,20 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     public void onActivityResumed(Activity activity) {
         lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
-        if (numberOfActivitiesInForeground == 0 && chatDestroyed) {
+        boolean activityLogeable = isActivityLogeable(activity);
+        if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
                 QBLoginAndJoinDialogsCommand.start(activity);
             }
         }
-        if (activity instanceof QBLogeable) {
+        if (activityLogeable){
             ++numberOfActivitiesInForeground;
         }
+    }
+
+    public boolean isActivityLogeable(Activity activity){
+        return (activity instanceof QBLogeable);
     }
 
     public void onActivityPaused(Activity activity) {
@@ -54,7 +59,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
-                QBLogoutAndDestroyChatCommand.start(activity);
+                QBLogoutAndDestroyChatCommand.start(activity, false);
             }
             // TODO SF app was killed.
             //android.os.Process.killProcess(android.os.Process.myPid());

@@ -32,17 +32,19 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = chatHelper;
     }
 
-    public static void start(Context context, String roomJid) {
+    public static void start(Context context, String dialogId, String roomJid) {
         Intent intent = new Intent(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
         intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        String roomJid = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        String roomJid = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
 
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, roomJid);
+        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
         GroupDialog groupDialog = new GroupDialog(dialog);
 
         List<Integer> participantIdsList = dialog.getOccupants();

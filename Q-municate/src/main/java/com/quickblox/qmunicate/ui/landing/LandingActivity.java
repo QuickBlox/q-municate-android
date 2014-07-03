@@ -10,11 +10,9 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
-import com.quickblox.qmunicate.model.LoginType;
 import com.quickblox.qmunicate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
@@ -22,7 +20,6 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
-import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
 
 public class LandingActivity extends BaseActivity {
@@ -99,6 +96,8 @@ public class LandingActivity extends BaseActivity {
     }
 
     private void startMainActivity(QBUser user) {
+        AppSession.getSession().updateUser(user);
+        AppSession.saveRememberMe(true);
         MainActivity.start(LandingActivity.this);
         finish();
     }

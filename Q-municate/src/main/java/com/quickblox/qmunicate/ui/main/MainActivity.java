@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.core.gcm.GSMHelper;
 import com.quickblox.qmunicate.model.AppSession;
+import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadFriendListCommand;
@@ -28,10 +30,12 @@ import com.quickblox.qmunicate.ui.friends.FriendsListFragment;
 import com.quickblox.qmunicate.ui.importfriends.ImportFriends;
 import com.quickblox.qmunicate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.qmunicate.ui.settings.SettingsFragment;
+import com.quickblox.qmunicate.utils.ChatDialogUtils;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -135,7 +139,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
     }
 
-
     private void initNavigationDrawer() {
         navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(
                 R.id.navigation_drawer);
@@ -176,10 +179,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            ArrayList<QBDialog> dialogs = (ArrayList<QBDialog>) bundle.getSerializable(
+            ArrayList<ParcelableQBDialog> parcelableDialogs =  bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            QBJoinGroupDialogCommand.start(MainActivity.this, dialogs);
+            QBJoinGroupDialogCommand.start(MainActivity.this, parcelableDialogs);
             //TODO may be move this in command to execute async
+            ArrayList<QBDialog> dialogs = ChatDialogUtils.parcelableDialogsToDialogs(parcelableDialogs);
             DatabaseManager.saveDialogs(MainActivity.this, dialogs);
         }
     }

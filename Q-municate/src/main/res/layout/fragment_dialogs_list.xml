@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ListView
         android:id="@+id/chats_listview"
@@ -15,7 +16,6 @@
         android:padding="10dp"
         android:text="@string/dlg_no_chats"
         android:textColor="@color/dark_gray"
-        android:textSize="@dimen/text_size_small"
-        android:visibility="gone" />
+        android:textSize="@dimen/text_size_small" />
 
 </RelativeLayout>

@@ -70,8 +70,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
         if (dialogId != null) {
-            saveMessageToCache(new DialogMessageCache(dialogId, userId, chatMessage.getBody(), attachUrl,
-                    time, true));
+            saveMessageToCache(new DialogMessageCache(dialogId, chatCreator.getId(), chatMessage.getBody(),
+                    attachUrl, time, true));
         }
     }
 

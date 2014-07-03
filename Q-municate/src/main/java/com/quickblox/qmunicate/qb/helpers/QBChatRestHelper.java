@@ -34,7 +34,8 @@ public class QBChatRestHelper extends BaseHelper {
 
     private ConnectionListener connectionListener = new ChatConnectionListener();
 
-    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(
+            QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             chatService = QBChatService.getInstance();

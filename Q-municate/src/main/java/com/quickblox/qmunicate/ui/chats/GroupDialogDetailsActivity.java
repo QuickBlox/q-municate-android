@@ -39,15 +39,15 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     private String groupNameCurrent;
     private String groupNameOld;
 
-    private String jid;
+    private String dialogId;
     private GroupDialog groupDialog;
 
     private Object actionMode;
     private boolean closeActionMode;
 
-    public static void start(Context context, String jid) {
+    public static void start(Context context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, jid);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
         context.startActivity(intent);
     }
 
@@ -55,8 +55,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
-        jid = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_ROOM_JID);
-        groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(this, jid));
+        dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+        groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(this, dialogId));
 
         initUI();
         initUIWithData();
@@ -67,7 +67,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     protected void onResume() {
         super.onResume();
         showProgress();
-        QBLoadGroupDialogCommand.start(this, jid);
+        QBLoadGroupDialogCommand.start(this, dialogId, groupDialog.getRoomJid());
     }
 
     private void initUI() {
@@ -109,7 +109,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
-                QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, jid);
+                QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
             }
         });
         dialog.show(getFragmentManager(), null);
@@ -182,7 +182,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
             return;
         }
         showProgress();
-        QBUpdateGroupNameCommand.start(this, groupDialog.getRoomJid(), groupNameCurrent);
+        QBUpdateGroupNameCommand.start(this, dialogId, groupNameCurrent);
     }
 
     private boolean isUserDataCorrect() {
