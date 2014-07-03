@@ -440,7 +440,7 @@ public QBDialog createRoomChat(String roomName,
 ```
 
 ### Step 10. Private chat page
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-44-20.png" height="400" />&nbsp;
+<img src="http://image.quickblox.com/bdf27e5efd56844e3e39de5b46dd.injoit.png" height="400" />&nbsp;
 
 Private Chat Page is used for messaging with a friend.
 
@@ -522,7 +522,7 @@ public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QB
 
 
 ### Step 11. Group chat page
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-40-23.png" height="400" />&nbsp; 
+<img src="http://image.quickblox.com/a68a675fddddf9b3c7c996fb0d6b.injoit.png" height="400" />&nbsp; 
 
 Group Chat Page is used for messaging with friends.
 
