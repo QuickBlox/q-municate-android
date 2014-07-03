@@ -15,6 +15,7 @@ public class QBServiceConsts {
     public static final String LOGOUT_ACTION = "logout_action";
     public static final String LOGOUT_REST_ACTION = "logout_rest_action";
     public static final String LOGOUT_CHAT_ACTION = "logout_chat_action";
+    public static final String LOGOUT_AND_DESTROY_CHAT_ACTION = "logout_and_destroy_chat_action";
     public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
     public static final String RESET_PASSWORD_ACTION = "reset_password_action";
     public static final String SIGNUP_ACTION = "signup_action";
@@ -164,4 +165,5 @@ public class QBServiceConsts {
     public static final String SMILE_SELECTED = "smile_selected";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
+    public static final String DESTROY_CHAT = "destroy_chat_after_logout";
 }

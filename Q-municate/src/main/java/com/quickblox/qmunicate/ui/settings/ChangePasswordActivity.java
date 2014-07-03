@@ -13,6 +13,7 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBChangePasswordCommand;
+import com.quickblox.qmunicate.qb.commands.QBReloginCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.utils.Consts;
@@ -89,6 +90,8 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private void addActions() {
         addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginChatSuccessAction());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -106,6 +109,29 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         AppSession.getSession().updateUser(user);
     }
 
+    private void relogin(){
+        showProgress();
+        QBReloginCommand.start(ChangePasswordActivity.this);
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
+        if(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION.equals(action)){
+            hideProgress();
+            finish();
+        }
+    }
+
+    private class ReloginChatSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            finish();
+        }
+    }
+
     private class ChangePasswordSuccessAction implements Command {
 
         @Override
@@ -114,7 +140,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
             saveUserCredentials(user);
             hideProgress();
             DialogUtils.showLong(ChangePasswordActivity.this, getString(R.string.dlg_password_changed));
-            finish();
+            relogin();
         }
     }
 

@@ -19,15 +19,26 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
         this.chatRestHelper = chatRestHelper;
     }
 
-    public static void start(Context context) {
-        Intent intent = new Intent(QBServiceConsts.LOGOUT_CHAT_ACTION, null, context, QBService.class);
+    public static void start(Context context, boolean destroyChat) {
+        Intent intent = new Intent(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.DESTROY_CHAT, destroyChat);
         context.startService(intent);
+    }
+
+    public static void start(Context context) {
+       start(context, false);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
+        boolean destroy = true;
+        if (extras != null) {
+            destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
+        }
         chatRestHelper.logout();
-        chatRestHelper.destroy();
+        if (destroy) {
+            chatRestHelper.destroy();
+        }
         return extras;
     }
 }

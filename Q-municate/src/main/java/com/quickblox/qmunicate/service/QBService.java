@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.qmunicate.core.command.CompositeServiceCommand;
 import com.quickblox.qmunicate.core.command.ServiceCommand;
 import com.quickblox.qmunicate.model.AppSession;
@@ -43,6 +45,7 @@ import com.quickblox.qmunicate.qb.commands.QBLoginWithSocialCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.qb.commands.QBLogoutRestCommand;
+import com.quickblox.qmunicate.qb.commands.QBReloginCommand;
 import com.quickblox.qmunicate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.qmunicate.qb.commands.QBSendGroupDialogMessageCommand;
@@ -54,6 +57,7 @@ import com.quickblox.qmunicate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
+import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
 import com.quickblox.qmunicate.qb.helpers.BaseHelper;
 import com.quickblox.qmunicate.qb.helpers.QBAuthHelper;
 import com.quickblox.qmunicate.qb.helpers.QBChatRestHelper;
@@ -61,6 +65,7 @@ import com.quickblox.qmunicate.qb.helpers.QBFriendListHelper;
 import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
+import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.Utils;
 
@@ -143,6 +148,7 @@ public class QBService extends Service {
         registerLoginCommand();
         registerLoginWithSocialCommand();
         registerSignUpCommand();
+        registerLogoutAndDestroyChatCommand();
         registerLogoutCommand();
         registerChangePasswordCommand();
         registerResetPasswordCommand();
@@ -155,7 +161,6 @@ public class QBService extends Service {
         registerLoadUsersCommand();
 
         registerLoginChatCommand();
-        registerLogoutAndDestroyChatCommand();
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
         registerJoinGroupChat();
@@ -175,6 +180,7 @@ public class QBService extends Service {
         registerUpdateStatusMessageCommand();
         registerSendPUshCommand();
         registerLoginAndJoinGroupChat();
+        registerReloginCommand();
     }
 
     private void registerUpdateGroupNameCommand() {
@@ -255,7 +261,7 @@ public class QBService extends Service {
         QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
         ServiceCommand logoutCommand = new QBLogoutAndDestroyChatCommand(this, chatRestHelper,
                 QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.LOGOUT_CHAT_ACTION, logoutCommand);
+        serviceCommandMap.put(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION, logoutCommand);
     }
 
     private void registerLoadAttachFileCommand() {
@@ -339,7 +345,7 @@ public class QBService extends Service {
     private void registerLogoutCommand() {
         QBLogoutCommand logoutCommand = new QBLogoutCommand(this, QBServiceConsts.LOGOUT_SUCCESS_ACTION,
                 QBServiceConsts.LOGOUT_FAIL_ACTION);
-        ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_CHAT_ACTION);
+        ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
         QBLogoutRestCommand logoutRestCommand = new QBLogoutRestCommand(this, authHelper,
                 QBServiceConsts.LOGOUT_REST_SUCCESS_ACTION, QBServiceConsts.LOGOUT_REST_FAIL_ACTION);
 
@@ -446,12 +452,28 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SEND_PUSH_ACTION, sendPushCommand);
     }
 
+    private void registerReloginCommand() {
+        QBReloginCommand reloginCommand = new QBReloginCommand(this,
+                QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
+        ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
+        reloginCommand.addCommand(logoutChatCommand);
+
+        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
+        reloginCommand.addCommand(loginChatCommand);
+
+        ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+        reloginCommand.addCommand(joinChatCommand);
+        serviceCommandMap.put(QBServiceConsts.RE_LOGIN_IN_CHAT_ACTION, reloginCommand);
+    }
+
     @Override
     public void onCreate() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(QBServiceConsts.LOGIN_ACTION);
+        filter.addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
         if (broadcastReceiver != null) {
-            registerReceiver(broadcastReceiver, filter);
+            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                    filter);
         }
     }
 
@@ -459,7 +481,7 @@ public class QBService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (broadcastReceiver != null) {
-            unregisterReceiver(broadcastReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
     }
 
@@ -524,7 +546,14 @@ public class QBService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //TODO will be defined in next refactor
+            Log.d(TAG, "onReceive" + intent.getAction());
+            String action = intent.getAction();
+            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
+                ((BaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(QBChatService.getInstance(), AppSession.getSession().getUser());
+                ((BaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(QBChatService.getInstance(), AppSession.getSession().getUser());
+                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance(),
+                        CallActivity.class);
+            }
         }
     }
 }
