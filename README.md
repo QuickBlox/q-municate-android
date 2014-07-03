@@ -1,5 +1,5 @@
 # QuickBlox
-QuickBlox - Communication & cloud backend (BaaS) platform which brings superpowers to mobile apps.
+QuickBlox - Communication backed as a Service (CaaS) platform which brings superpowers to mobile apps.
 
 QuickBlox is a suite of communication features & data services (APIs, SDKs, code samples, admin panel, tutorials) which help digital agencies, mobile developers and publishers to add great functionality to smartphone applications.
 
@@ -13,7 +13,6 @@ As always QuickBlox backend is at your service: http://quickblox.com/plans/
 
 Find the source code and more information about Q-municate in our Developers section: http://quickblox.com/developers/q-municate
 
-Download app from AppStore: http://itunes.apple.com/us/app/q-municate
 
 # Q-municate Android
 This guide is created by QuickBlox Android team to explain how you can build a communication app on Android with Quickblox API.
