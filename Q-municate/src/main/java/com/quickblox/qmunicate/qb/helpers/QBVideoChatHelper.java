@@ -28,6 +28,7 @@ public class QBVideoChatHelper extends BaseHelper {
     private VideoSenderChannel signalingChannel;
 
     private QBSignalingChannel.SignalingListener signalingListener;
+    private QBChatService chatService;
     private Class<? extends Activity> activityClass;
 
     public QBVideoChatHelper(Context context) {
@@ -38,11 +39,13 @@ public class QBVideoChatHelper extends BaseHelper {
         return signalingChannel;
     }
 
-    public void init(Class<? extends Activity> activityClass) {
+    public void init(QBChatService chatService,
+            Class<? extends Activity> activityClass) {
+        this.chatService = chatService;
         this.activityClass = activityClass;
         lo.g("init videochat");
         signalingListener = new VideoSignalingListener();
-        QBChatService.getInstance().getSignalingManager().addSignalingManagerListener(
+        this.chatService.getSignalingManager().addSignalingManagerListener(
                 new SignalingManagerListener());
     }
 

@@ -20,6 +20,7 @@ import com.quickblox.qmunicate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
+import com.quickblox.qmunicate.ui.base.BaseLogeableActivity;
 import com.quickblox.qmunicate.ui.media.MediaPlayerManager;
 import com.quickblox.qmunicate.ui.videocall.VideoCallFragment;
 import com.quickblox.qmunicate.ui.voicecall.VoiceCallFragment;
@@ -27,7 +28,7 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.Utils;
 
-public class CallActivity extends BaseActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
+public class CallActivity extends BaseLogeableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
@@ -92,6 +93,7 @@ public class CallActivity extends BaseActivity implements IncomingCallFragment.I
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
         actionBar.hide();
         mediaPlayer = App.getInstance().getMediaPlayer();
