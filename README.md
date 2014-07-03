@@ -626,7 +626,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ```
 
 ### Video call
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-02-14.png" height="400" />&nbsp; 
+<img src="http://image.quickblox.com/3d05b76fe821f9b3e7a5a2e95de8.injoit.png" height="400" />&nbsp; 
 
 ### Video Chat Page features:
 * This page is shown once user initiates a video call
@@ -673,7 +673,7 @@ Email –editable field
 
 
 ### Step 14. Profile Page
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-47-43.png" height="400" />&nbsp;
+<img src="http://image.quickblox.com/a43df11b3a57f2cdb6aae021aeb9.injoit.png" height="400" />&nbsp;
 
 Profile page allows user to edit his/her profile info.
 
