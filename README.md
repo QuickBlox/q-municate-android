@@ -56,7 +56,7 @@ Please note all these featureas are available in open source code, so you can cu
 
 ## Step by step guide
 ### Step 1. PreLogin page
-![PreLogin page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-18.png) &nbsp;
+![PreLogin page](http://files.quickblox.com/Screenshot_2014-07-03-10-22-18.png =100x50) &nbsp;
 
 #### Available features:
 #### Buttons:
