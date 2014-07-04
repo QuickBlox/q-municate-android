@@ -290,7 +290,6 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             @Override
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
                 for (com.facebook.model.GraphUser user : users) {
-                    Log.i("Friend", user.getName());
                     friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(), InviteFriend.VIA_FACEBOOK_TYPE, null, false));
                 }
                 friendsList.addAll(friendsFacebookList);
@@ -299,7 +298,6 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
                 baseActivity.hideProgress();
             }
         });
-        Log.i("Friend", friendsRequest.toString());
         friendsRequest.executeAsync();
     }
 
@@ -339,7 +337,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             FacebookRequestError error = response.getError();
             if (error != null) {
                 Log.e(getString(R.string.facebook_exception), error.toString());
-                DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
+                DialogUtils.showLong(getActivity(), getResources().getString(
+                        R.string.facebook_exception) + error);
             } else {
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
             }
