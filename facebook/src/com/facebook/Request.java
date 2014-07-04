@@ -22,6 +22,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.*;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import com.facebook.internal.ServerProtocol;
 import com.facebook.model.*;
