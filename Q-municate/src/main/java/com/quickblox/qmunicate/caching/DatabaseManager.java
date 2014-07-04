@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.QBHistoryMessage;
@@ -228,6 +227,24 @@ public class DatabaseManager {
         return friend;
     }
 
+    public static long getLastMessageDateSent(Context context, QBDialog dialog) {
+        long lastDateSent = Consts.ZERO_INT_VALUE;
+        Cursor cursor = context.getContentResolver().query(
+                DialogMessageTable.CONTENT_URI,
+                null,
+                DialogMessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
+                DialogMessageTable.Cols.IS_SYNC + " > 0",
+                null,
+                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+
+        if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
+            cursor.moveToLast();
+            lastDateSent = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+        }
+
+        return lastDateSent;
+    }
+
     public static int getCountUnreadDialogs(Context context) {
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
@@ -249,7 +266,7 @@ public class DatabaseManager {
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
-            String dialogId) {
+            String dialogId, boolean isSync) {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
@@ -262,7 +279,7 @@ public class DatabaseManager {
             }
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(dialogId, senderId, message,
-                    attachURL, historyMessage.getDateSent(), true);
+                    attachURL, historyMessage.getDateSent(), true, isSync);
 
             saveChatMessage(context, dialogMessageCache);
         }
@@ -276,55 +293,11 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
+        values.put(DialogMessageTable.Cols.IS_SYNC, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
         updateDialog(context, dialogMessageCache.getDialogId(), dialogMessageCache.getMessage(),
                 dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
-    }
-
-    public static boolean createDialog(Context context, DialogMessageCache dialogMessageCache) {
-        ContentResolver resolver = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
-        values.put(DialogTable.Cols.ROOM_JID_ID, dialogMessageCache.getDialogId());
-        Uri uri = resolver.insert(DialogTable.CONTENT_URI, values);
-        return uri != null;
-    }
-
-    public static QBDialog createPrivateDialogIfNotExistByRoomJidId(Context context, String dialogId,
-            String lastMessage, long dateSent, int lastSenderId) {
-        QBDialog dialog = new QBDialog(dialogId);
-        Friend opponentFriend = DatabaseManager.getFriendById(context, lastSenderId);
-        if (opponentFriend == null) {
-            opponentFriend = new Friend();
-            opponentFriend.setId(lastSenderId);
-            opponentFriend.setFullname(dialogId);
-        }
-        ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListForCreatePrivateDialog(
-                opponentFriend.getId());
-        dialog.setOccupantsIds(occupantsIdsList);
-        dialog.setType(QBDialogType.PRIVATE);
-        dialog.setLastMessage(lastMessage);
-        dialog.setLastMessageDateSent(dateSent);
-        dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
-        dialog.setLastMessageUserId(lastSenderId);
-        DatabaseManager.saveDialog(context, dialog);
-        return dialog;
-    }
-
-    public static void updateMessages(Context context, List<QBHistoryMessage> dialogMessagesList,
-            QBDialog dialog) {
-        if (dialogMessagesList != null) {
-            // TODO SF temp
-            deleteMessagesByDialogId(context, dialog.getDialogId());
-
-            saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
-    }
-
-    private void saveChatMessagesToCache(Context context, List<QBHistoryMessage> dialogMessagesList,
-            String dialogId, boolean isPrivate) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, dialogId);
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -416,18 +389,6 @@ public class DatabaseManager {
         int countMessages = cursor.getCount();
         cursor.close();
         return countMessages;
-    }
-
-    private static List<Friend> getFriendListFromCursor(Cursor cursor) {
-        if (cursor.getCount() > Consts.ZERO_INT_VALUE) {
-            List<Friend> friendList = new ArrayList<Friend>(cursor.getCount());
-            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                friendList.add(getFriendFromCursor(cursor));
-            }
-            cursor.close();
-            return friendList;
-        }
-        return null;
     }
 
     public static void clearAllCache(Context context) {

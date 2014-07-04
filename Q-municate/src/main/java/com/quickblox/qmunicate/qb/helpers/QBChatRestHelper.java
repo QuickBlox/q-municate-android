@@ -78,7 +78,7 @@ public class QBChatRestHelper extends BaseHelper {
             customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
         }
-        List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, null, bundle);
+        List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
         return dialogMessagesList;
     }
 

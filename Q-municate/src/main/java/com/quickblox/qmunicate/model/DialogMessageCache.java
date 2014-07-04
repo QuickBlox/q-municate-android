@@ -8,16 +8,27 @@ public class DialogMessageCache {
     private long time;
     private boolean isRead;
 
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean isSync) {
+        this.isSync = isSync;
+    }
+
+    private boolean isSync;
+
     private String dialogId;
 
     public DialogMessageCache(String dialogId, Integer senderId, String message, String attachUrl, long time,
-            boolean isRead) {
+            boolean isRead, boolean isSync) {
         this.dialogId = dialogId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
         this.isRead = isRead;
+        this.isSync = isSync;
     }
 
     public boolean isRead() {

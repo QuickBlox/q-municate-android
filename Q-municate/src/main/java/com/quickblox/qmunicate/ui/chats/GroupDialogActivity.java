@@ -3,8 +3,10 @@ package com.quickblox.qmunicate.ui.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -13,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
@@ -158,6 +161,22 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         actionBar.setTitle(groupName);
         // TODO IS must be implemented soon
         actionBar.setSubtitle("some information");
+        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
+        if (actionBarTitleId > Consts.ZERO_INT_VALUE) {
+            TextView title = (TextView) findViewById(actionBarTitleId);
+            if (title != null) {
+                title.setTextColor(Color.WHITE);
+            }
+        }
+        if (actionBarSubTitleId > Consts.ZERO_INT_VALUE) {
+            TextView subTitle = (TextView) findViewById(actionBarSubTitleId);
+            if (subTitle != null) {
+                float alpha = 0.5f;
+                subTitle.setTextColor(Color.WHITE);
+                subTitle.setAlpha(alpha);
+            }
+        }
     }
 
     @Override
@@ -221,12 +240,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void startLoadDialogMessages() {
-        // TODO SF temp
-        //        if (messagesAdapter.isEmpty()) {
-        startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
-        //        } else {
-        //            startLoadDialogMessages(dialog, dialogId, dialog.getLastMessageDateSent());
-        //        }
-        //---
+        if (messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
+        } else {
+            long lastMessageDateSent = DatabaseManager.getLastMessageDateSent(this, dialog);
+            startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
     }
 }

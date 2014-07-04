@@ -20,7 +20,6 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.model.DialogMessageCache;
-import com.quickblox.qmunicate.model.ParcelableQBDialog;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
 import com.quickblox.qmunicate.utils.Consts;
@@ -237,7 +236,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
             saveMessageToCache(new DialogMessageCache(dialogId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, false));
+                    chatMessage.getBody(), attachUrl, time, false, false));
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend, dialogId);

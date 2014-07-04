@@ -71,7 +71,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
         if (dialogId != null) {
             saveMessageToCache(new DialogMessageCache(dialogId, chatCreator.getId(), chatMessage.getBody(),
-                    attachUrl, time, true));
+                    attachUrl, time, true, true));
         }
     }
 
@@ -151,10 +151,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         DatabaseManager.saveDialogs(context, dialogsList);
     }
 
-    private void saveChatMessagesToCache(List<QBHistoryMessage> dialogMessagesList, String dialogId) {
-        DatabaseManager.saveChatMessages(context, dialogMessagesList, dialogId);
-    }
-
     public void updateStatusMessage(String messageId, boolean isRead) {
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
@@ -182,14 +178,13 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             friend.setFullname(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
         long time;
-        String roomJidId;
         String attachUrl = null;
 
         time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         saveMessageToCache(new DialogMessageCache(dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
-                attachUrl, time, false));
+                attachUrl, time, false, false));
         notifyMessageReceived(chatMessage, friend, dialogId);
     }
 
