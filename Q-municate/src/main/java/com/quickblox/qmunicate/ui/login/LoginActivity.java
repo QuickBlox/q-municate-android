@@ -15,6 +15,7 @@ import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.LoginType;
@@ -172,6 +173,7 @@ public class LoginActivity extends BaseActivity {
             if (rememberMeCheckBox.isChecked()) {
                 AppSession.saveRememberMe(true);
             }
+            DatabaseManager.clearAllCache(LoginActivity.this);
             MainActivity.start(LoginActivity.this);
             finish();
         }

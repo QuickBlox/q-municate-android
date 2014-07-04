@@ -469,6 +469,7 @@ public class QBService extends Service {
 
     @Override
     public void onCreate() {
+        Log.i(TAG, "onCreate");
         IntentFilter filter = new IntentFilter();
         filter.addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
         if (broadcastReceiver != null) {
@@ -480,6 +481,7 @@ public class QBService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i(TAG, "onDestroy");
         if (broadcastReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
@@ -527,6 +529,7 @@ public class QBService extends Service {
     }
 
     public void refreshSession() {
+        Log.i(TAG, "refreshSession");
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
