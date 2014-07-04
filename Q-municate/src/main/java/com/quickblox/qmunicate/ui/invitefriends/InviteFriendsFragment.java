@@ -285,11 +285,12 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private void getFacebookFriendsList() {
         baseActivity.showProgress();
-        Request.executeMyFriendsRequestAsync(Session.getActiveSession(), new Request.GraphUserListCallback() {
+        Request friendsRequest = Request.newMyFriendsRequest(Session.getActiveSession(), new Request.GraphUserListCallback() {
 
             @Override
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
                 for (com.facebook.model.GraphUser user : users) {
+                    Log.i("Friend", user.getName());
                     friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(), InviteFriend.VIA_FACEBOOK_TYPE, null, false));
                 }
                 friendsList.addAll(friendsFacebookList);
@@ -298,6 +299,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
                 baseActivity.hideProgress();
             }
         });
+        Log.i("Friend", friendsRequest.toString());
+        friendsRequest.executeAsync();
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {

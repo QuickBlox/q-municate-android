@@ -1407,6 +1407,7 @@ public class Request {
                 // as relative_url parameters within each batch entry.
                 url = new URL(ServerProtocol.getGraphUrlBase());
             }
+            Log.i("Friend", url.getPath());
         } catch (MalformedURLException e) {
             throw new FacebookException("could not construct URL for request", e);
         }
