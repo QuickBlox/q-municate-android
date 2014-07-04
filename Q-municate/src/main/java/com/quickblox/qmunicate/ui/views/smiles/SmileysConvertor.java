@@ -19,7 +19,6 @@ public class SmileysConvertor {
     private static final Map<Integer, Pattern> patterns = new LinkedHashMap<Integer, Pattern>();
 
     static {
-        /*
         smileysMap.put(R.drawable.e00a, "\ue00a");
         smileysMap.put(R.drawable.e00b, "\ue00b");
         smileysMap.put(R.drawable.e00c, "\ue00c");
@@ -427,7 +426,6 @@ public class SmileysConvertor {
         smileysMap.put(R.drawable.e420, "\ue420");
         smileysMap.put(R.drawable.e421, "\ue421");
         smileysMap.put(R.drawable.e537, "\ue537");
-        */
         smileysMap.put(R.drawable.e422, "\ue422");
         smileysMap.put(R.drawable.e423, "\ue423");
         smileysMap.put(R.drawable.e424, "\ue424");
