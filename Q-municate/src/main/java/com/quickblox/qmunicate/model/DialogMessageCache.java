@@ -2,33 +2,31 @@ package com.quickblox.qmunicate.model;
 
 public class DialogMessageCache {
 
+    private String id;
     private Integer senderId;
     private String message;
     private String attachUrl;
     private long time;
     private boolean isRead;
-
-    public boolean isSync() {
-        return isSync;
-    }
-
-    public void setSync(boolean isSync) {
-        this.isSync = isSync;
-    }
-
-    private boolean isSync;
-
     private String dialogId;
 
-    public DialogMessageCache(String dialogId, Integer senderId, String message, String attachUrl, long time,
-            boolean isRead, boolean isSync) {
+    public DialogMessageCache(String id, String dialogId, Integer senderId, String message, String attachUrl, long time,
+            boolean isRead) {
+        this.id = id;
         this.dialogId = dialogId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
         this.isRead = isRead;
-        this.isSync = isSync;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public boolean isRead() {

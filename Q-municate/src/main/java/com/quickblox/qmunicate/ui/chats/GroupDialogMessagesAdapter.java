@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
@@ -25,9 +26,10 @@ import com.quickblox.qmunicate.utils.DateUtils;
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public GroupDialogMessagesAdapter(Context context, Cursor cursor,
-                                      ScrollMessagesListener scrollMessagesListener) {
+                                      ScrollMessagesListener scrollMessagesListener, QBDialog dialog) {
         super(context, cursor);
         this.scrollMessagesListener = scrollMessagesListener;
+        this.dialog = dialog;
     }
 
     @Override
@@ -110,7 +112,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, messageId, true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

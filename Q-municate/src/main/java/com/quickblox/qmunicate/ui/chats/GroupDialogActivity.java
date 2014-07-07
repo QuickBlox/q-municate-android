@@ -156,7 +156,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -225,14 +225,5 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         addActions();
         updateChatData();
         scrollListView();
-    }
-
-    private void startLoadDialogMessages() {
-        if (messagesAdapter.isEmpty()) {
-            startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
-        } else {
-            long lastMessageDateSent = DatabaseManager.getLastMessageDateSent(this, dialog);
-            startLoadDialogMessages(dialog, lastMessageDateSent);
-        }
     }
 }

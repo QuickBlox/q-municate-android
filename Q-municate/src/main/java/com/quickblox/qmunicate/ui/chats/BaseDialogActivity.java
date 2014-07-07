@@ -303,6 +303,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         return SizeUtility.dipToPixels(this, SMILES_SIZE_IN_DIPS);
     }
 
+    protected void startLoadDialogMessages() {
+        if (messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
+        } else {
+            long lastMessageDateSent = DatabaseManager.getLastMessageDateSent(this, dialog);
+            startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
+
     public class LoadAttachFileSuccessAction implements Command {
 
         @Override

@@ -233,7 +233,7 @@ public class DatabaseManager {
                 DialogMessageTable.CONTENT_URI,
                 null,
                 DialogMessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
-                DialogMessageTable.Cols.IS_SYNC + " > 0",
+                DialogMessageTable.Cols.IS_READ + " > 0",
                 null,
                 DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
 
@@ -266,7 +266,7 @@ public class DatabaseManager {
     }
 
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
-            String dialogId, boolean isSync) {
+            String dialogId) {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
@@ -278,8 +278,8 @@ public class DatabaseManager {
                 attachURL = Consts.EMPTY_STRING;
             }
 
-            DialogMessageCache dialogMessageCache = new DialogMessageCache(dialogId, senderId, message,
-                    attachURL, historyMessage.getDateSent(), true, isSync);
+            DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(), dialogId, senderId, message,
+                    attachURL, historyMessage.getDateSent(), true);
 
             saveChatMessage(context, dialogMessageCache);
         }
@@ -287,13 +287,13 @@ public class DatabaseManager {
 
     public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {
         ContentValues values = new ContentValues();
+        values.put(DialogMessageTable.Cols.ID, dialogMessageCache.getId());
         values.put(DialogMessageTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
         values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
         values.put(DialogMessageTable.Cols.BODY, dialogMessageCache.getMessage());
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
-        values.put(DialogMessageTable.Cols.IS_SYNC, dialogMessageCache.isRead());
         context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
 
         updateDialog(context, dialogMessageCache.getDialogId(), dialogMessageCache.getMessage(),

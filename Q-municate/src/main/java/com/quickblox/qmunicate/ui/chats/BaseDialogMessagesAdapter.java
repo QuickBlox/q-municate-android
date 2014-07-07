@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
@@ -38,6 +39,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     protected ScrollMessagesListener scrollMessagesListener;
     protected ImageHelper imageHelper;
+    protected QBDialog dialog;
     private Random random;
     private Map<Integer, Integer> colorsMap;
 

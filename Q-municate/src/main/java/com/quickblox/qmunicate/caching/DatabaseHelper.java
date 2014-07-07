@@ -48,14 +48,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createDialogMessageTable(SQLiteDatabase db) {
         StringBuilder dialogMessageTableFields = new StringBuilder();
         dialogMessageTableFields
-                .append(DialogMessageTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(DialogMessageTable.Cols.ID).append(" TEXT PRIMARY KEY, ")
                 .append(DialogMessageTable.Cols.DIALOG_ID).append(" INTEGER, ")
                 .append(DialogMessageTable.Cols.SENDER_ID).append(" INTEGER, ")
                 .append(DialogMessageTable.Cols.BODY).append(" TEXT, ")
                 .append(DialogMessageTable.Cols.TIME).append(" LONG, ")
                 .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.IS_READ).append(" INTEGER, ")
-                .append(DialogMessageTable.Cols.IS_SYNC).append(" INTEGER");
+                .append(DialogMessageTable.Cols.IS_READ).append(" INTEGER");
         createTable(db, DialogMessageTable.TABLE_NAME, dialogMessageTableFields.toString());
     }
 

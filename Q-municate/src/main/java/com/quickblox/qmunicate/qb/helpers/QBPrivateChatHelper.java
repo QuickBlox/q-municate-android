@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBHistoryMessage;
@@ -69,9 +70,10 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         sendPrivateMessage(chatMessage, userId, dialogId);
         String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
+        String messageId = time + Consts.EMPTY_STRING;
         if (dialogId != null) {
-            saveMessageToCache(new DialogMessageCache(dialogId, chatCreator.getId(), chatMessage.getBody(),
-                    attachUrl, time, true, true));
+            saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatCreator.getId(), chatMessage.getBody(),
+                    attachUrl, time, true));
         }
     }
 
@@ -151,10 +153,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         DatabaseManager.saveDialogs(context, dialogsList);
     }
 
-    public void updateStatusMessage(String messageId, boolean isRead) {
-        DatabaseManager.updateStatusMessage(context, messageId, isRead);
-    }
-
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
         String attachUrl = null;
@@ -177,14 +175,17 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             friend = new Friend();
             friend.setFullname(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
-        long time;
-        String attachUrl = null;
 
+        String messageId;
+        long time;
+        String attachUrl;
+
+        messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID).toString();
         time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        saveMessageToCache(new DialogMessageCache(dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
-                attachUrl, time, false, false));
+        saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
+                attachUrl, time, false));
         notifyMessageReceived(chatMessage, friend, dialogId);
     }
 

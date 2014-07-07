@@ -38,7 +38,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
         List<QBHistoryMessage> dialogMessagesList = chatRestHelper.getDialogMessages(dialog, lastDateLoad);
         if (dialogMessagesList != null) {
-            DatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId(), true);
+            DatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
         }
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
