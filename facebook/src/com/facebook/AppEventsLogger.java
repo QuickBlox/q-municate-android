@@ -91,7 +91,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * </li>
  * <li>
  * There is a limit to the number of unique parameter names in the provided parameters that can
- * be used per event, on the order of 25.  This is not just for an individual call, but for all
+ * be used per event, on the order of 10.  This is not just for an individual call, but for all
  * invocations for that eventName.
  * </li>
  * <li>
@@ -704,10 +704,9 @@ public class AppEventsLogger {
             SessionEventsState state = stateMap.get(accessTokenAppId);
             if (state == null) {
                 // Retrieve attributionId, but we will only send it if attribution is supported for the app.
-                AttributionIdentifiers attributionIdentifiers =
-                    AttributionIdentifiers.getAttributionIdentifiers(context);
+                String attributionId = Settings.getAttributionId(context.getContentResolver());
 
-                state = new SessionEventsState(attributionIdentifiers, context.getPackageName(), hashedDeviceAndAppId);
+                state = new SessionEventsState(attributionId, context.getPackageName(), hashedDeviceAndAppId);
                 stateMap.put(accessTokenAppId, state);
             }
             return state;
@@ -930,7 +929,7 @@ public class AppEventsLogger {
         private List<AppEvent> accumulatedEvents = new ArrayList<AppEvent>();
         private List<AppEvent> inFlightEvents = new ArrayList<AppEvent>();
         private int numSkippedEventsDueToFullBuffer;
-        private AttributionIdentifiers attributionIdentifiers;
+        private String attributionId;
         private String packageName;
         private String hashedDeviceAndAppId;
 
@@ -940,8 +939,8 @@ public class AppEventsLogger {
 
         private final int MAX_ACCUMULATED_LOG_EVENTS = 1000;
 
-        public SessionEventsState(AttributionIdentifiers identifiers, String packageName, String hashedDeviceAndAppId) {
-            this.attributionIdentifiers = identifiers;
+        public SessionEventsState(String attributionId, String packageName, String hashedDeviceAndAppId) {
+            this.attributionId = attributionId;
             this.packageName = packageName;
             this.hashedDeviceAndAppId = hashedDeviceAndAppId;
         }
@@ -1021,7 +1020,7 @@ public class AppEventsLogger {
             }
 
             if (includeAttribution) {
-                Utility.setAppEventAttributionParameters(publishParams, attributionIdentifiers,
+                Utility.setAppEventAttributionParameters(publishParams, attributionId,
                         hashedDeviceAndAppId, limitEventUsage);
             }
 

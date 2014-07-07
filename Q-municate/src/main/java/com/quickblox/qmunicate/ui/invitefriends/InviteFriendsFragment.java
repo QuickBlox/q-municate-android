@@ -285,7 +285,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private void getFacebookFriendsList() {
         baseActivity.showProgress();
-        Request.executeMyFriendsRequestAsync(Session.getActiveSession(), new Request.GraphUserListCallback() {
+        Request friendsRequest = Request.newMyFriendsRequest(Session.getActiveSession(), new Request.GraphUserListCallback() {
 
             @Override
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
@@ -298,6 +298,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
                 baseActivity.hideProgress();
             }
         });
+        friendsRequest.executeAsync();
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {
@@ -336,7 +337,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             FacebookRequestError error = response.getError();
             if (error != null) {
                 Log.e(getString(R.string.facebook_exception), error.toString());
-                DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
+                DialogUtils.showLong(getActivity(), getResources().getString(
+                        R.string.facebook_exception) + error);
             } else {
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
             }
