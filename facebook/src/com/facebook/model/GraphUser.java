@@ -112,14 +112,13 @@ public interface GraphUser extends GraphObject {
     public void setBirthday(String birthday);
 
     /**
-     * Returns the current place of the user.
-     * @return the current place of the user
+     * Returns the current city of the user.
+     * @return the current city of the user
      */
-    public GraphPlace getLocation();
-
+    public GraphLocation getLocation();
     /**
-     * Sets the current place of the user.
-     * @param location the current place of the user
+     * Sets the current city of the user.
+     * @param location the current city of the user
      */
-    public void setLocation(GraphPlace location);
+    public void setLocation(GraphLocation location);
 }
