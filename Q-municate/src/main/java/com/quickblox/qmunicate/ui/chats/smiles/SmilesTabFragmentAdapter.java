@@ -15,7 +15,7 @@ import java.util.List;
 public class SmilesTabFragmentAdapter extends FragmentStatePagerAdapter implements IconPagerAdapter {
 
     public static final String RESOURCE_KEY = "RESOURCE_KEY";
-    private static final int SMILES_COUNT_PER_PAGE = 32;
+    private static final int SMILES_COUNT_PER_PAGE = 24;
 
     private List<Integer> smilesResources;
 

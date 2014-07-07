@@ -79,10 +79,10 @@ public class ChatEditText extends LightEditText {
             }
 
             if (event.getX() > (getWidth() - getPaddingRight() - smileIcon.getIntrinsicWidth()) && smileClickListener != null) {
-                switchSmileIcon();
                 smileClickListener.onSmileClick();
+                return true;
             } else if (switchViewListener != null) {
-                    switchViewListener.showLastListItem();
+                switchViewListener.showLastListItem();
             }
 
             return false;
