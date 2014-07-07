@@ -121,9 +121,10 @@ public class DatabaseManager {
     public static List<QBDialog> getDialogsByOpponent(Context context, int opponent,
             QBDialogType dialogType) {
         List<QBDialog> dialogs = new LinkedList<QBDialog>();
+
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                DialogTable.Cols.TYPE + " = '" + dialogType.getCode() + "'" + " AND " +
-                        DialogTable.Cols.OCCUPANTS_IDS + " like '%" + opponent + "%'", null, null
+                        DialogTable.Cols.TYPE + "= ? AND " + DialogTable.Cols.OCCUPANTS_IDS + " like ?",
+                new String[]{ String.valueOf(dialogType.getCode()),  "%" + opponent + "%"}, null
         );
 
         if (cursor != null) {
@@ -183,7 +184,7 @@ public class DatabaseManager {
         Integer lastMessageUserId = cursor.getInt(cursor.getColumnIndex(
                 DialogTable.Cols.LAST_MESSAGE_USER_ID));
         long dateSent = cursor.getLong(cursor.getColumnIndex(DialogTable.Cols.LAST_DATE_SENT));
-        String type = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.TYPE));
+        int type = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.TYPE));
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJidId);
@@ -193,7 +194,7 @@ public class DatabaseManager {
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageUserId(lastMessageUserId);
         dialog.setLastMessageDateSent(dateSent);
-        dialog.setType(QBDialogType.valueOf(type));
+        dialog.setType(QBDialogType.parseByCode(type));
 
         return dialog;
     }
@@ -387,7 +388,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
-        values.put(DialogTable.Cols.TYPE, dialog.getType().name());
+        values.put(DialogTable.Cols.TYPE, dialog.getType().getCode());
         return values;
     }
 

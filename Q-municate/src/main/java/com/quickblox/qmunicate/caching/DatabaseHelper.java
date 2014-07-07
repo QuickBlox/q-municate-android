@@ -61,7 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ").append(DialogTable.Cols.LAST_MESSAGE_USER_ID)
                 .append(" LONG, ").append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ").append(
                 DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ").append(DialogTable.Cols.TYPE).append(
-                " TEXT");
+                " INTEGER");
         createTable(db, DialogTable.TABLE_NAME, dialogTableFields.toString());
     }
 

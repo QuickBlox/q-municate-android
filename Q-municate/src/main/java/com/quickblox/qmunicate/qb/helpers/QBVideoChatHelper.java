@@ -52,6 +52,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
+            lo.g("signalingCreated");
             if (!createdLocally) {
                 if (activeChannels.containsKey(qbSignaling.getParticipant())){
                     return;
@@ -59,6 +60,7 @@ public class QBVideoChatHelper extends BaseHelper {
                 VideoSenderChannel signalingChannel = new VideoSenderChannel(qbSignaling);
                 VideoSignalingListener videoSignalingListener = new VideoSignalingListener(
                         qbSignaling.getParticipant());
+                lo.g("signalingCreated "+videoSignalingListener.toString());
                 signalingChannel.addSignalingListener(videoSignalingListener);
                 activeChannels.put(qbSignaling.getParticipant(), signalingChannel);
             }
@@ -98,7 +100,7 @@ public class QBVideoChatHelper extends BaseHelper {
             CallConfig callConfig = (CallConfig) connectionConfig;
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
                     callConfig.getSessionDescription());
-            lo.g("onCall " + callConfig.getCallStreamType().toString());
+            lo.g("onCall " + callConfig.getCallStreamType().toString() + ", listner="+this.toString());
             Intent intent = new Intent(context, activityClass);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
             intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
