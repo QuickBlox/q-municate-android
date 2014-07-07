@@ -18,7 +18,6 @@ import com.quickblox.module.videochat_webrtc.signalings.SignalingIgnoreFilter;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.ui.mediacall.CallActivity;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.FriendUtils;
 
@@ -42,13 +41,11 @@ public class QBVideoChatHelper extends BaseHelper {
         return activeChannels.get(participantId);
     }
 
-    public void init(QBChatService chatService,
-            Class<? extends Activity> activityClass) {
+    public void init(QBChatService chatService, Class<? extends Activity> activityClass) {
         this.chatService = chatService;
         this.activityClass = activityClass;
         lo.g("init videochat");
-        this.chatService.getSignalingManager().addSignalingManagerListener(
-                new SignalingManagerListener());
+        this.chatService.getSignalingManager().addSignalingManagerListener(new SignalingManagerListener());
     }
 
     private class SignalingManagerListener implements QBSignalingManagerListener {
@@ -56,14 +53,19 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
             if (!createdLocally) {
+                if (activeChannels.containsKey(qbSignaling.getParticipant())){
+                    return;
+                }
                 VideoSenderChannel signalingChannel = new VideoSenderChannel(qbSignaling);
-                signalingChannel.addSignalingListener(new VideoSignalingListener(qbSignaling.getParticipant()));
+                VideoSignalingListener videoSignalingListener = new VideoSignalingListener(
+                        qbSignaling.getParticipant());
+                signalingChannel.addSignalingListener(videoSignalingListener);
                 activeChannels.put(qbSignaling.getParticipant(), signalingChannel);
             }
         }
     }
 
-    public void closeSignalingChannel(int participantId){
+    public void closeSignalingChannel(int participantId) {
         activeChannels.remove(participantId);
     }
 
@@ -79,7 +81,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         private int participantId;
 
-        VideoSignalingListener(int participantId){
+        VideoSignalingListener(int participantId) {
             this.participantId = participantId;
         }
 
@@ -96,7 +98,7 @@ public class QBVideoChatHelper extends BaseHelper {
             CallConfig callConfig = (CallConfig) connectionConfig;
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
                     callConfig.getSessionDescription());
-            lo.g("onCall" + callConfig.getCallStreamType().toString());
+            lo.g("onCall " + callConfig.getCallStreamType().toString());
             Intent intent = new Intent(context, activityClass);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
             intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
