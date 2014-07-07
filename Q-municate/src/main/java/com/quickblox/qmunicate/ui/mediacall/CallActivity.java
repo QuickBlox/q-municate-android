@@ -6,10 +6,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
+import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
+import com.quickblox.module.videochat_webrtc.signalings.SignalingIgnoreFilter;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -103,10 +104,13 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     protected void onConnectedToService() {
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = ((QBVideoChatHelper)service.getHelper(QBService.VIDEO_CHAT_HELPER)).getSignalingChannel();
+            signalingChannel = ((QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER))
+                    .getSignalingChannel(opponent.getId());
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);
+                signalingChannel.addSignalingIgnoreFilter(messageHandler, new SignalingIgnoreFilter.Equals(
+                        QBSignalingChannel.PacketType.qbvideochat_call));
             } else {
                 DialogUtils.showLong(this, getString(R.string.dlg_wrong_signaling));
                 finish();

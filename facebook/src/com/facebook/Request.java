@@ -24,8 +24,11 @@ import android.os.*;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
-import com.facebook.internal.*;
+import com.facebook.internal.ServerProtocol;
 import com.facebook.model.*;
+import com.facebook.internal.Logger;
+import com.facebook.internal.Utility;
+import com.facebook.internal.Validate;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,8 +41,6 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A single request to be sent to the Facebook Platform through either the <a
@@ -68,13 +69,10 @@ public class Request {
      */
     public static final int MAXIMUM_BATCH_SIZE = 50;
 
-    public static final String TAG = Request.class.getSimpleName();
-
     private static final String ME = "me";
     private static final String MY_FRIENDS = "me/friends";
     private static final String MY_PHOTOS = "me/photos";
     private static final String MY_VIDEOS = "me/videos";
-    private static final String VIDEOS_SUFFIX = "/videos";
     private static final String SEARCH = "search";
     private static final String MY_FEED = "me/feed";
     private static final String MY_STAGING_RESOURCES = "me/staging_resources";
@@ -84,7 +82,6 @@ public class Request {
     private static final String USER_AGENT_BASE = "FBAndroidSDK";
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
-    private static final String ACCEPT_LANGUAGE_HEADER = "Accept-Language";
 
     // Parameter names/values
     private static final String PICTURE_PARAM = "picture";
@@ -103,6 +100,7 @@ public class Request {
     private static final String BATCH_PARAM = "batch";
     private static final String ATTACHMENT_FILENAME_PREFIX = "file";
     private static final String ATTACHED_FILES_PARAM = "attached_files";
+    private static final String MIGRATION_BUNDLE_PARAM = "migration_bundle";
     private static final String ISO_8601_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ssZ";
     private static final String STAGING_PARAM = "file";
     private static final String OBJECT_PARAM = "object";
@@ -110,8 +108,6 @@ public class Request {
     private static final String MIME_BOUNDARY = "3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
 
     private static String defaultBatchApplicationId;
-
-    private static Pattern versionPattern = Pattern.compile("^v\\d+\\.\\d+/.*");
 
     private Session session;
     private HttpMethod httpMethod;
@@ -125,7 +121,6 @@ public class Request {
     private Callback callback;
     private String overriddenURL;
     private Object tag;
-    private String version;
 
     /**
      * Constructs a request without a session, graph path, or any other parameters.
@@ -192,36 +187,9 @@ public class Request {
      *            a callback that will be called when the request is completed to handle success or error conditions
      */
     public Request(Session session, String graphPath, Bundle parameters, HttpMethod httpMethod, Callback callback) {
-        this(session, graphPath, parameters, httpMethod, callback, null);
-    }
-
-    /**
-     * Constructs a request with a specific Session, graph path, parameters, and HTTP method. A Session need not be
-     * provided, in which case the request is sent without an access token and thus is not executed in the context of
-     * any particular user. Only certain graph requests can be expected to succeed in this case. If a Session is
-     * provided, it must be in an opened state or the request will fail.
-     *
-     * Depending on the httpMethod parameter, the object at the graph path may be retrieved, created, or deleted.
-     *
-     * @param session
-     *            the Session to use, or null
-     * @param graphPath
-     *            the graph path to retrieve, create, or delete
-     * @param parameters
-     *            additional parameters to pass along with the Graph API request; parameters must be Strings, Numbers,
-     *            Bitmaps, Dates, or Byte arrays.
-     * @param httpMethod
-     *            the {@link HttpMethod} to use for the request, or null for default (HttpMethod.GET)
-     * @param callback
-     *            a callback that will be called when the request is completed to handle success or error conditions
-     * @param version
-     *            the version of the Graph API
-     */
-    public Request(Session session, String graphPath, Bundle parameters, HttpMethod httpMethod, Callback callback, String version) {
         this.session = session;
         this.graphPath = graphPath;
         this.callback = callback;
-        this.version = version;
 
         setHttpMethod(httpMethod);
 
@@ -231,8 +199,8 @@ public class Request {
             this.parameters = new Bundle();
         }
 
-        if (this.version == null) {
-            this.version = ServerProtocol.getAPIVersion();
+        if (!this.parameters.containsKey(MIGRATION_BUNDLE_PARAM)) {
+            this.parameters.putString(MIGRATION_BUNDLE_PARAM, FacebookSdkVersion.MIGRATION_BUNDLE);
         }
     }
 
@@ -617,23 +585,20 @@ public class Request {
         }
 
         String endpoint = applicationId + "/custom_audience_third_party_id";
-        AttributionIdentifiers attributionIdentifiers = AttributionIdentifiers.getAttributionIdentifiers(context);
-        Bundle parameters = new Bundle();
 
+        Bundle parameters = new Bundle();
         if (session == null) {
             // Only use the attributionID if we don't have an open session.  If we do have an open session, then
             // the user token will be used to identify the user, and is more reliable than the attributionID.
-            String udid = attributionIdentifiers.getAttributionId() != null
-                ? attributionIdentifiers.getAttributionId()
-                : attributionIdentifiers.getAndroidAdvertiserId();
-            if (attributionIdentifiers.getAttributionId() != null) {
-                parameters.putString("udid", udid);
+            String attributionId = Settings.getAttributionId(context.getContentResolver());
+            if (attributionId != null) {
+                parameters.putString("udid", attributionId);
             }
         }
 
         // Server will choose to not provide the App User ID in the event that event usage has been limited for
         // this user for this app.
-        if (Settings.getLimitEventAndDataUsage(context) || attributionIdentifiers.isTrackingLimited()) {
+        if (Settings.getLimitEventAndDataUsage(context)) {
             parameters.putString("limit_event_usage", "1");
         }
 
@@ -903,26 +868,6 @@ public class Request {
             throw new FacebookException("Can't change HTTP method on request with overridden URL.");
             }
         this.httpMethod = (httpMethod != null) ? httpMethod : HttpMethod.GET;
-    }
-
-    /**
-     * Returns the version of the API that this request will use.  By default this is the current API at the time
-     * the SDK is released.
-     *
-     * @return the version that this request will use
-     */
-    public final String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Set the version to use for this request.  By default the version will be the current API at the time the SDK
-     * is released.  Only use this if you need to explicitly override.
-     *
-     * @param version The version to use.  Should look like "v2.0"
-     */
-    public final void setVersion(String version) {
-        this.version = version;
     }
 
     /**
@@ -1407,6 +1352,7 @@ public class Request {
                 // as relative_url parameters within each batch entry.
                 url = new URL(ServerProtocol.getGraphUrlBase());
             }
+            Log.i("Friend", url.getPath());
         } catch (MalformedURLException e) {
             throw new FacebookException("could not construct URL for request", e);
         }
@@ -1749,7 +1695,6 @@ public class Request {
 
         connection.setRequestProperty(USER_AGENT_HEADER, getUserAgent());
         connection.setRequestProperty(CONTENT_TYPE_HEADER, getMimeContentType());
-        connection.setRequestProperty(ACCEPT_LANGUAGE_HEADER, Locale.getDefault().toString());
 
         connection.setChunkedStreamingMode(0);
         return connection;
@@ -1764,16 +1709,6 @@ public class Request {
                 String accessToken = this.session.getAccessToken();
                 Logger.registerAccessToken(accessToken);
                 this.parameters.putString(ACCESS_TOKEN_PARAM, accessToken);
-            }
-        } else if (!this.parameters.containsKey(ACCESS_TOKEN_PARAM)) {
-            String appID = Settings.getApplicationId();
-            String clientToken = Settings.getClientToken();
-            if (!Utility.isNullOrEmpty(appID) && !Utility.isNullOrEmpty(clientToken)) {
-                String accessToken = appID + "|" + clientToken;
-                this.parameters.putString(ACCESS_TOKEN_PARAM, accessToken);
-            } else {
-                Log.d(TAG,
-                        "Warning: Sessionless Request needs token but missing either application ID or client token.");
             }
         }
         this.parameters.putString(SDK_PARAM, SDK_ANDROID);
@@ -1814,9 +1749,9 @@ public class Request {
 
         String baseUrl;
         if (this.restMethod != null) {
-            baseUrl = getRestPathWithVersion();
+            baseUrl = ServerProtocol.BATCHED_REST_METHOD_URL_BASE + this.restMethod;
         } else {
-            baseUrl = getGraphPathWithVersion();
+            baseUrl = this.graphPath;
         }
 
         addCommonParameters();
@@ -1830,56 +1765,16 @@ public class Request {
 
         String baseUrl;
         if (this.restMethod != null) {
-            baseUrl = String.format("%s/%s", ServerProtocol.getRestUrlBase(), getRestPathWithVersion());
+            baseUrl = String.format("%s/%s", ServerProtocol.getRestUrlBase(), restMethod);
         } else {
-            String graphBaseUrlBase;
-            if (this.getHttpMethod() == HttpMethod.POST && graphPath != null && graphPath.endsWith(VIDEOS_SUFFIX)) {
-                graphBaseUrlBase = ServerProtocol.getGraphVideoUrlBase();
-            } else {
-                graphBaseUrlBase = ServerProtocol.getGraphUrlBase();
-            }
-            baseUrl = String.format("%s/%s", graphBaseUrlBase, getGraphPathWithVersion());
+            baseUrl = String.format("%s/%s", ServerProtocol.getGraphUrlBase(), graphPath);
         }
 
         addCommonParameters();
         return appendParametersToBaseUrl(baseUrl);
     }
 
-    private String getGraphPathWithVersion() {
-        Matcher matcher = versionPattern.matcher(this.graphPath);
-        if (matcher.matches()) {
-            return this.graphPath;
-        }
-        return String.format("%s/%s", this.version, this.graphPath);
-    }
-
-    private String getRestPathWithVersion() {
-        Matcher matcher = versionPattern.matcher(this.restMethod);
-        if (matcher.matches()) {
-            return this.restMethod;
-        }
-        return String.format("%s/%s/%s", this.version, ServerProtocol.REST_METHOD_BASE, this.restMethod);
-    }
-
-    private static class Attachment {
-        private final Request request;
-        private final Object value;
-
-        public Attachment(Request request, Object value) {
-            this.request = request;
-            this.value = value;
-        }
-
-        public Request getRequest() {
-            return request;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-    }
-
-    private void serializeToBatch(JSONArray batch, Map<String, Attachment> attachments) throws JSONException, IOException {
+    private void serializeToBatch(JSONArray batch, Bundle attachments) throws JSONException, IOException {
         JSONObject batchEntry = new JSONObject();
 
         if (this.batchEntryName != null) {
@@ -1907,7 +1802,7 @@ public class Request {
                 // Make the name unique across this entire batch.
                 String name = String.format("%s%d", ATTACHMENT_FILENAME_PREFIX, attachments.size());
                 attachmentNames.add(name);
-                attachments.put(name, new Attachment(this, value));
+                Utility.putObjectInBundle(attachments, name, value);
             }
         }
 
@@ -1936,22 +1831,6 @@ public class Request {
         if (graphPath != null && restMethod != null) {
             throw new IllegalArgumentException("Only one of a graph path or REST method may be specified per request.");
         }
-    }
-
-    private static boolean hasOnProgressCallbacks(RequestBatch requests) {
-        for (RequestBatch.Callback callback : requests.getCallbacks()) {
-            if (callback instanceof RequestBatch.OnProgressCallback) {
-                return true;
-            }
-        }
-
-        for (Request request : requests) {
-            if (request.getCallback() instanceof OnProgressCallback) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     final static void serializeToUrlConnection(RequestBatch requests, HttpURLConnection connection)
@@ -1984,80 +1863,44 @@ public class Request {
 
         connection.setDoOutput(true);
 
-        OutputStream outputStream = null;
+        BufferedOutputStream outputStream = new BufferedOutputStream(connection.getOutputStream());
         try {
-            if (hasOnProgressCallbacks(requests)) {
-                ProgressNoopOutputStream countingStream = null;
-                countingStream = new ProgressNoopOutputStream(requests.getCallbackHandler());
-                processRequest(requests, null, numRequests, url, countingStream);
+            Serializer serializer = new Serializer(outputStream, logger);
 
-                int max = countingStream.getMaxProgress();
-                Map<Request, RequestProgress> progressMap = countingStream.getProgressMap();
+            if (numRequests == 1) {
+                Request request = requests.get(0);
 
-                BufferedOutputStream buffered = new BufferedOutputStream(connection.getOutputStream());
-                outputStream = new ProgressOutputStream(buffered, requests, progressMap, max);
+                logger.append("  Parameters:\n");
+                serializeParameters(request.parameters, serializer);
+
+                logger.append("  Attachments:\n");
+                serializeAttachments(request.parameters, serializer);
+
+                if (request.graphObject != null) {
+                    processGraphObject(request.graphObject, url.getPath(), serializer);
+                }
+            } else {
+                String batchAppID = getBatchAppId(requests);
+                if (Utility.isNullOrEmpty(batchAppID)) {
+                    throw new FacebookException("At least one request in a batch must have an open Session, or a "
+                            + "default app ID must be specified.");
+                }
+
+                serializer.writeString(BATCH_APP_ID_PARAM, batchAppID);
+
+                // We write out all the requests as JSON, remembering which file attachments they have, then
+                // write out the attachments.
+                Bundle attachments = new Bundle();
+                serializeRequestsAsJSON(serializer, requests, attachments);
+
+                logger.append("  Attachments:\n");
+                serializeAttachments(attachments, serializer);
             }
-            else {
-                outputStream = new BufferedOutputStream(connection.getOutputStream());
-            }
-
-            processRequest(requests, logger, numRequests, url, outputStream);
-        }
-        finally {
+        } finally {
             outputStream.close();
         }
 
         logger.log();
-    }
-
-    private static void processRequest(RequestBatch requests, Logger logger, int numRequests, URL url, OutputStream outputStream)
-            throws IOException, JSONException
-    {
-        Serializer serializer = new Serializer(outputStream, logger);
-
-        if (numRequests == 1) {
-            Request request = requests.get(0);
-
-            Map<String, Attachment> attachments = new HashMap<String, Attachment>();
-            for(String key : request.parameters.keySet()) {
-                Object value = request.parameters.get(key);
-                if (isSupportedAttachmentType(value)) {
-                    attachments.put(key, new Attachment(request, value));
-                }
-            }
-
-            if (logger != null) {
-                logger.append("  Parameters:\n");
-            }
-            serializeParameters(request.parameters, serializer, request);
-
-            if (logger != null) {
-                logger.append("  Attachments:\n");
-            }
-            serializeAttachments(attachments, serializer);
-
-            if (request.graphObject != null) {
-                processGraphObject(request.graphObject, url.getPath(), serializer);
-            }
-        } else {
-            String batchAppID = getBatchAppId(requests);
-            if (Utility.isNullOrEmpty(batchAppID)) {
-                throw new FacebookException("At least one request in a batch must have an open Session, or a "
-                        + "default app ID must be specified.");
-            }
-
-            serializer.writeString(BATCH_APP_ID_PARAM, batchAppID);
-
-            // We write out all the requests as JSON, remembering which file attachments they have, then
-            // write out the attachments.
-            Map<String, Attachment> attachments = new HashMap<String, Attachment>();
-            serializeRequestsAsJSON(serializer, requests, attachments);
-
-            if (logger != null) {
-                logger.append("  Attachments:\n");
-            }
-            serializeAttachments(attachments, serializer);
-        }
     }
 
     private static void processGraphObject(GraphObject graphObject, String path, KeyValueSerializer serializer)
@@ -2136,36 +1979,37 @@ public class Request {
         }
     }
 
-    private static void serializeParameters(Bundle bundle, Serializer serializer, Request request) throws IOException {
+    private static void serializeParameters(Bundle bundle, Serializer serializer) throws IOException {
         Set<String> keys = bundle.keySet();
 
         for (String key : keys) {
             Object value = bundle.get(key);
             if (isSupportedParameterType(value)) {
-                serializer.writeObject(key, value, request);
+                serializer.writeObject(key, value);
             }
         }
     }
 
-    private static void serializeAttachments(Map<String, Attachment> attachments, Serializer serializer) throws IOException {
-        Set<String> keys = attachments.keySet();
+    private static void serializeAttachments(Bundle bundle, Serializer serializer) throws IOException {
+        Set<String> keys = bundle.keySet();
 
         for (String key : keys) {
-            Attachment attachment = attachments.get(key);
-            if (isSupportedAttachmentType(attachment.getValue())) {
-                serializer.writeObject(key, attachment.getValue(), attachment.getRequest());
+            Object value = bundle.get(key);
+            if (isSupportedAttachmentType(value)) {
+                serializer.writeObject(key, value);
             }
         }
     }
 
-    private static void serializeRequestsAsJSON(Serializer serializer, Collection<Request> requests, Map<String, Attachment> attachments)
+    private static void serializeRequestsAsJSON(Serializer serializer, Collection<Request> requests, Bundle attachments)
             throws JSONException, IOException {
         JSONArray batch = new JSONArray();
         for (Request request : requests) {
             request.serializeToBatch(batch, attachments);
         }
 
-        serializer.writeRequestsAsJson(BATCH_PARAM, batch, requests);
+        String batchAsString = batch.toString();
+        serializer.writeString(BATCH_PARAM, batchAsString);
     }
 
     private static String getMimeContentType() {
@@ -2237,20 +2081,16 @@ public class Request {
     }
 
     private static class Serializer implements KeyValueSerializer {
-        private final OutputStream outputStream;
+        private final BufferedOutputStream outputStream;
         private final Logger logger;
         private boolean firstWrite = true;
 
-        public Serializer(OutputStream outputStream, Logger logger) {
+        public Serializer(BufferedOutputStream outputStream, Logger logger) {
             this.outputStream = outputStream;
             this.logger = logger;
         }
 
-        public void writeObject(String key, Object value, Request request) throws IOException {
-            if (outputStream instanceof RequestOutputStream) {
-                ((RequestOutputStream) outputStream).setCurrentRequest(request);
-            }
-
+        public void writeObject(String key, Object value) throws IOException {
             if (isSupportedParameterType(value)) {
                 writeString(key, parameterToString(value));
             } else if (value instanceof Bitmap) {
@@ -2263,33 +2103,6 @@ public class Request {
                 writeFile(key, (ParcelFileDescriptorWithMimeType) value);
             } else {
                 throw new IllegalArgumentException("value is not a supported type: String, Bitmap, byte[]");
-            }
-        }
-
-        public void writeRequestsAsJson(String key, JSONArray requestJsonArray, Collection<Request> requests)
-                throws IOException, JSONException {
-            if (! (outputStream instanceof RequestOutputStream)) {
-                writeString(key, requestJsonArray.toString());
-                return;
-            }
-
-            RequestOutputStream requestOutputStream = (RequestOutputStream) outputStream;
-            writeContentDisposition(key, null, null);
-            write("[");
-            int i = 0;
-            for (Request request : requests) {
-                JSONObject requestJson = requestJsonArray.getJSONObject(i);
-                requestOutputStream.setCurrentRequest(request);
-                if (i > 0) {
-                    write(",%s", requestJson.toString());
-                } else {
-                    write("%s", requestJson.toString());
-                }
-                i++;
-            }
-            write("]");
-            if (logger != null) {
-                logger.appendKeyValue("    " + key, requestJsonArray.toString());
             }
         }
 
@@ -2308,9 +2121,7 @@ public class Request {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
             writeLine("");
             writeRecordBoundary();
-            if (logger != null) {
-                logger.appendKeyValue("    " + key, "<Image>");
-            }
+            logger.appendKeyValue("    " + key, "<Image>");
         }
 
         public void writeBytes(String key, byte[] bytes) throws IOException {
@@ -2318,9 +2129,7 @@ public class Request {
             this.outputStream.write(bytes);
             writeLine("");
             writeRecordBoundary();
-            if (logger != null) {
-                logger.appendKeyValue("    " + key, String.format("<Data: %d>", bytes.length));
-            }
+            logger.appendKeyValue("    " + key, String.format("<Data: %d>", bytes.length));
         }
 
         public void writeFile(String key, ParcelFileDescriptorWithMimeType descriptorWithMimeType) throws IOException {
@@ -2333,39 +2142,30 @@ public class Request {
             }
             writeContentDisposition(key, key, mimeType);
 
+            ParcelFileDescriptor.AutoCloseInputStream inputStream = null;
+            BufferedInputStream bufferedInputStream = null;
             int totalBytes = 0;
+            try {
+                inputStream = new ParcelFileDescriptor.AutoCloseInputStream(descriptor);
+                bufferedInputStream = new BufferedInputStream(inputStream);
 
-            if (outputStream instanceof ProgressNoopOutputStream) {
-                // If we are only counting bytes then skip reading the file
-                ((ProgressNoopOutputStream) outputStream).addProgress(descriptor.getStatSize());
-            }
-            else {
-                ParcelFileDescriptor.AutoCloseInputStream inputStream = null;
-                BufferedInputStream bufferedInputStream = null;
-                try {
-                    inputStream = new ParcelFileDescriptor.AutoCloseInputStream(descriptor);
-                    bufferedInputStream = new BufferedInputStream(inputStream);
-
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
-                        this.outputStream.write(buffer, 0, bytesRead);
-                        totalBytes += bytesRead;
-                    }
-                } finally {
-                    if (bufferedInputStream != null) {
-                        bufferedInputStream.close();
-                    }
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = bufferedInputStream.read(buffer)) != -1) {
+                    this.outputStream.write(buffer, 0, bytesRead);
+                    totalBytes += bytesRead;
+                }
+            } finally {
+                if (bufferedInputStream != null) {
+                    bufferedInputStream.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             }
             writeLine("");
             writeRecordBoundary();
-            if (logger != null) {
-                logger.appendKeyValue("    " + key, String.format("<Data: %d>", totalBytes));
-            }
+            logger.appendKeyValue("    " + key, String.format("<Data: %d>", totalBytes));
         }
 
         public void writeRecordBoundary() throws IOException {
@@ -2414,23 +2214,6 @@ public class Request {
          *            the Response of this request, which may include error information if the request was unsuccessful
          */
         void onCompleted(Response response);
-    }
-
-    /**
-     * Specifies the interface that consumers of the Request class can implement in order to be notified when a
-     * progress is made on a particular request. The frequency of the callbacks can be controlled using
-     * {@link com.facebook.Settings#setOnProgressThreshold(long)}
-     */
-    public interface OnProgressCallback extends Callback {
-        /**
-         * The method that will be called when progress is made.
-         *
-         * @param current
-         *            the current value of the progress of the request.
-         * @param max
-         *            the maximum value (target) value that the progress will have.
-         */
-        void onProgress(long current, long max);
     }
 
     /**
