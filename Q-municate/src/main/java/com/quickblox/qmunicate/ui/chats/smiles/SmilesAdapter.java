@@ -43,7 +43,7 @@ public class SmilesAdapter extends BaseAdapter {
         if (convertView == null) {
             holder = new SmileHolder();
             convertView = inflater.inflate(R.layout.list_item_smile, parent, false);
-            holder.smile = (ImageView) convertView.findViewById(R.id.smile_image_view);
+            holder.smile = (ImageView) convertView.findViewById(R.id.smile_imageview);
             convertView.setTag(holder);
         } else {
             holder = (SmileHolder) convertView.getTag();

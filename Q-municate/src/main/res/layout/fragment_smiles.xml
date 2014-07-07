@@ -3,6 +3,6 @@
     android:id="@+id/smiles_grid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:horizontalSpacing="15dip"
-    android:numColumns="8"
-    android:verticalSpacing="15dip" />
+    android:horizontalSpacing="5dp"
+    android:numColumns="6"
+    android:verticalSpacing="5dp" />

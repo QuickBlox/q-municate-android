@@ -8,7 +8,7 @@ import com.nineoldandroids.animation.ValueAnimator;
 
 public class HeightAnimator {
 
-    private static final long ANIMATION_DURATION = 250;
+    private static final long ANIMATION_DURATION = 300;
 
     private View triggerView;
     private View animatedView;
