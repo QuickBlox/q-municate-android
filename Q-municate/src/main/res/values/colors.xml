@@ -38,6 +38,8 @@
     <color name="green">#1cba48</color>
     <color name="blue">#0d70b3</color>
 
+    <color name="chat_background_color">#f5f5f5</color>
+
     <color name="screen_call_background_color">#333333</color>
     <color name="screen_call_timer_text_color">#999999</color>
 

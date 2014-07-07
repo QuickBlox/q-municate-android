@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
@@ -63,6 +67,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
+    protected BitmapFactory.Options bitmapOptions;
 
     protected BaseChatHelper chatHelper;
 
@@ -85,6 +90,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initListeners();
         initSmileWidgets();
         initSmiles();
+        initBitmapOption();
 
         addActions();
 
@@ -154,6 +160,33 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    protected void initColorsActionBar() {
+        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
+        if (actionBarTitleId > Consts.ZERO_INT_VALUE) {
+            TextView title = (TextView) findViewById(actionBarTitleId);
+            if (title != null) {
+                title.setTextColor(Color.WHITE);
+            }
+        }
+        if (actionBarSubTitleId > Consts.ZERO_INT_VALUE) {
+            TextView subTitle = (TextView) findViewById(actionBarSubTitleId);
+            if (subTitle != null) {
+                float alpha = 0.5f;
+                subTitle.setTextColor(Color.WHITE);
+                subTitle.setAlpha(alpha);
+            }
+        }
+    }
+
+    private void initBitmapOption() {
+        bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inDither = false;
+        bitmapOptions.inPurgeable = true;
+        bitmapOptions.inInputShareable = true;
+        bitmapOptions.inTempStorage = new byte[32 * 1024];
     }
 
     @Override

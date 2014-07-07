@@ -34,6 +34,8 @@ import java.util.Random;
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
     private final int colorMaxValue = 255;
+    private final float colorAlpha = 0.8f;
+
     protected ScrollMessagesListener scrollMessagesListener;
     protected ImageHelper imageHelper;
     private Random random;
@@ -82,8 +84,12 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     private int getRandomColor() {
-        return Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue),
-                random.nextInt(colorMaxValue));
+        float[] hsv = new float[3];
+        int color = Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue), random.nextInt(colorMaxValue));
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= colorAlpha;
+        color = Color.HSVToColor(hsv);
+        return color;
     }
 
     private int getItemViewType(Cursor cursor) {

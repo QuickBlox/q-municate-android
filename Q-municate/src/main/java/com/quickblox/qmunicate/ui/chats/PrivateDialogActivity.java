@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -92,10 +93,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper,
-                    BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
+            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(this, e.getMessage());
+        } catch (OutOfMemoryError e) {
+            ErrorUtils.showError(this, e.getMessage());
         }
     }
 
@@ -139,6 +142,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(opponentFriend.getFullname());
         actionBar.setSubtitle(opponentFriend.getOnlineStatus());
+        initColorsActionBar();
     }
 
     @Override

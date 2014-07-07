@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -104,10 +106,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper,
-                    BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
+            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(this, e.getMessage());
+        } catch (OutOfMemoryError e) {
+            ErrorUtils.showError(this, e.getMessage());
         }
     }
 
@@ -118,7 +122,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
-        //TODO make in command if will be low perfomance
+        //TODO make in command if will be low performance
         //QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, dialogId, null, file);
     }
 
@@ -159,24 +163,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void updateActionBar() {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(groupName);
-        // TODO IS must be implemented soon
-        actionBar.setSubtitle("some information");
-        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
-        int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
-        if (actionBarTitleId > Consts.ZERO_INT_VALUE) {
-            TextView title = (TextView) findViewById(actionBarTitleId);
-            if (title != null) {
-                title.setTextColor(Color.WHITE);
-            }
-        }
-        if (actionBarSubTitleId > Consts.ZERO_INT_VALUE) {
-            TextView subTitle = (TextView) findViewById(actionBarSubTitleId);
-            if (subTitle != null) {
-                float alpha = 0.5f;
-                subTitle.setTextColor(Color.WHITE);
-                subTitle.setAlpha(alpha);
-            }
-        }
+        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
+        initColorsActionBar();
     }
 
     @Override

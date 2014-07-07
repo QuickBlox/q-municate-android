@@ -55,7 +55,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
         timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
         progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
-        textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
+        textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_view);
         messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
