@@ -247,9 +247,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
            /* if (!opponent.isOnline()) {
                 QBSendPushCommand.start(getActivity(), Consts.DEFAULT_CALL_MESSAGE, opponent.getId());
             }*/
-            videoChat.call(userOpponent, sender, call_type, 5000);
+            videoChat.call(userOpponent, sender, call_type, Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
             callTimer = new Timer();
-            callTimer.schedule(new CancelCallTimerTask(), 40 * Consts.SECOND);
+            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
         }
     }
 
