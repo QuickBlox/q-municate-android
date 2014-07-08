@@ -112,6 +112,22 @@ public class ChatUtils {
         return chatMessage;
     }
 
+    public static QBChatMessage createUpdateChatNotificationMessage(QBDialog dialog) {
+        String dialogId = String.valueOf(dialog.getDialogId());
+        String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
+        String dialogName = dialog.getName();
+
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT);
+        chatMessage.setProperty(PROPERTY_DIALOG_ID, dialogId);
+        chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
+        if (!TextUtils.isEmpty(dialogName)) {
+            chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
+        }
+        return chatMessage;
+    }
+
+
     public static String getOccupantsIdsStringFromList(List<Integer> occupantIdsList) {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantIdsList);
     }

@@ -133,6 +133,17 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
+    private void notifyFriendsRoomUpdate(QBDialog dialog,
+            List<Integer> friendIdsList) {
+        for (Integer friendId : friendIdsList) {
+            try {
+                notifyFriendOnUpdateChat(dialog, friendId);
+            } catch (QBResponseException responseException) {
+
+            }
+        }
+    }
+
     private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws QBResponseException {
         long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
@@ -140,6 +151,21 @@ public class QBMultiChatHelper extends BaseChatHelper {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        try {
+            chat.sendMessage(chatMessage);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    private void notifyFriendOnUpdateChat(QBDialog dialog, Integer friendId) throws QBResponseException {
+        long time = DateUtils.getCurrentTime();
+        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
+        if (chat == null) {
+            chat = chatService.getPrivateChatManager().createChat(friendId, null);
+        }
+        QBChatMessage chatMessage = ChatUtils.createUpdateChatNotificationMessage(dialog);
         chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         try {
             chat.sendMessage(chatMessage);
@@ -197,15 +223,29 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public void updateRoomName(String dialogId, String newName) throws QBResponseException {
         QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
-
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
         updateDialog(dialog.getDialogId(), newName, requestBuilder);
+    }
+
+    private void notifyFriendOnUpdateChat(QBChatMessage chatMessage, Integer friendId) throws QBResponseException {
+        long time = DateUtils.getCurrentTime();
+        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
+        if (chat == null) {
+            chat = chatService.getPrivateChatManager().createChat(friendId, null);
+        }
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        try {
+            chat.sendMessage(chatMessage);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
     }
 
 
     private void updateDialog(String dialogId, String newName,
             QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = roomChatManager.updateDialog(dialogId, newName, requestBuilder);
+        notifyFriendsRoomUpdate(updatedDialog, updatedDialog.getOccupants());
         DatabaseManager.saveDialog(context, updatedDialog);
     }
 
