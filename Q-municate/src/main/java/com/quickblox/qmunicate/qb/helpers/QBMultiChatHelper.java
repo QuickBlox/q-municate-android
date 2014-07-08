@@ -139,7 +139,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             try {
                 notifyFriendOnUpdateChat(dialog, friendId);
             } catch (QBResponseException responseException) {
-
+                ErrorUtils.logError(responseException);
             }
         }
     }

@@ -127,7 +127,6 @@ public class ChatUtils {
         return chatMessage;
     }
 
-
     public static String getOccupantsIdsStringFromList(List<Integer> occupantIdsList) {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantIdsList);
     }
