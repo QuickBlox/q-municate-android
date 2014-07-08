@@ -22,8 +22,10 @@ import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class QBVideoChatHelper extends BaseHelper {
 
@@ -36,6 +38,8 @@ public class QBVideoChatHelper extends BaseHelper {
             ACTIVE_SESSIONS_DEFAULT_SIZE);
     private Map<String, Boolean> activeSessionMap = new HashMap<String, Boolean>(
             ACTIVE_SESSIONS_DEFAULT_SIZE);
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
 
     public QBVideoChatHelper(Context context) {
         super(context);
@@ -71,9 +75,9 @@ public class QBVideoChatHelper extends BaseHelper {
 
     public void closeSignalingChannel(ConnectionConfig connectionConfig) {
         activeSessionMap.put(connectionConfig.getConnectionSession(), false);
-        Timer timer = new Timer();
-        timer.schedule(new ClearSessionTask(connectionConfig.getConnectionSession(),
-                connectionConfig.getToUser().getId()), Consts.DEFAULT_CLEAR_SESSION_TIMEOUT);
+        ClearSessionTask clearSessionTask = new ClearSessionTask(connectionConfig.getConnectionSession(),
+                connectionConfig.getToUser().getId());
+        scheduler.schedule(clearSessionTask, Consts.DEFAULT_CLEAR_SESSION_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public VideoSenderChannel makeSignalingChannel(int participantId) {
