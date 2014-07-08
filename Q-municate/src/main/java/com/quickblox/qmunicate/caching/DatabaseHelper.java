@@ -60,16 +60,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void createDialogTable(SQLiteDatabase db) {
         StringBuilder dialogTableFields = new StringBuilder();
-        dialogTableFields.append(DialogTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
-                .append(DialogTable.Cols.DIALOG_ID).append(" TEXT, ")
-                .append(DialogTable.Cols.ROOM_JID_ID).append(" TEXT, ")
-                .append(DialogTable.Cols.NAME).append(" TEXT, ")
-                .append(DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" INTEGER, ")
-                .append(DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ")
-                .append(DialogTable.Cols.LAST_MESSAGE_USER_ID).append(" LONG, ")
-                .append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ")
-                .append(DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ")
-                .append(DialogTable.Cols.TYPE).append(" TEXT");
+        dialogTableFields.append(DialogTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ").append(
+                DialogTable.Cols.DIALOG_ID).append(" TEXT, ").append(DialogTable.Cols.ROOM_JID_ID).append(
+                " TEXT, ").append(DialogTable.Cols.NAME).append(" TEXT, ").append(
+                DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" INTEGER, ").append(
+                DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ").append(DialogTable.Cols.LAST_MESSAGE_USER_ID)
+                .append(" LONG, ").append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ").append(
+                DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ").append(DialogTable.Cols.TYPE).append(
+                " INTEGER");
         createTable(db, DialogTable.TABLE_NAME, dialogTableFields.toString());
     }
 

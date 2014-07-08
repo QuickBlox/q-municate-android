@@ -43,6 +43,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private QBSignalingChannel.PLATFORM remotePlatform;
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private ChatMessageHandler messageHandler;
+    private QBVideoChatHelper videoChatHelper;
 
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (!friend.isOnline()) {
@@ -104,8 +105,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     protected void onConnectedToService() {
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = ((QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER))
-                    .getSignalingChannel(opponent.getId());
+            videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getId());
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);
@@ -135,7 +136,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             QBUser userOpponent = Utils.friendToUser(opponent);
             ConnectionConfig connectionConfig = new ConnectionConfig(userOpponent, sessionId);
             signalingChannel.sendReject(connectionConfig);
-            signalingChannel.close();
+            if (videoChatHelper != null){
+                videoChatHelper.closeSignalingChannel(connectionConfig);
+            }
         }
         finish();
     }
@@ -204,7 +207,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void showIncomingFragment() {
         playIncomingRingtone();
         IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
-                opponent.getFullname());
+                opponent);
         setCurrentFragment(incomingCallFragment);
     }
 
