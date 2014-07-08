@@ -307,7 +307,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (messagesAdapter.isEmpty()) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
         } else {
-            long lastMessageDateSent = DatabaseManager.getLastMessageDateSent(this, dialog);
+            long lastMessageDateSent = DatabaseManager.getLastReadMessageDateSent(this, dialog);
             startLoadDialogMessages(dialog, lastMessageDateSent);
         }
     }

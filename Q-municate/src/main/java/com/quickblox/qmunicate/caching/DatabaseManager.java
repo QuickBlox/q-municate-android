@@ -227,7 +227,7 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static long getLastMessageDateSent(Context context, QBDialog dialog) {
+    public static long getLastReadMessageDateSent(Context context, QBDialog dialog) {
         long lastDateSent = Consts.ZERO_INT_VALUE;
         Cursor cursor = context.getContentResolver().query(
                 DialogMessageTable.CONTENT_URI,
