@@ -1,16 +1,15 @@
 # Q-municate 
-Q-municate is an open source code of chat application with full range of communication features on board (such as messaging, file transfer, push notifications, audio/video calls).
+Q-municate is an open source code of a chat application with a wide range of communication features included (such as messaging, file transfer, push notifications, audio/video calls).
 
-We are inspired to give you chat application out of the box. You can customize this application depending on your needs.
-QuickBlox is used for backend http://quickblox.com
+We are happy to offer you a chat application out of the box. You can customize this application to on your needs (with attribution as stated in the license). QuickBlox is used for the backend http://quickblox.com
 
 Find the source code and more information about Q-municate in our Developers section: http://quickblox.com/developers/q-municate
 
 
 # Q-municate Android
-This guide is created by QuickBlox Android team to explain how you can build a communication app on Android with Quickblox API.
+This guide was created by the QuickBlox Android team in order to explain how you can build a communication app on Android with Quickblox API.
 
-It is a step by step guide designed for all developer levels including beginners as we move from simple to more complex implementation. Depending on your skills and your project requirements you may choose which parts of this guide are to follow. Enjoy and please get in touch, if you need assistance from QuickBlox Android team.
+This is a step by step guide designed for developers of all levels including beginners as we move from simple to more complex implementation. Depending on your skills and your project requirements you may choose which parts of this guide are to follow. Enjoy and please get in touch if you need assistance.
 
 Q-municate is a fully fledged chat application using the Quickblox API.
 
@@ -21,7 +20,7 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 * [Custom objects](http://quickblox.com/modules/custom/)
 * [Messages](http://quickblox.com/modules/messages)
 
-## It includes such features as:
+## It includes features such as:
 
 * Two sign-up methods – Facebook and with email/password
 * Login using Facebook account and email/password
@@ -38,7 +37,7 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 * View and edit group chat info (title, logo, add friend or leave a group chat)
 * Allow users to edit their profile (set their own avatar and status (short text message))
 
-Please note all these featureas are available in open source code, so you can customize your app depending on your needs.
+Please note all these features are available in open source code, so you can customize your app depending on your needs.
 
 ## Software Environment
 * The Android application runs on the phones with screen sizes varying between 3 and 5 inches, with Android 4 and above till Android 4.4 onboard.
@@ -62,7 +61,7 @@ Please note all these featureas are available in open source code, so you can cu
 ###### Please note, that user will skip this page, if “Remember me” tick is set in the check box on Login page.
 
 
-### Step 2. SignUp page
+### Step 2. Sign up page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-30.png" height="400" />&nbsp;
 
 Sign Up Page allows to create new QM user.
@@ -79,12 +78,12 @@ Sign Up Page allows to create new QM user.
 * Choose user picture – all area and button is tappable/ clickable. After tap/click will be opened a gallery with images to choose, not mandatory. App will create round image from the center part of the selected image automatically.
 * Sign up – if all fields are filled in correctly, then user is navigated to Friends Page.
 Data validation will be done on the server. (Validation process is the same as for Login page) 
-* Back button - redirects user to Prelogin page
+* Back button - redirects user to pre-login page
 
 When new user is registered in the system , Facebook and email friends import will be done.
 Remember me tick in the check box on Login page will be set automatically, so there is no need for user to enter credentials during the next login.
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 public QBUser signup(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
@@ -113,7 +112,7 @@ public QBUser signup(QBUser inputUser, File file) throws QBResponseException, Ba
 ```
 
 
-### Step 3. LogIn page
+### Step 3. Login page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png" height="400" />&nbsp;
 
 User can login in the app via Facebook or login as a QM user.
@@ -124,7 +123,7 @@ By tapping on Connect with Facebook button app will take user’s Facebook crede
 
 If user signed up with Facebook, for user’s profile will be used FB avatar image, full name and email (user can’t edit email, because it is used as FB identifier)
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 public QBUser login(String socialProvider, String accessToken,
@@ -161,7 +160,7 @@ User can tap in the input field and edit login or password to enter app from ano
 fig.
 
 #### Buttons:
-* Connect with FB– this button allows user to enter the App with Facebook credentials set in the device settings. (same functionality as for Connect with Facebook button on Prelogin screen)
+* Connect with FB– this button allows user to enter the App with Facebook credentials set in the device settings. (same functionality as for Connect with Facebook button on pre-login screen)
 * Log in– these button allows user to enter the App if he/she provides correct and valid email and password.
 If user provides incorrect/invalid login credentials (email and password), the App shows pop-up with alert message. Alert message will be sent from the server, so app just needs to show it.
 Once user provides valid login credentials and taps on “Login” button, App will search for user’s friends in the list of existing Q-municate users (by Facebook id and email).
@@ -169,9 +168,9 @@ All friends will be imported into Friends page list.
 User will be redirected to Friends screen (Main Page).
 Data validation will be done on the server.
 Tapping on Forgot password link a predefined email from the server will be sent which will include restore password link.
-Back button – if tapped, user is redirected to Prelogin Page 
+Back button – if tapped, user is redirected to pre-login Page 
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceException {
@@ -198,12 +197,12 @@ public QBUser login(QBUser inputUser) throws QBResponseException, BaseServiceExc
 An app will import all user’s friends by email and Facebook ID after the first app login.
 
 #### Feature work flow:
-Notification with text "Please wait, Qmunicate app is searching for your friends" and spiner should be shown. Tapping out of the notification (or OK button) user can close this pop-up. App takes all emails from the phone contacts list and search them in Qmunicate users table (in the background). Adds all Qmunicate friends on the Friends page, If there are any in the search result. Friends screen will be shown. On Friends screen will be shown grey text “Invite your friends”, if there are no friends in the friends list.
+Notification with text "Please wait, Q-municate app is searching for your friends" and the spinner should be shown. Tapping out of the notification (or OK button) user can close this pop-up. App takes all emails from the phone contacts list and search them in Q-municate users table (in the background). Adds all Q-municate friends on the Friends page, If there are any in the search result. Friends screen will be shown. On Friends screen will be shown grey text “Invite your friends”, if there are no friends in the friends list.
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
-// retrieving Q-municate users by existing facebook ids
+// retrieving Q-municate users by existing Facebook ids
 realFriendsFacebookList = QBUsers.getUsersByFacebookId(friendsFacebookList, requestBuilder, params);
 …
 // retrieving Q-municate users by existing e-mails
@@ -236,8 +235,7 @@ For each contact will be shown full name, avatar image, short text message (stat
 Search bar is shown on top of the contacts list
 
 Side bar will be shown during first app login. 
-
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // updating Friends list
@@ -247,7 +245,7 @@ public List<Integer> updateFriendList() throws QBResponseException {
   return userIds;
 }
 
-// invating User to list
+// inviting User to list
 public void inviteFriend(int userId) throws Exception {
   if (isNotInvited(userId)) {
     sendInvitation(userId);
@@ -280,11 +278,11 @@ Search icon on Friends page opens/hides search bar.
 #### Available features:
 A list of friends, listed in alphabetical order.
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 …
-// searching Q-municate users by fullname
+// searching Q-municate users by full name
 List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
 …
 ```
@@ -333,10 +331,10 @@ User can access Invite Friends page from the Side bar, to invite his/her friends
 * Check box beside each contact full name, to be able to add needed user(s) to the Friends list.
 * Next button adds selected friends to the Friends Page
 
-#### If Fecabook friends are selected- Facebook access pop-up message will appear.
+#### If Facebook friends are selected- Facebook access pop-up message will appear.
 * Back button returns user to the Friends page
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // send invite via e-mail
@@ -391,7 +389,7 @@ Chats Page shows scrollable chats list (private and group).
 - A red badge counters will be shown on the Chats Page beside chat’s name, if there are some unread messages. Unread message will be marked as read, when user enters the chat  with unread message.
 - User can enter group chart or private chat to read/write chat messages or find more information about chat.
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // loading Dialogs
@@ -419,7 +417,7 @@ New Chat Page allows to create new chat.
 * Back button returns to the Chats Page (chapter 4.9. Fig.4.9-1, Fig.4.4-2 )
 * In the right side of the screen there is a row with check boxes for selected friends.
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // creating Chat Room
@@ -460,15 +458,15 @@ Message text
 Timestamp – device time and date should be used
 
 * Buttons set:
-- VideoChat – starts videochat with current chat opponent
-- AudioChat- – starts audiochat with current chat opponent
+- VideoChat – starts video chat with current chat opponent
+- AudioChat- – starts audio chat with current chat opponent
 - Attachment menu – allows to add an attachment to a message 
 - :) icon- opens Emoticons Tab
 - Send – sends whatever is entered in Message field
 - Message field – text/numeric/symbolic field 
 - Back button returns to the Chats page 
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // creating Private Chat
@@ -546,7 +544,7 @@ Timestamp – device time and date should be used
 * Message field – text/numeric/symbolic field 512 chars max
 * Back button returns to the Chats page 
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // creating Group Chat
@@ -612,7 +610,7 @@ Can be enabled by tapping it once more
 - End call – ends current call and redirects user to 1x1 Chat Page
 * Main page area shows user’s chat opponent avatar, full name and duration of a call
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // making audio call to User
@@ -637,7 +635,7 @@ Can be enabled by tapping it once more
 - End call – ends current call and redirects user to Main Page
 * Main page area shows user’s chat opponent, small rectangle area in bottom left part of screen shows user (as shown on 4.14-1)
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // making audio call to User
@@ -654,7 +652,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ### Step 13. Settings Page
 <img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-47.png" height="400" />&nbsp;
 
-Settings Page allows user to change his/her profile and change other inapp controls.
+Settings Page allows user to change his/her profile and change other in-app controls.
 
 #### Buttons set:
 * Profile
@@ -683,7 +681,7 @@ Profile page allows user to edit his/her profile info.
 * Full name – text/numeric fields 128 chars max
 * Email – text/numeric/symbolic fields 128 chars max
 * User picture name field will be auto filled with selected image name, if image is chosen.
-* tatus – text/numeric/symbolic field 256 chars max
+* Status – text/numeric/symbolic field 256 chars max
 
 #### Buttons:
 * User picture – all area and button is tappable/ clickable. After tap/click will be opened a gallery with images to choose, not mandatory.
@@ -691,7 +689,7 @@ App will create round image from the center part of the selected image automatic
 * Change/ Edit status – if tapped a typing indicator in the input field will appear
 * Back button- tapping on back button user confirms current profile information (changes)
 
-#### Please find below how you can do it in code:
+#### The code:
 
 ```java
 // updating users
@@ -707,14 +705,13 @@ public QBUser updateUser(QBUser user, File file) throws QBResponseException {
 
 ### Important - how to build your own Chat app</h3>
 
-If you want to build your own app using Q-municate as a basis, please do the following:<br />
-1) download the project from here (GIT)<br />
-2) register a QuickBlox account (if you don't have one yet): http://admin.quickblox.com/register<br />
-3) log in to QuickBlox admin panel [http://admin.quickblox.com/signin]http://admin.quickblox.com/signin<br />
-4) create a new app <br />
-5) click on the app title in the list to reveal app details:<br />
+If you want to build your own app using Q-municate as a basis, please do the following:
 
-![App credentials](http://files.quickblox.com/app_credentials.png)
-
-6) copy credentials (App ID, Authorization key, Authorization secret) into your Q-municate project code in Consts.java<br />
-7) Enjoy!
+ 1. Download the project from here (GIT)
+ 2. Register a QuickBlox account (if you don't have one yet): http://admin.quickblox.com/register
+ 3. Log in to QuickBlox admin panel [http://admin.quickblox.com/signin]http://admin.quickblox.com/signin
+ 4. Create a new app
+ 5. Click on the app title in the list to reveal the app details:
+   ![App credentials](http://files.quickblox.com/app_credentials.png)
+ 6. Copy credentials (App ID, Authorization key, Authorization secret) into your Q-municate project code in Consts.java<br />
+ 7. Enjoy!
