@@ -227,21 +227,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
         updateDialog(dialog.getDialogId(), newName, requestBuilder);
     }
 
-    private void notifyFriendOnUpdateChat(QBChatMessage chatMessage, Integer friendId) throws QBResponseException {
-        long time = DateUtils.getCurrentTime();
-        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
-        if (chat == null) {
-            chat = chatService.getPrivateChatManager().createChat(friendId, null);
-        }
-        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
-        try {
-            chat.sendMessage(chatMessage);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
-    }
-
-
     private void updateDialog(String dialogId, String newName,
             QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = roomChatManager.updateDialog(dialogId, newName, requestBuilder);
