@@ -56,7 +56,7 @@ public class ImageHelper {
         final int THREAD_POOL_SIZE = 5;
         final int COMPRESS_QUALITY = 60;
         final int MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE = 300;
-        final int MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE = 600;
+        final int MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE = 800;
 
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
                 .memoryCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE)

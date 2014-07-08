@@ -4,10 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
@@ -32,8 +30,6 @@ import java.util.List;
 public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChatManagerListener {
 
     private QBPrivateChatManager privateChatManager;
-    private QBPrivateChat privateChat;
-    private int opponentId;
     private QBNotificationChatListener notificationChatListener = new PrivateChatNotificationListener();
     private QBDialog currentDialog;
 
@@ -120,7 +116,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         } catch (Exception e) {
             ErrorUtils.logError(e);
         }
-        this.opponentId = opponentId;
         return dialog;
     }
 
