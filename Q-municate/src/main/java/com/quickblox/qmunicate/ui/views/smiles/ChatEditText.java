@@ -22,7 +22,6 @@ import java.util.List;
 public class ChatEditText extends LightEditText {
 
     private Drawable smileIcon;
-    private Drawable smileIconActive;
 
     private Context context;
     private boolean isSmileActive;
@@ -54,7 +53,6 @@ public class ChatEditText extends LightEditText {
     }
 
     public void switchSmileIcon() {
-        setCompoundDrawablesWithIntrinsicBounds(null, null, isSmileActive ? smileIcon : smileIconActive, null);
         isSmileActive = !isSmileActive;
     }
 
@@ -62,8 +60,7 @@ public class ChatEditText extends LightEditText {
         this.context = context;
         isSmileActive = false;
         Resources resources = getResources();
-        smileIcon = resources.getDrawable(R.drawable.chat_smile);
-        smileIconActive = resources.getDrawable(R.drawable.chat_smile_active);
+        smileIcon = resources.getDrawable(R.drawable.smile_ic);
         setCompoundDrawablesWithIntrinsicBounds(null, null, smileIcon, null);
         setOnTouchListener(new SmileIconTouchListener());
         textWatcher = new ChatTextChangeListener();

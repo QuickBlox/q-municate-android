@@ -32,23 +32,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void createFriendTable(SQLiteDatabase db) {
         StringBuilder friendTableFields = new StringBuilder();
-        friendTableFields.append(FriendTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ").append(
-                FriendTable.Cols.FULLNAME).append(" TEXT, ").append(FriendTable.Cols.EMAIL).append(" TEXT, ")
-                .append(FriendTable.Cols.PHONE).append(" TEXT, ").append(FriendTable.Cols.FILE_ID).append(
-                " TEXT, ").append(FriendTable.Cols.AVATAR_UID).append(" TEXT, ").append(
-                FriendTable.Cols.STATUS).append(" TEXT, ").append(FriendTable.Cols.ONLINE).append(" TEXT, ")
+        friendTableFields.append(FriendTable.Cols.ID)
+                .append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(FriendTable.Cols.FULLNAME).append(" TEXT, ")
+                .append(FriendTable.Cols.EMAIL).append(" TEXT, ")
+                .append(FriendTable.Cols.PHONE).append(" TEXT, ")
+                .append(FriendTable.Cols.FILE_ID).append(" TEXT, ")
+                .append(FriendTable.Cols.AVATAR_UID).append(" TEXT, ")
+                .append(FriendTable.Cols.STATUS).append(" TEXT, ")
+                .append(FriendTable.Cols.ONLINE).append(" TEXT, ")
                 .append(FriendTable.Cols.TYPE).append(" TEXT");
         createTable(db, FriendTable.TABLE_NAME, friendTableFields.toString());
     }
 
     private void createDialogMessageTable(SQLiteDatabase db) {
         StringBuilder dialogMessageTableFields = new StringBuilder();
-        dialogMessageTableFields.append(DialogMessageTable.Cols.ID).append(
-                " INTEGER PRIMARY KEY AUTOINCREMENT, ").append(DialogMessageTable.Cols.DIALOG_ID).append(
-                " INTEGER, ").append(DialogMessageTable.Cols.SENDER_ID).append(" INTEGER, ").append(
-                DialogMessageTable.Cols.BODY).append(" TEXT, ").append(DialogMessageTable.Cols.TIME).append(
-                " LONG, ").append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ").append(
-                DialogMessageTable.Cols.IS_READ).append(" INTEGER");
+        dialogMessageTableFields
+                .append(DialogMessageTable.Cols.ID).append(" TEXT PRIMARY KEY, ")
+                .append(DialogMessageTable.Cols.DIALOG_ID).append(" INTEGER, ")
+                .append(DialogMessageTable.Cols.SENDER_ID).append(" INTEGER, ")
+                .append(DialogMessageTable.Cols.BODY).append(" TEXT, ")
+                .append(DialogMessageTable.Cols.TIME).append(" LONG, ")
+                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(DialogMessageTable.Cols.IS_READ).append(" INTEGER");
         createTable(db, DialogMessageTable.TABLE_NAME, dialogMessageTableFields.toString());
     }
 

@@ -5,12 +5,14 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
@@ -24,9 +26,10 @@ import com.quickblox.qmunicate.utils.DateUtils;
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public GroupDialogMessagesAdapter(Context context, Cursor cursor,
-                                      ScrollMessagesListener scrollMessagesListener) {
+                                      ScrollMessagesListener scrollMessagesListener, QBDialog dialog) {
         super(context, cursor);
         this.scrollMessagesListener = scrollMessagesListener;
+        this.dialog = dialog;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
         viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
         viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
-        viewHolder.textMessageLinearLayout = (LinearLayout) view.findViewById(R.id.text_message_linearlayout);
+        viewHolder.textMessageView = view.findViewById(R.id.text_message_view);
         viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
         viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
@@ -93,14 +96,14 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!TextUtils.isEmpty(attachUrl)) {
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.textMessageLinearLayout.setVisibility(View.GONE);
+            viewHolder.textMessageView.setVisibility(View.GONE);
             viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
             displayAttachImage(attachUrl, viewHolder.attachImageView, viewHolder.progressRelativeLayout,
                     viewHolder.attachMessageRelativeLayout, viewHolder.verticalProgressBar,
                     viewHolder.centeredProgressBar, isOwnMessage);
         } else {
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.textMessageLinearLayout.setVisibility(View.VISIBLE);
+            viewHolder.textMessageView.setVisibility(View.VISIBLE);
             viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(body);
         }
@@ -109,7 +112,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, messageId, true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
@@ -121,7 +124,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         RelativeLayout attachMessageRelativeLayout;
         RoundedImageView avatarImageView;
         TextView nameTextView;
-        LinearLayout textMessageLinearLayout;
+        View textMessageView;
         ChatTextView messageTextView;
         ImageView attachImageView;
         TextView timeTextMessageTextView;

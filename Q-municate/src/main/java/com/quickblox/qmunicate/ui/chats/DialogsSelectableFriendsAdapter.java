@@ -68,7 +68,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         if (friend.isOnline()) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.onlineImageView.setVisibility(View.INVISIBLE);
+            viewHolder.onlineImageView.setVisibility(View.GONE);
         }
         viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {

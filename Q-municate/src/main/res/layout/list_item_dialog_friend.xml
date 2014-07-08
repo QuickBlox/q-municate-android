@@ -41,6 +41,7 @@
                 android:id="@id/online_imageview"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:paddingRight="5dp"
                 android:src="@drawable/badge_online" />
 
             <TextView
@@ -48,7 +49,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
                 android:textColor="@color/gray"
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
