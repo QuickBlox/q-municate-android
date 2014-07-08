@@ -60,6 +60,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private VideoSenderChannel signalingChannel;
     private QBVideoChatHelper videoChatHelper;
+    private ConnectionConfig currentConnectionConfig;
 
     public interface OutgoingCallListener {
 
@@ -208,6 +209,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             callConfig.setCallStreamType(call_type);
             callConfig.setSessionDescription(remoteSessionDescription);
             callConfig.setDevicePlatform(remotePlatform);
+            currentConnectionConfig = callConfig;
             videoChat.accept(callConfig);
             onConnectionEstablished();
         }
@@ -244,7 +246,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         QBUser sender = AppSession.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
-            videoChat.call(userOpponent, sender, call_type, Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
+            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type, Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
             callTimer = new Timer();
             callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
         }
@@ -279,11 +281,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 videoChat.disposeConnection();
             }
         }
-        if (signalingChannel != null) {
-            signalingChannel.close();
-        }
         if(videoChatHelper != null){
-            videoChatHelper.closeSignalingChannel(opponent.getId());
+            videoChatHelper.closeSignalingChannel(currentConnectionConfig);
         }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
             onConnectionClosed();

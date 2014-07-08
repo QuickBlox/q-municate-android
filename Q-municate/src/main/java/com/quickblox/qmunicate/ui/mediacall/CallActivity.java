@@ -136,9 +136,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             QBUser userOpponent = Utils.friendToUser(opponent);
             ConnectionConfig connectionConfig = new ConnectionConfig(userOpponent, sessionId);
             signalingChannel.sendReject(connectionConfig);
-            signalingChannel.close();
             if (videoChatHelper != null){
-                videoChatHelper.closeSignalingChannel(opponent.getId());
+                videoChatHelper.closeSignalingChannel(connectionConfig);
             }
         }
         finish();

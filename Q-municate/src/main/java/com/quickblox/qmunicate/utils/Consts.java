@@ -30,6 +30,7 @@ public class Consts {
     public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
     public static final int DEFAULT_CALL_PACKET_REPLY_TIMEOUT = 5 * SECOND;
     public static final int DEFAULT_DIALING_TIME = 35 * SECOND;
+    public static final long DEFAULT_CLEAR_SESSION_TIMEOUT = 10 * SECOND;
 
     public static final int OPPONENT_DIALOG_MESSAGE_TYPE = 0;
     public static final int OWN_DIALOG_MESSAGE_TYPE = 1;

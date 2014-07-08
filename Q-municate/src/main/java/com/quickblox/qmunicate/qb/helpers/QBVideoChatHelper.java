@@ -14,7 +14,6 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
-import com.quickblox.module.videochat_webrtc.signalings.SignalingIgnoreFilter;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.qmunicate.model.Friend;
@@ -23,22 +22,27 @@ import com.quickblox.qmunicate.utils.FriendUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class QBVideoChatHelper extends BaseHelper {
 
+    private final static int ACTIVE_SESSIONS_DEFAULT_SIZE = 5;
     private final Lo lo = new Lo(this);
 
-    private QBSignalingChannel.SignalingListener signalingListener;
     private QBChatService chatService;
     private Class<? extends Activity> activityClass;
-    private Map<Integer, VideoSenderChannel> activeChannels = new HashMap<Integer, VideoSenderChannel>(3);
+    private Map<Integer, VideoSenderChannel> activeChannelMap = new HashMap<Integer, VideoSenderChannel>(
+            ACTIVE_SESSIONS_DEFAULT_SIZE);
+    private Map<String, Boolean> activeSessionMap = new HashMap<String, Boolean>(
+            ACTIVE_SESSIONS_DEFAULT_SIZE);
 
     public QBVideoChatHelper(Context context) {
         super(context);
     }
 
     public VideoSenderChannel getSignalingChannel(int participantId) {
-        return activeChannels.get(participantId);
+        return activeChannelMap.get(participantId);
     }
 
     public void init(QBChatService chatService, Class<? extends Activity> activityClass) {
@@ -52,30 +56,31 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-            lo.g("signalingCreated");
             if (!createdLocally) {
-                if (activeChannels.containsKey(qbSignaling.getParticipant())){
+                if (activeChannelMap.containsKey(qbSignaling.getParticipant())) {
                     return;
                 }
                 VideoSenderChannel signalingChannel = new VideoSenderChannel(qbSignaling);
                 VideoSignalingListener videoSignalingListener = new VideoSignalingListener(
                         qbSignaling.getParticipant());
-                lo.g("signalingCreated "+videoSignalingListener.toString());
                 signalingChannel.addSignalingListener(videoSignalingListener);
-                activeChannels.put(qbSignaling.getParticipant(), signalingChannel);
+                activeChannelMap.put(qbSignaling.getParticipant(), signalingChannel);
             }
         }
     }
 
-    public void closeSignalingChannel(int participantId) {
-        activeChannels.remove(participantId);
+    public void closeSignalingChannel(ConnectionConfig connectionConfig) {
+        activeSessionMap.put(connectionConfig.getConnectionSession(), false);
+        Timer timer = new Timer();
+        timer.schedule(new ClearSessionTask(connectionConfig.getConnectionSession(),
+                connectionConfig.getToUser().getId()), Consts.DEFAULT_CLEAR_SESSION_TIMEOUT);
     }
 
     public VideoSenderChannel makeSignalingChannel(int participantId) {
         QBSignaling signaling = QBChatService.getInstance().getSignalingManager().createSignaling(
                 participantId, null);
         VideoSenderChannel signalingChannel = new VideoSenderChannel(signaling);
-        activeChannels.put(participantId, signalingChannel);
+        activeChannelMap.put(participantId, signalingChannel);
         return signalingChannel;
     }
 
@@ -94,13 +99,15 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onCall(ConnectionConfig connectionConfig) {
-            VideoSenderChannel senderChannel = activeChannels.get(participantId);
-            senderChannel.addSignalingIgnoreFilter(this, new SignalingIgnoreFilter.Equals(
-                    QBSignalingChannel.PacketType.qbvideochat_call));
+            if (activeSessionMap.containsKey(
+                    connectionConfig.getConnectionSession()) || isExistRunningSession()) {
+                return;
+            }
+            activeSessionMap.put(connectionConfig.getConnectionSession(), true);
             CallConfig callConfig = (CallConfig) connectionConfig;
             SessionDescriptionWrapper sessionDescriptionWrapper = new SessionDescriptionWrapper(
                     callConfig.getSessionDescription());
-            lo.g("onCall " + callConfig.getCallStreamType().toString() + ", listner="+this.toString());
+            lo.g("onCall " + callConfig.getCallStreamType().toString());
             Intent intent = new Intent(context, activityClass);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
             intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
@@ -112,6 +119,37 @@ public class QBVideoChatHelper extends BaseHelper {
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.getApplicationContext().startActivity(intent);
+        }
+    }
+
+    private boolean isExistRunningSession() {
+        for (Map.Entry<String, Boolean> entry : activeSessionMap.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private class ClearSessionTask extends TimerTask {
+
+        private String sessionId;
+        private int opponentId;
+
+        ClearSessionTask(String sessionId, int opponentId) {
+            this.sessionId = sessionId;
+            this.opponentId = opponentId;
+        }
+
+        @Override
+        public void run() {
+            if (!activeSessionMap.get(sessionId)) {
+                activeSessionMap.remove(sessionId);
+                VideoSenderChannel videoSenderChannel = activeChannelMap.remove(opponentId);
+                if (videoSenderChannel != null) {
+                    videoSenderChannel.close();
+                }
+            }
         }
     }
 }
