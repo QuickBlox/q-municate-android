@@ -25,6 +25,11 @@
         <item name="android:actionModeCloseDrawable">@drawable/badge_action_mode</item>
         <item name="android:actionModeBackground">@drawable/badge_action_mode</item>
         <item name="android:windowContentOverlay">@null</item>
+        <item name="android:titleTextStyle">@style/MyActionModeTitleText</item>
+    </style>
+
+    <style name="MyActionModeTitleText" parent="android:TextAppearance.Holo.Widget.ActionMode.Title">
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="baseToggleBtn">

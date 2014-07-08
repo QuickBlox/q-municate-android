@@ -94,7 +94,7 @@
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
-    <string name="ndl_ac_mode_title">Create Group Chat</string>
+    <string name="ndl_ac_mode_title">Group chat participants:</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>

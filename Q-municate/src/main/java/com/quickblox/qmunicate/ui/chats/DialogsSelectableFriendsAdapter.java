@@ -17,6 +17,7 @@ import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
@@ -25,11 +26,13 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     private NewDialogCounterFriendsListener counterChangedListener;
     private int counterFriends;
     private List<Friend> selectedFriends;
+    private HashMap<Integer, Boolean> sparseArrayCheckBoxes;
 
     public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         selectedFriends = new ArrayList<Friend>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        sparseArrayCheckBoxes = new HashMap<Integer, Boolean>();
     }
 
     public void setCounterChangedListener(NewDialogCounterFriendsListener listener) {
@@ -55,25 +58,28 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, Context context, final Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        Friend friend = DatabaseManager.getFriendFromCursor(cursor);
+        final Friend friend = DatabaseManager.getFriendFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullname());
         viewHolder.statusMessageTextView.setText(friend.getStatus());
         viewHolder.nameTextView.setText(friend.getFullname());
-        viewHolder.selectFriendCheckBox.setChecked(friend.isSelected());
-        viewHolder.selectFriendCheckBox.setTag(friend);
+
         if (friend.isOnline()) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.onlineImageView.setVisibility(View.GONE);
         }
+
+        final int position = cursor.getPosition();
+
         viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
+
             public void onClick(View view) {
                 CheckBox checkBox = (CheckBox) view;
-                Friend friend = (Friend) checkBox.getTag();
+                sparseArrayCheckBoxes.put(position, checkBox.isChecked());
                 friend.setSelected(checkBox.isChecked());
                 notifyCounterChanged(checkBox.isChecked());
                 if (checkBox.isChecked()) {
@@ -86,11 +92,14 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
             }
         });
 
+        boolean checked = sparseArrayCheckBoxes.get(position) == null ? false : sparseArrayCheckBoxes.get(position);
+
+        viewHolder.selectFriendCheckBox.setChecked(checked);
+
         String avatarUrl = getAvatarUrlForFriend(friend);
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
 
-        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(
-                viewHolder.selectFriendCheckBox.isChecked()));
+        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checked));
     }
 
     private void notifyCounterChanged(boolean isIncrease) {
