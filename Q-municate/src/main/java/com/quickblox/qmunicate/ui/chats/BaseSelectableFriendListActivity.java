@@ -6,9 +6,7 @@ import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
@@ -24,7 +22,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
 
     protected DialogsSelectableFriendsAdapter friendsAdapter;
     protected ListView friendsListView;
-    protected TextView countSelectedFriendsTextView;
     private ActionMode actionMode;
     private boolean isNeedToCloseWithoutRedirect;
 
@@ -66,19 +63,11 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         } else {
             startAction();
         }
-        countSelectedFriendsTextView.setText(valueCounter + Consts.EMPTY_STRING);
+        actionMode.setTitle(getResources().getString(R.string.ndl_ac_mode_title) + Consts.SPACE + valueCounter);
     }
 
     private void startAction() {
         actionMode = startActionMode(new ActionModeCallback());
-        View view = getLayoutInflater().inflate(getActionModeLayoutId(), null);
-        countSelectedFriendsTextView = (TextView) view.findViewById(R.id.count_selected_friends_textview);
-        actionMode.setCustomView(view);
-    }
-
-    public void actionModeTextOnClickListener(View view) {
-        closeActionModeWithRedirect(false);
-        view.getBackground().setAlpha(50);
     }
 
     private void closeActionModeWithRedirect(boolean isNeedToCloseWithoutRedirect) {
@@ -89,8 +78,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     private void initBase() {
         canPerformLogout.set(false);
     }
-
-    protected abstract int getActionModeLayoutId();
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {

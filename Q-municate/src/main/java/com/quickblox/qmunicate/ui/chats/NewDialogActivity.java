@@ -43,11 +43,6 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected int getActionModeLayoutId() {
-        return R.layout.action_mode_new_dialog;
-    }
-
-    @Override
     protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
         createChat(selectedFriends);
     }
