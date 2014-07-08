@@ -23,7 +23,6 @@
                 android:layout_width="@dimen/chat_attach_width"
                 android:layout_height="@dimen/chat_attach_height"
                 android:max="100"
-                android:padding="5dp"
                 android:visibility="gone" />
 
             <ProgressBar

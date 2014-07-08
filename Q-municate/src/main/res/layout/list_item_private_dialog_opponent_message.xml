@@ -22,7 +22,6 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="@dimen/chat_attach_width"
                 android:layout_height="@dimen/chat_attach_height"
-                android:padding="5dp"
                 android:max="100"
                 android:visibility="gone" />
 
