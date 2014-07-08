@@ -30,11 +30,10 @@ public class QBUpdateUserCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, QBUser user, File file, String status) {
+    public static void start(Context context, QBUser user, File file) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_USER_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, file);
-        intent.putExtra(QBServiceConsts.EXTRA_STATUS, status);
         context.startService(intent);
     }
 
@@ -42,10 +41,9 @@ public class QBUpdateUserCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
-        String status = extras.getString(QBServiceConsts.EXTRA_STATUS);
 
         user.setOldPassword(user.getPassword());
-        updateUser(user, file, status);
+        updateUser(user, file);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
@@ -53,8 +51,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
         return result;
     }
 
-    private void updateUser(QBUser user, File file,
-            String status) throws QBResponseException, SmackException.NotConnectedException {
+    private void updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {
         if (file == null) {
             authHelper.updateUser(user);
         } else {

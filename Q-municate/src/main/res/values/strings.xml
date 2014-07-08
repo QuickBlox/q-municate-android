@@ -122,8 +122,8 @@
     <string name="prf_change">Change</string>
     <string name="prf_title">Profile</string>
     <string name="prf_email">Email</string>
+    <string name="prf_phone">Phone</string>
     <string name="prf_status_message">Status Message</string>
-    <string name="prf_edit_status">Edit Status</string>
     <string name="prf_done">Done</string>
 
     // Add Friends To Group Dialog

@@ -110,8 +110,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
             ErrorUtils.showError(this, e.getMessage());
-        } catch (OutOfMemoryError e) {
-            ErrorUtils.showError(this, e.getMessage());
         }
     }
 

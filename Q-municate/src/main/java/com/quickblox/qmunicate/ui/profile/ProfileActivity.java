@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
@@ -36,7 +35,6 @@ import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.KeyboardUtils;
-import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
 
@@ -46,22 +44,25 @@ import java.io.FileNotFoundException;
 public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileListener, View.OnClickListener {
 
     private LinearLayout changeAvatarLinearLayout;
-    private RelativeLayout changeFullNameRelativeLayout;
-    private LinearLayout emailLinearLayout;
-    private LinearLayout changeStatusLinearLayout;
     private RoundedImageView avatarImageView;
-    private EditText fullNameEditText;
-    private TextView emailTextView;
-    private EditText statusMessageEditText;
+    private LinearLayout emailLinearLayout;
+    private RelativeLayout changeFullNameRelativeLayout;
+    private RelativeLayout changePhoneRelativeLayout;
+    private RelativeLayout changeStatusRelativeLayout;
     private TextView avatarTextView;
+    private TextView emailTextView;
+    private EditText fullNameEditText;
+    private EditText phoneEditText;
+    private EditText statusEditText;
 
     private ImageHelper imageHelper;
 
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
-    private String emailCurrent;
+    private String phoneCurrent;
     private String statusCurrent;
     private static String fullnameOld;
+    private static String phoneOld;
     private static String statusOld;
 
     private QBUser user;
@@ -93,14 +94,16 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void initUI() {
         changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
         avatarTextView = _findViewById(R.id.avatar_textview);
-        changeFullNameRelativeLayout = _findViewById(R.id.change_fullname_relativelayout);
-        emailLinearLayout = _findViewById(R.id.email_linearlayout);
-        changeStatusLinearLayout = _findViewById(R.id.changeStatusLinearLayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
-        fullNameEditText = _findViewById(R.id.fullname_edittext);
+        emailLinearLayout = _findViewById(R.id.email_linearlayout);
+        changeFullNameRelativeLayout = _findViewById(R.id.change_fullname_relativelayout);
+        changePhoneRelativeLayout = _findViewById(R.id.change_phone_relativelayout);
+        changeStatusRelativeLayout = _findViewById(R.id.change_status_relativelayout);
         emailTextView = _findViewById(R.id.email_textview);
-        statusMessageEditText = _findViewById(R.id.statusMessageEditText);
+        fullNameEditText = _findViewById(R.id.fullname_edittext);
+        phoneEditText = _findViewById(R.id.phone_edittext);
+        statusEditText = _findViewById(R.id.status_edittext);
     }
 
     private void initListeners() {
@@ -108,21 +111,24 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         changeAvatarLinearLayout.setOnClickListener(this);
         avatarImageView.setOnClickListener(this);
         changeFullNameRelativeLayout.setOnClickListener(this);
-        changeStatusLinearLayout.setOnClickListener(this);
+        changePhoneRelativeLayout.setOnClickListener(this);
+        changeStatusRelativeLayout.setOnClickListener(this);
     }
 
     private void initUIWithUsersData() {
         loadAvatar();
-        fullNameEditText.setText(user.getFullName());
+        fullnameOld = user.getFullName();
+        fullNameEditText.setText(fullnameOld);
         if (TextUtils.isEmpty(user.getEmail())) {
             emailLinearLayout.setVisibility(View.GONE);
         } else {
             emailLinearLayout.setVisibility(View.VISIBLE);
             emailTextView.setText(user.getEmail());
         }
-        String status = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_STATUS,
-                Consts.EMPTY_STRING);
-        statusMessageEditText.setText(status);
+        phoneOld = user.getPhone();
+        phoneEditText.setText(phoneOld);
+        statusOld = user.getCustomData();
+        statusEditText.setText(statusOld);
     }
 
     private void initBroadcastActionList() {
@@ -138,20 +144,23 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void initTextChangedListeners() {
         TextWatcher textWatcherListener = new TextWatcherListener();
         fullNameEditText.addTextChangedListener(textWatcherListener);
+        phoneEditText.addTextChangedListener(textWatcherListener);
+        statusEditText.addTextChangedListener(textWatcherListener);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.avatar_textview:
-            case R.id.change_avatar_linearlayout:
             case R.id.avatar_imageview:
                 changeAvatarOnClick();
                 break;
             case R.id.change_fullname_relativelayout:
                 changeFullNameOnClick();
                 break;
-            case R.id.changeStatusLinearLayout:
+            case R.id.change_phone_relativelayout:
+                changePhoneOnClick();
+                break;
+            case R.id.change_status_relativelayout:
                 changeStatusOnClick();
                 break;
         }
@@ -160,7 +169,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            fullNameEditText.setText(user.getFullName());
+            resetUserData();
             closeActionMode = true;
             ((ActionMode) actionMode).finish();
             return true;
@@ -225,14 +234,17 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         KeyboardUtils.hideKeyboard(this);
     }
 
+    public void changePhoneOnClick() {
+        initChangingEditText(phoneEditText);
+    }
+
     public void changeStatusOnClick() {
-        initChangingEditText(statusMessageEditText);
+        initChangingEditText(statusEditText);
     }
 
     @Override
     public void onCachedImageFileReceived(File imageFile) {
-        String status = statusMessageEditText.getText().toString();
-        QBUpdateUserCommand.start(this, user, imageFile, status);
+        QBUpdateUserCommand.start(this, user, imageFile);
     }
 
     @Override
@@ -241,44 +253,60 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     private void updateCurrentUserData() {
         fullnameCurrent = fullNameEditText.getText().toString();
-        emailCurrent = emailTextView.getText().toString();
-        statusCurrent = statusMessageEditText.getText().toString();
+        phoneCurrent = phoneEditText.getText().toString();
+        statusCurrent = statusEditText.getText().toString();
     }
 
     private void updateUserData() {
-        if (isUserDataChanged(fullnameCurrent, statusCurrent)) {
-            saveChanges(fullnameCurrent);
+        updateCurrentUserData();
+        if (isUserDataChanged()) {
+            saveChanges();
         }
     }
 
-    private boolean isUserDataChanged(String fullname, String status) {
-        return isNeedUpdateAvatar || !fullname.equals(fullnameOld) || !status.equals(statusOld);
+    private boolean isUserDataChanged() {
+        return isNeedUpdateAvatar || !fullnameCurrent.equals(fullnameOld) || !phoneCurrent.equals(phoneOld) || !statusCurrent.equals(statusOld);
     }
 
-    private void saveChanges(final String fullname) {
+    private void saveChanges() {
         if (!isUserDataCorrect()) {
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
         }
+
         showProgress();
-        user.setFullName(fullname);
+
+        user.setFullName(fullnameCurrent);
+        user.setPhone(phoneCurrent);
+        user.setCustomData(statusCurrent);
 
         if (isNeedUpdateAvatar) {
             new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
         } else {
-            String status = statusMessageEditText.getText().toString();
-            QBUpdateUserCommand.start(this, user, null, status);
+            QBUpdateUserCommand.start(this, user, null);
         }
+
         stopChangingEditText(fullNameEditText);
+        stopChangingEditText(phoneEditText);
+        stopChangingEditText(statusEditText);
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE
+                && phoneCurrent.length() > Consts.ZERO_INT_VALUE
+                && statusCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
         fullnameOld = fullNameEditText.getText().toString();
-        statusOld = statusMessageEditText.getText().toString();
+        phoneOld = phoneEditText.getText().toString();
+        statusOld = statusEditText.getText().toString();
+    }
+
+    private void resetUserData() {
+        user.setFullName(fullnameOld);
+        user.setPhone(phoneOld);
+        user.setCustomData(statusOld);
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {
@@ -295,7 +323,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             DialogUtils.showLong(ProfileActivity.this, exception.getMessage());
-            user.setFullName(fullnameOld);
+            resetUserData();
             hideProgress();
         }
     }
@@ -310,7 +338,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeActionMode) {
-                updateCurrentUserData();
                 updateUserData();
             }
             actionMode = null;
