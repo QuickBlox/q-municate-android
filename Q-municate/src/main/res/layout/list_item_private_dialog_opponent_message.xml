@@ -22,7 +22,6 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="@dimen/chat_attach_width"
                 android:layout_height="@dimen/chat_attach_height"
-                android:padding="5dp"
                 android:max="100"
                 android:visibility="gone" />
 
@@ -38,7 +37,7 @@
         </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/text_message_linearlayout"
+            android:id="@+id/text_message_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/chat_babble_margin"
@@ -63,7 +62,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|top"
-                android:textColor="@color/gray"/>
+                android:textColor="@color/black"
+                android:paddingTop="3dp"
+                android:paddingRight="5dp"
+                android:alpha="0.5" />
 
         </LinearLayout>
 
@@ -94,7 +96,9 @@
                 android:layout_alignParentTop="true"
                 android:layout_margin="10dp"
                 android:background="@drawable/badge_attach_message_time"
-                android:textColor="@color/gray" />
+                android:textColor="@color/black"
+                android:alpha="0.5"
+                android:padding="4dp" />
 
         </RelativeLayout>
 

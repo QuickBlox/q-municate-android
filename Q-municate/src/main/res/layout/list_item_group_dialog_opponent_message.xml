@@ -40,7 +40,6 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="@dimen/chat_attach_width"
                     android:layout_height="@dimen/chat_attach_height"
-                    android:padding="5dp"
                     android:max="100"
                     android:visibility="gone" />
 
@@ -55,55 +54,59 @@
 
             </RelativeLayout>
 
-            <LinearLayout
-                android:id="@+id/text_message_linearlayout"
+            <GridLayout
+                android:id="@+id/text_message_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="@dimen/chat_babble_margin"
                 android:background="@drawable/left_bubble"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:padding="5dp"
-                android:visibility="gone">
+                android:columnCount="1">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:padding="10dp">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/name_textview"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="left"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="5dp"
                         android:ellipsize="end"
                         android:singleLine="true"
                         android:textColor="@color/blue"
                         android:textSize="@dimen/text_size"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:gravity="left" />
 
-                    <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
-                        android:id="@+id/message_textview"
+                    <TextView
+                        android:id="@+id/time_text_message_textview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center|left"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="5dp"
+                        android:layout_marginLeft="10dp"
+                        android:alpha="0.5"
+                        android:paddingRight="7dp"
+                        android:paddingTop="3dp"
                         android:textColor="@color/black"
-                        android:textSize="@dimen/text_size_small" />
+                        android:gravity="right|top" />
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/time_text_message_textview"
-                    android:layout_width="match_parent"
+                <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
+                    android:id="@+id/message_textview"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|top"
-                    android:textColor="@color/gray" />
+                    android:layout_gravity="center|left"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_small" />
 
-            </LinearLayout>
+            </GridLayout>
 
             <RelativeLayout
                 android:id="@+id/attach_message_relativelayout"
@@ -132,7 +135,9 @@
                     android:layout_alignParentTop="true"
                     android:layout_margin="10dp"
                     android:background="@drawable/badge_attach_message_time"
-                    android:textColor="@color/gray" />
+                    android:textColor="@color/black"
+                    android:alpha="0.5"
+                    android:padding="4dp" />
 
             </RelativeLayout>
 
