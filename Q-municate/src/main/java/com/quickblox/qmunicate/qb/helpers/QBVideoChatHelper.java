@@ -77,7 +77,7 @@ public class QBVideoChatHelper extends BaseHelper {
         activeSessionMap.put(connectionConfig.getConnectionSession(), false);
         ClearSessionTask clearSessionTask = new ClearSessionTask(connectionConfig.getConnectionSession(),
                 connectionConfig.getToUser().getId());
-        scheduler.schedule(clearSessionTask, Consts.DEFAULT_CLEAR_SESSION_TIMEOUT, TimeUnit.SECONDS);
+        scheduler.schedule(clearSessionTask, Consts.DEFAULT_CLEAR_SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
     public VideoSenderChannel makeSignalingChannel(int participantId) {
@@ -147,6 +147,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void run() {
+            lo.g("clearing session running");
             if (!activeSessionMap.get(sessionId)) {
                 activeSessionMap.remove(sessionId);
                 VideoSenderChannel videoSenderChannel = activeChannelMap.remove(opponentId);
