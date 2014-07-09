@@ -24,6 +24,7 @@ public class Consts {
     public static final int ZERO_INT_VALUE = 0;
     public static final long ZERO_LONG_VALUE = 0L;
     public static final String EMPTY_STRING = "";
+    public static final String SPACE = " ";
 
     public static final int SECOND = 1000;
 

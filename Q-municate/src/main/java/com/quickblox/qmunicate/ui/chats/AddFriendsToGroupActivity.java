@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
-import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.Friend;
@@ -38,11 +37,6 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     protected Cursor getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
         return DatabaseManager.getFriendsFilteredByIds(this, getFriendIds(dialog.getOccupantList()));
-    }
-
-    @Override
-    protected int getActionModeLayoutId() {
-        return R.layout.action_mode_add_friends;
     }
 
     @Override
