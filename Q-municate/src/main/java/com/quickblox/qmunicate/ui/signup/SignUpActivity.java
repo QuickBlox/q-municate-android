@@ -8,9 +8,11 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
@@ -39,10 +41,12 @@ import java.io.FileNotFoundException;
 public class SignUpActivity extends BaseActivity implements ReceiveFileListener {
 
     private static final String TAG = SignUpActivity.class.getSimpleName();
+
     private EditText passwordEditText;
     private RoundedImageView avatarImageView;
     private EditText fullnameEditText;
     private EditText emailEditText;
+    private TextView policyTextView;
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
     private Bitmap avatarBitmapCurrent;
@@ -62,6 +66,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         resources = getResources();
 
         initUI();
+        initListeners();
 
         useDoubleBackPressed = true;
         qbUser = new QBUser();
@@ -151,6 +156,21 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                         .getString(R.string.dlg_not_email_field_entered), resources.getString(
                         R.string.dlg_not_password_field_entered)}
         );
+        policyTextView = _findViewById(R.id.policy_textview);
+    }
+
+    private void initListeners() {
+
+        policyTextView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String policyLink = resources.getString(R.string.sup_policy_link);
+                Intent intentWeb = new Intent(Intent.ACTION_VIEW);
+                intentWeb.setData(Uri.parse(policyLink));
+                startActivity(intentWeb);
+            }
+        });
     }
 
     private void addActions() {
