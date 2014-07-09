@@ -175,8 +175,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         long time;
         String attachUrl;
 
-        messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID).toString();
-        time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
+        messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID);
+        time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
