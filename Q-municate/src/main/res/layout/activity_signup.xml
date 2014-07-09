@@ -67,4 +67,18 @@
         android:text="@string/sup_sign_up"
         android:textColor="@color/white"
         android:textSize="@dimen/button_text_size" />
+
+    <TextView
+        android:id="@+id/policy_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_general_selector"
+        android:clickable="true"
+        android:gravity="center"
+        android:text="@string/sup_policy"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size_small" />
+
 </LinearLayout>

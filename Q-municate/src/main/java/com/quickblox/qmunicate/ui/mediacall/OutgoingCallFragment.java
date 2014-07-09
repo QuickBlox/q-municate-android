@@ -281,6 +281,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 videoChat.disposeConnection();
             }
         }
+        if(signalingChannel != null){
+            signalingChannel.removeSignalingListener(signalingMessageHandler);
+        }
         if(videoChatHelper != null){
             videoChatHelper.closeSignalingChannel(currentConnectionConfig);
         }

@@ -79,17 +79,21 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onConnectionRejected() {
+        unregisterListener();
         cancelPlayer();
         finish();
     }
 
     @Override
     public void onConnectionClosed() {
-        if (signalingChannel != null) {
-            signalingChannel.removeSignalingListener(messageHandler);
-            signalingChannel.close();
-        }
+        unregisterListener();
         finish();
+    }
+
+    private void unregisterListener(){
+        if (signalingChannel != null && messageHandler != null) {
+            signalingChannel.removeSignalingListener(messageHandler);
+        }
     }
 
     @Override
@@ -140,7 +144,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 videoChatHelper.closeSignalingChannel(connectionConfig);
             }
         }
-        finish();
+        onConnectionClosed();
     }
 
     private void accept() {
