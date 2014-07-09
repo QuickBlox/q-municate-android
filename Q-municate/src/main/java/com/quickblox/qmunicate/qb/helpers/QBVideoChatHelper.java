@@ -62,7 +62,6 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
-            if (!createdLocally) {
                 lo.g("signalingCreatedr=" + qbSignaling.getParticipant());
                 VideoSenderChannel signalingChannel = new VideoSenderChannel(qbSignaling);
                 VideoSignalingListener videoSignalingListener = new VideoSignalingListener(
@@ -70,7 +69,6 @@ public class QBVideoChatHelper extends BaseHelper {
                 lo.g("signalingCreatedr and put " + videoSignalingListener.toString());
                 signalingChannel.addSignalingListener(videoSignalingListener);
                 activeChannelMap.put(qbSignaling.getParticipant(), signalingChannel);
-            }
         }
     }
 
