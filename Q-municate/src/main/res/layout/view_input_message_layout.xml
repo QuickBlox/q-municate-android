@@ -32,6 +32,6 @@
         android:focusable="true"
         android:gravity="center_vertical|right|left"
         android:hint="@string/dlg_hint_message"
-        android:textColor="@android:color/black" />
+        android:textColor="@color/black" />
 
 </RelativeLayout>

@@ -1,9 +1,11 @@
 package com.quickblox.qmunicate.ui.voicecall;
 
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.qmunicate.ui.mediacall.TimeUpdater;
@@ -36,6 +38,10 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         rootView.findViewById(R.id.muteDynamicButton).setOnClickListener(this);
         if (updater != null) {
             updater.setTextView(timeTextView);
+        }
+        if(!TextUtils.isEmpty(opponent.getAvatarUrl())){
+            ImageLoader.getInstance().displayImage(opponent.getAvatarUrl(),
+                    (android.widget.ImageView) rootView.findViewById(R.id.avatar_imageview), Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
     }
 

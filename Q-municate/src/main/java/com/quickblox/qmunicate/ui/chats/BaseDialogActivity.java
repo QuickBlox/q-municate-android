@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
@@ -29,7 +33,6 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
-import com.quickblox.qmunicate.ui.chats.animation.HeightAnimator;
 import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
@@ -38,6 +41,7 @@ import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
 import com.quickblox.qmunicate.ui.views.smiles.SmileysConvertor;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
+import com.quickblox.qmunicate.utils.KeyboardUtils;
 import com.quickblox.qmunicate.utils.SizeUtility;
 
 import java.io.File;
@@ -57,13 +61,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
     protected IconPageIndicator smilesPagerIndicator;
-    protected HeightAnimator smilesAnimator;
     protected SmileSelectedBroadcastReceiver smileSelectedBroadcastReceiver;
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
+    protected BitmapFactory.Options bitmapOptions;
 
     protected BaseChatHelper chatHelper;
 
@@ -86,6 +90,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initListeners();
         initSmileWidgets();
         initSmiles();
+        initBitmapOption();
 
         addActions();
 
@@ -105,7 +110,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         FragmentStatePagerAdapter adapter = new SmilesTabFragmentAdapter(getSupportFragmentManager());
         smilesViewPager.setAdapter(adapter);
         smilesPagerIndicator.setViewPager(smilesViewPager);
-        smilesAnimator = new HeightAnimator(chatEditText, smilesLayout);
     }
 
     protected void attachButtonOnClick() {
@@ -122,7 +126,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void hideSmileLayout() {
         hideView(smilesLayout);
+        prepareChatEditText(true);
+    }
+
+    private void showSmileLayout() {
+        int smilesLayoutHeight = getSmileLayoutSizeInPixels();
+        showView(smilesLayout, smilesLayoutHeight);
+        prepareChatEditText(false);
+    }
+
+    private void prepareChatEditText(boolean showCursor) {
         chatEditText.switchSmileIcon();
+        chatEditText.setCursorVisible(showCursor);
     }
 
     protected void addActions() {
@@ -145,6 +160,33 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    protected void initColorsActionBar() {
+        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
+        int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
+        if (actionBarTitleId > Consts.ZERO_INT_VALUE) {
+            TextView title = (TextView) findViewById(actionBarTitleId);
+            if (title != null) {
+                title.setTextColor(Color.WHITE);
+            }
+        }
+        if (actionBarSubTitleId > Consts.ZERO_INT_VALUE) {
+            TextView subTitle = (TextView) findViewById(actionBarSubTitleId);
+            if (subTitle != null) {
+                float alpha = 0.5f;
+                subTitle.setTextColor(Color.WHITE);
+                subTitle.setAlpha(alpha);
+            }
+        }
+    }
+
+    private void initBitmapOption() {
+        bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inDither = false;
+        bitmapOptions.inPurgeable = true;
+        bitmapOptions.inInputShareable = true;
+        bitmapOptions.inTempStorage = new byte[32 * 1024];
     }
 
     @Override
@@ -230,6 +272,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         view.setLayoutParams(params);
     }
 
+    private void showView(View view, int height) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+        params.height = height;
+        view.setLayoutParams(params);
+    }
+
     @Override
     public void onScrollToBottom() {
         scrollListView();
@@ -255,6 +303,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         return SizeUtility.dipToPixels(this, SMILES_SIZE_IN_DIPS);
     }
 
+    protected void startLoadDialogMessages() {
+        if (messagesAdapter.isEmpty()) {
+            startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
+        } else {
+            long lastMessageDateSent = DatabaseManager.getLastReadMessageDateSent(this, dialog);
+            startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
+
     public class LoadAttachFileSuccessAction implements Command {
 
         @Override
@@ -272,8 +329,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             int resourceId = intent.getIntExtra(SerializableKeys.SMILE_ID, R.drawable.smile);
             int cursorPosition = chatEditText.getSelectionStart();
             String roundTrip;
-            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName(
-                    Consts.ENCODING_UTF8));
+            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName(Consts.ENCODING_UTF8));
             roundTrip = new String(bytes, Charset.forName(Consts.ENCODING_UTF8));
             chatEditText.getText().insert(cursorPosition, roundTrip);
         }
@@ -283,11 +339,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void onSmileClick() {
-            int smilesLayoutHeight = getSmileLayoutSizeInPixels();
             if (isSmilesLayoutShowing()) {
-                smilesAnimator.animateHeightFrom(smilesLayoutHeight, Consts.ZERO_INT_VALUE);
+                hideSmileLayout();
             } else {
-                smilesAnimator.animateHeightFrom(Consts.ZERO_INT_VALUE, smilesLayoutHeight);
+                KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
+                showSmileLayout();
             }
         }
     }

@@ -32,7 +32,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class InviteFriendsFragment extends BaseFragment implements CounterChangedListener {
+
     private View view;
+    private View headerList;
     private LinearLayout fromFacebookButton;
     private LinearLayout fromContactsButton;
     private ListView friendsListView;
@@ -69,6 +71,17 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         facebookSessionStatusCallback = new FacebookSessionStatusCallback();
         facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
 
+        initFriendsLists();
+        initHeaderUI(headerList);
+
+        initListeners();
+
+//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_invite_friends));
+
+        return view;
+    }
+
+    private void initFriendsLists() {
         friendsList = new ArrayList<InviteFriend>();
         friendsFacebookList = new ArrayList<InviteFriend>();
         friendsContactsList = new ArrayList<InviteFriend>();
@@ -76,18 +89,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         friendsAdapter = new InviteFriendsAdapter(baseActivity, friendsList);
         friendsAdapter.setCounterChangedListener(this);
 
-        View header = getActivity().getLayoutInflater().inflate(R.layout.view_section_title_invite_friends, null);
-        friendsListView.addHeaderView(header);
+        friendsListView.addHeaderView(headerList);
         friendsListView.setAdapter(friendsAdapter);
-
-        initHeaderUI(header);
-
-        initListeners();
-//        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_invite_friends));
-
-
-
-        return view;
     }
 
     private void initListeners() {
@@ -140,7 +143,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             for (InviteFriend friend : friends) {
                 friend.setSelected(false);
             }
-            newCounter = 0;
+            newCounter = Consts.ZERO_INT_VALUE;
         }
 
         if (isFacebook) {
@@ -159,7 +162,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void setCheckedCheckBox(int countSelected, CheckBox checkBox) {
-        if(countSelected == 0) {
+        if (countSelected == 0) {
             checkBox.setChecked(false);
         }
     }
@@ -194,6 +197,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private void initUI() {
         setHasOptionsMenu(true);
         friendsListView = (ListView) view.findViewById(R.id.friendsListView);
+        headerList = getActivity().getLayoutInflater().inflate(R.layout.view_section_title_invite_friends, null);
     }
 
     @Override
@@ -285,7 +289,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private void getFacebookFriendsList() {
         baseActivity.showProgress();
-        Request.executeMyFriendsRequestAsync(Session.getActiveSession(), new Request.GraphUserListCallback() {
+        Request friendsRequest = Request.newMyFriendsRequest(Session.getActiveSession(), new Request.GraphUserListCallback() {
 
             @Override
             public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
@@ -298,6 +302,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
                 baseActivity.hideProgress();
             }
         });
+        friendsRequest.executeAsync();
     }
 
     private void setVisibilityCountPart(List friends, LinearLayout fromButton, TextView counterTextView, CheckBox checkBox) {
@@ -336,7 +341,8 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             FacebookRequestError error = response.getError();
             if (error != null) {
                 Log.e(getString(R.string.facebook_exception), error.toString());
-                DialogUtils.showLong(getActivity(), getResources().getString(R.string.facebook_exception) + error);
+                DialogUtils.showLong(getActivity(), getResources().getString(
+                        R.string.facebook_exception) + error);
             } else {
                 DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_success_posted_to_facebook));
             }

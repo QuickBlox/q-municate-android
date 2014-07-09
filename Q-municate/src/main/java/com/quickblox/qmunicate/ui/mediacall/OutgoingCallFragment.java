@@ -14,14 +14,13 @@ import android.view.ViewGroup;
 
 import com.quickblox.module.chat.exceptions.QBChatException;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.module.videochat_webrtc.model.CallConfig;
 import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
-import com.quickblox.module.videochat_webrtc.signaling.SIGNAL_STATE;
+import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.communication.SessionDescriptionWrapper;
@@ -60,6 +59,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private QBSignalingChannel.PLATFORM remotePlatform;
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private VideoSenderChannel signalingChannel;
+    private QBVideoChatHelper videoChatHelper;
+    private ConnectionConfig currentConnectionConfig;
 
     public interface OutgoingCallListener {
 
@@ -208,6 +209,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             callConfig.setCallStreamType(call_type);
             callConfig.setSessionDescription(remoteSessionDescription);
             callConfig.setDevicePlatform(remotePlatform);
+            currentConnectionConfig = callConfig;
             videoChat.accept(callConfig);
             onConnectionEstablished();
         }
@@ -244,12 +246,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         QBUser sender = AppSession.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
-            if (!opponent.isOnline()) {
-                QBSendPushCommand.start(getActivity(), Consts.DEFAULT_CALL_MESSAGE, opponent.getId());
-            }
-            videoChat.call(userOpponent, sender, call_type);
+            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type, Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
             callTimer = new Timer();
-            callTimer.schedule(new CancelCallTimerTask(), 30 * Consts.SECOND);
+            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
         }
     }
 
@@ -282,8 +281,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 videoChat.disposeConnection();
             }
         }
-        if (signalingChannel != null) {
-            signalingChannel.close();
+        if(videoChatHelper != null){
+            videoChatHelper.closeSignalingChannel(currentConnectionConfig);
         }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
             onConnectionClosed();
@@ -293,9 +292,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void onConnectedToService() {
-        QBVideoChatHelper videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+        videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = videoChatHelper.getSignalingChannel();
+            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getId());
         } else {
             signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getId());
         }
@@ -369,15 +368,15 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
 
         @Override
-        public void onError(final SIGNAL_STATE state, final QBChatException e) {
+        public void onError(final QBSignalingChannel.PacketType state, final QBChatException e) {
             if (isExistActivity()) {
                 getBaseActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
                         switch (state) {
-                            case SEND_CALL:
-                            case SEND_ACCEPT: {
+                            case qbvideochat_call:
+                            case qbvideochat_acceptCall: {
                                 stopCall(true, STOP_TYPE.CLOSED);
                                 break;
                             }

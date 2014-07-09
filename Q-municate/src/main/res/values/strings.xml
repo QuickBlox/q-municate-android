@@ -94,7 +94,7 @@
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
-    <string name="ndl_ac_mode_title">Create Group Chat</string>
+    <string name="ndl_ac_mode_title">Group chat participants:</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -122,15 +122,15 @@
     <string name="prf_change">Change</string>
     <string name="prf_title">Profile</string>
     <string name="prf_email">Email</string>
+    <string name="prf_phone">Phone</string>
     <string name="prf_status_message">Status Message</string>
-    <string name="prf_edit_status">Edit Status</string>
     <string name="prf_done">Done</string>
 
     // Add Friends To Group Dialog
     <string name="afg_title">Add Friends</string>
 
     // Invite Friends
-    <string name="inf_header_label">Let your other friends know about \n Qmunication by sending them private invitations</string>
+    <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>
     <string name="inf_select_from_facebook">From Facebook</string>
     <string name="inf_select_from_contacts">From Contacts</string>
     <string name="inf_from_facebook">(invite via Facebook)</string>
@@ -148,8 +148,12 @@
 
     // Feedback
     <string name="fdb_feedback_title">Feedback Description</string>
-    <string name="fdb_feedback_label">Please write in email the steps to make the bug or error appear again.
-        Let us know how often it occurs and if it give an error code. We need to know this in order to find the source of the problem. Please give us as many details as possible. Thank you. </string>
+    <string name="fdb_feedback_label">
+        Please write in email the steps to make the bug or error appear again.
+        Let us know how often it occurs and if it give an error code.
+         We need to know this in order to find the source of the problem. 
+        Please give us as many details as possible. Thank you. 
+    </string>
     <string name="fdb_bug_type">Bug</string>
     <string name="fdb_improvement_type">Improvement</string>
     <string name="fdb_suggestion_type">Suggestion</string>

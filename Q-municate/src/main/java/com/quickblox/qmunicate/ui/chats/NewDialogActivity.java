@@ -43,11 +43,6 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected int getActionModeLayoutId() {
-        return R.layout.action_mode_new_dialog;
-    }
-
-    @Override
     protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
         createChat(selectedFriends);
     }
@@ -71,8 +66,8 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
 
     private String createChatName(ArrayList<Friend> friendList) {
         String userFullname = AppSession.getSession().getUser().getFullName();
-        String friendsFullnames = TextUtils.join(",", friendList);
-        return userFullname + "," + friendsFullnames;
+        String friendsFullnames = TextUtils.join(", ", friendList);
+        return userFullname + ", " + friendsFullnames;
     }
 
     private class CreateChatSuccessAction implements Command {

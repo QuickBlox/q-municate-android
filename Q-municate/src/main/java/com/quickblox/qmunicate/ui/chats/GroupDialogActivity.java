@@ -3,8 +3,11 @@ package com.quickblox.qmunicate.ui.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -13,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
@@ -26,6 +30,7 @@ import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
@@ -101,10 +106,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper,
-                    BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
+            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(this, e.getMessage());
         }
     }
 
@@ -115,7 +120,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
-        //TODO make in command if will be low perfomance
+        //TODO make in command if will be low performance
         //QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, dialogId, null, file);
     }
 
@@ -149,15 +154,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
         messagesListView.setAdapter(messagesAdapter);
     }
 
     private void updateActionBar() {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(groupName);
-        // TODO IS must be implemented soon
-        actionBar.setSubtitle("some information");
+        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
+        initColorsActionBar();
     }
 
     @Override
@@ -218,15 +223,5 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         addActions();
         updateChatData();
         scrollListView();
-    }
-
-    private void startLoadDialogMessages() {
-        // TODO SF temp
-        //        if (messagesAdapter.isEmpty()) {
-        startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
-        //        } else {
-        //            startLoadDialogMessages(dialog, dialogId, dialog.getLastMessageDateSent());
-        //        }
-        //---
     }
 }

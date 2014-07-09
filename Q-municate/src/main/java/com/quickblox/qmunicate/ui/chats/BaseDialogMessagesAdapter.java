@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
@@ -34,8 +35,11 @@ import java.util.Random;
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
     private final int colorMaxValue = 255;
+    private final float colorAlpha = 0.8f;
+
     protected ScrollMessagesListener scrollMessagesListener;
     protected ImageHelper imageHelper;
+    protected QBDialog dialog;
     private Random random;
     private Map<Integer, Integer> colorsMap;
 
@@ -82,8 +86,12 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     private int getRandomColor() {
-        return Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue),
-                random.nextInt(colorMaxValue));
+        float[] hsv = new float[3];
+        int color = Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue), random.nextInt(colorMaxValue));
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= colorAlpha;
+        color = Color.HSVToColor(hsv);
+        return color;
     }
 
     private int getItemViewType(Cursor cursor) {

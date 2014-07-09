@@ -24,8 +24,14 @@ public class Consts {
     public static final int ZERO_INT_VALUE = 0;
     public static final long ZERO_LONG_VALUE = 0L;
     public static final String EMPTY_STRING = "";
+    public static final String SPACE = " ";
+
+    public static final int SECOND = 1000;
 
     public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
+    public static final int DEFAULT_CALL_PACKET_REPLY_TIMEOUT = 5 * SECOND;
+    public static final int DEFAULT_DIALING_TIME = 35 * SECOND;
+    public static final long DEFAULT_CLEAR_SESSION_TIMEOUT = 10 * SECOND;
 
     public static final int OPPONENT_DIALOG_MESSAGE_TYPE = 0;
     public static final int OWN_DIALOG_MESSAGE_TYPE = 1;
@@ -60,10 +66,10 @@ public class Consts {
     public static final String ACCEPTED_CALL = "accepted_call";
     public static final int NOT_INITIALIZED_VALUE = -1;
     public static final int LOGIN_TIMEOUT = 40000;
-    public static final int SECOND = 1000;
     public static final String DEFAULT_CALL_MESSAGE = "";
     public static final String TOKEN_REQUIRED_ERROR = "Token is required";
     public static final String SESSION_DOES_NOT_EXIST = "base Required session does not exist";
+    public static final int FULL_QUALITY = 100;
 
     public static enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING

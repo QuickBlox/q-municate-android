@@ -7,6 +7,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
@@ -37,6 +38,7 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     protected QBChatService chatService;
     protected QBUser chatCreator;
+    protected static String PROPERTY_MESSAGE_ID = "chat_message_id";
     protected static String PROPERTY_DATE_SENT = "date_sent";
     protected static String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
     protected static String VALUE_SAVE_TO_HISTORY = "1";
@@ -107,6 +109,13 @@ public abstract class BaseChatHelper extends BaseHelper {
         chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         return chatMessage;
+    }
+
+    public void updateStatusMessage(QBDialog dialog, String messageId, boolean isRead) throws QBResponseException {
+        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
+        messagesIdsList.add(messageId);
+        QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
+        DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
 
     protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,

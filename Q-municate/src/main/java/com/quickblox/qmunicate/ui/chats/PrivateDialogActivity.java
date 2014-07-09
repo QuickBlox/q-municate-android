@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,12 +20,9 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
-import com.quickblox.qmunicate.qb.commands.QBCreatePrivateChatCommand;
-import com.quickblox.qmunicate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.service.QBService;
@@ -66,19 +64,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         initListView();
         initActionBar();
-        initStartLoadDialogMessages();
-    }
-
-    private void initStartLoadDialogMessages() {
-        // TODO SF temp
-//        if (dialog != null && messagesAdapter.isEmpty()) {
-//            startLoadDialogMessages(dialog, chatJidId, Consts.ZERO_LONG_VALUE);
-//        } else if (dialog != null && !messagesAdapter.isEmpty()) {
-//            startLoadDialogMessages(dialog, chatJidId, dialog.getLastMessageDateSent());
-//        }
-        if (dialog != null) {
-            startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
-        }
+        startLoadDialogMessages();
     }
 
     @Override
@@ -92,10 +78,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper,
-                    BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor()), true);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
+            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            ErrorUtils.showError(this, e.getMessage());
         }
     }
 
@@ -131,7 +117,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initListView() {
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this);
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -139,6 +125,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(opponentFriend.getFullname());
         actionBar.setSubtitle(opponentFriend.getOnlineStatus());
+        initColorsActionBar();
     }
 
     @Override
