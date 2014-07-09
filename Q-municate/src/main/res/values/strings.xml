@@ -157,7 +157,7 @@
     <string name="fdb_bug_type">Bug</string>
     <string name="fdb_improvement_type">Improvement</string>
     <string name="fdb_suggestion_type">Suggestion</string>
-    <string name="fdb_support_email">anton.dyachenko@quickblox.com</string>
+    <string name="fdb_support_email">q-municate@quickblox.com</string>
     <string name="fdb_choose_email_provider">Choose an email provider:</string>
     <string name="fdb_write_email">Write an Email</string>
 
