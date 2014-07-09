@@ -158,6 +158,13 @@ public abstract class BaseChatHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    protected void updateDialogByNotification(QBChatMessage chatMessage) {
+        long time;
+        time = DateUtils.getCurrentTime();
+        QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
+        saveDialogToCache(context, dialog);
+    }
+
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
 
     }

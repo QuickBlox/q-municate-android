@@ -144,10 +144,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         return file;
     }
 
-    private void saveDialogsToCache(List<QBDialog> dialogsList) {
-        DatabaseManager.saveDialogs(context, dialogsList);
-    }
-
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
         String attachUrl = null;
@@ -156,11 +152,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         if (QBDialogType.PRIVATE.equals(dialog.getType())) {
             saveDialogToCache(context, dialog);
         }
-    }
-
-    //TODO will be defined when update dialog signaling will be integrated
-    private void updateDialogByNotification(QBChatMessage chatMessage) {
-
     }
 
     @Override
