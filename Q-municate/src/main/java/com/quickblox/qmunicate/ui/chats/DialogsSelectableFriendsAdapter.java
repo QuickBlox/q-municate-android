@@ -2,6 +2,7 @@ package com.quickblox.qmunicate.ui.chats;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,6 @@ import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
@@ -26,13 +26,13 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     private NewDialogCounterFriendsListener counterChangedListener;
     private int counterFriends;
     private List<Friend> selectedFriends;
-    private HashMap<Integer, Boolean> sparseArrayCheckBoxes;
+    private SparseBooleanArray sparseArrayCheckBoxes;
 
     public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         selectedFriends = new ArrayList<Friend>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        sparseArrayCheckBoxes = new HashMap<Integer, Boolean>();
+        sparseArrayCheckBoxes = new SparseBooleanArray(cursor.getCount());
     }
 
     public void setCounterChangedListener(NewDialogCounterFriendsListener listener) {
@@ -77,6 +77,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
 
         viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
 
+            @Override
             public void onClick(View view) {
                 CheckBox checkBox = (CheckBox) view;
                 sparseArrayCheckBoxes.put(position, checkBox.isChecked());
@@ -92,7 +93,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
             }
         });
 
-        boolean checked = sparseArrayCheckBoxes.get(position) == null ? false : sparseArrayCheckBoxes.get(position);
+        boolean checked = sparseArrayCheckBoxes.get(position);
 
         viewHolder.selectFriendCheckBox.setChecked(checked);
 
