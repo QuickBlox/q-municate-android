@@ -197,7 +197,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
     public void leaveRoomChat(
             String roomJid) throws XMPPException, SmackException.NotConnectedException, QBResponseException {
         roomChatManager.getRoom(roomJid).leave();
-
         List<Integer> userIdsList = new ArrayList<Integer>();
         userIdsList.add(chatCreator.getId());
         removeUsersFromRoom(roomJid, userIdsList);
@@ -232,7 +231,9 @@ public class QBMultiChatHelper extends BaseChatHelper {
     private void updateDialog(String dialogId, String newName,
             QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = roomChatManager.updateDialog(dialogId, newName, requestBuilder);
-        notifyFriendsRoomUpdate(updatedDialog, updatedDialog.getOccupants());
+        ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
+        friendsList.remove(chatCreator.getId());
+        notifyFriendsRoomUpdate(updatedDialog, friendsList);
         DatabaseManager.saveDialog(context, updatedDialog);
     }
 
@@ -246,11 +247,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
             tryJoinRoomChat(dialog);
             saveDialogToCache(context, dialog);
         }
-    }
-
-    //TODO will be defined when update dialog signaling will be integrated
-    private void updateDialogByNotification(QBChatMessage chatMessage) {
-
     }
 
     private class RoomChatMessageListener implements QBMessageListener<QBRoomChat> {
