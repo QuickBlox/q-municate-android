@@ -8,15 +8,18 @@ import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.helper.StringifyArrayList;
+import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
@@ -111,10 +114,22 @@ public abstract class BaseChatHelper extends BaseHelper {
         return chatMessage;
     }
 
-    public void updateStatusMessage(QBDialog dialog, String messageId, boolean isRead) throws QBResponseException {
+    public void updateStatusMessage(QBDialog dialog, String messageId, long dateSent, boolean isRead) throws QBResponseException {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageId);
-        QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
+
+        // TODO Sergey Fedunets: temp decision
+        if(QBDialogType.GROUP.equals(dialog.getType())) {
+            Bundle bundle = new Bundle();
+            QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+            customObjectRequestBuilder.eq(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT, dateSent);
+            QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
+        }
+        // end of todo
+        else {
+            QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
+        }
+
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
 

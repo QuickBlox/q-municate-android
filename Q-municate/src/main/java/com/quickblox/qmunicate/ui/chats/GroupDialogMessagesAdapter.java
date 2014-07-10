@@ -112,7 +112,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageId, time, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
