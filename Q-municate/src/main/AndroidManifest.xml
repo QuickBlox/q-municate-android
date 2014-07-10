@@ -122,6 +122,12 @@
             android:label="@string/fpw_forgot_password_title"
             android:parentActivityName=".ui.login.LoginActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.agreements.UserAgreementActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/sup_user_agreement"
+            android:parentActivityName=".ui.signup.SignUpActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

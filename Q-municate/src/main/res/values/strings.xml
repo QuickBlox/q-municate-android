@@ -60,6 +60,7 @@
     <string name="sup_sign_up">Sign Up</string>
     <string name="sup_policy">By clicking Sign Up, you agree to Q-municate \n<b>User Agreement</b></string>
     <string name="sup_policy_link">http://q-municate.com/agreement/</string>
+    <string name="sup_user_agreement">User Agreement</string>
 
     // Friend List
     <string name="frl_global_search">Global Search</string>
