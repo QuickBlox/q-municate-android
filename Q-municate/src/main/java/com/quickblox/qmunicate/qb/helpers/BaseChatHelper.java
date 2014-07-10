@@ -159,8 +159,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void updateDialogByNotification(QBChatMessage chatMessage) {
-        long time;
-        time = DateUtils.getCurrentTime();
+        long time = DateUtils.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
         saveDialogToCache(context, dialog);
     }
