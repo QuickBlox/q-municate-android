@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -23,6 +22,7 @@ import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.agreements.UserAgreementActivity;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.ui.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
@@ -165,10 +165,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
 
             @Override
             public void onClick(View v) {
-                String policyLink = resources.getString(R.string.sup_policy_link);
-                Intent intentWeb = new Intent(Intent.ACTION_VIEW);
-                intentWeb.setData(Uri.parse(policyLink));
-                startActivity(intentWeb);
+                UserAgreementActivity.start(SignUpActivity.this);
             }
         });
     }

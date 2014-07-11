@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;
@@ -19,6 +20,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.utils.ChatUtils;
@@ -238,7 +240,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
         String roomJidId;
-        String attachUrl = null;
         time = DateUtils.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
         roomJidId = dialog.getRoomJid();
@@ -255,10 +256,21 @@ public class QBMultiChatHelper extends BaseChatHelper {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-            String messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID).toString();
             long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
+            boolean isRead = false;
+
+            // TODO Sergey Fedunets: temp decision
+            // String messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID).toString();
+            String messageId = time + Consts.EMPTY_STRING;
+            Integer userId = AppSession.getSession().getUser().getId();
+            if (chatMessage.getSenderId().equals(userId)) {
+                isRead = true;
+            }
+            // end of todo
+
             saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, false));
+                    chatMessage.getBody(), attachUrl, time, isRead));
+
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend, dialogId);
