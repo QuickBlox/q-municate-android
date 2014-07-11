@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quickblox.internal.core.exception.QBVideoException;
 import com.quickblox.module.chat.exceptions.QBChatException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
@@ -189,7 +190,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    public void initChat(QBSignalingChannel signalingChannel) {
+    public void initChat(QBSignalingChannel signalingChannel) throws QBVideoException {
         if (videoChat != null) {
             return;
         }
@@ -246,7 +247,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         QBUser sender = AppSession.getSession().getUser();
         if (sender != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
-            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type, Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
+            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type,
+                    Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
             callTimer = new Timer();
             callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
         }
@@ -281,10 +283,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 videoChat.disposeConnection();
             }
         }
-        if(signalingChannel != null){
+        if (signalingChannel != null) {
             signalingChannel.removeSignalingListener(signalingMessageHandler);
         }
-        if(videoChatHelper != null){
+        if (videoChatHelper != null) {
             videoChatHelper.closeSignalingChannel(currentConnectionConfig);
         }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
@@ -302,9 +304,18 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getId());
         }
         if (signalingChannel != null && isExistActivity()) {
-            initChat(signalingChannel);
+            tryInitChat();
         } else if (isExistActivity()) {
             ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
+        }
+    }
+
+    private void tryInitChat() {
+        try {
+            initChat(signalingChannel);
+        } catch (QBVideoException e) {
+            ErrorUtils.showError(getActivity(), getString(R.string.videochat_init_fail));
+            stopCall(true, STOP_TYPE.CLOSED);
         }
     }
 

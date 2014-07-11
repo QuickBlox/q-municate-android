@@ -200,6 +200,7 @@
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
+    <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
