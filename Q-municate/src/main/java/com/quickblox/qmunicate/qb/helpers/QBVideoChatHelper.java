@@ -63,10 +63,10 @@ public class QBVideoChatHelper extends BaseHelper {
     public void closeSignalingChannel(ConnectionConfig connectionConfig) {
         WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(
                 connectionConfig.getConnectionSession());
-        if (session != null) {
+        if (session != null  && session.isActive()) {
             session.cancel();
+            startClearSessionTask(connectionConfig);
         }
-        startClearSessionTask(connectionConfig);
     }
 
     private void startClearSessionTask(ConnectionConfig connectionConfig) {
