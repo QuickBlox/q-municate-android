@@ -17,7 +17,9 @@ public class WorkingSessionPull {
     }
 
     public WorkingSession getSession(String sessionId){
-        return activeSessions.get(sessionId);
+        synchronized (activeSessions) {
+            return activeSessions.get(sessionId);
+        }
     }
 
     public WorkingSession addSession(WorkingSession workingSession,String sessionId){

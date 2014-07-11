@@ -44,6 +44,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
     private ChatMessageHandler messageHandler;
     private QBVideoChatHelper videoChatHelper;
+    private ConnectionConfig currentConfig;
 
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
         if (!friend.isOnline()) {
@@ -86,6 +87,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onConnectionClosed() {
+        if (videoChatHelper != null && currentConfig != null){
+            videoChatHelper.closeSignalingChannel(currentConfig);
+        }
         unregisterListener();
         finish();
     }
@@ -138,11 +142,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void reject() {
         if (signalingChannel != null && opponent != null) {
             QBUser userOpponent = Utils.friendToUser(opponent);
-            ConnectionConfig connectionConfig = new ConnectionConfig(userOpponent, sessionId);
-            signalingChannel.sendReject(connectionConfig);
-            if (videoChatHelper != null){
-                videoChatHelper.closeSignalingChannel(connectionConfig);
-            }
+            currentConfig = new ConnectionConfig(userOpponent, sessionId);
+            signalingChannel.sendReject(currentConfig);
         }
         onConnectionClosed();
     }
@@ -219,6 +220,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         @Override
         public void onStop(ConnectionConfig connectionConfig) {
+            currentConfig = connectionConfig;
             onConnectionClosed();
         }
     }
