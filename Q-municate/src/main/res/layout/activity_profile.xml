@@ -1,226 +1,233 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="vertical">
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/change_avatar_linearlayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/button_general_selector"
-            android:clickable="true"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <com.quickblox.qmunicate.ui.views.RoundedImageView
-                android:id="@+id/avatar_imageview"
-                android:layout_width="@dimen/image_view_big_avatar_layout_width"
-                android:layout_height="@dimen/image_view_big_avatar_layout_height"
-                android:duplicateParentState="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/placeholder_user" />
-
-            <TextView
-                android:id="@+id/avatar_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="15dp"
-                android:layout_marginTop="5dp"
-                android:duplicateParentState="true"
-                android:gravity="center"
-                android:paddingRight="70dp"
-                android:text="@string/sup_choose_user_picture"
-                android:textColor="@color/dark_gray"
-                android:textSize="@dimen/text_size" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/email_linearlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:orientation="vertical"
-            android:paddingTop="15dp">
+            android:paddingRight="10dp">
+
+            <LinearLayout
+                android:id="@+id/change_avatar_linearlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/button_general_selector"
+                android:clickable="true"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <com.quickblox.qmunicate.ui.views.RoundedImageView
+                    android:id="@+id/avatar_imageview"
+                    android:layout_width="@dimen/image_view_big_avatar_layout_width"
+                    android:layout_height="@dimen/image_view_big_avatar_layout_height"
+                    android:duplicateParentState="true"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/placeholder_user" />
+
+                <TextView
+                    android:id="@+id/avatar_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="5dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center"
+                    android:paddingRight="70dp"
+                    android:text="@string/sup_choose_user_picture"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="@dimen/text_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/email_linearlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_general_selector"
+                android:orientation="vertical"
+                android:paddingTop="15dp">
+
+                <TextView
+                    android:id="@+id/label_email_textview"
+                    style="?android:attr/listSeparatorTextViewStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/prf_email"
+                    android:textColor="@color/dark_gray" />
+
+                <TextView
+                    android:id="@+id/email_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:paddingTop="10dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size" />
+
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/label_email_textview"
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/prf_email"
+                android:paddingTop="15dp"
+                android:text="@string/prf_full_name"
                 android:textColor="@color/dark_gray" />
 
-            <TextView
-                android:id="@+id/email_textview"
+            <RelativeLayout
+                android:id="@+id/change_fullname_relativelayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
-                android:background="@null"
-                android:clickable="false"
-                android:ellipsize="end"
-                android:paddingTop="10dp"
-                android:singleLine="true"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size" />
+                android:background="@drawable/button_general_selector"
+                android:clickable="true"
+                android:paddingTop="5dp">
+
+                <EditText
+                    android:id="@+id/fullname_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/change_fullname_textview"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:ellipsize="end"
+                    android:focusableInTouchMode="true"
+                    android:inputType="text"
+                    android:paddingRight="5dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size" />
+
+                <TextView
+                    android:id="@+id/change_fullname_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/button_general_selector"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:text="@string/prf_change"
+                    android:textColor="@color/link_text_color"
+                    android:textSize="@dimen/text_size" />
+
+            </RelativeLayout>
+
+            <TextView
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp"
+                android:text="@string/prf_phone"
+                android:textColor="@color/dark_gray" />
+
+            <RelativeLayout
+                android:id="@+id/change_phone_relativelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_general_selector"
+                android:clickable="true"
+                android:paddingTop="5dp">
+
+                <EditText
+                    android:id="@+id/phone_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/change_phone_textview"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:ellipsize="end"
+                    android:focusableInTouchMode="true"
+                    android:inputType="phone"
+                    android:maxLength="13"
+                    android:paddingRight="5dp"
+                    android:singleLine="true"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size" />
+
+                <TextView
+                    android:id="@+id/change_phone_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/button_general_selector"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:text="@string/prf_change"
+                    android:textColor="@color/link_text_color"
+                    android:textSize="@dimen/text_size" />
+
+            </RelativeLayout>
+
+            <TextView
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="15dp"
+                android:text="@string/prf_status_message"
+                android:textColor="@color/dark_gray" />
+
+            <RelativeLayout
+                android:id="@+id/change_status_relativelayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_general_selector"
+                android:clickable="true"
+                android:paddingTop="5dp">
+
+                <EditText
+                    android:id="@+id/status_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/change_status_textview"
+                    android:background="@null"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:ellipsize="end"
+                    android:focusableInTouchMode="true"
+                    android:inputType="textMultiLine"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size" />
+
+                <TextView
+                    android:id="@+id/change_status_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/button_general_selector"
+                    android:clickable="false"
+                    android:duplicateParentState="true"
+                    android:text="@string/prf_change"
+                    android:textColor="@color/link_text_color"
+                    android:textSize="@dimen/text_size" />
+
+            </RelativeLayout>
 
         </LinearLayout>
 
-        <TextView
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prf_full_name"
-            android:textColor="@color/dark_gray"
-            android:paddingTop="15dp" />
+    </ScrollView>
 
-        <RelativeLayout
-            android:id="@+id/change_fullname_relativelayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
-            android:clickable="true"
-            android:paddingTop="5dp">
-
-            <EditText
-                android:id="@+id/fullname_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/change_fullname_textview"
-                android:background="@null"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:ellipsize="end"
-                android:focusableInTouchMode="true"
-                android:inputType="text"
-                android:paddingRight="5dp"
-                android:singleLine="true"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size" />
-
-            <TextView
-                android:id="@+id/change_fullname_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/button_general_selector"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:text="@string/prf_change"
-                android:textColor="@color/link_text_color"
-                android:textSize="@dimen/text_size" />
-
-        </RelativeLayout>
-
-        <TextView
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prf_phone"
-            android:textColor="@color/dark_gray"
-            android:paddingTop="15dp" />
-
-        <RelativeLayout
-            android:id="@+id/change_phone_relativelayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
-            android:clickable="true"
-            android:paddingTop="5dp">
-
-            <EditText
-                android:id="@+id/phone_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/change_phone_textview"
-                android:background="@null"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:ellipsize="end"
-                android:focusableInTouchMode="true"
-                android:inputType="phone"
-                android:maxLength="13"
-                android:paddingRight="5dp"
-                android:singleLine="true"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size" />
-
-            <TextView
-                android:id="@+id/change_phone_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/button_general_selector"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:text="@string/prf_change"
-                android:textColor="@color/link_text_color"
-                android:textSize="@dimen/text_size" />
-
-        </RelativeLayout>
-
-        <TextView
-            style="?android:attr/listSeparatorTextViewStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prf_status_message"
-            android:textColor="@color/dark_gray"
-            android:paddingTop="15dp" />
-
-        <RelativeLayout
-            android:id="@+id/change_status_relativelayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
-            android:clickable="true"
-            android:paddingTop="5dp">
-
-            <EditText
-                android:id="@+id/status_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/change_status_textview"
-                android:background="@null"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:ellipsize="end"
-                android:focusableInTouchMode="true"
-                android:inputType="textMultiLine"
-                android:paddingRight="5dp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size" />
-
-            <TextView
-                android:id="@+id/change_status_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/button_general_selector"
-                android:clickable="false"
-                android:duplicateParentState="true"
-                android:text="@string/prf_change"
-                android:textColor="@color/link_text_color"
-                android:textSize="@dimen/text_size" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-</ScrollView>
+</LinearLayout>

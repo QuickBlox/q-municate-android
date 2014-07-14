@@ -100,7 +100,7 @@
         <activity
             android:name=".ui.profile.ProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="adjustPan"
+
             android:label="@string/prf_title"
             android:parentActivityName=".ui.main.MainActivity"
             android:screenOrientation="portrait" />
