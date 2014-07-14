@@ -11,6 +11,14 @@ This guide was created by the QuickBlox Android team in order to explain how you
 
 This is a step by step guide designed for developers of all levels including beginners as we move from simple to more complex implementation. Depending on your skills and your project requirements you may choose which parts of this guide are to follow. Enjoy and please get in touch if you need assistance.
 
+## Software Environment
+* The Android application runs on the phones with screen sizes varying between 3 and 5 inches, with Android 4 and above till Android 4.4 onboard.
+* The Android App is developed as native Android application.
+* Web component is based on QuickBlox platform.
+* The App and Web panel has English language interface.
+* The App works only in Portrait screen mode
+
+
 Q-municate is a fully fledged chat application using the Quickblox API.
 
 ## Q-municate application uses following QuickBlox modules:
@@ -39,12 +47,6 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 
 Please note all these features are available in open source code, so you can customize your app depending on your needs.
 
-## Software Environment
-* The Android application runs on the phones with screen sizes varying between 3 and 5 inches, with Android 4 and above till Android 4.4 onboard.
-* The Android App is developed as native Android application.
-* Web component is based on QuickBlox platform.
-* The App and Web panel has English language interface.
-* The App works only in Portrait screen mode
 
 ## Step by step guide
 ### Step 1. PreLogin page
