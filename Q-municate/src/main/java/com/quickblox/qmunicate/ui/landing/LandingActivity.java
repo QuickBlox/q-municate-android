@@ -1,6 +1,7 @@
 package com.quickblox.qmunicate.ui.landing;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +11,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
@@ -20,12 +22,19 @@ import com.quickblox.qmunicate.ui.login.LoginActivity;
 import com.quickblox.qmunicate.ui.main.MainActivity;
 import com.quickblox.qmunicate.ui.signup.SignUpActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
+import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;
 
 public class LandingActivity extends BaseActivity {
 
     private static final String TAG = LandingActivity.class.getSimpleName();
+
     private FacebookHelper facebookHelper;
+    private UserAgreementDialog userAgreementDialog;
+    private boolean userAgreementShown;
+
+    private DialogInterface.OnClickListener positiveUserAgreementOnClickListener;
+    private DialogInterface.OnClickListener negativeUserAgreementOnClickListener;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LandingActivity.class);
@@ -33,18 +42,59 @@ public class LandingActivity extends BaseActivity {
     }
 
     public void signUpOnClickListener(View view) {
+        if(!userAgreementShown) {
+            positiveUserAgreementOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    saveUserAgreementShowing();
+                    startSignUpActivity();
+                }
+            };
+            showUserAgreement(positiveUserAgreementOnClickListener, negativeUserAgreementOnClickListener);
+        } else {
+            startSignUpActivity();
+        }
+    }
+
+    private void startSignUpActivity() {
         SignUpActivity.start(LandingActivity.this);
         finish();
     }
 
     public void connectFacebookOnClickListener(View view) {
-        facebookHelper.loginWithFacebook();
+        if(!userAgreementShown) {
+            positiveUserAgreementOnClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    saveUserAgreementShowing();
+                    facebookHelper.loginWithFacebook();
+                }
+            };
+            showUserAgreement(positiveUserAgreementOnClickListener, negativeUserAgreementOnClickListener);
+        } else {
+            facebookHelper.loginWithFacebook();
+        }
     }
 
+    public void saveUserAgreementShowing() {
+        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
+        prefsHelper.savePref(PrefsHelper.PREF_USER_AGREEMENT, true);
+    }
+
+    public boolean isUserAgreementShown() {
+        PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
+        return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
+    }
 
     public void loginOnClickListener(View view) {
         LoginActivity.start(LandingActivity.this);
         finish();
+    }
+
+    private void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,
+                                   DialogInterface.OnClickListener negativeClickListener) {
+        userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener, negativeClickListener);
+        userAgreementDialog.show(getFragmentManager(), null);
     }
 
     @Override
@@ -55,6 +105,7 @@ public class LandingActivity extends BaseActivity {
 
         addActions();
 
+        userAgreementShown = isUserAgreementShown();
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         initVersionName();

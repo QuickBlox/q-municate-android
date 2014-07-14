@@ -125,7 +125,7 @@
         <activity
             android:name=".ui.agreements.UserAgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/sup_user_agreement"
+            android:label="@string/uag_user_agreement_title"
             android:parentActivityName=".ui.signup.SignUpActivity"
             android:screenOrientation="portrait" />
 

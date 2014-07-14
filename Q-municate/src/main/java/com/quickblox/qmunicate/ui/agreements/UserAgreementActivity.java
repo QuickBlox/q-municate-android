@@ -26,7 +26,7 @@ public class UserAgreementActivity extends BaseActivity {
     private void initUserAgreementWebView() {
         userAgreementWebView = (WebView) findViewById(R.id.user_agreement_webview);
         userAgreementWebView.getSettings().setJavaScriptEnabled(true);
-        String policyLink = getResources().getString(R.string.sup_policy_link);
+        String policyLink = getResources().getString(R.string.uag_policy_link);
         userAgreementWebView.loadUrl(policyLink);
     }
 }

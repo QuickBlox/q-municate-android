@@ -22,6 +22,7 @@ public class PrefsHelper {
     public static final String PREF_PUSH_MESSAGE = "message";
     public static final String PREF_REG_USER_ID = "registered_push_user";
     public static final String PREF_GCM_SENDER_ID = "265299067289";
+    public static final String PREF_USER_AGREEMENT = "user_agreement";
 
     public static final String PREF_REG_ID = "registration_id";
     public static final String PREF_APP_VERSION = "appVersion";

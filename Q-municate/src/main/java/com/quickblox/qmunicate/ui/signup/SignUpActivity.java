@@ -46,7 +46,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
     private RoundedImageView avatarImageView;
     private EditText fullnameEditText;
     private EditText emailEditText;
-    private TextView policyTextView;
+    private TextView userAgreementTextView;
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
     private Bitmap avatarBitmapCurrent;
@@ -156,12 +156,11 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                         .getString(R.string.dlg_not_email_field_entered), resources.getString(
                         R.string.dlg_not_password_field_entered)}
         );
-        policyTextView = _findViewById(R.id.policy_textview);
+        userAgreementTextView = _findViewById(R.id.user_agreement_textview);
     }
 
     private void initListeners() {
-
-        policyTextView.setOnClickListener(new View.OnClickListener() {
+        userAgreementTextView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
