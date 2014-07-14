@@ -62,11 +62,27 @@ public class ChatUtils {
         dialog.setRoomJid(roomJid);
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
-        dialog.setType(parseByCode(Integer.parseInt(dialogTypeCode)));
+        if (dialogTypeCode != null) {
+            QBDialogType dialogType = parseDialogType(dialogTypeCode);
+            if (dialogType != null) {
+                dialog.setType(dialogType);
+            }
+        }
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageDateSent(dateSent);
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
+    }
+
+    public static QBDialogType parseDialogType(String dialogTypeCode) {
+        QBDialogType dialogType = null;
+        try {
+            int dialogCode = Integer.parseInt(dialogTypeCode);
+            dialogType = QBDialogType.parseByCode(dialogCode);
+        } catch (NumberFormatException e) {
+            ErrorUtils.logError(e);
+        }
+        return dialogType;
     }
 
     public static ArrayList<Integer> getOccupantsIdsListFromString(String occupantIds) {
@@ -94,7 +110,7 @@ public class ChatUtils {
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
-        String dialogTypeCode = String.valueOf(dialog.getType().ordinal());
+        String dialogTypeCode = String.valueOf(dialog.getType().getCode());
 
         QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();

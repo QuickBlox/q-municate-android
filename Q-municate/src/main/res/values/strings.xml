@@ -58,8 +58,11 @@
     <string name="sup_email_hint">Email</string>
     <string name="sup_choose_user_picture">Choose user picture</string>
     <string name="sup_sign_up">Sign Up</string>
-    <string name="sup_policy">By clicking Sign Up, you agree to Q-municate \n<b>User Agreement</b></string>
-    <string name="sup_policy_link">http://q-municate.com/agreement/</string>
+
+    // User Agreement
+    <string name="uag_user_agreement_title">User Agreement</string>
+    <string name="uag_user_agreement">By clicking Sign Up, you agree to \nQ-municate <b><u>User Agreement</u></b></string>
+    <string name="uag_policy_link">http://q-municate.com/agreement/</string>
 
     // Friend List
     <string name="frl_global_search">Global Search</string>
@@ -199,6 +202,7 @@
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
+    <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>

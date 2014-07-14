@@ -220,7 +220,6 @@ public class DatabaseManager {
         boolean online = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ONLINE)) > 0;
         String type = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.TYPE));
 
-        // TODO IS set Cursor as argument to constructor
         Friend friend = new Friend(id, fullname, email, phone, fileId, avatarUid, Friend.Type.valueOf(type));
         friend.setStatus(status);
         friend.setOnline(online);
@@ -271,6 +270,7 @@ public class DatabaseManager {
         for (QBHistoryMessage historyMessage : messagesList) {
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
+            long time = historyMessage.getDateSent();
             String attachURL;
 
             if (TextUtils.isEmpty(message)) {
@@ -280,7 +280,7 @@ public class DatabaseManager {
             }
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(), dialogId, senderId, message,
-                    attachURL, historyMessage.getDateSent(), true);
+                    attachURL, time, true);
 
             saveChatMessage(context, dialogMessageCache);
         }

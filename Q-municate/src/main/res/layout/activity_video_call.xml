@@ -38,6 +38,7 @@
                 android:background="@drawable/button_general_selector"
                 android:padding="5dp"
                 android:enabled="false"
+                android:visibility="invisible"
                 android:src="@drawable/ic_call_switch" />
 
             <ImageButton
