@@ -29,6 +29,9 @@ Q-municate is a fully fledged chat application using the Quickblox API.
 * [Custom objects](http://quickblox.com/modules/custom/)
 * [Messages](http://quickblox.com/modules/messages)
 
+
+Please note, in order to start using Chat 2.0, you should know the [following] (http://quickblox.com/developers/Chat#Pre-Requirements)
+
 ## It includes features such as:
 
 * Two sign-up methods – Facebook and with email/password
