@@ -10,6 +10,7 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.utils.Consts;
 
 import org.jivesoftware.smack.ConnectionListener;
@@ -77,9 +78,15 @@ public class QBChatRestHelper extends BaseHelper {
         if (lastDateLoad != Consts.ZERO_LONG_VALUE) {
             customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
+        } else {
+            deleteMessagesByDialogId(dialog.getDialogId());
         }
         List<QBHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
         return dialogMessagesList;
+    }
+
+    private void deleteMessagesByDialogId(String dialogId) {
+        DatabaseManager.deleteMessagesByDialogId(context, dialogId);
     }
 
     private class ChatConnectionListener implements ConnectionListener {

@@ -171,6 +171,20 @@ public class DatabaseManager {
         return dialogs;
     }
 
+    public static DialogMessageCache getMessageFromCursor(Cursor cursor) {
+        String id = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
+        String dialogId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.DIALOG_ID));
+        Integer senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
+        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+
+        DialogMessageCache dialogMessageCache = new DialogMessageCache(id, dialogId, senderId, body, attachUrl, time, isRead);
+
+        return dialogMessageCache;
+    }
+
     public static QBDialog getDialogFromCursor(Cursor cursor) {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
         String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
@@ -227,8 +241,9 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static long getLastReadMessageDateSent(Context context, QBDialog dialog) {
-        long lastDateSent = Consts.ZERO_INT_VALUE;
+    public static DialogMessageCache getLastReadMessage(Context context, QBDialog dialog) {
+        DialogMessageCache dialogMessageCache = null;
+
         Cursor cursor = context.getContentResolver().query(
                 DialogMessageTable.CONTENT_URI,
                 null,
@@ -239,10 +254,10 @@ public class DatabaseManager {
 
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
             cursor.moveToLast();
-            lastDateSent = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+            dialogMessageCache = getMessageFromCursor(cursor);
         }
 
-        return lastDateSent;
+        return dialogMessageCache;
     }
 
     public static int getCountUnreadDialogs(Context context) {

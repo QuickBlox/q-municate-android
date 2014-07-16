@@ -25,6 +25,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
+import com.quickblox.qmunicate.model.DialogMessageCache;
 import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
@@ -216,9 +217,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onFileLoaded(QBFile file);
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
-        if (dialog != null) {
-            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
-        }
+        QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
     }
 
     @Override
@@ -304,10 +303,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startLoadDialogMessages() {
-        if (messagesAdapter.isEmpty()) {
+        if (dialog == null) {
+            return;
+        }
+        DialogMessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
+        if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
         } else {
-            long lastMessageDateSent = DatabaseManager.getLastReadMessageDateSent(this, dialog);
+            long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
         }
     }
