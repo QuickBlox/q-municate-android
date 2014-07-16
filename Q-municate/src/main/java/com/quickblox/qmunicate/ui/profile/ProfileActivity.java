@@ -292,9 +292,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE
-                && phoneCurrent.length() > Consts.ZERO_INT_VALUE
-                && statusCurrent.length() > Consts.ZERO_INT_VALUE;
+        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
