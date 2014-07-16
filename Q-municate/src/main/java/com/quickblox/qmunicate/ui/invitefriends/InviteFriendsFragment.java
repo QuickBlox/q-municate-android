@@ -162,7 +162,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void setCheckedCheckBox(int countSelected, CheckBox checkBox) {
-        if (countSelected == 0) {
+        if (countSelected == Consts.ZERO_INT_VALUE) {
             checkBox.setChecked(false);
         }
     }
@@ -239,26 +239,21 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void performActionNext() {
-        baseActivity.showProgress();
-        if (friendsAdapter.isEmpty()) {
+        selectedFacebookFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE);
+        selectedContactsFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_CONTACTS_TYPE);
+
+        if (selectedFacebookFriendsArray.length == Consts.ZERO_INT_VALUE && selectedContactsFriendsArray.length == Consts.ZERO_INT_VALUE) {
             DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
-            baseActivity.hideProgress();
-        } else {
-            selectedFacebookFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_FACEBOOK_TYPE);
-            selectedContactsFriendsArray = getSelectedFriendsForInvite(InviteFriend.VIA_CONTACTS_TYPE);
-
-            if (selectedFacebookFriendsArray.length == 0 && selectedContactsFriendsArray.length == 0) {
-                DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends_selected));
-                baseActivity.hideProgress();
-                return;
-            }
-
-            if (selectedFacebookFriendsArray.length > 0) {
-                sendInviteToFacebook();
-            }
-
-            new ActionSendInviteToContactsTask().execute();
+            return;
         }
+
+        baseActivity.showProgress();
+
+        if (selectedFacebookFriendsArray.length > Consts.ZERO_INT_VALUE) {
+            sendInviteToFacebook();
+        }
+
+        new ActionSendInviteToContactsTask().execute();
         clearCheckedFriends();
     }
 
@@ -394,7 +389,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     private class ActionSendInviteToContactsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            if (selectedContactsFriendsArray.length > 0) {
+            if (selectedContactsFriendsArray.length > Consts.ZERO_INT_VALUE) {
                 sendInviteToContacts();
                 baseActivity.hideProgress();
             }

@@ -35,9 +35,11 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
         if (extras != null) {
             destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
         }
-        chatRestHelper.logout();
-        if (destroy) {
-            chatRestHelper.destroy();
+        if(chatRestHelper != null) {
+            chatRestHelper.logout();
+            if (destroy) {
+                chatRestHelper.destroy();
+            }
         }
         return extras;
     }

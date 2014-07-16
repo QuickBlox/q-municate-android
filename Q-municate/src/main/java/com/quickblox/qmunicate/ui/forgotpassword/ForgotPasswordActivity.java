@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.KeyboardUtils;
 import com.quickblox.qmunicate.utils.ValidationUtils;
 
 public class ForgotPasswordActivity extends BaseActivity {
@@ -40,6 +41,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     }
 
     public void forgotPasswordOnClickListener(View view) {
+        KeyboardUtils.hideKeyboard(this);
         String emailText = emailEditText.getText().toString();
         if (validationUtils.isValidForgotPasswordData(emailText)) {
             showProgress();
