@@ -386,7 +386,6 @@ Chats Page shows scrollable chats list (private and group).
 * Plus icon opens New chat page 
 * Chat  information:
 - Full name / group name
-- Status- short text message with text/numeric fields 128 chars max, not mandatory
 - Icon , not mandatory (or grey place holder image)
 - Blue badge counter shows number of participants in group chat
 - A red badge counters will be shown on the Chats Page beside chat’s name, if there are some unread messages. Unread message will be marked as read, when user enters the chat  with unread message.
