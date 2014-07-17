@@ -170,6 +170,7 @@ public class LoginActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            AppSession.getSession().updateUser(user);
             if (rememberMeCheckBox.isChecked()) {
                 AppSession.saveRememberMe(true);
             }

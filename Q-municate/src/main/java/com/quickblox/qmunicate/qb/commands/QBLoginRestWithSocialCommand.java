@@ -44,16 +44,20 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
         if(TextUtils.isEmpty(user.getWebsite())) {
-            QBUser newUser = new QBUser();
-            newUser.setId(user.getId());
-            newUser.setPassword(user.getPassword());
-            newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-            extras.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
+            extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
         } else {
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
         }
         return extras;
+    }
+
+    private QBUser getUserWithAvatar(QBUser user) {
+        QBUser newUser = new QBUser();
+        newUser.setId(user.getId());
+        newUser.setPassword(user.getPassword());
+        newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+        return newUser;
     }
 }
