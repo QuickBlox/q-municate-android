@@ -308,7 +308,11 @@ public class DatabaseManager {
         values.put(DialogMessageTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
         values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
         String body = dialogMessageCache.getMessage();
-        values.put(DialogMessageTable.Cols.BODY, Html.fromHtml(body).toString());
+        if (TextUtils.isEmpty(body)) {
+            values.put(DialogMessageTable.Cols.BODY, body);
+        } else {
+            values.put(DialogMessageTable.Cols.BODY, Html.fromHtml(body).toString());
+        }
         values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
         values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
         values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
@@ -373,7 +377,11 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
-        values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        if (TextUtils.isEmpty(bodyLastMessage)) {
+            values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
+        } else {
+            values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        }
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
@@ -394,7 +402,11 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,
                 dialogId));
         String bodyLastMessage = getLastMessage(context, lastMessage, dateSent);
-        values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        if (TextUtils.isEmpty(bodyLastMessage)) {
+            values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
+        } else {
+            values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        }
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, lastSenderId);
         values.put(DialogTable.Cols.LAST_DATE_SENT, dateSent);
         String condition = DialogTable.Cols.DIALOG_ID + "='" + dialogId + "'";
