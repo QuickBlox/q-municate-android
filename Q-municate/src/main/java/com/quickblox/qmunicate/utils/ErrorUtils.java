@@ -17,6 +17,10 @@ public class ErrorUtils {
         Toast.makeText(context, error, Toast.LENGTH_LONG).show();
     }
 
+    public static Toast getErrorToast(Context context, String error) {
+        return Toast.makeText(context, error, Toast.LENGTH_LONG);
+    }
+
     public static void logError(String tag, Exception e) {
         String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : Consts.EMPTY_STRING;
         Log.e(tag, errorMsg, e);

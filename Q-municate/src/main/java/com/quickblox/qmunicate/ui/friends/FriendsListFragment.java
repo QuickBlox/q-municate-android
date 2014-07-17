@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -55,6 +56,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private MenuItem searchItem;
     private SearchView searchView;
     private static boolean isFriendsListLoaded = false;
+    private Toast errorToast;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -275,6 +277,14 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         baseActivity.hideProgress();
     }
 
+    private void showErrorToast(String error) {
+        if (errorToast != null) {
+            errorToast.cancel();
+        }
+        errorToast = ErrorUtils.getErrorToast(baseActivity, error);
+        errorToast.show();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -338,7 +348,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         @Override
         public void execute(Bundle bundle) {
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
-            ErrorUtils.showError(baseActivity, notFoundError);
+            showErrorToast(notFoundError);
         }
     }
 

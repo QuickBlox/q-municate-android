@@ -107,7 +107,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void initListeners() {
-        avatarTextView.setOnClickListener(this);
         changeAvatarLinearLayout.setOnClickListener(this);
         avatarImageView.setOnClickListener(this);
         changeFullNameRelativeLayout.setOnClickListener(this);
@@ -152,6 +151,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.avatar_imageview:
+            case R.id.change_avatar_linearlayout:
                 changeAvatarOnClick();
                 break;
             case R.id.change_fullname_relativelayout:

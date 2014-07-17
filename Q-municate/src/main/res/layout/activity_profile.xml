@@ -28,6 +28,8 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/button_general_selector"
                 android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
@@ -46,7 +48,6 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="15dp"
                     android:layout_marginTop="5dp"
-                    android:duplicateParentState="true"
                     android:gravity="center"
                     android:paddingRight="70dp"
                     android:text="@string/sup_choose_user_picture"
