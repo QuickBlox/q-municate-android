@@ -26,7 +26,7 @@ public class ChatUtils {
     private static final String PROPERTY_ROOM_NAME = "name";
     private static final String PROPERTY_DIALOG_TYPE_CODE = "type";
     private static final String PROPERTY_ROOM_JID = "room_jid";
-    public static final String PROPERTY_DIALOG_ID = "_id";
+    public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
 
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
