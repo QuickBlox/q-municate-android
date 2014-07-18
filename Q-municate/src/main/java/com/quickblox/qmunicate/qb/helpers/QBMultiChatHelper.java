@@ -204,13 +204,15 @@ public class QBMultiChatHelper extends BaseChatHelper {
         DatabaseManager.deleteDialogByRoomJid(context, roomJid);
     }
 
-    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws QBResponseException {
+    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws QBResponseException, XMPPException, SmackException {
         QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
         requestBuilder.push(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
                 userIdsList.toArray());
         updateDialog(dialog.getDialogId(), dialog.getName(), requestBuilder);
+
+        inviteFriendsToRoom(dialog, userIdsList);
     }
 
     public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {

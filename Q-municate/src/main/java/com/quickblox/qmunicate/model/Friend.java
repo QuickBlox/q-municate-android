@@ -142,6 +142,6 @@ public class Friend implements Serializable {
     }
 
     public enum Type {
-        to, from, both
+        none, to, from, both, remove;
     }
 }
