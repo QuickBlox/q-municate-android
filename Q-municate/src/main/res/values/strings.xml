@@ -144,7 +144,7 @@
     <string name="inf_choose_email_provider">Choose an email provider:</string>
     <string name="inf_subject_of_invitation">Q-municate</string>
     <string name="inf_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
-    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
     <string name="inf_fb_wall_param_name">Q-municate</string>
     <string name="inf_fb_wall_param_description">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
     <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
