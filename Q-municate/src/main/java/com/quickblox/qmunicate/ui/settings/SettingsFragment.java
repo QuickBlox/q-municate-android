@@ -19,7 +19,7 @@ import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
-import com.quickblox.qmunicate.ui.login.LoginActivity;
+import com.quickblox.qmunicate.ui.authorization.login.LoginActivity;
 import com.quickblox.qmunicate.ui.profile.ProfileActivity;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 import com.quickblox.qmunicate.utils.Utils;

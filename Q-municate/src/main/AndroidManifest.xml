@@ -41,17 +41,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.landing.LandingActivity"
+            android:name=".ui.authorization.landing.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".ui.authorization.login.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/lgn_login"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.signup.SignUpActivity"
+            android:name=".ui.authorization.signup.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/sup_sign_up"
             android:screenOrientation="portrait" />
@@ -119,13 +119,13 @@
             android:name=".ui.forgotpassword.ForgotPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/fpw_forgot_password_title"
-            android:parentActivityName=".ui.login.LoginActivity"
+            android:parentActivityName=".ui.authorization.login.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.agreements.UserAgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/uag_user_agreement_title"
-            android:parentActivityName=".ui.signup.SignUpActivity"
+            android:parentActivityName=".ui.authorization.signup.SignUpActivity"
             android:screenOrientation="portrait" />
 
         <meta-data

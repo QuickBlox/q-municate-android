@@ -33,7 +33,7 @@ import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
-import com.quickblox.qmunicate.ui.landing.LandingActivity;
+import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 

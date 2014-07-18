@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.signup;
+package com.quickblox.qmunicate.ui.authorization.signup;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,14 +18,12 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
-import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBSignUpCommand;
 import com.quickblox.qmunicate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.agreements.UserAgreementActivity;
-import com.quickblox.qmunicate.ui.base.BaseActivity;
-import com.quickblox.qmunicate.ui.landing.LandingActivity;
-import com.quickblox.qmunicate.ui.main.MainActivity;
+import com.quickblox.qmunicate.ui.authorization.base.BaseAuthActivity;
+import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
@@ -38,20 +36,15 @@ import com.quickblox.qmunicate.utils.ValidationUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class SignUpActivity extends BaseActivity implements ReceiveFileListener {
+public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListener {
 
-    private static final String TAG = SignUpActivity.class.getSimpleName();
-
-    private EditText passwordEditText;
     private RoundedImageView avatarImageView;
     private EditText fullnameEditText;
-    private EditText emailEditText;
     private TextView userAgreementTextView;
     private ImageHelper imageHelper;
     private boolean isNeedUpdateAvatar;
     private Bitmap avatarBitmapCurrent;
-    private QBUser qbUser;
-    private ValidationUtils validationUtils;
+    private QBUser user;
     private Resources resources;
 
     public static void start(Context context) {
@@ -69,8 +62,15 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         initListeners();
 
         useDoubleBackPressed = true;
-        qbUser = new QBUser();
+
+        user = new QBUser();
         imageHelper = new ImageHelper(this);
+        validationUtils = new ValidationUtils(SignUpActivity.this,
+                new EditText[]{fullnameEditText, emailEditText, passwordEditText},
+                new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources
+                        .getString(R.string.dlg_not_email_field_entered), resources.getString(
+                        R.string.dlg_not_password_field_entered)}
+        );
 
         addActions();
     }
@@ -92,7 +92,8 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         finish();
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
             Uri originalUri = data.getData();
@@ -118,9 +119,9 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         String passwordText = passwordEditText.getText().toString();
 
         if (validationUtils.isValidUserDate(fullNameText, emailText, passwordText)) {
-            qbUser.setFullName(fullNameText);
-            qbUser.setEmail(emailText);
-            qbUser.setPassword(passwordText);
+            user.setFullName(fullNameText);
+            user.setEmail(emailText);
+            user.setPassword(passwordText);
 
             showProgress();
 
@@ -128,18 +129,17 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
                 new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
             } else {
                 App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-                QBSignUpCommand.start(SignUpActivity.this, qbUser, null);
+                QBSignUpCommand.start(SignUpActivity.this, user, null);
             }
         }
     }
 
     public void onCachedImageFileReceived(File imageFile) {
-        QBSignUpCommand.start(SignUpActivity.this, qbUser, imageFile);
+        QBSignUpCommand.start(SignUpActivity.this, user, imageFile);
     }
 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
-
     }
 
     private void initUI() {
@@ -150,12 +150,6 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         passwordEditText = _findViewById(R.id.password_edittext);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
-        validationUtils = new ValidationUtils(SignUpActivity.this,
-                new EditText[]{fullnameEditText, emailEditText, passwordEditText},
-                new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources
-                        .getString(R.string.dlg_not_email_field_entered), resources.getString(
-                        R.string.dlg_not_password_field_entered)}
-        );
         userAgreementTextView = _findViewById(R.id.user_agreement_textview);
     }
 
@@ -181,10 +175,7 @@ public class SignUpActivity extends BaseActivity implements ReceiveFileListener 
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            AppSession.getSession().updateUser(user);
-            AppSession.saveRememberMe(true);
-            MainActivity.start(SignUpActivity.this);
-            finish();
+            startMainActivity(SignUpActivity.this, user, true);
         }
     }
 
