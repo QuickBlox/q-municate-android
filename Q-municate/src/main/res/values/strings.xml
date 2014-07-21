@@ -154,7 +154,7 @@
     // Feedback
     <string name="fdb_feedback_title">Feedback Description</string>
     <string name="fdb_feedback_label">
-        In your email please provide the steps of bug/error reproduction.Let us know how often it occurs and if it gives any error code.
+        In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
         This information will help us to find the source of the issue. Kindly give us as many details as possible. Thank you.
     </string>
     <string name="fdb_bug_type">Bug</string>

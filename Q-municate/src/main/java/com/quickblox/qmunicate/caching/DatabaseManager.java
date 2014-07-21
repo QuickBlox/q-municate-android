@@ -293,9 +293,11 @@ public class DatabaseManager {
     public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
             String dialogId) {
         for (QBHistoryMessage historyMessage : messagesList) {
+            String messageId = historyMessage.getMessageId();
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
             long time = historyMessage.getDateSent();
+
             String attachURL;
 
             if (TextUtils.isEmpty(message)) {
@@ -304,7 +306,7 @@ public class DatabaseManager {
                 attachURL = Consts.EMPTY_STRING;
             }
 
-            DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(), dialogId, senderId, message,
+            DialogMessageCache dialogMessageCache = new DialogMessageCache(messageId, dialogId, senderId, message,
                     attachURL, time, true);
 
             saveChatMessage(context, dialogMessageCache);

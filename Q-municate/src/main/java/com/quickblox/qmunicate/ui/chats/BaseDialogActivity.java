@@ -243,6 +243,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void initListeners() {
         messageEditText.addTextChangedListener(new SimpleTextWatcher() {
+
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 super.onTextChanged(charSequence, start, before, count);
