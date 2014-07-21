@@ -3,7 +3,10 @@ package com.quickblox.qmunicate.ui.friends;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +20,7 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
+import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
@@ -32,6 +36,7 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
+import java.util.Currency;
 import java.util.List;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
@@ -45,10 +50,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private View phoneView;
 
     private Friend friend;
+    private Cursor friendCursor;
 
-    public static void start(Context context, Friend friend) {
+    public static void start(Context context, int friendId) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ID, friendId);
         context.startActivity(intent);
     }
 
@@ -57,8 +63,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
         canPerformLogout.set(true);
-        friend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_FRIEND);
+        int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
+        friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
+        friend = DatabaseManager.getFriendById(this, friendId);
         initUI();
+        initListeners();
         initUIWithFriendsData();
         initBroadcastActionList();
     }
@@ -74,6 +83,21 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneView = _findViewById(R.id.phone_relativelayout);
     }
 
+    private void initListeners() {
+        friendCursor.registerContentObserver(new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                setOnlineStatus();
+            }
+
+            @Override
+            public boolean deliverSelfNotifications() {
+                return true;
+            }
+        });
+    }
+
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
@@ -87,12 +111,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         loadAvatar();
         setName();
         setOnlineStatus();
-        setStatus();
         setPhone();
-    }
-
-    private void setStatus() {
-        statusTextView.setText(friend.getStatus());
     }
 
     private void setName() {
@@ -109,11 +128,13 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void setOnlineStatus() {
+        Friend friend = DatabaseManager.getFriendById(this, this.friend.getId());
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
         } else {
             onlineImageView.setVisibility(View.GONE);
         }
+        statusTextView.setText(friend.getStatus());
         onlineStatusTextView.setText(friend.getOnlineStatus());
     }
 

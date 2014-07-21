@@ -224,6 +224,15 @@ public class DatabaseManager {
         return friend;
     }
 
+    public static Cursor getFriendCursorById(Context context, int friendId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.ID + " = " + friendId, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
     public static Friend getFriendFromCursor(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.ID));
         String fullname = cursor.getString(cursor.getColumnIndex(FriendTable.Cols.FULLNAME));

@@ -163,7 +163,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
         if (selectedItem.getCount() != Consts.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
-            FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem));
+            FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem).getId());
         }
     }
 
