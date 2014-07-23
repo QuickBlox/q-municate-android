@@ -59,7 +59,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void sendGroupMessage(String roomJidId, String message) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessage(message);
+        QBChatMessage chatMessage = getQBChatMessage(message, null);
         sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
@@ -92,7 +92,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessageWithImage(file);
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(
+                R.string.dlg_attached_last_message), file);
         sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 

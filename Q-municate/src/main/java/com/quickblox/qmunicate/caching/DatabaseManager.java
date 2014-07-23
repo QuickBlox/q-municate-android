@@ -300,11 +300,7 @@ public class DatabaseManager {
 
             String attachURL;
 
-            if (TextUtils.isEmpty(message)) {
-                attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
-            } else {
-                attachURL = Consts.EMPTY_STRING;
-            }
+            attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
             DialogMessageCache dialogMessageCache = new DialogMessageCache(messageId, dialogId, senderId, message,
                     attachURL, time, true);
