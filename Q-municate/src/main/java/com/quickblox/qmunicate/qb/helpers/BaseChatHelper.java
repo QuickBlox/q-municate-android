@@ -94,13 +94,13 @@ public abstract class BaseChatHelper extends BaseHelper {
         DatabaseManager.saveDialog(context, dialog);
     }
 
-    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile) {
+    protected QBChatMessage getQBChatMessage(String body, QBFile file) {
         long time = DateUtils.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-        if (qbFile != null) {
+        if (file != null) {
             QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
-            attachment.setUrl(qbFile.getPublicUrl());
+            attachment.setUrl(file.getPublicUrl());
             chatMessage.addAttachment(attachment);
         }
         chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
