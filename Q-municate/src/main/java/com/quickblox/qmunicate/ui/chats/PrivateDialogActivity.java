@@ -93,7 +93,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        //TODO call in command if it shuold be async
+        //TODO call in command if it should be async
         //QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, opponentFriend.getId(), file);
         scrollListView();
     }
@@ -144,7 +144,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        //TODO call in command if it shuold be async
+        //TODO call in command if it should be async
         /*QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(),
                 opponentFriend.getId(), null);*/
         messageEditText.setText(Consts.EMPTY_STRING);
