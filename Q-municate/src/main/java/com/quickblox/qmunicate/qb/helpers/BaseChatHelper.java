@@ -94,21 +94,15 @@ public abstract class BaseChatHelper extends BaseHelper {
         DatabaseManager.saveDialog(context, dialog);
     }
 
-    protected QBChatMessage getQBChatMessage(String body) {
+    protected QBChatMessage getQBChatMessage(String body, QBFile qbFile) {
         long time = DateUtils.getCurrentTime();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
-        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
-        return chatMessage;
-    }
-
-    protected QBChatMessage getQBChatMessageWithImage(QBFile qbFile) {
-        long time = DateUtils.getCurrentTime();
-        QBChatMessage chatMessage = new QBChatMessage();
-        QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
-        attachment.setUrl(qbFile.getPublicUrl());
-        chatMessage.addAttachment(attachment);
+        if (qbFile != null) {
+            QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
+            attachment.setUrl(qbFile.getPublicUrl());
+            chatMessage.addAttachment(attachment);
+        }
         chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         return chatMessage;
@@ -119,7 +113,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         messagesIdsList.add(messageId);
 
         // TODO Sergey Fedunets: temp decision
-        if(QBDialogType.GROUP.equals(dialog.getType())) {
+        if(QBDialogType.GROUP.equals(dialog.getType()) || messageId == null) {
             Bundle bundle = new Bundle();
             QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
             customObjectRequestBuilder.eq(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT, dateSent);

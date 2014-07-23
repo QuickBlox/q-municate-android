@@ -123,9 +123,8 @@ public class DatabaseManager {
         List<QBDialog> dialogs = new LinkedList<QBDialog>();
 
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                        DialogTable.Cols.TYPE + "= ? AND " + DialogTable.Cols.OCCUPANTS_IDS + " like ?",
-                new String[]{ String.valueOf(dialogType.getCode()),  "%" + opponent + "%"}, null
-        );
+                DialogTable.Cols.TYPE + "= ? AND " + DialogTable.Cols.OCCUPANTS_IDS + " like ?",
+                new String[]{String.valueOf(dialogType.getCode()), "%" + opponent + "%"}, null);
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
@@ -179,9 +178,11 @@ public class DatabaseManager {
         String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
         String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(
+                DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
 
-        DialogMessageCache dialogMessageCache = new DialogMessageCache(id, dialogId, senderId, body, attachUrl, time, isRead);
+        DialogMessageCache dialogMessageCache = new DialogMessageCache(id, dialogId, senderId, body,
+                attachUrl, time, isRead);
 
         return dialogMessageCache;
     }
@@ -254,13 +255,11 @@ public class DatabaseManager {
     public static DialogMessageCache getLastReadMessage(Context context, QBDialog dialog) {
         DialogMessageCache dialogMessageCache = null;
 
-        Cursor cursor = context.getContentResolver().query(
-                DialogMessageTable.CONTENT_URI,
-                null,
+        Cursor cursor = context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
                 DialogMessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
-                DialogMessageTable.Cols.IS_READ + " > 0",
-                null,
-                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+                        DialogMessageTable.Cols.IS_READ + " > 0", null,
+                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC"
+        );
 
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
             cursor.moveToLast();
@@ -298,14 +297,10 @@ public class DatabaseManager {
             long time = historyMessage.getDateSent();
             String attachURL;
 
-            if (TextUtils.isEmpty(message)) {
-                attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
-            } else {
-                attachURL = Consts.EMPTY_STRING;
-            }
+            attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(), dialogId, senderId, message,
-                    attachURL, time, true);
+            DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(),
+                    dialogId, senderId, message, attachURL, time, true);
 
             saveChatMessage(context, dialogMessageCache);
         }
@@ -372,7 +367,8 @@ public class DatabaseManager {
         if (!TextUtils.isEmpty(dialog.getLastMessage())) {
             values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
         }
-        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
+        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
@@ -385,7 +381,8 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.ROOM_JID_ID, dialog.getRoomJid());
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
+        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
         if (TextUtils.isEmpty(bodyLastMessage)) {
             values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
         } else {

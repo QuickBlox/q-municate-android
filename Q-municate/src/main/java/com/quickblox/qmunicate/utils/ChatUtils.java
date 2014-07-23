@@ -14,6 +14,7 @@ import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.quickblox.module.chat.model.QBDialogType.parseByCode;
@@ -177,8 +178,9 @@ public class ChatUtils {
 
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = Consts.EMPTY_STRING;
-        if (TextUtils.isEmpty(chatMessage.getBody())) {
-            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(chatMessage.getAttachments()));
+        Collection<QBAttachment> attachments = chatMessage.getAttachments();
+        if (attachments != null && attachments.size() > 0) {
+            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(attachments));
         }
         return attachURL;
     }

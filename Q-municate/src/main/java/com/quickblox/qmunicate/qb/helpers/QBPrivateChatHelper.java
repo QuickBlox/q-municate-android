@@ -48,17 +48,14 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
-        sendPrivateMessage(file, null, userId);
+        sendPrivateMessage(file, context.getString(
+                R.string.dlg_attached_last_message), userId);
     }
 
     //TODO add dialodId to save in cache
     private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
         QBChatMessage chatMessage;
-        if (file != null) {
-            chatMessage = getQBChatMessageWithImage(file);
-        } else {
-            chatMessage = getQBChatMessage(message);
-        }
+        chatMessage = getQBChatMessage(message, file);
         String dialogId = null;
         if (currentDialog != null) {
             dialogId = currentDialog.getDialogId();
