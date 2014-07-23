@@ -302,8 +302,6 @@ public class DatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            DialogMessageCache dialogMessageCache = new DialogMessageCache(historyMessage.getMessageId(),
-                    dialogId, senderId, message, attachURL, time, true);
             DialogMessageCache dialogMessageCache = new DialogMessageCache(messageId, dialogId, senderId, message,
                     attachURL, time, true);
 
