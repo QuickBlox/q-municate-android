@@ -25,8 +25,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
-import com.quickblox.qmunicate.ui.authorization.login.LoginActivity;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;

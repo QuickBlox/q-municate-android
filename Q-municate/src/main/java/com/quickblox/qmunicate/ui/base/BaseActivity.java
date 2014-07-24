@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
 import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
@@ -251,14 +250,12 @@ public abstract class BaseActivity extends Activity {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);
-            }
-            else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())){
+            } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                 SplashActivity.start(BaseActivity.this);
                 finish();
             }
         }
     }
-
 
 
     private class QBChatServiceConnection implements ServiceConnection {
