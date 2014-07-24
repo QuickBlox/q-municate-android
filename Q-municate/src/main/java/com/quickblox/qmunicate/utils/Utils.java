@@ -45,6 +45,17 @@ public class Utils {
         return false;
     }
 
+    public static boolean isExactError(QBResponseException e, String msgError) {
+        List<String> errors = e.getErrors();
+        for (String error : errors) {
+            if (msgError.equals(error)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public static void closeOutputStream(OutputStream outputStream) {
         if (outputStream != null) {
             try {

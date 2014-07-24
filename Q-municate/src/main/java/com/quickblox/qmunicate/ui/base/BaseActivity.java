@@ -26,6 +26,7 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
+import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -111,7 +112,7 @@ public abstract class BaseActivity extends Activity {
         app = App.getInstance();
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
-        messageBroadcastReceiver = new MessageBroadcastReceiver();
+        messageBroadcastReceiver = new GlobalBroadcastReceiver();
         failAction = new FailAction();
         initUI();
     }
@@ -240,18 +241,22 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    private class MessageBroadcastReceiver extends BroadcastReceiver {
+    private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null) {
+            if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
                 String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
                 String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
                 showNewMessageAlert(sender, message);
+            } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
+                SplashActivity.start(BaseActivity.this);
+                finish();
             }
         }
     }
+
 
     private class QBChatServiceConnection implements ServiceConnection {
 

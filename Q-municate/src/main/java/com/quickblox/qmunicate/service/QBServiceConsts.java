@@ -167,4 +167,5 @@ public class QBServiceConsts {
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";
+    public static final String FORCE_RELOGIN = "force_relogin";
 }

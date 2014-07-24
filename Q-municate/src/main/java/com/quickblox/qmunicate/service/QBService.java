@@ -66,6 +66,7 @@ import com.quickblox.qmunicate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.qmunicate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.qmunicate.ui.mediacall.CallActivity;
+import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 import com.quickblox.qmunicate.utils.Utils;
 
@@ -516,14 +517,22 @@ public class QBService extends Service {
                     command.execute(intent.getExtras());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
-                    if (Utils.isTokenDestroyedError(e) && AppSession.getSession().isSessionExist()) {
+                    if (Utils.isExactError(e, Consts.SESSION_DOES_NOT_EXIST)){
                         refreshSession();
                     }
+                    else if (Utils.isTokenDestroyedError(e)) {
+                        forceRelogin();
+                    }
                 } catch (Exception e) {
-
+                    ErrorUtils.logError(e);
                 }
             }
         });
+    }
+
+    private void forceRelogin() {
+        Intent intent = new Intent(QBServiceConsts.FORCE_RELOGIN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void refreshSession() {
