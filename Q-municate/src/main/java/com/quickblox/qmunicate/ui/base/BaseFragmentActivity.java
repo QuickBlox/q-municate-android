@@ -25,7 +25,10 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
+import com.quickblox.qmunicate.ui.authorization.login.LoginActivity;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
+import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -99,7 +102,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
         actionBar = getActionBar();
         broadcastReceiver = new BaseBroadcastReceiver();
-        messageBroadcastReceiver = new MessageBroadcastReceiver();
+        messageBroadcastReceiver = new GlobalBroadcastReceiver();
         failAction = new FailAction();
         initUI();
     }
@@ -258,13 +261,17 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
     }
 
-    private class MessageBroadcastReceiver extends BroadcastReceiver {
+    private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            if (extras != null) {
-                onReceiveMessage(extras);
+            if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+               onReceiveMessage(extras);
+            }
+            else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())){
+                SplashActivity.start(BaseFragmentActivity.this);
+                finish();
             }
         }
     }

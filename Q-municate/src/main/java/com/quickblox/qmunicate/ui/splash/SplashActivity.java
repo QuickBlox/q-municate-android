@@ -1,5 +1,6 @@
 package com.quickblox.qmunicate.ui.splash;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,6 +27,11 @@ public class SplashActivity extends BaseActivity {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
     private FacebookHelper facebookHelper;
+
+    public static void start(Context context) {
+        Intent intent = new Intent(context, SplashActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
