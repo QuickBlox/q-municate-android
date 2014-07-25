@@ -133,7 +133,6 @@ public class ActivityDelegator extends BaseActivityDelegator{
                     actionsListener.onReceiveForceReloginAction(intent.getExtras());
                 }
             }else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())){
-                Log.d("GlobalBroadcastReceiver", "REFRESH_SESSION ");
                 if (actionsListener != null){
                     actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
                 }

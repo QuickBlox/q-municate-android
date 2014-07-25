@@ -545,13 +545,11 @@ public class QBService extends Service {
     }
 
     private void forceRelogin() {
-        Log.d(TAG, "forceRelogin=" );
         Intent intent = new Intent(QBServiceConsts.FORCE_RELOGIN);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void refreshSession() {
-        Log.d(TAG, "refreshSession =" );
         Intent intent = new Intent(QBServiceConsts.REFRESH_SESSION);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
