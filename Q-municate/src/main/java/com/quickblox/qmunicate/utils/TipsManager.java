@@ -7,10 +7,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.ui.main.MainActivity;
-import com.quickblox.qmunicate.ui.main.NavigationDrawerFragment;
+
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 

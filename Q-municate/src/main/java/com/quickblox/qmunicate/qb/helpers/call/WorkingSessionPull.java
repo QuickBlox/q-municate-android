@@ -1,8 +1,6 @@
 package com.quickblox.qmunicate.qb.helpers.call;
 
 
-import com.facebook.Session;
-
 import java.util.HashMap;
 import java.util.Map;
 

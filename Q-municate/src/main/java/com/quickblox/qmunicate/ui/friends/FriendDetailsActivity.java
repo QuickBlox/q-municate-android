@@ -20,7 +20,6 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
@@ -36,7 +35,6 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
-import java.util.Currency;
 import java.util.List;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {

@@ -14,6 +14,7 @@ import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.Friend;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
@@ -53,9 +54,11 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
         ((TextView) rootView.findViewById(R.id.name_textview)).setText(friend.getFullname());
+        RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
+        avatarView.setOval(true);
         if(!TextUtils.isEmpty(friend.getAvatarUrl())){
             ImageLoader.getInstance().displayImage(friend.getAvatarUrl(),
-                    (android.widget.ImageView) rootView.findViewById(R.id.avatar_imageview), Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);

@@ -200,6 +200,8 @@
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
+    <string name="dlg_force_relogin_on_token_required">Token error is occured in application. Relogin will be executed now</string>
+    <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
 
     // Facebook
@@ -330,5 +332,6 @@
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
+
 
 </resources>

@@ -23,6 +23,9 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.core.QBEntityCallback;
+import com.quickblox.internal.core.exception.BaseServiceException;
+import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.qmunicate.App;
 import com.quickblox.qmunicate.R;
@@ -31,9 +34,9 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.qb.commands.QBLogoutCommand;
 import com.quickblox.qmunicate.service.QBServiceConsts;
+import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.ui.dialogs.ConfirmDialog;
-import com.quickblox.qmunicate.ui.authorization.landing.LandingActivity;
 import com.quickblox.qmunicate.utils.FacebookHelper;
 import com.quickblox.qmunicate.utils.PrefsHelper;
 

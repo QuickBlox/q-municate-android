@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.ui.base.BaseFragment;
 import com.quickblox.qmunicate.utils.ChatUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 

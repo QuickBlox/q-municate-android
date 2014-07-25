@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;

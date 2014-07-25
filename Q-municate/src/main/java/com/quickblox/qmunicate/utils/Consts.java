@@ -68,7 +68,7 @@ public class Consts {
     public static final int LOGIN_TIMEOUT = 40000;
     public static final String DEFAULT_CALL_MESSAGE = "";
     public static final String TOKEN_REQUIRED_ERROR = "Token is required";
-    public static final String SESSION_DOES_NOT_EXIST = "base Required session does not exist";
+    public static final String SESSION_DOES_NOT_EXIST = "Required session does not exist";
     public static final int FULL_QUALITY = 100;
 
     public static enum CALL_DIRECTION_TYPE {
