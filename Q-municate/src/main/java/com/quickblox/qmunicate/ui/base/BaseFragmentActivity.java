@@ -4,19 +4,15 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -26,12 +22,9 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -41,23 +34,22 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     public static final int DOUBLE_BACK_DELAY = 2000;
 
     protected final ProgressDialog progress;
-    protected BroadcastReceiver broadcastReceiver;
-    protected BroadcastReceiver messageBroadcastReceiver;
     protected App app;
     protected ActionBar actionBar;
     protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    protected SuccessAction successAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
-    private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
+    private ActivityDelegator activityDelegator;
 
     public BaseFragmentActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -99,9 +91,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
         }
         actionBar = getActionBar();
-        broadcastReceiver = new BaseBroadcastReceiver();
-        messageBroadcastReceiver = new GlobalBroadcastReceiver();
         failAction = new FailAction();
+        successAction = new SuccessAction();
+        activityDelegator = new ActivityDelegator(this, new GlobalListener());
+        activityDelegator.onCreate();
         initUI();
     }
 
@@ -113,14 +106,15 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     @Override
     protected void onPause() {
-        unregisterBroadcastReceiver();
+        activityDelegator.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateBroadcastActionList();
+        activityDelegator.onResume();
+        addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
     @Override
@@ -153,19 +147,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
-        IntentFilter intentFilter = new IntentFilter();
-        for (String commandName : broadcastCommandMap.keySet()) {
-            intentFilter.addAction(commandName);
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
-    }
-
-    private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        activityDelegator.updateBroadcastActionList();
     }
 
     public void showProgress() {
@@ -179,11 +161,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void addAction(String action, Command command) {
-        broadcastCommandMap.put(action, command);
+        activityDelegator.addAction(action, command);
     }
 
     public void removeAction(String action) {
-        broadcastCommandMap.remove(action);
+        activityDelegator.removeAction(action);
     }
 
     protected void onConnectedToService(QBService service) {
@@ -218,6 +200,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
+    protected void onSuccessAction(String action) {
+
+    }
+
     protected void onReceiveMessage(Bundle extras) {
         String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
@@ -227,6 +213,15 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();
+    }
+
+    public class SuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
+        }
     }
 
     public class FailAction implements Command {
@@ -240,39 +235,25 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
     }
 
-    private class BaseBroadcastReceiver extends BroadcastReceiver {
+    private class GlobalListener implements  ActivityDelegator.GlobalActionsListener {
+        @Override
+        public void onReceiveChatMessageAction(Bundle extras) {
+           onReceiveMessage(extras);
+        }
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (intent != null && (action) != null) {
-                Command command = broadcastCommandMap.get(action);
-                if (command != null) {
-                    Log.d("STEPS", "executing " + action);
-                    try {
-                        command.execute(intent.getExtras());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+        public void onReceiveForceReloginAction(Bundle extras) {
+            activityDelegator.forceRelogin();
+        }
+
+        @Override
+        public void onReceiveRefreshSessionAction(Bundle extras) {
+            DialogUtils.show(BaseFragmentActivity.this, getString(R.string.dlg_refresh_session));
+            showProgress();
+            activityDelegator.refreshSession();
         }
     }
 
-    private class GlobalBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
-               onReceiveMessage(extras);
-            }
-            else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())){
-                SplashActivity.start(BaseFragmentActivity.this);
-                finish();
-            }
-        }
-    }
 
     private class QBChatServiceConnection implements ServiceConnection {
 

@@ -5,18 +5,14 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -26,12 +22,8 @@ import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.dialogs.ProgressDialog;
-import com.quickblox.qmunicate.ui.splash.SplashActivity;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -40,20 +32,19 @@ public abstract class BaseActivity extends Activity {
     public static final int DOUBLE_BACK_DELAY = 2000;
 
     protected final ProgressDialog progress;
-    protected BroadcastReceiver broadcastReceiver;
-    protected BroadcastReceiver messageBroadcastReceiver;
     protected App app;
     protected ActionBar actionBar;
     protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
+    protected SuccessAction successAction;
+    protected ActivityDelegator activityDelegator;
 
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
-    private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
 
@@ -76,15 +67,15 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void addAction(String action, Command command) {
-        broadcastCommandMap.put(action, command);
+        activityDelegator.addAction(action, command);
     }
 
     public boolean hasAction(String action) {
-        return broadcastCommandMap.containsKey(action);
+        return activityDelegator.hasAction(action);
     }
 
     public void removeAction(String action) {
-        broadcastCommandMap.remove(action);
+        activityDelegator.removeAction(action);
     }
 
     public void showNewMessageAlert(String sender, String message) {
@@ -95,15 +86,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageBroadcastReceiver);
-        IntentFilter intentFilter = new IntentFilter();
-        for (String commandName : broadcastCommandMap.keySet()) {
-            intentFilter.addAction(commandName);
-        }
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(messageBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.GOT_CHAT_MESSAGE));
+        activityDelegator.updateBroadcastActionList();
     }
 
     @Override
@@ -111,9 +94,10 @@ public abstract class BaseActivity extends Activity {
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
-        broadcastReceiver = new BaseBroadcastReceiver();
-        messageBroadcastReceiver = new GlobalBroadcastReceiver();
         failAction = new FailAction();
+        successAction = new SuccessAction();
+        activityDelegator = new ActivityDelegator(this, new GlobalListener());
+        activityDelegator.onCreate();
         initUI();
     }
 
@@ -126,12 +110,13 @@ public abstract class BaseActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        updateBroadcastActionList();
+        activityDelegator.onResume();
+        addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
     @Override
     protected void onPause() {
-        unregisterBroadcastReceiver();
+        activityDelegator.onPause();
         super.onPause();
     }
 
@@ -192,10 +177,6 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-    }
-
     private void connectToService() {
         Intent intent = new Intent(this, QBService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -211,6 +192,10 @@ public abstract class BaseActivity extends Activity {
 
     }
 
+    protected void onSuccessAction(String action) {
+
+    }
+
     public class FailAction implements Command {
 
         @Override
@@ -222,41 +207,35 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    private class BaseBroadcastReceiver extends BroadcastReceiver {
+    public class SuccessAction implements Command {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (intent != null && (action) != null) {
-                Command command = broadcastCommandMap.get(action);
-                if (command != null) {
-                    Log.d("STEPS", "executing " + action);
-                    try {
-                        command.execute(intent.getExtras());
-                    } catch (Exception e) {
-
-                    }
-                }
-            }
+        public void execute(Bundle bundle) {
+            hideProgress();
+            onSuccessAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
 
-    private class GlobalBroadcastReceiver extends BroadcastReceiver {
+    private class GlobalListener implements  ActivityDelegator.GlobalActionsListener {
+        @Override
+        public void onReceiveChatMessageAction(Bundle extras) {
+            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
+            String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+            showNewMessageAlert(sender, message);
+        }
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
-                String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-                String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-                showNewMessageAlert(sender, message);
-            } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
-                SplashActivity.start(BaseActivity.this);
-                finish();
-            }
+        public void onReceiveForceReloginAction(Bundle extras) {
+            activityDelegator.forceRelogin();
+        }
+
+        @Override
+        public void onReceiveRefreshSessionAction(Bundle extras) {
+            DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
+            showProgress();
+            activityDelegator.refreshSession();
         }
     }
-
 
     private class QBChatServiceConnection implements ServiceConnection {
 

@@ -9,6 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.qmunicate.ui.mediacall.TimeUpdater;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
 import com.quickblox.qmunicate.utils.Consts;
 
 public class VoiceCallFragment extends OutgoingCallFragment {
@@ -39,9 +40,11 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         if (updater != null) {
             updater.setTextView(timeTextView);
         }
+        RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
+        avatarView.setOval(true);
         if(!TextUtils.isEmpty(opponent.getAvatarUrl())){
             ImageLoader.getInstance().displayImage(opponent.getAvatarUrl(),
-                    (android.widget.ImageView) rootView.findViewById(R.id.avatar_imageview), Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
         }
     }
 

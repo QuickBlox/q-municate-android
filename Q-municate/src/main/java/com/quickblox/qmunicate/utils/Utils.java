@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.utils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.users.model.QBUser;
@@ -46,9 +47,12 @@ public class Utils {
     }
 
     public static boolean isExactError(QBResponseException e, String msgError) {
+        Log.d(Utils.class.getSimpleName(), "");
         List<String> errors = e.getErrors();
         for (String error : errors) {
-            if (msgError.equals(error)) {
+            Log.d(Utils.class.getSimpleName(), "error =" +error);
+            if (error.contains(msgError)) {
+                Log.d(Utils.class.getSimpleName(), error + " contains "+msgError);
                 return true;
             }
         }

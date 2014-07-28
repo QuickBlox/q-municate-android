@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.io.File;
-import java.util.List;
 
 public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChatManagerListener {
 

@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.quickblox.module.chat.model.QBDialogType.parseByCode;
-
 public class ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";

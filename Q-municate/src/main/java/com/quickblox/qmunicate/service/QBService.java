@@ -146,6 +146,8 @@ public class QBService extends Service {
     }
 
     private void initCommands() {
+        registerLoginRestCommand();
+        registerLoginRestSocialCommand();
         registerLoginCommand();
         registerLoginWithSocialCommand();
         registerSignUpCommand();
@@ -182,6 +184,19 @@ public class QBService extends Service {
         registerSendPUshCommand();
         registerLoginAndJoinGroupChat();
         registerReloginCommand();
+    }
+
+    private void registerLoginRestCommand() {
+        QBLoginRestCommand loginRestCommand = new QBLoginRestCommand(this, authHelper,
+                QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, QBServiceConsts.LOGIN_REST_FAIL_ACTION);
+
+        serviceCommandMap.put(QBServiceConsts.LOGIN_REST_ACTION, loginRestCommand);
+    }
+
+    private void registerLoginRestSocialCommand() {
+        QBLoginRestWithSocialCommand loginRestCommand = new QBLoginRestWithSocialCommand(this, authHelper,
+                QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, QBServiceConsts.LOGIN_REST_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LOGIN_REST_SOCIAL_ACTION, loginRestCommand);
     }
 
     private void registerUpdateGroupNameCommand() {
@@ -370,8 +385,7 @@ public class QBService extends Service {
     private void registerLoginWithSocialCommand() {
         QBLoginWithSocialCommand loginCommand = new QBLoginWithSocialCommand(this,
                 QBServiceConsts.LOGIN_SUCCESS_ACTION, QBServiceConsts.LOGIN_FAIL_ACTION);
-        QBLoginRestWithSocialCommand loginRestCommand = new QBLoginRestWithSocialCommand(this, authHelper,
-                QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, QBServiceConsts.LOGIN_REST_FAIL_ACTION);
+        QBLoginRestWithSocialCommand loginRestCommand = (QBLoginRestWithSocialCommand) serviceCommandMap.get(QBServiceConsts.LOGIN_REST_SOCIAL_ACTION);
         QBUpdateUserCommand updateUserCommand = new QBUpdateUserCommand(this, authHelper, friendListHelper,
                 QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, QBServiceConsts.UPDATE_USER_FAIL_ACTION);
 
@@ -385,8 +399,8 @@ public class QBService extends Service {
     private void registerLoginCommand() {
         QBLoginCommand loginCommand = new QBLoginCommand(this, QBServiceConsts.LOGIN_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_FAIL_ACTION);
-        QBLoginRestCommand loginRestCommand = new QBLoginRestCommand(this, authHelper,
-                QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, QBServiceConsts.LOGIN_REST_FAIL_ACTION);
+
+        QBLoginRestCommand loginRestCommand = (QBLoginRestCommand) serviceCommandMap.get(QBServiceConsts.LOGIN_REST_ACTION);
 
         loginCommand.addCommand(loginRestCommand);
 
@@ -536,12 +550,8 @@ public class QBService extends Service {
     }
 
     public void refreshSession() {
-        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
-            QBLoginRestCommand.start(this, AppSession.getSession().getUser());
-        } else {
-            QBLoginRestWithSocialCommand.start(this, QBProvider.FACEBOOK,
-                    Session.getActiveSession().getAccessToken(), null);
-        }
+        Intent intent = new Intent(QBServiceConsts.REFRESH_SESSION);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public class QBServiceBinder extends Binder {

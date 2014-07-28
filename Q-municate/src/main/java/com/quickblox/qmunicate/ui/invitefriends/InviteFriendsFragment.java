@@ -24,7 +24,10 @@ import com.facebook.SessionState;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.model.InviteFriend;
 import com.quickblox.qmunicate.ui.base.BaseFragment;
-import com.quickblox.qmunicate.utils.*;
+import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.qmunicate.utils.DialogUtils;
+import com.quickblox.qmunicate.utils.EmailUtils;
+import com.quickblox.qmunicate.utils.FacebookHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;

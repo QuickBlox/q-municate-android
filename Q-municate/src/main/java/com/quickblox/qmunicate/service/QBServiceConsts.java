@@ -11,6 +11,7 @@ public class QBServiceConsts {
     public static final String GET_FILE_ACTION = "get_file_action";
     public static final String LOGIN_ACTION = "login_action";
     public static final String LOGIN_REST_ACTION = "login_rest_command";
+    public static final String LOGIN_REST_SOCIAL_ACTION = "login_rest__social_command";
     public static final String LOGIN_CHAT_ACTION = "login_chat_action";
     public static final String LOGOUT_ACTION = "logout_action";
     public static final String LOGOUT_REST_ACTION = "logout_rest_action";
@@ -168,4 +169,5 @@ public class QBServiceConsts {
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";
     public static final String FORCE_RELOGIN = "force_relogin";
+    public static final String REFRESH_SESSION = "refresh_session";
 }

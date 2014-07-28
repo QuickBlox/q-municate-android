@@ -12,7 +12,6 @@ import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBMessageListener;
