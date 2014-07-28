@@ -50,8 +50,6 @@ public class SettingsFragment extends BaseFragment {
             rootView.findViewById(R.id.change_password_linearlyout).setVisibility(View.GONE);
         }
 
-        versionView.setText(getString(R.string.stn_version, Utils.getAppVersionName(baseActivity)));
-
         initListeners();
 
         //        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
@@ -64,7 +62,6 @@ public class SettingsFragment extends BaseFragment {
         pushNotificationSwitch = (Switch) rootView.findViewById(R.id.push_notification_switch);
         changePasswordButton = (Button) rootView.findViewById(R.id.change_password_button);
         logoutButton = (Button) rootView.findViewById(R.id.logout_button);
-        versionView = (TextView) rootView.findViewById(R.id.version_textview);
     }
 
     @Override
