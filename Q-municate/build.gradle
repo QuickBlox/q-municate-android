@@ -40,7 +40,7 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('/Users/vadim/Projects/projects/IdeaProjects/Qmunicate/q-municate-android/cert/qmun.jks')
+            storeFile file('"keystore/qmun.jks')
             storePassword 'Injoit00'
             keyAlias 'qmunicate'
             keyPassword 'Injoit00'
