@@ -40,10 +40,10 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('../cert/release.keystore')
-            storePassword ''
-            keyAlias ''
-            keyPassword ''
+            storeFile file('/Users/vadim/Projects/projects/IdeaProjects/Qmunicate/q-municate-android/cert/qmun.jks')
+            storePassword 'Injoit00'
+            keyAlias 'qmunicate'
+            keyPassword 'Injoit00'
         }
     }
     buildTypes {
@@ -57,9 +57,6 @@ android {
             signingConfig signingConfigs.release
             runProguard false
             proguardFile 'proguard.cfg'
-            proguardFile getDefaultProguardFile('proguard-rules.txt')
-            resValue "string", "lgn_default_user_email", ""
-            resValue "string", "lgn_default_user_password", ""
         }
     }
     packagingOptions {
