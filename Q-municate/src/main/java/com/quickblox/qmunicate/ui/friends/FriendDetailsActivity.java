@@ -20,7 +20,6 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
-import com.quickblox.qmunicate.caching.tables.FriendTable;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.AppSession;
 import com.quickblox.qmunicate.model.Friend;
@@ -36,7 +35,6 @@ import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DialogUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
-import java.util.Currency;
 import java.util.List;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
@@ -51,6 +49,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private Friend friend;
     private Cursor friendCursor;
+    private ContentObserver statusContentObserver;
 
     public static void start(Context context, int friendId) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
@@ -67,7 +66,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
         friend = DatabaseManager.getFriendById(this, friendId);
         initUI();
-        initListeners();
+        registerStatusChangingObserver();
         initUIWithFriendsData();
         initBroadcastActionList();
     }
@@ -83,8 +82,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneView = _findViewById(R.id.phone_relativelayout);
     }
 
-    private void initListeners() {
-        friendCursor.registerContentObserver(new ContentObserver(new Handler()) {
+    private void registerStatusChangingObserver() {
+        statusContentObserver = new ContentObserver(new Handler()) {
 
             @Override
             public void onChange(boolean selfChange) {
@@ -95,7 +94,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             public boolean deliverSelfNotifications() {
                 return true;
             }
-        });
+        };
+        friendCursor.registerContentObserver(statusContentObserver);
+    }
+
+    private void unregisterStatusChangingObserver() {
+        friendCursor.unregisterContentObserver(statusContentObserver);
     }
 
     private void initBroadcastActionList() {
@@ -112,6 +116,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         setName();
         setOnlineStatus();
         setPhone();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterStatusChangingObserver();
     }
 
     private void setName() {

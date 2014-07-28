@@ -3,10 +3,16 @@ package com.quickblox.qmunicate.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.drawable.NinePatchDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -37,9 +43,11 @@ public class ImageHelper {
     private static final String TEMP_FILE_NAME = "temp.png";
 
     private Activity activity;
+    private Resources resources;
 
     public ImageHelper(Activity activity) {
         this.activity = activity;
+        resources = activity.getResources();
     }
 
     public static Bitmap getScaledBitmap(Bitmap bitmapOrg, int width, int height, int preferredWidth) {
@@ -126,12 +134,12 @@ public class ImageHelper {
     }
 
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {
-        final int preferredWidth = 300;
+        int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
         int origWidth = origBitmap.getWidth();
         int origHeight = origBitmap.getHeight();
         File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
-        Bitmap bitmap = getScaledBitmap(origBitmap, origWidth, origHeight, preferredWidth);
+        Bitmap bitmap = getScaledBitmap(origBitmap, origWidth, origHeight, width);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, Consts.FULL_QUALITY, bos);
         byte[] bitmapData = bos.toByteArray();
@@ -140,6 +148,34 @@ public class ImageHelper {
         fos.close();
         bos.close();
         return tempFile;
+    }
+
+    public Bitmap decodeBackgroundBubbleImage(int resourcesId) {
+        return BitmapFactory.decodeResource(resources, resourcesId);
+    }
+
+    public Bitmap generateMask(Bitmap mask, Bitmap original) {
+        int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
+        original = getScaledBitmap(original, original.getWidth(), original.getHeight(), width);
+        Bitmap result = Bitmap.createBitmap(width, original.getHeight(), Bitmap.Config.ARGB_8888);
+        mask = getNinepatch(resources, mask, width, original.getHeight());
+        Canvas canvas = new Canvas(result);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+        canvas.drawBitmap(original, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, null);
+        canvas.drawBitmap(mask, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, paint);
+        paint.setXfermode(null);
+        return result;
+    }
+
+    private Bitmap getNinepatch(Resources resource, Bitmap bitmap, int x, int y) {
+        byte[] chunk = bitmap.getNinePatchChunk();
+        NinePatchDrawable ninePatchDrawable = new NinePatchDrawable(resource, bitmap, chunk, new Rect(), null);
+        ninePatchDrawable.setBounds(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, x, y);
+        Bitmap outputBitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(outputBitmap);
+        ninePatchDrawable.draw(canvas);
+        return outputBitmap;
     }
 
     /*

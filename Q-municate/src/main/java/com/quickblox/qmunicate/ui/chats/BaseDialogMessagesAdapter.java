@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -21,11 +21,14 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
-import com.quickblox.qmunicate.ui.views.MaskGenerator;
+import com.quickblox.qmunicate.ui.views.RoundedImageView;
+import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
 import com.quickblox.qmunicate.utils.ReceiveImageFileTask;
+import com.quickblox.qmunicate.utils.ReceiveMaskedBitmapListener;
+import com.quickblox.qmunicate.utils.ReceiveMaskedImageFileTask;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,12 +37,13 @@ import java.util.Random;
 
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
-    private final int colorMaxValue = 255;
-    private final float colorAlpha = 0.8f;
-
     protected ScrollMessagesListener scrollMessagesListener;
     protected ImageHelper imageHelper;
     protected QBDialog dialog;
+
+    private final int colorMaxValue = 255;
+    private final float colorAlpha = 0.8f;
+
     private Random random;
     private Map<Integer, Integer> colorsMap;
 
@@ -65,14 +69,10 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         return senderId == currentUser.getId();
     }
 
-    protected void displayAttachImage(String uri, final ImageView attachImageView,
-            final RelativeLayout progressRelativeLayout, final RelativeLayout attachMessageRelativeLayout,
-            final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar,
-            boolean isOwnMessage) {
-        ImageLoader.getInstance().displayImage(uri, attachImageView, Consts.UIL_DEFAULT_DISPLAY_OPTIONS,
-                new SimpleImageLoading(attachImageView, progressRelativeLayout, attachMessageRelativeLayout,
-                        verticalProgressBar, centeredProgressBar, isOwnMessage),
-                new SimpleImageLoadingProgressListener(verticalProgressBar));
+    protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder, int maskedBackgroundId) {
+        ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView, Consts.UIL_DEFAULT_DISPLAY_OPTIONS,
+                new SimpleImageLoading(viewHolder, maskedBackgroundId),
+                new SimpleImageLoadingProgressListener(viewHolder));
     }
 
     protected int getTextColor(Integer senderId) {
@@ -85,9 +85,26 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         }
     }
 
+    protected int getMaskedImageBackgroundId(int senderId) {
+        int maskedBackgroundId;
+        if (isOwnMessage(senderId)) {
+            maskedBackgroundId = R.drawable.right_bubble;
+        } else {
+            maskedBackgroundId = R.drawable.left_bubble;
+        }
+        return maskedBackgroundId;
+    }
+
+    protected void resetUI(ViewHolder viewHolder) {
+        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
+        viewHolder.progressRelativeLayout.setVisibility(View.GONE);
+        viewHolder.textMessageView.setVisibility(View.GONE);
+    }
+
     private int getRandomColor() {
         float[] hsv = new float[3];
-        int color = Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue), random.nextInt(colorMaxValue));
+        int color = Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue),
+                random.nextInt(colorMaxValue));
         Color.colorToHSV(color, hsv);
         hsv[2] *= colorAlpha;
         color = Color.HSVToColor(hsv);
@@ -122,64 +139,47 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         imageHelper.showFullImage(context, absolutePath);
     }
 
-    public class SimpleImageLoading extends SimpleImageLoadingListener {
+    public class SimpleImageLoading extends SimpleImageLoadingListener implements ReceiveMaskedBitmapListener {
 
-        private RelativeLayout progressRelativeLayout;
-        private RelativeLayout attachMessageRelativeLayout;
-        private ImageView attachImageView;
-        private ProgressBar verticalProgressBar;
-        private ProgressBar centeredProgressBar;
+        private ViewHolder viewHolder;
+        private int maskedBackgroundId;
         private Bitmap loadedImageBitmap;
-        private boolean isOwnMessage;
 
-        public SimpleImageLoading(final ImageView attachImageView,
-                final RelativeLayout progressRelativeLayout, final RelativeLayout attachMessageRelativeLayout,
-                final ProgressBar verticalProgressBar, final ProgressBar centeredProgressBar,
-                boolean isOwnMessage) {
-            this.progressRelativeLayout = progressRelativeLayout;
-            this.attachMessageRelativeLayout = attachMessageRelativeLayout;
-            this.attachImageView = attachImageView;
-            this.verticalProgressBar = verticalProgressBar;
-            this.centeredProgressBar = centeredProgressBar;
-            this.isOwnMessage = isOwnMessage;
+        public SimpleImageLoading(ViewHolder viewHolder, int maskedBackgroundId) {
+            this.viewHolder = viewHolder;
+            this.maskedBackgroundId = maskedBackgroundId;
         }
 
         @Override
-        public void onLoadingStarted(String imageUri, View view) {
-            verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
-            verticalProgressBar.setVisibility(View.VISIBLE);
-            centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
-            centeredProgressBar.setVisibility(View.VISIBLE);
+        public void onMaskedImageBitmapReceived(Bitmap maskedImageBitmap) {
+            hideAttachmentBackground(viewHolder.attachImageView);
+            viewHolder.attachImageView.setImageBitmap(maskedImageBitmap);
+            viewHolder.attachMessageRelativeLayout.setVisibility(View.VISIBLE);
+            viewHolder.attachImageView.setVisibility(View.VISIBLE);
+            updateUIAfterLoading();
+            scrollMessagesListener.onScrollToBottom();
         }
 
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            verticalProgressBar.setVisibility(View.GONE);
-            centeredProgressBar.setVisibility(View.GONE);
-            progressRelativeLayout.setVisibility(View.GONE);
+            updateUIAfterLoading();
         }
 
         @Override
-        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedImageBitmap) {
-            Bitmap backgroundBitmap;
-            verticalProgressBar.setVisibility(View.GONE);
-            centeredProgressBar.setVisibility(View.GONE);
-            if (progressRelativeLayout != null) {
-                progressRelativeLayout.setVisibility(View.GONE);
+        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
+            initMaskedImageView(loadedBitmap);
+        }
+
+        private void initMaskedImageView(Bitmap loadedBitmap) {
+            loadedImageBitmap = loadedBitmap;
+            makeMaskedImageView();
+            viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
+        }
+
+        private void updateUIAfterLoading() {
+            if (viewHolder.progressRelativeLayout != null) {
+                viewHolder.progressRelativeLayout.setVisibility(View.GONE);
             }
-            if (isOwnMessage) {
-                backgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.right_bubble);
-            } else {
-                backgroundBitmap = BitmapFactory.decodeResource(resources, R.drawable.left_bubble);
-            }
-            attachMessageRelativeLayout.setVisibility(View.VISIBLE);
-            attachImageView.setVisibility(View.VISIBLE);
-            attachImageView.setOnClickListener(receiveImageFileOnClickListener());
-            this.loadedImageBitmap = loadedImageBitmap;
-            hideAttachmentBackground(attachImageView);
-            attachImageView.setImageBitmap(MaskGenerator.generateMask(context, backgroundBitmap,
-                    loadedImageBitmap));
-            scrollMessagesListener.onScrollToBottom();
         }
 
         private View.OnClickListener receiveImageFileOnClickListener() {
@@ -187,27 +187,43 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
                 @Override
                 public void onClick(View view) {
-                    //TODO add listener to disable logout in stopped state
-                    view.startAnimation(AnimationUtils.loadAnimation(context,
-                            R.anim.chat_attached_file_click));
+                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
                     new ReceiveImageFileTask(BaseDialogMessagesAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);
                 }
             };
         }
+
+        private void makeMaskedImageView() {
+            new ReceiveMaskedImageFileTask(this).execute(imageHelper, maskedBackgroundId, loadedImageBitmap);
+        }
     }
 
     public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {
 
-        private ProgressBar verticalProgressBar;
+        private ViewHolder viewHolder;
 
-        public SimpleImageLoadingProgressListener(ProgressBar verticalProgressBar) {
-            this.verticalProgressBar = verticalProgressBar;
+        public SimpleImageLoadingProgressListener(ViewHolder viewHolder) {
+            this.viewHolder = viewHolder;
         }
 
         @Override
         public void onProgressUpdate(String imageUri, View view, int current, int total) {
-            verticalProgressBar.setProgress(Math.round(100.0f * current / total));
+            viewHolder.verticalProgressBar.setProgress(Math.round(100.0f * current / total));
         }
+    }
+
+    public class ViewHolder {
+        public RoundedImageView avatarImageView;
+        public TextView nameTextView;
+        public View textMessageView;
+        public RelativeLayout progressRelativeLayout;
+        public RelativeLayout attachMessageRelativeLayout;
+        public ChatTextView messageTextView;
+        public ImageView attachImageView;
+        public TextView timeTextMessageTextView;
+        public TextView timeAttachMessageTextView;
+        public ProgressBar verticalProgressBar;
+        public ProgressBar centeredProgressBar;
     }
 }

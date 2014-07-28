@@ -30,29 +30,7 @@
             android:layout_centerInParent="true"
             android:orientation="vertical">
 
-            <RelativeLayout
-                android:id="@+id/progress_relativelayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <ProgressBar
-                    android:id="@+id/vertical_progressbar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="@dimen/chat_attach_width"
-                    android:layout_height="@dimen/chat_attach_height"
-                    android:max="100"
-                    android:visibility="gone" />
-
-                <ProgressBar
-                    android:id="@+id/centered_progressbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:indeterminate="false"
-                    android:max="100"
-                    android:visibility="gone" />
-
-            </RelativeLayout>
+            <include layout="@layout/view_chat_progress_bars" />
 
             <GridLayout
                 android:id="@+id/text_message_view"
@@ -108,38 +86,7 @@
 
             </GridLayout>
 
-            <RelativeLayout
-                android:id="@+id/attach_message_relativelayout"
-                android:layout_width="@dimen/chat_attach_width"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/attach_imageview"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:adjustViewBounds="true"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:scaleType="fitCenter"
-                    android:src="@null" />
-
-                <TextView
-                    android:id="@+id/time_attach_message_textview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_margin="10dp"
-                    android:background="@drawable/badge_attach_message_time"
-                    android:textColor="@color/black"
-                    android:alpha="0.5"
-                    android:padding="4dp" />
-
-            </RelativeLayout>
+            <include layout="@layout/view_chat_attach_message_opponent" />
 
         </LinearLayout>
 

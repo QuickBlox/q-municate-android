@@ -5,9 +5,7 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -39,9 +37,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
-            view = layoutInflater.inflate(R.layout.list_item_dialog_own_message, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_group_dialog_opponent_message, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_group_message_opponent, null, true);
             viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
             viewHolder.avatarImageView.setOval(true);
             viewHolder.avatarImageView.setVisibility(View.VISIBLE);
@@ -76,11 +74,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
         int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
         long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
-        boolean isOwnMessage = isOwnMessage(senderId);
+        boolean ownMessage = isOwnMessage(senderId);
 
-        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
+        resetUI(viewHolder);
 
-        if (isOwnMessage) {
+        if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
@@ -96,40 +94,21 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!TextUtils.isEmpty(attachUrl)) {
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.textMessageView.setVisibility(View.GONE);
             viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
-            displayAttachImage(attachUrl, viewHolder.attachImageView, viewHolder.progressRelativeLayout,
-                    viewHolder.attachMessageRelativeLayout, viewHolder.verticalProgressBar,
-                    viewHolder.centeredProgressBar, isOwnMessage);
+            int maskedBackgroundId = getMaskedImageBackgroundId(senderId);
+            displayAttachImage(attachUrl, viewHolder, maskedBackgroundId);
         } else {
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
             viewHolder.textMessageView.setVisibility(View.VISIBLE);
-            viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
             viewHolder.messageTextView.setText(body);
         }
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(
-                DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
             String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
             QBUpdateStatusMessageCommand.start(context, dialog, messageId, time, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
-    }
-
-    private static class ViewHolder {
-
-        RelativeLayout progressRelativeLayout;
-        RelativeLayout attachMessageRelativeLayout;
-        RoundedImageView avatarImageView;
-        TextView nameTextView;
-        View textMessageView;
-        ChatTextView messageTextView;
-        ImageView attachImageView;
-        TextView timeTextMessageTextView;
-        TextView timeAttachMessageTextView;
-        ProgressBar verticalProgressBar;
-        ProgressBar centeredProgressBar;
     }
 }

@@ -22,6 +22,8 @@ public class SmileysConvertor {
         smileysMap.put(R.drawable.e00a, "\ue00a");
         smileysMap.put(R.drawable.e00b, "\ue00b");
         smileysMap.put(R.drawable.e00c, "\ue00c");
+
+        /*
         smileysMap.put(R.drawable.e00d, "\ue00d");
         smileysMap.put(R.drawable.e00e, "\ue00e");
         smileysMap.put(R.drawable.e00f, "\ue00f");
@@ -490,6 +492,7 @@ public class SmileysConvertor {
         smileysMap.put(R.drawable.e534, "\ue534");
         smileysMap.put(R.drawable.e535, "\ue535");
         smileysMap.put(R.drawable.e536, "\ue536");
+        */
 
         for (Map.Entry<Integer, String> entry : smileysMap.entrySet()) {
             patterns.put(entry.getKey(), Pattern.compile(entry.getValue(), Pattern.CASE_INSENSITIVE));
