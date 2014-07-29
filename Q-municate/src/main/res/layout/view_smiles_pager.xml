@@ -15,7 +15,7 @@
         android:paddingTop="10dp"
         android:layout_gravity="center"/>
 
-    <com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator
+    <com.quickblox.q_municate.ui.views.indicator.IconPageIndicator
         android:id="@+id/smiles_pager_indicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

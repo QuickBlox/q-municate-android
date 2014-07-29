@@ -46,7 +46,7 @@
             android:padding="5dp"
             android:visibility="gone">
 
-            <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
+            <com.quickblox.q_municate.ui.views.smiles.ChatTextView
                 android:id="@+id/message_textview"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

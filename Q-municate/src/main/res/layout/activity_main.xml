@@ -15,5 +15,5 @@
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:name="com.quickblox.qmunicate.ui.main.NavigationDrawerFragment" />
+        android:name="com.quickblox.q_municate.ui.main.NavigationDrawerFragment" />
 </android.support.v4.widget.DrawerLayout>
