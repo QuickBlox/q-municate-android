@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,6 +40,7 @@ import java.util.List;
 
 public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, FilterQueryProvider {
 
+    private static final String TAG = FriendsListFragment.class.getSimpleName();
     private List<Friend> usersList;
     private UserListAdapter usersListAdapter;
     private LinearLayout globalSearchLayout;
@@ -373,6 +375,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
+            Log.i(TAG, "LoadFriendsSuccessAction");
             List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
             if (friendsList.isEmpty()) {

@@ -124,7 +124,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
-        loadChatsDialogs();
     }
 
     private boolean isImportInitialized() {
@@ -134,6 +133,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadDialogsSuccessAction());
+        addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
+        addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
     }
 
@@ -173,6 +174,13 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         gsmHelper.checkPlayServices();
     }
 
+    @Override
+    protected void onFailAction(String action) {
+        if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)){
+            loadChatsDialogs();
+        }
+    }
+
     private class LoadDialogsSuccessAction implements Command {
 
         @Override
@@ -196,6 +204,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
+        }
+    }
+
+    private class LoadFriendsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            Log.i(TAG, "LoadFriendsSuccessAction");
+            loadChatsDialogs();
         }
     }
 }

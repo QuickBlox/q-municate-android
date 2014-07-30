@@ -22,6 +22,7 @@ import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
@@ -29,7 +30,7 @@ public class ActivityDelegator extends BaseActivityDelegator{
 
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
-    private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
+    private Map<String, List<Command>> broadcastCommandMap = new HashMap<String, List<Command>>();
     private GlobalActionsListener actionsListener;
 
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
