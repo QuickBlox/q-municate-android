@@ -15,11 +15,4 @@
         android:paddingTop="10dp"
         android:layout_gravity="center"/>
 
-    <com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator
-        android:id="@+id/smiles_pager_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp" />
-
 </LinearLayout>

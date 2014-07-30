@@ -18,6 +18,12 @@
 
     <include layout="@layout/view_input_message_layout"/>
 
-    <include layout="@layout/view_smiles_pager"/>
+    <fragment
+        android:id="@+id/emojicons_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        class="com.quickblox.qmunicate.ui.chats.emoji1.EmojiconsFragment"/>
+
+    <!--<include layout="@layout/view_smiles_pager"/>-->
 
 </LinearLayout>

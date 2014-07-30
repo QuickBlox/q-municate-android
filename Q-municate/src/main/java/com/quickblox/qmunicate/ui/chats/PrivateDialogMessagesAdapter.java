@@ -14,7 +14,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.qb.commands.QBUpdateStatusMessageCommand;
-import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
+import com.quickblox.qmunicate.ui.chats.emoji1.EmojiconTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.DateUtils;
 
@@ -49,7 +49,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
         viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
         viewHolder.textMessageView = view.findViewById(R.id.text_message_view);
-        viewHolder.messageTextView = (ChatTextView) view.findViewById(R.id.message_textview);
+        viewHolder.messageTextView = (EmojiconTextView) view.findViewById(R.id.message_textview);
         viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
         viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
         viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);

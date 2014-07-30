@@ -1,0 +1,9 @@
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/smile_imageview"
+    android:layout_width="@dimen/smile_width"
+    android:layout_height="@dimen/smile_height"
+    android:background="@drawable/button_general_selector"
+    android:contentDescription="@string/ignore_content_description"
+    android:padding="@dimen/smile_padding"
+    android:scaleType="fitCenter"
+    android:layout_gravity="center" />

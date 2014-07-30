@@ -22,7 +22,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.tables.DialogMessageTable;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.views.RoundedImageView;
-import com.quickblox.qmunicate.ui.views.smiles.ChatTextView;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.ReceiveFileListener;
@@ -219,7 +218,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public View textMessageView;
         public RelativeLayout progressRelativeLayout;
         public RelativeLayout attachMessageRelativeLayout;
-        public ChatTextView messageTextView;
+        public TextView messageTextView;
         public ImageView attachImageView;
         public TextView timeTextMessageTextView;
         public TextView timeAttachMessageTextView;

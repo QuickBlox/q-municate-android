@@ -22,7 +22,7 @@
         android:src="@drawable/ic_send_message"
         android:layout_centerVertical="true" />
 
-    <com.quickblox.qmunicate.ui.views.smiles.ChatEditText
+    <com.quickblox.qmunicate.ui.chats.emoji1.EmojiconEditText
         android:id="@+id/message_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -32,6 +32,20 @@
         android:focusable="true"
         android:gravity="center_vertical|right|left"
         android:hint="@string/dlg_hint_message"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:layout_toRightOf="@+id/smile_panel_imagebutton" />
+
+    <ImageButton
+        android:id="@+id/smile_panel_imagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/chat_input_message_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="false"
+        android:background="@drawable/button_general_selector"
+        android:onClick="sendMessageOnClick"
+        android:padding="5dp"
+        android:src="@drawable/smile_ic"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>

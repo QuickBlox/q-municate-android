@@ -22,16 +22,16 @@ public class SmileTabFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_smiles, container, false);
-        smilesGrid = (GridView) view.findViewById(R.id.smiles_grid);
+        view = inflater.inflate(R.layout.view_smiles_grid, container, false);
+        smilesGrid = (GridView) view.findViewById(R.id.smiles_gridview);
         initGrid();
         return view;
     }
 
     public void initGrid() {
-        List<Integer> resources = getArguments().getIntegerArrayList(SmilesTabFragmentAdapter.RESOURCE_KEY);
+//        List<Integer> resources = getArguments().getIntegerArrayList(SmilesTabFragmentAdapter.RESOURCE_KEY);
         SmilesAdapter smilesAdapter = new SmilesAdapter(getActivity());
-        smilesAdapter.setResources(resources);
+//        smilesAdapter.setResources(resources);
         smilesGrid.setAdapter(smilesAdapter);
         smilesGrid.setOnItemClickListener(new OnSmileClickListener());
     }
