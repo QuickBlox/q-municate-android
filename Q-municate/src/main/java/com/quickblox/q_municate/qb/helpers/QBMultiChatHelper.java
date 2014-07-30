@@ -153,7 +153,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
-        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         try {
             chat.sendMessage(chatMessage);
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
         QBChatMessage chatMessage = ChatUtils.createUpdateChatNotificationMessage(dialog);
-        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         try {
             chat.sendMessage(chatMessage);
         } catch (Exception e) {
@@ -258,17 +258,14 @@ public class QBMultiChatHelper extends BaseChatHelper {
             Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-            long time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT).toString());
+            long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
             boolean isRead = false;
+            String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
 
-            // TODO Sergey Fedunets: temp decision
-            // String messageId = chatMessage.getProperty(PROPERTY_MESSAGE_ID).toString();
-            String messageId = time + Consts.EMPTY_STRING;
             Integer userId = AppSession.getSession().getUser().getId();
             if (chatMessage.getSenderId().equals(userId)) {
                 isRead = true;
             }
-            // end of todo
 
             saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, isRead));
