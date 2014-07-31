@@ -30,7 +30,7 @@ class EmojiAdapter extends ArrayAdapter<EmojiObject> {
         return view;
     }
 
-    class ViewHolder {
+    public class ViewHolder {
         TextView iconTextView;
     }
 }

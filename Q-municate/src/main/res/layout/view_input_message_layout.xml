@@ -19,6 +19,7 @@
         android:background="@drawable/button_general_selector"
         android:onClick="sendMessageOnClick"
         android:padding="5dp"
+        android:layout_marginTop="2dp"
         android:src="@drawable/ic_send_message"
         android:layout_centerVertical="true" />
 
@@ -44,6 +45,7 @@
         android:background="@drawable/button_general_selector"
         android:onClick="sendMessageOnClick"
         android:padding="5dp"
+        android:layout_marginTop="2dp"
         android:src="@drawable/smile_ic"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true" />

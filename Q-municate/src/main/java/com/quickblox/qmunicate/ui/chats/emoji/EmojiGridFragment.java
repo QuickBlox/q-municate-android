@@ -14,13 +14,14 @@ import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.Emoji;
 import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
 
 public class EmojiGridFragment extends Fragment implements AdapterView.OnItemClickListener {
+
     private OnEmojiconClickedListener mOnEmojiconClickedListener;
     private EmojiObject[] mData;
 
     protected static EmojiGridFragment newInstance(EmojiObject[] emojiObjects) {
         EmojiGridFragment emojiGridFragment = new EmojiGridFragment();
         Bundle args = new Bundle();
-        args.putSerializable("emojicons", emojiObjects);
+        args.putSerializable("fragment_emoji", emojiObjects);
         emojiGridFragment.setArguments(args);
         return emojiGridFragment;
     }
@@ -34,7 +35,7 @@ public class EmojiGridFragment extends Fragment implements AdapterView.OnItemCli
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
-        mData = getArguments() == null ? Emoji.DATA_PEOPLE : (EmojiObject[]) getArguments().getSerializable("emojicons");
+        mData = getArguments() == null ? Emoji.DATA_PEOPLE : (EmojiObject[]) getArguments().getSerializable("fragment_emoji");
         gridView.setAdapter(new EmojiAdapter(view.getContext(), mData));
         gridView.setOnItemClickListener(this);
     }
@@ -42,7 +43,7 @@ public class EmojiGridFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("emojicons", mData);
+        outState.putSerializable("fragment_emoji", mData);
     }
 
     @Override
