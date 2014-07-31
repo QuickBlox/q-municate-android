@@ -42,10 +42,6 @@ public class SplashActivity extends BaseActivity {
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
-        if (isFacebookSessionAlreadyExist()) {
-            return;
-        }
-
         String userEmail = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
 
@@ -55,13 +51,13 @@ public class SplashActivity extends BaseActivity {
                 false);
 
         if (isRememberMe && isEmailEntered && isPasswordEntered) {
-            login(userEmail, userPassword);
+            makeAutoLogin(userEmail, userPassword);
         } else {
             startLanding();
         }
     }
 
-    public boolean isFacebookSessionAlreadyExist() {
+    public boolean isLoggedViaFB() {
         return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
     }
 
@@ -92,6 +88,14 @@ public class SplashActivity extends BaseActivity {
     private void startLanding() {
         LandingActivity.start(SplashActivity.this);
         finish();
+    }
+
+    private void makeAutoLogin(String userEmail, String userPassword) {
+        if (isLoggedViaFB() || LoginType.EMAIL.equals(getCurrentLoginType())) {
+            login(userEmail, userPassword);
+        } else {
+            facebookHelper.loginWithFacebook();
+        }
     }
 
     private void login(String userEmail, String userPassword) {
