@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.ToggleButton;
 
 import com.quickblox.internal.core.exception.QBVideoException;
 import com.quickblox.module.chat.exceptions.QBChatException;
@@ -33,6 +35,7 @@ import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.Utils;
 
 import org.webrtc.SessionDescription;
@@ -132,7 +135,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(getContentView(), container, false);
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
-        rootView.findViewById(R.id.muteMicrophoneButton).setOnClickListener(this);
+        ToggleButton muteMicrophoneToggleBtn = (ToggleButton) rootView.findViewById(R.id.muteMicrophoneButton);
+        boolean microphoneMuted = MediaUtils.isMicrophoneMuted(getActivity());
+        muteMicrophoneToggleBtn.setChecked(microphoneMuted);
+        if (microphoneMuted){
+            ErrorUtils.showError(getActivity(), getActivity().getString(R.string.dlg_microphone_muted));
+        }
+        muteMicrophoneToggleBtn.setOnCheckedChangeListener(new MuteMicrophoneCheckedChangeListener());
         initChatData();
         reInitChatIfExist(rootView);
         postInit(rootView);
@@ -171,9 +180,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         switch (v.getId()) {
             case R.id.stopСallButton:
                 stopCall(true, STOP_TYPE.CLOSED);
-                break;
-            case R.id.muteMicrophoneButton:
-                muteMicrophone();
                 break;
             default:
                 break;
@@ -315,6 +321,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         } catch (QBVideoException e) {
             ErrorUtils.showError(getActivity(), getString(R.string.videochat_init_fail));
             stopCall(true, STOP_TYPE.CLOSED);
+        }
+    }
+
+    private class MuteMicrophoneCheckedChangeListener implements CompoundButton.OnCheckedChangeListener {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            muteMicrophone();
         }
     }
 

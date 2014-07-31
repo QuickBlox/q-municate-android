@@ -56,11 +56,13 @@ public abstract class BaseActivity extends Activity {
         return failAction;
     }
 
-    public void showProgress() {
-        progress.show(getFragmentManager(), null);
+    public synchronized void showProgress() {
+        if (progress.getActivity() == null) {
+            progress.show(getFragmentManager(), null);
+        }
     }
 
-    public void hideProgress() {
+    public synchronized void hideProgress() {
         if (progress != null && progress.getActivity() != null) {
             progress.dismissAllowingStateLoss();
         }
