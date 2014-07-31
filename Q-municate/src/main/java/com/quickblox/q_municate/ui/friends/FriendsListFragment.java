@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -374,8 +373,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private class LoadFriendsSuccessAction implements Command {
 
         @Override
-        public void execute(Bundle bundle) {
-            Log.i(TAG, "LoadFriendsSuccessAction");
+        public void execute(Bundle bundle){
             List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
             if (friendsList.isEmpty()) {

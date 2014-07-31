@@ -211,7 +211,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) throws Exception {
-            Log.i(TAG, "LoadFriendsSuccessAction");
             loadChatsDialogs();
         }
     }

@@ -113,14 +113,14 @@ public class ActivityDelegator extends BaseActivityDelegator{
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (intent != null && (action) != null) {
+                Log.d("STEPS", "executing " + action);
                 List<Command> commandList = broadcastCommandMap.get(action);
                 if(commandList != null && !commandList.isEmpty()) {
                     for (Command command : commandList) {
-                        Log.d("STEPS", "executing " + action);
                         try {
                             command.execute(intent.getExtras());
                         } catch (Exception e) {
-
+                            ErrorUtils.logError(e);
                         }
                     }
                 }
