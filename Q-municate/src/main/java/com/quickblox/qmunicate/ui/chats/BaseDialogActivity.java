@@ -1,24 +1,17 @@
 package com.quickblox.qmunicate.ui.chats;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,7 +22,6 @@ import com.quickblox.qmunicate.R;
 import com.quickblox.qmunicate.caching.DatabaseManager;
 import com.quickblox.qmunicate.core.command.Command;
 import com.quickblox.qmunicate.model.DialogMessageCache;
-import com.quickblox.qmunicate.model.SerializableKeys;
 import com.quickblox.qmunicate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.qmunicate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.qmunicate.qb.helpers.BaseChatHelper;
@@ -37,28 +29,21 @@ import com.quickblox.qmunicate.service.QBService;
 import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.base.BaseCursorAdapter;
 import com.quickblox.qmunicate.ui.base.BaseFragmentActivity;
-import com.quickblox.qmunicate.ui.chats.emoji1.EmojiconGridFragment;
-import com.quickblox.qmunicate.ui.chats.emoji1.EmojiconsFragment;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Emojicon;
-import com.quickblox.qmunicate.ui.chats.smil.GridFragment;
-import com.quickblox.qmunicate.ui.chats.smiles.SmilesTabFragmentAdapter;
+import com.quickblox.qmunicate.ui.chats.emoji.EmojiFragment;
+import com.quickblox.qmunicate.ui.chats.emoji.EmojiGridFragment;
+import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.qmunicate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.qmunicate.ui.views.indicator.IconPageIndicator;
-import com.quickblox.qmunicate.ui.views.smiles.SmileClickListener;
-import com.quickblox.qmunicate.ui.views.smiles.SmileysConvertor;
 import com.quickblox.qmunicate.utils.Consts;
 import com.quickblox.qmunicate.utils.ImageHelper;
 import com.quickblox.qmunicate.utils.KeyboardUtils;
 import com.quickblox.qmunicate.utils.SizeUtility;
 
 import java.io.File;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener,
+        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiconBackspaceClickedListener {
 
-    protected static final float SMILES_SIZE_IN_DIPS = 220;
+    protected static final float SMILES_PANEL_SIZE_IN_DIPS = 220;
 
     protected EditText chatEditText;
     protected ListView messagesListView;
@@ -68,10 +53,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ImageButton smilePanelImageButton;
     protected String currentOpponent;
     protected String dialogId;
-
     protected ViewPager smilesViewPager;
     protected View smilesLayout;
-    protected SmileSelectedBroadcastReceiver smileSelectedBroadcastReceiver;
+
     protected int layoutResID;
     protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
@@ -79,33 +63,32 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected boolean isNeedToScrollMessages;
     protected BitmapFactory.Options bitmapOptions;
     protected View emojiconsFragment;
-
     protected BaseChatHelper chatHelper;
 
     private int chatHelperIdentifier;
 
-    private static String[][] data = {
-            new String[]
-                    {},
-            new String[]//189
-                    {"\\ud83d\\ude01", "\\ud83d\\ude01", "\\ud83d\\ude01", "\\ud83d\\ude01"},
-            new String[]//189
-                    {"0xe331", "0xe331", "0xe331"},
-    };
+    public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
+        this.chatHelperIdentifier = chatHelperIdentifier;
+        this.layoutResID = layoutResID;
+    }
 
     @Override
-    public void onEmojiconClicked(Emojicon emojicon) {
-        EmojiconsFragment.input(messageEditText, emojicon);
+    public void onEmojiconClicked(EmojiObject emojiObject) {
+        EmojiFragment.input(messageEditText, emojiObject);
     }
 
     @Override
     public void onEmojiconBackspaceClicked(View v) {
-        EmojiconsFragment.backspace(messageEditText);
+        EmojiFragment.backspace(messageEditText);
     }
 
-    public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
-        this.chatHelperIdentifier = chatHelperIdentifier;
-        this.layoutResID = layoutResID;
+    @Override
+    public void onBackPressed() {
+        if (isSmilesLayoutShowing()) {
+            hideSmileLayout();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -119,14 +102,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initUI();
         initListeners();
 
-//        initSmileWidgets();
-//        initSmiles();
-
         initBitmapOption();
 
         addActions();
 
         isNeedToScrollMessages = true;
+
+        hideSmileLayout();
     }
 
     @Override
@@ -134,39 +116,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         super.onPause();
         onUpdateChatDialog();
         hideSmileLayout();
-    }
-
-    public void initSmileWidgets() {
-        List<GridFragment> gridFragments = new ArrayList<GridFragment>();
-        String[] itemsFragment;
-        for (int j = 1; j < data.length; j++) {
-            itemsFragment = new String[data[j].length];
-            for (int i = 0; i < data[j].length; i++) {
-                itemsFragment[i] = data[j][i];
-            }
-            gridFragments.add(new GridFragment(itemsFragment, BaseDialogActivity.this));
-        }
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager(), gridFragments);
-        smilesViewPager.setAdapter(pagerAdapter);
-    }
-
-    private class PagerAdapter extends FragmentStatePagerAdapter {
-        private List<GridFragment> fragments;
-
-        public PagerAdapter(FragmentManager fm, List<GridFragment> fragments) {
-            super(fm);
-            this.fragments = fragments;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return this.fragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return this.fragments.size();
-        }
     }
 
     protected void attachButtonOnClick() {
@@ -187,6 +136,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void showSmileLayout() {
         int smilesLayoutHeight = getSmileLayoutSizeInPixels();
+        KeyboardUtils.hideKeyboard(this);
         showView(emojiconsFragment, smilesLayoutHeight);
     }
 
@@ -292,6 +242,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void initListeners() {
+        messageEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideSmileLayout();
+            }
+        });
+
         messageEditText.addTextChangedListener(new SimpleTextWatcher() {
 
             @Override
@@ -314,7 +271,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected boolean isSmilesLayoutShowing() {
-        return smilesLayout.getHeight() != Consts.ZERO_INT_VALUE;
+        return emojiconsFragment.getHeight() != Consts.ZERO_INT_VALUE;
     }
 
     private void hideView(View view) {
@@ -351,7 +308,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private int getSmileLayoutSizeInPixels() {
-        return SizeUtility.dipToPixels(this, SMILES_SIZE_IN_DIPS);
+        return SizeUtility.dipToPixels(this, SMILES_PANEL_SIZE_IN_DIPS);
     }
 
     protected void startLoadDialogMessages() {
@@ -374,32 +331,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             onFileLoaded(file);
             hideProgress();
-        }
-    }
-
-    private class SmileSelectedBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int resourceId = intent.getIntExtra(SerializableKeys.SMILE_ID, R.drawable.smile);
-            int cursorPosition = chatEditText.getSelectionStart();
-            String roundTrip;
-            byte[] bytes = SmileysConvertor.getSymbolByResourceId(resourceId).getBytes(Charset.forName(Consts.ENCODING_UTF8));
-            roundTrip = new String(bytes, Charset.forName(Consts.ENCODING_UTF8));
-            chatEditText.getText().insert(cursorPosition, roundTrip);
-        }
-    }
-
-    private class OnSmileClickListener implements SmileClickListener {
-
-        @Override
-        public void onSmileClick() {
-            if (isSmilesLayoutShowing()) {
-                hideSmileLayout();
-            } else {
-                KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
-                showSmileLayout();
-            }
         }
     }
 }

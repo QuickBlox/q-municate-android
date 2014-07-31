@@ -22,7 +22,7 @@
         android:id="@+id/emojicons_fragment"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        class="com.quickblox.qmunicate.ui.chats.emoji1.EmojiconsFragment"/>
+        class="com.quickblox.qmunicate.ui.chats.emoji.EmojiFragment"/>
 
     <!--<include layout="@layout/view_smiles_pager"/>-->
 

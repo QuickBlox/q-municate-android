@@ -1,20 +1,4 @@
-/*
- * Copyright 2014 Hieu Rocker
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package com.quickblox.qmunicate.ui.chats.emoji1;
+package com.quickblox.qmunicate.ui.chats.emoji;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -28,27 +12,18 @@ import android.view.*;
 import android.widget.EditText;
 
 import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Emojicon;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Nature;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Objects;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.People;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Places;
-import com.quickblox.qmunicate.ui.chats.emoji1.emoji.Symbols;
+import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.Emoji;
+import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
 
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author Hieu Rocker (rockerhieu@gmail.com).
- */
-public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChangeListener {
+public class EmojiFragment extends Fragment implements ViewPager.OnPageChangeListener {
     private OnEmojiconBackspaceClickedListener mOnEmojiconBackspaceClickedListener;
     private int mEmojiTabLastSelectedIndex = -1;
     private View[] mEmojiTabs;
 
-    public static EmojiconsFragment instance;
-
-
+    public static EmojiFragment instance;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,11 +31,11 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
         final ViewPager emojisPager = (ViewPager) view.findViewById(R.id.emojis_pager);
         emojisPager.setOnPageChangeListener(this);
         EmojisPagerAdapter emojisAdapter = new EmojisPagerAdapter(getFragmentManager(), Arrays.asList(
-                EmojiconGridFragment.newInstance(People.DATA),
-                EmojiconGridFragment.newInstance(Nature.DATA),
-                EmojiconGridFragment.newInstance(Objects.DATA),
-                EmojiconGridFragment.newInstance(Places.DATA),
-                EmojiconGridFragment.newInstance(Symbols.DATA)
+                EmojiGridFragment.newInstance(Emoji.DATA_PEOPLE),
+                EmojiGridFragment.newInstance(Emoji.DATA_NATURE),
+                EmojiGridFragment.newInstance(Emoji.DATA_OBJECTS),
+                EmojiGridFragment.newInstance(Emoji.DATA_PLACES),
+                EmojiGridFragment.newInstance(Emoji.DATA_SYMBOLS)
         ));
         emojisPager.setAdapter(emojisAdapter);
 
@@ -109,17 +84,17 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
         super.onDetach();
     }
 
-    public static void input(EditText editText, Emojicon emojicon) {
-        if (editText == null || emojicon == null) {
+    public static void input(EditText editText, EmojiObject emojiObject) {
+        if (editText == null || emojiObject == null) {
             return;
         }
 
         int start = editText.getSelectionStart();
         int end = editText.getSelectionEnd();
         if (start < 0) {
-            editText.append(emojicon.getEmoji());
+            editText.append(emojiObject.getEmoji());
         } else {
-            editText.getText().replace(Math.min(start, end), Math.max(start, end), emojicon.getEmoji(), 0, emojicon.getEmoji().length());
+            editText.getText().replace(Math.min(start, end), Math.max(start, end), emojiObject.getEmoji(), 0, emojiObject.getEmoji().length());
         }
     }
 
@@ -157,9 +132,9 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
     }
 
     private static class EmojisPagerAdapter extends FragmentStatePagerAdapter {
-        private List<EmojiconGridFragment> fragments;
+        private List<EmojiGridFragment> fragments;
 
-        public EmojisPagerAdapter(FragmentManager fm, List<EmojiconGridFragment> fragments) {
+        public EmojisPagerAdapter(FragmentManager fm, List<EmojiGridFragment> fragments) {
             super(fm);
             this.fragments = fragments;
         }

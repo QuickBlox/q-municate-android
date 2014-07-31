@@ -74,7 +74,7 @@
 
                 </LinearLayout>
 
-                <com.quickblox.qmunicate.ui.chats.emoji1.EmojiconTextView
+                <com.quickblox.qmunicate.ui.chats.emoji.EmojiTextView
                     android:id="@+id/message_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

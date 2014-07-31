@@ -22,7 +22,7 @@
         android:src="@drawable/ic_send_message"
         android:layout_centerVertical="true" />
 
-    <com.quickblox.qmunicate.ui.chats.emoji1.EmojiconEditText
+    <com.quickblox.qmunicate.ui.chats.emoji.EmojiEditText
         android:id="@+id/message_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
