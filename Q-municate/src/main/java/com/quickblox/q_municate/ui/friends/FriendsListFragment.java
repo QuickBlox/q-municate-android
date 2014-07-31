@@ -39,6 +39,7 @@ import java.util.List;
 
 public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, FilterQueryProvider {
 
+    private static final String TAG = FriendsListFragment.class.getSimpleName();
     private List<Friend> usersList;
     private UserListAdapter usersListAdapter;
     private LinearLayout globalSearchLayout;
@@ -372,7 +373,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private class LoadFriendsSuccessAction implements Command {
 
         @Override
-        public void execute(Bundle bundle) {
+        public void execute(Bundle bundle){
             List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
             if (friendsList.isEmpty()) {

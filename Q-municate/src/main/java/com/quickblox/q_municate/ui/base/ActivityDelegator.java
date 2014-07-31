@@ -22,6 +22,8 @@ import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
@@ -29,7 +31,7 @@ public class ActivityDelegator extends BaseActivityDelegator{
 
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
-    private Map<String, Command> broadcastCommandMap = new HashMap<String, Command>();
+    private Map<String, List<Command>> broadcastCommandMap = new HashMap<String, List<Command>>();
     private GlobalActionsListener actionsListener;
 
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
@@ -58,7 +60,12 @@ public class ActivityDelegator extends BaseActivityDelegator{
     }
 
     public void addAction(String action, Command command) {
-        broadcastCommandMap.put(action, command);
+        List<Command> commandList = broadcastCommandMap.get(action);
+        if(commandList == null){
+            commandList = new LinkedList<Command>();
+            broadcastCommandMap.put(action, commandList);
+        }
+        commandList.add(command);
     }
 
     public boolean hasAction(String action) {
@@ -106,13 +113,15 @@ public class ActivityDelegator extends BaseActivityDelegator{
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (intent != null && (action) != null) {
-                Command command = broadcastCommandMap.get(action);
-                if (command != null) {
-                    Log.d("STEPS", "executing " + action);
-                    try {
-                        command.execute(intent.getExtras());
-                    } catch (Exception e) {
-
+                Log.d("STEPS", "executing " + action);
+                List<Command> commandList = broadcastCommandMap.get(action);
+                if(commandList != null && !commandList.isEmpty()) {
+                    for (Command command : commandList) {
+                        try {
+                            command.execute(intent.getExtras());
+                        } catch (Exception e) {
+                            ErrorUtils.logError(e);
+                        }
                     }
                 }
             }

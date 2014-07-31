@@ -103,13 +103,19 @@ public class QBFriendListHelper extends BaseHelper {
 
     public List<Integer> updateFriendList() throws QBResponseException {
         List<Integer> userIds = getUserIdsFromRoster();
-        updateFriends(userIds);
+        if (!userIds.isEmpty()) {
+            updateFriends(userIds);
+        }
         return userIds;
     }
 
     private List<Integer> getUserIdsFromRoster() {
         Collection<QBRosterEntry> entries = roster.getEntries();
         List<Integer> userIds = new ArrayList<Integer>();
+        if (roster == null){
+            ErrorUtils.logError(TAG, "ROSTER isn't initialized");
+            return userIds;
+        }
         for (QBRosterEntry entry : entries) {
             userIds.add(entry.getUserId());
         }
