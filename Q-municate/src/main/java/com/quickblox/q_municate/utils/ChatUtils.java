@@ -27,7 +27,7 @@ public class ChatUtils {
     public static final String PROPERTY_ROOM_JID = "room_jid";
     public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
-    public static final String PROPERTY_MESSAGE_ID = "chat_message_id";
+    public static final String PROPERTY_MESSAGE_ID = "message_id";
     public static final String PROPERTY_DATE_SENT = "date_sent";
     public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
     public static final String VALUE_SAVE_TO_HISTORY = "1";
