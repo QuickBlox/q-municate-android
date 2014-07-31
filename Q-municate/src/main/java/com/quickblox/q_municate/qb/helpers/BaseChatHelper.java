@@ -8,7 +8,6 @@ import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.helper.StringifyArrayList;
-import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
@@ -18,7 +17,6 @@ import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
@@ -40,15 +38,11 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     protected QBChatService chatService;
     protected QBUser chatCreator;
-    protected static String PROPERTY_MESSAGE_ID = "chat_message_id";
-    protected static String PROPERTY_DATE_SENT = "date_sent";
-    protected static String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
-    protected static String VALUE_SAVE_TO_HISTORY = "1";
     protected QBPrivateChatManager privateChatManager;
-    protected PrivateChatMessageListener privateChatMessageListener = new PrivateChatMessageListener();
+    protected PrivateChatMessageListener privateChatMessageListener;
 
-    private QBPrivateChatManagerListener privateChatManagerListener = new PrivateChatManagerListener();
-    private List<QBNotificationChatListener> notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
+    private QBPrivateChatManagerListener privateChatManagerListener;
+    private List<QBNotificationChatListener> notificationChatListeners;
 
     public interface QBNotificationChatListener {
 
@@ -57,6 +51,9 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     public BaseChatHelper(Context context) {
         super(context);
+        privateChatMessageListener = new PrivateChatMessageListener();
+        privateChatManagerListener = new PrivateChatManagerListener();
+        notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
     }
 
     public void saveMessageToCache(DialogMessageCache dialogMessageCache) {
@@ -102,27 +99,15 @@ public abstract class BaseChatHelper extends BaseHelper {
             attachment.setUrl(file.getPublicUrl());
             chatMessage.addAttachment(attachment);
         }
-        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
-        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
+        chatMessage.setProperty(ChatUtils.PROPERTY_SAVE_TO_HISTORY, ChatUtils.VALUE_SAVE_TO_HISTORY);
         return chatMessage;
     }
 
-    public void updateStatusMessage(QBDialog dialog, String messageId, long dateSent, boolean isRead) throws QBResponseException {
+    public void updateStatusMessage(QBDialog dialog, String messageId, boolean isRead) throws QBResponseException {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageId);
-
-        // TODO Sergey Fedunets: temp decision
-        if(QBDialogType.GROUP.equals(dialog.getType()) || messageId == null) {
-            Bundle bundle = new Bundle();
-            QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-            customObjectRequestBuilder.eq(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT, dateSent);
-            QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
-        }
-        // end of todo
-        else {
-            QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
-        }
-
+        QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
 
@@ -153,6 +138,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
         String fullname = friend.getFullname();
+
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {

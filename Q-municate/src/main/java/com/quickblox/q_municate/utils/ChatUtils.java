@@ -21,12 +21,16 @@ public class ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
 
-    private static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
-    private static final String PROPERTY_ROOM_NAME = "name";
-    private static final String PROPERTY_DIALOG_TYPE_CODE = "type";
-    private static final String PROPERTY_ROOM_JID = "room_jid";
+    public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
+    public static final String PROPERTY_ROOM_NAME = "name";
+    public static final String PROPERTY_DIALOG_TYPE_CODE = "type";
+    public static final String PROPERTY_ROOM_JID = "room_jid";
     public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
+    public static final String PROPERTY_MESSAGE_ID = "message_id";
+    public static final String PROPERTY_DATE_SENT = "date_sent";
+    public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
+    public static final String VALUE_SAVE_TO_HISTORY = "1";
 
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
     public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
