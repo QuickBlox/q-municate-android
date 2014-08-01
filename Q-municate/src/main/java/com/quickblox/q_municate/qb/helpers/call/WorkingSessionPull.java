@@ -1,11 +1,14 @@
 package com.quickblox.q_municate.qb.helpers.call;
 
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class WorkingSessionPull {
 
+    private static final String TAG = WorkingSessionPull.class.getSimpleName();
     private Map<String, WorkingSession> activeSessions;
     private int defaultSize;
 
@@ -41,6 +44,7 @@ public class WorkingSessionPull {
     public boolean existActive() {
         for (Map.Entry<String, WorkingSession> entry:activeSessions.entrySet()) {
             if (entry.getValue().isActive()) {
+                Log.i(TAG, "existActive");
                 return true;
             }
         }
