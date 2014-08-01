@@ -23,11 +23,13 @@ import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.Utils;
 
 import java.io.File;
 
 public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChatManagerListener {
 
+    private static final String TAG = QBPrivateChatHelper.class.getSimpleName();
     private QBPrivateChatManager privateChatManager;
     private QBNotificationChatListener notificationChatListener;
     private QBDialog currentDialog;
@@ -71,7 +73,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     @Override
-    public QBPrivateChat createChatLocally(QBDialog currentDialog, Bundle additional) {
+    public QBPrivateChat createChatLocally(QBDialog currentDialog, Bundle additional) throws QBResponseException {
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         QBPrivateChat privateChat = createChat(opponentId);
         this.currentDialog = currentDialog;
@@ -83,7 +85,12 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         currentDialog = null;
     }
 
-    private QBPrivateChat createChat(int opponentId) {
+    private QBPrivateChat createChat(int opponentId) throws QBResponseException {
+        boolean notNull = Utils.validateNotNull(privateChatManager);
+        if( !notNull){
+            ErrorUtils.logError(TAG, " privateChatManager is NULL");
+            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
+        }
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
             privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);

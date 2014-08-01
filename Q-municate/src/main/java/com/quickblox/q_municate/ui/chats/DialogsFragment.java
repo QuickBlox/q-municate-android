@@ -111,8 +111,6 @@ public class DialogsFragment extends BaseFragment {
         Friend occupant = dialogsAdapter.getOccupantById(occupantId);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
-        } else {
-            PrivateDialogActivity.start(baseActivity, occupant, null);
         }
     }
 

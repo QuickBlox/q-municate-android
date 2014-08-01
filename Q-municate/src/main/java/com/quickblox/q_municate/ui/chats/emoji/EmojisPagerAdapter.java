@@ -8,20 +8,20 @@ import java.util.List;
 
 public class EmojisPagerAdapter extends FragmentPagerAdapter {
 
-    private List<EmojiGridFragment> fragments;
+    private List<EmojiGridFragment> fragmentsList;
 
-    public EmojisPagerAdapter(FragmentManager fm, List<EmojiGridFragment> fragments) {
+    public EmojisPagerAdapter(FragmentManager fm, List<EmojiGridFragment> fragmentsList) {
         super(fm);
-        this.fragments = fragments;
+        this.fragmentsList = fragmentsList;
     }
 
     @Override
     public Fragment getItem(int i) {
-        return fragments.get(i);
+        return fragmentsList.get(i);
     }
 
     @Override
     public int getCount() {
-        return fragments.size();
+        return fragmentsList.size();
     }
 }
