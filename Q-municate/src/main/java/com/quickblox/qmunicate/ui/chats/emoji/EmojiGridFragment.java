@@ -10,40 +10,21 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.quickblox.qmunicate.R;
+import com.quickblox.qmunicate.service.QBServiceConsts;
 import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.Emoji;
 import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
 
 public class EmojiGridFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private OnEmojiconClickedListener mOnEmojiconClickedListener;
-    private EmojiObject[] mData;
+    private EmojiObject[] emojiObjects;
 
     protected static EmojiGridFragment newInstance(EmojiObject[] emojiObjects) {
         EmojiGridFragment emojiGridFragment = new EmojiGridFragment();
         Bundle args = new Bundle();
-        args.putSerializable("fragment_emoji", emojiObjects);
+        args.putSerializable(QBServiceConsts.EXTRA_EMOJIS, emojiObjects);
         emojiGridFragment.setArguments(args);
         return emojiGridFragment;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.emojicon_grid, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
-        mData = getArguments() == null ? Emoji.DATA_PEOPLE : (EmojiObject[]) getArguments().getSerializable("fragment_emoji");
-        gridView.setAdapter(new EmojiAdapter(view.getContext(), mData));
-        gridView.setOnItemClickListener(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("fragment_emoji", mData);
     }
 
     @Override
@@ -51,11 +32,34 @@ public class EmojiGridFragment extends Fragment implements AdapterView.OnItemCli
         super.onAttach(activity);
         if (activity instanceof OnEmojiconClickedListener) {
             mOnEmojiconClickedListener = (OnEmojiconClickedListener) activity;
-        } else if(getParentFragment() instanceof OnEmojiconClickedListener) {
+        } else if (getParentFragment() instanceof OnEmojiconClickedListener) {
             mOnEmojiconClickedListener = (OnEmojiconClickedListener) getParentFragment();
         } else {
-            throw new IllegalArgumentException(activity + " must implement interface " + OnEmojiconClickedListener.class.getSimpleName());
+            throw new IllegalArgumentException(
+                    activity + " must implement interface " + OnEmojiconClickedListener.class
+                            .getSimpleName());
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.view_emoji_grid, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
+        emojiObjects = getArguments() == null ? Emoji.DATA_PEOPLE : (EmojiObject[]) getArguments()
+                .getSerializable(QBServiceConsts.EXTRA_EMOJIS);
+        gridView.setAdapter(new EmojiAdapter(view.getContext(), emojiObjects));
+        gridView.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(QBServiceConsts.EXTRA_EMOJIS, emojiObjects);
     }
 
     @Override
@@ -72,6 +76,7 @@ public class EmojiGridFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     public interface OnEmojiconClickedListener {
+
         void onEmojiconClicked(EmojiObject emojiObject);
     }
 }

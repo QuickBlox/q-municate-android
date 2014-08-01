@@ -40,7 +40,7 @@
 
     <!-- EmojiTabs styles -->
     <style name="EmojiTabImageButton" parent="android:Widget.ImageButton">
-        <item name="android:background">@drawable/button_general_selector</item>
+        <item name="android:background">@drawable/tab_emoji_selector</item>
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>

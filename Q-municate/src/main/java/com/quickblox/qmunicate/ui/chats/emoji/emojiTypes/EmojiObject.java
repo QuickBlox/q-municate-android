@@ -3,6 +3,7 @@ package com.quickblox.qmunicate.ui.chats.emoji.emojiTypes;
 import java.io.Serializable;
 
 public class EmojiObject implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private int icon;
     private char value;

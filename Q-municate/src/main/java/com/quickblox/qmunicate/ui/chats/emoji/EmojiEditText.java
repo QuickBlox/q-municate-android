@@ -14,7 +14,6 @@ public class EmojiEditText extends EditText {
     public EmojiEditText(Context context) {
         super(context);
         emojiconSize = (int) getTextSize();
-
     }
 
     public EmojiEditText(Context context, AttributeSet attrs) {
@@ -36,7 +35,7 @@ public class EmojiEditText extends EditText {
 
     @Override
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
-        EmojiHandler.addEmojis(getContext(), getText(), emojiconSize);
+        EmojiCreator.addEmojis(getContext(), getText(), emojiconSize);
     }
 
     public void setEmojiconSize(int pixels) {

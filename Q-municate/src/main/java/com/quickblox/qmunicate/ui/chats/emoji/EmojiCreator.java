@@ -6,17 +6,12 @@ import android.util.SparseIntArray;
 
 import com.quickblox.qmunicate.R;
 
-public final class EmojiHandler {
-
-    private EmojiHandler() {
-    }
+public final class EmojiCreator {
 
     private static final int SIZE_EMOJI_SPARSE = 900;
-    private static final int SIZE_SOFT_BANKS = 500;
-
     private static final SparseIntArray emojisSparseArray = new SparseIntArray(SIZE_EMOJI_SPARSE);
+    private static final int SIZE_SOFT_BANKS = 500;
     private static final SparseIntArray softBanksSparseArray = new SparseIntArray(SIZE_SOFT_BANKS);
-
     static {
         // People
         emojisSparseArray.put(0x1f604, R.drawable.emoji_1f604);
@@ -1326,6 +1321,9 @@ public final class EmojiHandler {
         softBanksSparseArray.put(0xe537, R.drawable.emoji_2122);
     }
 
+    private EmojiCreator() {
+    }
+
     private static boolean isSoftBankEmoji(char c) {
         return ((c >> 12) == 0xe);
     }
@@ -1338,13 +1336,6 @@ public final class EmojiHandler {
         return softBanksSparseArray.get(c);
     }
 
-    /**
-     * Convert emoji characters of the given Spannable to the according emojicon.
-     *
-     * @param context
-     * @param text
-     * @param emojiSize
-     */
     public static void addEmojis(Context context, Spannable text, int emojiSize) {
         int length = text.length();
         EmojiSpan[] oldSpans = text.getSpans(0, length, EmojiSpan.class);
@@ -1456,7 +1447,8 @@ public final class EmojiHandler {
             }
 
             if (icon > 0) {
-                text.setSpan(new EmojiSpan(context, icon, emojiSize), i, i + skip, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                text.setSpan(new EmojiSpan(context, icon, emojiSize), i, i + skip,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
     }

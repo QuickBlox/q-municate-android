@@ -7,8 +7,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,7 +41,7 @@ import com.quickblox.qmunicate.utils.SizeUtility;
 import java.io.File;
 
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener,
-        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiconBackspaceClickedListener {
+        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     protected static final float SMILES_PANEL_SIZE_IN_DIPS = 220;
 
@@ -53,16 +53,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected ImageButton smilePanelImageButton;
     protected String currentOpponent;
     protected String dialogId;
-    protected ViewPager smilesViewPager;
-    protected View smilesLayout;
+    protected View emojisFragment;
+    protected ImageHelper imageHelper;
 
     protected int layoutResID;
-    protected ImageHelper imageHelper;
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
     protected BitmapFactory.Options bitmapOptions;
-    protected View emojiconsFragment;
     protected BaseChatHelper chatHelper;
 
     private int chatHelperIdentifier;
@@ -78,7 +76,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     @Override
-    public void onEmojiconBackspaceClicked(View v) {
+    public void onEmojiBackspaceClicked(View v) {
         EmojiFragment.backspace(messageEditText);
     }
 
@@ -118,6 +116,23 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         hideSmileLayout();
     }
 
+    @Override
+    protected void onConnectedToService(QBService service) {
+        if (chatHelper == null) {
+            chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
+            chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+        }
+    }
+
+    @Override
+    protected void onReceiveMessage(Bundle extras) {
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
+        if (!isFromCurrentChat) {
+            super.onReceiveMessage(extras);
+        }
+    }
+
     protected void attachButtonOnClick() {
         canPerformLogout.set(false);
         imageHelper.getImage();
@@ -131,13 +146,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void hideSmileLayout() {
-        hideView(emojiconsFragment);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) emojisFragment.getLayoutParams();
+        params.height = Consts.ZERO_INT_VALUE;
+        emojisFragment.setLayoutParams(params);
+        setSmilePanelIcon(R.drawable.ic_smile);
     }
 
     private void showSmileLayout() {
         int smilesLayoutHeight = getSmileLayoutSizeInPixels();
-        KeyboardUtils.hideKeyboard(this);
-        showView(emojiconsFragment, smilesLayoutHeight);
+        showView(emojisFragment, smilesLayoutHeight);
+        setSmilePanelIcon(R.drawable.ic_keyboard);
     }
 
     protected void addActions() {
@@ -162,6 +180,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (chatHelper != null) {
+            chatHelper.closeChat(dialog, generateBundleToInitDialog());
+        }
+        removeActions();
+    }
+
     protected void initColorsActionBar() {
         int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
@@ -181,28 +208,19 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
+    protected void removeActions() {
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
+        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+    }
+
     private void initBitmapOption() {
         bitmapOptions = new BitmapFactory.Options();
         bitmapOptions.inDither = false;
         bitmapOptions.inPurgeable = true;
         bitmapOptions.inInputShareable = true;
         bitmapOptions.inTempStorage = new byte[32 * 1024];
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (chatHelper != null) {
-            chatHelper.closeChat(dialog, generateBundleToInitDialog());
-        }
-        removeActions();
-    }
-
-    protected void removeActions() {
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
     }
 
     protected abstract void onFileSelected(Uri originalUri);
@@ -218,20 +236,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
     }
 
-    @Override
-    protected void onConnectedToService(QBService service) {
-        if (chatHelper == null) {
-            chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
-            chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
-        }
-    }
-
     protected abstract Bundle generateBundleToInitDialog();
 
     private void initUI() {
-        emojiconsFragment = _findViewById(R.id.emojicons_fragment);
-        smilesLayout = _findViewById(R.id.smiles_linearlayout);
-        smilesViewPager = _findViewById(R.id.smiles_viewpager);
+        emojisFragment = _findViewById(R.id.emojicons_fragment);
         chatEditText = _findViewById(R.id.message_edittext);
         messagesListView = _findViewById(R.id.messages_listview);
         messageEditText = _findViewById(R.id.message_edittext);
@@ -242,10 +250,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void initListeners() {
-        messageEditText.setOnClickListener(new View.OnClickListener() {
+        messageEditText.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onTouch(View view, MotionEvent event) {
                 hideSmileLayout();
+                return false;
             }
         });
 
@@ -261,23 +270,28 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 }
             }
         });
+
         smilePanelImageButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                showSmileLayout();
+                if(isSmilesLayoutShowing()) {
+                    hideSmileLayout();
+                    KeyboardUtils.showKeyboard(BaseDialogActivity.this);
+                } else {
+                    KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
+                    showSmileLayout();
+                }
             }
         });
     }
 
-    protected boolean isSmilesLayoutShowing() {
-        return emojiconsFragment.getHeight() != Consts.ZERO_INT_VALUE;
+    private void setSmilePanelIcon(int resourceId) {
+        smilePanelImageButton.setImageResource(resourceId);
     }
 
-    private void hideView(View view) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-        params.height = Consts.ZERO_INT_VALUE;
-        view.setLayoutParams(params);
+    protected boolean isSmilesLayoutShowing() {
+        return emojisFragment.getHeight() != Consts.ZERO_INT_VALUE;
     }
 
     private void showView(View view, int height) {
@@ -289,15 +303,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onScrollToBottom() {
         scrollListView();
-    }
-
-    @Override
-    protected void onReceiveMessage(Bundle extras) {
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
-        if (!isFromCurrentChat) {
-            super.onReceiveMessage(extras);
-        }
     }
 
     protected void scrollListView() {

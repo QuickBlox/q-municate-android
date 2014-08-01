@@ -41,13 +41,10 @@ public class EmojiTextView extends TextView {
     @Override
     public void setText(CharSequence text, BufferType type) {
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
-        EmojiHandler.addEmojis(getContext(), builder, emojiconSize);
+        EmojiCreator.addEmojis(getContext(), builder, emojiconSize);
         super.setText(builder, type);
     }
 
-    /**
-     * Set the size of emojicon in pixels.
-     */
     public void setEmojiconSize(int pixels) {
         emojiconSize = pixels;
     }
