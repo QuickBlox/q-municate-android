@@ -1,5 +1,5 @@
-<RelativeLayout android:id="@+id/message_relativelayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_relativelayout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/chat_input_message_height"
     android:background="@color/white">
@@ -23,7 +23,7 @@
         android:padding="5dp"
         android:src="@drawable/ic_send_message" />
 
-    <com.quickblox.qmunicate.ui.chats.emoji.EmojiEditText
+    <com.quickblox.q_municate.ui.chats.emoji.EmojiEditText
         android:id="@+id/message_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

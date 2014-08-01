@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:padding="10dp">
 
-    <com.quickblox.qmunicate.ui.views.RoundedImageView
+    <com.quickblox.q_municate.ui.views.RoundedImageView
         android:id="@+id/avatar_imageview"
         android:layout_width="@dimen/image_view_small_avatar_layout_width"
         android:layout_height="@dimen/image_view_small_avatar_layout_height"
@@ -74,7 +74,7 @@
 
                 </LinearLayout>
 
-                <com.quickblox.qmunicate.ui.chats.emoji.EmojiTextView
+                <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
                     android:id="@+id/message_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

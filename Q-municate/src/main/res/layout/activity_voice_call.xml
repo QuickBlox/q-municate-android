@@ -37,16 +37,15 @@
 
         </LinearLayout>
 
-        <com.quickblox.qmunicate.ui.views.RoundedImageView
+        <com.quickblox.q_municate.ui.views.RoundedImageView
             android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/act_call_avatar_size"
             android:layout_height="@dimen/act_call_avatar_size"
             android:layout_alignParentTop="false"
-            android:layout_alignWithParentIfMissing="false"
             android:layout_centerInParent="true"
             android:layout_gravity="center"
+            android:scaleType="centerCrop"
             android:layout_marginTop="@dimen/act_call_margin_top"
-            app:oval="true"
             android:src="@drawable/placeholder_user" />
 
         <LinearLayout
