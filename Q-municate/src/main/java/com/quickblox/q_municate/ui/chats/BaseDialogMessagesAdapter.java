@@ -21,11 +21,13 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.tables.DialogMessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
-import com.quickblox.q_municate.ui.views.MaskGenerator;
+import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.qmunicate.utils.ReceiveMaskedBitmapListener;
+import com.quickblox.qmunicate.utils.ReceiveMaskedImageFileTask;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,13 +36,11 @@ import java.util.Random;
 
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
 
+    private final int colorMaxValue = 255;
+    private final float colorAlpha = 0.8f;
     protected ScrollMessagesListener scrollMessagesListener;
     protected ImageHelper imageHelper;
     protected QBDialog dialog;
-
-    private final int colorMaxValue = 255;
-    private final float colorAlpha = 0.8f;
-
     private Random random;
     private Map<Integer, Integer> colorsMap;
 
@@ -67,8 +67,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder, int maskedBackgroundId) {
-        ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView, Consts.UIL_DEFAULT_DISPLAY_OPTIONS,
-                new SimpleImageLoading(viewHolder, maskedBackgroundId),
+        ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
+                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new SimpleImageLoading(viewHolder, maskedBackgroundId),
                 new SimpleImageLoadingProgressListener(viewHolder));
     }
 
@@ -184,7 +184,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
                 @Override
                 public void onClick(View view) {
-                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
+                    view.startAnimation(AnimationUtils.loadAnimation(context,
+                            R.anim.chat_attached_file_click));
                     new ReceiveImageFileTask(BaseDialogMessagesAdapter.this).execute(imageHelper,
                             loadedImageBitmap, false);
                 }
@@ -211,6 +212,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     public class ViewHolder {
+
         public RoundedImageView avatarImageView;
         public TextView nameTextView;
         public View textMessageView;

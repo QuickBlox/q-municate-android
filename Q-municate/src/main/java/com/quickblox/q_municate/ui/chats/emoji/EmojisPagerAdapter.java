@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

@@ -1,11 +1,11 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.text.style.DynamicDrawableSpan;
 
-import com.quickblox.qmunicate.utils.Consts;
-import com.quickblox.qmunicate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
 
 class EmojiSpan extends DynamicDrawableSpan {
 

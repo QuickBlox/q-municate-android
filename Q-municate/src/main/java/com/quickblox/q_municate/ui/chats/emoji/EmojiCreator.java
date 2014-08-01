@@ -1,10 +1,10 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.content.Context;
 import android.text.Spannable;
 import android.util.SparseIntArray;
 
-import com.quickblox.qmunicate.R;
+import com.quickblox.q_municate.R;
 
 public final class EmojiCreator {
 

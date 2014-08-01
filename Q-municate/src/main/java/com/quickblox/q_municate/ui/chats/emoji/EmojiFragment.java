@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.Emoji;
-import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
-import com.quickblox.qmunicate.utils.Consts;
+import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.Emoji;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
+import com.quickblox.q_municate.utils.Consts;
 
 import java.util.Arrays;
 

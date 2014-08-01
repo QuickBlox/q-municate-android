@@ -16,8 +16,8 @@ import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.caching.tables.DialogMessageTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.ui.views.smiles.ChatTextView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 

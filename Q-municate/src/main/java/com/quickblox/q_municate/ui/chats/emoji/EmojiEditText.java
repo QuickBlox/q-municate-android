@@ -1,11 +1,11 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import com.quickblox.qmunicate.R;
+import com.quickblox.q_municate.R;
 
 public class EmojiEditText extends EditText {
 

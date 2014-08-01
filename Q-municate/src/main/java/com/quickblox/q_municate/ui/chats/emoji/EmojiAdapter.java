@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.content.Context;
 import android.view.View;
@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 
 class EmojiAdapter extends ArrayAdapter<EmojiObject> {
 

@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.chats.emoji;
+package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,10 +9,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.quickblox.qmunicate.R;
-import com.quickblox.qmunicate.service.QBServiceConsts;
-import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.Emoji;
-import com.quickblox.qmunicate.ui.chats.emoji.emojiTypes.EmojiObject;
+import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.Emoji;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 
 public class EmojiGridFragment extends Fragment implements AdapterView.OnItemClickListener {
 

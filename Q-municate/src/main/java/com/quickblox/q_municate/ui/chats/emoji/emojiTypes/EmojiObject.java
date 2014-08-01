@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.ui.chats.emoji.emojiTypes;
+package com.quickblox.q_municate.ui.chats.emoji.emojiTypes;
 
 import java.io.Serializable;
 

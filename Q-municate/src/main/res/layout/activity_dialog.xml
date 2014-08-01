@@ -22,6 +22,6 @@
         android:id="@+id/emojicons_fragment"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        class="com.quickblox.qmunicate.ui.chats.emoji.EmojiFragment"/>
+        class="com.quickblox.q_municate.ui.chats.emoji.EmojiFragment"/>
 
 </LinearLayout>

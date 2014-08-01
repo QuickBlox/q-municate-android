@@ -2,7 +2,8 @@ package com.quickblox.qmunicate.utils;
 
 import android.graphics.Bitmap;
 
-import com.quickblox.qmunicate.core.concurrency.BaseAsyncTask;
+import com.quickblox.q_municate.core.concurrency.BaseAsyncTask;
+import com.quickblox.q_municate.utils.ImageHelper;
 
 public class ReceiveMaskedImageFileTask extends BaseAsyncTask {
 
