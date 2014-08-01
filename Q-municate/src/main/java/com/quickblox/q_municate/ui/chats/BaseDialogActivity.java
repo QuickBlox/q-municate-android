@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,14 +35,11 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.SizeUtility;
 
 import java.io.File;
 
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener,
         EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
-
-    protected static final float SMILES_PANEL_SIZE_IN_DIPS = 220;
 
     protected EditText chatEditText;
     protected ListView messagesListView;
@@ -146,15 +142,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void hideSmileLayout() {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) emojisFragment.getLayoutParams();
-        params.height = Consts.ZERO_INT_VALUE;
-        emojisFragment.setLayoutParams(params);
+        emojisFragment.setVisibility(View.GONE);
         setSmilePanelIcon(R.drawable.ic_smile);
     }
 
     private void showSmileLayout() {
-        int smilesLayoutHeight = getSmileLayoutSizeInPixels();
-        showView(emojisFragment, smilesLayoutHeight);
+        emojisFragment.setVisibility(View.VISIBLE);
         setSmilePanelIcon(R.drawable.ic_keyboard);
     }
 
@@ -291,13 +284,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected boolean isSmilesLayoutShowing() {
-        return emojisFragment.getHeight() != Consts.ZERO_INT_VALUE;
-    }
-
-    private void showView(View view, int height) {
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-        params.height = height;
-        view.setLayoutParams(params);
+        return emojisFragment.getVisibility() == View.VISIBLE;
     }
 
     @Override
@@ -310,10 +297,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             isNeedToScrollMessages = false;
             messagesListView.setSelection(messagesAdapter.getCount() - 1);
         }
-    }
-
-    private int getSmileLayoutSizeInPixels() {
-        return SizeUtility.dipToPixels(this, SMILES_PANEL_SIZE_IN_DIPS);
     }
 
     protected void startLoadDialogMessages() {

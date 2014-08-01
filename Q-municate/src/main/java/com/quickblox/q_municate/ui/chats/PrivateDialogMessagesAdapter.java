@@ -64,12 +64,12 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         resetUI(viewHolder);
 
         if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
             int maskedBackgroundId = getMaskedImageBackgroundId(senderId);
             displayAttachImage(attachUrl, viewHolder, maskedBackgroundId);
         } else {
-            viewHolder.textMessageView.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(body);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
         }

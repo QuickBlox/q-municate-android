@@ -42,9 +42,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             view = layoutInflater.inflate(R.layout.list_item_group_message_opponent, null, true);
             viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
             viewHolder.avatarImageView.setOval(true);
-            viewHolder.avatarImageView.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.avatarImageView, View.VISIBLE);
             viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
-            viewHolder.nameTextView.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.nameTextView, View.VISIBLE);
         }
 
         viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
@@ -94,11 +94,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!TextUtils.isEmpty(attachUrl)) {
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.progressRelativeLayout.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             int maskedBackgroundId = getMaskedImageBackgroundId(senderId);
             displayAttachImage(attachUrl, viewHolder, maskedBackgroundId);
         } else {
-            viewHolder.textMessageView.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
             viewHolder.messageTextView.setText(body);
         }

@@ -68,7 +68,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder, int maskedBackgroundId) {
         ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
-                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new SimpleImageLoading(viewHolder, maskedBackgroundId),
+                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder, maskedBackgroundId),
                 new SimpleImageLoadingProgressListener(viewHolder));
     }
 
@@ -93,9 +93,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     protected void resetUI(ViewHolder viewHolder) {
-        viewHolder.attachMessageRelativeLayout.setVisibility(View.GONE);
-        viewHolder.progressRelativeLayout.setVisibility(View.GONE);
-        viewHolder.textMessageView.setVisibility(View.GONE);
+        setViewVisibility(viewHolder.attachMessageRelativeLayout, View.GONE);
+        setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
+        setViewVisibility(viewHolder.textMessageView, View.GONE);
     }
 
     private int getRandomColor() {
@@ -136,13 +136,17 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         imageHelper.showFullImage(context, absolutePath);
     }
 
-    public class SimpleImageLoading extends SimpleImageLoadingListener implements ReceiveMaskedBitmapListener {
+    protected void setViewVisibility(View view, int visibility) {
+        view.setVisibility(visibility);
+    }
+
+    public class ImageLoadingListener extends SimpleImageLoadingListener implements ReceiveMaskedBitmapListener {
 
         private ViewHolder viewHolder;
         private int maskedBackgroundId;
         private Bitmap loadedImageBitmap;
 
-        public SimpleImageLoading(ViewHolder viewHolder, int maskedBackgroundId) {
+        public ImageLoadingListener(ViewHolder viewHolder, int maskedBackgroundId) {
             this.viewHolder = viewHolder;
             this.maskedBackgroundId = maskedBackgroundId;
         }
@@ -151,8 +155,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public void onMaskedImageBitmapReceived(Bitmap maskedImageBitmap) {
             hideAttachmentBackground(viewHolder.attachImageView);
             viewHolder.attachImageView.setImageBitmap(maskedImageBitmap);
-            viewHolder.attachMessageRelativeLayout.setVisibility(View.VISIBLE);
-            viewHolder.attachImageView.setVisibility(View.VISIBLE);
+            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
+            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
             updateUIAfterLoading();
             scrollMessagesListener.onScrollToBottom();
         }
@@ -175,7 +179,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
         private void updateUIAfterLoading() {
             if (viewHolder.progressRelativeLayout != null) {
-                viewHolder.progressRelativeLayout.setVisibility(View.GONE);
+                setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
             }
         }
 
