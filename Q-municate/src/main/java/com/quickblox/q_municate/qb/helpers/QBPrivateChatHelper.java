@@ -20,10 +20,10 @@ import com.quickblox.q_municate.model.DialogMessageCache;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
-import com.quickblox.q_municate.utils.CheckUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.Utils;
 
 import java.io.File;
 
@@ -86,7 +86,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     private QBPrivateChat createChat(int opponentId) throws QBResponseException {
-        boolean notNull = CheckUtils.validateNotNull(privateChatManager);
+        boolean notNull = Utils.validateNotNull(privateChatManager);
         if( !notNull){
             ErrorUtils.logError(TAG, " privateChatManager is NULL");
             throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
