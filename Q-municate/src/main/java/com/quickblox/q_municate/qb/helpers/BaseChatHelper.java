@@ -63,7 +63,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     /*
     Call this method when you want start chating by existing dialog
      */
-    public abstract QBChat createChatLocally(QBDialog dialogId, Bundle additional);
+    public abstract QBChat createChatLocally(QBDialog dialogId, Bundle additional) throws QBResponseException;
 
     public abstract void closeChat(QBDialog dialogId, Bundle additional);
 

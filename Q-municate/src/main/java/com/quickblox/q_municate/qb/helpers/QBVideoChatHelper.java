@@ -97,6 +97,11 @@ public class QBVideoChatHelper extends BaseHelper {
         }
     }
 
+    private boolean isExistSameSession(String sessionId){
+        WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(sessionId);
+        return (session != null );
+    }
+
     private class VideoSignalingListener extends SignalingListenerImpl {
 
         @Override
@@ -108,8 +113,7 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onCall(ConnectionConfig connectionConfig) {
             String sessionId = connectionConfig.getConnectionSession();
             lo.g("onCall sessionId="+sessionId);
-            WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(sessionId);
-            if ( (session != null && session.isActive()) || workingSessionPull.existActive() ) {
+            if ( isExistSameSession(sessionId) || workingSessionPull.existActive() ) {
                 return;
             }
 

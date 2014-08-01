@@ -206,6 +206,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         if (existingPrivateDialog != null) {
             PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
         } else {
+            showProgress();
             QBCreatePrivateChatCommand.start(this, friend);
         }
     }
@@ -224,6 +225,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) throws Exception {
+            hideProgress();
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog != null) {
                 PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);

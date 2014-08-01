@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
@@ -41,6 +42,7 @@ import com.quickblox.q_municate.ui.views.smiles.ChatEditText;
 import com.quickblox.q_municate.ui.views.smiles.SmileClickListener;
 import com.quickblox.q_municate.ui.views.smiles.SmileysConvertor;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.SizeUtility;
@@ -224,7 +226,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onConnectedToService(QBService service) {
         if (chatHelper == null) {
             chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
-            chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+            try {
+                chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+            } catch (QBResponseException e) {
+                ErrorUtils.showError(this, e.getMessage());
+                finish();
+            }
         }
     }
 
