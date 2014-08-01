@@ -38,7 +38,7 @@
                 android:maxLines="2"
                 android:ellipsize="end" />
 
-            <com.quickblox.q_municate.ui.views.smiles.ChatTextView
+            <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_chat_progress_bars" />
+
+        <include layout="@layout/view_chat_text_message_opponent" />
+
+        <include layout="@layout/view_chat_attach_message_opponent" />
+
+    </LinearLayout>
+
+</RelativeLayout>

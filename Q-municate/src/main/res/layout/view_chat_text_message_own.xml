@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/text_message_view"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/chat_babble_margin"
+    android:background="@drawable/right_bubble"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:visibility="gone">
+
+    <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+        android:id="@+id/message_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|left"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small" />
+
+    <TextView
+        android:id="@+id/time_text_message_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:alpha="0.5"
+        android:paddingRight="12dp"
+        android:paddingTop="3dp"
+        android:textColor="@color/white" />
+
+</LinearLayout>

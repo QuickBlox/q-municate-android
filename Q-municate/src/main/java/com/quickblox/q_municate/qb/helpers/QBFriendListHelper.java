@@ -215,7 +215,7 @@ public class QBFriendListHelper extends BaseHelper {
         public void presenceChanged(QBPresence presence) {
             Friend friend = DatabaseManager.getFriendById(context, presence.getUserId());
             if (friend == null) {
-                ErrorUtils.logError(TAG, "Could not find friend in DB by Id = " + friend.getId());
+                ErrorUtils.logError(TAG, "Could not find friend in DB by Id = " + presence.getUserId());
                 return;
             }
             fillFriendOnlineStatus(friend);
