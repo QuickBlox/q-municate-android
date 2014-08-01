@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class WorkingSessionPull {
 
+    private static final String TAG = WorkingSessionPull.class.getSimpleName();
     private Map<String, WorkingSession> activeSessions;
     private int defaultSize;
 

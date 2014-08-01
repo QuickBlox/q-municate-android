@@ -87,7 +87,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
             @Override
             public void onChange(boolean selfChange) {
-                setOnlineStatus();
+                friend = DatabaseManager.getFriendById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getId());
+                setOnlineStatus(friend);
             }
 
             @Override
@@ -114,7 +115,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private void initUIWithFriendsData() {
         loadAvatar();
         setName();
-        setOnlineStatus();
+        setOnlineStatus(friend);
         setPhone();
     }
 
@@ -137,8 +138,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneTextView.setText(friend.getPhone());
     }
 
-    private void setOnlineStatus() {
-        Friend friend = DatabaseManager.getFriendById(this, this.friend.getId());
+    private void setOnlineStatus(Friend friend) {
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
         } else {
@@ -206,6 +206,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         if (existingPrivateDialog != null) {
             PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
         } else {
+            showProgress();
             QBCreatePrivateChatCommand.start(this, friend);
         }
     }
@@ -224,6 +225,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) throws Exception {
+            hideProgress();
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog != null) {
                 PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);

@@ -96,4 +96,8 @@ public class Utils {
         }
         return integerList;
     }
+
+    public static boolean validateNotNull(Object object){
+        return object != null;
+    }
 }

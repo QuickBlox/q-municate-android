@@ -26,6 +26,7 @@ import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.Utils;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -35,6 +36,7 @@ import java.util.List;
 
 public class QBMultiChatHelper extends BaseChatHelper {
 
+    private static final String TAG = QBMultiChatHelper.class.getSimpleName();
     private QBRoomChatManager roomChatManager;
     private QBRoomChat roomChat;
     private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
@@ -46,7 +48,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     @Override
-    public QBChat createChatLocally(QBDialog dialog, Bundle additional) {
+    public QBChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
         QBRoomChat roomChat = createChatIfNotExist(dialog);
         currentDialog = dialog;
         return roomChat;
@@ -176,7 +178,12 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    private QBRoomChat createChatIfNotExist(QBDialog dialog) {
+    private QBRoomChat createChatIfNotExist(QBDialog dialog) throws QBResponseException {
+        boolean notNull = Utils.validateNotNull(roomChatManager);
+        if( !notNull){
+            ErrorUtils.logError(TAG, " roomChatManager is NULL");
+            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
+        }
         roomChat = roomChatManager.getRoom(dialog.getRoomJid());
         if (roomChat == null) {
             roomChat = roomChatManager.createRoom(dialog.getRoomJid());
@@ -185,7 +192,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         return roomChat;
     }
 
-    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException {
+    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
         QBRoomChat roomChat = createChatIfNotExist(dialog);
         roomChat.join();
     }
