@@ -83,7 +83,7 @@
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
-    <string name="dlg_no_chats">There are no chats yet.</string>
+    <string name="dlg_no_chats">Oops…\nYou don\'t have any chats, \ntap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
@@ -100,6 +100,7 @@
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
     <string name="ndl_ac_mode_title">Group chat participants:</string>
+    <string name="ndl_no_friends_for_new_chat">You don\'t have any Friends for creating New Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>

@@ -23,6 +23,8 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.utils.ChatUtils;
+import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.DialogUtils;
 
 import java.util.ArrayList;
 
@@ -33,7 +35,6 @@ public class DialogsFragment extends BaseFragment {
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
-    private static boolean isChatsListLoaded = false;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -131,10 +132,19 @@ public class DialogsFragment extends BaseFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                NewDialogActivity.start(baseActivity);
+                startNewDialogPage();
                 break;
         }
         return true;
+    }
+
+    private void startNewDialogPage() {
+        boolean isFriends = DatabaseManager.getAllFriends(baseActivity).getCount() > Consts.ZERO_INT_VALUE;
+        if (isFriends) {
+            NewDialogActivity.start(baseActivity);
+        } else {
+            DialogUtils.showLong(baseActivity, getResources().getString(R.string.ndl_no_friends_for_new_chat));
+        }
     }
 
     private void addActions() {
@@ -150,7 +160,6 @@ public class DialogsFragment extends BaseFragment {
         public void execute(Bundle bundle) {
             ArrayList<QBDialog> dialogsList = (ArrayList<QBDialog>) bundle.getSerializable(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            isChatsListLoaded = true;
             if (dialogsList.isEmpty()) {
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
