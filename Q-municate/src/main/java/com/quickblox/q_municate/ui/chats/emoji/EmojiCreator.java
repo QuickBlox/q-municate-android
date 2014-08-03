@@ -5,6 +5,7 @@ import android.text.Spannable;
 import android.util.SparseIntArray;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.Consts;
 
 public final class EmojiCreator {
 
@@ -1338,6 +1339,9 @@ public final class EmojiCreator {
 
     public static void addEmojis(Context context, Spannable text, int emojiSize) {
         int length = text.length();
+        if (length == Consts.ZERO_INT_VALUE) {
+            return;
+        }
         EmojiSpan[] oldSpans = text.getSpans(0, length, EmojiSpan.class);
         for (int i = 0; i < oldSpans.length; i++) {
             text.removeSpan(oldSpans[i]);

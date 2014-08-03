@@ -3,17 +3,23 @@ package com.quickblox.q_municate.ui.chats;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
@@ -27,7 +33,13 @@ import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.q_municate.ui.views.RoundedImageView;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
+import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.ImageHelper;
+
+import java.io.FileNotFoundException;
 
 public class GroupDialogDetailsActivity extends BaseLogeableActivity {
 
@@ -35,6 +47,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     private TextView participantsTextView;
     private ListView friendsListView;
     private TextView onlineParticipantsTextView;
+    private RoundedImageView avatarImageView;
 
     private String groupNameCurrent;
     private String groupNameOld;
@@ -44,6 +57,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
 
     private Object actionMode;
     private boolean closeActionMode;
+    private boolean isNeedUpdateAvatar;
+    private Bitmap avatarBitmapCurrent;
+    private ImageHelper imageHelper;
 
     public static void start(Context context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -57,7 +73,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         setContentView(R.layout.activity_group_dialog_details);
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(this, dialogId));
-
+        imageHelper = new ImageHelper(this);
         initUI();
         initUIWithData();
         addActions();
@@ -70,7 +86,14 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         QBLoadGroupDialogCommand.start(this, dialogId, groupDialog.getRoomJid());
     }
 
+    public void changeAvatarOnClick(View view) {
+        canPerformLogout.set(false);
+        imageHelper.getImage();
+    }
+
     private void initUI() {
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        avatarImageView.setOval(true);
         groupNameEditText = _findViewById(R.id.name_textview);
         participantsTextView = _findViewById(R.id.participants_textview);
         friendsListView = _findViewById(R.id.chat_friends_listview);
@@ -155,6 +178,25 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            isNeedUpdateAvatar = true;
+            Uri originalUri = data.getData();
+            try {
+                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
+                avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
+            } catch (FileNotFoundException e) {
+                ErrorUtils.logError(e);
+            }
+            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
+                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+            startAction();
+        }
+        canPerformLogout.set(true);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void startAction() {
         if (actionMode != null) {
             return;
@@ -173,7 +215,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     }
 
     private boolean isGroupDataChanged(String groupName) {
-        return !groupName.equals(groupNameOld);
+        return !groupName.equals(groupNameOld) || isNeedUpdateAvatar;
     }
 
     private void saveChanges(final String groupNameCurrent) {
@@ -213,8 +255,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeActionMode) {
-                updateCurrentUserData();
                 updateUserData();
+                updateCurrentUserData();
             }
             actionMode = null;
         }

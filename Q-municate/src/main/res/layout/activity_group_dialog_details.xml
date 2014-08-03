@@ -11,13 +11,14 @@
         android:layout_margin="35dp"
         android:orientation="horizontal">
 
-        <ImageView
+        <com.quickblox.q_municate.ui.views.RoundedImageView
             android:id="@+id/avatar_imageview"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:src="@drawable/placeholder_user" />
+            android:src="@drawable/placeholder_user"
+            android:onClick="changeAvatarOnClick" />
 
         <LinearLayout
             android:layout_width="wrap_content"

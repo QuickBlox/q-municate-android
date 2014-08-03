@@ -3,10 +3,12 @@ package com.quickblox.q_municate.ui.chats.emoji;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.Consts;
 
 public class EmojiTextView extends TextView {
 
@@ -40,6 +42,10 @@ public class EmojiTextView extends TextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
+        if (text == null) {
+            super.setText(Consts.EMPTY_STRING);
+            return;
+        }
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         EmojiCreator.addEmojis(getContext(), builder, emojiconSize);
         super.setText(builder, type);
