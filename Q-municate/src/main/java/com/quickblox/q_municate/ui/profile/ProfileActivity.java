@@ -49,7 +49,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private RelativeLayout changeFullNameRelativeLayout;
     private RelativeLayout changePhoneRelativeLayout;
     private RelativeLayout changeStatusRelativeLayout;
-    private TextView avatarTextView;
     private TextView emailTextView;
     private EditText fullNameEditText;
     private EditText phoneEditText;
@@ -93,7 +92,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     private void initUI() {
         changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
-        avatarTextView = _findViewById(R.id.avatar_textview);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         avatarImageView.setOval(true);
         emailLinearLayout = _findViewById(R.id.email_linearlayout);
@@ -299,12 +297,14 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         fullnameOld = fullNameEditText.getText().toString();
         phoneOld = phoneEditText.getText().toString();
         statusOld = statusEditText.getText().toString();
+        isNeedUpdateAvatar = false;
     }
 
     private void resetUserData() {
         user.setFullName(fullnameOld);
         user.setPhone(phoneOld);
         user.setCustomData(statusOld);
+        isNeedUpdateAvatar = false;
     }
 
     private class TextWatcherListener extends SimpleTextWatcher {
