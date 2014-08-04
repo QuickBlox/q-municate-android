@@ -81,7 +81,7 @@
                     android:ellipsize="end"
                     android:paddingTop="10dp"
                     android:singleLine="true"
-                    android:textColor="@color/black"
+                    android:textColor="@color/dark_gray"
                     android:textSize="@dimen/text_size" />
 
             </LinearLayout>
