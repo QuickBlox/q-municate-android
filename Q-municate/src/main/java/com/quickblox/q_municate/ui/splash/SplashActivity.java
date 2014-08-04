@@ -39,8 +39,8 @@ public class SplashActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
         setContentView(R.layout.activity_splash);
-        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+
+        addActions();
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
@@ -57,6 +57,11 @@ public class SplashActivity extends BaseActivity {
         } else {
             startLanding();
         }
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
     }
 
     public boolean isLoggedViaFB() {
@@ -109,6 +114,10 @@ public class SplashActivity extends BaseActivity {
         return AppSession.getSession().getLoginType();
     }
 
+    private void startMainActivity() {
+        MainActivity.start(SplashActivity.this);
+    }
+
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
@@ -132,7 +141,7 @@ public class SplashActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            MainActivity.start(SplashActivity.this);
+            startMainActivity();
             finish();
         }
     }
