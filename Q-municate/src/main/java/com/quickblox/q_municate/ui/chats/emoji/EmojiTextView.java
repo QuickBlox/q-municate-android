@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.chats.emoji;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -42,7 +41,7 @@ public class EmojiTextView extends TextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        if (TextUtils.isEmpty(text)) {
+        if (text == null) {
             super.setText(Consts.EMPTY_STRING);
             return;
         }
