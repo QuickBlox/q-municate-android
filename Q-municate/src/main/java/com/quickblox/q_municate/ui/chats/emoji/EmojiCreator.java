@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.chats.emoji;
 
 import android.content.Context;
 import android.text.Spannable;
+import android.text.TextUtils;
 import android.util.SparseIntArray;
 
 import com.quickblox.q_municate.R;
@@ -1339,7 +1340,7 @@ public final class EmojiCreator {
 
     public static void addEmojis(Context context, Spannable text, int emojiSize) {
         int length = text.length();
-        if (length == Consts.ZERO_INT_VALUE) {
+        if (TextUtils.isEmpty(text)) {
             return;
         }
         EmojiSpan[] oldSpans = text.getSpans(0, length, EmojiSpan.class);

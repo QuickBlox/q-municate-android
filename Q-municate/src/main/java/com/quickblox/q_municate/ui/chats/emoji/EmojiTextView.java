@@ -42,7 +42,7 @@ public class EmojiTextView extends TextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        if (text == null) {
+        if (TextUtils.isEmpty(text)) {
             super.setText(Consts.EMPTY_STRING);
             return;
         }
