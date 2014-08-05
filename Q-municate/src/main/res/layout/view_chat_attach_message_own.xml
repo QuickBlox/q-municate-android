@@ -1,20 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/attach_message_relativelayout"
     android:layout_width="@dimen/chat_attach_width"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/chat_attach_height"
     android:orientation="horizontal"
     android:padding="5dp"
     android:visibility="gone">
 
     <ImageView
         android:id="@+id/attach_imageview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
+        android:layout_width="@dimen/chat_attach_width"
+        android:layout_height="@dimen/chat_attach_height"
         android:clickable="true"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:scaleType="fitCenter"
+        android:layout_gravity="center"
+        android:scaleType="center"
         android:src="@null"
         android:visibility="gone" />
 
