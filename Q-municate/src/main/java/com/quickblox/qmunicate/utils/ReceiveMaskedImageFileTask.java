@@ -32,7 +32,7 @@ public class ReceiveMaskedImageFileTask extends BaseAsyncTask {
         Bitmap loadedImageBitmap = (Bitmap) params[2];
 
         backgroundBitmap = imageHelper.decodeBackgroundBubbleImage(resourcesId);
-        maskedImageBitmap = imageHelper.generateMask(backgroundBitmap, loadedImageBitmap);
+        maskedImageBitmap = imageHelper.generateMaskedBitmap(backgroundBitmap, loadedImageBitmap);
 
         return maskedImageBitmap;
     }

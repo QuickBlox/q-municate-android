@@ -14,7 +14,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_gravity="center"
-        android:scaleType="center"
+        android:scaleType="fitCenter"
         android:src="@null" />
 
     <TextView

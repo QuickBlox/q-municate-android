@@ -171,6 +171,13 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             initMaskedImageView(loadedBitmap);
         }
 
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+            super.onLoadingStarted(imageUri, view);
+            viewHolder.verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+            viewHolder.centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+        }
+
         private void initMaskedImageView(Bitmap loadedBitmap) {
             loadedImageBitmap = loadedBitmap;
             makeMaskedImageView();

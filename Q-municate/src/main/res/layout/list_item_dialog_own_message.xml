@@ -11,96 +11,11 @@
         android:layout_alignParentRight="true"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/progress_relativelayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone">
+        <include layout="@layout/view_chat_progress_bars" />
 
-            <ProgressBar
-                android:id="@+id/vertical_progressbar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="@dimen/chat_attach_width"
-                android:layout_height="@dimen/chat_attach_height"
-                android:max="100"
-                android:visibility="gone" />
+        <include layout="@layout/view_chat_text_message_own" />
 
-            <ProgressBar
-                android:id="@+id/centered_progressbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:indeterminate="false"
-                android:max="100"
-                android:visibility="gone" />
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:id="@+id/text_message_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/chat_babble_margin"
-            android:background="@drawable/right_bubble"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:visibility="gone">
-
-            <com.quickblox.q_municate.ui.views.smiles.ChatTextView
-                android:id="@+id/message_textview"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|left"
-                android:layout_weight="1"
-                android:paddingRight="5dp"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_small" />
-
-            <TextView
-                android:id="@+id/time_text_message_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|top"
-                android:paddingTop="3dp"
-                android:paddingRight="12dp"
-                android:textColor="@color/white"
-                android:alpha="0.5" />
-
-        </LinearLayout>
-
-        <RelativeLayout
-            android:id="@+id/attach_message_relativelayout"
-            android:layout_width="@dimen/chat_attach_width"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/attach_imageview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:clickable="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:scaleType="fitCenter"
-                android:src="@null" />
-
-            <TextView
-                android:id="@+id/time_attach_message_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
-                android:background="@drawable/badge_attach_message_time"
-                android:textColor="@color/black"
-                android:alpha="0.5"
-                android:padding="4dp" />
-
-        </RelativeLayout>
+        <include layout="@layout/view_chat_attach_message_own" />
 
     </LinearLayout>
 

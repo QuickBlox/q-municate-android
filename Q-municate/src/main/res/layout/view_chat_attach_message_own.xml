@@ -14,9 +14,8 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:layout_gravity="center"
-        android:scaleType="center"
-        android:src="@null"
-        android:visibility="gone" />
+        android:scaleType="fitCenter"
+        android:src="@null" />
 
     <TextView
         android:id="@+id/time_attach_message_textview"

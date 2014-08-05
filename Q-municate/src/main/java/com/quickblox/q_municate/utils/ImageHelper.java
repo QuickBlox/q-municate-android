@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -30,8 +29,6 @@ import com.quickblox.q_municate.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -50,79 +47,6 @@ public class ImageHelper {
     public ImageHelper(Activity activity) {
         this.activity = activity;
         resources = activity.getResources();
-    }
-
-    private enum ScalingLogic {
-        CROP, FIT
-    }
-
-    public Bitmap getBitmap(Bitmap bitmapOrg, int dstWidth, int dstHeight) {
-        Bitmap scaledBitmap = createScaledBitmap(bitmapOrg, dstWidth,
-                dstHeight, ScalingLogic.FIT);
-        bitmapOrg.recycle();
-
-        return scaledBitmap;
-    }
-
-    private Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
-        Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(),
-                dstWidth, dstHeight, scalingLogic);
-        Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(),
-                dstWidth, dstHeight, scalingLogic);
-        Bitmap scaledBitmap = Bitmap.createBitmap(dstRect.width(), dstRect.height(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(scaledBitmap);
-        canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, new Paint(Paint.FILTER_BITMAP_FLAG));
-
-        return scaledBitmap;
-    }
-
-    private Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
-        if (scalingLogic == ScalingLogic.CROP) {
-            final float srcAspect = (float)srcWidth / (float)srcHeight;
-            final float dstAspect = (float)dstWidth / (float)dstHeight;
-
-            if (srcAspect > dstAspect) {
-                final int srcRectWidth = (int)(srcHeight * dstAspect);
-                final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
-                return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
-            } else {
-                final int srcRectHeight = (int)(srcWidth / dstAspect);
-                final int scrRectTop = (int)(srcHeight - srcRectHeight) / 2;
-                return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
-            }
-        } else {
-            return new Rect(0, 0, srcWidth, srcHeight);
-        }
-    }
-
-    public Rect calculateDstRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
-            ScalingLogic scalingLogic) {
-        if (scalingLogic == ScalingLogic.FIT) {
-            final float srcAspect = (float)srcWidth / (float)srcHeight;
-            final float dstAspect = (float)dstWidth / (float)dstHeight;
-
-            if (srcAspect > dstAspect) {
-                return new Rect(0, 0, dstWidth, (int)(dstWidth / srcAspect));
-            } else {
-                return new Rect(0, 0, (int)(dstHeight * srcAspect), dstHeight);
-            }
-        } else {
-            return new Rect(0, 0, dstWidth, dstHeight);
-        }
-    }
-
-    // --------
-
-    public static Bitmap getScaledBitmap(Bitmap bitmapOrg, int width, int height, int preferredWidth) {
-        float scaleValue = ((float) preferredWidth) / width;
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleValue, scaleValue);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmapOrg, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE,
-                width, height, matrix, true);
-        return resizedBitmap;
     }
 
     public static ImageLoaderConfiguration getImageLoaderConfiguration(Context context) {
@@ -152,6 +76,59 @@ public class ImageHelper {
         return ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
     }
 
+    public Bitmap getBitmap(Bitmap bitmapOrg, int dstWidth, int dstHeight) {
+        Bitmap scaledBitmap = createScaledBitmap(bitmapOrg, dstWidth, dstHeight, ScalingLogic.FIT);
+        return scaledBitmap;
+    }
+
+    private Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
+            ScalingLogic scalingLogic) {
+        Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth,
+                dstHeight, scalingLogic);
+        Rect dstRect = calculateDstRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth,
+                dstHeight, scalingLogic);
+        Bitmap scaledBitmap = Bitmap.createBitmap(dstRect.width(), dstRect.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(scaledBitmap);
+        canvas.drawBitmap(unscaledBitmap, srcRect, dstRect, new Paint(Paint.FILTER_BITMAP_FLAG));
+        return scaledBitmap;
+    }
+
+    private Rect calculateSrcRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
+            ScalingLogic scalingLogic) {
+        if (scalingLogic == ScalingLogic.CROP) {
+            final float srcAspect = (float) srcWidth / (float) srcHeight;
+            final float dstAspect = (float) dstWidth / (float) dstHeight;
+
+            if (srcAspect > dstAspect) {
+                final int srcRectWidth = (int) (srcHeight * dstAspect);
+                final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
+                return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
+            } else {
+                final int srcRectHeight = (int) (srcWidth / dstAspect);
+                final int scrRectTop = (int) (srcHeight - srcRectHeight) / 2;
+                return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
+            }
+        } else {
+            return new Rect(0, 0, srcWidth, srcHeight);
+        }
+    }
+
+    public Rect calculateDstRect(int srcWidth, int srcHeight, int dstWidth, int dstHeight,
+            ScalingLogic scalingLogic) {
+        if (scalingLogic == ScalingLogic.FIT) {
+            final float srcAspect = (float) srcWidth / (float) srcHeight;
+            final float dstAspect = (float) dstWidth / (float) dstHeight;
+
+            if (srcAspect > dstAspect) {
+                return new Rect(0, 0, dstWidth, (int) (dstWidth / srcAspect));
+            } else {
+                return new Rect(0, 0, (int) (dstHeight * srcAspect), dstHeight);
+            }
+        } else {
+            return new Rect(0, 0, dstWidth, dstHeight);
+        }
+    }
+
     public void getImage() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             Intent intent = new Intent();
@@ -179,7 +156,7 @@ public class ImageHelper {
     }
 
     public String getAbsolutePathByBitmap(Bitmap origBitmap) {
-        File tempFile = new File(activity.getExternalFilesDir(null), "temp.png");
+        File tempFile = new File(activity.getExternalFilesDir(null), TEMP_FILE_NAME);
         ByteArrayOutputStream bos = null;
         FileOutputStream fos = null;
         try {
@@ -188,8 +165,8 @@ public class ImageHelper {
             byte[] bitmapData = bos.toByteArray();
             fos = new FileOutputStream(tempFile);
             fos.write(bitmapData);
-            fos.close();
-            bos.close();
+            Utils.closeOutputStream(fos);
+            Utils.closeOutputStream(bos);
         } catch (IOException e) {
             ErrorUtils.showError(activity, e);
         } finally {
@@ -201,9 +178,10 @@ public class ImageHelper {
 
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {
         int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
+        int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
         File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
-        Bitmap bitmap = getBitmap(origBitmap, width, width);
+        Bitmap bitmap = getBitmap(origBitmap, width, height);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, Consts.FULL_QUALITY, bos);
         byte[] bitmapData = bos.toByteArray();
@@ -218,32 +196,41 @@ public class ImageHelper {
         return BitmapFactory.decodeResource(resources, resourcesId);
     }
 
-    public Bitmap generateMask(Bitmap mask, Bitmap original) {
+    public Bitmap generateMaskedBitmap(Bitmap mask, Bitmap original) {
         int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
-        original = getBitmap(original, width, width);
-        Bitmap result = Bitmap.createBitmap(width, original.getHeight(), Bitmap.Config.ARGB_8888);
-        mask = getNinepatch(resources, mask, width, original.getHeight());
+        int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        mask = getNinepatch(resources, mask, width, height);
         Canvas canvas = new Canvas(result);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawBitmap(original, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, null);
+        int centerWidth = (width - original.getWidth()) / 2;
+        int centerHeight = (height - original.getHeight()) / 2;
+        canvas.drawColor(resources.getColor(R.color.chat_attach_background_color));
+        canvas.drawBitmap(original, centerWidth, centerHeight, null);
         canvas.drawBitmap(mask, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, paint);
         paint.setXfermode(null);
+        mask.recycle();
         return result;
     }
 
-    private Bitmap getNinepatch(Resources resource, Bitmap bitmap, int x, int y) {
+    private Bitmap getNinepatch(Resources resource, Bitmap bitmap, int width, int height) {
         byte[] chunk = bitmap.getNinePatchChunk();
-        NinePatchDrawable ninePatchDrawable = new NinePatchDrawable(resource, bitmap, chunk, new Rect(), null);
-        ninePatchDrawable.setBounds(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, x, y);
-        Bitmap outputBitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
+        NinePatchDrawable ninePatchDrawable = new NinePatchDrawable(resource, bitmap, chunk, new Rect(),
+                null);
+        ninePatchDrawable.setBounds(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, width, height);
+        Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(outputBitmap);
         ninePatchDrawable.draw(canvas);
         return outputBitmap;
     }
 
+    private enum ScalingLogic {
+        CROP, FIT
+    }
+
     /*
-    * TODO SF class will be realised for video attach
+    * TODO Sergey Fedunets: class will be realised for video attach
      */
     public static class SmartUriDecoder implements ImageDecoder {
 
