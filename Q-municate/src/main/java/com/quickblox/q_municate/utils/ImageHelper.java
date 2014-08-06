@@ -77,7 +77,7 @@ public class ImageHelper {
     }
 
     public Bitmap getBitmap(Bitmap bitmapOrg, int dstWidth, int dstHeight) {
-        Bitmap scaledBitmap = createScaledBitmap(bitmapOrg, dstWidth, dstHeight, ScalingLogic.FIT);
+        Bitmap scaledBitmap = createScaledBitmap(bitmapOrg, dstWidth, dstHeight, ScalingLogic.CROP);
         return scaledBitmap;
     }
 
