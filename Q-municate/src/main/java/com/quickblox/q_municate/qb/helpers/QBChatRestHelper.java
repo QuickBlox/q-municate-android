@@ -37,12 +37,15 @@ public class QBChatRestHelper extends BaseHelper {
 
     public synchronized void login(
             QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
+        lo.g("login in chat");
         if (!QBChatService.isInitialized()) {
+            lo.g("init chat service ");
             QBChatService.init(context);
             chatService = QBChatService.getInstance();
             chatService.addConnectionListener(connectionListener);
         }
         if (!chatService.isLoggedIn() && user != null) {
+            lo.g("login in chat user="+user.getId() + " user pswd="+user.getPassword());
             chatService.login(user);
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
         }
