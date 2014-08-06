@@ -43,6 +43,9 @@ import java.io.FileNotFoundException;
 
 public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileListener, View.OnClickListener {
 
+    private static String fullnameOld;
+    private static String phoneOld;
+    private static String statusOld;
     private LinearLayout changeAvatarLinearLayout;
     private RoundedImageView avatarImageView;
     private LinearLayout emailLinearLayout;
@@ -53,17 +56,11 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private EditText fullNameEditText;
     private EditText phoneEditText;
     private EditText statusEditText;
-
     private ImageHelper imageHelper;
-
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
     private String phoneCurrent;
     private String statusCurrent;
-    private static String fullnameOld;
-    private static String phoneOld;
-    private static String statusOld;
-
     private QBUser user;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
@@ -146,8 +143,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.avatar_imageview:
             case R.id.change_avatar_linearlayout:
                 changeAvatarOnClick();
@@ -225,6 +222,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void initChangingEditText(EditText editText) {
         editText.setEnabled(true);
         editText.requestFocus();
+        KeyboardUtils.showKeyboard(this);
     }
 
     private void stopChangingEditText(EditText editText) {
@@ -263,7 +261,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private boolean isUserDataChanged() {
-        return isNeedUpdateAvatar || !fullnameCurrent.equals(fullnameOld) || !phoneCurrent.equals(phoneOld) || !statusCurrent.equals(statusOld);
+        return isNeedUpdateAvatar || !fullnameCurrent.equals(fullnameOld) || !phoneCurrent.equals(
+                phoneOld) || !statusCurrent.equals(statusOld);
     }
 
     private void saveChanges() {

@@ -26,8 +26,8 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
-import com.quickblox.qmunicate.utils.ReceiveMaskedBitmapListener;
-import com.quickblox.qmunicate.utils.ReceiveMaskedImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveMaskedBitmapListener;
+import com.quickblox.q_municate.utils.ReceiveMaskedImageFileTask;
 
 import java.io.File;
 import java.util.HashMap;
@@ -169,6 +169,13 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
             initMaskedImageView(loadedBitmap);
+        }
+
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+            super.onLoadingStarted(imageUri, view);
+            viewHolder.verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+            viewHolder.centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
         }
 
         private void initMaskedImageView(Bitmap loadedBitmap) {

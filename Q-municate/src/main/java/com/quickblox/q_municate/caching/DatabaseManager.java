@@ -367,11 +367,12 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 dialog.getOccupants()));
-        if (!TextUtils.isEmpty(dialog.getLastMessage())) {
-            values.put(DialogTable.Cols.LAST_MESSAGE, dialog.getLastMessage());
-        }
         String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
-        values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        if (TextUtils.isEmpty(bodyLastMessage)) {
+            values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
+        } else {
+            values.put(DialogTable.Cols.LAST_MESSAGE, Html.fromHtml(bodyLastMessage).toString());
+        }
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
         return values;

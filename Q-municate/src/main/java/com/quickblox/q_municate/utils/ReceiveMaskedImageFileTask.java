@@ -1,9 +1,8 @@
-package com.quickblox.qmunicate.utils;
+package com.quickblox.q_municate.utils;
 
 import android.graphics.Bitmap;
 
 import com.quickblox.q_municate.core.concurrency.BaseAsyncTask;
-import com.quickblox.q_municate.utils.ImageHelper;
 
 public class ReceiveMaskedImageFileTask extends BaseAsyncTask {
 
@@ -32,7 +31,7 @@ public class ReceiveMaskedImageFileTask extends BaseAsyncTask {
         Bitmap loadedImageBitmap = (Bitmap) params[2];
 
         backgroundBitmap = imageHelper.decodeBackgroundBubbleImage(resourcesId);
-        maskedImageBitmap = imageHelper.generateMask(backgroundBitmap, loadedImageBitmap);
+        maskedImageBitmap = imageHelper.generateMaskedBitmap(backgroundBitmap, loadedImageBitmap);
 
         return maskedImageBitmap;
     }
