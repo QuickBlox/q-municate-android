@@ -67,5 +67,14 @@
         android:orientation="vertical">
 
         <include layout="@layout/view_separator_gray" />
+
+        <TextView
+            android:id="@+id/version_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:textSize="@dimen/text_size" />
     </LinearLayout>
 </LinearLayout>
