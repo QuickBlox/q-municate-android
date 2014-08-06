@@ -20,6 +20,7 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate.service.QBService;
+import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.ui.videocall.VideoCallFragment;
@@ -46,11 +47,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private ConnectionConfig currentConfig;
 
     public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (!friend.isOnline()) {
-            String callMsg = context.getResources().getString(R.string.dlg_offline_call,
-                    AppSession.getSession().getUser().getFullName());
-            QBSendPushCommand.start(context, callMsg, friend.getId());
-        }
+        Log.i (TAG,  "Friend.isOnline() = " + friend.isOnline());
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.EXTRA_FRIEND, friend);
         intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.OUTGOING);
@@ -107,6 +104,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         actionBar.hide();
         mediaPlayer = App.getInstance().getMediaPlayer();
         parseIntentExtras(getIntent().getExtras());
+        addAction(QBServiceConsts.SEND_PUSH_MESSAGES_FAIL_ACTION, failAction);
     }
 
     @Override
@@ -168,10 +166,19 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 sessionDescriptionWrapper = extras.getParcelable(Consts.REMOTE_DESCRIPTION);
                 showIncomingFragment();
             } else {
+                notifyFriendOnCall(opponent);
                 showOutgoingFragment();
             }
         }
         Log.i(TAG, "opponentId=" + opponent);
+    }
+
+    private void notifyFriendOnCall(Friend friend){
+        if (!friend.isOnline()) {
+            String callMsg = getResources().getString(R.string.dlg_offline_call,
+                    AppSession.getSession().getUser().getFullName());
+            QBSendPushCommand.start(this, callMsg, friend.getId());
+        }
     }
 
     private void showOutgoingFragment() {
