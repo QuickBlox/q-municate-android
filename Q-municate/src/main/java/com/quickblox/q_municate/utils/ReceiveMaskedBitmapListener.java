@@ -1,4 +1,4 @@
-package com.quickblox.qmunicate.utils;
+package com.quickblox.q_municate.utils;
 
 import android.graphics.Bitmap;
 

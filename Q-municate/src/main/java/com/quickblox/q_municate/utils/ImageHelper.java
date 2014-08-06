@@ -102,14 +102,14 @@ public class ImageHelper {
             if (srcAspect > dstAspect) {
                 final int srcRectWidth = (int) (srcHeight * dstAspect);
                 final int srcRectLeft = (srcWidth - srcRectWidth) / 2;
-                return new Rect(srcRectLeft, 0, srcRectLeft + srcRectWidth, srcHeight);
+                return new Rect(srcRectLeft, Consts.ZERO_INT_VALUE, srcRectLeft + srcRectWidth, srcHeight);
             } else {
                 final int srcRectHeight = (int) (srcWidth / dstAspect);
                 final int scrRectTop = (int) (srcHeight - srcRectHeight) / 2;
-                return new Rect(0, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
+                return new Rect(Consts.ZERO_INT_VALUE, scrRectTop, srcWidth, scrRectTop + srcRectHeight);
             }
         } else {
-            return new Rect(0, 0, srcWidth, srcHeight);
+            return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, srcWidth, srcHeight);
         }
     }
 
@@ -120,12 +120,12 @@ public class ImageHelper {
             final float dstAspect = (float) dstWidth / (float) dstHeight;
 
             if (srcAspect > dstAspect) {
-                return new Rect(0, 0, dstWidth, (int) (dstWidth / srcAspect));
+                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, dstWidth, (int) (dstWidth / srcAspect));
             } else {
-                return new Rect(0, 0, (int) (dstHeight * srcAspect), dstHeight);
+                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, (int) (dstHeight * srcAspect), dstHeight);
             }
         } else {
-            return new Rect(0, 0, dstWidth, dstHeight);
+            return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, dstWidth, dstHeight);
         }
     }
 

@@ -26,8 +26,8 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
-import com.quickblox.qmunicate.utils.ReceiveMaskedBitmapListener;
-import com.quickblox.qmunicate.utils.ReceiveMaskedImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveMaskedBitmapListener;
+import com.quickblox.q_municate.utils.ReceiveMaskedImageFileTask;
 
 import java.io.File;
 import java.util.HashMap;
