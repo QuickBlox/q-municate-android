@@ -23,7 +23,6 @@ import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.Utils;
 
@@ -68,7 +67,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
         String messageId = chatMessage.getPacketId();
         String packetId = chatMessage.getPacketId();
-        DialogUtils.showLong(context, "sendPrivateMessage(), packedId = " + messageId);
         if (dialogId != null) {
             saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatCreator.getId(), chatMessage.getBody(),
                     attachUrl, time, true, false));
@@ -162,21 +160,16 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     private void messageDeliveryStatusReceived(QBChatMessage chatMessage) {
         String messageId;
-        String dialogTypeCodeString = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_TYPE_CODE);
         boolean messageDelivered = true;
+        messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
 
-        if(QBDialogType.PRIVATE.equals(ChatUtils.parseDialogType(dialogTypeCodeString))) {
-            messageId = chatMessage.getPacketId();
-        } else {
-            messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
-        }
+        Log.d("debug_statuses", "messageDeliveryStatusReceived(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", messageId = " + messageId);
 
         updateMessageStatusDelivered(messageId, messageDelivered);
     }
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        Log.d("debug_statuses", "onPrivateMessageReceived(), chatMessage.getPacketId() = " + chatMessage.getPacketId());
         Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
         if (friend == null) {
             friend = new Friend();
@@ -195,13 +188,13 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(), chatMessage.getBody(),
                 attachUrl, time, false, false));
         notifyMessageReceived(chatMessage, friend, dialogId);
+        Log.d("debug_statuses", "onPrivateMessageReceived(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", messageId = " + messageId);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            Log.d("debug_statuses", "onReceivedNotification(), chatMessage.getPacketId() = " + chatMessage.getPacketId());
             if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT.equals(notificationType)) {
                 createDialogByNotification(chatMessage);
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(notificationType)) {

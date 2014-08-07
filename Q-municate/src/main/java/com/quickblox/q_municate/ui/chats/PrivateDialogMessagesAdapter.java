@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.chats;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -80,6 +81,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
             messageCache.setRead(true);
+            Log.d("debug_statuses", "updateMessageDeliveryStatus(), messageId = " + messageCache.getId() + ", packed = " + messageCache.getPacketId());
             QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
     }

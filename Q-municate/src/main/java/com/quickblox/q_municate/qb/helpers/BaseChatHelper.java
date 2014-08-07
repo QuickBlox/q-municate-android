@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.helper.StringifyArrayList;
@@ -108,7 +109,7 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws QBResponseException {
         updateStatusMessage(dialog.getDialogId(), messageCache.getId(), messageCache.isRead());
-        sendMessageDeliveryStatus(messageCache.getId(), messageCache.getPacketId(), dialog.getLastMessageUserId(),
+        sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(), dialog.getLastMessageUserId(),
                 dialog.getType().getCode());
     }
 
@@ -143,6 +144,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         if (error != null) {
             throw new QBResponseException(error);
         }
+        Log.d("debug_statuses", "sendPrivateMessage(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", chatMessage.getMessageId() = " + chatMessage.getMessageId());
     }
 
     protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId, int dialogTypeCode) {
@@ -151,6 +153,7 @@ public abstract class BaseChatHelper extends BaseHelper {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
         QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context, packedId, messageId, dialogTypeCode);
+        Log.d("debug_statuses", "sendMessageDeliveryStatus(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", chatMessage.getMessageId() = " + chatMessage.getMessageId());
         try {
             chat.sendMessage(chatMessage);
         } catch (Exception e) {

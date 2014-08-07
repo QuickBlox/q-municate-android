@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
@@ -458,6 +459,7 @@ public class DatabaseManager {
     }
 
     public static void updateMessageDeliveryStatus(Context context, String messageId, boolean isDelivered) {
+        Log.d("debug_statuses", "updateMessageDeliveryStatus(), messageId = " + messageId);
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
