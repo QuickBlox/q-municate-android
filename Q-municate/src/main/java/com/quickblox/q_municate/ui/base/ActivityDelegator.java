@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -27,22 +28,24 @@ import java.util.Map;
 import java.util.Set;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
-public class ActivityDelegator extends BaseActivityDelegator{
+public class ActivityDelegator extends BaseActivityDelegator {
 
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
     private GlobalActionsListener actionsListener;
+    private Handler handler;
 
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
     }
 
-    public void forceRelogin(){
-        ErrorUtils.showError(getContext(), getContext().getString(R.string.dlg_force_relogin_on_token_required));
+    public void forceRelogin() {
+        ErrorUtils.showError(getContext(), getContext().getString(
+                R.string.dlg_force_relogin_on_token_required));
         SplashActivity.start(getContext());
-        ((Activity)getContext()).finish();
+        ((Activity) getContext()).finish();
     }
 
     public void refreshSession() {
@@ -61,7 +64,7 @@ public class ActivityDelegator extends BaseActivityDelegator{
 
     public void addAction(String action, Command command) {
         Set<Command> commandSet = broadcastCommandMap.get(action);
-        if(commandSet == null){
+        if (commandSet == null) {
             commandSet = new HashSet<Command>();
             broadcastCommandMap.put(action, commandSet);
         }
@@ -94,12 +97,13 @@ public class ActivityDelegator extends BaseActivityDelegator{
         updateBroadcastActionList();
     }
 
-    private void registerGlobalReceiver(){
+    private void registerGlobalReceiver() {
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(globalBroadcastReceiver,
+                globalActionsIntentFilter);
     }
 
     private void unregisterBroadcastReceiver() {
@@ -107,22 +111,35 @@ public class ActivityDelegator extends BaseActivityDelegator{
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
     }
 
+    private Handler getHandler() {
+        if (handler == null) {
+            handler = new Handler();
+        }
+        return handler;
+    }
+
     private class BaseBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, final Intent intent) {
             String action = intent.getAction();
             if (intent != null && (action) != null) {
                 Log.d("STEPS", "executing " + action);
-                Set<Command> commandSet = broadcastCommandMap.get(action);
-                if(commandSet != null && !commandSet.isEmpty()) {
-                    for (Command command : commandSet) {
-                        try {
-                            command.execute(intent.getExtras());
-                        } catch (Exception e) {
-                            ErrorUtils.logError(e);
+                final Set<Command> commandSet = broadcastCommandMap.get(action);
+
+                if (commandSet != null && !commandSet.isEmpty()) {
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Command command : commandSet) {
+                                try {
+                                    command.execute(intent.getExtras());
+                                } catch (Exception e) {
+                                    ErrorUtils.logError(e);
+                                }
+                            }
                         }
-                    }
+                    });
                 }
             }
         }
@@ -131,25 +148,30 @@ public class ActivityDelegator extends BaseActivityDelegator{
     private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle extras = intent.getExtras();
-            if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
-                if (actionsListener != null){
-                   actionsListener.onReceiveChatMessageAction(intent.getExtras());
+        public void onReceive(Context context,final Intent intent) {
+            getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Bundle extras = intent.getExtras();
+                    if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveChatMessageAction(intent.getExtras());
+                        }
+                    } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveForceReloginAction(intent.getExtras());
+                        }
+                    } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
+                        }
+                    }
                 }
-            } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
-                if (actionsListener != null){
-                    actionsListener.onReceiveForceReloginAction(intent.getExtras());
-                }
-            }else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())){
-                if (actionsListener != null){
-                    actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
-                }
-            }
+            });
         }
     }
 
-    public interface GlobalActionsListener{
+    public interface GlobalActionsListener {
 
         public void onReceiveChatMessageAction(Bundle extras);
 
