@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.caching.tables.MessageTable;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.utils.Consts;
@@ -31,7 +33,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
 
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
         } else {
@@ -56,28 +58,29 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
         viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
 
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
 
         resetUI(viewHolder);
 
-        if (!TextUtils.isEmpty(attachUrl)) {
+        if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
-            int maskedBackgroundId = getMaskedImageBackgroundId(senderId);
-            displayAttachImage(attachUrl, viewHolder, maskedBackgroundId);
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
+            int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
         } else {
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-            viewHolder.messageTextView.setText(body);
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
+            viewHolder.messageTextView.setText(messageCache.getMessage());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
+            if (isOwnMessage(messageCache.getSenderId())) {
+                viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
+                viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
+            }
         }
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
-            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
+            messageCache.setRead(true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
     }
 }

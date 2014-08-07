@@ -21,12 +21,14 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.model.DialogMessageCache;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate.utils.DialogUtils;
+import com.quickblox.q_municate.utils.ErrorUtils;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -56,8 +58,8 @@ public abstract class BaseChatHelper extends BaseHelper {
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
     }
 
-    public void saveMessageToCache(DialogMessageCache dialogMessageCache) {
-        DatabaseManager.saveChatMessage(context, dialogMessageCache);
+    public void saveMessageToCache(MessageCache messageCache) {
+        DatabaseManager.saveChatMessage(context, messageCache);
     }
 
     /*
@@ -104,11 +106,21 @@ public abstract class BaseChatHelper extends BaseHelper {
         return chatMessage;
     }
 
-    public void updateStatusMessage(QBDialog dialog, String messageId, boolean isRead) throws QBResponseException {
+    public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws QBResponseException {
+        updateStatusMessage(dialog.getDialogId(), messageCache.getId(), messageCache.isRead());
+        sendMessageDeliveryStatus(messageCache.getId(), messageCache.getPacketId(), dialog.getLastMessageUserId(),
+                dialog.getType().getCode());
+    }
+
+    public void updateStatusMessage(String dialogId, String messageId, boolean isRead) throws QBResponseException {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageId);
-        QBChatService.updateMessage(dialog.getDialogId(), messagesIdsList);
+        QBChatService.updateMessage(dialogId, messagesIdsList);
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
+    }
+
+    public void updateMessageStatusDelivered(String messageId, boolean isDelivered) {
+        DatabaseManager.updateMessageDeliveryStatus(context, messageId, isDelivered);
     }
 
     protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
@@ -130,6 +142,19 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
         if (error != null) {
             throw new QBResponseException(error);
+        }
+    }
+
+    protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId, int dialogTypeCode) {
+        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
+        if (chat == null) {
+            chat = chatService.getPrivateChatManager().createChat(friendId, null);
+        }
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context, packedId, messageId, dialogTypeCode);
+        try {
+            chat.sendMessage(chatMessage);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
         }
     }
 
@@ -159,7 +184,6 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-
     }
 
     private class PrivateChatManagerListener implements QBPrivateChatManagerListener {

@@ -1,24 +1,38 @@
 package com.quickblox.q_municate.model;
 
-public class DialogMessageCache {
+import java.io.Serializable;
+
+public class MessageCache implements Serializable {
 
     private String id;
+    private String dialogId;
+    private String packetId;
     private Integer senderId;
     private String message;
     private String attachUrl;
     private long time;
     private boolean isRead;
-    private String dialogId;
+    private boolean isDelivered;
 
-    public DialogMessageCache(String id, String dialogId, Integer senderId, String message, String attachUrl, long time,
-            boolean isRead) {
+    public MessageCache(String id, String dialogId, String packetId, Integer senderId, String message,
+            String attachUrl, long time, boolean isRead, boolean isDelivered) {
         this.id = id;
         this.dialogId = dialogId;
+        this.packetId = packetId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
         this.isRead = isRead;
+        this.isDelivered = isDelivered;
+    }
+
+    public boolean isDelivered() {
+        return isDelivered;
+    }
+
+    public void setDelivered(boolean isDelivered) {
+        this.isDelivered = isDelivered;
     }
 
     public String getId() {
@@ -79,5 +93,13 @@ public class DialogMessageCache {
 
     public void setDialogId(String dialogId) {
         this.dialogId = dialogId;
+    }
+
+    public String getPacketId() {
+        return packetId;
+    }
+
+    public void setPacketId(String packetId) {
+        this.packetId = packetId;
     }
 }

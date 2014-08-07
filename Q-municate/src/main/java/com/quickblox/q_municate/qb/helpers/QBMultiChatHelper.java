@@ -20,7 +20,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.DialogMessageCache;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
@@ -266,16 +266,18 @@ public class QBMultiChatHelper extends BaseChatHelper {
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-            boolean isRead = false;
             String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
+            String packetId = chatMessage.getPacketId();
+            boolean isRead = false;
+            boolean isDelivered = false;
 
             Integer userId = AppSession.getSession().getUser().getId();
             if (chatMessage.getSenderId().equals(userId)) {
                 isRead = true;
             }
 
-            saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, isRead));
+            saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
+                    chatMessage.getBody(), attachUrl, time, isRead, isDelivered));
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
@@ -290,7 +292,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT.equals(notificationType)) {
                 createDialogByNotification(chatMessage);
-            } else {
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT.equals(notificationType)) {
                 updateDialogByNotification(chatMessage);
             }
         }

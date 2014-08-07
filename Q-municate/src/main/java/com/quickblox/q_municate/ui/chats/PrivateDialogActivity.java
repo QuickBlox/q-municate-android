@@ -20,7 +20,7 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
@@ -106,8 +106,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private QBDialog getDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        Integer senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        String lastMessage = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
+        Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageDateSent(DateUtils.getCurrentTime());
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);

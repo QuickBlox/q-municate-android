@@ -19,7 +19,7 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
@@ -82,6 +82,16 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         }
     }
 
+    protected int getMessageDeliveredIconId(boolean deliveredStatus) {
+        int iconResourceId;
+        if (deliveredStatus) {
+            iconResourceId = R.drawable.ic_status_mes_sent_received;
+        } else {
+            iconResourceId = R.drawable.ic_status_mes_sent;
+        }
+        return iconResourceId;
+    }
+
     protected int getMaskedImageBackgroundId(int senderId) {
         int maskedBackgroundId;
         if (isOwnMessage(senderId)) {
@@ -109,7 +119,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     private int getItemViewType(Cursor cursor) {
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             return Consts.OWN_DIALOG_MESSAGE_TYPE;
         } else {
@@ -227,6 +237,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public RoundedImageView avatarImageView;
         public TextView nameTextView;
         public View textMessageView;
+        public ImageView messageDeliveryStatusImageView;
         public RelativeLayout progressRelativeLayout;
         public RelativeLayout attachMessageRelativeLayout;
         public TextView messageTextView;

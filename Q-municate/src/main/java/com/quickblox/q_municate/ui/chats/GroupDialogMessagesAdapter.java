@@ -13,9 +13,8 @@ import android.widget.TextView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.Friend;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
@@ -35,7 +34,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         View view;
         ViewHolder viewHolder = new ViewHolder();
 
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
         } else {
@@ -70,10 +69,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String avatarUrl = null;
         String senderName;
 
-        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
+        String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ATTACH_FILE_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
+        long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+
         boolean ownMessage = isOwnMessage(senderId);
 
         resetUI(viewHolder);
@@ -103,10 +103,10 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.messageTextView.setText(body);
         }
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         if (!isRead) {
-            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
+            String messageId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ID));
+            //QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.caching.tables.DialogTable;
 import com.quickblox.q_municate.caching.tables.FriendTable;
 import com.quickblox.q_municate.utils.Consts;
@@ -40,8 +40,8 @@ public class DatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
-            case DialogMessageTable.PATH_TOKEN: {
-                result = doQuery(db, uri, DialogMessageTable.TABLE_NAME, projection, selection, selectionArgs,
+            case MessageTable.PATH_TOKEN: {
+                result = doQuery(db, uri, MessageTable.TABLE_NAME, projection, selection, selectionArgs,
                         sortOrder);
                 break;
             }
@@ -86,8 +86,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doInsert(db, FriendTable.TABLE_NAME, FriendTable.CONTENT_URI, uri, values);
                 break;
             }
-            case DialogMessageTable.PATH_TOKEN: {
-                result = doInsert(db, DialogMessageTable.TABLE_NAME, DialogMessageTable.CONTENT_URI, uri,
+            case MessageTable.PATH_TOKEN: {
+                result = doInsert(db, MessageTable.TABLE_NAME, MessageTable.CONTENT_URI, uri,
                         values);
                 break;
             }
@@ -115,8 +115,8 @@ public class DatabaseProvider extends ContentProvider {
                 table = FriendTable.TABLE_NAME;
                 break;
             }
-            case DialogMessageTable.PATH_TOKEN: {
-                table = DialogMessageTable.TABLE_NAME;
+            case MessageTable.PATH_TOKEN: {
+                table = MessageTable.TABLE_NAME;
                 break;
             }
             case DialogTable.PATH_TOKEN: {
@@ -153,8 +153,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doDelete(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
-            case DialogMessageTable.PATH_TOKEN: {
-                result = doDelete(db, uri, DialogMessageTable.TABLE_NAME, selection, selectionArgs);
+            case MessageTable.PATH_TOKEN: {
+                result = doDelete(db, uri, MessageTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
             case DialogTable.PATH_TOKEN: {
@@ -179,8 +179,8 @@ public class DatabaseProvider extends ContentProvider {
                 result = doUpdate(db, uri, FriendTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
-            case DialogMessageTable.PATH_TOKEN: {
-                result = doUpdate(db, uri, DialogMessageTable.TABLE_NAME, selection, selectionArgs, values);
+            case MessageTable.PATH_TOKEN: {
+                result = doUpdate(db, uri, MessageTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
             case DialogTable.PATH_TOKEN: {

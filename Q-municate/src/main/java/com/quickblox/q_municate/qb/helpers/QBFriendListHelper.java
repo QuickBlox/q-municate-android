@@ -49,10 +49,13 @@ public class QBFriendListHelper extends BaseHelper {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         roster.addSubscriptionListener(new SubscriptionListener());
+        Log.d("roster_debug", "init()");
     }
 
     public void inviteFriend(int userId) throws Exception {
+        Log.d("roster_debug", "inviteFriend(int userId), userId == " + userId);
         if (isNotInvited(userId)) {
+            Log.d("roster_debug", "inviteFriend(int userId), isNotInvited(userId) == true");
             sendInvitation(userId);
             addUserToFriendlist(userId);
         }
@@ -63,8 +66,10 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private boolean isInvited(int userId) {
+        Log.d("roster_debug", "isInvited(int userId), userId == " + userId);
         QBRosterEntry entry = roster.getEntry(userId);
         if (entry == null) {
+            Log.d("roster_debug", "isInvited(int userId), entry == null");
             return false;
         }
         boolean isSubscribedToUser = entry.getType() == RosterPacket.ItemType.from;
@@ -73,14 +78,18 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void sendInvitation(int userId) throws Exception {
+        Log.d("roster_debug", "sendInvitation(int userId), userId == " + userId);
         if (roster.contains(userId)) {
+            Log.d("roster_debug", "sendInvitation(int userId), true");
             roster.subscribe(userId);
         } else {
+            Log.d("roster_debug", "sendInvitation(int userId), false");
             roster.createEntry(userId, null);
         }
     }
 
     private void addUserToFriendlist(int userId) throws Exception {
+        Log.d("roster_debug", "addUserToFriendlist(int userId), userId == " + userId);
         Friend friend = loadFriend(userId);
         fillFriendWithRosterData(friend);
 
@@ -88,6 +97,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private Friend loadFriend(int userId) throws QBResponseException {
+        Log.d("roster_debug", "loadFriend(int userId)");
         QBUser user = QBUsers.getUser(new QBUser(userId));
         return FriendUtils.createFriend(user);
     }
@@ -101,7 +111,8 @@ public class QBFriendListHelper extends BaseHelper {
         roster.unsubscribe(friend.getId());
     }
 
-    public List<Integer> updateFriendList() throws QBResponseException {
+    public List<Integer> updateFriendList() throws QBResponseException, SmackException.NotLoggedInException, XMPPException, SmackException.NotConnectedException, SmackException.NoResponseException {
+        Log.d("roster_debug", "updateFriendList()");
         List<Integer> userIds = getUserIdsFromRoster();
         if (!userIds.isEmpty()) {
             updateFriends(userIds);
@@ -109,7 +120,8 @@ public class QBFriendListHelper extends BaseHelper {
         return userIds;
     }
 
-    private List<Integer> getUserIdsFromRoster() {
+    private List<Integer> getUserIdsFromRoster() throws SmackException.NotLoggedInException, SmackException.NoResponseException, SmackException.NotConnectedException, XMPPException {
+        Log.d("roster_debug", "getUserIdsFromRoster()");
         Collection<QBRosterEntry> entries = roster.getEntries();
         List<Integer> userIds = new ArrayList<Integer>();
         if (roster == null){
@@ -117,12 +129,17 @@ public class QBFriendListHelper extends BaseHelper {
             return userIds;
         }
         for (QBRosterEntry entry : entries) {
+            Log.d("roster_debug", "getUserIdsFromRoster()" + ", entry.getUserId() == " + entry.getUserId() + ", entry.getType() == " + entry.getType());
+            if(RosterPacket.ItemType.from.equals(entry.getType())) {
+                roster.confirmSubscription(entry.getUserId());
+            }
             userIds.add(entry.getUserId());
         }
         return userIds;
     }
 
     private void updateFriends(Collection<Integer> userIds) throws QBResponseException {
+        Log.d("roster_debug", "updateFriends(Collection<Integer> userIds)");
         List<QBUser> users = loadUsers(userIds);
         List<Friend> friends = FriendUtils.createFriendList(users);
         fillFriendsWithRosterData(friends);
@@ -131,6 +148,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
+        Log.d("roster_debug", "loadUsers(Collection<Integer> userIds)");
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(FIRST_PAGE);
         requestBuilder.setPerPage(userIds.size());
@@ -195,6 +213,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void entriesAdded(Collection<Integer> userIds) {
+            Log.d("roster_debug", "entriesAdded()");
             try {
                 updateFriends(userIds);
             } catch (QBResponseException e) {
@@ -204,6 +223,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void entriesUpdated(Collection<Integer> userIds) {
+            Log.d("roster_debug", "entriesUpdated()");
             try {
                 updateFriends(userIds);
             } catch (QBResponseException e) {
@@ -214,6 +234,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void presenceChanged(QBPresence presence) {
             Friend friend = DatabaseManager.getFriendById(context, presence.getUserId());
+            Log.d("roster_debug", "presenceChanged(), friend == " + friend.getFullname() + ", presence.getType() == " + presence.getType());
             if (friend == null) {
                 ErrorUtils.logError(TAG, "Could not find friend in DB by Id = " + presence.getUserId());
                 return;
@@ -229,6 +250,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void subscriptionRequested(int userId) {
+            Log.d("roster_debug", "!!! subscriptionRequested(), userId == " + userId);
             try {
                 roster.confirmSubscription(userId);
             } catch (Exception e) {
