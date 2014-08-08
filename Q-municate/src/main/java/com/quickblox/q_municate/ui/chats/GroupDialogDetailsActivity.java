@@ -255,8 +255,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeActionMode) {
-                updateUserData();
                 updateCurrentUserData();
+                updateUserData();
             }
             actionMode = null;
         }
