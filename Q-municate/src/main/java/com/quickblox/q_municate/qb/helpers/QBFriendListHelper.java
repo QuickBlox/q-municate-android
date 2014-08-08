@@ -101,7 +101,7 @@ public class QBFriendListHelper extends BaseHelper {
         roster.unsubscribe(friend.getId());
     }
 
-    public List<Integer> updateFriendList() throws QBResponseException {
+    public List<Integer> updateFriendList() throws QBResponseException, SmackException.NotLoggedInException, XMPPException, SmackException.NotConnectedException, SmackException.NoResponseException {
         List<Integer> userIds = getUserIdsFromRoster();
         if (!userIds.isEmpty()) {
             updateFriends(userIds);
@@ -109,14 +109,17 @@ public class QBFriendListHelper extends BaseHelper {
         return userIds;
     }
 
-    private List<Integer> getUserIdsFromRoster() {
+    private List<Integer> getUserIdsFromRoster() throws SmackException.NotLoggedInException, SmackException.NoResponseException, SmackException.NotConnectedException, XMPPException {
         Collection<QBRosterEntry> entries = roster.getEntries();
         List<Integer> userIds = new ArrayList<Integer>();
-        if (roster == null){
+        if (roster == null) {
             ErrorUtils.logError(TAG, "ROSTER isn't initialized");
             return userIds;
         }
         for (QBRosterEntry entry : entries) {
+            if (RosterPacket.ItemType.from.equals(entry.getType())) {
+                roster.confirmSubscription(entry.getUserId());
+            }
             userIds.add(entry.getUserId());
         }
         return userIds;

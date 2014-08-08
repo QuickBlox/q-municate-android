@@ -13,8 +13,9 @@ import android.widget.TextView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -35,7 +36,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         View view;
         ViewHolder viewHolder = new ViewHolder();
 
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
+        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
             view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
         } else {
@@ -70,43 +71,42 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String avatarUrl = null;
         String senderName;
 
-        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        int senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
-        boolean ownMessage = isOwnMessage(senderId);
+        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+
+        boolean ownMessage = isOwnMessage(messageCache.getSenderId());
 
         resetUI(viewHolder);
 
         if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
+            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
+            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
         } else {
-            Friend senderFriend = DatabaseManager.getFriendById(context, senderId);
+            Friend senderFriend = DatabaseManager.getFriendById(context, messageCache.getSenderId());
             if (senderFriend != null) {
                 senderName = senderFriend.getFullname();
                 avatarUrl = getAvatarUrlForFriend(senderFriend);
             } else {
-                senderName = senderId + Consts.EMPTY_STRING;
+                senderName = messageCache.getSenderId() + Consts.EMPTY_STRING;
             }
-            viewHolder.nameTextView.setTextColor(getTextColor(senderId));
+            viewHolder.nameTextView.setTextColor(getTextColor(messageCache.getSenderId()));
             viewHolder.nameTextView.setText(senderName);
         }
 
-        if (!TextUtils.isEmpty(attachUrl)) {
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(time));
+        if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            int maskedBackgroundId = getMaskedImageBackgroundId(senderId);
-            displayAttachImage(attachUrl, viewHolder, maskedBackgroundId);
+            int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
         } else {
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(time));
-            viewHolder.messageTextView.setText(body);
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
+            viewHolder.messageTextView.setText(messageCache.getMessage());
         }
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if (!isRead) {
-            String messageId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-            QBUpdateStatusMessageCommand.start(context, dialog, messageId, true);
+        if (!messageCache.isRead()) {
+            messageCache.setRead(true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

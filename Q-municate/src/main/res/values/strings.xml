@@ -329,6 +329,7 @@
     <string name="file_was_attached">file was attached</string>
     <string name="uploading_file">Uploading… Please wait</string>
     <string name="user_created_room">%1$s created group chat</string>
+    <string name="user_read_message">%1$s read message</string>
 
     <string name="label_done">Done</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>

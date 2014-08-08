@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.core.command.ServiceCommand;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -20,21 +21,19 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, String messageId, boolean isRead) {
+    public static void start(Context context, QBDialog dialog, MessageCache messageCache) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE_ID, messageId);
-        intent.putExtra(QBServiceConsts.EXTRA_STATUS_MESSAGE, isRead);
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, messageCache);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        String messageId = extras.getString(QBServiceConsts.EXTRA_MESSAGE_ID);
-        boolean isRead = extras.getBoolean(QBServiceConsts.EXTRA_STATUS_MESSAGE);
-        baseChatHelper.updateStatusMessage(dialog, messageId, isRead);
+        MessageCache messageCache = (MessageCache) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
+        baseChatHelper.updateStatusMessage(dialog, messageCache);
         return null;
     }
 }
