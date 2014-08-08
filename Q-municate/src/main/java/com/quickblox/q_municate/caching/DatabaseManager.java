@@ -6,15 +6,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.caching.tables.DialogTable;
 import com.quickblox.q_municate.caching.tables.FriendTable;
-import com.quickblox.q_municate.model.DialogMessageCache;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
@@ -172,18 +173,20 @@ public class DatabaseManager {
         return dialogs;
     }
 
-    public static DialogMessageCache getMessageFromCursor(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ID));
-        String dialogId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.DIALOG_ID));
-        Integer senderId = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-        String body = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-        long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.ATTACH_FILE_ID));
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(DialogMessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+    public static MessageCache getMessageCacheFromCursor(Cursor cursor) {
+        String id = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ID));
+        String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+        String packetId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.PACKET_ID));
+        Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
+        String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
+        long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+        String attachUrl = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ATTACH_FILE_ID));
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isDelivered = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
 
-        DialogMessageCache dialogMessageCache = new DialogMessageCache(id, dialogId, senderId, body, attachUrl, time, isRead);
+        MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time, isRead, isDelivered);
 
-        return dialogMessageCache;
+        return messageCache;
     }
 
     public static QBDialog getDialogFromCursor(Cursor cursor) {
@@ -251,23 +254,23 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static DialogMessageCache getLastReadMessage(Context context, QBDialog dialog) {
-        DialogMessageCache dialogMessageCache = null;
+    public static MessageCache getLastReadMessage(Context context, QBDialog dialog) {
+        MessageCache messageCache = null;
 
         Cursor cursor = context.getContentResolver().query(
-                DialogMessageTable.CONTENT_URI,
+                MessageTable.CONTENT_URI,
                 null,
-                DialogMessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
-                DialogMessageTable.Cols.IS_READ + " > 0",
+                MessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
+                MessageTable.Cols.IS_READ + " > 0",
                 null,
-                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
 
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
             cursor.moveToLast();
-            dialogMessageCache = getMessageFromCursor(cursor);
+            messageCache = getMessageCacheFromCursor(cursor);
         }
 
-        return dialogMessageCache;
+        return messageCache;
     }
 
     public static int getCountUnreadDialogs(Context context) {
@@ -277,13 +280,13 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllDialogMessagesByDialogId(Context context, String dialogId) {
-        return context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
-                DialogMessageTable.Cols.ID + " ORDER BY " + DialogMessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+        return context.getContentResolver().query(MessageTable.CONTENT_URI, null,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
+                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
     public static void deleteAllMessages(Context context) {
-        context.getContentResolver().delete(DialogMessageTable.CONTENT_URI, null, null);
+        context.getContentResolver().delete(MessageTable.CONTENT_URI, null, null);
     }
 
     public static void deleteAllDialogs(Context context) {
@@ -302,31 +305,32 @@ public class DatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            DialogMessageCache dialogMessageCache = new DialogMessageCache(messageId, dialogId, senderId, message,
-                    attachURL, time, true);
+            MessageCache messageCache = new MessageCache(messageId, dialogId, null, senderId, message,
+                    attachURL, time, true, true);
 
-            saveChatMessage(context, dialogMessageCache);
+            saveChatMessage(context, messageCache);
         }
     }
 
-    public static void saveChatMessage(Context context, DialogMessageCache dialogMessageCache) {
+    public static void saveChatMessage(Context context, MessageCache messageCache) {
         ContentValues values = new ContentValues();
-        values.put(DialogMessageTable.Cols.ID, dialogMessageCache.getId());
-        values.put(DialogMessageTable.Cols.DIALOG_ID, dialogMessageCache.getDialogId());
-        values.put(DialogMessageTable.Cols.SENDER_ID, dialogMessageCache.getSenderId());
-        String body = dialogMessageCache.getMessage();
+        values.put(MessageTable.Cols.ID, messageCache.getId());
+        values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
+        values.put(MessageTable.Cols.PACKET_ID, messageCache.getPacketId());
+        values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
+        String body = messageCache.getMessage();
         if (TextUtils.isEmpty(body)) {
-            values.put(DialogMessageTable.Cols.BODY, body);
+            values.put(MessageTable.Cols.BODY, body);
         } else {
-            values.put(DialogMessageTable.Cols.BODY, Html.fromHtml(body).toString());
+            values.put(MessageTable.Cols.BODY, Html.fromHtml(body).toString());
         }
-        values.put(DialogMessageTable.Cols.TIME, dialogMessageCache.getTime());
-        values.put(DialogMessageTable.Cols.ATTACH_FILE_ID, dialogMessageCache.getAttachUrl());
-        values.put(DialogMessageTable.Cols.IS_READ, dialogMessageCache.isRead());
-        context.getContentResolver().insert(DialogMessageTable.CONTENT_URI, values);
+        values.put(MessageTable.Cols.TIME, messageCache.getTime());
+        values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
+        values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
+        context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
 
-        updateDialog(context, dialogMessageCache.getDialogId(), dialogMessageCache.getMessage(),
-                dialogMessageCache.getTime(), dialogMessageCache.getSenderId());
+        updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(),
+                messageCache.getTime(), messageCache.getSenderId());
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -341,8 +345,8 @@ public class DatabaseManager {
     }
 
     public static void deleteMessagesByDialogId(Context context, String dialogId) {
-        context.getContentResolver().delete(DialogMessageTable.CONTENT_URI,
-                DialogMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
+        context.getContentResolver().delete(MessageTable.CONTENT_URI,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
     private static ContentValues getContentValuesFriendTable(Friend friend) {
@@ -422,8 +426,8 @@ public class DatabaseManager {
     }
 
     public static int getCountUnreadMessagesByRoomJid(Context context, String dialogId) {
-        Cursor cursor = context.getContentResolver().query(DialogMessageTable.CONTENT_URI, null,
-                DialogMessageTable.Cols.IS_READ + " = 0 AND " + DialogMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'",
+        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
+                MessageTable.Cols.IS_READ + " = 0 AND " + MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'",
                 null, null);
         int countMessages = cursor.getCount();
         cursor.close();
@@ -439,18 +443,30 @@ public class DatabaseManager {
 
     public static void updateStatusMessage(Context context, String messageId, boolean isRead) {
         ContentValues values = new ContentValues();
-        String condition = DialogMessageTable.Cols.ID + "='" + messageId + "'";
+        String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(DialogMessageTable.CONTENT_URI, null, condition, null, null);
+        Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-            String roomJidId = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.DIALOG_ID));
-            String message = cursor.getString(cursor.getColumnIndex(DialogMessageTable.Cols.BODY));
-            long time = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.TIME));
-            long lastSenderId = cursor.getLong(cursor.getColumnIndex(DialogMessageTable.Cols.SENDER_ID));
-            values.put(DialogMessageTable.Cols.IS_READ, isRead);
-            resolver.update(DialogMessageTable.CONTENT_URI, values, condition, null);
+            String roomJidId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+            String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
+            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+            long lastSenderId = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
+            values.put(MessageTable.Cols.IS_READ, isRead);
+            resolver.update(MessageTable.CONTENT_URI, values, condition, null);
             cursor.close();
             updateDialog(context, roomJidId, message, time, lastSenderId);
+        }
+    }
+
+    public static void updateMessageDeliveryStatus(Context context, String messageId, boolean isDelivered) {
+        ContentValues values = new ContentValues();
+        String condition = MessageTable.Cols.ID + "='" + messageId + "'";
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            values.put(MessageTable.Cols.IS_DELIVERED, isDelivered);
+            resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+            cursor.close();
         }
     }
 

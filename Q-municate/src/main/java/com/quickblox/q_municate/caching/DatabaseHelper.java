@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.caching.tables.DialogTable;
 import com.quickblox.q_municate.caching.tables.FriendTable;
 
@@ -48,33 +48,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createDialogMessageTable(SQLiteDatabase db) {
         StringBuilder dialogMessageTableFields = new StringBuilder();
         dialogMessageTableFields
-                .append(DialogMessageTable.Cols.ID).append(" TEXT PRIMARY KEY, ")
-                .append(DialogMessageTable.Cols.DIALOG_ID).append(" INTEGER, ")
-                .append(DialogMessageTable.Cols.SENDER_ID).append(" INTEGER, ")
-                .append(DialogMessageTable.Cols.BODY).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.TIME).append(" LONG, ")
-                .append(DialogMessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
-                .append(DialogMessageTable.Cols.IS_READ).append(" INTEGER");
-        createTable(db, DialogMessageTable.TABLE_NAME, dialogMessageTableFields.toString());
+                .append(MessageTable.Cols.ID).append(" TEXT PRIMARY KEY, ")
+                .append(MessageTable.Cols.DIALOG_ID).append(" INTEGER, ")
+                .append(MessageTable.Cols.PACKET_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.SENDER_ID).append(" INTEGER, ")
+                .append(MessageTable.Cols.BODY).append(" TEXT, ")
+                .append(MessageTable.Cols.TIME).append(" LONG, ")
+                .append(MessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.IS_READ).append(" INTEGER, ")
+                .append(MessageTable.Cols.IS_DELIVERED).append(" INTEGER");
+        createTable(db, MessageTable.TABLE_NAME, dialogMessageTableFields.toString());
     }
 
     private void createDialogTable(SQLiteDatabase db) {
         StringBuilder dialogTableFields = new StringBuilder();
-        dialogTableFields.append(DialogTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ").append(
-                DialogTable.Cols.DIALOG_ID).append(" TEXT, ").append(DialogTable.Cols.ROOM_JID_ID).append(
-                " TEXT, ").append(DialogTable.Cols.NAME).append(" TEXT, ").append(
-                DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" INTEGER, ").append(
-                DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ").append(DialogTable.Cols.LAST_MESSAGE_USER_ID)
-                .append(" LONG, ").append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ").append(
-                DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ").append(DialogTable.Cols.TYPE).append(
-                " INTEGER");
+        dialogTableFields
+                .append(DialogTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
+                .append(DialogTable.Cols.DIALOG_ID).append(" TEXT, ")
+                .append(DialogTable.Cols.ROOM_JID_ID).append(" TEXT, ")
+                .append(DialogTable.Cols.NAME).append(" TEXT, ")
+                .append(DialogTable.Cols.COUNT_UNREAD_MESSAGES).append(" INTEGER, ")
+                .append(DialogTable.Cols.LAST_MESSAGE).append(" TEXT, ")
+                .append(DialogTable.Cols.LAST_MESSAGE_USER_ID).append(" LONG, ")
+                .append(DialogTable.Cols.LAST_DATE_SENT).append(" LONG, ")
+                .append(DialogTable.Cols.OCCUPANTS_IDS).append(" TEXT, ")
+                .append(DialogTable.Cols.TYPE).append(" INTEGER");
         createTable(db, DialogTable.TABLE_NAME, dialogTableFields.toString());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropTable(db, FriendTable.TABLE_NAME);
-        dropTable(db, DialogMessageTable.TABLE_NAME);
+        dropTable(db, MessageTable.TABLE_NAME);
         dropTable(db, DialogTable.TABLE_NAME);
         // TODO SF other tables can be dropped
         onCreate(db);

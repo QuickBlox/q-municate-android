@@ -21,7 +21,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.model.DialogMessageCache;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;
@@ -312,7 +312,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (dialog == null) {
             return;
         }
-        DialogMessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
+        MessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
         } else {

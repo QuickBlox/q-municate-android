@@ -3,7 +3,7 @@ package com.quickblox.q_municate.caching;
 import android.content.UriMatcher;
 import android.net.Uri;
 
-import com.quickblox.q_municate.caching.tables.DialogMessageTable;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.caching.tables.DialogTable;
 import com.quickblox.q_municate.caching.tables.FriendTable;
 
@@ -17,7 +17,7 @@ public class ContentDescriptor {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         matcher.addURI(AUTHORITY, FriendTable.PATH, FriendTable.PATH_TOKEN);
-        matcher.addURI(AUTHORITY, DialogMessageTable.PATH, DialogMessageTable.PATH_TOKEN);
+        matcher.addURI(AUTHORITY, MessageTable.PATH, MessageTable.PATH_TOKEN);
         matcher.addURI(AUTHORITY, DialogTable.PATH, DialogTable.PATH_TOKEN);
         // TODO SF other tables can be added
 

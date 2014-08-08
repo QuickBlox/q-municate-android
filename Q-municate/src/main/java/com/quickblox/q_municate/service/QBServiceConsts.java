@@ -164,6 +164,7 @@ public class QBServiceConsts {
     public static final String EXTRA_USER_ID = "user_id";
     public static final String EXTRA_DATE_SENT = "date_sent";
     public static final String EXTRA_EMOJIS = "emojis";
+    public static final String EXTRA_MESSAGE = "message";
 
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
