@@ -76,11 +76,6 @@ public class ImageHelper {
         return ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
     }
 
-    public Bitmap getBitmap(Bitmap bitmapOrg, int dstWidth, int dstHeight) {
-        Bitmap scaledBitmap = createScaledBitmap(bitmapOrg, dstWidth, dstHeight, ScalingLogic.CROP);
-        return scaledBitmap;
-    }
-
     private Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
             ScalingLogic scalingLogic) {
         Rect srcRect = calculateSrcRect(unscaledBitmap.getWidth(), unscaledBitmap.getHeight(), dstWidth,
@@ -181,7 +176,7 @@ public class ImageHelper {
         int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
         File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
-        Bitmap bitmap = getBitmap(origBitmap, width, height);
+        Bitmap bitmap = createScaledBitmap(origBitmap, width, height, ScalingLogic.FIT);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, Consts.FULL_QUALITY, bos);
         byte[] bitmapData = bos.toByteArray();
@@ -201,6 +196,7 @@ public class ImageHelper {
         int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
         Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mask = getNinepatch(resources, mask, width, height);
+        original = createScaledBitmap(original, width, height, ScalingLogic.CROP);
         Canvas canvas = new Canvas(result);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));

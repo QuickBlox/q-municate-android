@@ -3,11 +3,13 @@ package com.quickblox.q_municate.ui.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +22,7 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.Friend;
@@ -42,6 +45,8 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
     private Friend opponentFriend;
+    private ContentObserver statusContentObserver;
+    private Cursor friendCursor;
 
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
@@ -61,11 +66,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         opponentFriend = (Friend) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
-
+        friendCursor = DatabaseManager.getFriendCursorById(this, opponentFriend.getId());
         initListView();
         initActionBar();
         startLoadDialogMessages();
+        registerStatusChangingObserver();
     }
+
+
 
     @Override
     protected void onUpdateChatDialog() {
@@ -93,9 +101,36 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        //TODO call in command if it should be async
-        //QBSendPrivateChatMessageCommand.start(PrivateDialogActivity.this, null, opponentFriend.getId(), file);
         scrollListView();
+    }
+
+    private void registerStatusChangingObserver() {
+        statusContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                opponentFriend = DatabaseManager.getFriendById(PrivateDialogActivity.this,
+                        PrivateDialogActivity.this.opponentFriend.getId());
+                setOnlineStatus(opponentFriend);
+            }
+
+            @Override
+            public boolean deliverSelfNotifications() {
+                return true;
+            }
+        };
+        friendCursor.registerContentObserver(statusContentObserver);
+    }
+
+    private void unregisterStatusChangingObserver() {
+        if (friendCursor != null && statusContentObserver != null ) {
+            friendCursor.unregisterContentObserver(statusContentObserver);
+        }
+    }
+
+    private void setOnlineStatus(Friend friend) {
+        ActionBar actionBar = getActionBar();
+        actionBar.setSubtitle(friend.getOnlineStatus());
     }
 
     private void startUpdateChatDialog() {
@@ -144,9 +179,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        //TODO call in command if it should be async
-        /*QBSendPrivateChatMessageCommand.start(this, messageEditText.getText().toString(),
-                opponentFriend.getId(), null);*/
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
@@ -202,5 +234,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         super.onPause();
         currentOpponent = null;
         Crouton.cancelAllCroutons();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterStatusChangingObserver();
     }
 }
