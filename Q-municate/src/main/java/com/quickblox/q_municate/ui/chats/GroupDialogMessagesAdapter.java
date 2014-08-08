@@ -77,10 +77,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         resetUI(viewHolder);
 
+        viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
+        viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.attach_message_delivery_status_imageview);
+
         if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
-            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
         } else {
             Friend senderFriend = DatabaseManager.getFriendById(context, messageCache.getSenderId());
             if (senderFriend != null) {
@@ -94,11 +95,13 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         }
 
         if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
+            setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
             displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
         } else {
+            setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             viewHolder.messageTextView.setText(messageCache.getMessage());

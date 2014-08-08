@@ -92,6 +92,14 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         return iconResourceId;
     }
 
+    protected void setDeliveryStatus(View view, ViewHolder viewHolder, int resourceId, boolean ownMessage,
+            boolean messageDelivered) {
+        if (ownMessage) {
+            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
+            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageDelivered));
+        }
+    }
+
     protected int getMaskedImageBackgroundId(int senderId) {
         int maskedBackgroundId;
         if (isOwnMessage(senderId)) {

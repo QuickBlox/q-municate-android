@@ -153,6 +153,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         long time = DateUtils.getCurrentTime();
         Bundle bundle = new Bundle();
         bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentId);
+        QBPrivateChat chat = createChat(opponentId);
         QBChatMessage chatMessage = ChatUtils.createChatNotificationMessage(context, dialog);
         chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         sendPrivateMessage(chatMessage, opponentId);
