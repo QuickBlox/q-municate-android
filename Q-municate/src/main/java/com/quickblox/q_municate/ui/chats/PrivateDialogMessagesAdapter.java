@@ -31,6 +31,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
+        ViewHolder viewHolder = new ViewHolder();
 
         int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         if (isOwnMessage(senderId)) {
@@ -38,8 +39,6 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         } else {
             view = layoutInflater.inflate(R.layout.list_item_private_message_opponent, null, true);
         }
-
-        ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
         viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(R.id.time_attach_message_textview);
@@ -63,21 +62,24 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
 
+        boolean ownMessage = isOwnMessage(messageCache.getSenderId());
+
         resetUI(viewHolder);
 
         if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
+            setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
             displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
         } else {
+            setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
         }
 
-        if (isOwnMessage(messageCache.getSenderId())) {
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
+        if (ownMessage) {
             viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
         }
 

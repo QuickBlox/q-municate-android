@@ -209,16 +209,17 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     }
 
     private void updateUserData() {
-        if (isGroupDataChanged(groupNameCurrent)) {
-            saveChanges(groupNameCurrent);
+        updateCurrentUserData();
+        if (isGroupDataChanged()) {
+            saveChanges();
         }
     }
 
-    private boolean isGroupDataChanged(String groupName) {
-        return !groupName.equals(groupNameOld) || isNeedUpdateAvatar;
+    private boolean isGroupDataChanged() {
+        return !groupNameCurrent.equals(groupNameOld) || isNeedUpdateAvatar;
     }
 
-    private void saveChanges(final String groupNameCurrent) {
+    private void saveChanges() {
         if (!isUserDataCorrect()) {
             DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
             return;
@@ -255,7 +256,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!closeActionMode) {
-                updateCurrentUserData();
                 updateUserData();
             }
             actionMode = null;
@@ -267,7 +267,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
         @Override
         public void execute(Bundle bundle) {
             groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
-
+            updateOldUserData();
             initUIWithData();
             initTextChangedListeners();
             initListView();
