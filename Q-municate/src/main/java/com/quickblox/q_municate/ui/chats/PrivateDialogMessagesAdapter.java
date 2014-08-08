@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.chats;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,7 +17,6 @@ import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
-import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 
 public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
@@ -41,11 +39,6 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             view = layoutInflater.inflate(R.layout.list_item_private_message_opponent, null, true);
         }
 
-        return view;
-    }
-
-    @Override
-    public void bindView(View view, final Context context, Cursor cursor) {
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(R.id.attach_message_relativelayout);
@@ -58,6 +51,15 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
         viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
         viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
+
+        view.setTag(viewHolder);
+
+        return view;
+    }
+
+    @Override
+    public void bindView(View view, final Context context, Cursor cursor) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
 
@@ -72,16 +74,15 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-            if (isOwnMessage(messageCache.getSenderId())) {
-                viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
-                viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
-            }
         }
 
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        if (!isRead) {
+        if (isOwnMessage(messageCache.getSenderId())) {
+            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.message_delivery_status_imageview);
+            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageCache.isDelivered()));
+        }
+
+        if (!messageCache.isRead()) {
             messageCache.setRead(true);
-            Log.d("debug_statuses", "updateMessageDeliveryStatus(), messageId = " + messageCache.getId() + ", packed = " + messageCache.getPacketId());
             QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
     }

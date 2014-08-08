@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.helper.StringifyArrayList;
@@ -22,13 +21,12 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
 import org.jivesoftware.smack.SmackException;
@@ -46,11 +44,6 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     private QBPrivateChatManagerListener privateChatManagerListener;
     private List<QBNotificationChatListener> notificationChatListeners;
-
-    public interface QBNotificationChatListener {
-
-        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
-    }
 
     public BaseChatHelper(Context context) {
         super(context);
@@ -109,11 +102,12 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws QBResponseException {
         updateStatusMessage(dialog.getDialogId(), messageCache.getId(), messageCache.isRead());
-        sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(), dialog.getLastMessageUserId(),
-                dialog.getType().getCode());
+        sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(),
+                messageCache.getSenderId(), dialog.getType().getCode());
     }
 
-    public void updateStatusMessage(String dialogId, String messageId, boolean isRead) throws QBResponseException {
+    public void updateStatusMessage(String dialogId, String messageId,
+            boolean isRead) throws QBResponseException {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageId);
         QBChatService.updateMessage(dialogId, messagesIdsList);
@@ -144,16 +138,16 @@ public abstract class BaseChatHelper extends BaseHelper {
         if (error != null) {
             throw new QBResponseException(error);
         }
-        Log.d("debug_statuses", "sendPrivateMessage(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", chatMessage.getMessageId() = " + chatMessage.getMessageId());
     }
 
-    protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId, int dialogTypeCode) {
+    protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId,
+            int dialogTypeCode) {
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
         if (chat == null) {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context, packedId, messageId, dialogTypeCode);
-        Log.d("debug_statuses", "sendMessageDeliveryStatus(), chatMessage.getPacketId() = " + chatMessage.getPacketId() + ", chatMessage.getMessageId() = " + chatMessage.getMessageId());
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context,
+                packedId, messageId, dialogTypeCode);
         try {
             chat.sendMessage(chatMessage);
         } catch (Exception e) {
@@ -187,6 +181,11 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
+    }
+
+    public interface QBNotificationChatListener {
+
+        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
     }
 
     private class PrivateChatManagerListener implements QBPrivateChatManagerListener {

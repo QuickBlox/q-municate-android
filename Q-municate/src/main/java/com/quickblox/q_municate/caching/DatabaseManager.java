@@ -459,7 +459,6 @@ public class DatabaseManager {
     }
 
     public static void updateMessageDeliveryStatus(Context context, String messageId, boolean isDelivered) {
-        Log.d("debug_statuses", "updateMessageDeliveryStatus(), messageId = " + messageId);
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
