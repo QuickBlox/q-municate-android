@@ -57,7 +57,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     public synchronized void showProgress() {
-        if (progress.getActivity() == null) {
+        if (!progress.isAdded()) {
             progress.show(getFragmentManager(), null);
         }
     }

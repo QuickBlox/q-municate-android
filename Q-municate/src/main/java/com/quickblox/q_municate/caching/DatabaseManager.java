@@ -6,17 +6,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.caching.tables.DialogTable;
 import com.quickblox.q_municate.caching.tables.FriendTable;
-import com.quickblox.q_municate.model.MessageCache;
+import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 
@@ -107,6 +106,22 @@ public class DatabaseManager {
         QBDialog dialog = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String resultDialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
+            if (!TextUtils.isEmpty(resultDialogId)) {
+                dialog = getDialogFromCursor(cursor);
+            }
+            cursor.close();
+        }
+
+        return dialog;
+    }
+
+    public static QBDialog getDialogByRoomJid(Context context, String roomJid) {
+        QBDialog dialog = null;
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             String resultDialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));

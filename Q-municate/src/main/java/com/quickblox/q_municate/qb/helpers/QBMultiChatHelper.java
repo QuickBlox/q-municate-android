@@ -223,7 +223,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, roomJid);
+        QBDialog dialog = DatabaseManager.getDialogByRoomJid(context, roomJid);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
         requestBuilder.pullAll(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,

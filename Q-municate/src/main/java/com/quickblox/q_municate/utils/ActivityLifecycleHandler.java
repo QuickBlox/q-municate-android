@@ -61,8 +61,6 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity, false);
             }
-            // TODO SF app was killed.
-            //android.os.Process.killProcess(android.os.Process.myPid());
         }
     }
 

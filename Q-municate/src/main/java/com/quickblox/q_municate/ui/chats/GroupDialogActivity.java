@@ -110,8 +110,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
-        //TODO make in command if will be low performance
-        //QBSendGroupDialogMessageCommand.start(GroupDialogActivity.this, dialogId, null, file);
     }
 
     @Override
@@ -138,9 +136,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void updateChatData() {
         dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
-        groupName = dialog.getName();
-
-        updateActionBar();
+        if ( dialog != null) {
+            groupName = dialog.getName();
+            updateActionBar();
+        }
     }
 
     private void initListView() {
@@ -171,8 +170,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
-        //QBSendGroupDialogMessageCommand.start(this, dialog.getRoomJid(), messageEditText.getText().toString(),
-        //      null); TODO make async if will be low perfomance
         messageEditText.setText(Consts.EMPTY_STRING);
         scrollListView();
     }
