@@ -1,10 +1,13 @@
 package com.quickblox.q_municate.ui.chats;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
@@ -99,7 +104,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         initUI();
         initListeners();
-
+        initActionBar();
         initBitmapOption();
 
         addActions();
@@ -178,7 +183,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeActions();
     }
 
-    protected void initColorsActionBar() {
+    private void initActionBar() {
+        actionBar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);
+        initColorsActionBar();
+    }
+
+    private void initColorsActionBar() {
         int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
         int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
         if (actionBarTitleId > Consts.ZERO_INT_VALUE) {
@@ -195,6 +206,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 subTitle.setAlpha(alpha);
             }
         }
+    }
+
+    protected void loadLogoActionBar(String logoUrl) {
+        ImageLoader.getInstance().loadImage(logoUrl, Consts.UIL_AVATAR_DISPLAY_OPTIONS,
+                new SimpleImageLoadingListener() {
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        updateLogoActionBar(loadedImage);
+                    }
+                }
+        );
+    }
+
+    private void updateLogoActionBar(Bitmap loadedBitmap) {
+        actionBar.setLogo(new BitmapDrawable(getResources(), loadedBitmap));
     }
 
     protected void removeActions() {

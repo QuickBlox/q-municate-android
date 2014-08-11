@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,9 +38,6 @@ import java.util.ArrayList;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
 
-    private static final String EXTRA_FRIENDS = "extra_friends";
-    private static final String EXTRA_ROOM_JID = "extra_room_jid";
-
     private String groupName;
 
     public GroupDialogActivity() {
@@ -48,13 +46,13 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     public static void start(Context context, ArrayList<Friend> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(EXTRA_FRIENDS, friends);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
     }
 
     public static void start(Context context, QBDialog qbDialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(EXTRA_ROOM_JID, qbDialog.getDialogId());
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, qbDialog.getDialogId());
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         context.startActivity(intent);
     }
@@ -63,8 +61,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getIntent().hasExtra(EXTRA_ROOM_JID)) {
-            dialogId = getIntent().getStringExtra(EXTRA_ROOM_JID);
+        if (getIntent().hasExtra(QBServiceConsts.EXTRA_ROOM_JID)) {
+            dialogId = getIntent().getStringExtra(QBServiceConsts.EXTRA_ROOM_JID);
         }
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
@@ -148,10 +146,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void updateActionBar() {
-        ActionBar actionBar = getActionBar();
         actionBar.setTitle(groupName);
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
-        initColorsActionBar();
+        actionBar.setLogo(R.drawable.placeholder_group);
     }
 
     @Override

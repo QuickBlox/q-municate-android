@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,8 +73,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         startLoadDialogMessages();
         registerStatusChangingObserver();
     }
-
-
 
     @Override
     protected void onUpdateChatDialog() {
@@ -157,10 +156,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initActionBar() {
-        ActionBar actionBar = getActionBar();
         actionBar.setTitle(opponentFriend.getFullname());
         actionBar.setSubtitle(opponentFriend.getOnlineStatus());
-        initColorsActionBar();
+        actionBar.setLogo(R.drawable.placeholder_user);
+        if(!TextUtils.isEmpty(opponentFriend.getAvatarUrl())) {
+            loadLogoActionBar(opponentFriend.getAvatarUrl());
+        }
     }
 
     @Override
