@@ -341,6 +341,7 @@ public class DatabaseManager {
         }
         values.put(MessageTable.Cols.TIME, messageCache.getTime());
         values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
+        values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
         values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
         context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
 
