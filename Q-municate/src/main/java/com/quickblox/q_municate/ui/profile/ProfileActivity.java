@@ -178,7 +178,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                navigateToParent();
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);

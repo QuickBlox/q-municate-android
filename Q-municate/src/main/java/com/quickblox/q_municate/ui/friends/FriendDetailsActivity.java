@@ -164,7 +164,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                navigateToParent();
+                finish();
                 return true;
             //TODO implement
             //            case R.id.action_delete:
