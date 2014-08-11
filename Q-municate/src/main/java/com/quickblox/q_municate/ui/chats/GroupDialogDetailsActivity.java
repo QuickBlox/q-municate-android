@@ -15,14 +15,18 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
@@ -30,7 +34,9 @@ import com.quickblox.q_municate.qb.commands.QBUpdateGroupNameCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
+import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
 import com.quickblox.q_municate.ui.main.MainActivity;
+import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -41,7 +47,7 @@ import com.quickblox.q_municate.utils.ImageHelper;
 
 import java.io.FileNotFoundException;
 
-public class GroupDialogDetailsActivity extends BaseLogeableActivity {
+public class GroupDialogDetailsActivity extends BaseLogeableActivity implements AdapterView.OnItemClickListener {
 
     private EditText groupNameEditText;
     private TextView participantsTextView;
@@ -60,6 +66,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     private boolean isNeedUpdateAvatar;
     private Bitmap avatarBitmapCurrent;
     private ImageHelper imageHelper;
+    private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
 
     public static void start(Context context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -109,7 +116,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
     }
 
     private void initListView() {
-        friendsListView.setAdapter(getFriendsAdapter());
+        groupDialogOccupantsAdapter = getFriendsAdapter();
+        friendsListView.setAdapter(groupDialogOccupantsAdapter);
+        friendsListView.setOnItemClickListener(this);
     }
 
     private void addActions() {
@@ -234,6 +243,23 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity {
 
     private void updateOldUserData() {
         groupNameOld = groupNameEditText.getText().toString();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        Friend selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        if(selectedFriend != null) {
+            startFriendProfile(selectedFriend);
+        }
+    }
+
+    private void startFriendProfile(Friend selectedFriend) {
+        QBUser currentUser = AppSession.getSession().getUser();
+        if(currentUser.getId() == selectedFriend.getId()) {
+            ProfileActivity.start(GroupDialogDetailsActivity.this);
+        } else {
+            FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
+        }
     }
 
     private class GroupNameTextWatcherListener extends SimpleTextWatcher {
