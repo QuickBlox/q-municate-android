@@ -249,11 +249,11 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Friend selectedFriend = groupDialogOccupantsAdapter.getItem(position);
         if(selectedFriend != null) {
-            friendOnClick(selectedFriend);
+            startFriendProfile(selectedFriend);
         }
     }
 
-    private void friendOnClick(Friend selectedFriend) {
+    private void startFriendProfile(Friend selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
         if(currentUser.getId() == selectedFriend.getId()) {
             ProfileActivity.start(GroupDialogDetailsActivity.this);
