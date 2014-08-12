@@ -104,7 +104,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListe
                 ErrorUtils.showError(this, e);
             }
             ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
-                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

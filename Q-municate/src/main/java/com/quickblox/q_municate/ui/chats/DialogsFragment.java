@@ -55,8 +55,6 @@ public class DialogsFragment extends BaseFragment {
         initChatsDialogs();
         Crouton.cancelAllCroutons();
 
-        //        TipsManager.showTipIfNotShownYet(this, baseActivity.getString(R.string.tip_chats_list));
-
         addActions();
 
         return view;

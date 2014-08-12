@@ -150,7 +150,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private void loadAvatar() {
         String url = friend.getAvatarUrl();
-        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     @Override
