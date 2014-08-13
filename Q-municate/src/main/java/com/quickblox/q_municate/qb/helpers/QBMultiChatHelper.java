@@ -17,7 +17,6 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
@@ -235,15 +234,13 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void updateDialog(QBDialog dialog) throws QBResponseException {
-        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
-        updateDialog(dialog, requestBuilder);
+        updateDialog(dialog, (QBCustomObjectUpdateBuilder) null);
     }
 
     public void updateDialog(QBDialog dialog, File inputFile) throws QBResponseException {
         QBFile file = QBContent.uploadFileTask(inputFile, true, (String) null);
         dialog.setPhotoUrl(file.getPublicUrl());
-        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
-        updateDialog(dialog, requestBuilder);
+        updateDialog(dialog, (QBCustomObjectUpdateBuilder) null);
     }
 
     private void updateDialog(QBDialog dialog, QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {

@@ -59,9 +59,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private TextView onlineParticipantsTextView;
     private RoundedImageView avatarImageView;
 
-    private String groupNameCurrent;
-    private String groupNameOld;
-
     private String dialogId;
     private GroupDialog groupDialog;
 
@@ -71,9 +68,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private Bitmap avatarBitmapCurrent;
     private QBDialog dialogCurrent;
+    private String groupNameCurrent;
 
     private String photoUrlOld;
-    private QBDialog dialogOld;
+    private String groupNameOld;
 
     private ImageHelper imageHelper;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
