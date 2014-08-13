@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
@@ -30,7 +31,7 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
-import com.quickblox.q_municate.qb.commands.QBUpdateGroupNameCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
@@ -44,10 +45,13 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.ReceiveFileListener;
+import com.quickblox.q_municate.utils.ReceiveImageFileTask;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
-public class GroupDialogDetailsActivity extends BaseLogeableActivity implements AdapterView.OnItemClickListener {
+public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileListener, AdapterView.OnItemClickListener {
 
     private EditText groupNameEditText;
     private TextView participantsTextView;
@@ -55,16 +59,20 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private TextView onlineParticipantsTextView;
     private RoundedImageView avatarImageView;
 
-    private String groupNameCurrent;
-    private String groupNameOld;
-
     private String dialogId;
     private GroupDialog groupDialog;
 
     private Object actionMode;
     private boolean closeActionMode;
     private boolean isNeedUpdateAvatar;
+
     private Bitmap avatarBitmapCurrent;
+    private QBDialog dialogCurrent;
+    private String groupNameCurrent;
+
+    private String photoUrlOld;
+    private String groupNameOld;
+
     private ImageHelper imageHelper;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
 
@@ -79,17 +87,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(this, dialogId));
+        dialogCurrent = DatabaseManager.getDialogByDialogId(this, dialogId);
+        groupDialog = new GroupDialog(dialogCurrent);
         imageHelper = new ImageHelper(this);
         initUI();
         initUIWithData();
         addActions();
+        startLoadGroupDialog();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        showProgress();
+    private void startLoadGroupDialog() {
         QBLoadGroupDialogCommand.start(this, dialogId, groupDialog.getRoomJid());
     }
 
@@ -112,7 +119,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
         onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
                 groupDialog.getOnlineOccupantsCount(), groupDialog.getOccupantsCount()));
-        updateOldUserData();
+        loadAvatar(groupDialog.getPhotoUrl());
+        updateOldGroupData();
+    }
+
+    private void loadAvatar(String photoUrl) {
+        ImageLoader.getInstance().displayImage(photoUrl, avatarImageView,
+                Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void initListView() {
@@ -122,12 +135,15 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void addActions() {
+        UpdateGroupFailAction updateGroupFailAction = new UpdateGroupFailAction();
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION, new LoadGroupDialogSuccessAction());
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
         addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION, new UpdateGroupNameSuccessAction());
-        addAction(QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION, updateGroupFailAction);
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateGroupPhotoSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, updateGroupFailAction);
         updateBroadcastActionList();
     }
 
@@ -199,7 +215,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 ErrorUtils.logError(e);
             }
             ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
-                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
             startAction();
         }
         canPerformLogout.set(true);
@@ -230,36 +246,65 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void saveChanges() {
         if (!isUserDataCorrect()) {
-            DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
+            DialogUtils.showLong(this, getString(R.string.gdd_name_not_entered));
             return;
         }
+
+        dialogCurrent.setName(groupNameCurrent);
+
+        if (isNeedUpdateAvatar) {
+            new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
+        } else {
+            startUpdatingGroupDialog(null);
+        }
+
         showProgress();
-        QBUpdateGroupNameCommand.start(this, dialogId, groupNameCurrent);
     }
 
     private boolean isUserDataCorrect() {
         return !TextUtils.isEmpty(groupNameCurrent);
     }
 
-    private void updateOldUserData() {
-        groupNameOld = groupNameEditText.getText().toString();
+    private void updateOldGroupData() {
+        groupNameOld = groupDialog.getName();
+        photoUrlOld = groupDialog.getPhotoUrl();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Friend selectedFriend = groupDialogOccupantsAdapter.getItem(position);
-        if(selectedFriend != null) {
+        if (selectedFriend != null) {
             startFriendProfile(selectedFriend);
         }
     }
 
     private void startFriendProfile(Friend selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if(currentUser.getId() == selectedFriend.getId()) {
+        if (currentUser.getId() == selectedFriend.getId()) {
             ProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
             FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
         }
+    }
+
+    private void resetGroupData() {
+        groupNameEditText.setText(groupNameOld);
+        isNeedUpdateAvatar = false;
+        loadAvatar(photoUrlOld);
+    }
+
+    private void startUpdatingGroupDialog(File imageFile) {
+        QBUpdateGroupDialogCommand.start(this, dialogCurrent, imageFile);
+    }
+
+    @Override
+    public void onCachedImageFileReceived(File imageFile) {
+        startUpdatingGroupDialog(imageFile);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
+
     }
 
     private class GroupNameTextWatcherListener extends SimpleTextWatcher {
@@ -293,10 +338,21 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
-            updateOldUserData();
+            updateOldGroupData();
             initUIWithData();
             initTextChangedListeners();
             initListView();
+            hideProgress();
+        }
+    }
+
+    private class UpdateGroupFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
+            resetGroupData();
             hideProgress();
         }
     }
@@ -315,7 +371,19 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
         @Override
         public void execute(Bundle bundle) {
-            updateOldUserData();
+            updateOldGroupData();
+            hideProgress();
+        }
+    }
+
+    private class UpdateGroupPhotoSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this,
+                    dialog.getDialogId()));
+            updateOldGroupData();
             hideProgress();
         }
     }

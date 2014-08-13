@@ -208,6 +208,7 @@ public class DatabaseManager {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
         String roomJidId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.ROOM_JID_ID));
         String name = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.NAME));
+        String photoUrl = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.PHOTO_URL));
         String occupantsIdsString = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.OCCUPANTS_IDS));
         ArrayList<Integer> occupantsIdsList = ChatUtils.getOccupantsIdsListFromString(occupantsIdsString);
         int countUnreadMessages = cursor.getInt(cursor.getColumnIndex(
@@ -226,6 +227,7 @@ public class DatabaseManager {
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageUserId(lastMessageUserId);
         dialog.setLastMessageDateSent(dateSent);
+        dialog.setPhotoUrl(photoUrl);
         dialog.setType(QBDialogType.parseByCode(type));
 
         return dialog;
@@ -385,6 +387,7 @@ public class DatabaseManager {
             values.put(DialogTable.Cols.DIALOG_ID, dialog.getDialogId());
         }
         values.put(DialogTable.Cols.NAME, dialog.getName());
+        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhotoUrl());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 dialog.getOccupants()));
         String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
@@ -413,6 +416,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
+        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhotoUrl());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().getCode());
         return values;

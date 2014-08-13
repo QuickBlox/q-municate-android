@@ -1,5 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
     android:id="@+id/message_relativelayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/chat_input_message_height"
     android:background="@color/white">
@@ -36,7 +38,8 @@
         android:gravity="center_vertical|right|left"
         android:hint="@string/dlg_hint_message"
         android:maxLines="5"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
 
     <ImageButton
         android:id="@+id/smile_panel_imagebutton"

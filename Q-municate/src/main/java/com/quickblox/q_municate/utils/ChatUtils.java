@@ -23,6 +23,7 @@ public class ChatUtils {
 
     public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
     public static final String PROPERTY_ROOM_NAME = "name";
+    public static final String PROPERTY_PHOTO_URL = "photo";
     public static final String PROPERTY_DIALOG_TYPE_CODE = "type";
     public static final String PROPERTY_ROOM_JID = "room_jid";
     public static final String PROPERTY_DIALOG_ID = "dialog_id";
@@ -62,10 +63,12 @@ public class ChatUtils {
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = chatMessage.getProperty(PROPERTY_PHOTO_URL);
         String dialogTypeCode = chatMessage.getProperty(PROPERTY_DIALOG_TYPE_CODE);
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
+        dialog.setPhotoUrl(photoUrl);
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
         if (dialogTypeCode != null) {
@@ -116,6 +119,7 @@ public class ChatUtils {
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
+        String photoUrl = dialog.getPhotoUrl();
         String dialogTypeCode = String.valueOf(dialog.getType().getCode());
 
         QBUser user = AppSession.getSession().getUser();
@@ -127,6 +131,9 @@ public class ChatUtils {
             chatMessage.setProperty(PROPERTY_ROOM_JID, roomJid);
         }
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
+        if (!TextUtils.isEmpty(photoUrl)) {
+            chatMessage.setProperty(PROPERTY_PHOTO_URL, photoUrl);
+        }
         if (!TextUtils.isEmpty(dialogName)) {
             chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
         }
@@ -155,6 +162,7 @@ public class ChatUtils {
         String dialogId = String.valueOf(dialog.getDialogId());
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
+        String photoUrl = dialog.getPhotoUrl();
 
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT);
@@ -162,6 +170,9 @@ public class ChatUtils {
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
         if (!TextUtils.isEmpty(dialogName)) {
             chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
+        }
+        if (!TextUtils.isEmpty(photoUrl)) {
+            chatMessage.setProperty(PROPERTY_PHOTO_URL, photoUrl);
         }
         return chatMessage;
     }

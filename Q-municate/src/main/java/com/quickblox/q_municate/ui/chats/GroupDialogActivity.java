@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.chats;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -134,7 +133,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private void updateChatData() {
         dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
-        if ( dialog != null) {
+        if (dialog != null) {
             groupName = dialog.getName();
             updateActionBar();
         }
@@ -149,6 +148,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         actionBar.setTitle(groupName);
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
+        if(!TextUtils.isEmpty(dialog.getPhotoUrl())) {
+            loadLogoActionBar(dialog.getPhotoUrl());
+        }
     }
 
     @Override

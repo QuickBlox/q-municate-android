@@ -44,7 +44,11 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+    }
+
+    protected void displayGroupPhotoImage(String uri, ImageView imageView) {
+        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
     protected String getAvatarUrlForCurrentUser() {

@@ -55,6 +55,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);
             viewHolder.userCountTextView.setText(dialog.getOccupants().size() + Consts.EMPTY_STRING);
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
+            displayGroupPhotoImage(dialog.getPhotoUrl(), viewHolder.avatarImageView);
         }
 
         if (dialog.getUnreadMessageCount() > Consts.ZERO_INT_VALUE) {

@@ -1,31 +1,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@color/white"
     android:orientation="vertical"
     android:padding="15dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="35dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <com.quickblox.q_municate.ui.views.RoundedImageView
             android:id="@+id/avatar_imageview"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:src="@drawable/placeholder_user"
-            android:onClick="changeAvatarOnClick" />
+            android:layout_width="@dimen/avatar_width"
+            android:layout_height="@dimen/avatar_height"
+            android:background="@drawable/button_general_selector"
+            android:onClick="changeAvatarOnClick"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_group" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:descendantFocusability="beforeDescendants"
             android:focusableInTouchMode="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingLeft="10dp">
 
             <EditText
                 android:id="@+id/name_textview"
@@ -36,22 +37,22 @@
                 android:background="@null"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textSize="20sp" />
+                android:textSize="@dimen/text_size" />
 
             <TextView
                 android:id="@+id/participants_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
+                android:textColor="@color/dark_gray"
+                android:textSize="@dimen/text_size_small" />
         </LinearLayout>
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/action_bar_background_color" />
+        android:background="@color/blue" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -72,18 +73,17 @@
             android:id="@+id/online_participants_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4/27 online"
-            android:textSize="18sp" />
+            android:textSize="@dimen/text_size_small" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:background="@android:color/darker_gray" />
+        android:background="@color/dark_gray" />
 
     <ListView
         android:id="@+id/chat_friends_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white" />
+        android:background="@color/white" />
 </LinearLayout>
