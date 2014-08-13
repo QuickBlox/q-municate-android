@@ -21,13 +21,12 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
+import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
-import com.quickblox.q_municate.utils.ReceiveMaskedBitmapListener;
-import com.quickblox.q_municate.utils.ReceiveMaskedImageFileTask;
 
 import java.io.File;
 import java.util.HashMap;
@@ -158,26 +157,26 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         view.setVisibility(visibility);
     }
 
-    public class ImageLoadingListener extends SimpleImageLoadingListener implements ReceiveMaskedBitmapListener {
+    public class ImageLoadingListener extends SimpleImageLoadingListener /* implements ReceiveMaskedBitmapListener*/ {
 
         private ViewHolder viewHolder;
-        private int maskedBackgroundId;
+//        private int maskedBackgroundId;
         private Bitmap loadedImageBitmap;
 
         public ImageLoadingListener(ViewHolder viewHolder, int maskedBackgroundId) {
             this.viewHolder = viewHolder;
-            this.maskedBackgroundId = maskedBackgroundId;
+//            this.maskedBackgroundId = maskedBackgroundId;
         }
 
-        @Override
-        public void onMaskedImageBitmapReceived(Bitmap maskedImageBitmap) {
-            hideAttachmentBackground(viewHolder.attachImageView);
-            viewHolder.attachImageView.setImageBitmap(maskedImageBitmap);
-            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
-            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
-            updateUIAfterLoading();
-            scrollMessagesListener.onScrollToBottom();
-        }
+//        @Override
+//        public void onMaskedImageBitmapReceived(Bitmap maskedImageBitmap) {
+//            hideAttachmentBackground(viewHolder.attachImageView);
+//            viewHolder.attachImageView.setImageBitmap(maskedImageBitmap);
+//            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
+//            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
+//            updateUIAfterLoading();
+//            scrollMessagesListener.onScrollToBottom();
+//        }
 
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
@@ -198,8 +197,13 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
         private void initMaskedImageView(Bitmap loadedBitmap) {
             loadedImageBitmap = loadedBitmap;
-            makeMaskedImageView();
+//            makeMaskedImageView();
             viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
+            viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
+            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
+            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
+            updateUIAfterLoading();
+            scrollMessagesListener.onScrollToBottom();
         }
 
         private void updateUIAfterLoading() {
@@ -221,9 +225,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             };
         }
 
-        private void makeMaskedImageView() {
-            new ReceiveMaskedImageFileTask(this).execute(imageHelper, maskedBackgroundId, loadedImageBitmap);
-        }
+//        private void makeMaskedImageView() {
+//            new ReceiveMaskedImageFileTask(this).execute(imageHelper, maskedBackgroundId, loadedImageBitmap);
+//        }
     }
 
     public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {
@@ -249,7 +253,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public RelativeLayout progressRelativeLayout;
         public RelativeLayout attachMessageRelativeLayout;
         public TextView messageTextView;
-        public ImageView attachImageView;
+        public MaskedImageView attachImageView;
         public TextView timeTextMessageTextView;
         public TextView timeAttachMessageTextView;
         public ProgressBar verticalProgressBar;
