@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -61,6 +62,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected View emojisFragment;
     protected ImageHelper imageHelper;
 
+    private int keyboardHeight = 0;
+    int prevViewHeight = 0;
+    private View rootView;
+    private boolean needToShowSmileLayout;
+
     protected int layoutResID;
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
@@ -101,8 +107,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(layoutResID);
+        rootView = getLayoutInflater().inflate(layoutResID, null);
+        setContentView(rootView);
 
         imageHelper = new ImageHelper(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
@@ -230,6 +236,27 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
+//    @Override
+//    public void onSizeChanged(int height) {
+//        Rect localRect = new Rect();
+//        this.getWindow().getDecorView().getWindowVisibleDisplayFrame(localRect);
+//
+//        WindowManager manager = (WindowManager) App.getInstance().getApplicationContext().getSystemService(
+//                Activity.WINDOW_SERVICE);
+//        if (manager == null || manager.getDefaultDisplay() == null) {
+//            return;
+//        }
+//        int rotation = manager.getDefaultDisplay().getRotation();
+//
+//        if (height > SizeNotifierLinearLayout.dp(100)) {
+//            if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
+//                keyboardHeightLand = height;
+//            } else {
+//                keyboardHeight = height;
+//            }
+//        }
+//    }
+
     protected void loadLogoActionBar(String logoUrl) {
         ImageLoader.getInstance().loadImage(logoUrl, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
@@ -320,10 +347,23 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                     KeyboardUtils.showKeyboard(BaseDialogActivity.this);
                 } else {
                     KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
-                    showSmileLayout();
+                    needToShowSmileLayout = true;
                 }
             }
         });
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                    @Override
+                    public void onGlobalLayout() {
+                        if (needToShowSmileLayout) {
+                            needToShowSmileLayout = false;
+                            showSmileLayout();
+                        }
+                    }
+                }
+        );
     }
 
     private void setSmilePanelIcon(int resourceId) {
