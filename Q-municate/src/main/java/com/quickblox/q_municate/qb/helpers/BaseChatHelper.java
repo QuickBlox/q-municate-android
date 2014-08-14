@@ -119,7 +119,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
-            String dialogId) throws QBResponseException {
+            String dialogId) throws QBResponseException, XMPPException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
             throw new QBResponseException("Private chat was not created!");
@@ -130,8 +130,8 @@ public abstract class BaseChatHelper extends BaseHelper {
         String error = null;
         try {
             privateChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_send_msg);
+        }catch (XMPPException e){
+            error = context.getString(R.string.dlg_fail_connection);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         }

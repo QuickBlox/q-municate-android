@@ -239,7 +239,9 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     private void updateDialog(String dialogId, String newName,
             QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
-        QBDialog updatedDialog = roomChatManager.updateDialog(dialogId, newName, requestBuilder);
+        QBDialog dialog = new QBDialog(dialogId);
+        dialog.setName(newName);
+        QBDialog updatedDialog = roomChatManager.updateDialog(dialog, requestBuilder);
         ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
         friendsList.remove(chatCreator.getId());
         notifyFriendsRoomUpdate(updatedDialog, friendsList);

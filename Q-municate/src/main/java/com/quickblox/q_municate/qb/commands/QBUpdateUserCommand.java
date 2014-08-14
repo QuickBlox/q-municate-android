@@ -3,6 +3,7 @@ package com.quickblox.q_municate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.users.model.QBUser;
@@ -11,6 +12,7 @@ import com.quickblox.q_municate.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.utils.Consts;
 
 import org.jivesoftware.smack.SmackException;
 
@@ -43,12 +45,21 @@ public class QBUpdateUserCommand extends ServiceCommand {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
         user.setOldPassword(user.getPassword());
-        updateUser(user, file);
+        int authorizationType = extras.getInt(QBServiceConsts.AUTH_ACTION_TYPE, Consts.NOT_INITIALIZED_VALUE);
 
         Bundle result = new Bundle();
+        if (isLoggedViaFB(user, authorizationType)) {
+            result.putSerializable(QBServiceConsts.EXTRA_USER, user);
+            return result;
+        }
+        updateUser(user, file);
         result.putSerializable(QBServiceConsts.EXTRA_USER, user);
 
         return result;
+    }
+
+    private boolean isLoggedViaFB(QBUser user, int authorizationType){
+       return !TextUtils.isEmpty(user.getFacebookId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
     }
 
     private void updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {

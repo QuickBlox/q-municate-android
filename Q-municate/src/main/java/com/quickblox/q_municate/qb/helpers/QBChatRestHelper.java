@@ -39,6 +39,7 @@ public class QBChatRestHelper extends BaseHelper {
             QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
+            QBChatService.setDefaultPacketReplyTimeout(15000);
             chatService = QBChatService.getInstance();
             chatService.addConnectionListener(connectionListener);
         }

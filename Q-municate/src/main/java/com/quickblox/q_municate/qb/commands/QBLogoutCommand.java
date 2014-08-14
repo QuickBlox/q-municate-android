@@ -29,12 +29,12 @@ public class QBLogoutCommand extends CompositeServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         try {
             super.perform(extras);
+            resetCacheData();
+            resetRememberMe();
+            resetUserData();
         } catch (Exception e) {
             ErrorUtils.logError(TAG, e);
         }
-        resetCacheData();
-        resetRememberMe();
-        resetUserData();
         return extras;
     }
 
