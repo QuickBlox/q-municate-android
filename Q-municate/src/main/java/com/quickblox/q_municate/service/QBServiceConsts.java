@@ -173,4 +173,7 @@ public class QBServiceConsts {
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";
     public static final String FORCE_RELOGIN = "force_relogin";
     public static final String REFRESH_SESSION = "refresh_session";
+    public static final String AUTH_ACTION_TYPE = "authorize_type";
+    public static final int AUTH_TYPE_REGISTRATION = 1;
+    public static final int AUTH_TYPE_LOGIN = 2;
 }

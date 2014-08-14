@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.qb.helpers;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.facebook.Session;
 import com.quickblox.internal.core.exception.BaseServiceException;
@@ -73,9 +72,6 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
-        if (!TextUtils.isEmpty(inputUser.getFacebookId()) && TextUtils.isEmpty(inputUser.getWebsite())) {
-            return inputUser;
-        }
         String password = inputUser.getPassword();
         user = QBUsers.updateUser(inputUser);
         user.setPassword(password);
