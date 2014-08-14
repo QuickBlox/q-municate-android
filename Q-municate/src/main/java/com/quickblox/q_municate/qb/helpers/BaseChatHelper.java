@@ -119,7 +119,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
-            String dialogId) throws QBResponseException, XMPPException {
+            String dialogId) throws QBResponseException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
             throw new QBResponseException("Private chat was not created!");
