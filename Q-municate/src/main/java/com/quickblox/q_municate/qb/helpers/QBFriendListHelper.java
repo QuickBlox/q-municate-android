@@ -110,12 +110,12 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private List<Integer> getUserIdsFromRoster() throws SmackException.NotLoggedInException, SmackException.NoResponseException, SmackException.NotConnectedException, XMPPException {
-        Collection<QBRosterEntry> entries = roster.getEntries();
         List<Integer> userIds = new ArrayList<Integer>();
         if (roster == null) {
             ErrorUtils.logError(TAG, "ROSTER isn't initialized");
             return userIds;
         }
+        Collection<QBRosterEntry> entries = roster.getEntries();
         for (QBRosterEntry entry : entries) {
             if (RosterPacket.ItemType.from.equals(entry.getType())) {
                 roster.confirmSubscription(entry.getUserId());
