@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -48,8 +50,7 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.io.File;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener,
-        ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     protected EditText chatEditText;
     protected ListView messagesListView;
@@ -61,12 +62,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected String dialogId;
     protected View emojisFragment;
     protected ImageHelper imageHelper;
-
-    private int keyboardHeight = 0;
-    int prevViewHeight = 0;
-    private View rootView;
-    private boolean needToShowSmileLayout;
-
     protected int layoutResID;
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
@@ -74,8 +69,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected BitmapFactory.Options bitmapOptions;
     protected BaseChatHelper chatHelper;
 
+    private int keyboardHeight;
+    private View rootView;
+    private boolean needToShowSmileLayout;
     private ImageView messageTypingBoxImageView;
-
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
@@ -175,8 +172,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setSmilePanelIcon(R.drawable.ic_smile);
     }
 
-    private void showSmileLayout() {
+    private void showSmileLayout(int keyboardHeight) {
+        needToShowSmileLayout = false;
         emojisFragment.setVisibility(View.VISIBLE);
+        if(keyboardHeight != Consts.ZERO_INT_VALUE) {
+            ViewGroup.LayoutParams params = emojisFragment.getLayoutParams();
+            params.height = keyboardHeight;
+            emojisFragment.setLayoutParams(params);
+        }
         setSmilePanelIcon(R.drawable.ic_keyboard);
     }
 
@@ -236,27 +239,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-//    @Override
-//    public void onSizeChanged(int height) {
-//        Rect localRect = new Rect();
-//        this.getWindow().getDecorView().getWindowVisibleDisplayFrame(localRect);
-//
-//        WindowManager manager = (WindowManager) App.getInstance().getApplicationContext().getSystemService(
-//                Activity.WINDOW_SERVICE);
-//        if (manager == null || manager.getDefaultDisplay() == null) {
-//            return;
-//        }
-//        int rotation = manager.getDefaultDisplay().getRotation();
-//
-//        if (height > SizeNotifierLinearLayout.dp(100)) {
-//            if (rotation == Surface.ROTATION_270 || rotation == Surface.ROTATION_90) {
-//                keyboardHeightLand = height;
-//            } else {
-//                keyboardHeight = height;
-//            }
-//        }
-//    }
-
     protected void loadLogoActionBar(String logoUrl) {
         ImageLoader.getInstance().loadImage(logoUrl, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
@@ -265,8 +247,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
                         updateLogoActionBar(loadedBitmap);
                     }
-                }
-        );
+                });
     }
 
     private void updateLogoActionBar(Bitmap loadedBitmap) {
@@ -348,6 +329,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 } else {
                     KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
                     needToShowSmileLayout = true;
+                    if (keyboardHeight == Consts.ZERO_INT_VALUE) {
+                        showSmileLayout(Consts.ZERO_INT_VALUE);
+                    }
                 }
             }
         });
@@ -357,13 +341,25 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
                     @Override
                     public void onGlobalLayout() {
+                        final int EXPECTED_HEIGHT = 100;
+                        Rect r = new Rect();
+                        rootView.getWindowVisibleDisplayFrame(r);
+
+                        int screenHeight = rootView.getRootView().getHeight();
+                        int heightDifference = screenHeight - (r.bottom - r.top);
+                        int resourceId = getResources().getIdentifier("status_bar_height", "dimen",
+                                "android");
+                        if (resourceId > Consts.ZERO_INT_VALUE) {
+                            heightDifference -= getResources().getDimensionPixelSize(resourceId);
+                        }
+                        if (heightDifference > EXPECTED_HEIGHT) {
+                            keyboardHeight = heightDifference;
+                        }
                         if (needToShowSmileLayout) {
-                            needToShowSmileLayout = false;
-                            showSmileLayout();
+                            showSmileLayout(keyboardHeight);
                         }
                     }
-                }
-        );
+                });
     }
 
     private void setSmilePanelIcon(int resourceId) {
