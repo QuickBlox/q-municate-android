@@ -191,8 +191,8 @@ public abstract class BaseChatHelper extends BaseHelper {
     private class PrivateChatManagerListener implements QBPrivateChatManagerListener {
 
         @Override
-        public void chatCreated(QBPrivateChat qbPrivateChat, boolean b) {
-            qbPrivateChat.addMessageListener(privateChatMessageListener);
+        public void chatCreated(QBPrivateChat privateChat, boolean b) {
+            privateChat.addMessageListener(privateChatMessageListener);
         }
     }
 

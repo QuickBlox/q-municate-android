@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
     android:id="@+id/text_message_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -17,7 +18,8 @@
         android:paddingLeft="10dp"
         android:paddingRight="5dp"
         android:textColor="@color/black"
-        android:textSize="@dimen/text_size_small" />
+        android:textSize="@dimen/text_size_small"
+        emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
 
     <TextView
         android:id="@+id/time_text_message_textview"

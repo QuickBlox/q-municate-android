@@ -22,6 +22,7 @@ public class DialogTable {
         public static final String LAST_MESSAGE_USER_ID = "last_message_user_id";
         public static final String LAST_DATE_SENT = "last_date_sent";
         public static final String OCCUPANTS_IDS = "occupants_ids";
+        public static final String PHOTO_URL = "photo_url";
         public static final String TYPE = "type";
     }
 }

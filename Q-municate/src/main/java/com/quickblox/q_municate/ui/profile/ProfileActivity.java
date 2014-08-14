@@ -132,7 +132,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     private void loadAvatar() {
         String url = user.getWebsite();
-        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void initTextChangedListeners() {
@@ -178,7 +178,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                navigateToParent();
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -196,7 +196,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
                 ErrorUtils.logError(e);
             }
             ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
-                    Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
             startAction();
         }
         canPerformLogout.set(true);

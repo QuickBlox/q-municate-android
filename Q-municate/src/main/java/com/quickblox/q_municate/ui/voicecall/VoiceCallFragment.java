@@ -44,7 +44,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         avatarView.setOval(true);
         if(!TextUtils.isEmpty(opponent.getAvatarUrl())){
             ImageLoader.getInstance().displayImage(opponent.getAvatarUrl(),
-                    avatarView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }
 

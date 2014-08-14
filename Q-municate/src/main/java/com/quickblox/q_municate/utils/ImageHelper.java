@@ -59,7 +59,8 @@ public class ImageHelper {
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
                 .memoryCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE)
                 .discCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE,
-                        Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, null).threadPoolSize(THREAD_POOL_SIZE)
+                        Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, null)
+                .threadPoolSize(THREAD_POOL_SIZE)
                 .threadPriority(Thread.NORM_PRIORITY).denyCacheImageMultipleSizesInMemory().memoryCache(
                         new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT)).writeDebugLogs()
                 .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS).imageDecoder(

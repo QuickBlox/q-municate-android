@@ -58,7 +58,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         avatarView.setOval(true);
         if(!TextUtils.isEmpty(friend.getAvatarUrl())){
             ImageLoader.getInstance().displayImage(friend.getAvatarUrl(),
-                    avatarView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);

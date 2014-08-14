@@ -5,9 +5,9 @@
 
     <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
         android:id="@+id/emojicon_icon"
-        android:layout_width="32dip"
-        android:layout_height="32dip"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="center"
         android:gravity="center"
-        emojicon:emojiconSize="30dip" />
+        emojicon:emojiconSize="@dimen/chat_emoji_item_size" />
 </FrameLayout>

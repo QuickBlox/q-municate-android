@@ -9,6 +9,7 @@ public class GroupDialog extends Dialog {
     private String roomJid;
     private ArrayList<Friend> occupantList;
     private int unreadMessageCount;
+    private String photoUrl;
 
     public GroupDialog(String id) {
         super(id);
@@ -18,6 +19,15 @@ public class GroupDialog extends Dialog {
         super(dialog);
         roomJid = dialog.getRoomJid();
         occupantList = new ArrayList<Friend>();
+        photoUrl = dialog.getPhotoUrl();
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     @Override

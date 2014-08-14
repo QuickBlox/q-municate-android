@@ -49,7 +49,7 @@ public class EmojiGridFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        GridView gridView = (GridView) view.findViewById(R.id.Emoji_GridView);
+        GridView gridView = (GridView) view.findViewById(R.id.emojis_gridview);
         emojiObjects = getArguments() == null ? Emoji.DATA_PEOPLE : (EmojiObject[]) getArguments()
                 .getSerializable(QBServiceConsts.EXTRA_EMOJIS);
         gridView.setAdapter(new EmojiAdapter(view.getContext(), emojiObjects));

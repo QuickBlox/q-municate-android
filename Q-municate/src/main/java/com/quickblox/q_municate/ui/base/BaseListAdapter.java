@@ -45,6 +45,6 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     }
 
     protected void displayImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 }

@@ -50,7 +50,7 @@ import com.quickblox.q_municate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
-import com.quickblox.q_municate.qb.commands.QBUpdateGroupNameCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.qb.commands.push.QBSendPushCommand;
@@ -198,7 +198,7 @@ public class QBService extends Service {
 
     private void registerUpdateGroupNameCommand() {
         QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
-        QBUpdateGroupNameCommand updateGroupNameCommand = new QBUpdateGroupNameCommand(this, multiChatHelper,
+        QBUpdateGroupDialogCommand updateGroupNameCommand = new QBUpdateGroupDialogCommand(this, multiChatHelper,
                 QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, updateGroupNameCommand);

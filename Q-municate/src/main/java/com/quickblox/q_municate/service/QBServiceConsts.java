@@ -122,6 +122,8 @@ public class QBServiceConsts {
     public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
+    public static final String UPDATE_GROUP_PHOTO_SUCCESS_ACTION = "update_group_photo_success_action";
+    public static final String UPDATE_GROUP_PHOTO_FAIL_ACTION = "update_group_photo_fail_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
