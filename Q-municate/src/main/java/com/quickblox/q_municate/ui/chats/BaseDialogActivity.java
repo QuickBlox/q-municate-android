@@ -341,25 +341,28 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
                     @Override
                     public void onGlobalLayout() {
-                        final int EXPECTED_HEIGHT = 100;
-                        Rect r = new Rect();
-                        rootView.getWindowVisibleDisplayFrame(r);
-
-                        int screenHeight = rootView.getRootView().getHeight();
-                        int heightDifference = screenHeight - (r.bottom - r.top);
-                        int resourceId = getResources().getIdentifier("status_bar_height", "dimen",
-                                "android");
-                        if (resourceId > Consts.ZERO_INT_VALUE) {
-                            heightDifference -= getResources().getDimensionPixelSize(resourceId);
-                        }
-                        if (heightDifference > EXPECTED_HEIGHT) {
-                            keyboardHeight = heightDifference;
-                        }
+                        initKeyboardHeight();
                         if (needToShowSmileLayout) {
                             showSmileLayout(keyboardHeight);
                         }
                     }
                 });
+    }
+
+    private void initKeyboardHeight() {
+        final int EXPECTED_HEIGHT = 100;
+        Rect r = new Rect();
+        rootView.getWindowVisibleDisplayFrame(r);
+        int screenHeight = rootView.getRootView().getHeight();
+        int heightDifference = screenHeight - (r.bottom - r.top);
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen",
+                "android");
+        if (resourceId > Consts.ZERO_INT_VALUE) {
+            heightDifference -= getResources().getDimensionPixelSize(resourceId);
+        }
+        if (heightDifference > EXPECTED_HEIGHT) {
+            keyboardHeight = heightDifference;
+        }
     }
 
     private void setSmilePanelIcon(int resourceId) {

@@ -34,6 +34,7 @@ public class MaskedImageView extends ImageView {
     }
 
     private void init(AttributeSet attrs) {
+        maskResourceId = Consts.ZERO_INT_VALUE;
         TypedArray array = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.MaskedImageView,
                 Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
 
