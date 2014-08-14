@@ -2,12 +2,17 @@ package com.quickblox.q_municate.model;
 
 import android.text.TextUtils;
 
+import com.quickblox.internal.core.exception.BaseServiceException;
+import com.quickblox.internal.core.server.BaseService;
+import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class AppSession implements Serializable {
 
@@ -90,6 +95,23 @@ public class AppSession implements Serializable {
     public static void saveRememberMe(boolean value) {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
     }
+
+    public static boolean isSessionExistOrNotExpired(long expirationTime){
+        try {
+            BaseService baseService = QBAuth.getBaseService();
+            String token = baseService.getToken();
+            if (token == null){
+                return false;
+            }
+            Date tokenExpirationDate = baseService.getTokenExpirationDate();
+            long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
+            return tokenLiveOffset > expirationTime;
+        } catch (BaseServiceException e) {
+            ErrorUtils.logError(e);
+        }
+        return false;
+    }
+
 
     public static AppSession getSession() {
         AppSession activeSession = AppSession.getActiveSession();

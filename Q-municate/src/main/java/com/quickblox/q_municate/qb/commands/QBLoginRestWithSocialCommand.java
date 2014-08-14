@@ -43,9 +43,11 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
         if(TextUtils.isEmpty(user.getWebsite())) {
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+            extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
         } else {
             App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_LOGIN);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
         }
         return extras;

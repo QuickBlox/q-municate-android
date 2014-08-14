@@ -15,14 +15,18 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
+import com.quickblox.q_municate.qb.commands.QBLoginChatCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.main.MainActivity;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.PrefsHelper;
+
+import java.util.concurrent.TimeUnit;
 
 public class SplashActivity extends BaseActivity {
 
@@ -47,20 +51,36 @@ public class SplashActivity extends BaseActivity {
         String userEmail = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
 
-        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
-        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
         boolean isRememberMe = App.getInstance().getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME,
                 false);
 
-        if (isRememberMe && isEmailEntered && isPasswordEntered) {
-            makeAutoLogin(userEmail, userPassword);
+        if (isRememberMe) {
+            checkStartExistSession(userEmail, userPassword);
         } else {
             startLanding();
         }
     }
 
+    private void checkStartExistSession(String userEmail, String userPassword){
+        boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
+        boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
+        if ( ( isEmailEntered && isPasswordEntered ) ||
+                (isLoggedViaFB(isPasswordEntered)) ){
+                           runExistSession(userEmail, userPassword);
+        }
+        else {
+            startLanding();
+        }
+    }
+
+    private boolean isLoggedViaFB(boolean isPasswordEntered){
+        return isPasswordEntered && LoginType.FACEBOOK.equals(getCurrentLoginType());
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, new LoginChatSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
     }
 
@@ -97,8 +117,18 @@ public class SplashActivity extends BaseActivity {
         finish();
     }
 
-    private void makeAutoLogin(String userEmail, String userPassword) {
-        if (isLoggedViaFB() || LoginType.EMAIL.equals(getCurrentLoginType())) {
+    private void runExistSession(String userEmail, String userPassword) {
+        //check is token valid for about 1 minute
+        if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(Consts.TOKEN_VALID_TIME_IN_MINUTES))){
+            QBLoginChatCommand.start(this);
+        }
+        else{
+            doAutoLogin(userEmail, userPassword);
+        }
+    }
+
+    private void doAutoLogin(String userEmail, String userPassword){
+        if (LoginType.EMAIL.equals(getCurrentLoginType())) {
             login(userEmail, userPassword);
         } else {
             facebookHelper.loginWithFacebook();
@@ -133,6 +163,15 @@ public class SplashActivity extends BaseActivity {
     protected void onFailAction(String action) {
         super.onFailAction(action);
         startLanding();
+    }
+
+    private class LoginChatSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            startMainActivity();
+            finish();
+        }
     }
 
     private class LoginSuccessAction implements Command {
