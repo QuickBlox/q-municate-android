@@ -8,6 +8,7 @@ import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.io.Serializable;
@@ -106,7 +107,7 @@ public class AppSession implements Serializable {
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
         } catch (BaseServiceException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
         }
         return false;
     }

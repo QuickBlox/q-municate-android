@@ -28,7 +28,7 @@ public class Consts {
 
     public static final int SECOND = 1000;
 
-    public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 10 * 1000;
+    public static final int DEFAULT_PACKET_REPLY_TIMEOUT = 15 * 1000;
     public static final int DEFAULT_CALL_PACKET_REPLY_TIMEOUT = 5 * SECOND;
     public static final int DEFAULT_DIALING_TIME = 35 * SECOND;
     public static final long DEFAULT_CLEAR_SESSION_TIMEOUT_SECONDS = 10;
