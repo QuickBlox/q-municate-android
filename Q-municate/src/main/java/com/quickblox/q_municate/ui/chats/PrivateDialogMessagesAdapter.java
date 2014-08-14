@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -71,8 +70,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-            int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
-            displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
             setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);

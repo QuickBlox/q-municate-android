@@ -1,7 +1,7 @@
 <RelativeLayout
     android:id="@+id/attach_message_relativelayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:miv="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/chat_attach_width"
     android:layout_height="@dimen/chat_attach_height"
     android:orientation="horizontal"
@@ -13,8 +13,9 @@
         android:layout_width="@dimen/chat_attach_width"
         android:layout_height="@dimen/chat_attach_height"
         android:layout_marginTop="4dp"
+        android:layout_alignParentRight="true"
         android:scaleType="centerCrop"
-        miv:mask="@drawable/right_bubble1"
+        app:mask="@drawable/right_bubble"
         android:src="@null" />
 
     <LinearLayout

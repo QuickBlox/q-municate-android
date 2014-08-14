@@ -1,11 +1,9 @@
 package com.quickblox.q_municate.ui.chats;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Build;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -65,9 +63,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         return senderId == currentUser.getId();
     }
 
-    protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder, int maskedBackgroundId) {
+    protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
         ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
-                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder, maskedBackgroundId),
+                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder),
                 new SimpleImageLoadingProgressListener(viewHolder));
     }
 
@@ -95,18 +93,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             boolean messageDelivered) {
         if (ownMessage) {
             viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
-            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(messageDelivered));
+            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(
+                    messageDelivered));
         }
-    }
-
-    protected int getMaskedImageBackgroundId(int senderId) {
-        int maskedBackgroundId;
-        if (isOwnMessage(senderId)) {
-            maskedBackgroundId = R.drawable.right_bubble;
-        } else {
-            maskedBackgroundId = R.drawable.left_bubble;
-        }
-        return maskedBackgroundId;
     }
 
     protected void resetUI(ViewHolder viewHolder) {
@@ -134,16 +123,6 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void hideAttachmentBackground(ImageView attachImageView) {
-        int sdk = android.os.Build.VERSION.SDK_INT;
-        if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            attachImageView.setBackgroundDrawable(null);
-        } else {
-            attachImageView.setBackground(null);
-        }
-    }
-
     @Override
     public void onCachedImageFileReceived(File imageFile) {
     }
@@ -157,26 +136,21 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         view.setVisibility(visibility);
     }
 
-    public class ImageLoadingListener extends SimpleImageLoadingListener /* implements ReceiveMaskedBitmapListener*/ {
+    public class ImageLoadingListener extends SimpleImageLoadingListener {
 
         private ViewHolder viewHolder;
-//        private int maskedBackgroundId;
         private Bitmap loadedImageBitmap;
 
-        public ImageLoadingListener(ViewHolder viewHolder, int maskedBackgroundId) {
+        public ImageLoadingListener(ViewHolder viewHolder) {
             this.viewHolder = viewHolder;
-//            this.maskedBackgroundId = maskedBackgroundId;
         }
 
-//        @Override
-//        public void onMaskedImageBitmapReceived(Bitmap maskedImageBitmap) {
-//            hideAttachmentBackground(viewHolder.attachImageView);
-//            viewHolder.attachImageView.setImageBitmap(maskedImageBitmap);
-//            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
-//            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
-//            updateUIAfterLoading();
-//            scrollMessagesListener.onScrollToBottom();
-//        }
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+            super.onLoadingStarted(imageUri, view);
+            viewHolder.verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+            viewHolder.centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
+        }
 
         @Override
         public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
@@ -188,16 +162,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             initMaskedImageView(loadedBitmap);
         }
 
-        @Override
-        public void onLoadingStarted(String imageUri, View view) {
-            super.onLoadingStarted(imageUri, view);
-            viewHolder.verticalProgressBar.setProgress(Consts.ZERO_INT_VALUE);
-            viewHolder.centeredProgressBar.setProgress(Consts.ZERO_INT_VALUE);
-        }
-
         private void initMaskedImageView(Bitmap loadedBitmap) {
             loadedImageBitmap = loadedBitmap;
-//            makeMaskedImageView();
             viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
             viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
             setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
@@ -224,10 +190,6 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
                 }
             };
         }
-
-//        private void makeMaskedImageView() {
-//            new ReceiveMaskedImageFileTask(this).execute(imageHelper, maskedBackgroundId, loadedImageBitmap);
-//        }
     }
 
     public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {

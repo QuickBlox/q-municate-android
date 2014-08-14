@@ -262,8 +262,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 new SimpleImageLoadingListener() {
 
                     @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        updateLogoActionBar(loadedImage);
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
+                        updateLogoActionBar(loadedBitmap);
                     }
                 }
         );

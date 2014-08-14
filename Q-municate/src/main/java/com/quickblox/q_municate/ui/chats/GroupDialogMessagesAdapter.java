@@ -99,8 +99,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
-            displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
             setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
