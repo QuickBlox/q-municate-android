@@ -206,7 +206,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private boolean isGalleryCalled(int requestCode){
-        return ImageHelper.GALLERY_KITKAT_INTENT_CALLED == requestCode || ImageHelper.GALLERY_INTENT_CALLED == requestCode;
+        return ImageHelper.GALLERY_INTENT_CALLED == requestCode;
     }
 
     @Override
