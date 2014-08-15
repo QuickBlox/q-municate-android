@@ -49,12 +49,6 @@ public class QBFriendListHelper extends BaseHelper {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         roster.addSubscriptionListener(new SubscriptionListener());
-        try {
-            makeAutoSubscription(roster.getEntries());
-        }
-        catch (QBResponseException e){
-            ErrorUtils.logError(e);
-        }
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -111,6 +105,13 @@ public class QBFriendListHelper extends BaseHelper {
         List<Integer> userIds = getUserIdsFromRoster();
         if (!userIds.isEmpty()) {
             updateFriends(userIds);
+        }
+        try {
+            if (roster != null) {
+                makeAutoSubscription(roster.getEntries());
+            }
+        }catch (QBResponseException e){
+            ErrorUtils.logError(e);
         }
         return userIds;
     }
@@ -224,9 +225,6 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesAdded(Collection<Integer> userIds) {
             try {
-                if (roster != null) {
-                    makeAutoSubscription(roster.getEntries());
-                }
                 updateFriends(userIds);
             } catch (QBResponseException e) {
                 Log.e(TAG, "Failed to add friends to list", e);
@@ -236,9 +234,6 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesUpdated(Collection<Integer> userIds) {
             try {
-                if (roster != null) {
-                    makeAutoSubscription(roster.getEntries());
-                }
                 updateFriends(userIds);
             } catch (QBResponseException e) {
                 Log.e(TAG, "Failed to update friend list", e);
