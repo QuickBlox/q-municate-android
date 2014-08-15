@@ -18,7 +18,8 @@
             android:layout_width="@dimen/crop_view_width"
             android:layout_height="@dimen/crop_view_height"
             android:layout_gravity="center"
-            app:fixAspectRatio="true" />
+            app:fixAspectRatio="true"
+            app:guidelines="on" />
 
         <LinearLayout
             android:layout_width="match_parent"

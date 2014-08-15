@@ -32,16 +32,16 @@ public class ReceiveImageFileTask extends BaseAsyncTask {
     public Object performInBackground(Object[] params) throws Exception {
         File imageFile;
         String absolutePath;
-        ImageHelper imageHelper = (ImageHelper) params[0];
+        ImageUtils imageUtils = (ImageUtils) params[0];
         Bitmap bitmap = (Bitmap) params[1];
         boolean isGettingFile = (Boolean) params[2];
 
         try {
             if (isGettingFile) {
-                imageFile = imageHelper.getFileFromImageView(bitmap);
+                imageFile = imageUtils.getFileFromImageView(bitmap);
                 return imageFile;
             } else {
-                absolutePath = imageHelper.getAbsolutePathByBitmap(bitmap);
+                absolutePath = imageUtils.getAbsolutePathByBitmap(bitmap);
                 return absolutePath;
             }
         } catch (IOException e) {

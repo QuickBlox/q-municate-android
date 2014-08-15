@@ -95,7 +95,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
             Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null,
                     bitmapOptions);
-            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper, bitmap, true);
+            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
         } catch (FileNotFoundException e) {
             ErrorUtils.showError(this, e.getMessage());
         }

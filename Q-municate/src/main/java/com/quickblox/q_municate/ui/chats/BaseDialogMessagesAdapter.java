@@ -22,7 +22,7 @@ import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
 
@@ -36,7 +36,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
     protected ScrollMessagesListener scrollMessagesListener;
-    protected ImageHelper imageHelper;
+    protected ImageUtils imageUtils;
     protected QBDialog dialog;
     private Random random;
     private Map<Integer, Integer> colorsMap;
@@ -45,7 +45,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         super(context, cursor, true);
         random = new Random();
         colorsMap = new HashMap<Integer, Integer>();
-        imageHelper = new ImageHelper((android.app.Activity) context);
+        imageUtils = new ImageUtils((android.app.Activity) context);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
-        imageHelper.showFullImage(context, absolutePath);
+        imageUtils.showFullImage(context, absolutePath);
     }
 
     protected void setViewVisibility(View view, int visibility) {
@@ -185,7 +185,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
                 public void onClick(View view) {
                     view.startAnimation(AnimationUtils.loadAnimation(context,
                             R.anim.chat_attached_file_click));
-                    new ReceiveImageFileTask(BaseDialogMessagesAdapter.this).execute(imageHelper,
+                    new ReceiveImageFileTask(BaseDialogMessagesAdapter.this).execute(imageUtils,
                             loadedImageBitmap, false);
                 }
             };

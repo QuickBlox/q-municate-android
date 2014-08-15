@@ -9,7 +9,7 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 public class App extends Application {
@@ -32,7 +32,7 @@ public class App extends Application {
     }
 
     private void initImageLoader(Context context) {
-        ImageLoader.getInstance().init(ImageHelper.getImageLoaderConfiguration(context));
+        ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
     }
 
     public PrefsHelper getPrefsHelper() {

@@ -45,7 +45,7 @@ import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.io.File;
@@ -61,7 +61,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected String currentOpponent;
     protected String dialogId;
     protected View emojisFragment;
-    protected ImageHelper imageHelper;
+    protected ImageUtils imageUtils;
     protected int layoutResID;
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
@@ -107,7 +107,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         rootView = getLayoutInflater().inflate(layoutResID, null);
         setContentView(rootView);
 
-        imageHelper = new ImageHelper(this);
+        imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
 
         initUI();
@@ -157,7 +157,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void attachButtonOnClick() {
         canPerformLogout.set(false);
-        imageHelper.getImage();
+        imageUtils.getImage();
     }
 
     @Override
@@ -206,7 +206,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private boolean isGalleryCalled(int requestCode){
-        return ImageHelper.GALLERY_INTENT_CALLED == requestCode;
+        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.ActionMode;
@@ -33,14 +32,13 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
-import com.quickblox.q_municate.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.FileUtils;
+import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileListener, View.OnClickListener {
 
@@ -57,7 +55,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private EditText fullNameEditText;
     private EditText phoneEditText;
     private EditText statusEditText;
-    private ImageHelper imageHelper;
+    private ImageUtils imageUtils;
     private Bitmap avatarBitmapCurrent;
     private String fullnameCurrent;
     private String phoneCurrent;
@@ -78,7 +76,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         setContentView(R.layout.activity_profile);
         useDoubleBackPressed = false;
         user = AppSession.getSession().getUser();
-        imageHelper = new ImageHelper(this);
+        imageUtils = new ImageUtils(this);
 
         initUI();
         initListeners();
@@ -186,16 +184,16 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageCropperActivity.ACTIVITY_RESULT_CODE) {
+        if (requestCode == ImageCropperActivity.INTENT_RESULT_CODE) {
             if (resultCode == RESULT_OK) {
                 isNeedUpdateAvatar = true;
                 String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
                 avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
-                imageHelper.removeFile(filePath);
+                FileUtils.removeFile(filePath);
                 avatarImageView.setImageBitmap(avatarBitmapCurrent);
                 startAction();
             }
-        } else if (requestCode == ImageHelper.GALLERY_INTENT_CALLED) {
+        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED) {
             if (resultCode == RESULT_OK) {
                 Uri originalUri = data.getData();
                 if (originalUri != null) {
@@ -220,7 +218,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     public void changeAvatarOnClick() {
         canPerformLogout.set(false);
-        imageHelper.getImage();
+        imageUtils.getImage();
     }
 
     public void changeFullNameOnClick() {
@@ -286,7 +284,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         user.setCustomData(statusCurrent);
 
         if (isNeedUpdateAvatar) {
-            new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
+            new ReceiveImageFileTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
             QBUpdateUserCommand.start(this, user, null);
         }

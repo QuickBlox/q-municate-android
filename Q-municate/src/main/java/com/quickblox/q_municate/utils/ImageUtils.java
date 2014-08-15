@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
-public class ImageHelper {
+public class ImageUtils {
 
     public static final int GALLERY_INTENT_CALLED = 1;
 
@@ -42,7 +42,7 @@ public class ImageHelper {
 
     private Activity activity;
 
-    public ImageHelper(Activity activity) {
+    public ImageUtils(Activity activity) {
         this.activity = activity;
     }
 
@@ -176,11 +176,6 @@ public class ImageHelper {
             Utils.closeOutputStream(bos);
         }
         return tempFile.getAbsolutePath();
-    }
-
-    public void removeFile(String filePath) {
-        File file = new File(filePath);
-        file.deleteOnExit();
     }
 
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {

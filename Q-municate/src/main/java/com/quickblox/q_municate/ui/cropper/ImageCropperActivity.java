@@ -12,18 +12,17 @@ import android.view.View;
 import com.edmodo.cropper.CropImageView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.ImageUtils;
 
 import java.io.File;
 import java.io.IOException;
 
 public class ImageCropperActivity extends BaseLogeableActivity {
 
-    public static final int ACTIVITY_RESULT_CODE = 911;
+    public static final int INTENT_RESULT_CODE = 911;
     private static final int DEFAULT_ASPECT_RATIO_VALUES = 5;
 
     private CropImageView cropImageView;
@@ -31,12 +30,12 @@ public class ImageCropperActivity extends BaseLogeableActivity {
 
     private Bitmap defaultImageBitmap;
     private Bitmap croppedImageBitmap;
-    private ImageHelper imageHelper;
+    private ImageUtils imageUtils;
 
     public static void start(Activity activity, Uri originalUri) {
         Intent intent = new Intent(activity, ImageCropperActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FILE_PATH, originalUri);
-        activity.startActivityForResult(intent, ACTIVITY_RESULT_CODE);
+        activity.startActivityForResult(intent, INTENT_RESULT_CODE);
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -64,10 +63,10 @@ public class ImageCropperActivity extends BaseLogeableActivity {
     }
 
     private void initFields() {
-        imageHelper = new ImageHelper(this);
+        imageUtils = new ImageUtils(this);
         croppedImageBitmap = null;
         Uri originalUri = getIntent().getParcelableExtra(QBServiceConsts.EXTRA_FILE_PATH);
-        defaultImageBitmap = imageHelper.getBitmap(originalUri);
+        defaultImageBitmap = imageUtils.getBitmap(originalUri);
         cropImageView.setImageBitmap(defaultImageBitmap);
         cropImageView.setAspectRatio(DEFAULT_ASPECT_RATIO_VALUES, DEFAULT_ASPECT_RATIO_VALUES);
     }
@@ -102,18 +101,22 @@ public class ImageCropperActivity extends BaseLogeableActivity {
     private class ReceiveFilePathTask extends AsyncTask {
 
         @Override
-        protected byte[] doInBackground(Object[] params) {
-            byte[] byteArray = ImageHelper.getBytesBitmap(croppedImageBitmap);
-            File file;
+        protected Object doInBackground(Object[] params) {
+            byte[] byteArray = ImageUtils.getBytesBitmap(croppedImageBitmap);
+            File file = null;
 
             try {
-                file = imageHelper.createFile(byteArray);
-                onCompressedBitmapReceived(file.getAbsolutePath());
+                file = imageUtils.createFile(byteArray);
             } catch (IOException e) {
                 ErrorUtils.logError(e);
             }
 
-            return null;
+            return file != null ? file.getAbsolutePath() : null;
+        }
+
+        @Override
+        protected void onPostExecute(Object object) {
+            onCompressedBitmapReceived(object.toString());
         }
     }
 }

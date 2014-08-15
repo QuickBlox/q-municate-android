@@ -42,7 +42,8 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
-import com.quickblox.q_municate.utils.ImageHelper;
+import com.quickblox.q_municate.utils.FileUtils;
+import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
 import com.quickblox.q_municate.utils.ReceiveImageFileTask;
 
@@ -73,7 +74,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private String photoUrlOld;
     private String groupNameOld;
 
-    private ImageHelper imageHelper;
+    private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
 
     public static void start(Activity context, String dialogId) {
@@ -89,7 +90,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         dialogCurrent = DatabaseManager.getDialogByDialogId(this, dialogId);
         groupDialog = new GroupDialog(dialogCurrent);
-        imageHelper = new ImageHelper(this);
+        imageUtils = new ImageUtils(this);
         initUI();
         initUIWithData();
         addActions();
@@ -102,7 +103,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     public void changeAvatarOnClick(View view) {
         canPerformLogout.set(false);
-        imageHelper.getImage();
+        imageUtils.getImage();
     }
 
     private void initUI() {
@@ -204,16 +205,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageCropperActivity.ACTIVITY_RESULT_CODE) {
+        if (requestCode == ImageCropperActivity.INTENT_RESULT_CODE) {
             if (resultCode == RESULT_OK) {
                 isNeedUpdateAvatar = true;
                 String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
                 avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
-                imageHelper.removeFile(filePath);
+                FileUtils.removeFile(filePath);
                 avatarImageView.setImageBitmap(avatarBitmapCurrent);
                 startAction();
             }
-        } else if (requestCode == ImageHelper.GALLERY_INTENT_CALLED) {
+        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED) {
             if (resultCode == RESULT_OK) {
                 Uri originalUri = data.getData();
                 if (originalUri != null) {
@@ -259,7 +260,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         dialogCurrent.setName(groupNameCurrent);
 
         if (isNeedUpdateAvatar) {
-            new ReceiveImageFileTask(this).execute(imageHelper, avatarBitmapCurrent, true);
+            new ReceiveImageFileTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
             startUpdatingGroupDialog(null);
         }
