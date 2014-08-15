@@ -188,40 +188,6 @@ public class ImageHelper {
         return tempFile;
     }
 
-    public Bitmap decodeBackgroundBubbleImage(int resourcesId) {
-        return BitmapFactory.decodeResource(resources, resourcesId);
-    }
-
-    public Bitmap generateMaskedBitmap(Bitmap mask, Bitmap original) {
-        int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
-        int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        mask = getNinepatch(resources, mask, width, height);
-        original = createScaledBitmap(original, width, height, ScalingLogic.CROP);
-        Canvas canvas = new Canvas(result);
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        int centerWidth = (width - original.getWidth()) / 2;
-        int centerHeight = (height - original.getHeight()) / 2;
-        canvas.drawColor(resources.getColor(R.color.chat_attach_background_color));
-        canvas.drawBitmap(original, centerWidth, centerHeight, null);
-        canvas.drawBitmap(mask, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, paint);
-        paint.setXfermode(null);
-        mask.recycle();
-        return result;
-    }
-
-    private Bitmap getNinepatch(Resources resource, Bitmap bitmap, int width, int height) {
-        byte[] chunk = bitmap.getNinePatchChunk();
-        NinePatchDrawable ninePatchDrawable = new NinePatchDrawable(resource, bitmap, chunk, new Rect(),
-                null);
-        ninePatchDrawable.setBounds(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, width, height);
-        Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(outputBitmap);
-        ninePatchDrawable.draw(canvas);
-        return outputBitmap;
-    }
-
     private enum ScalingLogic {
         CROP, FIT
     }

@@ -18,6 +18,7 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
+import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -53,7 +54,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(R.id.progress_relativelayout);
         viewHolder.textMessageView = view.findViewById(R.id.text_message_view);
         viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
-        viewHolder.attachImageView = (ImageView) view.findViewById(R.id.attach_imageview);
+        viewHolder.attachImageView = (MaskedImageView) view.findViewById(R.id.attach_imageview);
         viewHolder.timeTextMessageTextView = (TextView) view.findViewById(R.id.time_text_message_textview);
         viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
         viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
@@ -98,8 +99,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            int maskedBackgroundId = getMaskedImageBackgroundId(messageCache.getSenderId());
-            displayAttachImage(messageCache.getAttachUrl(), viewHolder, maskedBackgroundId);
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
             setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage, messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);

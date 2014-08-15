@@ -14,4 +14,8 @@
         <attr name="emojiconSize" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="MaskedImageView">
+        <attr name="mask" format="integer" />
+    </declare-styleable>
+
 </resources>
