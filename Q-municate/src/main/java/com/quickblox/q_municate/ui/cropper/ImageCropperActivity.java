@@ -79,7 +79,7 @@ public class ImageCropperActivity extends BaseLogeableActivity {
 
     private void sendFeedbackActivityData() {
         if (croppedImageBitmap != null) {
-            new ReceiveFilePathTask().execute(imageHelper, croppedImageBitmap);
+            new ReceiveFilePathTask().execute();
             showProgress();
         } else {
             setResult(RESULT_CANCELED, new Intent());
@@ -103,9 +103,7 @@ public class ImageCropperActivity extends BaseLogeableActivity {
 
         @Override
         protected byte[] doInBackground(Object[] params) {
-            ImageHelper imageHelper = (ImageHelper) params[0];
-            Bitmap bitmap = (Bitmap) params[1];
-            byte[] byteArray = ImageHelper.getBytesBitmap(bitmap);
+            byte[] byteArray = ImageHelper.getBytesBitmap(croppedImageBitmap);
             File file;
 
             try {
