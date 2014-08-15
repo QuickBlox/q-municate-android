@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.ui.chats;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,7 +36,6 @@ import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
-import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
@@ -52,6 +51,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileListener, AdapterView.OnItemClickListener {
+
+    public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
+    public static final int RESULT_LEAVE_GROUP = 2;
 
     private EditText groupNameEditText;
     private TextView participantsTextView;
@@ -76,10 +78,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private ImageHelper imageHelper;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
 
-    public static void start(Context context, String dialogId) {
+    public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
-        context.startActivity(intent);
+        context.startActivityForResult(intent, UPDATE_DIALOG_REQUEST_CODE);
     }
 
     @Override
@@ -362,7 +364,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            MainActivity.start(GroupDialogDetailsActivity.this);
+            setResult(RESULT_LEAVE_GROUP, getIntent());
             finish();
         }
     }

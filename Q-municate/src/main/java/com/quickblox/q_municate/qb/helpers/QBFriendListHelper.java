@@ -49,6 +49,12 @@ public class QBFriendListHelper extends BaseHelper {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
         roster.addSubscriptionListener(new SubscriptionListener());
+        try {
+            makeAutoSubscription(roster.getEntries());
+        }
+        catch (QBResponseException e){
+            ErrorUtils.logError(e);
+        }
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -101,7 +107,7 @@ public class QBFriendListHelper extends BaseHelper {
         roster.unsubscribe(friend.getId());
     }
 
-    public List<Integer> updateFriendList() throws QBResponseException, SmackException.NotLoggedInException, XMPPException, SmackException.NotConnectedException, SmackException.NoResponseException {
+    public List<Integer> updateFriendList() throws QBResponseException {
         List<Integer> userIds = getUserIdsFromRoster();
         if (!userIds.isEmpty()) {
             updateFriends(userIds);
@@ -109,7 +115,7 @@ public class QBFriendListHelper extends BaseHelper {
         return userIds;
     }
 
-    private List<Integer> getUserIdsFromRoster() throws SmackException.NotLoggedInException, SmackException.NoResponseException, SmackException.NotConnectedException, XMPPException {
+    private List<Integer> getUserIdsFromRoster(){
         List<Integer> userIds = new ArrayList<Integer>();
         if (roster == null) {
             ErrorUtils.logError(TAG, "ROSTER isn't initialized");
@@ -117,12 +123,31 @@ public class QBFriendListHelper extends BaseHelper {
         }
         Collection<QBRosterEntry> entries = roster.getEntries();
         for (QBRosterEntry entry : entries) {
-            if (RosterPacket.ItemType.from.equals(entry.getType())) {
-                roster.confirmSubscription(entry.getUserId());
-            }
             userIds.add(entry.getUserId());
         }
         return userIds;
+    }
+
+    private void makeAutoSubscription(Collection<QBRosterEntry> entries) throws QBResponseException{
+        for (QBRosterEntry entry : entries) {
+            if (RosterPacket.ItemType.from.equals(entry.getType())) {
+                boolean errorOccurred = false;
+                try {
+                    roster.confirmSubscription(entry.getUserId());
+                } catch (SmackException.NotConnectedException e) {
+                    errorOccurred = true;
+                } catch (SmackException.NotLoggedInException e) {
+                    errorOccurred = true;
+                } catch (XMPPException e) {
+                    errorOccurred = true;
+                } catch (SmackException.NoResponseException e) {
+                    errorOccurred = true;
+                }
+                if (errorOccurred){
+                    throw new QBResponseException("Errors occurred while confirm friend subscriptions");
+                }
+            }
+        }
     }
 
     private void updateFriends(Collection<Integer> userIds) throws QBResponseException {
@@ -199,6 +224,9 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesAdded(Collection<Integer> userIds) {
             try {
+                if (roster != null) {
+                    makeAutoSubscription(roster.getEntries());
+                }
                 updateFriends(userIds);
             } catch (QBResponseException e) {
                 Log.e(TAG, "Failed to add friends to list", e);
@@ -208,6 +236,9 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesUpdated(Collection<Integer> userIds) {
             try {
+                if (roster != null) {
+                    makeAutoSubscription(roster.getEntries());
+                }
                 updateFriends(userIds);
             } catch (QBResponseException e) {
                 Log.e(TAG, "Failed to update friend list", e);
