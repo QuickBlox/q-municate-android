@@ -47,7 +47,6 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
 
         viewHolder.contentRelativeLayout = (RelativeLayout) view.findViewById(R.id.contentRelativeLayout);
         viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        viewHolder.avatarImageView.setOval(true);
         viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
         viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.statusMessageTextView);

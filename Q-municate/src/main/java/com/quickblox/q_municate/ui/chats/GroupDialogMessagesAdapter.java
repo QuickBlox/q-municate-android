@@ -43,7 +43,6 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         } else {
             view = layoutInflater.inflate(R.layout.list_item_group_message_opponent, null, true);
             viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-            viewHolder.avatarImageView.setOval(true);
             setViewVisibility(viewHolder.avatarImageView, View.VISIBLE);
             viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
             setViewVisibility(viewHolder.nameTextView, View.VISIBLE);

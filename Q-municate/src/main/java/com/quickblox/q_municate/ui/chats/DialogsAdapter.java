@@ -28,7 +28,6 @@ public class DialogsAdapter extends BaseCursorAdapter {
         convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-        viewHolder.avatarImageView.setOval(true);
         viewHolder.userCountTextView = (TextView) convertView.findViewById(R.id.user_count_textview);
         viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
         viewHolder.lastMessageTextView = (TextView) convertView.findViewById(R.id.last_message_textview);

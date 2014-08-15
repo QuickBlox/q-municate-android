@@ -29,7 +29,6 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<Friend> {
             holder = new ViewHolder();
 
             holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-            holder.avatarImageView.setOval(true);
             holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             holder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
             holder.onlineStatusMessageTextView = (TextView) convertView.findViewById(

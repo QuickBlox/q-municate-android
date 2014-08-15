@@ -8,19 +8,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.drawable.NinePatchDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.decode.ImageDecoder;
@@ -29,6 +28,7 @@ import com.quickblox.q_municate.R;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -36,17 +36,14 @@ import java.lang.ref.WeakReference;
 
 public class ImageHelper {
 
-    public static final int GALLERY_KITKAT_INTENT_CALLED = 2;
     public static final int GALLERY_INTENT_CALLED = 1;
 
     private static final String TEMP_FILE_NAME = "temp.png";
 
     private Activity activity;
-    private Resources resources;
 
     public ImageHelper(Activity activity) {
         this.activity = activity;
-        resources = activity.getResources();
     }
 
     public static ImageLoaderConfiguration getImageLoaderConfiguration(Context context) {
@@ -59,8 +56,7 @@ public class ImageHelper {
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
                 .memoryCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE)
                 .discCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE,
-                        Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, null)
-                .threadPoolSize(THREAD_POOL_SIZE)
+                        Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, null).threadPoolSize(THREAD_POOL_SIZE)
                 .threadPriority(Thread.NORM_PRIORITY).denyCacheImageMultipleSizesInMemory().memoryCache(
                         new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT)).writeDebugLogs()
                 .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS).imageDecoder(
@@ -75,6 +71,14 @@ public class ImageHelper {
             videoPath = videoPath.replace("file://", "");
         }
         return ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
+    }
+
+    public static byte[] getBytesBitmap(Bitmap imageBitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.PNG, Consts.FULL_QUALITY, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        Utils.closeOutputStream(byteArrayOutputStream);
+        return byteArray;
     }
 
     private Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
@@ -116,9 +120,11 @@ public class ImageHelper {
             final float dstAspect = (float) dstWidth / (float) dstHeight;
 
             if (srcAspect > dstAspect) {
-                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, dstWidth, (int) (dstWidth / srcAspect));
+                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, dstWidth,
+                        (int) (dstWidth / srcAspect));
             } else {
-                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, (int) (dstHeight * srcAspect), dstHeight);
+                return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, (int) (dstHeight * srcAspect),
+                        dstHeight);
             }
         } else {
             return new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, dstWidth, dstHeight);
@@ -140,7 +146,7 @@ public class ImageHelper {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        activity.startActivityForResult(intent, GALLERY_KITKAT_INTENT_CALLED);
+        activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
     }
 
     public void showFullImage(Context context, String absolutePath) {
@@ -172,20 +178,39 @@ public class ImageHelper {
         return tempFile.getAbsolutePath();
     }
 
+    public void removeFile(String filePath) {
+        File file = new File(filePath);
+        file.deleteOnExit();
+    }
+
     public File getFileFromImageView(Bitmap origBitmap) throws IOException {
         int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
         int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
+        Bitmap bitmap = createScaledBitmap(origBitmap, width, height, ScalingLogic.FIT);
+        byte[] bitmapData = getBytesBitmap(bitmap);
+        File tempFile = createFile(bitmapData);
+        return tempFile;
+    }
+
+    public File createFile(byte[] bitmapData) throws IOException {
         File tempFile = new File(activity.getCacheDir(), TEMP_FILE_NAME);
         tempFile.createNewFile();
-        Bitmap bitmap = createScaledBitmap(origBitmap, width, height, ScalingLogic.FIT);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, Consts.FULL_QUALITY, bos);
-        byte[] bitmapData = bos.toByteArray();
-        FileOutputStream fos = new FileOutputStream(tempFile);
-        fos.write(bitmapData);
-        fos.close();
-        bos.close();
+        FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+        fileOutputStream.write(bitmapData);
+        Utils.closeOutputStream(fileOutputStream);
         return tempFile;
+    }
+
+    public Bitmap getBitmap(Uri originalUri) {
+        Bitmap selectedBitmap = null;
+        try {
+            ParcelFileDescriptor descriptor = activity.getContentResolver().openFileDescriptor(originalUri,
+                    "r");
+            selectedBitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
+        } catch (FileNotFoundException e) {
+            ErrorUtils.showError(activity, e);
+        }
+        return selectedBitmap;
     }
 
     private enum ScalingLogic {

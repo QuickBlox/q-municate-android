@@ -7,13 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -24,9 +22,8 @@ import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
+import com.quickblox.q_municate.ui.cropper.ImageCropperActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ImageHelper;
 import com.quickblox.q_municate.utils.PrefsHelper;
 import com.quickblox.q_municate.utils.ReceiveFileListener;
@@ -34,7 +31,6 @@ import com.quickblox.q_municate.utils.ReceiveImageFileTask;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListener {
 
@@ -69,10 +65,30 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListe
                 new EditText[]{fullnameEditText, emailEditText, passwordEditText},
                 new String[]{resources.getString(R.string.dlg_not_fullname_field_entered), resources
                         .getString(R.string.dlg_not_email_field_entered), resources.getString(
-                        R.string.dlg_not_password_field_entered)}
-        );
+                        R.string.dlg_not_password_field_entered)});
 
         addActions();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImageCropperActivity.ACTIVITY_RESULT_CODE) {
+            if (resultCode == RESULT_OK) {
+                isNeedUpdateAvatar = true;
+                String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
+                avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
+                imageHelper.removeFile(filePath);
+                avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            }
+        } else if (requestCode == ImageHelper.GALLERY_INTENT_CALLED) {
+            if (resultCode == RESULT_OK) {
+                Uri originalUri = data.getData();
+                if (originalUri != null) {
+                    startCropActivity(originalUri);
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -92,21 +108,8 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListe
         finish();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            Uri originalUri = data.getData();
-            try {
-                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
-            } catch (FileNotFoundException e) {
-                ErrorUtils.showError(this, e);
-            }
-            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
-                    Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    private void startCropActivity(Uri originalUri) {
+        ImageCropperActivity.start(this, originalUri);
     }
 
     public void changeAvatarOnClickListener(View view) {
@@ -149,7 +152,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileListe
         emailEditText = _findViewById(R.id.email_textview);
         passwordEditText = _findViewById(R.id.password_edittext);
         avatarImageView = _findViewById(R.id.avatar_imageview);
-        avatarImageView.setOval(true);
         userAgreementTextView = _findViewById(R.id.user_agreement_textview);
     }
 

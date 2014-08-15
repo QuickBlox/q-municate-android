@@ -27,6 +27,7 @@ import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.cropper.ImageCropperActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -90,7 +91,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void initUI() {
         changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
-        avatarImageView.setOval(true);
         emailLinearLayout = _findViewById(R.id.email_linearlayout);
         changeFullNameRelativeLayout = _findViewById(R.id.change_fullname_relativelayout);
         changePhoneRelativeLayout = _findViewById(R.id.change_phone_relativelayout);
@@ -185,22 +185,30 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            Uri originalUri = data.getData();
-            try {
-                ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-                avatarBitmapCurrent = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
-            } catch (FileNotFoundException e) {
-                ErrorUtils.logError(e);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ImageCropperActivity.ACTIVITY_RESULT_CODE) {
+            if (resultCode == RESULT_OK) {
+                isNeedUpdateAvatar = true;
+                String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
+                avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
+                imageHelper.removeFile(filePath);
+                avatarImageView.setImageBitmap(avatarBitmapCurrent);
+                startAction();
             }
-            ImageLoader.getInstance().displayImage(originalUri.toString(), avatarImageView,
-                    Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
-            startAction();
+        } else if (requestCode == ImageHelper.GALLERY_INTENT_CALLED) {
+            if (resultCode == RESULT_OK) {
+                Uri originalUri = data.getData();
+                if (originalUri != null) {
+                    startCropActivity(originalUri);
+                }
+            }
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void startCropActivity(Uri originalUri) {
+        ImageCropperActivity.start(this, originalUri);
     }
 
     private void startAction() {
