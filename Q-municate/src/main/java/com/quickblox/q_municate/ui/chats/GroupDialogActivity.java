@@ -93,7 +93,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onFileSelected(Uri originalUri) {
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null,
+                    bitmapOptions);
             new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageHelper, bitmap, true);
         } catch (FileNotFoundException e) {
             ErrorUtils.showError(this, e.getMessage());
@@ -107,6 +108,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode &&
+                GroupDialogDetailsActivity.RESULT_LEAVE_GROUP == resultCode) {
+            finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -140,7 +150,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
+                dialog);
         messagesListView.setAdapter(messagesAdapter);
     }
 
@@ -148,7 +159,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         actionBar.setTitle(groupName);
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
-        if(!TextUtils.isEmpty(dialog.getPhotoUrl())) {
+        if (!TextUtils.isEmpty(dialog.getPhotoUrl())) {
             loadLogoActionBar(dialog.getPhotoUrl());
         }
     }

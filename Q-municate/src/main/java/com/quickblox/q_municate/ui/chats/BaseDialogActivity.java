@@ -189,11 +189,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
-        if (resultCode == RESULT_OK) {
+        if (isGalleryCalled(requestCode) && resultCode == RESULT_OK) {
             isNeedToScrollMessages = true;
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean isGalleryCalled(int requestCode){
+        return ImageHelper.GALLERY_KITKAT_INTENT_CALLED == requestCode || ImageHelper.GALLERY_INTENT_CALLED == requestCode;
     }
 
     @Override
