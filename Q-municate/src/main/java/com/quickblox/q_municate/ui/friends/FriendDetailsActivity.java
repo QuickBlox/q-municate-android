@@ -73,7 +73,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private void initUI() {
         avatarImageView = _findViewById(R.id.avatar_imageview);
-        avatarImageView.setOval(true);
         nameTextView = _findViewById(R.id.name_textview);
         statusTextView = _findViewById(R.id.status_textview);
         onlineImageView = _findViewById(R.id.online_imageview);

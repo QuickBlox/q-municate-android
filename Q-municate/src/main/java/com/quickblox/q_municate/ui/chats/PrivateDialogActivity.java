@@ -85,7 +85,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         try {
             ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
             Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
-            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageHelper, bitmap, true);
+            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
         } catch (FileNotFoundException e) {
             ErrorUtils.showError(this, e.getMessage());
         }

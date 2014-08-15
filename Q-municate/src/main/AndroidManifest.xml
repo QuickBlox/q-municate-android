@@ -131,6 +131,12 @@
             android:label="@string/uag_user_agreement_title"
             android:parentActivityName="com.quickblox.q_municate.ui.authorization.signup.SignUpActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.quickblox.q_municate.ui.cropper.ImageCropperActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/crop_title"
+            android:parentActivityName="com.quickblox.q_municate.ui.authorization.signup.SignUpActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

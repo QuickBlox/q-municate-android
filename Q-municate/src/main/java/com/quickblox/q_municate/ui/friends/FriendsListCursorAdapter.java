@@ -30,7 +30,6 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         ViewHolder holder = new ViewHolder();
 
         holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.avatarImageView.setOval(true);
         holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
         holder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);

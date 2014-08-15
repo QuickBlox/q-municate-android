@@ -64,6 +64,10 @@
     <string name="uag_user_agreement">By clicking Sign Up, you agree to \nQ-municate <b><u>User Agreement</u></b></string>
     <string name="uag_policy_link">http://q-municate.com/agreement/</string>
 
+    // Cropper
+    <string name="crop_title">Crop Image</string>
+    <string name="crop_title_crop">Crop</string>
+
     // Friend List
     <string name="frl_global_search">Global Search</string>
     <string name="frl_online">Online</string>
@@ -336,7 +340,5 @@
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
-
-
 
 </resources>
