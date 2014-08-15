@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.InflateException;
 import android.widget.ImageView;
 
 import com.quickblox.q_municate.R;
@@ -34,7 +35,7 @@ public class MaskedImageView extends ImageView {
     }
 
     private void init(AttributeSet attrs) {
-        maskResourceId = Consts.ZERO_INT_VALUE;
+        maskResourceId = -1;
         TypedArray array = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.MaskedImageView,
                 Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
 
@@ -42,6 +43,10 @@ public class MaskedImageView extends ImageView {
             maskResourceId = array.getResourceId(R.styleable.MaskedImageView_mask, -1);
         } finally {
             array.recycle();
+        }
+
+        if (maskResourceId < Consts.ZERO_INT_VALUE) {
+            throw new InflateException("Mandatory 'mask' attribute not set!");
         }
 
         maskedPaint = new Paint();
