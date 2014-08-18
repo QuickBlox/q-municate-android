@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -175,7 +176,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private void showSmileLayout(int keyboardHeight) {
         needToShowSmileLayout = false;
         emojisFragment.setVisibility(View.VISIBLE);
-        if(keyboardHeight != Consts.ZERO_INT_VALUE) {
+        if (keyboardHeight != Consts.ZERO_INT_VALUE) {
             ViewGroup.LayoutParams params = emojisFragment.getLayoutParams();
             params.height = keyboardHeight;
             emojisFragment.setLayoutParams(params);
@@ -205,10 +206,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean isGalleryCalled(int requestCode){
-        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -216,6 +213,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             chatHelper.closeChat(dialog, generateBundleToInitDialog());
         }
         removeActions();
+    }
+
+    private boolean isGalleryCalled(int requestCode) {
+        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
     }
 
     private void initActionBar() {
@@ -249,14 +250,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        updateLogoActionBar(loadedBitmap);
+                        startUpdatingActionBarLogo(loadedBitmap);
                     }
                 });
     }
 
-    private void updateLogoActionBar(Bitmap loadedBitmap) {
-        Bitmap croppedBitmap = imageUtils.getRoundedBitmap(loadedBitmap);
-        actionBar.setLogo(new BitmapDrawable(getResources(), croppedBitmap));
+    private void startUpdatingActionBarLogo(Bitmap loadedBitmap) {
+        new ReceiveRoundedBitmapPathTask().execute(loadedBitmap);
+    }
+
+    private void updateActionBarLogo(Bitmap roundedBitmap) {
+        actionBar.setLogo(new BitmapDrawable(getResources(), roundedBitmap));
     }
 
     protected void removeActions() {
@@ -360,8 +364,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         rootView.getWindowVisibleDisplayFrame(r);
         int screenHeight = rootView.getRootView().getHeight();
         int heightDifference = screenHeight - (r.bottom - r.top);
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen",
-                "android");
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > Consts.ZERO_INT_VALUE) {
             heightDifference -= getResources().getDimensionPixelSize(resourceId);
         }
@@ -400,6 +403,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         } else {
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
+
+    private class ReceiveRoundedBitmapPathTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            Bitmap bitmap = (Bitmap) params[0];
+            Bitmap roundedBitmap = imageUtils.getRoundedBitmap(bitmap);
+            return roundedBitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Object object) {
+            updateActionBarLogo((Bitmap) object);
         }
     }
 
