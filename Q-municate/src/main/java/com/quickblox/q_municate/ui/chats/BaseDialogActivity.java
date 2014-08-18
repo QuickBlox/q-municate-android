@@ -255,7 +255,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void updateLogoActionBar(Bitmap loadedBitmap) {
-        actionBar.setLogo(new BitmapDrawable(getResources(), loadedBitmap));
+        Bitmap croppedBitmap = imageUtils.getRoundedBitmap(loadedBitmap);
+        actionBar.setLogo(new BitmapDrawable(getResources(), croppedBitmap));
     }
 
     protected void removeActions() {
