@@ -3,11 +3,12 @@ package com.quickblox.q_municate.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
@@ -19,7 +20,6 @@ import android.webkit.MimeTypeMap;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
 import com.nostra13.universalimageloader.core.decode.ImageDecoder;
@@ -155,6 +155,34 @@ public class ImageUtils {
         Uri uri = Uri.parse("file://" + absolutePath);
         intent.setDataAndType(uri, "image/*");
         context.startActivity(intent);
+    }
+
+    public Bitmap getRoundedBitmap(Bitmap bitmap) {
+        Bitmap resultBitmap;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        float r;
+
+        if (originalWidth > originalHeight) {
+            resultBitmap = Bitmap.createBitmap(originalHeight, originalHeight, Bitmap.Config.ARGB_8888);
+            r = originalHeight / 2;
+        } else {
+            resultBitmap = Bitmap.createBitmap(originalWidth, originalWidth, Bitmap.Config.ARGB_8888);
+            r = originalWidth / 2;
+        }
+
+        Canvas canvas = new Canvas(resultBitmap);
+
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, originalWidth, originalHeight);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
+        canvas.drawCircle(r, r, r, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return resultBitmap;
     }
 
     public String getAbsolutePathByBitmap(Bitmap origBitmap) {
