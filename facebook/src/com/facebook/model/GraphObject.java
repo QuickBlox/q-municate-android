@@ -86,7 +86,8 @@ public interface GraphObject {
      * @param graphObjectClass the GraphObject-derived interface to cast the property to a list of
      * @return
      */
-    <T extends GraphObject> GraphObjectList<T> getPropertyAsList(String propertyName, Class<T> graphObjectClass);
+    <T extends GraphObject> GraphObjectList<T> getPropertyAsList(String propertyName,
+            Class<T> graphObjectClass);
 
     /**
      * Sets a property of the GraphObject
@@ -630,18 +631,18 @@ public interface GraphObject {
                         !Utility.isNullOrEmpty(createGraphObject.value())) {
                     String propertyName = createGraphObject.value();
                     if (List.class.isAssignableFrom(value.getClass())) {
-                        GraphObjectList<GraphObject> graphObjects = GraphObject.Factory.createList(GraphObject.class);
+                        GraphObjectList<GraphObject> graphObjects = Factory.createList(GraphObject.class);
                         @SuppressWarnings("unchecked")
                         List<Object> values = (List<Object>)value;
                         for (Object obj : values) {
-                            GraphObject graphObject = GraphObject.Factory.create();
+                            GraphObject graphObject = Factory.create();
                             graphObject.setProperty(propertyName, obj);
                             graphObjects.add(graphObject);
                         }
 
                         value = graphObjects;
                     } else {
-                        GraphObject graphObject = GraphObject.Factory.create();
+                        GraphObject graphObject = Factory.create();
                         graphObject.setProperty(propertyName, value);
 
                         value = graphObject;

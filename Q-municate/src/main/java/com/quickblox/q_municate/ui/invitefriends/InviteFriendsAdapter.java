@@ -17,23 +17,16 @@ import java.util.List;
 public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
     private CounterChangedListener counterChangedListener;
-    private String selectedFriendFromFacebook;
     private String selectedFriendFromContacts;
-    private int counterFacebook;
     private int counterContacts;
 
     public InviteFriendsAdapter(BaseActivity activity, List<InviteFriend> objects) {
         super(activity, objects);
-        selectedFriendFromFacebook = activity.getString(R.string.inf_from_facebook);
         selectedFriendFromContacts = activity.getString(R.string.inf_from_contacts);
     }
 
     public void setCounterChangedListener(CounterChangedListener listener) {
         counterChangedListener = listener;
-    }
-
-    public void setCounterFacebook(int counterFacebook) {
-        this.counterFacebook = counterFacebook;
     }
 
     public void setCounterContacts(int counterContacts) {
@@ -42,78 +35,53 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder viewHolder;
         final InviteFriend data = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
-            holder = new ViewHolder();
+            viewHolder = new ViewHolder();
 
-            holder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
+            viewHolder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
                     R.id.contentRelativeLayout);
-            holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            holder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
-            holder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
+            viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
+            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
+            viewHolder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
+            viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
 
-            convertView.setTag(holder);
+            convertView.setTag(viewHolder);
 
-            final ViewHolder finalHolder = holder;
-            holder.checkBox.setOnClickListener(new View.OnClickListener() {
+            final ViewHolder finalHolder = viewHolder;
+            viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     CheckBox checkBox = (CheckBox) view;
                     InviteFriend inviteFriend = (InviteFriend) checkBox.getTag();
                     inviteFriend.setSelected(checkBox.isChecked());
-                    notifyCounterChanged(checkBox.isChecked(), inviteFriend.getViaLabelType());
-                    finalHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checkBox.isChecked()));
+                    notifyCounterChanged(checkBox.isChecked());
+                    finalHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(
+                            checkBox.isChecked()));
                 }
             });
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        holder.nameTextView.setText(data.getName());
-        holder.viaTextView.setText(getViaLabelById(data.getViaLabelType()));
-        holder.checkBox.setChecked(data.isSelected());
-        holder.checkBox.setTag(data);
+        viewHolder.nameTextView.setText(data.getName());
+        viewHolder.viaTextView.setText(selectedFriendFromContacts);
+        viewHolder.checkBox.setChecked(data.isSelected());
+        viewHolder.checkBox.setTag(data);
 
-        String uri = null;
-        if (data.getViaLabelType() == InviteFriend.VIA_CONTACTS_TYPE) {
-            uri = data.getUri().toString();
-        } else if (data.getViaLabelType() == InviteFriend.VIA_FACEBOOK_TYPE) {
-            uri = baseActivity.getString(R.string.inf_url_to_facebook_avatar, data.getId());
-        }
+        String uri = data.getUri().toString();
 
-        holder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(holder.checkBox.isChecked()));
+        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(viewHolder.checkBox.isChecked()));
 
-        displayImage(uri, holder.avatarImageView);
+        displayImage(uri, viewHolder.avatarImageView);
         return convertView;
     }
 
-    private void notifyCounterChanged(boolean isIncrease, int type) {
-        switch (type) {
-            case InviteFriend.VIA_FACEBOOK_TYPE:
-                counterFacebook = getChangedCounter(isIncrease, counterFacebook);
-                counterChangedListener.onCounterFacebookChanged(counterFacebook);
-                break;
-            case InviteFriend.VIA_CONTACTS_TYPE:
-                counterContacts = getChangedCounter(isIncrease, counterContacts);
-                counterChangedListener.onCounterContactsChanged(counterContacts);
-                break;
-        }
-    }
-
-    private String getViaLabelById(int type) {
-        String viaLabel = null;
-        switch (type) {
-            case InviteFriend.VIA_FACEBOOK_TYPE:
-                viaLabel = selectedFriendFromFacebook;
-                break;
-            case InviteFriend.VIA_CONTACTS_TYPE:
-                viaLabel = selectedFriendFromContacts;
-                break;
-        }
-        return viaLabel;
+    private void notifyCounterChanged(boolean isIncrease) {
+        counterContacts = getChangedCounter(isIncrease, counterContacts);
+        counterChangedListener.onCounterContactsChanged(counterContacts);
     }
 
     private int getChangedCounter(boolean isIncrease, int counter) {

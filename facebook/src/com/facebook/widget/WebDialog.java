@@ -37,7 +37,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.facebook.*;
-import com.facebook.android.*;
+import com.facebook.android.R;
+import com.facebook.android.Util;
 import com.facebook.internal.Logger;
 import com.facebook.internal.ServerProtocol;
 import com.facebook.internal.Utility;
@@ -51,7 +52,6 @@ import com.facebook.internal.Validate;
 public class WebDialog extends Dialog {
     private static final String LOG_TAG = Logger.LOG_TAG_BASE + "WebDialog";
     private static final String DISPLAY_TOUCH = "touch";
-    private static final String USER_AGENT = "user_agent";
     static final String REDIRECT_URI = "fbconnect://success";
     static final String CANCEL_URI = "fbconnect://cancel";
     static final boolean DISABLE_SSL_CHECK_FOR_TESTING = false;
@@ -135,10 +135,15 @@ public class WebDialog extends Dialog {
         if (parameters == null) {
             parameters = new Bundle();
         }
-        parameters.putString(ServerProtocol.DIALOG_PARAM_DISPLAY, DISPLAY_TOUCH);
-        parameters.putString(ServerProtocol.DIALOG_PARAM_TYPE, USER_AGENT);
 
-        Uri uri = Utility.buildUri(ServerProtocol.getDialogAuthority(), ServerProtocol.DIALOG_PATH + action,
+        // our webview client only handles the redirect uri we specify, so just hard code it here
+        parameters.putString(ServerProtocol.DIALOG_PARAM_REDIRECT_URI, REDIRECT_URI);
+
+        parameters.putString(ServerProtocol.DIALOG_PARAM_DISPLAY, DISPLAY_TOUCH);
+
+        Uri uri = Utility.buildUri(
+                ServerProtocol.getDialogAuthority(),
+                ServerProtocol.getAPIVersion() + "/" + ServerProtocol.DIALOG_PATH + action,
                 parameters);
         this.url = uri.toString();
         onCompleteListener = listener;
@@ -342,6 +347,7 @@ public class WebDialog extends Dialog {
                 ViewGroup.LayoutParams.MATCH_PARENT));
         webView.setVisibility(View.INVISIBLE);
         webView.getSettings().setSavePassword(false);
+        webView.getSettings().setSaveFormData(false);
 
         webViewContainer.setPadding(margin, margin, margin, margin);
         webViewContainer.addView(webView);
@@ -457,6 +463,22 @@ public class WebDialog extends Dialog {
         private OnCompleteListener listener;
         private Bundle parameters;
 
+        protected BuilderBase(Context context, String action) {
+            Session activeSession = Session.getActiveSession();
+            if (activeSession != null && activeSession.isOpened()) {
+                this.session = activeSession;
+            } else {
+                String applicationId = Utility.getMetadataApplicationId(context);
+                if (applicationId != null) {
+                    this.applicationId = applicationId;
+                } else {
+                    throw new FacebookException("Attempted to create a builder without an open" +
+                            " Active Session or a valid default Application ID.");
+                }
+            }
+            finishInit(context, action, null);
+        }
+
         protected BuilderBase(Context context, Session session, String action, Bundle parameters) {
             Validate.notNull(session, "session");
             if (!session.isOpened()) {
@@ -468,6 +490,9 @@ public class WebDialog extends Dialog {
         }
 
         protected BuilderBase(Context context, String applicationId, String action, Bundle parameters) {
+            if (applicationId == null) {
+                applicationId = Utility.getMetadataApplicationId(context);
+            }
             Validate.notNullOrEmpty(applicationId, "applicationId");
             this.applicationId = applicationId;
 
@@ -514,10 +539,6 @@ public class WebDialog extends Dialog {
                 parameters.putString(ServerProtocol.DIALOG_PARAM_APP_ID, applicationId);
             }
 
-            if (!parameters.containsKey(ServerProtocol.DIALOG_PARAM_REDIRECT_URI)) {
-                parameters.putString(ServerProtocol.DIALOG_PARAM_REDIRECT_URI, REDIRECT_URI);
-            }
-
             return new WebDialog(context, action, parameters, theme, listener);
         }
 
@@ -537,7 +558,7 @@ public class WebDialog extends Dialog {
             return parameters;
         }
 
-        protected WebDialog.OnCompleteListener getListener() {
+        protected OnCompleteListener getListener() {
             return listener;
         }
 
@@ -556,6 +577,18 @@ public class WebDialog extends Dialog {
      * Provides a builder that allows construction of an arbitary Facebook web dialog.
      */
     public static class Builder extends BuilderBase<Builder> {
+        /**
+         * Constructor that builds a dialog using either the active session, or the application
+         * id specified in the application/meta-data.
+         *
+         * @param context the Context within which the dialog will be shown.
+         * @param action the portion of the dialog URL following www.facebook.com/dialog/.
+         *               See https://developers.facebook.com/docs/reference/dialogs/ for details.
+         */
+        public Builder(Context context, String action) {
+            super(context, action);
+        }
+
         /**
          * Constructor that builds a dialog for an authenticated user.
          *
@@ -600,7 +633,17 @@ public class WebDialog extends Dialog {
         private static final String DESCRIPTION_PARAM = "description";
 
         /**
-         * Constructor.
+         * Constructor that builds a Feed Dialog using either the active session, or the application
+         * ID specified in the application/meta-data.
+         *
+         * @param context the Context within which the dialog will be shown.
+         */
+        public FeedDialogBuilder(Context context) {
+            super(context, FEED_DIALOG);
+        }
+
+        /**
+         * Constructor that builds a Feed Dialog using the provided session.
          *
          * @param context the Context within which the dialog will be shown.
          * @param session the Session representing an authenticating user to use for
@@ -611,19 +654,35 @@ public class WebDialog extends Dialog {
         }
 
         /**
-         * Constructor.
+         * Constructor that builds a Feed Dialog using the provided session and parameters.
          *
          * @param context    the Context within which the dialog will be shown.
+         * @param session    the Session representing an authenticating user to use for
+         *                   showing the dialog; must not be null, and must be opened.
          * @param parameters a Bundle containing parameters to pass as part of the
          *                   dialog URL. No validation is done on these parameters; it is
          *                   the caller's responsibility to ensure they are valid. For more information,
          *                   see <a href="https://developers.facebook.com/docs/reference/dialogs/feed/">
          *                   https://developers.facebook.com/docs/reference/dialogs/feed/</a>.
-         * @param session    the Session representing an authenticating user to use for
-         *                   showing the dialog; must not be null, and must be opened.
          */
         public FeedDialogBuilder(Context context, Session session, Bundle parameters) {
             super(context, session, FEED_DIALOG, parameters);
+        }
+
+        /**
+         * Constructor that builds a Feed Dialog using the provided application ID and parameters.
+         *
+         * @param context       the Context within which the dialog will be shown.
+         * @param applicationId the application ID to use. If null, the application ID specified in the
+         *                      application/meta-data will be used instead.
+         * @param parameters    a Bundle containing parameters to pass as part of the
+         *                      dialog URL. No validation is done on these parameters; it is
+         *                      the caller's responsibility to ensure they are valid. For more information,
+         *                      see <a href="https://developers.facebook.com/docs/reference/dialogs/feed/">
+         *                      https://developers.facebook.com/docs/reference/dialogs/feed/</a>.
+         */
+        public FeedDialogBuilder(Context context, String applicationId, Bundle parameters) {
+            super(context, applicationId, FEED_DIALOG, parameters);
         }
 
         /**
@@ -641,7 +700,8 @@ public class WebDialog extends Dialog {
 
         /**
          * Sets the ID of the profile that the story will be published to. If not specified, it
-         * will default to the same profile that the story is being published from.
+         * will default to the same profile that the story is being published from. The ID must be a friend who also
+         * uses your app.
          *
          * @param id Facebook ID of the profile to post to
          * @return the builder
@@ -731,7 +791,17 @@ public class WebDialog extends Dialog {
         private static final String TITLE_PARAM = "title";
 
         /**
-         * Constructor.
+         * Constructor that builds a Requests Dialog using either the active session, or the application
+         * ID specified in the application/meta-data.
+         *
+         * @param context the Context within which the dialog will be shown.
+         */
+        public RequestsDialogBuilder(Context context) {
+            super(context, APPREQUESTS_DIALOG);
+        }
+
+        /**
+         * Constructor that builds a Requests Dialog using the provided session.
          *
          * @param context the Context within which the dialog will be shown.
          * @param session the Session representing an authenticating user to use for
@@ -742,19 +812,35 @@ public class WebDialog extends Dialog {
         }
 
         /**
-         * Constructor.
+         * Constructor that builds a Requests Dialog using the provided session and parameters.
          *
          * @param context    the Context within which the dialog will be shown.
+         * @param session    the Session representing an authenticating user to use for
+         *                   showing the dialog; must not be null, and must be opened.
          * @param parameters a Bundle containing parameters to pass as part of the
          *                   dialog URL. No validation is done on these parameters; it is
          *                   the caller's responsibility to ensure they are valid. For more information,
          *                   see <a href="https://developers.facebook.com/docs/reference/dialogs/requests/">
          *                   https://developers.facebook.com/docs/reference/dialogs/requests/</a>.
-         * @param session    the Session representing an authenticating user to use for
-         *                   showing the dialog; must not be null, and must be opened.
          */
         public RequestsDialogBuilder(Context context, Session session, Bundle parameters) {
             super(context, session, APPREQUESTS_DIALOG, parameters);
+        }
+
+        /**
+         * Constructor that builds a Requests Dialog using the provided application ID and parameters.
+         *
+         * @param context       the Context within which the dialog will be shown.
+         * @param applicationId the application ID to use. If null, the application ID specified in the
+         *                      application/meta-data will be used instead.
+         * @param parameters    a Bundle containing parameters to pass as part of the
+         *                      dialog URL. No validation is done on these parameters; it is
+         *                      the caller's responsibility to ensure they are valid. For more information,
+         *                      see <a href="https://developers.facebook.com/docs/reference/dialogs/requests/">
+         *                      https://developers.facebook.com/docs/reference/dialogs/requests/</a>.
+         */
+        public RequestsDialogBuilder(Context context, String applicationId, Bundle parameters) {
+            super(context, applicationId, APPREQUESTS_DIALOG, parameters);
         }
 
         /**

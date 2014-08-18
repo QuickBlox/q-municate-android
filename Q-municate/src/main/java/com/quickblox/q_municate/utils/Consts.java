@@ -80,7 +80,7 @@ public class Consts {
     //Sound
     public static final String ASSETS_SOUND_PATH = "sound/";
 
-    // Facebook
+    // Facebook Wall
     public static final String FB_WALL_PARAM_NAME = "name";
     public static final String FB_WALL_PARAM_DESCRIPTION = "description";
     public static final String FB_WALL_PARAM_LINK = "link";
@@ -88,6 +88,10 @@ public class Consts {
     public static final String FB_WALL_PARAM_PLACE = "place";
     public static final String FB_WALL_PARAM_TAGS = "tags";
     public static final String FB_WALL_PARAM_FEED = "me/feed";
+
+    // Facebook Request
+    public static final String FB_REQUEST_PARAM_MESSAGE = "message";
+    public static final String FB_REQUEST_PARAM_TITLE = "title";
 
     public static final String TYPE_OF_EMAIL = "message/rfc822";
 
