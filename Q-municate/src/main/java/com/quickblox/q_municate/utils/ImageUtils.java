@@ -159,31 +159,29 @@ public class ImageUtils {
 
     public Bitmap getRoundedBitmap(Bitmap bitmap) {
         Bitmap resultBitmap;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        float r;
 
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            resultBitmap = Bitmap.createBitmap(bitmap.getHeight(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        if (originalWidth > originalHeight) {
+            resultBitmap = Bitmap.createBitmap(originalHeight, originalHeight, Bitmap.Config.ARGB_8888);
+            r = originalHeight / 2;
         } else {
-            resultBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getWidth(), Bitmap.Config.ARGB_8888);
+            resultBitmap = Bitmap.createBitmap(originalWidth, originalWidth, Bitmap.Config.ARGB_8888);
+            r = originalWidth / 2;
         }
 
         Canvas canvas = new Canvas(resultBitmap);
 
         final Paint paint = new Paint();
-        final Rect rect = new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, bitmap.getWidth(), bitmap.getHeight());
-
-        float r;
-
-        if (bitmap.getWidth() > bitmap.getHeight()) {
-            r = bitmap.getHeight() / 2;
-        } else {
-            r = bitmap.getWidth() / 2;
-        }
+        final Rect rect = new Rect(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, originalWidth, originalHeight);
 
         paint.setAntiAlias(true);
         canvas.drawARGB(Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE, Consts.ZERO_INT_VALUE);
         canvas.drawCircle(r, r, r, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
+
         return resultBitmap;
     }
 
