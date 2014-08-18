@@ -16,8 +16,8 @@ allprojects {
 ext.compileSdkVersion = 19
 ext.buildToolsVersion = '19.1.0'
 
-ext.versionName = '1.0.55'
-ext.versionCode = 2
+ext.versionName = '1.0.4'
+ext.versionCode = 3
 
 ext.prodDebug = false
 ext.devDebug = true
