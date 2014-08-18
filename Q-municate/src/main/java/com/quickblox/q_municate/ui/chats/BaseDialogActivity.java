@@ -406,18 +406,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    private class ReceiveRoundedBitmapPathTask extends AsyncTask {
+    private class ReceiveRoundedBitmapPathTask extends AsyncTask<Object, Bitmap, Bitmap> {
 
         @Override
-        protected Object doInBackground(Object[] params) {
+        protected Bitmap doInBackground(Object[] params) {
             Bitmap bitmap = (Bitmap) params[0];
             Bitmap roundedBitmap = imageUtils.getRoundedBitmap(bitmap);
             return roundedBitmap;
         }
 
         @Override
-        protected void onPostExecute(Object object) {
-            updateActionBarLogo((Bitmap) object);
+        protected void onPostExecute(Bitmap bitmap) {
+            updateActionBarLogo(bitmap);
         }
     }
 
