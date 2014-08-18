@@ -119,17 +119,10 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
 
     private int getCheckedFriends(List<InviteFriend> friends, boolean isCheck) {
         int newCounter;
-        if (isCheck) {
-            for (InviteFriend friend : friends) {
-                friend.setSelected(true);
-            }
-            newCounter = friends.size();
-        } else {
-            for (InviteFriend friend : friends) {
-                friend.setSelected(false);
-            }
-            newCounter = Consts.ZERO_INT_VALUE;
+        for (InviteFriend friend : friends) {
+            friend.setSelected(isCheck);
         }
+        newCounter = isCheck ? friends.size() : Consts.ZERO_INT_VALUE;
 
         onCounterContactsChanged(newCounter);
 

@@ -123,29 +123,33 @@ public class FacebookHelper {
         Bundle postParams = getBundleForFriendsRequest();
         return (new WebDialog.RequestsDialogBuilder(activity,
                 Session.getActiveSession(), postParams)).setOnCompleteListener(
-                new WebDialog.OnCompleteListener() {
+                getWebDialogOnCompleteListener()).build();
+    }
 
-                    @Override
-                    public void onComplete(Bundle values, FacebookException error) {
-                        if (error != null) {
-                            if (error instanceof FacebookOperationCanceledException) {
-                                DialogUtils.showLong(activity, resources.getString(
-                                        R.string.inf_fb_request_canceled));
-                            } else {
-                                ErrorUtils.showError(activity, error);
-                            }
-                        } else {
-                            final String requestId = values.getString("request");
-                            if (requestId != null) {
-                                DialogUtils.showLong(activity, resources.getString(
-                                        R.string.dlg_success_request_facebook));
-                            } else {
-                                DialogUtils.showLong(activity, resources.getString(
-                                        R.string.inf_fb_request_canceled));
-                            }
-                        }
+    private WebDialog.OnCompleteListener getWebDialogOnCompleteListener() {
+        return new WebDialog.OnCompleteListener() {
+
+            @Override
+            public void onComplete(Bundle values, FacebookException error) {
+                if (error != null) {
+                    if (error instanceof FacebookOperationCanceledException) {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.inf_fb_request_canceled));
+                    } else {
+                        ErrorUtils.showError(activity, error);
                     }
-                }).build();
+                } else {
+                    final String requestId = values.getString("request");
+                    if (requestId != null) {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.dlg_success_request_facebook));
+                    } else {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.inf_fb_request_canceled));
+                    }
+                }
+            }
+        };
     }
 
     public boolean checkPermissions() {
