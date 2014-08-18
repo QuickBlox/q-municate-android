@@ -13,7 +13,6 @@ import com.edmodo.cropper.CropImageView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 
@@ -26,7 +25,6 @@ public class ImageCropperActivity extends BaseLogeableActivity {
     private static final int DEFAULT_ASPECT_RATIO_VALUES = 5;
 
     private CropImageView cropImageView;
-    private RoundedImageView croppedImageView;
 
     private Bitmap defaultImageBitmap;
     private Bitmap croppedImageBitmap;
@@ -47,15 +45,10 @@ public class ImageCropperActivity extends BaseLogeableActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        sendFeedbackActivityData();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -73,7 +66,6 @@ public class ImageCropperActivity extends BaseLogeableActivity {
 
     private void initUI() {
         cropImageView = (CropImageView) findViewById(R.id.crop_imageview);
-        croppedImageView = (RoundedImageView) findViewById(R.id.avatar_imageview);
     }
 
     private void sendFeedbackActivityData() {
@@ -87,7 +79,11 @@ public class ImageCropperActivity extends BaseLogeableActivity {
 
     public void cropOnClick(View view) {
         croppedImageBitmap = cropImageView.getCroppedImage();
-        croppedImageView.setImageBitmap(croppedImageBitmap);
+        sendFeedbackActivityData();
+    }
+
+    public void cancelOnClick(View view) {
+        finish();
     }
 
     public void onCompressedBitmapReceived(String byteArray) {
