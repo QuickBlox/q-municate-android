@@ -15,7 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
-import com.quickblox.q_municate.qb.commands.QBLoginChatCommand;
+import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -79,8 +79,8 @@ public class SplashActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, new LoginChatSuccessAction());
-        addAction(QBServiceConsts.LOGIN_CHAT_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
+        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
     }
 
@@ -120,7 +120,7 @@ public class SplashActivity extends BaseActivity {
     private void runExistSession(String userEmail, String userPassword) {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(Consts.TOKEN_VALID_TIME_IN_MINUTES))){
-            QBLoginChatCommand.start(this);
+            QBLoginAndJoinDialogsCommand.start(this);
         }
         else{
             doAutoLogin(userEmail, userPassword);
@@ -165,7 +165,7 @@ public class SplashActivity extends BaseActivity {
         startLanding();
     }
 
-    private class LoginChatSuccessAction implements Command {
+    private class LoginAndJoinChatsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {

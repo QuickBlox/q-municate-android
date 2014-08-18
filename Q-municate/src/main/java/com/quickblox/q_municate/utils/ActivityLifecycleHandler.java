@@ -59,7 +59,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
-                QBLogoutAndDestroyChatCommand.start(activity, true);
+                QBLogoutAndDestroyChatCommand.start(activity, false);
             }
         }
     }
