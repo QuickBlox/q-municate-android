@@ -16,7 +16,7 @@
         android:textSize="@dimen/text_size_small" />
 
     <LinearLayout
-        android:id="@+id/fromFacebookButton"
+        android:id="@+id/from_facebook_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/list_item_background_selector"
@@ -35,7 +35,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/iconFacebookImageView"
+                android:id="@+id/icon_facebook_imageview"
                 android:layout_width="@dimen/inf_list_item_height"
                 android:layout_height="@dimen/inf_list_item_height"
                 android:layout_alignParentLeft="true"
@@ -43,40 +43,17 @@
                 android:src="@drawable/ic_fb_blue" />
 
             <TextView
-                android:id="@+id/fromFacebookTextView"
+                android:id="@+id/from_facebook_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@+id/iconFacebookImageView"
+                android:layout_toRightOf="@+id/icon_facebook_imageview"
                 android:clickable="false"
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/inf_select_from_facebook"
-                android:textColor="@android:color/black"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_size" />
-
-            <TextView
-                android:id="@+id/counterFacebookTextView"
-                android:layout_width="?android:attr/listPreferredItemHeight"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center|right"
-                android:layout_toLeftOf="@+id/checkAllFacebookFriendsCheckBox"
-                android:background="@drawable/badge_friend_counter"
-                android:clickable="false"
-                android:gravity="center"
-                android:text="0"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/text_size"
-                android:visibility="gone" />
-
-            <CheckBox
-                android:id="@+id/checkAllFacebookFriendsCheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -89,7 +66,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/fromContactsButton"
+        android:id="@+id/from_contacts_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/list_item_background_selector"
@@ -102,7 +79,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/iconContactImageView"
+                android:id="@+id/icon_contact_imageview"
                 android:layout_width="@dimen/inf_list_item_height"
                 android:layout_height="@dimen/inf_list_item_height"
                 android:layout_alignParentLeft="true"
@@ -110,25 +87,25 @@
                 android:src="@drawable/ic_contacts" />
 
             <TextView
-                android:id="@+id/fromContactTextView"
+                android:id="@+id/from_contact_textview"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@+id/iconContactImageView"
+                android:layout_toRightOf="@+id/icon_contact_imageview"
                 android:clickable="false"
                 android:gravity="left|center_vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="@string/inf_select_from_contacts"
-                android:textColor="@android:color/black"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_size" />
 
             <TextView
-                android:id="@+id/counterContactsTextView"
+                android:id="@+id/counter_contacts_textview"
                 android:layout_width="?android:attr/listPreferredItemHeight"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
-                android:layout_toLeftOf="@+id/checkAllContactsFriendsCheckBox"
+                android:layout_toLeftOf="@+id/check_contacts_checkbox"
                 android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
@@ -138,7 +115,7 @@
                 android:visibility="gone" />
 
             <CheckBox
-                android:id="@+id/checkAllContactsFriendsCheckBox"
+                android:id="@+id/check_contacts_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

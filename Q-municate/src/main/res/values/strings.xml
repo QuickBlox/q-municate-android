@@ -156,6 +156,7 @@
     <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
+    <string name="inf_fb_request_canceled">Request cancelled</string>
 
     // Feedback
     <string name="fdb_feedback_title">Feedback Description</string>
@@ -191,6 +192,7 @@
     <string name="dlg_no_contacts_friends">No Contacts friends</string>
     <string name="dlg_no_friends">No friends</string>
     <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
+    <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>

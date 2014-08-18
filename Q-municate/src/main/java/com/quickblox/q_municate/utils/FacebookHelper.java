@@ -6,6 +6,8 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
 import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
@@ -13,6 +15,7 @@ import com.facebook.RequestAsyncTask;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
+import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 
 import java.util.Arrays;
@@ -20,14 +23,24 @@ import java.util.Collection;
 import java.util.List;
 
 public class FacebookHelper {
+
     public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
     private Activity activity;
     private Session.StatusCallback facebookStatusCallback;
+    private Resources resources;
 
-    public FacebookHelper(Activity activity, Bundle savedInstanceState, Session.StatusCallback facebookStatusCallback) {
+    public FacebookHelper(Activity activity, Bundle savedInstanceState,
+            Session.StatusCallback facebookStatusCallback) {
         this.activity = activity;
         this.facebookStatusCallback = facebookStatusCallback;
+        resources = activity.getResources();
         initFacebook(savedInstanceState);
+    }
+
+    public static void logout() {
+        if (Session.getActiveSession() != null) {
+            Session.getActiveSession().closeAndClearTokenInformation();
+        }
     }
 
     private void initFacebook(Bundle savedInstanceState) {
@@ -73,19 +86,13 @@ public class FacebookHelper {
     }
 
     public void onActivityStop() {
-        if(Session.getActiveSession() != null) {
+        if (Session.getActiveSession() != null) {
             Session.getActiveSession().removeCallback(facebookStatusCallback);
         }
     }
 
     public boolean isSessionOpened() {
         return Session.getActiveSession().isOpened();
-    }
-
-    public static void logout() {
-        if (Session.getActiveSession() != null) {
-            Session.getActiveSession().closeAndClearTokenInformation();
-        }
     }
 
     public void postInviteToWall(Request.Callback requestCallback, String[] selectedFriends) {
@@ -105,12 +112,52 @@ public class FacebookHelper {
         }
     }
 
+    private Bundle getBundleForFriendsRequest() {
+        Bundle postParams = new Bundle();
+        postParams.putString(Consts.FB_REQUEST_PARAM_TITLE, resources.getString(R.string.inf_subject_of_invitation));
+        postParams.putString(Consts.FB_REQUEST_PARAM_MESSAGE, resources.getString(R.string.inf_body_of_invitation));
+        return postParams;
+    }
+
+    public WebDialog getWebDialogRequest() {
+        Bundle postParams = getBundleForFriendsRequest();
+        return (new WebDialog.RequestsDialogBuilder(activity,
+                Session.getActiveSession(), postParams)).setOnCompleteListener(
+                getWebDialogOnCompleteListener()).build();
+    }
+
+    private WebDialog.OnCompleteListener getWebDialogOnCompleteListener() {
+        return new WebDialog.OnCompleteListener() {
+
+            @Override
+            public void onComplete(Bundle values, FacebookException error) {
+                if (error != null) {
+                    if (error instanceof FacebookOperationCanceledException) {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.inf_fb_request_canceled));
+                    } else {
+                        ErrorUtils.showError(activity, error);
+                    }
+                } else {
+                    final String requestId = values.getString("request");
+                    if (requestId != null) {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.dlg_success_request_facebook));
+                    } else {
+                        DialogUtils.showLong(activity, resources.getString(
+                                R.string.inf_fb_request_canceled));
+                    }
+                }
+            }
+        };
+    }
+
     public boolean checkPermissions() {
         Session session = Session.getActiveSession();
         List<String> permissions = session.getPermissions();
         if (!isSubsetOf(FacebookHelper.PERMISSIONS, permissions)) {
-            Session.NewPermissionsRequest newPermissionsRequest = new Session
-                    .NewPermissionsRequest(activity, FacebookHelper.PERMISSIONS);
+            Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(activity,
+                    FacebookHelper.PERMISSIONS);
             session.requestNewPublishPermissions(newPermissionsRequest);
             return false;
         }

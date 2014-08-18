@@ -19,7 +19,7 @@ package com.facebook;
 import android.os.Bundle;
 
 /**
- * Implements a trivial {@link TokenCachingStrategy} that does not actually cache any tokens.
+ * Implements a trivial {@link com.facebook.TokenCachingStrategy} that does not actually cache any tokens.
  * It is intended for use when an access token may be used on a temporary basis but should not be
  * cached for future use (for instance, when handling a deep link).
  */

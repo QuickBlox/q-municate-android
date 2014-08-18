@@ -18,7 +18,7 @@ package com.facebook;
 
 /**
  * Predefined event and parameter names for logging events common to many apps. Logging occurs through the
- * {@link AppEventsLogger#logEvent(String, android.os.Bundle)} family of methods.
+ * {@link com.facebook.AppEventsLogger#logEvent(String, android.os.Bundle)} family of methods.
  */
 public class AppEventsConstants {
     // Event names
@@ -27,6 +27,12 @@ public class AppEventsConstants {
 
     /** Log this event when an app is being activated. */
     public static final String EVENT_NAME_ACTIVATED_APP = "fb_mobile_activate_app";
+
+    public static final String EVENT_NAME_DEACTIVATED_APP = "fb_mobile_deactivate_app";
+
+    public static final String EVENT_NAME_SESSION_INTERRUPTIONS = "fb_mobile_app_interruptions";
+
+    public static final String EVENT_NAME_TIME_BETWEEN_SESSIONS = "fb_mobile_time_between_sessions";
 
     /** Log this event when a user has completed registration with the app. */
     public static final String EVENT_NAME_COMPLETED_REGISTRATION = "fb_mobile_complete_registration";
@@ -71,7 +77,7 @@ public class AppEventsConstants {
 
     /**
      * Log this event when the user has completed a purchase.
-     * The {@link AppEventsLogger#logPurchase(java.math.BigDecimal, java.util.Currency)} method is a shortcut for
+     * The {@link com.facebook.AppEventsLogger#logPurchase(java.math.BigDecimal, java.util.Currency)} method is a shortcut for
      * logging this event.
      */
     public static final String EVENT_NAME_PURCHASED = "fb_mobile_purchase";
@@ -164,5 +170,4 @@ public class AppEventsConstants {
 
     /** No-valued parameter value to be used with parameter keys that need a Yes/No value */
     public static final String EVENT_PARAM_VALUE_NO = "0";
-
 }

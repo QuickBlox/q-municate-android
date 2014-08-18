@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * <p>
- * A base class for implementations of a {@link Session Session} token cache.
+ * A base class for implementations of a {@link com.facebook.Session Session} token cache.
  * </p>
  * <p>
  * The Session constructor optionally takes a TokenCachingStrategy, from which it will
@@ -76,6 +76,12 @@ public abstract class TokenCachingStrategy {
      */
     public static final String PERMISSIONS_KEY = "com.facebook.TokenCachingStrategy.Permissions";
 
+    /**
+     * The key used by Session to store the list of permissions declined by the user in the token in the Bundle
+     * during load and save.
+     */
+    public static final String DECLINED_PERMISSIONS_KEY = "com.facebook.TokenCachingStrategy.DeclinedPermissions";
+
     private static final long INVALID_BUNDLE_MILLISECONDS = Long.MIN_VALUE;
     private static final String IS_SSO_KEY = "com.facebook.TokenCachingStrategy.IsSSO";
 
@@ -104,7 +110,7 @@ public abstract class TokenCachingStrategy {
 
     /**
      * Called when a Session learns its token is no longer valid or during a
-     * call to {@link Session#closeAndClearTokenInformation
+     * call to {@link com.facebook.Session#closeAndClearTokenInformation
      * closeAndClearTokenInformation} to clear the durable state associated with
      * the token.
      */
@@ -265,6 +271,31 @@ public abstract class TokenCachingStrategy {
         }
         bundle.putStringArrayList(PERMISSIONS_KEY, arrayList);
     }
+
+    /**
+     * Puts the list of declined permissions into a Bundle.
+     *
+     * @param bundle
+     *            A Bundle in which the list of permissions should be stored.
+     * @param value
+     *            The List&lt;String&gt; representing the list of permissions,
+     *            or null.
+     *
+     * @throws NullPointerException if the passed in Bundle or permissions list are null
+     */
+    public static void putDeclinedPermissions(Bundle bundle, List<String> value) {
+        Validate.notNull(bundle, "bundle");
+        Validate.notNull(value, "value");
+
+        ArrayList<String> arrayList;
+        if (value instanceof ArrayList<?>) {
+            arrayList = (ArrayList<String>) value;
+        } else {
+            arrayList = new ArrayList<String>(value);
+        }
+        bundle.putStringArrayList(DECLINED_PERMISSIONS_KEY, arrayList);
+    }
+
 
     /**
      * Gets the cached enum indicating the source of the token from the Bundle.

@@ -147,8 +147,8 @@ public final class Util {
      * @param method - the HTTP method to use ("GET", "POST", etc.)
      * @param params - the query parameter for the URL (e.g. access_token=foo)
      * @return the URL contents as a String
-     * @throws MalformedURLException - if the URL format is invalid
-     * @throws IOException - if a network problem occurs
+     * @throws java.net.MalformedURLException - if the URL format is invalid
+     * @throws java.io.IOException - if a network problem occurs
      */
     @Deprecated
     public static String openUrl(String url, String method, Bundle params)
@@ -252,7 +252,7 @@ public final class Util {
      *
      * @param response - string representation of the response
      * @return the response as a JSON Object
-     * @throws JSONException - if the response is not valid JSON
+     * @throws org.json.JSONException - if the response is not valid JSON
      * @throws FacebookError - if an error condition is set
      */
     @Deprecated
