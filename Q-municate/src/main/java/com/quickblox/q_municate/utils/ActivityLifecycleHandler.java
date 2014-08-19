@@ -35,12 +35,12 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
                 QBLoginAndJoinDialogsCommand.start(activity);
             }
         }
-        if (activityLogeable){
+        if (activityLogeable) {
             ++numberOfActivitiesInForeground;
         }
     }
 
-    public boolean isActivityLogeable(Activity activity){
+    public boolean isActivityLogeable(Activity activity) {
         return (activity instanceof QBLogeable);
     }
 
@@ -67,7 +67,14 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     private boolean isLogedIn() {
-        return QBChatService.getInstance().isLoggedIn();
+        boolean result = false;
+        try {
+            result = QBChatService.getInstance()
+                    .isLoggedIn(); //Chat service isn't initialized  -> return false
+        } catch (IllegalStateException e) {
+            ErrorUtils.logError(e);
+        }
+        return result;
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
