@@ -23,15 +23,14 @@ import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
-import com.quickblox.q_municate.utils.ReceiveFileListener;
-import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileListener {
+public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
@@ -185,7 +184,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
                 public void onClick(View view) {
                     view.startAnimation(AnimationUtils.loadAnimation(context,
                             R.anim.chat_attached_file_click));
-                    new ReceiveImageFileTask(BaseDialogMessagesAdapter.this).execute(imageUtils,
+                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils,
                             loadedImageBitmap, false);
                 }
             };

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -33,7 +32,6 @@ import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.cropper.ImageCropperActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;
@@ -42,14 +40,14 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
-import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
-import com.quickblox.q_municate.utils.ReceiveFileListener;
-import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
+import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileListener, AdapterView.OnItemClickListener {
+public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener, AdapterView.OnItemClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
     public static final int RESULT_LEAVE_GROUP = 2;
@@ -66,6 +64,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private Object actionMode;
     private boolean closeActionMode;
     private boolean isNeedUpdateAvatar;
+    private Uri outputUri;
 
     private Bitmap avatarBitmapCurrent;
     private QBDialog dialogCurrent;
@@ -95,6 +94,12 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         initUIWithData();
         addActions();
         startLoadGroupDialog();
+    }
+
+    @Override
+    public void onUriScaledBitmapReceived(Uri originalUri) {
+        hideProgress();
+        startCropActivity(originalUri);
     }
 
     private void startLoadGroupDialog() {
@@ -205,28 +210,33 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageCropperActivity.INTENT_RESULT_CODE) {
-            if (resultCode == RESULT_OK) {
-                isNeedUpdateAvatar = true;
-                String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
-                avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
-                FileUtils.removeFile(filePath);
-                avatarImageView.setImageBitmap(avatarBitmapCurrent);
-                startAction();
-            }
-        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED) {
-            if (resultCode == RESULT_OK) {
-                Uri originalUri = data.getData();
-                if (originalUri != null) {
-                    startCropActivity(originalUri);
-                }
+        if (requestCode == Crop.REQUEST_CROP) {
+            handleCrop(resultCode, data);
+        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
+            Uri originalUri = data.getData();
+            if (originalUri != null) {
+                showProgress();
+                new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
             }
         }
+        canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            isNeedUpdateAvatar = true;
+            avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
+            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            startAction();
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            DialogUtils.showLong(this, Crop.getError(result).getMessage());
+        }
+    }
+
     private void startCropActivity(Uri originalUri) {
-        ImageCropperActivity.start(this, originalUri);
+        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        new Crop(originalUri).output(outputUri).asSquare().start(this);
     }
 
     private void startAction() {
@@ -260,7 +270,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         dialogCurrent.setName(groupNameCurrent);
 
         if (isNeedUpdateAvatar) {
-            new ReceiveImageFileTask(this).execute(imageUtils, avatarBitmapCurrent, true);
+            new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
             startUpdatingGroupDialog(null);
         }

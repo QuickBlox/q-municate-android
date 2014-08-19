@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.Display;
 import android.webkit.MimeTypeMap;
 
 import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
@@ -79,6 +80,15 @@ public class ImageUtils {
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         Utils.closeOutputStream(byteArrayOutputStream);
         return byteArray;
+    }
+
+    public Bitmap createScaledBitmap(Bitmap unscaledBitmap) {
+        Display display = activity.getWindowManager().getDefaultDisplay();
+        int displayWidth = display.getWidth();
+
+        Bitmap scaledBitmap = createScaledBitmap(unscaledBitmap, displayWidth, displayWidth, ScalingLogic.FIT);
+
+        return scaledBitmap;
     }
 
     private Bitmap createScaledBitmap(Bitmap unscaledBitmap, int dstWidth, int dstHeight,
@@ -206,7 +216,7 @@ public class ImageUtils {
         return tempFile.getAbsolutePath();
     }
 
-    public File getFileFromImageView(Bitmap origBitmap) throws IOException {
+    public File getFileFromBitmap(Bitmap origBitmap) throws IOException {
         int width = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_WIDTH);
         int height = SizeUtility.dipToPixels(activity, Consts.CHAT_ATTACH_HEIGHT);
         Bitmap bitmap = createScaledBitmap(origBitmap, width, height, ScalingLogic.FIT);
@@ -225,15 +235,24 @@ public class ImageUtils {
     }
 
     public Bitmap getBitmap(Uri originalUri) {
+        BitmapFactory.Options bitmapOptions = getBitmapOption();
         Bitmap selectedBitmap = null;
         try {
-            ParcelFileDescriptor descriptor = activity.getContentResolver().openFileDescriptor(originalUri,
-                    "r");
-            selectedBitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor());
+            ParcelFileDescriptor descriptor = activity.getContentResolver().openFileDescriptor(originalUri, "r");
+            selectedBitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
         } catch (FileNotFoundException e) {
-            ErrorUtils.showError(activity, e);
+            ErrorUtils.showError(activity, e.getMessage());
         }
         return selectedBitmap;
+    }
+
+    private BitmapFactory.Options getBitmapOption() {
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inDither = false;
+        bitmapOptions.inPurgeable = true;
+        bitmapOptions.inInputShareable = true;
+        bitmapOptions.inTempStorage = new byte[32 * 1024];
+        return bitmapOptions;
     }
 
     private enum ScalingLogic {

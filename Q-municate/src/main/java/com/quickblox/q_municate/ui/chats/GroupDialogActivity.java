@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -28,14 +26,12 @@ import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ReceiveFileListener;
-import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
+public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private String groupName;
 
@@ -91,14 +87,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        try {
-            ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null,
-                    bitmapOptions);
-            new ReceiveImageFileTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
-        } catch (FileNotFoundException e) {
-            ErrorUtils.showError(this, e.getMessage());
-        }
+        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
     @Override

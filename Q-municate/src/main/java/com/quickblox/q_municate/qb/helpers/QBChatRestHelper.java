@@ -50,8 +50,10 @@ public class QBChatRestHelper extends BaseHelper {
     }
 
     public synchronized void logout() throws QBResponseException, SmackException.NotConnectedException {
-        chatService.stopAutoSendPresence();
-        chatService.logout();
+        if (chatService != null) {
+            chatService.stopAutoSendPresence();
+            chatService.logout();
+        }
     }
 
     public void destroy() {
