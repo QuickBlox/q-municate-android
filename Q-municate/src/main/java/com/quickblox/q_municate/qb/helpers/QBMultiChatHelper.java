@@ -293,7 +293,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
 
         @Override
-        public void stateChanged(QBRoomChat qbRoomChat, int participant, QBChatState qbChatState) {
+        public void stateChanged(QBRoomChat roomChat, int participant, QBChatState chatState) {
             //TODO VF add composing state changed
         }
     }

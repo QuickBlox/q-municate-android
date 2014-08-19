@@ -216,7 +216,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
 
         @Override
-        public void stateChanged(QBPrivateChat qbPrivateChat, int chatParticipant, QBChatState qbChatState) {
+        public void stateChanged(QBPrivateChat privateChat, int chatParticipant, QBChatState chatState) {
             //TODO VF add composing state changed
         }
     }
