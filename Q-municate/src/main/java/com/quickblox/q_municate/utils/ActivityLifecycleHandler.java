@@ -5,6 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.helper.Lo;
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutAndDestroyChatCommand;
@@ -27,6 +28,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
+        chatDestroyed = chatDestroyed && !isLogedIn();
         if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
@@ -65,8 +67,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     private boolean isLogedIn() {
-        AppSession activeSession = AppSession.getSession();
-        return activeSession.isSessionExist();
+        return QBChatService.getInstance().isLoggedIn();
     }
 
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
