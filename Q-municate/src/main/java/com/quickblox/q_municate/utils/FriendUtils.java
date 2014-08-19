@@ -44,4 +44,12 @@ public class FriendUtils {
         }
         return friendIdsList;
     }
+
+    public static ArrayList<Integer> getFriendIds(List<Friend> friendList) {
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
+        for (Friend friend : friendList) {
+            friendIdsList.add(friend.getId());
+        }
+        return friendIdsList;
+    }
 }

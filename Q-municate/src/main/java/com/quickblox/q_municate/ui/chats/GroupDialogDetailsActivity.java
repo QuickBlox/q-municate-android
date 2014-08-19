@@ -40,6 +40,7 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
+import com.quickblox.q_municate.utils.FriendUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
@@ -93,6 +94,11 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         initUI();
         initUIWithData();
         addActions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         startLoadGroupDialog();
     }
 
@@ -199,13 +205,22 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 navigateToParent();
                 return true;
             case R.id.action_add:
-                AddFriendsToGroupActivity.start(this, groupDialog);
+                startAddFriendsActivity();
                 return true;
             case R.id.action_leave:
                 showLeaveGroupDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startAddFriendsActivity() {
+        int countUnselectedFriendsInChat = DatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
+        if (countUnselectedFriendsInChat != Consts.ZERO_INT_VALUE) {
+            AddFriendsToGroupActivity.start(this, groupDialog);
+        } else {
+            DialogUtils.showLong(this, getResources().getString(R.string.gdd_all_friends_is_in_group));
+        }
     }
 
     @Override

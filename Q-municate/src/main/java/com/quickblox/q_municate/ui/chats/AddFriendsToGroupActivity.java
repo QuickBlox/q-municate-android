@@ -11,6 +11,7 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.utils.FriendUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,26 +37,18 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     protected Cursor getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
-        return DatabaseManager.getFriendsFilteredByIds(this, getFriendIds(dialog.getOccupantList()));
+        return DatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(dialog.getOccupantList()));
     }
 
     @Override
     protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
         showProgress();
-        QBAddFriendsToGroupCommand.start(this, dialog.getId(), getFriendIds(selectedFriends));
+        QBAddFriendsToGroupCommand.start(this, dialog.getId(), FriendUtils.getFriendIds(selectedFriends));
     }
 
     private void addActions() {
         addAction(QBServiceConsts.ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION, new AddFriendsToGroupSuccessCommand());
         updateBroadcastActionList();
-    }
-
-    private ArrayList<Integer> getFriendIds(List<Friend> friendList) {
-        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (Friend friend : friendList) {
-            friendIdsList.add(friend.getId());
-        }
-        return friendIdsList;
     }
 
     private class AddFriendsToGroupSuccessCommand implements Command {
