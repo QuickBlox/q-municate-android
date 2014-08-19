@@ -11,9 +11,11 @@ import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBChatState;
+import com.quickblox.module.chat.QBChatStateListener;
+import com.quickblox.module.chat.QBChatStateManager;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
 import com.quickblox.module.chat.model.QBDialog;
@@ -41,6 +43,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     protected QBUser chatCreator;
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
+    protected QBChatStateManager chatStateManager;
 
     private QBPrivateChatManagerListener privateChatManagerListener;
     private List<QBNotificationChatListener> notificationChatListeners;
@@ -67,6 +70,8 @@ public abstract class BaseChatHelper extends BaseHelper {
         this.chatService = chatService;
         privateChatManager = chatService.getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
+        chatStateManager = chatService.getChatStateManager();
+        chatStateManager.subscribeOnPrivateChat(privateChatManager);
         this.chatCreator = chatCreator;
     }
 
@@ -196,7 +201,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
     }
 
-    private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
+    private class PrivateChatMessageListener implements QBChatStateListener<QBPrivateChat> {
 
         @Override
         public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
@@ -208,6 +213,11 @@ public abstract class BaseChatHelper extends BaseHelper {
             } else {
                 onPrivateMessageReceived(privateChat, chatMessage);
             }
+        }
+
+        @Override
+        public void stateChanged(QBPrivateChat qbPrivateChat, int chatParticipant, QBChatState qbChatState) {
+            //TODO VF add composing state changed
         }
     }
 }
