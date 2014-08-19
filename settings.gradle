@@ -1,1 +1,1 @@
-include ':Q-municate', ':facebook'
+include ':Q-municate', ':facebook', ':cropper'
