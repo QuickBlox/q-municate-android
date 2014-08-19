@@ -9,10 +9,11 @@ import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;
 import com.quickblox.module.chat.QBChat;
 import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBChatState;
+import com.quickblox.module.chat.QBChatStateListener;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBRoomChat;
 import com.quickblox.module.chat.QBRoomChatManager;
-import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
@@ -21,8 +22,8 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -69,6 +70,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     public void init(QBChatService chatService, QBUser user) {
         super.init(chatService, user);
         roomChatManager = chatService.getRoomChatManager();
+        chatStateManager.subscribeOnRoomChat(roomChatManager);
         addNotificationChatListener(notificationChatListener);
     }
 
@@ -263,7 +265,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    private class RoomChatMessageListener implements QBMessageListener<QBRoomChat> {
+    private class RoomChatMessageListener implements QBChatStateListener<QBRoomChat> {
 
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
@@ -288,6 +290,11 @@ public class QBMultiChatHelper extends BaseChatHelper {
                 // TODO IS handle logic when friend is not in the friend list
                 notifyMessageReceived(chatMessage, friend, dialogId);
             }
+        }
+
+        @Override
+        public void stateChanged(QBRoomChat roomChat, int participant, QBChatState chatState) {
+            //TODO VF add composing state changed
         }
     }
 
