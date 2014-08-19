@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,21 +25,21 @@ import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.cropper.ImageCropperActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
-import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.ReceiveFileListener;
-import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
+import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileListener, View.OnClickListener {
+public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
+        View.OnClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
     private static String fullnameOld;
     private static String phoneOld;
@@ -64,6 +63,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
     private boolean closeActionMode;
+    private Uri outputUri;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -184,29 +184,39 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ImageCropperActivity.INTENT_RESULT_CODE) {
-            if (resultCode == RESULT_OK) {
-                isNeedUpdateAvatar = true;
-                String filePath = data.getStringExtra(QBServiceConsts.EXTRA_FILE_PATH);
-                avatarBitmapCurrent = BitmapFactory.decodeFile(filePath);
-                FileUtils.removeFile(filePath);
-                avatarImageView.setImageBitmap(avatarBitmapCurrent);
-                startAction();
-            }
-        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED) {
-            if (resultCode == RESULT_OK) {
-                Uri originalUri = data.getData();
-                if (originalUri != null) {
-                    startCropActivity(originalUri);
-                }
+        if (requestCode == Crop.REQUEST_CROP) {
+            handleCrop(resultCode, data);
+        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
+            Uri originalUri = data.getData();
+            if (originalUri != null) {
+                showProgress();
+                new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
             }
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            isNeedUpdateAvatar = true;
+            avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
+            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            startAction();
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            DialogUtils.showLong(this, Crop.getError(result).getMessage());
+        }
+    }
+
     private void startCropActivity(Uri originalUri) {
-        ImageCropperActivity.start(this, originalUri);
+        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        new Crop(originalUri).output(outputUri).asSquare().start(this);
+    }
+
+    @Override
+    public void onUriScaledBitmapReceived(Uri originalUri) {
+        hideProgress();
+        startCropActivity(originalUri);
     }
 
     private void startAction() {
@@ -284,7 +294,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         user.setCustomData(statusCurrent);
 
         if (isNeedUpdateAvatar) {
-            new ReceiveImageFileTask(this).execute(imageUtils, avatarBitmapCurrent, true);
+            new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
             QBUpdateUserCommand.start(this, user, null);
         }

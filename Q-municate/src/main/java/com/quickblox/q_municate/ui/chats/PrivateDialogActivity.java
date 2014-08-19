@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,15 +33,13 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ReceiveFileListener;
-import com.quickblox.q_municate.utils.ReceiveImageFileTask;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileListener {
+public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private Friend opponentFriend;
     private ContentObserver statusContentObserver;
@@ -82,13 +78,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        try {
-            ParcelFileDescriptor descriptor = getContentResolver().openFileDescriptor(originalUri, "r");
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(descriptor.getFileDescriptor(), null, bitmapOptions);
-            new ReceiveImageFileTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
-        } catch (FileNotFoundException e) {
-            ErrorUtils.showError(this, e.getMessage());
-        }
+        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
     @Override

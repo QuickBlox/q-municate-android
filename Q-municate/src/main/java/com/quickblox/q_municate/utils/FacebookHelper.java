@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookServiceException;
 import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
@@ -130,26 +131,36 @@ public class FacebookHelper {
         return new WebDialog.OnCompleteListener() {
 
             @Override
-            public void onComplete(Bundle values, FacebookException error) {
-                if (error != null) {
-                    if (error instanceof FacebookOperationCanceledException) {
-                        DialogUtils.showLong(activity, resources.getString(
-                                R.string.inf_fb_request_canceled));
-                    } else {
-                        ErrorUtils.showError(activity, error);
-                    }
-                } else {
-                    final String requestId = values.getString("request");
-                    if (requestId != null) {
-                        DialogUtils.showLong(activity, resources.getString(
-                                R.string.dlg_success_request_facebook));
-                    } else {
-                        DialogUtils.showLong(activity, resources.getString(
-                                R.string.inf_fb_request_canceled));
-                    }
-                }
+            public void onComplete(Bundle values, FacebookException facebookException) {
+                parseFacebookRequestError(values, facebookException);
             }
         };
+    }
+
+    private void parseFacebookRequestError(Bundle values, FacebookException facebookException) {
+        if (facebookException != null) {
+            if (facebookException instanceof FacebookOperationCanceledException) {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+            } else if (facebookException instanceof FacebookServiceException) {
+                final int errorCodeCancel = 4201;
+                FacebookServiceException facebookServiceException = (FacebookServiceException) facebookException;
+                if (errorCodeCancel == facebookServiceException.getRequestError().getErrorCode()) {
+                    DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+                } else {
+                    ErrorUtils.showError(activity,
+                            facebookServiceException.getRequestError().getErrorMessage());
+                }
+            } else if (!TextUtils.isEmpty(facebookException.getMessage())) {
+                ErrorUtils.showError(activity, facebookException);
+            }
+        } else {
+            final String requestId = values.getString("request");
+            if (requestId != null) {
+                DialogUtils.showLong(activity, resources.getString(R.string.dlg_success_request_facebook));
+            } else {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+            }
+        }
     }
 
     public boolean checkPermissions() {

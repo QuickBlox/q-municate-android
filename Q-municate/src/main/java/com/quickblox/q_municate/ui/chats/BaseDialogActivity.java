@@ -67,7 +67,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
-    protected BitmapFactory.Options bitmapOptions;
     protected BaseChatHelper chatHelper;
 
     private int keyboardHeight;
@@ -114,7 +113,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         initUI();
         initListeners();
         initActionBar();
-        initBitmapOption();
 
         addActions();
 
@@ -268,14 +266,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
-    }
-
-    private void initBitmapOption() {
-        bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inDither = false;
-        bitmapOptions.inPurgeable = true;
-        bitmapOptions.inInputShareable = true;
-        bitmapOptions.inTempStorage = new byte[32 * 1024];
     }
 
     protected abstract void onFileSelected(Uri originalUri);

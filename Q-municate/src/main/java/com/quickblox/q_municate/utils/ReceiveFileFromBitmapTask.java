@@ -7,20 +7,20 @@ import com.quickblox.q_municate.core.concurrency.BaseAsyncTask;
 import java.io.File;
 import java.io.IOException;
 
-public class ReceiveImageFileTask extends BaseAsyncTask {
+public class ReceiveFileFromBitmapTask extends BaseAsyncTask {
 
-    private ReceiveFileListener listener;
+    private ReceiveFileListener receiveFileListener;
 
-    public ReceiveImageFileTask(ReceiveFileListener listener) {
-        this.listener = listener;
+    public ReceiveFileFromBitmapTask(ReceiveFileListener receiveFileListener) {
+        this.receiveFileListener = receiveFileListener;
     }
 
     @Override
     public void onResult(Object object) {
         if (object instanceof File) {
-            listener.onCachedImageFileReceived((File) object);
+            receiveFileListener.onCachedImageFileReceived((File) object);
         } else if (object instanceof String) {
-            listener.onAbsolutePathExtFileReceived((String) object);
+            receiveFileListener.onAbsolutePathExtFileReceived((String) object);
         }
     }
 
@@ -38,7 +38,7 @@ public class ReceiveImageFileTask extends BaseAsyncTask {
 
         try {
             if (isGettingFile) {
-                imageFile = imageUtils.getFileFromImageView(bitmap);
+                imageFile = imageUtils.getFileFromBitmap(bitmap);
                 return imageFile;
             } else {
                 absolutePath = imageUtils.getAbsolutePathByBitmap(bitmap);
@@ -49,5 +49,12 @@ public class ReceiveImageFileTask extends BaseAsyncTask {
         }
 
         return null;
+    }
+
+    public interface ReceiveFileListener {
+
+        public void onCachedImageFileReceived(File imageFile);
+
+        public void onAbsolutePathExtFileReceived(String absolutePath);
     }
 }
