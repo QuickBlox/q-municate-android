@@ -3,7 +3,6 @@ package com.quickblox.qmunicate.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;
@@ -268,7 +267,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             }
             // end of todo
 
-            saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(),
+            saveMessageToCache(new DialogMessageCache(chatMessage.getProperty("message_id"), dialogId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, isRead));
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {

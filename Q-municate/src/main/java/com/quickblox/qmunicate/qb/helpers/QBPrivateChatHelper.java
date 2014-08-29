@@ -25,7 +25,6 @@ import com.quickblox.qmunicate.utils.DateUtils;
 import com.quickblox.qmunicate.utils.ErrorUtils;
 
 import java.io.File;
-import java.util.List;
 
 public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChatManagerListener {
 
@@ -170,7 +169,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         time = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        saveMessageToCache(new DialogMessageCache(messageId, dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
+        saveMessageToCache(new DialogMessageCache(chatMessage.getProperty("message_id"), dialogId, chatMessage.getSenderId(), chatMessage.getBody(),
                 attachUrl, time, false));
         notifyMessageReceived(chatMessage, friend, dialogId);
     }
