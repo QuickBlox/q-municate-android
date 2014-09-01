@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate.service.QBService;

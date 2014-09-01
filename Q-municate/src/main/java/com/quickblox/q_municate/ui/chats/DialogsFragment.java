@@ -17,7 +17,7 @@ import android.widget.TextView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.service.QBServiceConsts;

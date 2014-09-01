@@ -10,7 +10,7 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.utils.Consts;
 
 import org.jivesoftware.smack.ConnectionListener;

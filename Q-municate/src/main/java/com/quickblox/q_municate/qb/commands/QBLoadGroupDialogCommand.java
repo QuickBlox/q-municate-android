@@ -8,7 +8,7 @@ import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.GroupDialog;

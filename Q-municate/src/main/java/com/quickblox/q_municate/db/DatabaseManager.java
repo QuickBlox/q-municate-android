@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.caching;
+package com.quickblox.q_municate.db;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -11,9 +11,9 @@ import com.quickblox.module.chat.QBHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.DialogTable;
-import com.quickblox.q_municate.caching.tables.FriendTable;
-import com.quickblox.q_municate.caching.tables.MessageTable;
+import com.quickblox.q_municate.db.tables.DialogTable;
+import com.quickblox.q_municate.db.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.utils.ChatUtils;

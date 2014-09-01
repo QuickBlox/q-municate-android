@@ -17,7 +17,7 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.MessageTable;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;

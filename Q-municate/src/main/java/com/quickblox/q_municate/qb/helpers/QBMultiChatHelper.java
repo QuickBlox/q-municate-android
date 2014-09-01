@@ -20,7 +20,7 @@ import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.MessageCache;

@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.caching.tables.MessageTable;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;

@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.caching;
+package com.quickblox.q_municate.db;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.quickblox.q_municate.caching.tables.MessageTable;
-import com.quickblox.q_municate.caching.tables.DialogTable;
-import com.quickblox.q_municate.caching.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.MessageTable;
+import com.quickblox.q_municate.db.tables.DialogTable;
+import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.utils.Consts;
 
 public class DatabaseProvider extends ContentProvider {

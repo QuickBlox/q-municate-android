@@ -7,7 +7,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;

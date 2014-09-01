@@ -16,7 +16,7 @@ import com.quickblox.module.chat.listeners.QBRosterListener;
 import com.quickblox.module.chat.listeners.QBSubscriptionListener;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;

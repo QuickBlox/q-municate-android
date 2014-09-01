@@ -13,7 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;

@@ -1,11 +1,11 @@
-package com.quickblox.q_municate.caching;
+package com.quickblox.q_municate.db;
 
 import android.content.UriMatcher;
 import android.net.Uri;
 
-import com.quickblox.q_municate.caching.tables.MessageTable;
-import com.quickblox.q_municate.caching.tables.DialogTable;
-import com.quickblox.q_municate.caching.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.MessageTable;
+import com.quickblox.q_municate.db.tables.DialogTable;
+import com.quickblox.q_municate.db.tables.FriendTable;
 
 public class ContentDescriptor {
 

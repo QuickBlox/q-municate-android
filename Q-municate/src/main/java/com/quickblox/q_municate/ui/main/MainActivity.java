@@ -13,7 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.model.AppSession;
