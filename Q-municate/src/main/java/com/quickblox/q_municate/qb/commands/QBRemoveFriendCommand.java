@@ -9,7 +9,7 @@ import com.quickblox.module.custom.QBCustomObjects;
 import com.quickblox.module.custom.model.QBCustomObject;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.Consts;
@@ -24,7 +24,7 @@ public class QBRemoveFriendCommand extends ServiceCommand {
         super(context, successAction, failAction);
     }
 
-    public static void start(Context context, Friend friend) {
+    public static void start(Context context, User friend) {
         Intent intent = new Intent(QBServiceConsts.REMOVE_FRIEND_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
         context.startService(intent);
@@ -33,11 +33,11 @@ public class QBRemoveFriendCommand extends ServiceCommand {
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
         //TODO VF Implementation will be changed
-        Friend friend = (Friend) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
+        User friend = (User) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
         QBCustomObjectRequestBuilder builder = new QBCustomObjectRequestBuilder();
         builder.eq(Consts.FRIEND_FIELD_USER_ID, AppSession.getSession().getUser().getId());
-        builder.eq(Consts.FRIEND_FIELD_FRIEND_ID, friend.getId());
+        builder.eq(Consts.FRIEND_FIELD_FRIEND_ID, friend.getUserId());
 
         List<QBCustomObject> objects = QBCustomObjects.getObjects(Consts.EXTRA_FRIEND, builder);
 

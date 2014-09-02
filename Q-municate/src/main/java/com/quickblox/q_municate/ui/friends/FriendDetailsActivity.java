@@ -22,7 +22,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -47,7 +47,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView phoneTextView;
     private View phoneView;
 
-    private Friend friend;
+    private User friend;
     private Cursor friendCursor;
     private ContentObserver statusContentObserver;
 
@@ -86,7 +86,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
             @Override
             public void onChange(boolean selfChange) {
-                friend = DatabaseManager.getFriendById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getId());
+                friend = DatabaseManager.getFriendById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getUserId());
                 setOnlineStatus(friend);
             }
 
@@ -125,7 +125,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void setName() {
-        nameTextView.setText(friend.getFullname());
+        nameTextView.setText(friend.getFullName());
     }
 
     private void setPhone() {
@@ -137,7 +137,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneTextView.setText(friend.getPhone());
     }
 
-    private void setOnlineStatus(Friend friend) {
+    private void setOnlineStatus(User friend) {
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
         } else {
@@ -190,8 +190,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         callToUser(friend, WebRTC.MEDIA_STREAM.VIDEO);
     }
 
-    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSession.getSession().getUser().getId()) {
+    private void callToUser(User friend, WebRTC.MEDIA_STREAM callType) {
+        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }
@@ -201,7 +201,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void chatClickListener(View view) {
-        QBDialog existingPrivateDialog = getExistPrivateDialog(friend.getId());
+        QBDialog existingPrivateDialog = getExistPrivateDialog(friend.getUserId());
         if (existingPrivateDialog != null) {
             PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
         } else {

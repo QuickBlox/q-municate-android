@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Friend fullname"
+            android:text="Friend fullName"
             android:textSize="20sp" />
 
         <TextView

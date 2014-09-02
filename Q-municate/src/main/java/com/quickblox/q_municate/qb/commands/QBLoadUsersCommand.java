@@ -9,7 +9,7 @@ import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.Consts;
@@ -42,8 +42,8 @@ public class QBLoadUsersCommand extends ServiceCommand {
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collections.sort(userList, new UserComparator());
-        List<Friend> friendList = FriendUtils.createFriendList(userList);
-        friendList.remove(FriendUtils.createFriend(AppSession.getSession().getUser()));
+        List<User> friendList = FriendUtils.createUsersList(userList);
+        friendList.remove(FriendUtils.createUser(AppSession.getSession().getUser()));
 
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendList);

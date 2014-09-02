@@ -16,7 +16,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -87,10 +87,10 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+        User friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
         if (friend == null) {
-            friend = new Friend();
-            friend.setFullname(Consts.EMPTY_STRING + chatMessage.getSenderId());
+            friend = new User();
+            friend.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
 
         String messageId;

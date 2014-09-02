@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.q_municate.core.command.ServiceCommand;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -20,7 +20,7 @@ public class QBAddFriendCommand extends ServiceCommand {
         this.friendListHelper = friendListHelper;
     }
 
-    public static void start(Context context, Friend friend) {
+    public static void start(Context context, User friend) {
         Intent intent = new Intent(QBServiceConsts.ADD_FRIEND_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
         context.startService(intent);
@@ -28,9 +28,9 @@ public class QBAddFriendCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        Friend friend = (Friend) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
+        User friend = (User) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
-        friendListHelper.inviteFriend(friend.getId());
+        friendListHelper.inviteFriend(friend.getUserId());
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_FRIEND, friend);

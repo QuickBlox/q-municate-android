@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.core.command.ServiceCommand;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -24,7 +24,7 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = multiChatHelper;
     }
 
-    public static void start(Context context, String roomName, ArrayList<Friend> friendList) {
+    public static void start(Context context, String roomName, ArrayList<User> friendList) {
         Intent intent = new Intent(QBServiceConsts.CREATE_GROUP_CHAT_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_ROOM_NAME, roomName);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friendList);
@@ -33,7 +33,7 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        ArrayList<Friend> friendList = (ArrayList<Friend>) extras.getSerializable(
+        ArrayList<User> friendList = (ArrayList<User>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 

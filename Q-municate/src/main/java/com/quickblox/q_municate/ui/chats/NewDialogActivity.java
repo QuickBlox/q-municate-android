@@ -11,7 +11,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -43,7 +43,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
+    protected void onFriendsSelected(ArrayList<User> selectedFriends) {
         createChat(selectedFriends);
     }
 
@@ -58,13 +58,13 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
         updateBroadcastActionList();
     }
 
-    private void createChat(ArrayList<Friend> friendList) {
+    private void createChat(ArrayList<User> friendList) {
         showProgress();
         String groupName = createChatName(friendList);
         QBCreateGroupDialogCommand.start(this, groupName, friendList);
     }
 
-    private String createChatName(ArrayList<Friend> friendList) {
+    private String createChatName(ArrayList<User> friendList) {
         String userFullname = AppSession.getSession().getUser().getFullName();
         String friendsFullnames = TextUtils.join(", ", friendList);
         return userFullname + ", " + friendsFullnames;

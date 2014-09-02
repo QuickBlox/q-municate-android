@@ -7,8 +7,8 @@ import com.quickblox.q_municate.db.ContentDescriptor;
 public class DialogTable {
 
     public static final String TABLE_NAME = "dialog";
-    public static final String PATH = "dialog";
-    public static final int PATH_TOKEN = 30;
+    public static final String PATH = "dialog_table";
+    public static final int PATH_TOKEN = 40;
     public static final Uri CONTENT_URI = ContentDescriptor.BASE_URI.buildUpon().appendPath(PATH).build();
 
     public static class Cols {

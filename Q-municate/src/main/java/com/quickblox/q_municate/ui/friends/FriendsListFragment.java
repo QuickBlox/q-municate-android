@@ -23,7 +23,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -40,7 +40,7 @@ import java.util.List;
 public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, FilterQueryProvider {
 
     private static final String TAG = FriendsListFragment.class.getSimpleName();
-    private List<Friend> usersList;
+    private List<User> usersList;
     private UserListAdapter usersListAdapter;
     private LinearLayout globalSearchLayout;
     private State state;
@@ -100,7 +100,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         if (TextUtils.isEmpty(constraint)) {
             return null;
         }
-        return DatabaseManager.getFriendsByFullname(baseActivity, constraint.toString());
+        return DatabaseManager.getFriendsByFullName(baseActivity, constraint.toString());
     }
 
     @Override
@@ -164,7 +164,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
         Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
         if (selectedItem.getCount() != Consts.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
-            FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem).getId());
+            FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem).getUserId());
         }
     }
 
@@ -236,7 +236,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     private void initUserList() {
-        usersList = new ArrayList<Friend>();
+        usersList = new ArrayList<User>();
         usersListAdapter = new UserListAdapter(baseActivity, usersList,
                 new UserListAdapter.UserListListener() {
                     @Override
@@ -254,7 +254,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         startUsersListLoader(constraint);
     }
 
-    private void addToFriendList(final Friend friend) {
+    private void addToFriendList(final User friend) {
         baseActivity.showProgress();
         QBAddFriendCommand.start(baseActivity, friend);
         KeyboardUtils.hideKeyboard(baseActivity);
@@ -266,7 +266,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         usersListAdapter.setSearchCharacters(newText);
     }
 
-    private void updateUsersList(List<Friend> friendsList) {
+    private void updateUsersList(List<User> friendsList) {
         usersList.clear();
         usersList.addAll(friendsList);
         usersListAdapter.notifyDataSetChanged();
@@ -339,7 +339,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+            List<User> friendsList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             updateUsersList(friendsList);
         }
     }
@@ -374,7 +374,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle){
-            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
+            List<User> friendsList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
             isFriendsListLoaded = true;
             if (friendsList.isEmpty()) {
                 emptyListTextView.setVisibility(View.VISIBLE);

@@ -25,7 +25,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
@@ -304,18 +304,18 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        Friend selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
         if (selectedFriend != null) {
             startFriendProfile(selectedFriend);
         }
     }
 
-    private void startFriendProfile(Friend selectedFriend) {
+    private void startFriendProfile(User selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if (currentUser.getId() == selectedFriend.getId()) {
+        if (currentUser.getId() == selectedFriend.getUserId()) {
             ProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
-            FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
+            FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getUserId());
         }
     }
 

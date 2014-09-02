@@ -19,7 +19,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.MessageTable;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -39,7 +39,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
     }
 
-    public static void start(Context context, ArrayList<Friend> friends) {
+    public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);

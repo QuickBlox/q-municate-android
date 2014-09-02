@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -16,12 +16,12 @@ import com.quickblox.q_municate.utils.TextViewHelper;
 
 import java.util.List;
 
-public class UserListAdapter extends BaseListAdapter<Friend> {
+public class UserListAdapter extends BaseListAdapter<User> {
 
     private UserListListener listener;
     private String searchCharacters;
 
-    public UserListAdapter(BaseActivity activity, List<Friend> users, UserListListener listener) {
+    public UserListAdapter(BaseActivity activity, List<User> users, UserListListener listener) {
         super(activity, users);
         this.listener = listener;
     }
@@ -29,7 +29,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        Friend user = objectsList.get(position);
+        User user = objectsList.get(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_user, null);
@@ -43,7 +43,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
 
         displayImage(url, holder.avatarImageView);
 
-        holder.fullnameTextView.setText(user.getFullname());
+        holder.fullNameTextView.setText(user.getFullName());
         holder.addFriendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,14 +51,14 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
             }
         });
 
-        if (DatabaseManager.isFriendInBase(baseActivity, user.getId())) {
+        if (DatabaseManager.isFriendInBase(baseActivity, user.getUserId())) {
             holder.addFriendButton.setVisibility(View.INVISIBLE);
         } else {
             holder.addFriendButton.setVisibility(View.VISIBLE);
         }
 
         if (!TextUtils.isEmpty(searchCharacters)) {
-            TextViewHelper.changeTextColorView(baseActivity, holder.fullnameTextView, searchCharacters);
+            TextViewHelper.changeTextColorView(baseActivity, holder.fullNameTextView, searchCharacters);
         }
 
         return convertView;
@@ -71,7 +71,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     private ViewHolder createViewHolder(View view) {
         ViewHolder holder = new ViewHolder();
         holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
+        holder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.addFriendButton = (ImageButton) view.findViewById(R.id.addFriendButton);
         return holder;
     }
@@ -84,7 +84,7 @@ public class UserListAdapter extends BaseListAdapter<Friend> {
     private static class ViewHolder {
 
         public RoundedImageView avatarImageView;
-        public TextView fullnameTextView;
+        public TextView fullNameTextView;
         public ImageButton addFriendButton;
     }
 }

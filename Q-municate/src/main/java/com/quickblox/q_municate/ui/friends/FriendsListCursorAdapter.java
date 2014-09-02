@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.TextViewHelper;
@@ -43,9 +43,9 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        Friend friend = DatabaseManager.getFriendFromCursor(cursor);
+        User friend = DatabaseManager.getFriendFromCursor(cursor);
 
-        holder.fullnameTextView.setText(friend.getFullname());
+        holder.fullnameTextView.setText(friend.getFullName());
         holder.statusTextView.setText(friend.getOnlineStatus());
 
         if (friend.isOnline()) {

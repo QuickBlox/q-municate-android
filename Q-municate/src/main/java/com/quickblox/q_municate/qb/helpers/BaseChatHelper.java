@@ -23,7 +23,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -160,11 +160,11 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, Friend friend, String dialogId) {
+    protected void notifyMessageReceived(QBChatMessage chatMessage, User friend, String dialogId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
-        String fullname = friend.getFullname();
+        String fullname = friend.getFullName();
 
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);

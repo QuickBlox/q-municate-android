@@ -14,7 +14,7 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.MessageTable;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
@@ -83,9 +83,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
-            Friend senderFriend = DatabaseManager.getFriendById(context, messageCache.getSenderId());
+            User senderFriend = DatabaseManager.getFriendById(context, messageCache.getSenderId());
             if (senderFriend != null) {
-                senderName = senderFriend.getFullname();
+                senderName = senderFriend.getFullName();
                 avatarUrl = getAvatarUrlForFriend(senderFriend);
             } else {
                 senderName = messageCache.getSenderId() + Consts.EMPTY_STRING;

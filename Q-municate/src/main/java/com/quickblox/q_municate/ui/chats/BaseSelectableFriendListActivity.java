@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.utils.Consts;
@@ -101,12 +101,12 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         return super.onOptionsItemSelected(item);
     }
 
-    protected abstract void onFriendsSelected(ArrayList<Friend> selectedFriends);
+    protected abstract void onFriendsSelected(ArrayList<User> selectedFriends);
 
-    public static class SimpleComparator implements Comparator<Friend> {
+    public static class SimpleComparator implements Comparator<User> {
 
-        public int compare(Friend friend1, Friend friend2) {
-            return (new Integer(friend1.getId())).compareTo(friend2.getId());
+        public int compare(User friend1, User friend2) {
+            return (new Integer(friend1.getUserId())).compareTo(friend2.getUserId());
         }
     }
 
@@ -120,7 +120,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             if (!isNeedToCloseWithoutRedirect) {
-                ArrayList<Friend> selectedFriends = new ArrayList<Friend>(
+                ArrayList<User> selectedFriends = new ArrayList<User>(
                         friendsAdapter.getSelectedFriends());
                 Collections.sort(selectedFriends, new SimpleComparator());
                 onFriendsSelected(selectedFriends);

@@ -16,7 +16,7 @@ import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
 import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
 import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.call.WorkingSessionPull;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FriendUtils;
@@ -127,7 +127,7 @@ public class QBVideoChatHelper extends BaseHelper {
             intent.putExtra(WebRTC.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());
             intent.putExtra(Consts.CALL_TYPE_EXTRA, callConfig.getCallStreamType());
             intent.putExtra(WebRTC.SESSION_ID_EXTENSION, sessionId);
-            Friend friend = FriendUtils.createFriend(callConfig.getFromUser());
+            User friend = FriendUtils.createUser(callConfig.getFromUser());
             intent.putExtra(Consts.EXTRA_FRIEND, friend);
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

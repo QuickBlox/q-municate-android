@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.core.command.ServiceCommand;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -21,10 +21,10 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
         this.chatHelper = chatHelper;
     }
 
-    public static void start(Context context, Friend friend) {
+    public static void start(Context context, User friend) {
         Intent intent = new Intent(QBServiceConsts.CREATE_PRIVATE_CHAT_ACTION, null, context,
                 QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend.getId());
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend.getUserId());
         context.startService(intent);
     }
 

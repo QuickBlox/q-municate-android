@@ -11,7 +11,7 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -201,10 +201,10 @@ public class ChatUtils {
         return occupantsIdsList;
     }
 
-    public static ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
+    public static ArrayList<Integer> getFriendIdsList(List<User> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (Friend friend : friendList) {
-            friendIdsList.add(friend.getId());
+        for (User friend : friendList) {
+            friendIdsList.add(friend.getUserId());
         }
         return friendIdsList;
     }

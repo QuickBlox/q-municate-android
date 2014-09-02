@@ -22,7 +22,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
@@ -269,7 +269,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
-            Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+            User friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());

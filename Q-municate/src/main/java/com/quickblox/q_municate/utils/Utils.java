@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -70,13 +70,13 @@ public class Utils {
         }
     }
 
-    public static QBUser friendToUser(Friend friend) {
+    public static QBUser friendToUser(User friend) {
         if (friend == null) {
             return null;
         }
         QBUser user = new QBUser();
-        user.setId(friend.getId());
-        user.setFullName(friend.getFullname());
+        user.setId(friend.getUserId());
+        user.setFullName(friend.getFullName());
         return user;
     }
 
