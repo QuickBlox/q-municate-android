@@ -119,7 +119,7 @@ public class QBServiceConsts {
     public static final String UPDATE_GROUP_NAME_FAIL_ACTION = "update_group_name_fail_action";
     public static final String LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION = "login_and_join_chats_sucess_action";
     public static final String LOGIN_AND_JOIN_CHATS_FAIL_ACTION = "login_and_join_chats_fail_action";
-    public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
+    public static final String USER_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
     public static final String UPDATE_GROUP_PHOTO_SUCCESS_ACTION = "update_group_photo_success_action";

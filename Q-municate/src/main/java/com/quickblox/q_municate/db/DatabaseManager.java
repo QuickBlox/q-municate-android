@@ -331,7 +331,7 @@ public class DatabaseManager {
         return dialog;
     }
 
-    public static User getFriendById(Context context, int friendId) {
+    public static User getUserById(Context context, int friendId) {
         Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
                 UserTable.Cols.USER_ID + " = " + friendId, null, null);
         User friend = null;

@@ -64,7 +64,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         canPerformLogout.set(true);
         int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
         friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
-        friend = DatabaseManager.getFriendById(this, friendId);
+        friend = DatabaseManager.getUserById(this, friendId);
         initUI();
         registerStatusChangingObserver();
         initUIWithFriendsData();
@@ -86,7 +86,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
             @Override
             public void onChange(boolean selfChange) {
-                friend = DatabaseManager.getFriendById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getUserId());
+                friend = DatabaseManager.getUserById(FriendDetailsActivity.this,
+                        FriendDetailsActivity.this.friend.getUserId());
                 setOnlineStatus(friend);
             }
 

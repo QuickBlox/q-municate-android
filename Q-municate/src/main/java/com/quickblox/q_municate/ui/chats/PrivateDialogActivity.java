@@ -98,7 +98,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
             @Override
             public void onChange(boolean selfChange) {
-                opponentFriend = DatabaseManager.getFriendById(PrivateDialogActivity.this,
+                opponentFriend = DatabaseManager.getUserById(PrivateDialogActivity.this,
                         PrivateDialogActivity.this.opponentFriend.getUserId());
                 setOnlineStatus(opponentFriend);
             }

@@ -83,7 +83,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
-            User senderFriend = DatabaseManager.getFriendById(context, messageCache.getSenderId());
+            User senderFriend = DatabaseManager.getUserById(context, messageCache.getSenderId());
             if (senderFriend != null) {
                 senderName = senderFriend.getFullName();
                 avatarUrl = getAvatarUrlForFriend(senderFriend);

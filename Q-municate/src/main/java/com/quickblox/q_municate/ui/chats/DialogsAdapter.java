@@ -68,7 +68,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
     }
 
     public User getOccupantById(int occupantId) {
-        User friend = DatabaseManager.getFriendById(context, occupantId);
+        User friend = DatabaseManager.getUserById(context, occupantId);
         if (friend == null) {
             friend = new User();
             friend.setUserId(occupantId);

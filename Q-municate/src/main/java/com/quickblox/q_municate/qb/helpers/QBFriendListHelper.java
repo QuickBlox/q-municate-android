@@ -1,9 +1,7 @@
 package com.quickblox.q_municate.qb.helpers;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
@@ -19,7 +17,6 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
@@ -85,7 +82,7 @@ public class QBFriendListHelper extends BaseHelper {
         User user = loadUser(userId);
         Friend friend = FriendUtils.createNewFriend(user);
 
-        fillUserWithRosterData(user);
+        fillUserOnlineStatus(user);
 
         DatabaseManager.saveUser(context, user);
         DatabaseManager.saveFriend(context, friend);
@@ -117,7 +114,7 @@ public class QBFriendListHelper extends BaseHelper {
             }
             try {
                 makeAutoSubscription(rosterEntryCollection);
-            }catch (QBResponseException e){
+            } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
             }
         } else {
@@ -127,7 +124,7 @@ public class QBFriendListHelper extends BaseHelper {
         return userIdsList;
     }
 
-    private void makeAutoSubscription(Collection<QBRosterEntry> entries) throws QBResponseException{
+    private void makeAutoSubscription(Collection<QBRosterEntry> entries) throws QBResponseException {
         for (QBRosterEntry entry : entries) {
             if (RosterPacket.ItemType.from.equals(entry.getType())) {
                 boolean errorOccurred = false;
@@ -142,14 +139,15 @@ public class QBFriendListHelper extends BaseHelper {
                 } catch (SmackException.NoResponseException e) {
                     errorOccurred = true;
                 }
-                if (errorOccurred){
+                if (errorOccurred) {
                     throw new QBResponseException("Errors occurred while confirm friend subscriptions");
                 }
             }
         }
     }
 
-    private void updateFriends(Collection<Integer> userIdsList, Collection<QBRosterEntry> rosterEntryCollection) throws QBResponseException {
+    private void updateFriends(Collection<Integer> userIdsList,
+            Collection<QBRosterEntry> rosterEntryCollection) throws QBResponseException {
         List<QBUser> qbUsersList = loadUsers(userIdsList);
         List<User> usersList = FriendUtils.createUsersList(qbUsersList);
         List<Friend> friendsList = FriendUtils.createFriendsList(rosterEntryCollection);
@@ -170,7 +168,7 @@ public class QBFriendListHelper extends BaseHelper {
         User user = loadUser(userId);
         Friend friend = FriendUtils.createFriend(rosterEntry);
 
-        fillUserWithRosterData(user);
+        fillUserOnlineStatus(user);
 
         DatabaseManager.saveUser(context, user);
         DatabaseManager.saveFriend(context, friend);
@@ -185,15 +183,15 @@ public class QBFriendListHelper extends BaseHelper {
         return QBUsers.getUsersByIDs(userIds, requestBuilder, params);
     }
 
-    private void fillUsersWithRosterData(List<User> friends) {
-        for (User friend : friends) {
-            fillUserWithRosterData(friend);
+    private void fillUsersWithRosterData(List<User> usersList) {
+        for (User user : usersList) {
+            fillUserOnlineStatus(user);
         }
     }
 
-    private void fillUserWithRosterData(User friend) {
-//        fillFriendStatus(friend);
-        fillFriendOnlineStatus(friend);
+    private void fillUserOnlineStatus(User user) {
+        QBPresence presence = roster.getPresence(user.getUserId());
+        fillUserOnlineStatus(user, presence);
     }
 
     private void fillFriendStatus(User friend) {
@@ -201,22 +199,12 @@ public class QBFriendListHelper extends BaseHelper {
         friend.setStatus(presence.getStatus());
     }
 
-    private void fillFriendOnlineStatus(User friend) {
-        QBPresence presence = roster.getPresence(friend.getUserId());
-        if (presence == null) {
-            return;
-        }
-        if (presence.getType() == QBPresence.Type.online) {
-            friend.setOnline(true);
+    private void fillUserOnlineStatus(User user, QBPresence presence) {
+        if (QBPresence.Type.online.equals(presence.getType())) {
+            user.setOnline(true);
         } else {
-            friend.setOnline(false);
+            user.setOnline(false);
         }
-    }
-
-    private void notifyFriendStatusChanged(User friend) {
-        Intent intent = new Intent(QBServiceConsts.FRIEND_STATUS_CHANGED_ACTION);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND, friend);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     public void sendStatus(String status) throws SmackException.NotConnectedException {
@@ -252,15 +240,13 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User friend = DatabaseManager.getFriendById(context, presence.getUserId());
-            if (friend == null) {
+            User user = DatabaseManager.getUserById(context, presence.getUserId());
+            if (user == null) {
                 ErrorUtils.logError(TAG, "Could not find friend in DB by Id = " + presence.getUserId());
-                return;
+            } else {
+                fillUserOnlineStatus(user, presence);
+                DatabaseManager.saveUser(context, user);
             }
-            fillFriendOnlineStatus(friend);
-            fillFriendStatus(friend);
-            DatabaseManager.saveUser(context, friend);
-            notifyFriendStatusChanged(friend);
         }
     }
 

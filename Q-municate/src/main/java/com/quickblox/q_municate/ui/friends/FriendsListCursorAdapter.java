@@ -30,7 +30,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         ViewHolder holder = new ViewHolder();
 
         holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
-        holder.fullnameTextView = (TextView) view.findViewById(R.id.name_textview);
+        holder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
         holder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
 
@@ -45,7 +45,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
 
         User friend = DatabaseManager.getFriendFromCursor(cursor);
 
-        holder.fullnameTextView.setText(friend.getFullName());
+        holder.fullNameTextView.setText(friend.getFullName());
         holder.statusTextView.setText(friend.getOnlineStatus());
 
         if (friend.isOnline()) {
@@ -58,7 +58,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
         displayAvatarImage(avatarUrl, holder.avatarImageView);
 
         if (!TextUtils.isEmpty(searchCharacters)) {
-            TextViewHelper.changeTextColorView(context, holder.fullnameTextView, searchCharacters);
+            TextViewHelper.changeTextColorView(context, holder.fullNameTextView, searchCharacters);
         }
     }
 
@@ -69,7 +69,7 @@ public class FriendsListCursorAdapter extends BaseCursorAdapter {
     private static class ViewHolder {
 
         public RoundedImageView avatarImageView;
-        public TextView fullnameTextView;
+        public TextView fullNameTextView;
         public TextView statusTextView;
         public ImageView onlineImageView;
     }

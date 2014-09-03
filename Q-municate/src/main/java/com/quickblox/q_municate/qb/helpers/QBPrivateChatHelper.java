@@ -87,7 +87,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        User friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+        User friend = DatabaseManager.getUserById(context, chatMessage.getSenderId());
         if (friend == null) {
             friend = new User();
             friend.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());

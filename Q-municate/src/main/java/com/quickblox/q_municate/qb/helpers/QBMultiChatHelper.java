@@ -269,7 +269,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
-            User friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
+            User friend = DatabaseManager.getUserById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
