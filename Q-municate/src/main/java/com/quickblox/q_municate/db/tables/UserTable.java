@@ -9,13 +9,13 @@ public class UserTable {
     public static final String TABLE_NAME = "user";
 
     public static final String PATH = "user_table";
-    public static final String USER_FRIEND_PATH = "user_friend_table";
+    public static final String USER_FRIEND_PATH = "user_friend_tables";
 
     public static final int PATH_TOKEN = 10;
     public static final int USER_FRIEND_PATH_TOKEN = 11;
 
     public static final Uri CONTENT_URI = ContentDescriptor.BASE_URI.buildUpon().appendPath(PATH).build();
-    public static final Uri USER_TABLE_CONTENT_URI = ContentDescriptor.BASE_URI.buildUpon().appendPath(USER_FRIEND_PATH).build();
+    public static final Uri USER_FRIEND_CONTENT_URI = ContentDescriptor.BASE_URI.buildUpon().appendPath(USER_FRIEND_PATH).build();
 
     public static class Cols {
 

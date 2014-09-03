@@ -28,6 +28,8 @@ import java.util.List;
 
 public class DatabaseManager {
 
+    private static String USER_FRIEND_RELATION_KEY = UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " = " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID;
+
     public static void savePeople(Context context, List<User> usersList, List<Friend> friendsList) {
         for (User user : usersList) {
             saveUser(context, user);
@@ -98,8 +100,9 @@ public class DatabaseManager {
 
         int relationStatusId = Consts.ZERO_INT_VALUE;
 
-        if(cursor != null && cursor.moveToFirst()) {
-            relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID));
+        if (cursor != null && cursor.moveToFirst()) {
+            relationStatusId = cursor.getInt(cursor.getColumnIndex(
+                    FriendsRelationTable.Cols.RELATION_STATUS_ID));
         }
 
         if (cursor != null) {
@@ -115,8 +118,9 @@ public class DatabaseManager {
         Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null,
                 FriendsRelationTable.Cols.RELATION_STATUS + " = '" + relationStatus + "'", null, null);
 
-        if(cursor != null && cursor.moveToFirst()) {
-            relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID));
+        if (cursor != null && cursor.moveToFirst()) {
+            relationStatusId = cursor.getInt(cursor.getColumnIndex(
+                    FriendsRelationTable.Cols.RELATION_STATUS_ID));
         }
 
         if (cursor != null) {
@@ -140,38 +144,29 @@ public class DatabaseManager {
     public static Cursor getFriendsByFullName(Context context, String fullName) {
         Cursor cursor;
         String sorting = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+
         if (TextUtils.isEmpty(fullName)) {
             cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null, null, null, sorting);
         } else {
             cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
                     UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'", null, sorting);
         }
+
         if (cursor != null) {
             cursor.moveToFirst();
         }
+
         return cursor;
     }
 
     public static Cursor getAllFriends(Context context) {
-        String condition = UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " = " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID;
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_TABLE_CONTENT_URI, null, condition, null, sortOrder);
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY, null,
+                sortOrder);
 
         return cursor;
-
-//        return context.getContentResolver().query(UserTable.CONTENT_URI, null, null, null,
-//                UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC");
-    }
-
-    public static List<User> getAllFriendsList(Context context) {
-        List<User> friendList = new ArrayList<User>();
-        Cursor cursor = getAllFriends(context);
-        while (cursor.moveToNext()) {
-            friendList.add(getFriendFromCursor(cursor));
-        }
-        cursor.close();
-        return friendList;
     }
 
     public static Cursor getFriendsFilteredByIds(Context context, List<Integer> friendIdsList) {
@@ -186,6 +181,10 @@ public class DatabaseManager {
     }
 
     public static void deleteAllFriends(Context context) {
+        context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
+    }
+
+    public static void deleteAllUsers(Context context) {
         context.getContentResolver().delete(UserTable.CONTENT_URI, null, null);
     }
 
@@ -229,22 +228,21 @@ public class DatabaseManager {
 
     public static List<QBDialog> getDialogsByOpponent(Context context, int opponent,
             QBDialogType dialogType) {
-        List<QBDialog> dialogs = new LinkedList<QBDialog>();
+        List<QBDialog> dialogsList = new LinkedList<QBDialog>();
 
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                        DialogTable.Cols.TYPE + "= ? AND " + DialogTable.Cols.OCCUPANTS_IDS + " like ?",
-                new String[]{ String.valueOf(dialogType.getCode()),  "%" + opponent + "%"}, null
-        );
+                DialogTable.Cols.TYPE + "= ? AND " + DialogTable.Cols.OCCUPANTS_IDS + " like ?",
+                new String[]{String.valueOf(dialogType.getCode()), "%" + opponent + "%"}, null);
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                dialogs.add(getDialogFromCursor(cursor));
+                dialogsList.add(getDialogFromCursor(cursor));
             }
 
             cursor.close();
         }
 
-        return dialogs;
+        return dialogsList;
     }
 
     public static void saveDialog(Context context, QBDialog dialog) {
@@ -252,6 +250,7 @@ public class DatabaseManager {
         String condition = DialogTable.Cols.DIALOG_ID + "='" + dialog.getDialogId() + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(DialogTable.CONTENT_URI, null, condition, null, null);
+
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
             values = getContentValuesForUpdateDialogTable(context, dialog);
             resolver.update(DialogTable.CONTENT_URI, values, condition, null);
@@ -259,7 +258,10 @@ public class DatabaseManager {
             values = getContentValuesForCreateDialogTable(context, dialog);
             resolver.insert(DialogTable.CONTENT_URI, values);
         }
-        cursor.close();
+
+        if (cursor != null) {
+            cursor.close();
+        }
     }
 
     public static Cursor getAllDialogs(Context context) {
@@ -289,10 +291,13 @@ public class DatabaseManager {
         String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
         long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
         String attachUrl = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ATTACH_FILE_ID));
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
-        boolean isDelivered = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
+        boolean isRead = cursor.getInt(cursor.getColumnIndex(
+                MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
+        boolean isDelivered = cursor.getInt(cursor.getColumnIndex(
+                MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
 
-        MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time, isRead, isDelivered);
+        MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time,
+                isRead, isDelivered);
 
         return messageCache;
     }
@@ -354,24 +359,20 @@ public class DatabaseManager {
         String avatarUid = cursor.getString(cursor.getColumnIndex(UserTable.Cols.AVATAR_URL));
         String status = cursor.getString(cursor.getColumnIndex(UserTable.Cols.STATUS));
         boolean online = cursor.getInt(cursor.getColumnIndex(UserTable.Cols.IS_ONLINE)) > 0;
-//        String type = cursor.getString(cursor.getColumnIndex(UserTable.Cols.TYPE));
 
-        User friend = new User(id, fullName, email, phone, avatarUid);
-        friend.setStatus(status);
-        friend.setOnline(online);
+        User user = new User(id, fullName, email, phone, avatarUid);
+        user.setStatus(status);
+        user.setOnline(online);
 
-        return friend;
+        return user;
     }
 
     public static MessageCache getLastReadMessage(Context context, QBDialog dialog) {
         MessageCache messageCache = null;
 
-        Cursor cursor = context.getContentResolver().query(
-                MessageTable.CONTENT_URI,
-                null,
+        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
                 MessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
-                MessageTable.Cols.IS_READ + " > 0",
-                null,
+                        MessageTable.Cols.IS_READ + " > 0", null,
                 MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
 
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
@@ -439,8 +440,8 @@ public class DatabaseManager {
         values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
         context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
 
-        updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(),
-                messageCache.getTime(), messageCache.getSenderId());
+        updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
+                messageCache.getSenderId());
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -451,6 +452,7 @@ public class DatabaseManager {
             cursor.close();
             return true;
         }
+
         return false;
     }
 
@@ -459,16 +461,15 @@ public class DatabaseManager {
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
-    private static ContentValues getContentValuesUserTable(User friend) {
+    private static ContentValues getContentValuesUserTable(User user) {
         ContentValues values = new ContentValues();
-        values.put(UserTable.Cols.USER_ID, friend.getUserId());
-        values.put(UserTable.Cols.FULL_NAME, friend.getFullName());
-        values.put(UserTable.Cols.EMAIL, friend.getEmail());
-        values.put(UserTable.Cols.PHONE, friend.getPhone());
-        values.put(UserTable.Cols.AVATAR_URL, friend.getAvatarUrl());
-        values.put(UserTable.Cols.STATUS, friend.getOnlineStatus());
-        values.put(UserTable.Cols.IS_ONLINE, friend.isOnline());
-//        values.put(UserTable.Cols.TYPE, friend.getType().name());
+        values.put(UserTable.Cols.USER_ID, user.getUserId());
+        values.put(UserTable.Cols.FULL_NAME, user.getFullName());
+        values.put(UserTable.Cols.EMAIL, user.getEmail());
+        values.put(UserTable.Cols.PHONE, user.getPhone());
+        values.put(UserTable.Cols.AVATAR_URL, user.getAvatarUrl());
+        values.put(UserTable.Cols.STATUS, user.getOnlineStatus());
+        values.put(UserTable.Cols.IS_ONLINE, user.isOnline());
         return values;
     }
 
@@ -481,7 +482,8 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhotoUrl());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 dialog.getOccupants()));
-        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
+        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
         if (TextUtils.isEmpty(bodyLastMessage)) {
             values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
         } else {
@@ -498,7 +500,8 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.ROOM_JID_ID, dialog.getRoomJid());
         values.put(DialogTable.Cols.NAME, dialog.getName());
         values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
-        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
+        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
         if (TextUtils.isEmpty(bodyLastMessage)) {
             values.put(DialogTable.Cols.LAST_MESSAGE, bodyLastMessage);
         } else {
@@ -546,10 +549,11 @@ public class DatabaseManager {
     }
 
     public static void clearAllCache(Context context) {
-        DatabaseManager.deleteAllFriends(context);
-        DatabaseManager.deleteAllMessages(context);
-        DatabaseManager.deleteAllDialogs(context);
-        // TODO SF clear something else
+        deleteAllUsers(context);
+        deleteAllFriends(context);
+        deleteAllMessages(context);
+        deleteAllDialogs(context);
+        // TODO clear something else
     }
 
     public static void updateStatusMessage(Context context, String messageId, boolean isRead) {
