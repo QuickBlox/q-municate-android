@@ -29,11 +29,13 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private LayoutInflater layoutInflater;
     private String searchCharacters;
     private Context context;
+    private FriendsListFragment.FriendSelectListener friendSelectListener;
 
-    public FriendsListCursorAdapter(Context context, Cursor cursor) {
+    public FriendsListCursorAdapter(Context context, Cursor cursor, FriendsListFragment.FriendSelectListener friendSelectListener) {
         super(cursor, context, true);
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
+        this.friendSelectListener = friendSelectListener;
     }
 
     public void setSearchCharacters(String searchCharacters) {
@@ -83,7 +85,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        User user = DatabaseManager.getFriendFromCursor(cursor);
+        final User user = DatabaseManager.getFriendFromCursor(cursor);
 
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
 
@@ -95,9 +97,34 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         String avatarUrl = getAvatarUrlForUser(user);
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
 
+        initListeners(viewHolder, user.getUserId());
+
         if (!TextUtils.isEmpty(searchCharacters)) {
             TextViewHelper.changeTextColorView(context, viewHolder.fullNameTextView, searchCharacters);
         }
+    }
+
+    private void initListeners(ViewHolder viewHolder, final int userId) {
+        viewHolder.addFriendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                friendSelectListener.onRejectUserClicked(userId);
+            }
+        });
+
+        viewHolder.acceptFriendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                friendSelectListener.onAcceptUserClicked(userId);
+            }
+        });
+
+        viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                friendSelectListener.onAcceptUserClicked(userId);
+            }
+        });
     }
 
     private void setRelationStatusVisibility(ViewHolder viewHolder, boolean status) {

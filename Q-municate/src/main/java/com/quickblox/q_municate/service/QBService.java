@@ -15,6 +15,7 @@ import com.quickblox.module.chat.QBChatService;
 import com.quickblox.q_municate.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate.qb.commands.QBChangePasswordCommand;
@@ -155,6 +156,7 @@ public class QBService extends Service {
         registerUpdateUserCommand();
 
         registerAddFriendCommand();
+        registerAcceptFriendCommand();
         registerImportFriendsCommand();
         registerRemoveFriendCommand();
         registerLoadFriendsCommand();
@@ -341,6 +343,12 @@ public class QBService extends Service {
         QBAddFriendCommand addFriendCommand = new QBAddFriendCommand(this, friendListHelper,
                 QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, QBServiceConsts.ADD_FRIEND_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.ADD_FRIEND_ACTION, addFriendCommand);
+    }
+
+    private void registerAcceptFriendCommand() {
+        QBAcceptFriendCommand acceptFriendCommand = new QBAcceptFriendCommand(this, friendListHelper,
+                QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.ACCEPT_FRIEND_ACTION, acceptFriendCommand);
     }
 
     private void registerImportFriendsCommand() {

@@ -18,12 +18,12 @@ import java.util.List;
 
 public class UserListAdapter extends BaseListAdapter<User> {
 
-    private UserListListener listener;
+    private FriendsListFragment.FriendSelectListener friendSelectListener;
     private String searchCharacters;
 
-    public UserListAdapter(BaseActivity activity, List<User> users, UserListListener listener) {
+    public UserListAdapter(BaseActivity activity, List<User> users, FriendsListFragment.FriendSelectListener friendSelectListener) {
         super(activity, users);
-        this.listener = listener;
+        this.friendSelectListener = friendSelectListener;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class UserListAdapter extends BaseListAdapter<User> {
         holder.addFriendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onUserSelected(position);
+                friendSelectListener.onAddUserClicked(position);
             }
         });
 
@@ -74,11 +74,6 @@ public class UserListAdapter extends BaseListAdapter<User> {
         holder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
         holder.addFriendImageButton = (ImageButton) view.findViewById(R.id.add_friend_imagebutton);
         return holder;
-    }
-
-    public interface UserListListener {
-
-        void onUserSelected(int position);
     }
 
     private static class ViewHolder {

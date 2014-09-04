@@ -69,6 +69,11 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
+    public void acceptFriend(int userId) throws Exception {
+        roster.confirmSubscription(userId);
+        updateFriend(userId);
+    }
+
     private boolean isNotInvited(int userId) {
         return !isInvited(userId);
     }

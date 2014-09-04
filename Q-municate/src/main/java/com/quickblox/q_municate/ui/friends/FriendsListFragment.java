@@ -29,6 +29,7 @@ import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
@@ -210,6 +211,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
+        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
         baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
@@ -245,7 +247,7 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         Cursor headersCursor = createHeadersCursor();
 
-        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, createHeadersCursor());
+        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, createHeadersCursor(),new  FriendSelectAction());
         friendsListAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -313,10 +315,20 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     private void initUserList() {
         usersList = new ArrayList<User>();
         usersListAdapter = new UserListAdapter(baseActivity, usersList,
-                new UserListAdapter.UserListListener() {
+                new FriendSelectListener() {
                     @Override
-                    public void onUserSelected(int position) {
-                        addToFriendList(usersList.get(position));
+                    public void onAddUserClicked(int position) {
+//                        addToFriendList(usersList.get(position));
+                    }
+
+                    @Override
+                    public void onAcceptUserClicked(int position) {
+
+                    }
+
+                    @Override
+                    public void onRejectUserClicked(int position) {
+
                     }
                 });
 
@@ -329,12 +341,15 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         startUsersListLoader(constraint);
     }
 
-    /// TODO
-    private void addToFriendList(final User friend) {
+    private void addToFriendList(final int userId) {
         baseActivity.showProgress();
-        QBAddFriendCommand.start(baseActivity, friend);
+        QBAddFriendCommand.start(baseActivity, userId);
         KeyboardUtils.hideKeyboard(baseActivity);
         searchView.clearFocus();
+    }
+
+    private void acceptFriend(final int userId) {
+        QBAcceptFriendCommand.start(baseActivity, userId);
     }
 
     private void startUsersListLoader(String newText) {
@@ -391,6 +406,31 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 initFriendsList();
             }
             return true;
+        }
+    }
+
+    public interface FriendSelectListener {
+
+        void onAddUserClicked(int userId);
+        void onAcceptUserClicked(int userId);
+        void onRejectUserClicked(int userId);
+    }
+
+    private class FriendSelectAction implements FriendSelectListener {
+
+        @Override
+        public void onAddUserClicked(int userId) {
+            addToFriendList(userId);
+        }
+
+        @Override
+        public void onAcceptUserClicked(int userId) {
+            acceptFriend(userId);
+        }
+
+        @Override
+        public void onRejectUserClicked(int userId) {
+
         }
     }
 
