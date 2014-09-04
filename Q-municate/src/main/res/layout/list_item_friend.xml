@@ -46,11 +46,45 @@
             android:textSize="15sp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@id/online_imageview"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/badge_online" />
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/add_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:src="@drawable/ic_add_friend"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/accept_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:src="@drawable/ic_send_message"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/reject_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:src="@drawable/ic_close"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/online_imageview"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/badge_online"
+            android:visibility="gone" />
+    </LinearLayout>
+
 </RelativeLayout>

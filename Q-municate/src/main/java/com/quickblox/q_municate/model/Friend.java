@@ -5,14 +5,22 @@ import java.io.Serializable;
 public class Friend implements Serializable {
 
     private Integer userId;
+    private int relationStatusId;
     private String relationStatus;
 
     public Friend() {
     }
-
     public Friend(Integer userId, String relationStatus) {
         this.userId = userId;
         this.relationStatus = relationStatus;
+    }
+
+    public int getRelationStatusId() {
+        return relationStatusId;
+    }
+
+    public void setRelationStatusId(int relationStatusId) {
+        this.relationStatusId = relationStatusId;
     }
 
     public String getRelationStatus() {

@@ -58,7 +58,13 @@ public class DatabaseManager {
     }
 
     public static void saveFriend(Context context, Friend friend) {
-        ContentValues values = getContentValuesFriendTable(context, friend);
+        initFriendsRelationStatuses(context);
+
+        int relationStatusId = getRelationStatusIdByName(context, friend.getRelationStatus());
+
+        friend.setRelationStatusId(relationStatusId);
+
+        ContentValues values = getContentValuesFriendTable(friend);
 
         String condition = FriendTable.Cols.USER_ID + "='" + friend.getUserId() + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -75,44 +81,51 @@ public class DatabaseManager {
         }
     }
 
-    private static ContentValues getContentValuesFriendTable(Context context, Friend friend) {
+    private static ContentValues getContentValuesFriendTable(Friend friend) {
         ContentValues values = new ContentValues();
 
-        int relationStatusId = getRelationStatusId(context, friend.getRelationStatus());
-        if (relationStatusId == Consts.ZERO_INT_VALUE) {
-            relationStatusId = saveFriendsRelationStatus(context, friend.getRelationStatus());
-        }
-
         values.put(FriendTable.Cols.USER_ID, friend.getUserId());
-        values.put(FriendTable.Cols.RELATION_STATUS_ID, relationStatusId);
+        values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
 
         return values;
     }
 
-    private static int saveFriendsRelationStatus(Context context, String relationStatus) {
+    private static void initFriendsRelationStatuses(Context context) {
         ContentValues values = new ContentValues();
-        values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatus);
-
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(FriendsRelationTable.CONTENT_URI, null, null, null, null);
 
-        resolver.insert(FriendsRelationTable.CONTENT_URI, values);
+        String[] relationStatusesArray = context.getResources().getStringArray(R.array.friends_relation_statuses_array);
 
-        int relationStatusId = Consts.ZERO_INT_VALUE;
-
-        if (cursor != null && cursor.moveToFirst()) {
-            relationStatusId = cursor.getInt(cursor.getColumnIndex(
-                    FriendsRelationTable.Cols.RELATION_STATUS_ID));
+        for (int i = 0; i < relationStatusesArray.length; i++) {
+            values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatusesArray[i]);
+            resolver.insert(FriendsRelationTable.CONTENT_URI, values);
         }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return relationStatusId;
     }
 
-    public static int getRelationStatusId(Context context, String relationStatus) {
+//    private static int saveFriendsRelationStatus(Context context, String relationStatus) {
+//        ContentValues values = new ContentValues();
+//        values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatus);
+//
+//        ContentResolver resolver = context.getContentResolver();
+//        Cursor cursor = resolver.query(FriendsRelationTable.CONTENT_URI, null, null, null, null);
+//
+//        resolver.insert(FriendsRelationTable.CONTENT_URI, values);
+//
+//        int relationStatusId = Consts.ZERO_INT_VALUE;
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            relationStatusId = cursor.getInt(cursor.getColumnIndex(
+//                    FriendsRelationTable.Cols.RELATION_STATUS_ID));
+//        }
+//
+//        if (cursor != null) {
+//            cursor.close();
+//        }
+//
+//        return relationStatusId;
+//    }
+
+    public static int getRelationStatusIdByName(Context context, String relationStatus) {
         int relationStatusId = Consts.ZERO_INT_VALUE;
 
         Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null,
@@ -128,6 +141,24 @@ public class DatabaseManager {
         }
 
         return relationStatusId;
+    }
+
+    public static String getRelationStatusNameById(Context context, int relationStatusId) {
+        String relationStatus = null;
+
+        Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null,
+                FriendsRelationTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            relationStatus = cursor.getString(cursor.getColumnIndex(
+                    FriendsRelationTable.Cols.RELATION_STATUS));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return relationStatus;
     }
 
     public static boolean isFriendInBase(Context context, int searchId) {
@@ -159,11 +190,27 @@ public class DatabaseManager {
         return cursor;
     }
 
+    public static Cursor getAllFriendsRelationStatuses(Context context) {
+        return context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null, null, null, null);
+    }
+
     public static Cursor getAllFriends(Context context) {
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY, null,
+                sortOrder);
+
+        return cursor;
+    }
+
+    public static Cursor getAllFriends(Context context, int relationStatusId) {
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId;
+
+        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND " + condition, null,
                 sortOrder);
 
         return cursor;

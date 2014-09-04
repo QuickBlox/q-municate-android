@@ -32,10 +32,10 @@ public class FriendUtils {
         return friend;
     }
 
-    public static Friend createNewFriend(User user) {
+    public static Friend getFriendWithStatus(int userId, String relationStatus) {
         Friend friend = new Friend();
-        friend.setUserId(user.getUserId());
-        friend.setRelationStatus(RosterPacket.ItemType.to.name());
+        friend.setUserId(userId);
+        friend.setRelationStatus(relationStatus);
         return friend;
     }
 

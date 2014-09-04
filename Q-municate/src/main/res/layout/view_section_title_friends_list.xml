@@ -5,10 +5,10 @@
 
     <TextView
         style="?android:attr/listSeparatorTextViewStyle"
-        android:id="@+id/listTitle"
+        android:id="@+id/list_title_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="@string/frl_friends"
-        android:textColor="@android:color/darker_gray" />
+        android:textColor="@color/gray" />
 </LinearLayout>

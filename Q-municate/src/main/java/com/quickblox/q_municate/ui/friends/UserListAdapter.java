@@ -44,7 +44,7 @@ public class UserListAdapter extends BaseListAdapter<User> {
         displayImage(url, holder.avatarImageView);
 
         holder.fullNameTextView.setText(user.getFullName());
-        holder.addFriendButton.setOnClickListener(new View.OnClickListener() {
+        holder.addFriendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onUserSelected(position);
@@ -52,9 +52,9 @@ public class UserListAdapter extends BaseListAdapter<User> {
         });
 
         if (DatabaseManager.isFriendInBase(baseActivity, user.getUserId())) {
-            holder.addFriendButton.setVisibility(View.INVISIBLE);
+            holder.addFriendImageButton.setVisibility(View.INVISIBLE);
         } else {
-            holder.addFriendButton.setVisibility(View.VISIBLE);
+            holder.addFriendImageButton.setVisibility(View.VISIBLE);
         }
 
         if (!TextUtils.isEmpty(searchCharacters)) {
@@ -72,7 +72,7 @@ public class UserListAdapter extends BaseListAdapter<User> {
         ViewHolder holder = new ViewHolder();
         holder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         holder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
-        holder.addFriendButton = (ImageButton) view.findViewById(R.id.addFriendButton);
+        holder.addFriendImageButton = (ImageButton) view.findViewById(R.id.add_friend_imagebutton);
         return holder;
     }
 
@@ -85,6 +85,6 @@ public class UserListAdapter extends BaseListAdapter<User> {
 
         public RoundedImageView avatarImageView;
         public TextView fullNameTextView;
-        public ImageButton addFriendButton;
+        public ImageButton addFriendImageButton;
     }
 }
