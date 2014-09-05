@@ -43,6 +43,7 @@ import com.quickblox.q_municate.qb.commands.QBLoginWithSocialCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutRestCommand;
+import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBResetPasswordCommand;
@@ -157,6 +158,7 @@ public class QBService extends Service {
 
         registerAddFriendCommand();
         registerAcceptFriendCommand();
+        registerRejectFriendCommand();
         registerImportFriendsCommand();
         registerRemoveFriendCommand();
         registerLoadFriendsCommand();
@@ -349,6 +351,12 @@ public class QBService extends Service {
         QBAcceptFriendCommand acceptFriendCommand = new QBAcceptFriendCommand(this, friendListHelper,
                 QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.ACCEPT_FRIEND_ACTION, acceptFriendCommand);
+    }
+
+    private void registerRejectFriendCommand() {
+        QBRejectFriendCommand rejectFriendCommand = new QBRejectFriendCommand(this, friendListHelper,
+                QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, QBServiceConsts.REJECT_FRIEND_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.REJECT_FRIEND_ACTION, rejectFriendCommand);
     }
 
     private void registerImportFriendsCommand() {

@@ -75,23 +75,21 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void rejectFriend(int userId) throws Exception {
-//        roster.unsubscribe(userId);
-//        roster.removeEntry(new QBRosterEntry());
-//        updateFriend(userId);
+        roster.unsubscribe(userId);
+        deleteUser(userId);
     }
-
 
     private boolean isNotInvited(int userId) {
         return !isInvited(userId);
     }
 
     private boolean isInvited(int userId) {
-        QBRosterEntry entry = roster.getEntry(userId);
-        if (entry == null) {
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry == null) {
             return false;
         }
-        boolean isSubscribedToUser = entry.getType() == RosterPacket.ItemType.from;
-        boolean isBothSubscribed = entry.getType() == RosterPacket.ItemType.both;
+        boolean isSubscribedToUser = rosterEntry.getType() == RosterPacket.ItemType.from;
+        boolean isBothSubscribed = rosterEntry.getType() == RosterPacket.ItemType.both;
         return isSubscribedToUser || isBothSubscribed;
     }
 
@@ -229,6 +227,10 @@ public class QBFriendListHelper extends BaseHelper {
         DatabaseManager.saveFriend(context, friend);
     }
 
+    private void deleteUser(int userId) {
+        DatabaseManager.deleteUserById(context, userId);
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -270,7 +272,6 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                QBRosterEntry rosterEntry = roster.getEntry(userId);
                 createFriendWithStatus(userId, RosterPacket.ItemType.none.name());
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);

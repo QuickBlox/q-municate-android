@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.ui.friends;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,13 +30,17 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private LayoutInflater layoutInflater;
     private String searchCharacters;
     private Context context;
+    private Resources resources;
     private FriendsListFragment.FriendSelectListener friendSelectListener;
+    private int relationStatusNoneId;
 
     public FriendsListCursorAdapter(Context context, Cursor cursor, FriendsListFragment.FriendSelectListener friendSelectListener) {
         super(cursor, context, true);
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.friendSelectListener = friendSelectListener;
+        resources = context.getResources();
+        relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
     }
 
     public void setSearchCharacters(String searchCharacters) {
@@ -45,7 +50,12 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     @Override
     protected Cursor getChildrenCursor(Cursor groupCursor) {
         int relationStatusId = groupCursor.getInt(groupCursor.getColumnIndex(HEADER_COLUMN_ID));
-        return DatabaseManager.getAllFriends(context, relationStatusId);
+
+        if (relationStatusId == relationStatusNoneId) {
+            return DatabaseManager.getAllFriends(context, relationStatusId);
+        } else {
+            return DatabaseManager.getAllFriends(context);
+        }
     }
 
     @Override
@@ -107,7 +117,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         viewHolder.addFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onRejectUserClicked(userId);
+                friendSelectListener.onAddUserClicked(userId);
             }
         });
 
@@ -121,7 +131,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onAcceptUserClicked(userId);
+                friendSelectListener.onRejectUserClicked(userId);
             }
         });
     }
@@ -135,19 +145,21 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     }
 
     private void checkRelationStatus(ViewHolder viewHolder, int relationStatusId, User user) {
-
+        String status = null;
         String relationStatus = DatabaseManager.getRelationStatusNameById(context, relationStatusId);
 
         if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE)) {
             viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
             viewHolder.rejectFriendImageView.setVisibility(View.VISIBLE);
-        } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH)) {
+            status = resources.getString(R.string.frl_pending_status);
+        } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus.equals(QBFriendListHelper.RELATION_STATUS_FROM)) {
             viewHolder.acceptFriendImageView.setVisibility(View.GONE);
             viewHolder.rejectFriendImageView.setVisibility(View.GONE);
             setStatusVisibility(viewHolder, user.isOnline());
-            viewHolder.statusTextView.setText(user.getOnlineStatus());
+            status = user.getOnlineStatus();
         }
 
+        viewHolder.statusTextView.setText(status);
     }
 
     private void displayAvatarImage(String uri, ImageView imageView) {

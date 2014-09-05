@@ -19,6 +19,7 @@ import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 
@@ -195,10 +196,16 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllFriends(Context context) {
+        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
+
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId;
+
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY, null,
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND " + condition, null,
                 sortOrder);
 
         return cursor;
@@ -506,6 +513,11 @@ public class DatabaseManager {
     public static void deleteMessagesByDialogId(Context context, String dialogId) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI,
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
+    }
+
+    public static void deleteUserById(Context context, int userId) {
+        context.getContentResolver().delete(FriendTable.CONTENT_URI,
+                FriendTable.Cols.USER_ID + " = " + userId, null);
     }
 
     private static ContentValues getContentValuesUserTable(User user) {

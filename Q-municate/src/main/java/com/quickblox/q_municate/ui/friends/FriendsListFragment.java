@@ -32,6 +32,7 @@ import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
+import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -272,8 +273,6 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         }
 
         expandAllGroups(headersCursor);
-
-        //        friendsListView.setSelector(R.drawable.list_item_background_selector);
     }
 
     private void expandAllGroups(Cursor headersCursor) {
@@ -288,16 +287,11 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME,
                 FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
 
-        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_NONE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_NONE, "none-none-none"});
-        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_TO) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_TO, "to-to-to"});
-        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_FROM) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_FROM, "from-from-from"});
-        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, "both-both-both"});
-        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_REMOVE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_REMOVE, "remove-remove-remove"});
+        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity, QBFriendListHelper.RELATION_STATUS_NONE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_NONE, "none-none-none"});
+//        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity, QBFriendListHelper.RELATION_STATUS_TO) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_TO, "to-to-to"});
+//        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity, QBFriendListHelper.RELATION_STATUS_FROM) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_FROM, "from-from-from"});
+        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity, QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, "both + from"});
+//        headersCursor.addRow(new String[] {DatabaseManager.getRelationStatusIdByName(baseActivity, QBFriendListHelper.RELATION_STATUS_REMOVE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_REMOVE, "remove-remove-remove"});
 
         return headersCursor;
     }
@@ -348,8 +342,12 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         searchView.clearFocus();
     }
 
-    private void acceptFriend(final int userId) {
+    private void acceptUser(final int userId) {
         QBAcceptFriendCommand.start(baseActivity, userId);
+    }
+
+    private void rejectUser(final int userId) {
+        QBRejectFriendCommand.start(baseActivity, userId);
     }
 
     private void startUsersListLoader(String newText) {
@@ -425,12 +423,12 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void onAcceptUserClicked(int userId) {
-            acceptFriend(userId);
+            acceptUser(userId);
         }
 
         @Override
         public void onRejectUserClicked(int userId) {
-
+            rejectUser(userId);
         }
     }
 
