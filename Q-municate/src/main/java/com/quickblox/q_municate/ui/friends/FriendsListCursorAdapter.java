@@ -90,9 +90,8 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
 
         viewHolder.fullNameTextView.setText(user.getFullName());
-        viewHolder.statusTextView.setText(user.getOnlineStatus());
 
-        checkRelationStatus(viewHolder, relationStatusId, user.isOnline());
+        checkRelationStatus(viewHolder, relationStatusId, user);
 
         String avatarUrl = getAvatarUrlForUser(user);
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
@@ -127,7 +126,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         });
     }
 
-    private void setRelationStatusVisibility(ViewHolder viewHolder, boolean status) {
+    private void setStatusVisibility(ViewHolder viewHolder, boolean status) {
         if (status) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
@@ -135,17 +134,18 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         }
     }
 
-    private void checkRelationStatus(ViewHolder viewHolder, int relationStatusId, boolean online) {
+    private void checkRelationStatus(ViewHolder viewHolder, int relationStatusId, User user) {
 
         String relationStatus = DatabaseManager.getRelationStatusNameById(context, relationStatusId);
 
-        if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_FROM)) {
+        if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE)) {
             viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
             viewHolder.rejectFriendImageView.setVisibility(View.VISIBLE);
         } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH)) {
             viewHolder.acceptFriendImageView.setVisibility(View.GONE);
             viewHolder.rejectFriendImageView.setVisibility(View.GONE);
-            setRelationStatusVisibility(viewHolder, online);
+            setStatusVisibility(viewHolder, user.isOnline());
+            viewHolder.statusTextView.setText(user.getOnlineStatus());
         }
 
     }

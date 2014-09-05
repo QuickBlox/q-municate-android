@@ -42,13 +42,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="status"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/dark_gray"
             android:textSize="15sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:orientation="horizontal" >
@@ -56,7 +56,7 @@
         <ImageButton
             android:id="@+id/add_friend_imagebutton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/button_general_selector"
             android:src="@drawable/ic_add_friend"
             android:visibility="gone" />
@@ -64,7 +64,7 @@
         <ImageButton
             android:id="@+id/accept_friend_imagebutton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/button_general_selector"
             android:src="@drawable/ic_send_message"
             android:visibility="gone" />
@@ -72,7 +72,7 @@
         <ImageButton
             android:id="@+id/reject_friend_imagebutton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/button_general_selector"
             android:src="@drawable/ic_close"
             android:visibility="gone" />

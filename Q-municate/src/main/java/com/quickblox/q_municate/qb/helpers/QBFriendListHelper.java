@@ -74,6 +74,13 @@ public class QBFriendListHelper extends BaseHelper {
         updateFriend(userId);
     }
 
+    public void rejectFriend(int userId) throws Exception {
+//        roster.unsubscribe(userId);
+//        roster.removeEntry(new QBRosterEntry());
+//        updateFriend(userId);
+    }
+
+
     private boolean isNotInvited(int userId) {
         return !isInvited(userId);
     }
@@ -102,8 +109,8 @@ public class QBFriendListHelper extends BaseHelper {
 
         fillUserOnlineStatus(user);
 
-        DatabaseManager.saveUser(context, user);
-        DatabaseManager.saveFriend(context, friend);
+        saveUser(user);
+        saveFriend(friend);
     }
 
     private User loadUser(int userId) throws QBResponseException {
@@ -137,28 +144,6 @@ public class QBFriendListHelper extends BaseHelper {
         return userIdsList;
     }
 
-    private void makeAutoSubscription(Collection<QBRosterEntry> entriesList) throws QBResponseException {
-        for (QBRosterEntry rosterEntry : entriesList) {
-            if (RosterPacket.ItemType.from.equals(rosterEntry.getType())) {
-                boolean errorOccurred = false;
-                try {
-                    roster.confirmSubscription(rosterEntry.getUserId());
-                } catch (SmackException.NotConnectedException e) {
-                    errorOccurred = true;
-                } catch (SmackException.NotLoggedInException e) {
-                    errorOccurred = true;
-                } catch (XMPPException e) {
-                    errorOccurred = true;
-                } catch (SmackException.NoResponseException e) {
-                    errorOccurred = true;
-                }
-                if (errorOccurred) {
-                    throw new QBResponseException("Errors occurred while confirm friend subscriptions");
-                }
-            }
-        }
-    }
-
     private void updateFriends(Collection<Integer> userIdsList,
             Collection<QBRosterEntry> rosterEntryCollection) throws QBResponseException {
         List<QBUser> qbUsersList = loadUsers(userIdsList);
@@ -183,18 +168,18 @@ public class QBFriendListHelper extends BaseHelper {
 
         fillUserOnlineStatus(user);
 
-        DatabaseManager.saveUser(context, user);
-        DatabaseManager.saveFriend(context, friend);
+        saveUser(user);
+        saveFriend(friend);
     }
 
-    private void createFriendWithStatusFrom(int userId) throws QBResponseException {
+    private void createFriendWithStatus(int userId, String relationStatus) throws QBResponseException {
         User user = loadUser(userId);
-        Friend friend = FriendUtils.getFriendWithStatus(userId, RosterPacket.ItemType.from.name());
+        Friend friend = FriendUtils.getFriendWithStatus(userId, relationStatus);
 
         fillUserOnlineStatus(user);
 
-        DatabaseManager.saveUser(context, user);
-        DatabaseManager.saveFriend(context, friend);
+        saveUser(user);
+        saveFriend(friend);
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
@@ -234,6 +219,14 @@ public class QBFriendListHelper extends BaseHelper {
         QBPresence presence = new QBPresence(QBPresence.Type.online, status, STATUS_PRESENCE_PRIORITY,
                 QBPresence.Mode.available);
         roster.sendPresence(presence);
+    }
+
+    private void saveUser(User user) {
+        DatabaseManager.saveUser(context, user);
+    }
+
+    private void saveFriend(Friend friend) {
+        DatabaseManager.saveFriend(context, friend);
     }
 
     private class RosterListener implements QBRosterListener {
@@ -277,7 +270,8 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                createFriendWithStatusFrom(userId);
+                QBRosterEntry rosterEntry = roster.getEntry(userId);
+                createFriendWithStatus(userId, RosterPacket.ItemType.none.name());
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
