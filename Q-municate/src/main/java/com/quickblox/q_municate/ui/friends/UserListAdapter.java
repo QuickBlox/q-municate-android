@@ -18,12 +18,12 @@ import java.util.List;
 
 public class UserListAdapter extends BaseListAdapter<User> {
 
-    private FriendsListFragment.FriendSelectListener friendSelectListener;
+    private FriendsListFragment.FriendOperationListener friendOperationListener;
     private String searchCharacters;
 
-    public UserListAdapter(BaseActivity activity, List<User> users, FriendsListFragment.FriendSelectListener friendSelectListener) {
+    public UserListAdapter(BaseActivity activity, List<User> users, FriendsListFragment.FriendOperationListener friendOperationListener) {
         super(activity, users);
-        this.friendSelectListener = friendSelectListener;
+        this.friendOperationListener = friendOperationListener;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class UserListAdapter extends BaseListAdapter<User> {
         holder.addFriendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onAddUserClicked(position);
+                friendOperationListener.onAddUserClicked(position);
             }
         });
 

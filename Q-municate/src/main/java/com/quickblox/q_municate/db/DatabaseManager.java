@@ -163,8 +163,16 @@ public class DatabaseManager {
     }
 
     public static boolean isFriendInBase(Context context, int searchId) {
-        Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
-                UserTable.Cols.USER_ID + " = " + searchId, null, null);
+        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
+
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + ") AND (" + FriendTable.TABLE_NAME + "."
+                + FriendTable.Cols.USER_ID + " = " + searchId;
+
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
 
         boolean isFriendInBase = cursor.getCount() > Consts.ZERO_INT_VALUE;
 
@@ -205,7 +213,7 @@ public class DatabaseManager {
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND " + condition, null,
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
                 sortOrder);
 
         return cursor;
@@ -390,7 +398,7 @@ public class DatabaseManager {
                 UserTable.Cols.USER_ID + " = " + friendId, null, null);
         User friend = null;
         if (cursor != null && cursor.moveToFirst()) {
-            friend = getFriendFromCursor(cursor);
+            friend = getUserFromCursor(cursor);
             cursor.close();
         }
         return friend;
@@ -405,7 +413,7 @@ public class DatabaseManager {
         return cursor;
     }
 
-    public static User getFriendFromCursor(Cursor cursor) {
+    public static User getUserFromCursor(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndex(UserTable.Cols.USER_ID));
         String fullName = cursor.getString(cursor.getColumnIndex(UserTable.Cols.FULL_NAME));
         String email = cursor.getString(cursor.getColumnIndex(UserTable.Cols.EMAIL));

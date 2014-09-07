@@ -18,6 +18,7 @@
         android:textSize="@dimen/text_size"
         android:text="@string/frl_no_friends"
         android:textColor="@color/dark_gray"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:visibility="gone" />
 
 </RelativeLayout>

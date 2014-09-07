@@ -60,7 +60,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, final Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final User friend = DatabaseManager.getFriendFromCursor(cursor);
+        final User friend = DatabaseManager.getUserFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullName());
         viewHolder.statusMessageTextView.setText(friend.getStatus());

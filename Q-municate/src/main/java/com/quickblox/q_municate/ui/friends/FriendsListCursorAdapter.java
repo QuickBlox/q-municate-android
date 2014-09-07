@@ -31,14 +31,14 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private String searchCharacters;
     private Context context;
     private Resources resources;
-    private FriendsListFragment.FriendSelectListener friendSelectListener;
+    private FriendsListFragment.FriendOperationListener friendOperationListener;
     private int relationStatusNoneId;
 
-    public FriendsListCursorAdapter(Context context, Cursor cursor, FriendsListFragment.FriendSelectListener friendSelectListener) {
+    public FriendsListCursorAdapter(Context context, Cursor cursor, FriendsListFragment.FriendOperationListener friendOperationListener) {
         super(cursor, context, true);
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
-        this.friendSelectListener = friendSelectListener;
+        this.friendOperationListener = friendOperationListener;
         resources = context.getResources();
         relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
     }
@@ -95,7 +95,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final User user = DatabaseManager.getFriendFromCursor(cursor);
+        final User user = DatabaseManager.getUserFromCursor(cursor);
 
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
 
@@ -117,21 +117,21 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         viewHolder.addFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onAddUserClicked(userId);
+                friendOperationListener.onAddUserClicked(userId);
             }
         });
 
         viewHolder.acceptFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onAcceptUserClicked(userId);
+                friendOperationListener.onAcceptUserClicked(userId);
             }
         });
 
         viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendSelectListener.onRejectUserClicked(userId);
+                friendOperationListener.onRejectUserClicked(userId);
             }
         });
     }
