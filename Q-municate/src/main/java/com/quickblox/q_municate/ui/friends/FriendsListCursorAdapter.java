@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.friends;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,14 +34,18 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private Resources resources;
     private FriendsListFragment.FriendOperationListener friendOperationListener;
     private int relationStatusNoneId;
+    private int relationStatusAllUsersId;
+    private MatrixCursor usersCursor;
 
-    public FriendsListCursorAdapter(Context context, Cursor cursor, FriendsListFragment.FriendOperationListener friendOperationListener) {
+    public FriendsListCursorAdapter(Context context, Cursor cursor, MatrixCursor usersCursor, FriendsListFragment.FriendOperationListener friendOperationListener) {
         super(cursor, context, true);
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
         this.friendOperationListener = friendOperationListener;
+        this.usersCursor = usersCursor;
         resources = context.getResources();
         relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+        relationStatusAllUsersId = QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS;
     }
 
     public void setSearchCharacters(String searchCharacters) {
@@ -53,6 +58,8 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
 
         if (relationStatusId == relationStatusNoneId) {
             return DatabaseManager.getAllFriends(context, relationStatusId);
+        } else if (relationStatusId == relationStatusAllUsersId) {
+            return usersCursor;
         } else {
             return DatabaseManager.getAllFriends(context);
         }
@@ -81,9 +88,10 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         viewHolder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
         viewHolder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
+        viewHolder.dividerView = view.findViewById(R.id.divider_view);
         viewHolder.addFriendImageView = (ImageView) view.findViewById(R.id.add_friend_imagebutton);
         viewHolder.acceptFriendImageView = (ImageView) view.findViewById(R.id.accept_friend_imagebutton);
-        viewHolder.rejectFriendImageView = (ImageView) view.findViewById(R.id.reject_friend_imagebutton);
+        viewHolder.removeFriendImageView = (ImageView) view.findViewById(R.id.remove_friend_imagebutton);
         viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
 
         view.setTag(viewHolder);
@@ -128,10 +136,10 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
             }
         });
 
-        viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.removeFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendOperationListener.onRejectUserClicked(userId);
+                friendOperationListener.onRemoveUserClicked(userId);
             }
         });
     }
@@ -148,15 +156,32 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         String status = null;
         String relationStatus = DatabaseManager.getRelationStatusNameById(context, relationStatusId);
 
-        if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE)) {
-            viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
-            viewHolder.rejectFriendImageView.setVisibility(View.VISIBLE);
-            status = resources.getString(R.string.frl_pending_status);
-        } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus.equals(QBFriendListHelper.RELATION_STATUS_FROM)) {
+        if (!TextUtils.isEmpty(relationStatus)) {
+            if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE)) {
+                viewHolder.dividerView.setVisibility(View.VISIBLE);
+                viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
+                viewHolder.removeFriendImageView.setVisibility(View.VISIBLE);
+                viewHolder.addFriendImageView.setVisibility(View.GONE);
+                viewHolder.onlineImageView.setVisibility(View.GONE);
+                status = resources.getString(R.string.frl_pending_status);
+            } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus
+                    .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
+                    .equals(QBFriendListHelper.RELATION_STATUS_TO)) {
+                viewHolder.dividerView.setVisibility(View.GONE);
+                viewHolder.addFriendImageView.setVisibility(View.GONE);
+                viewHolder.acceptFriendImageView.setVisibility(View.GONE);
+                viewHolder.removeFriendImageView.setVisibility(View.GONE);
+                setStatusVisibility(viewHolder, user.isOnline());
+                status = user.getOnlineStatus();
+            }
+        }
+
+        if (relationStatusId == relationStatusAllUsersId) {
+            viewHolder.addFriendImageView.setVisibility(View.VISIBLE);
+            viewHolder.dividerView.setVisibility(View.GONE);
+            viewHolder.onlineImageView.setVisibility(View.GONE);
             viewHolder.acceptFriendImageView.setVisibility(View.GONE);
-            viewHolder.rejectFriendImageView.setVisibility(View.GONE);
-            setStatusVisibility(viewHolder, user.isOnline());
-            status = user.getOnlineStatus();
+            viewHolder.removeFriendImageView.setVisibility(View.GONE);
         }
 
         viewHolder.statusTextView.setText(status);
@@ -175,9 +200,10 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         public RoundedImageView avatarImageView;
         public TextView fullNameTextView;
         public TextView statusTextView;
+        public View dividerView;
         public ImageView addFriendImageView;
         public ImageView acceptFriendImageView;
-        public ImageView rejectFriendImageView;
+        public ImageView removeFriendImageView;
         public ImageView onlineImageView;
     }
 }

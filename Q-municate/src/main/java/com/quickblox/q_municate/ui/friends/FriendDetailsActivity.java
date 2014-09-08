@@ -19,8 +19,8 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
@@ -166,10 +166,9 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            //TODO implement
-            //            case R.id.action_delete:
-            //                showRemoveUserDialog();
-            //                return true;
+            case R.id.action_delete:
+                showRemoveUserDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -181,7 +180,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
-                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend.getUserId());
             }
         });
         dialog.show(getFragmentManager(), null);

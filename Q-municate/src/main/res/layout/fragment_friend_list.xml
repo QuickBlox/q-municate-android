@@ -4,7 +4,7 @@
     android:background="@color/white">
 
     <ExpandableListView
-        android:id="@+id/friends_listview"
+        android:id="@+id/friends_expandablelistview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
@@ -18,7 +18,6 @@
         android:textSize="@dimen/text_size"
         android:text="@string/frl_no_friends"
         android:textColor="@color/dark_gray"
-        android:gravity="center_horizontal"
-        android:visibility="gone" />
+        android:gravity="center_horizontal" />
 
 </RelativeLayout>

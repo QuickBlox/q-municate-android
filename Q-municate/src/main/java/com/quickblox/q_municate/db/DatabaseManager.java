@@ -36,7 +36,9 @@ public class DatabaseManager {
             saveUser(context, user);
         }
         for (Friend friend : friendsList) {
-            saveFriend(context, friend);
+            if (!DatabaseManager.hasFriendTempStatus(context, friend.getUserId())) {
+                saveFriend(context, friend);
+            }
         }
     }
 
@@ -87,6 +89,7 @@ public class DatabaseManager {
 
         values.put(FriendTable.Cols.USER_ID, friend.getUserId());
         values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
+        values.put(FriendTable.Cols.TEMP_RELATION_STATUS_ID, friend.getTempRelationStatusId());
 
         return values;
     }
@@ -102,29 +105,6 @@ public class DatabaseManager {
             resolver.insert(FriendsRelationTable.CONTENT_URI, values);
         }
     }
-
-//    private static int saveFriendsRelationStatus(Context context, String relationStatus) {
-//        ContentValues values = new ContentValues();
-//        values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatus);
-//
-//        ContentResolver resolver = context.getContentResolver();
-//        Cursor cursor = resolver.query(FriendsRelationTable.CONTENT_URI, null, null, null, null);
-//
-//        resolver.insert(FriendsRelationTable.CONTENT_URI, values);
-//
-//        int relationStatusId = Consts.ZERO_INT_VALUE;
-//
-//        if (cursor != null && cursor.moveToFirst()) {
-//            relationStatusId = cursor.getInt(cursor.getColumnIndex(
-//                    FriendsRelationTable.Cols.RELATION_STATUS_ID));
-//        }
-//
-//        if (cursor != null) {
-//            cursor.close();
-//        }
-//
-//        return relationStatusId;
-//    }
 
     public static int getRelationStatusIdByName(Context context, String relationStatus) {
         int relationStatusId = Consts.ZERO_INT_VALUE;
@@ -162,12 +142,28 @@ public class DatabaseManager {
         return relationStatus;
     }
 
+    public static boolean hasFriendTempStatus(Context context, int searchId) {
+        String condition = FriendTable.Cols.TEMP_RELATION_STATUS_ID + " = " + 1 + " AND " + FriendTable.Cols.USER_ID + " = " + searchId;
+
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, null, condition, null, null);
+
+        boolean isFriendInBase = cursor.getCount() > Consts.ZERO_INT_VALUE;
+
+        cursor.close();
+
+        return isFriendInBase;
+    }
+
     public static boolean isFriendInBase(Context context, int searchId) {
         int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
         int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
 
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + ") AND (" + FriendTable.TABLE_NAME + "."
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId + ") AND (" + FriendTable.TABLE_NAME + "."
                 + FriendTable.Cols.USER_ID + " = " + searchId;
 
         ContentResolver resolver = context.getContentResolver();
@@ -205,10 +201,12 @@ public class DatabaseManager {
 
     public static Cursor getAllFriends(Context context) {
         int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
         int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
 
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId;
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId;
 
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
@@ -229,6 +227,19 @@ public class DatabaseManager {
                 sortOrder);
 
         return cursor;
+    }
+
+    public static List<User> getAllFriendsList(Context context) {
+        List<User> friendList = new ArrayList<User>();
+        Cursor cursor = getAllFriends(context);
+
+        while (cursor.moveToNext()) {
+            friendList.add(getUserFromCursor(cursor));
+        }
+
+        cursor.close();
+
+        return friendList;
     }
 
     public static Cursor getFriendsFilteredByIds(Context context, List<Integer> friendIdsList) {
@@ -523,9 +534,10 @@ public class DatabaseManager {
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
-    public static void deleteUserById(Context context, int userId) {
-        context.getContentResolver().delete(FriendTable.CONTENT_URI,
+    public static boolean deleteUserById(Context context, int userId) {
+        int deletedRow = context.getContentResolver().delete(FriendTable.CONTENT_URI,
                 FriendTable.Cols.USER_ID + " = " + userId, null);
+        return deletedRow > Consts.ZERO_INT_VALUE;
     }
 
     private static ContentValues getContentValuesUserTable(User user) {

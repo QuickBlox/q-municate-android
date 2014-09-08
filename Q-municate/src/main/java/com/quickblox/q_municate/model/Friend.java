@@ -7,12 +7,23 @@ public class Friend implements Serializable {
     private Integer userId;
     private int relationStatusId;
     private String relationStatus;
+    private int tempRelationStatusId;
 
     public Friend() {
     }
-    public Friend(Integer userId, String relationStatus) {
+
+    public Friend(Integer userId, String relationStatus, int tempRelationStatusId) {
         this.userId = userId;
         this.relationStatus = relationStatus;
+        this.tempRelationStatusId = tempRelationStatusId;
+    }
+
+    public int getTempRelationStatusId() {
+        return tempRelationStatusId;
+    }
+
+    public void setTempRelationStatusId(int tempRelationStatusId) {
+        this.tempRelationStatusId = tempRelationStatusId;
     }
 
     public int getRelationStatusId() {

@@ -7,7 +7,7 @@ public class QBServiceConsts {
     public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
     public static final String ACCEPT_FRIEND_ACTION = "accept_friend_action";
-    public static final String REJECT_FRIEND_ACTION = "reject_friend_action";
+    public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
     public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";
     public static final String GET_FILE_ACTION = "get_file_action";
@@ -19,7 +19,6 @@ public class QBServiceConsts {
     public static final String LOGOUT_REST_ACTION = "logout_rest_action";
     public static final String LOGOUT_CHAT_ACTION = "logout_chat_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_ACTION = "logout_and_destroy_chat_action";
-    public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
     public static final String RESET_PASSWORD_ACTION = "reset_password_action";
     public static final String SIGNUP_ACTION = "signup_action";
     public static final String SOCIAL_LOGIN_ACTION = "social_login_action";
@@ -53,8 +52,8 @@ public class QBServiceConsts {
     public static final String ADD_FRIEND_FAIL_ACTION = "add_friend_fail_action";
     public static final String ACCEPT_FRIEND_SUCCESS_ACTION = "accept_friend_success_action";
     public static final String ACCEPT_FRIEND_FAIL_ACTION = "accept_friend_fail_action";
-    public static final String REJECT_FRIEND_SUCCESS_ACTION = "reject_friend_success_action";
-    public static final String REJECT_FRIEND_FAIL_ACTION = "reject_friend_fail_action";
+    public static final String REMOVE_FRIEND_SUCCESS_ACTION = "remove_friend_success_action";
+    public static final String REMOVE_FRIEND_FAIL_ACTION = "remove_friend_fail_action";
     public static final String IMPORT_FRIENDS_SUCCESS_ACTION = "import_friends_success_action";
     public static final String IMPORT_FRIENDS_FAIL_ACTION = "import_friends_fail_action";
     public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change_password_success_action";
@@ -65,8 +64,6 @@ public class QBServiceConsts {
     public static final String LOGIN_FAIL_ACTION = "login_fail_action";
     public static final String LOGOUT_SUCCESS_ACTION = "logout_success_action";
     public static final String LOGOUT_FAIL_ACTION = "logout_fail_action";
-    public static final String REMOVE_FRIEND_SUCCESS_ACTION = "remove_friend_success_action";
-    public static final String REMOVE_FRIEND_FAIL_ACTION = "remove_friend_fail_action";
     public static final String RESET_PASSWORD_SUCCESS_ACTION = "reset_password_success_action";
     public static final String RESET_PASSWORD_FAIL_ACTION = "reset_password_fail_action";
     public static final String SIGNUP_SUCCESS_ACTION = "signup_success_action";

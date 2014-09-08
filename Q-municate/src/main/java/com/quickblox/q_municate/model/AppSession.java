@@ -112,7 +112,6 @@ public class AppSession implements Serializable {
         return false;
     }
 
-
     public static AppSession getSession() {
         AppSession activeSession = AppSession.getActiveSession();
         if (activeSession == null) {

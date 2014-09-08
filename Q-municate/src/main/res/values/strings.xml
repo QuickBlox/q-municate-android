@@ -13,7 +13,7 @@
     <string name="acb_chat_attach_title">Add attach</string>
 
     // Navigation Drawer
-    <string name="nvd_title_friends">Friends</string>
+    <string name="nvd_title_contacts">Contacts</string>
     <string name="nvd_title_web_room">Web room</string>
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
@@ -72,7 +72,10 @@
     <string name="frl_all_users">All Users</string>
     <string name="frl_no_friends">Oops…\nYou don\'t have any friends,\ntap search icon to find them \nor invite new ones.</string>
     <string name="frl_not_found_users">Sorry… no users</string>
-    <string name="frl_pending_status">Pending…</string>
+    <string name="frl_pending_status">Waiting…</string>
+    <string name="frl_column_header_name_requests">Requests</string>
+    <string name="frl_column_header_name_contacts">Contacts</string>
+    <string name="frl_column_header_name_all_users">All Users</string>
 
     // Friend Details
     <string name="frd_title">Details</string>

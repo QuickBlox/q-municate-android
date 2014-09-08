@@ -43,9 +43,8 @@ import com.quickblox.q_municate.qb.commands.QBLoginWithSocialCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutRestCommand;
-import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
-import com.quickblox.q_municate.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
+import com.quickblox.q_municate.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.q_municate.qb.commands.QBSendPrivateChatMessageCommand;
@@ -158,9 +157,8 @@ public class QBService extends Service {
 
         registerAddFriendCommand();
         registerAcceptFriendCommand();
-        registerRejectFriendCommand();
-        registerImportFriendsCommand();
         registerRemoveFriendCommand();
+        registerImportFriendsCommand();
         registerLoadFriendsCommand();
         registerLoadUsersCommand();
 
@@ -353,22 +351,16 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.ACCEPT_FRIEND_ACTION, acceptFriendCommand);
     }
 
-    private void registerRejectFriendCommand() {
-        QBRejectFriendCommand rejectFriendCommand = new QBRejectFriendCommand(this, friendListHelper,
-                QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, QBServiceConsts.REJECT_FRIEND_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.REJECT_FRIEND_ACTION, rejectFriendCommand);
+    private void registerRemoveFriendCommand() {
+        QBRemoveFriendCommand rejectFriendCommand = new QBRemoveFriendCommand(this, friendListHelper,
+                QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, rejectFriendCommand);
     }
 
     private void registerImportFriendsCommand() {
         QBImportFriendsCommand importFriendsCommand = new QBImportFriendsCommand(this, friendListHelper,
                 QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.IMPORT_FRIENDS_ACTION, importFriendsCommand);
-    }
-
-    private void registerRemoveFriendCommand() {
-        QBRemoveFriendCommand removeFriendCommand = new QBRemoveFriendCommand(this,
-                QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.REMOVE_FRIEND_ACTION, removeFriendCommand);
     }
 
     private void registerLogoutCommand() {

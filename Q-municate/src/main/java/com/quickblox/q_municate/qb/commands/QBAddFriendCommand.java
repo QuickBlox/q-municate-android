@@ -29,7 +29,7 @@ public class QBAddFriendCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
 
-        friendListHelper.inviteFriend(userId);
+        friendListHelper.addFriend(userId);
 
         Bundle result = new Bundle();
         result.putSerializable(QBServiceConsts.EXTRA_FRIEND_ID, userId);
