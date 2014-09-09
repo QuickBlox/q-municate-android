@@ -106,10 +106,11 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         final User user = DatabaseManager.getUserFromCursor(cursor);
 
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
+        boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > Consts.ZERO_INT_VALUE;
 
         viewHolder.fullNameTextView.setText(user.getFullName());
 
-        checkRelationStatus(viewHolder, relationStatusId, user);
+        checkVisibilityItems(viewHolder, relationStatusId, user, isAskStatus);
 
         String avatarUrl = getAvatarUrlForUser(user);
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
@@ -152,21 +153,33 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         }
     }
 
-    private void checkRelationStatus(ViewHolder viewHolder, int relationStatusId, User user) {
+    private void checkVisibilityItems(ViewHolder viewHolder, int relationStatusId, User user,
+            boolean isAskStatus) {
         String status = null;
+
         String relationStatus = DatabaseManager.getRelationStatusNameById(context, relationStatusId);
 
         if (!TextUtils.isEmpty(relationStatus)) {
-            if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE)) {
+            boolean isAllFriends = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus
+                    .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
+                    .equals(QBFriendListHelper.RELATION_STATUS_TO);
+            boolean isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && isAskStatus;
+            boolean isPendingFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && !isAskStatus;
+            if (isAddedFriend) {
+                viewHolder.dividerView.setVisibility(View.GONE);
+                viewHolder.acceptFriendImageView.setVisibility(View.GONE);
+                viewHolder.removeFriendImageView.setVisibility(View.GONE);
+                viewHolder.addFriendImageView.setVisibility(View.GONE);
+                viewHolder.onlineImageView.setVisibility(View.GONE);
+                status = resources.getString(R.string.frl_pending_request_status);
+            } else if (isPendingFriend) {
                 viewHolder.dividerView.setVisibility(View.VISIBLE);
                 viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
                 viewHolder.removeFriendImageView.setVisibility(View.VISIBLE);
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 viewHolder.onlineImageView.setVisibility(View.GONE);
                 status = resources.getString(R.string.frl_pending_status);
-            } else if (relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus
-                    .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
-                    .equals(QBFriendListHelper.RELATION_STATUS_TO)) {
+            } else if (isAllFriends) {
                 viewHolder.dividerView.setVisibility(View.GONE);
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 viewHolder.acceptFriendImageView.setVisibility(View.GONE);

@@ -7,23 +7,33 @@ public class Friend implements Serializable {
     private Integer userId;
     private int relationStatusId;
     private String relationStatus;
-    private int tempRelationStatusId;
+    private boolean isAskStatus;
+    private boolean isRequestedFriend;
 
     public Friend() {
     }
 
-    public Friend(Integer userId, String relationStatus, int tempRelationStatusId) {
+    public Friend(Integer userId, String relationStatus, boolean isAskStatus, boolean isRequestedFriend) {
         this.userId = userId;
         this.relationStatus = relationStatus;
-        this.tempRelationStatusId = tempRelationStatusId;
+        this.isAskStatus = isAskStatus;
+        this.isRequestedFriend = isRequestedFriend;
     }
 
-    public int getTempRelationStatusId() {
-        return tempRelationStatusId;
+    public boolean isRequestedFriend() {
+        return isRequestedFriend;
     }
 
-    public void setTempRelationStatusId(int tempRelationStatusId) {
-        this.tempRelationStatusId = tempRelationStatusId;
+    public void setRequestedFriend(boolean isRequestedFriend) {
+        this.isRequestedFriend = isRequestedFriend;
+    }
+
+    public boolean isAskStatus() {
+        return isAskStatus;
+    }
+
+    public void setAskStatus(boolean isAskStatus) {
+        this.isAskStatus = isAskStatus;
     }
 
     public int getRelationStatusId() {

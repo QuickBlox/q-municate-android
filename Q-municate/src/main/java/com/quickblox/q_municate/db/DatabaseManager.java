@@ -36,9 +36,7 @@ public class DatabaseManager {
             saveUser(context, user);
         }
         for (Friend friend : friendsList) {
-            if (!DatabaseManager.hasFriendTempStatus(context, friend.getUserId())) {
-                saveFriend(context, friend);
-            }
+            saveFriend(context, friend);
         }
     }
 
@@ -89,7 +87,8 @@ public class DatabaseManager {
 
         values.put(FriendTable.Cols.USER_ID, friend.getUserId());
         values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
-        values.put(FriendTable.Cols.TEMP_RELATION_STATUS_ID, friend.getTempRelationStatusId());
+        values.put(FriendTable.Cols.IS_STATUS_ASK, friend.isAskStatus());
+        values.put(FriendTable.Cols.IS_REQUESTED_FRIEND, friend.isRequestedFriend());
 
         return values;
     }
@@ -142,20 +141,6 @@ public class DatabaseManager {
         return relationStatus;
     }
 
-    public static boolean hasFriendTempStatus(Context context, int searchId) {
-        String condition = FriendTable.Cols.TEMP_RELATION_STATUS_ID + " = " + 1 + " AND " + FriendTable.Cols.USER_ID + " = " + searchId;
-
-        ContentResolver resolver = context.getContentResolver();
-
-        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, null, condition, null, null);
-
-        boolean isFriendInBase = cursor.getCount() > Consts.ZERO_INT_VALUE;
-
-        cursor.close();
-
-        return isFriendInBase;
-    }
-
     public static boolean isFriendInBase(Context context, int searchId) {
         int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
         int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
@@ -203,10 +188,13 @@ public class DatabaseManager {
         int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
         int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
         int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
 
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
                 + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + " OR "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId;
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId + " OR ("
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
 
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
@@ -218,12 +206,13 @@ public class DatabaseManager {
     }
 
     public static Cursor getAllFriends(Context context, int relationStatusId) {
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId;
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
 
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND " + condition, null,
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
                 sortOrder);
 
         return cursor;

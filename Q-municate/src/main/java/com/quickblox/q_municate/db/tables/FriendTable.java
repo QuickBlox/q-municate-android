@@ -16,6 +16,7 @@ public class FriendTable {
         public static final String ID = "_id";
         public static final String USER_ID = "user_id";
         public static final String RELATION_STATUS_ID = "relation_status_id";
-        public static final String TEMP_RELATION_STATUS_ID = "temp_relation_status_id";
+        public static final String IS_STATUS_ASK = "is_status_ask";
+        public static final String IS_REQUESTED_FRIEND = "is_requested_friend";
     }
 }

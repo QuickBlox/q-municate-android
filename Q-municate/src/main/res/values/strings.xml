@@ -73,6 +73,7 @@
     <string name="frl_no_friends">Oops…\nYou don\'t have any friends,\ntap search icon to find them \nor invite new ones.</string>
     <string name="frl_not_found_users">Sorry… no users</string>
     <string name="frl_pending_status">Waiting…</string>
+    <string name="frl_pending_request_status">Pending contact request</string>
     <string name="frl_column_header_name_requests">Requests</string>
     <string name="frl_column_header_name_contacts">Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>

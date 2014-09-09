@@ -55,7 +55,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private MenuItem searchItem;
     private SearchView searchView;
     private Toast errorToast;
-    private ContentObserver statusContentObserver;
+    private ContentObserver userTableContentObserver;
+    private ContentObserver friendTableContentObserver;
     private MatrixCursor headersCursor;
     private List<User> usersList;
     private MatrixCursor searchResultCursor;
@@ -83,7 +84,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onDetach() {
         super.onDetach();
-        unregisterStatusChangingObserver();
+        unregisterDBObservers();
     }
 
     @Override
@@ -96,8 +97,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchView.setOnQueryTextListener(this);
     }
 
-    private void registerStatusChangingObserver() {
-        statusContentObserver = new ContentObserver(new Handler()) {
+    private void registerDBObservers() {
+        userTableContentObserver = new ContentObserver(new Handler()) {
 
             @Override
             public void onChange(boolean selfChange) {
@@ -105,12 +106,24 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 checkVisibilityEmptyLabel();
             }
         };
+
+        friendTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                initFriendsList();
+                checkVisibilityEmptyLabel();
+            }
+        };
+
         baseActivity.getContentResolver().registerContentObserver(UserTable.CONTENT_URI, true,
-                statusContentObserver);
+                userTableContentObserver);
+        baseActivity.getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
+                friendTableContentObserver);
     }
 
-    private void unregisterStatusChangingObserver() {
-        baseActivity.getContentResolver().unregisterContentObserver(statusContentObserver);
+    private void unregisterDBObservers() {
+        baseActivity.getContentResolver().unregisterContentObserver(userTableContentObserver);
     }
 
     @Override
@@ -134,7 +147,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         initUI(rootView);
         initListeners();
-        registerStatusChangingObserver();
+        registerDBObservers();
 
         resources = getResources();
         friendOperationAction = new FriendOperationAction();
@@ -325,7 +338,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     private MatrixCursor createSearchResultCursor(List<User> usersList) {
         MatrixCursor usersCursor = new MatrixCursor(
-                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID});
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK, FriendTable.Cols.IS_REQUESTED_FRIEND});
 
         List<User> friendsList = DatabaseManager.getAllFriendsList(baseActivity);
 
@@ -334,7 +347,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 usersCursor.addRow(new String[]{user.getUserId() + Consts.EMPTY_STRING, user
                         .getUserId() + Consts.EMPTY_STRING, user.getFullName(), user.getEmail(), user
                         .getPhone(), user.getAvatarUrl(), user
-                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING});
+                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING});
             }
         }
 
