@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/list_item_background_selector"
@@ -10,15 +11,17 @@
         android:layout_height="wrap_content"
         android:padding="4dp">
 
-        <com.quickblox.qmunicate.ui.views.RoundedImageView
+        <com.quickblox.q_municate.ui.views.RoundedImageView
+            style="@style/AvatarImageView"
             android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_small_avatar_layout_width"
             android:layout_height="@dimen/image_view_small_avatar_layout_height"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/placeholder_user" />
+            app:border_color="@color/dark_gray"
+            app:border_width="@dimen/avatar_border_width"
+            app:oval="true" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -38,7 +41,7 @@
                 android:maxLines="2"
                 android:ellipsize="end" />
 
-            <com.quickblox.qmunicate.ui.views.smiles.ChatTextView
+            <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

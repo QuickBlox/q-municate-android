@@ -37,4 +37,22 @@
         <item name="android:textOff"></item>
         <item name="android:textOn"></item>
     </style>
+
+    <!-- EmojiTabs styles -->
+    <style name="EmojiTabImageButton" parent="android:Widget.ImageButton">
+        <item name="android:background">@drawable/tab_emoji_selector</item>
+        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <!-- Avatars ImageView style -->
+    <style name="AvatarImageView">
+        <item name="android:layout_width">@dimen/image_view_big_avatar_layout_width</item>
+        <item name="android:layout_height">@dimen/image_view_big_avatar_layout_height</item>
+        <item name="android:layout_gravity">center|top</item>
+        <item name="android:scaleType">centerCrop</item>
+        <item name="android:src">@drawable/placeholder_user</item>
+    </style>
+
 </resources>

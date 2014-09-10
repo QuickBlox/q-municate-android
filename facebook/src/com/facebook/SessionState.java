@@ -53,17 +53,17 @@ public enum SessionState {
 
     /**
      * Indicates that the Session is opened. In this state, the Session may be
-     * used with a {@link Request}.
+     * used with a {@link com.facebook.Request}.
      */
     OPENED(Category.OPENED_CATEGORY),
 
     /**
      * <p>
      * Indicates that the Session is opened and that the token has changed. In
-     * this state, the Session may be used with {@link Request}.
+     * this state, the Session may be used with {@link com.facebook.Request}.
      * </p>
      * <p>
-     * Every time the token is updated, {@link Session.StatusCallback
+     * Every time the token is updated, {@link com.facebook.Session.StatusCallback
      * StatusCallback} is called with this value.
      * </p>
      */
@@ -72,7 +72,7 @@ public enum SessionState {
     /**
      * Indicates that the Session is closed, and that it was not closed
      * normally. Typically this means that the open call failed, and the
-     * Exception parameter to {@link Session.StatusCallback StatusCallback} will
+     * Exception parameter to {@link com.facebook.Session.StatusCallback StatusCallback} will
      * be non-null.
      */
     CLOSED_LOGIN_FAILED(Category.CLOSED_CATEGORY),
@@ -90,11 +90,11 @@ public enum SessionState {
 
     /**
      * Returns a boolean indicating whether the state represents a successfully
-     * opened state in which the Session can be used with a {@link Request}.
+     * opened state in which the Session can be used with a {@link com.facebook.Request}.
      * 
      * @return a boolean indicating whether the state represents a successfully
      *         opened state in which the Session can be used with a
-     *         {@link Request}.
+     *         {@link com.facebook.Request}.
      */
     public boolean isOpened() {
         return this.category == Category.OPENED_CATEGORY;
@@ -102,10 +102,10 @@ public enum SessionState {
 
     /**
      * Returns a boolean indicating whether the state represents a closed
-     * Session that can no longer be used with a {@link Request}.
+     * Session that can no longer be used with a {@link com.facebook.Request}.
      * 
      * @return a boolean indicating whether the state represents a closed
-     * Session that can no longer be used with a {@link Request}.
+     * Session that can no longer be used with a {@link com.facebook.Request}.
      */
     public boolean isClosed() {
         return this.category == Category.CLOSED_CATEGORY;

@@ -70,7 +70,7 @@
     <string name="frl_offline">Offline</string>
     <string name="frl_friends">Friends</string>
     <string name="frl_all_users">All Users</string>
-    <string name="frl_no_friends">Currently there are no friends.\nYou can search friends or invite them via Invite screen.</string>
+    <string name="frl_no_friends">Oops…\nYou don\'t have any friends,\ntap search icon to find them \nor invite new ones.</string>
     <string name="frl_not_found_users">Sorry… no users</string>
 
     // Friend Details
@@ -83,7 +83,7 @@
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
-    <string name="dlg_no_chats">There are no chats yet.</string>
+    <string name="dlg_no_chats">Oops…\nYou don\'t have any chats, \ntap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
@@ -96,10 +96,13 @@
     <string name="gdd_leave_group">Leave group</string>
     <string name="gdd_participants">%1$d participants</string>
     <string name="gdd_online_participants">%1$d/%2$d online</string>
+    <string name="gdd_name_not_entered">Please fill group name</string>
+    <string name="gdd_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
     <string name="ndl_ac_mode_title">Group chat participants:</string>
+    <string name="ndl_no_friends_for_new_chat">You don\'t have any Friends for creating New Chat</string>
 
     // Preferences
     <string name="pref_title_profile_and_details">Profile and details</string>
@@ -144,20 +147,19 @@
     <string name="inf_choose_email_provider">Choose an email provider:</string>
     <string name="inf_subject_of_invitation">Q-municate</string>
     <string name="inf_body_of_invitation">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
-    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=normal</string>
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
     <string name="inf_fb_wall_param_name">Q-municate</string>
     <string name="inf_fb_wall_param_description">Dear friend, use Q-municate application to reach me!\nDownload it here: http://q-municate.com/</string>
     <string name="inf_fb_wall_param_link">http://q-municate.com/</string>
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
+    <string name="inf_fb_request_canceled">Request cancelled</string>
 
     // Feedback
     <string name="fdb_feedback_title">Feedback Description</string>
     <string name="fdb_feedback_label">
-        Please write in email the steps to make the bug or error appear again.
-        Let us know how often it occurs and if it give an error code.
-         We need to know this in order to find the source of the problem. 
-        Please give us as many details as possible. Thank you. 
+        In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
+        This information will help us to find the source of the issue. Kindly give us as many details as possible. Thank you.
     </string>
     <string name="fdb_bug_type">Bug</string>
     <string name="fdb_improvement_type">Improvement</string>
@@ -186,7 +188,8 @@
     <string name="dlg_no_facebook_friends">No Facebook friends</string>
     <string name="dlg_no_contacts_friends">No Contacts friends</string>
     <string name="dlg_no_friends">No friends</string>
-    <string name="dlg_success_posted_to_facebook">Facebook chat was sent successful!</string>
+    <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
+    <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
     <string name="dlg_friend_removed">Friend is removed</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
@@ -202,7 +205,10 @@
     <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
     <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
+    <string name="dlg_force_relogin_on_token_required">Token error is occured in application. Relogin will be executed now</string>
+    <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
+    <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
@@ -327,6 +333,7 @@
     <string name="file_was_attached">file was attached</string>
     <string name="uploading_file">Uploading… Please wait</string>
     <string name="user_created_room">%1$s created group chat</string>
+    <string name="user_read_message">%1$s read message</string>
 
     <string name="label_done">Done</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>

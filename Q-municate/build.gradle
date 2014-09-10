@@ -1,14 +1,29 @@
+buildscript {
+    repositories {
+        maven { url 'http://download.crashlytics.com/maven' }
+    }
+
+    dependencies {
+        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+    }
+}
 apply plugin: 'android'
+apply plugin: 'crashlytics'
+
+repositories {
+    maven { url 'http://download.crashlytics.com/maven' }
+}
 
 dependencies {
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':facebook')
+    compile project(':cropper')
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
-    compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
     compile "de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
+    compile 'com.crashlytics.android:crashlytics:1.+'
 }
 
 task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
@@ -39,27 +54,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            storeFile file('../cert/release.keystore')
-            storePassword ''
-            keyAlias ''
-            keyPassword ''
-        }
     }
     buildTypes {
         debug {
             debuggable rootProject.devDebug
             signingConfig signingConfigs.debug
             zipAlign true
-        }
-        release {
-            debuggable rootProject.prodDebug
-            signingConfig signingConfigs.release
-            runProguard false
-            proguardFile 'proguard.cfg'
-            proguardFile getDefaultProguardFile('proguard-rules.txt')
-            resValue "string", "lgn_default_user_email", ""
-            resValue "string", "lgn_default_user_password", ""
         }
     }
     packagingOptions {
@@ -68,7 +68,5 @@ android {
     }
     lintOptions {
         abortOnError false
-    }
-    productFlavors {
     }
 }

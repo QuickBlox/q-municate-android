@@ -37,8 +37,12 @@
     <color name="red">#ff0000</color>
     <color name="green">#1cba48</color>
     <color name="blue">#0d70b3</color>
+    <color name="light_blue">#ff0d8cd1</color>
 
     <color name="chat_background_color">#f5f5f5</color>
+    <color name="chat_emoji_panel_color">#ff303030</color>
+    <color name="chat_emoji_tabs_color">#ff202020</color>
+    <color name="chat_attach_background_color">#ffd9d9d9</color>
 
     <color name="screen_call_background_color">#333333</color>
     <color name="screen_call_timer_text_color">#999999</color>
