@@ -13,6 +13,10 @@ public class Friend implements Serializable {
     public Friend() {
     }
 
+    public Friend(Integer userId) {
+        this.userId = userId;
+    }
+
     public Friend(Integer userId, String relationStatus, boolean isAskStatus, boolean isRequestedFriend) {
         this.userId = userId;
         this.relationStatus = relationStatus;

@@ -36,7 +36,9 @@ public class DatabaseManager {
             saveUser(context, user);
         }
         for (Friend friend : friendsList) {
-            saveFriend(context, friend);
+            if (!isUserRequested(context, friend.getUserId())) {
+                saveFriend(context, friend);
+            }
         }
     }
 
@@ -103,6 +105,24 @@ public class DatabaseManager {
             values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatusesArray[i]);
             resolver.insert(FriendsRelationTable.CONTENT_URI, values);
         }
+    }
+
+    public static boolean isUserRequested(Context context, int userId) {
+        boolean isUserRequested = false;
+
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.USER_ID + " = " + userId, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            isUserRequested = cursor.getInt(cursor.getColumnIndex(
+                    FriendTable.Cols.IS_REQUESTED_FRIEND)) > Consts.ZERO_INT_VALUE;
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return isUserRequested;
     }
 
     public static int getRelationStatusIdByName(Context context, String relationStatus) {
