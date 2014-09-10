@@ -31,6 +31,7 @@ import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
+import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -203,8 +204,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
 
-        baseActivity.addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
+        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
 
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
@@ -313,9 +314,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         QBAcceptFriendCommand.start(baseActivity, userId);
     }
 
-    private void removeUser(final int userId) {
+    private void rejectUser(final int userId) {
         baseActivity.showProgress();
-        QBRemoveFriendCommand.start(baseActivity, userId);
+        QBRejectFriendCommand.start(baseActivity, userId);
     }
 
     private void startUsersListLoader(String newText) {
@@ -379,7 +380,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         void onAcceptUserClicked(int userId);
 
-        void onRemoveUserClicked(int userId);
+        void onRejectUserClicked(int userId);
     }
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
@@ -417,8 +418,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
 
         @Override
-        public void onRemoveUserClicked(int userId) {
-            removeUser(userId);
+        public void onRejectUserClicked(int userId) {
+            rejectUser(userId);
         }
     }
 
@@ -440,7 +441,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
-    private class RemoveFriendSuccessAction implements Command {
+    private class RejectFriendSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {

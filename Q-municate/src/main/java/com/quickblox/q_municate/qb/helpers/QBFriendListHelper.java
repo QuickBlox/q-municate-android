@@ -45,7 +45,6 @@ public class QBFriendListHelper extends BaseHelper {
     private static final String ENTRIES_ADDED_ERROR = "Failed to add friends to list";
     private static final String ENTRIES_DELETED_ERROR = "Failed to delete friends";
     private static final String SUBSCRIPTION_ERROR = "Failed to confirm subscription";
-    private static final String UNSUBSCRIPTION_ERROR = "Failed usubscription";
     private static final String ROSTER_INIT_ERROR = "ROSTER isn't initialized. Please make relogin";
 
     private static final int FIRST_PAGE = 1;
@@ -84,6 +83,11 @@ public class QBFriendListHelper extends BaseHelper {
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
         updateFriend(userId);
+    }
+
+    public void rejectFriend(int userId) throws Exception {
+        roster.reject(userId);
+        deleteUser(userId);
     }
 
     public void removeFriend(int userId) throws Exception {
@@ -294,14 +298,5 @@ public class QBFriendListHelper extends BaseHelper {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
         }
-//
-//        @Override
-//        public void unsubscriptionRequested(int userId) {
-//            try {
-//                removeFriend(userId);
-//            } catch (Exception e) {
-//                Log.e(TAG, UNSUBSCRIPTION_ERROR, e);
-//            }
-//        }
     }
 }
