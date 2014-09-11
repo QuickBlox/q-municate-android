@@ -49,7 +49,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private static View fragmentContainerView;
     private Resources resources;
     private ListView drawerListView;
-    private TextView fullnameTextView;
+    private TextView fullNameTextView;
     private ImageButton logoutButton;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
@@ -58,7 +58,6 @@ public class NavigationDrawerFragment extends BaseFragment {
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
-    private boolean isMissedMessage;
     private NavigationDrawerAdapter navigationDrawerAdapter;
     private BroadcastReceiver countUnreadDialogsBroadcastReceiver;
 
@@ -77,11 +76,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         if (savedInstanceState != null) {
             currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             fromSavedInstanceState = true;
-        }
-
-        if (isMissedMessage) {
-            currentSelectedPosition = MainActivity.ID_CHATS_LIST_FRAGMENT;
-            saveMissedMessageFlag(false);
         }
 
         selectItem(currentSelectedPosition);
@@ -122,7 +116,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         super.onResume();
         QBUser user = AppSession.getSession().getUser();
         if (user != null) {
-            fullnameTextView.setText(user.getFullName());
+            fullNameTextView.setText(user.getFullName());
         }
         addActions();
     }
@@ -180,11 +174,6 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initPrefValues() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
-        isMissedMessage = prefsHelper.getPref(PrefsHelper.PREF_MISSED_MESSAGE, false);
-    }
-
-    private void saveMissedMessageFlag(boolean isMissedMessage) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
     }
 
     private void selectItem(int position) {
@@ -209,7 +198,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initUI(View rootView) {
         drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
         logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
-        fullnameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
+        fullNameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
     }
 
     private void initListeners() {

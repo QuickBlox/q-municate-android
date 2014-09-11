@@ -55,12 +55,7 @@ public class GCMIntentService extends IntentService {
 
     private void parseMessage(Bundle extras) {
         String message = extras.getString(NotificationHelper.MESSAGE, "");
-        saveMissedMessageFlag(true);
         sendNotification(message);
-    }
-
-    private void saveMissedMessageFlag(boolean isMissedMessage) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
     }
 
     private void sendNotification(String msg) {

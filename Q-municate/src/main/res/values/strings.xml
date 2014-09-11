@@ -23,8 +23,8 @@
     <string name="nvd_close">Close navigation drawer</string>
 
     <string-array name="nvd_items_array">
-        <item>Friends</item>
         <item>Chats</item>
+        <item>Contacts</item>
         <item>Invite Friends</item>
         <item>Settings</item>
         <item>Give Feedback</item>
@@ -75,7 +75,7 @@
     <string name="frl_pending_status">Waiting…</string>
     <string name="frl_pending_request_status">Pending contact request</string>
     <string name="frl_column_header_name_requests">Requests</string>
-    <string name="frl_column_header_name_contacts">Contacts</string>
+    <string name="frl_column_header_name_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
 
     // Friend Details
