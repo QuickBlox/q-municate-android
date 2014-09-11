@@ -183,14 +183,26 @@ public class DatabaseManager {
     }
 
     public static Cursor getFriendsByFullName(Context context, String fullName) {
-        Cursor cursor;
+        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+
+        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId + " OR ("
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")) AND "
+                + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
+
         String sorting = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
+        Cursor cursor;
+
         if (TextUtils.isEmpty(fullName)) {
-            cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null, null, null, sorting);
+            cursor = getAllFriends(context);
         } else {
-            cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
-                    UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'", null, sorting);
+            cursor = context.getContentResolver().query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, sorting);
         }
 
         if (cursor != null) {

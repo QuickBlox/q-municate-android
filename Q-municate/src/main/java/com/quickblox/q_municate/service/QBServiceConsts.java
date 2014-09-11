@@ -136,6 +136,7 @@ public class QBServiceConsts {
     public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
     public static final String EXTRA_ROOM_JID = "room_jid_id";
     public static final String EXTRA_USER = "qb_user";
+    public static final String EXTRA_USERS = "users";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_ERROR_CODE = "error_code";
     public static final String EXTRA_FRIEND = "friend";

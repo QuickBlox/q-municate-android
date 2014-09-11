@@ -36,8 +36,9 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private int relationStatusNoneId;
     private int relationStatusAllUsersId;
     private MatrixCursor usersCursor;
+    private boolean forSearch;
 
-    public FriendsListCursorAdapter(Context context, Cursor cursor, MatrixCursor usersCursor, FriendsListFragment.FriendOperationListener friendOperationListener) {
+    public FriendsListCursorAdapter(Context context, Cursor cursor, MatrixCursor usersCursor, FriendsListFragment.FriendOperationListener friendOperationListener, boolean forSearch) {
         super(cursor, context, true);
         layoutInflater = LayoutInflater.from(context);
         this.context = context;
@@ -46,6 +47,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         resources = context.getResources();
         relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
         relationStatusAllUsersId = QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS;
+        this.forSearch = forSearch;
     }
 
     public void setSearchCharacters(String searchCharacters) {
@@ -56,12 +58,20 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     protected Cursor getChildrenCursor(Cursor groupCursor) {
         int relationStatusId = groupCursor.getInt(groupCursor.getColumnIndex(HEADER_COLUMN_ID));
 
-        if (relationStatusId == relationStatusNoneId) {
-            return DatabaseManager.getAllFriends(context, relationStatusId);
-        } else if (relationStatusId == relationStatusAllUsersId) {
-            return usersCursor;
+        if (forSearch) {
+            if (relationStatusId == relationStatusAllUsersId) {
+                return usersCursor;
+            } else {
+                return DatabaseManager.getFriendsByFullName(context, searchCharacters);
+            }
         } else {
-            return DatabaseManager.getAllFriends(context);
+            if (relationStatusId == relationStatusNoneId) {
+                return DatabaseManager.getAllFriends(context, relationStatusId);
+            } else if (relationStatusId == relationStatusAllUsersId) {
+                return usersCursor;
+            } else {
+                return DatabaseManager.getAllFriends(context);
+            }
         }
     }
 

@@ -1,9 +1,16 @@
 package com.quickblox.q_municate.utils;
 
+import android.content.Context;
+import android.database.MatrixCursor;
+
 import com.quickblox.module.chat.QBRosterEntry;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 
 import org.jivesoftware.smack.packet.RosterPacket;
 
@@ -89,5 +96,23 @@ public class FriendUtils {
             userIds.add(entry.getUserId());
         }
         return userIds;
+    }
+
+    public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
+        MatrixCursor usersCursor = new MatrixCursor(
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK, FriendTable.Cols.IS_REQUESTED_FRIEND});
+
+        List<User> friendsList = DatabaseManager.getAllFriendsList(context);
+
+        for (User user : usersList) {
+            if (!friendsList.contains(user)) {
+                usersCursor.addRow(new String[]{user.getUserId() + Consts.EMPTY_STRING, user
+                        .getUserId() + Consts.EMPTY_STRING, user.getFullName(), user.getEmail(), user
+                        .getPhone(), user.getAvatarUrl(), user
+                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING});
+            }
+        }
+
+        return usersCursor;
     }
 }

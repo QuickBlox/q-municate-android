@@ -42,11 +42,11 @@ public class QBLoadUsersCommand extends ServiceCommand {
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collections.sort(userList, new UserComparator());
-        List<User> friendList = FriendUtils.createUsersList(userList);
-        friendList.remove(FriendUtils.createUser(AppSession.getSession().getUser()));
+        List<User> usersList = FriendUtils.createUsersList(userList);
+        usersList.remove(FriendUtils.createUser(AppSession.getSession().getUser()));
 
         Bundle params = new Bundle();
-        params.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) friendList);
+        params.putSerializable(QBServiceConsts.EXTRA_USERS, (java.io.Serializable) usersList);
         return params;
     }
 
