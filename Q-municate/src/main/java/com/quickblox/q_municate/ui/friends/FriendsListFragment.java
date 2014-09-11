@@ -83,7 +83,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onDetach() {
         super.onDetach();
-        unregisterDBObservers();
+        unregisterContentObservers();
     }
 
     @Override
@@ -121,7 +121,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 friendTableContentObserver);
     }
 
-    private void unregisterDBObservers() {
+    private void unregisterContentObservers() {
         baseActivity.getContentResolver().unregisterContentObserver(userTableContentObserver);
         baseActivity.getContentResolver().unregisterContentObserver(friendTableContentObserver);
     }

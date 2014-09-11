@@ -20,7 +20,7 @@ public class NotificationHelper {
         userIds.addAll(userIdsList);
         QBEvent event = new QBEvent();
         event.setUserIds(userIds);
-        event.setEnvironment(QBEnvironment.DEVELOPMENT);
+        event.setEnvironment(QBEnvironment.PRODUCTION);
         event.setNotificationType(QBNotificationType.PUSH);
         event.setMessage(message);
         return event;
