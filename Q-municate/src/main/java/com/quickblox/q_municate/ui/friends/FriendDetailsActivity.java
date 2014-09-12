@@ -185,6 +185,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
                 QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend.getUserId());
             }
         });
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
         alertDialog.show(getFragmentManager(), null);
     }
 

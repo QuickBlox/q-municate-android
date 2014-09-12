@@ -21,7 +21,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -99,12 +98,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         initUI();
     }
 
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-    }
-
     @Override
     protected void onPause() {
         activityDelegator.onPause();
@@ -119,6 +112,12 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         connectToService();
@@ -130,10 +129,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         unbindService();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean(CAN_PERFORM_LOGOUT, canPerformLogout.get());
-        super.onSaveInstanceState(outState);
+    private void initUI() {
+        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
     }
 
     private void unbindService() {
@@ -236,10 +235,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
     }
 
-    private class GlobalListener implements  ActivityDelegator.GlobalActionsListener {
+    private class GlobalListener implements ActivityDelegator.GlobalActionsListener {
+
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-           onReceiveMessage(extras);
+            onReceiveMessage(extras);
         }
 
         @Override
@@ -260,7 +260,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             activityDelegator.showFriendAlert(alertMessage);
         }
     }
-
 
     private class QBChatServiceConnection implements ServiceConnection {
 

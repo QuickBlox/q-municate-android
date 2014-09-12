@@ -7,7 +7,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -20,13 +19,8 @@ import android.widget.TextView;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.chats.BaseDialogActivity;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -225,6 +219,7 @@ public abstract class BaseActivity extends Activity {
     }
 
     private class GlobalListener implements ActivityDelegator.GlobalActionsListener {
+
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
             String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);

@@ -46,10 +46,10 @@ public class ActivityDelegator extends BaseActivityDelegator {
 
     public void showFriendAlert(String message) {
         AlertDialog alertDialog = AlertDialog.newInstance(message);
-        if(context instanceof BaseActivity) {
-            alertDialog.show(((BaseActivity)context).getFragmentManager(), null);
+        if (context instanceof BaseActivity) {
+            alertDialog.show(((BaseActivity) context).getFragmentManager(), null);
         } else {
-            alertDialog.show(((BaseFragmentActivity)context).getFragmentManager(), null);
+            alertDialog.show(((BaseFragmentActivity) context).getFragmentManager(), null);
         }
     }
 
@@ -131,6 +131,17 @@ public class ActivityDelegator extends BaseActivityDelegator {
         return handler;
     }
 
+    public interface GlobalActionsListener {
+
+        public void onReceiveChatMessageAction(Bundle extras);
+
+        public void onReceiveForceReloginAction(Bundle extras);
+
+        public void onReceiveRefreshSessionAction(Bundle extras);
+
+        public void onReceiveFriendActionAction(Bundle extras);
+    }
+
     private class BaseBroadcastReceiver extends BroadcastReceiver {
 
         @Override
@@ -161,7 +172,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
     private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context,final Intent intent) {
+        public void onReceive(Context context, final Intent intent) {
             getHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -186,16 +197,5 @@ public class ActivityDelegator extends BaseActivityDelegator {
                 }
             });
         }
-    }
-
-    public interface GlobalActionsListener {
-
-        public void onReceiveChatMessageAction(Bundle extras);
-
-        public void onReceiveForceReloginAction(Bundle extras);
-
-        public void onReceiveRefreshSessionAction(Bundle extras);
-
-        public void onReceiveFriendActionAction(Bundle extras);
     }
 }

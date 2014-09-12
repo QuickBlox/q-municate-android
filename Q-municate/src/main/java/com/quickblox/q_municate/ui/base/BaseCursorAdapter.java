@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.LoginType;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.utils.Consts;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {

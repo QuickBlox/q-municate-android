@@ -351,6 +351,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 QBRejectFriendCommand.start(baseActivity, userId);
             }
         });
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
         alertDialog.show(getFragmentManager(), null);
     }
 

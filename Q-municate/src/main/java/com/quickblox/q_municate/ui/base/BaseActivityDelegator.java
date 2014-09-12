@@ -7,7 +7,7 @@ public abstract class BaseActivityDelegator {
 
     private Context context;
 
-    public BaseActivityDelegator(Context context){
+    public BaseActivityDelegator(Context context) {
         this.context = context;
     }
 
