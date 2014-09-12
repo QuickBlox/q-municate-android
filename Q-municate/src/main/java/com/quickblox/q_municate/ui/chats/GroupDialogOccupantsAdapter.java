@@ -5,7 +5,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
@@ -21,47 +23,61 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        User friend = getItem(position);
+        ViewHolder viewHolder;
+        User user = getItem(position);
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_dialog_friend, null);
-            holder = new ViewHolder();
+            viewHolder = new ViewHolder();
 
-            holder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            holder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
-            holder.onlineStatusMessageTextView = (TextView) convertView.findViewById(
+            viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
+            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
+            viewHolder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
+            viewHolder.onlineStatusMessageTextView = (TextView) convertView.findViewById(
                     R.id.statusMessageTextView);
 
-            convertView.setTag(holder);
+            convertView.setTag(viewHolder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        String fullname;
-        if (isFriend(friend)) {
-            fullname = friend.getFullName();
-            holder.onlineStatusMessageTextView.setVisibility(View.VISIBLE);
+        String fullName;
+        if (isFriend(user)) {
+            fullName = user.getFullName();
+            viewHolder.onlineStatusMessageTextView.setVisibility(View.VISIBLE);
         } else {
-            fullname = String.valueOf(friend.getUserId());
-            holder.onlineStatusMessageTextView.setVisibility(View.GONE);
+            fullName = String.valueOf(user.getUserId());
+            viewHolder.onlineStatusMessageTextView.setVisibility(View.GONE);
         }
-        holder.nameTextView.setText(fullname);
+        viewHolder.nameTextView.setText(fullName);
 
-        holder.onlineStatusMessageTextView.setText(friend.getOnlineStatus());
-        if (friend.isOnline()) {
-            holder.onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            holder.onlineImageView.setVisibility(View.GONE);
-        }
-        displayImage(friend.getAvatarUrl(), holder.avatarImageView);
+        setOnlineStatusVisibility(viewHolder, user);
+
+        displayImage(user.getAvatarUrl(), viewHolder.avatarImageView);
 
         return convertView;
     }
 
-    private boolean isFriend(User friend) {
-        return friend.getFullName() != null;
+    private void setOnlineStatusVisibility(ViewHolder viewHolder, User user) {
+        if(isMe(user)) {
+            user.setOnline(true);
+        }
+
+        viewHolder.onlineStatusMessageTextView.setText(user.getOnlineStatus());
+        if (user.isOnline()) {
+            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.onlineImageView.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean isFriend(User user) {
+        return user.getFullName() != null;
+    }
+
+    private boolean isMe(User inputUser) {
+        QBUser currentUser = AppSession.getSession().getUser();
+        return currentUser.getId() == inputUser.getUserId();
     }
 
     private static class ViewHolder {

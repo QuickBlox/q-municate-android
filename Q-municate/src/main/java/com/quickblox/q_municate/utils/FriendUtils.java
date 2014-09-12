@@ -42,11 +42,11 @@ public class FriendUtils {
         return friend;
     }
 
-    public static Friend createFriend(int userId) {
+    public static Friend createFriend(int userId, boolean requestedFriend) {
         Friend friend = new Friend();
         friend.setUserId(userId);
         friend.setRelationStatus(RosterPacket.ItemType.none.name());
-        friend.setRequestedFriend(true);
+        friend.setRequestedFriend(requestedFriend);
         return friend;
     }
 

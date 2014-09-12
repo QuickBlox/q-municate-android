@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPresence;
 import com.quickblox.module.chat.QBRoster;
@@ -78,12 +76,8 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void addFriend(int userId) throws Exception {
-        if (isNotInvited(userId)) {
-            Friend friend = new Friend(userId);
-            friend.setRequestedFriend(false);
-            saveFriend(friend);
-            sendInvitation(userId);
-        }
+        createFriend(userId, false);
+        sendInvitation(userId);
     }
 
     public void acceptFriend(int userId) throws Exception {
@@ -166,12 +160,6 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private void createFriends(Collection<Integer> userIdsList) throws QBResponseException {
-        for (Integer userId : userIdsList) {
-            createFriend(userId);
-        }
-    }
-
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
@@ -205,9 +193,9 @@ public class QBFriendListHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private void createFriend(int userId) throws QBResponseException {
+    private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
         User user = loadUser(userId);
-        Friend friend = FriendUtils.createFriend(userId);
+        Friend friend = FriendUtils.createFriend(userId, requestedFriend);
 
         fillUserOnlineStatus(user);
 
@@ -294,7 +282,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesAdded(Collection<Integer> userIdsList) {
             try {
-                createFriends(userIdsList);
+                updateFriends(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_ADDED_ERROR, e);
             }
@@ -326,7 +314,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                createFriend(userId);
+                createFriend(userId, true);
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }

@@ -205,6 +205,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         if (state == State.GLOBAL_LIST) {
             friendsListAdapter.setSearchCharacters(newText);
+            baseActivity.showProgress();
             startUsersListLoader(newText);
         }
 
@@ -476,6 +477,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
             usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
             searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
             initFriendsListForSearch();
@@ -487,6 +489,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
         }
