@@ -19,6 +19,8 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FriendUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -62,10 +64,22 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         }
 
         ArrayList<User> friendList = new ArrayList<User>(friendMap.values());
+        Collections.sort(friendList, new UserComparator());
         groupDialog.setOccupantList(friendList);
 
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG, groupDialog);
         return params;
+    }
+
+    private class UserComparator implements Comparator<User> {
+
+        @Override
+        public int compare(User firstUser, User secondUser) {
+            if (firstUser.getFullName() == null || secondUser.getFullName() == null) {
+                return Consts.ZERO_INT_VALUE;
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(firstUser.getFullName(), secondUser.getFullName());
+        }
     }
 }

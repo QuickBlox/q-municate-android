@@ -73,6 +73,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean needToShowSmileLayout;
     private ImageView messageTypingBoxImageView;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
+    private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
 
@@ -108,6 +109,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
+        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
 
         initUI();
         initListeners();
@@ -184,6 +186,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void addActions() {
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, loadAttachFileSuccessAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -386,6 +390,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (dialog == null) {
             return;
         }
+
+        showProgress();
+
         MessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
@@ -416,6 +423,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             onFileLoaded(file);
+            hideProgress();
+        }
+    }
+
+    public class LoadDialogMessagesSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
             hideProgress();
         }
     }
