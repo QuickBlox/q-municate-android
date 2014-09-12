@@ -1,11 +1,15 @@
 package com.quickblox.q_municate.qb.helpers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
+import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPresence;
 import com.quickblox.module.chat.QBRoster;
@@ -14,9 +18,11 @@ import com.quickblox.module.chat.listeners.QBRosterListener;
 import com.quickblox.module.chat.listeners.QBSubscriptionListener;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
@@ -82,7 +88,6 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
-        updateFriend(userId);
     }
 
     public void rejectFriend(int userId) throws Exception {
@@ -161,15 +166,43 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
+    private void createFriends(Collection<Integer> userIdsList) throws QBResponseException {
+        for (Integer userId : userIdsList) {
+            createFriend(userId);
+        }
+    }
+
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
+
         User user = loadUser(userId);
         Friend friend = FriendUtils.createFriend(rosterEntry);
+
+        checkAlertShowing(friend);
 
         fillUserOnlineStatus(user);
 
         saveUser(user);
         saveFriend(friend);
+    }
+
+    private void checkAlertShowing(Friend newFriend) {
+        String alertMessage;
+        Friend oldFriend = DatabaseManager.getFriendById(context, newFriend.getUserId());
+        String friendName = DatabaseManager.getUserById(context, newFriend.getUserId()).getFullName();
+        if(oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE)) {
+            alertMessage = context.getString(R.string.frl_alrt_reject_friend, friendName);
+            notifyFriendAlert(alertMessage);
+        } else if (oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_TO)) {
+            alertMessage = context.getString(R.string.frl_alrt_accepted_friend, friendName);
+            notifyFriendAlert(alertMessage);
+        }
+    }
+
+    protected void notifyFriendAlert(String message) {
+        Intent intent = new Intent(QBServiceConsts.FRIEND_ALERT_SHOW);
+        intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE, message);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private void createFriend(int userId) throws QBResponseException {
@@ -261,7 +294,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesAdded(Collection<Integer> userIdsList) {
             try {
-                updateFriends(userIdsList);
+                createFriends(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_ADDED_ERROR, e);
             }

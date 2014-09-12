@@ -21,6 +21,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -251,6 +252,12 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             DialogUtils.show(BaseFragmentActivity.this, getString(R.string.dlg_refresh_session));
             showProgress();
             activityDelegator.refreshSession();
+        }
+
+        @Override
+        public void onReceiveFriendActionAction(Bundle extras) {
+            String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
+            activityDelegator.showFriendAlert(alertMessage);
         }
     }
 

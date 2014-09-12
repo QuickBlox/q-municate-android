@@ -19,6 +19,7 @@ import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
@@ -30,6 +31,7 @@ import java.util.Set;
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
 public class ActivityDelegator extends BaseActivityDelegator {
 
+    private Context context;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
@@ -39,6 +41,16 @@ public class ActivityDelegator extends BaseActivityDelegator {
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
+        this.context = context;
+    }
+
+    public void showFriendAlert(String message) {
+        AlertDialog alertDialog = AlertDialog.newInstance(message);
+        if(context instanceof BaseActivity) {
+            alertDialog.show(((BaseActivity)context).getFragmentManager(), null);
+        } else {
+            alertDialog.show(((BaseFragmentActivity)context).getFragmentManager(), null);
+        }
     }
 
     public void forceRelogin() {
@@ -102,6 +114,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
+        globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
     }
@@ -165,6 +178,10 @@ public class ActivityDelegator extends BaseActivityDelegator {
                         if (actionsListener != null) {
                             actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
                         }
+                    } else if (QBServiceConsts.FRIEND_ALERT_SHOW.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveFriendActionAction(intent.getExtras());
+                        }
                     }
                 }
             });
@@ -178,5 +195,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
         public void onReceiveForceReloginAction(Bundle extras);
 
         public void onReceiveRefreshSessionAction(Bundle extras);
+
+        public void onReceiveFriendActionAction(Bundle extras);
     }
 }

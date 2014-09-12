@@ -77,6 +77,9 @@
     <string name="frl_column_header_name_requests">Requests</string>
     <string name="frl_column_header_name_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
+    <string name="frl_dlg_reject_friend">Do you really what to reject contact  request from %1$s?</string>
+    <string name="frl_alrt_reject_friend">%1$s has rejected your contact request.</string>
+    <string name="frl_alrt_accepted_friend">%1$s has accepted your contact request. </string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -84,6 +87,7 @@
     <string name="frd_audio_call">Audio Call</string>
     <string name="frd_chat">Chat</string>
     <string name="frd_mobile">MOBILE</string>
+    <string name="frd_dlg_remove_friend">Do you really what to delete %1$s  from your contact list?</string>
 
     // Dialog
     <string name="dlg_message">Message</string>
@@ -188,7 +192,6 @@
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
-    <string name="dlg_remove_user">Remove user</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_no_facebook_friends">No Facebook friends</string>
     <string name="dlg_no_contacts_friends">No Contacts friends</string>

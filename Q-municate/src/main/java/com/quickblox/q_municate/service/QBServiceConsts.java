@@ -175,12 +175,14 @@ public class QBServiceConsts {
     public static final String EXTRA_EMOJIS = "emojis";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_FILE_PATH = "file_path";
+    public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
 
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";
     public static final String FORCE_RELOGIN = "force_relogin";
     public static final String REFRESH_SESSION = "refresh_session";
+    public static final String FRIEND_ALERT_SHOW = "friend_alert";
     public static final String AUTH_ACTION_TYPE = "authorize_type";
     public static final int AUTH_TYPE_REGISTRATION = 1;
     public static final int AUTH_TYPE_LOGIN = 2;

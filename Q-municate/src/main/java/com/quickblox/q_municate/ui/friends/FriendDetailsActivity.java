@@ -28,6 +28,7 @@ import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -175,15 +176,16 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
+                R.string.frd_dlg_remove_friend, friend.getFullName()));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
                 QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend.getUserId());
             }
         });
-        dialog.show(getFragmentManager(), null);
+        alertDialog.show(getFragmentManager(), null);
     }
 
     public void videoCallClickListener(View view) {

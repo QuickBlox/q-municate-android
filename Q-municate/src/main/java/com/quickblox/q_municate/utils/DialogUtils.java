@@ -61,4 +61,18 @@ public class DialogUtils {
 
         return builder.create();
     }
+
+    public static Dialog createDialog(Context context, String message, DialogInterface.OnClickListener positiveButtonListener,
+            DialogInterface.OnClickListener negativeButtonListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message);
+
+        builder.setPositiveButton(R.string.dlg_ok, positiveButtonListener);
+
+        if(negativeButtonListener != null) {
+            builder.setNegativeButton(R.string.dlg_cancel, negativeButtonListener);
+        }
+
+        return builder.create();
+    }
 }

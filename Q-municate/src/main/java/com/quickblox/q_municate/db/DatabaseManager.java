@@ -425,12 +425,25 @@ public class DatabaseManager {
         return dialog;
     }
 
-    public static User getUserById(Context context, int friendId) {
+    public static User getUserById(Context context, int userId) {
         Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
-                UserTable.Cols.USER_ID + " = " + friendId, null, null);
-        User friend = null;
+                UserTable.Cols.USER_ID + " = " + userId, null, null);
+        User user = null;
         if (cursor != null && cursor.moveToFirst()) {
-            friend = getUserFromCursor(cursor);
+            user = getUserFromCursor(cursor);
+            cursor.close();
+        }
+        return user;
+    }
+
+    public static Friend getFriendById(Context context, int friendId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.USER_ID + " = " + friendId, null, null);
+        Friend friend = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            friend = getFriendFromCursor(cursor);
+            String relationStatus = getRelationStatusNameById(context, friend.getRelationStatusId());
+            friend.setRelationStatus(relationStatus);
             cursor.close();
         }
         return friend;
@@ -459,6 +472,20 @@ public class DatabaseManager {
         user.setOnline(online);
 
         return user;
+    }
+
+    public static Friend getFriendFromCursor(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.USER_ID));
+        int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
+        boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > 0;
+        boolean isRequestedFriend = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_REQUESTED_FRIEND)) > 0;
+
+        Friend friend = new Friend(id);
+        friend.setRelationStatusId(relationStatusId);
+        friend.setAskStatus(isAskStatus);
+        friend.setRequestedFriend(isRequestedFriend);
+
+        return friend;
     }
 
     public static MessageCache getLastReadMessage(Context context, QBDialog dialog) {

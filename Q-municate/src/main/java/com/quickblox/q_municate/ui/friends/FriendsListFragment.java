@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.friends;
 
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -30,9 +31,11 @@ import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
+import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -335,8 +338,20 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void rejectUser(final int userId) {
-        baseActivity.showProgress();
-        QBRejectFriendCommand.start(baseActivity, userId);
+        showRejectUserDialog(userId);
+    }
+
+    private void showRejectUserDialog(final int userId) {
+        User user = DatabaseManager.getUserById(baseActivity, userId);
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(R.string.frl_dlg_reject_friend, user.getFullName()));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                baseActivity.showProgress();
+                QBRejectFriendCommand.start(baseActivity, userId);
+            }
+        });
+        alertDialog.show(getFragmentManager(), null);
     }
 
     private void startUsersListLoader(String newText) {
