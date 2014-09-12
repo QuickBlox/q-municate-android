@@ -31,7 +31,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createFriendsRelationTable(db);
         createMessageTable(db);
         createDialogTable(db);
-        // TODO SF other tables can be created
     }
 
     private void createUserTable(SQLiteDatabase db) {
@@ -51,8 +50,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(UserTable.Cols.TWITTER_ID).append(" INTEGER, ")
                 .append(UserTable.Cols.BLOB_ID).append(" INTEGER, ")
                 .append(UserTable.Cols.AVATAR_URL).append(" TEXT, ")
-                .append(UserTable.Cols.PASSWORD).append(" TEXT, ")
-                .append(UserTable.Cols.OLD_PASSWORD).append(" TEXT, ")
                 .append(UserTable.Cols.STATUS).append(" TEXT, ")
                 .append(UserTable.Cols.IS_ONLINE).append(" INTEGER");
         createTable(db, UserTable.TABLE_NAME, userTableFields.toString());
@@ -118,9 +115,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropTable(db, UserTable.TABLE_NAME);
+        dropTable(db, FriendTable.TABLE_NAME);
+        dropTable(db, FriendsRelationTable.TABLE_NAME);
         dropTable(db, MessageTable.TABLE_NAME);
         dropTable(db, DialogTable.TABLE_NAME);
-        // TODO SF other tables can be dropped
         onCreate(db);
     }
 

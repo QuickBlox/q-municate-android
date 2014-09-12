@@ -33,8 +33,6 @@ public class UserTable {
         public static final String TWITTER_ID = "twitter_id";
         public static final String BLOB_ID = "blob_id";
         public static final String AVATAR_URL = "avatar_url";
-        public static final String PASSWORD = "password";
-        public static final String OLD_PASSWORD = "old_password";
         public static final String STATUS = "status";
         public static final String IS_ONLINE = "online";
     }

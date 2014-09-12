@@ -20,8 +20,6 @@ public class User implements Serializable {
     private String facebookId;
     private String twitterId;
     private Integer blobId;
-    private String password;
-    private String oldPassword;
     private String avatarUrl;
     private String status;
     private boolean online;
@@ -43,8 +41,6 @@ public class User implements Serializable {
         this.facebookId = user.getFacebookId();
         this.twitterId = user.getTwitterId();
         this.blobId = user.getFileId();
-        this.password = user.getPassword();
-        this.oldPassword = user.getOldPassword();
         // TODO Sergey Fedunets: temp
         this.avatarUrl = user.getWebsite();
         // end
@@ -124,22 +120,6 @@ public class User implements Serializable {
 
     public void setBlobId(Integer blobId) {
         this.blobId = blobId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getOldPassword() {
-        return oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.model;
 
 public interface SerializableKeys {
+
     String ONE_TO_ONE_CONVERSATION = "ONE_TO_ONE_CONVERSATION";
     String GROUP_CONVERSATION = "GROUP_CONVERSATION";
     String GROUP_TO_CREATE = "GROUP_TO_CREATE";

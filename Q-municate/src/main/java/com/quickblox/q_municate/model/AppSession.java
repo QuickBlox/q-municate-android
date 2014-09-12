@@ -16,9 +16,9 @@ import java.util.Date;
 
 public class AppSession implements Serializable {
 
+    private static final Object lock = new Object();
     private static AppSession activeSession;
     private final LoginType loginType;
-    private static final Object lock = new Object();
     private QBUser user;
     private String sessionToken;
 
@@ -31,6 +31,53 @@ public class AppSession implements Serializable {
 
     public static void startSession(LoginType loginType, QBUser user, String sessionToken) {
         activeSession = new AppSession(loginType, user, sessionToken);
+    }
+
+    private static AppSession getActiveSession() {
+        synchronized (lock) {
+            return activeSession;
+        }
+    }
+
+    public static AppSession load() {
+        PrefsHelper helper = App.getInstance().getPrefsHelper();
+        String loginTypeRaw = helper.getPref(PrefsHelper.PREF_LOGIN_TYPE, LoginType.EMAIL.toString());
+        int userId = helper.getPref(PrefsHelper.PREF_USER_ID, Consts.NOT_INITIALIZED_VALUE);
+        String userFullName = helper.getPref(PrefsHelper.PREF_USER_FULL_NAME, Consts.EMPTY_STRING);
+        String sessionToken = helper.getPref(PrefsHelper.PREF_SESSION_TOKEN, Consts.EMPTY_STRING);
+        QBUser qbUser = new QBUser();
+        qbUser.setId(userId);
+        qbUser.setFullName(userFullName);
+        LoginType loginType = LoginType.valueOf(loginTypeRaw);
+        return new AppSession(loginType, qbUser, sessionToken);
+    }
+
+    public static void saveRememberMe(boolean value) {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
+    }
+
+    public static boolean isSessionExistOrNotExpired(long expirationTime) {
+        try {
+            BaseService baseService = QBAuth.getBaseService();
+            String token = baseService.getToken();
+            if (token == null) {
+                return false;
+            }
+            Date tokenExpirationDate = baseService.getTokenExpirationDate();
+            long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
+            return tokenLiveOffset > expirationTime;
+        } catch (BaseServiceException e) {
+            ErrorUtils.logError(e);
+        }
+        return false;
+    }
+
+    public static AppSession getSession() {
+        AppSession activeSession = AppSession.getActiveSession();
+        if (activeSession == null) {
+            activeSession = AppSession.load();
+        }
+        return activeSession;
     }
 
     public void closeAndClear() {
@@ -53,12 +100,6 @@ public class AppSession implements Serializable {
         saveUser(user, prefsHelper);
     }
 
-    private static AppSession getActiveSession() {
-        synchronized (lock) {
-            return activeSession;
-        }
-    }
-
     public void updateUser(QBUser user) {
         this.user = user;
         saveUser(this.user, App.getInstance().getPrefsHelper());
@@ -77,46 +118,5 @@ public class AppSession implements Serializable {
 
     public LoginType getLoginType() {
         return loginType;
-    }
-
-    public static AppSession load() {
-        PrefsHelper helper = App.getInstance().getPrefsHelper();
-        String loginTypeRaw = helper.getPref(PrefsHelper.PREF_LOGIN_TYPE, LoginType.EMAIL.toString());
-        int userId = helper.getPref(PrefsHelper.PREF_USER_ID, Consts.NOT_INITIALIZED_VALUE);
-        String userFullName = helper.getPref(PrefsHelper.PREF_USER_FULL_NAME, Consts.EMPTY_STRING);
-        String sessionToken = helper.getPref(PrefsHelper.PREF_SESSION_TOKEN, Consts.EMPTY_STRING);
-        QBUser qbUser = new QBUser();
-        qbUser.setId(userId);
-        qbUser.setFullName(userFullName);
-        LoginType loginType = LoginType.valueOf(loginTypeRaw);
-        return new AppSession(loginType, qbUser, sessionToken);
-    }
-
-    public static void saveRememberMe(boolean value) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
-    }
-
-    public static boolean isSessionExistOrNotExpired(long expirationTime){
-        try {
-            BaseService baseService = QBAuth.getBaseService();
-            String token = baseService.getToken();
-            if (token == null){
-                return false;
-            }
-            Date tokenExpirationDate = baseService.getTokenExpirationDate();
-            long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
-            return tokenLiveOffset > expirationTime;
-        } catch (BaseServiceException e) {
-            ErrorUtils.logError(e);
-        }
-        return false;
-    }
-
-    public static AppSession getSession() {
-        AppSession activeSession = AppSession.getActiveSession();
-        if (activeSession == null) {
-            activeSession = AppSession.load();
-        }
-        return activeSession;
     }
 }
