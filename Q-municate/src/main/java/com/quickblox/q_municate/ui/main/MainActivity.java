@@ -7,21 +7,19 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
+import android.view.Window;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
-import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.ParcelableQBDialog;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadFriendListCommand;
-import com.quickblox.q_municate.qb.commands.QBLoadUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.DialogsFragment;
@@ -36,7 +34,6 @@ import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -107,7 +104,10 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         useDoubleBackPressed = true;

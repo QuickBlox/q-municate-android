@@ -45,8 +45,8 @@ public class FindUnknownFriendsTask extends AsyncTask {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
             boolean isUserInBase = DatabaseManager.isUserInBase(context,
-                    occupantId) && currentUserId != occupantId;
-            if (!isUserInBase) {
+                    occupantId);
+            if (!isUserInBase && currentUserId != occupantId) {
                 startLoadUser(occupantId);
             }
         }

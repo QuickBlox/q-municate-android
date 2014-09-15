@@ -31,7 +31,6 @@ import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
-import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -45,8 +44,12 @@ import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener {
+
+    private static final int SEARCH_DELAY = 500;
 
     private State state;
     private String constraint;
@@ -65,6 +68,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private FriendOperationAction friendOperationAction;
     private int relationStatusNoneId;
     private Resources resources;
+    private Timer searchTimer;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -149,6 +153,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(baseActivity,
                 QBFriendListHelper.RELATION_STATUS_NONE);
         usersList = Collections.emptyList();
+        searchTimer = new Timer();
 
         return rootView;
     }
@@ -203,17 +208,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
 
-        if (state == State.GLOBAL_LIST) {
-            friendsListAdapter.setSearchCharacters(newText);
-            baseActivity.showProgress();
-            startUsersListLoader(newText);
+        if (State.GLOBAL_LIST.equals(state)) {
+            checkUsersListLoader();
         }
 
         return true;
-    }
-
-    public MenuItem getSearchItem() {
-        return searchItem;
     }
 
     private void addActions() {
@@ -360,9 +359,15 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         alertDialog.show(getFragmentManager(), null);
     }
 
-    private void startUsersListLoader(String newText) {
-        QBLoadUsersCommand.start(baseActivity, newText);
-        friendsListAdapter.setSearchCharacters(newText);
+    private void checkUsersListLoader() {
+        searchTimer.cancel();
+        searchTimer = new Timer();
+        searchTimer.schedule(new SearchTimerTask(), SEARCH_DELAY);
+        setVisibilitySearchProgressBar(true);
+    }
+
+    private void startUsersListLoader() {
+        QBLoadUsersCommand.start(baseActivity, constraint);
     }
 
     private void importFriendsFinished() {
@@ -404,6 +409,18 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         void onAcceptUserClicked(int userId);
 
         void onRejectUserClicked(int userId);
+    }
+
+    private void setVisibilitySearchProgressBar(boolean visibility) {
+        baseActivity.setProgressBarIndeterminateVisibility(visibility);
+    }
+
+    private class SearchTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            startUsersListLoader();
+        }
     }
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
@@ -477,11 +494,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
             usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
             searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
             initFriendsListForSearch();
             checkVisibilityEmptyLabel();
+            setVisibilitySearchProgressBar(false);
         }
     }
 
@@ -489,9 +506,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
+            setVisibilitySearchProgressBar(false);
         }
     }
 
