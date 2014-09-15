@@ -521,7 +521,23 @@ public class DatabaseManager {
     public static int getCountUnreadDialogs(Context context) {
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
-        return cursor.getCount();
+
+        int count = cursor.getCount();
+
+        cursor.close();
+
+        return count;
+    }
+
+    public static int getCountContactRequests(Context context) {
+        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+        Cursor cursor = getAllFriends(context, relationStatusNoneId);
+
+        int count = cursor.getCount();
+
+        cursor.close();
+
+        return count;
     }
 
     public static Cursor getAllDialogMessagesByDialogId(Context context, String dialogId) {

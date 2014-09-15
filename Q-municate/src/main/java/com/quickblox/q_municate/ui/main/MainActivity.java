@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     public static final int ID_CHATS_LIST_FRAGMENT = 0;
-    public static final int ID_FRIEND_LIST_FRAGMENT = 1;
+    public static final int ID_CONTACTS_LIST_FRAGMENT = 1;
     public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
     public static final int ID_SETTINGS_FRAGMENT = 3;
     public static final int ID_FEEDBACK_FRAGMENT = 4;
@@ -86,7 +86,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             case ID_CHATS_LIST_FRAGMENT:
                 fragment = DialogsFragment.newInstance();
                 break;
-            case ID_FRIEND_LIST_FRAGMENT:
+            case ID_CONTACTS_LIST_FRAGMENT:
                 fragment = FriendsListFragment.newInstance();
                 break;
             case ID_INVITE_FRIENDS_FRAGMENT:

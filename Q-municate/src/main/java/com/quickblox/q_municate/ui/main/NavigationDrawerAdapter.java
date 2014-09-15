@@ -11,9 +11,10 @@ import com.quickblox.q_municate.utils.Consts;
 
 import java.util.List;
 
-public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.UpdateCountUnreadDialogsListener {
+public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.NavigationDrawerCounterListener {
 
-    private TextView counterUnreadChatsDialogs;
+    private TextView counterUnreadChatsDialogsTextView;
+    private TextView counterContactRequestsTextView;
 
     public NavigationDrawerAdapter(BaseActivity activity, List<String> objects) {
         super(activity, objects);
@@ -21,44 +22,60 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder viewHolder;
         final String data = getItem(position);
+
         String chatItem = resources.getStringArray(
                 R.array.nvd_items_array)[MainActivity.ID_CHATS_LIST_FRAGMENT];
+        String contactsItem = resources.getStringArray(
+                R.array.nvd_items_array)[MainActivity.ID_CONTACTS_LIST_FRAGMENT];
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_navigation_drawer, null);
-            holder = new ViewHolder();
-            holder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            holder.unreadMessagesTextView = (TextView) convertView.findViewById(
-                    R.id.unread_messages_textview);
-            convertView.setTag(holder);
+            viewHolder = new ViewHolder();
+            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
+            viewHolder.counterTextView = (TextView) convertView.findViewById(
+                    R.id.counter_textview);
+            convertView.setTag(viewHolder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         if (data.equals(chatItem)) {
-            counterUnreadChatsDialogs = holder.unreadMessagesTextView;
+            counterUnreadChatsDialogsTextView = viewHolder.counterTextView;
         }
 
-        holder.nameTextView.setText(data);
+        if (data.equals(contactsItem)) {
+            counterContactRequestsTextView = viewHolder.counterTextView;
+        }
+
+        viewHolder.nameTextView.setText(data);
 
         return convertView;
     }
 
     @Override
     public void onUpdateCountUnreadDialogs(int count) {
+        updateCounter(counterUnreadChatsDialogsTextView, count);
+    }
+
+    @Override
+    public void onUpdateCountContactRequests(int count) {
+        updateCounter(counterContactRequestsTextView, count);
+    }
+
+    private void updateCounter(TextView counterTextView, int count) {
         if (count > Consts.ZERO_INT_VALUE) {
-            counterUnreadChatsDialogs.setVisibility(View.VISIBLE);
-            counterUnreadChatsDialogs.setText(count + Consts.EMPTY_STRING);
+            counterTextView.setVisibility(View.VISIBLE);
+            counterTextView.setText(count + Consts.EMPTY_STRING);
         } else {
-            counterUnreadChatsDialogs.setVisibility(View.GONE);
+            counterTextView.setVisibility(View.GONE);
         }
     }
 
     private static class ViewHolder {
 
         TextView nameTextView;
-        TextView unreadMessagesTextView;
+        TextView counterTextView;
     }
 }

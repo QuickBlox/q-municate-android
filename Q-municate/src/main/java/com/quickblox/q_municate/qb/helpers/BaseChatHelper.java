@@ -166,7 +166,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
 
-        String fullname = user.getFullName();
+        String fullName = user.getFullName();
 
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
@@ -175,7 +175,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
 
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullname);
+        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullName);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

@@ -53,13 +53,14 @@ public class NavigationDrawerFragment extends BaseFragment {
     private ImageButton logoutButton;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
+    private NavigationDrawerCounterListener navigationDrawerCounterListener;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
     private NavigationDrawerAdapter navigationDrawerAdapter;
     private BroadcastReceiver countUnreadDialogsBroadcastReceiver;
+    private BroadcastReceiver countContactRequestBroadcastReceiver;
 
     public static boolean isDrawerOpen() {
         return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
@@ -80,9 +81,17 @@ public class NavigationDrawerFragment extends BaseFragment {
 
         selectItem(currentSelectedPosition);
 
+        initLocalBroadcastManagers();
+    }
+
+    private void initLocalBroadcastManagers() {
         countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
+        countContactRequestBroadcastReceiver = new CountContactRequestsBroadcastReceiver();
+
         LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countContactRequestBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CONTACT_REQUEST));
     }
 
     @Override
@@ -192,7 +201,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initNavigationAdapter() {
         navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
-        updateCountUnreadDialogsListener = navigationDrawerAdapter;
+        navigationDrawerCounterListener = navigationDrawerAdapter;
     }
 
     private void initUI(View rootView) {
@@ -246,8 +255,12 @@ public class NavigationDrawerFragment extends BaseFragment {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
 
-    private int getCounterUnreadDialogs() {
+    private int getCountUnreadDialogs() {
         return DatabaseManager.getCountUnreadDialogs(baseActivity);
+    }
+
+    private int getCountContactRequests() {
+        return DatabaseManager.getCountContactRequests(baseActivity);
     }
 
     public interface NavigationDrawerCallbacks {
@@ -255,9 +268,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    public interface UpdateCountUnreadDialogsListener {
+    public interface NavigationDrawerCounterListener {
 
         public void onUpdateCountUnreadDialogs(int count);
+        public void onUpdateCountContactRequests(int count);
     }
 
     private class CountUnreadDialogsBroadcastReceiver extends BroadcastReceiver {
@@ -266,8 +280,16 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
+                navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
             }
+        }
+    }
+
+    private class CountContactRequestsBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            navigationDrawerCounterListener.onUpdateCountContactRequests(getCountContactRequests());
         }
     }
 
@@ -292,7 +314,8 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawer();
             }
 
-            updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
+            navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
+            navigationDrawerCounterListener.onUpdateCountContactRequests(getCountContactRequests());
         }
 
         @Override

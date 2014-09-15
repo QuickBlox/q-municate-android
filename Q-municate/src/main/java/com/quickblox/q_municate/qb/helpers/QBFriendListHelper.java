@@ -268,6 +268,11 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
+    private void notifyContactRequest() {
+        Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -315,6 +320,7 @@ public class QBFriendListHelper extends BaseHelper {
         public void subscriptionRequested(int userId) {
             try {
                 createFriend(userId, true);
+                notifyContactRequest();
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
