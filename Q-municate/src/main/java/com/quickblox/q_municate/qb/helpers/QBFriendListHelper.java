@@ -121,7 +121,7 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private User loadUser(int userId) throws QBResponseException {
+    public User loadUser(int userId) throws QBResponseException {
         QBUser user = QBUsers.getUser(new QBUser(userId));
         return FriendUtils.createUser(user);
     }

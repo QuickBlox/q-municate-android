@@ -87,10 +87,11 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        User friend = DatabaseManager.getUserById(context, chatMessage.getSenderId());
-        if (friend == null) {
-            friend = new User();
-            friend.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());
+        User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+
+        if (user == null) {
+            user = new User();
+            user.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
 
         String messageId;
@@ -104,7 +105,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String packetId = chatMessage.getPacketId();
         saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
                 chatMessage.getBody(), attachUrl, time, false, false));
-        notifyMessageReceived(chatMessage, friend, dialogId);
+        notifyMessageReceived(chatMessage, user, dialogId);
     }
 
     private QBPrivateChat createChat(int opponentId) throws QBResponseException {
@@ -172,7 +173,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
-        String attachUrl = null;
         time = DateUtils.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
         if (QBDialogType.PRIVATE.equals(dialog.getType())) {

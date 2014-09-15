@@ -4,23 +4,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.core.command.ServiceCommand;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.ParcelableQBDialog;
 import com.quickblox.q_municate.qb.helpers.QBChatRestHelper;
+import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
     private QBChatRestHelper chatRestHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBLoadDialogsCommand(Context context, QBChatRestHelper chatHelper, String successAction,
-            String failAction) {
+    public QBLoadDialogsCommand(Context context, QBChatRestHelper chatRestHelper,
+            QBMultiChatHelper multiChatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
-        this.chatRestHelper = chatHelper;
+        this.chatRestHelper = chatRestHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
     public static void start(Context context) {
@@ -30,9 +36,18 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        ArrayList<ParcelableQBDialog> dialogsList = ChatDialogUtils.dialogsToParcelableDialogs(chatRestHelper.getDialogs());
+        List<QBDialog> dialogsList = chatRestHelper.getDialogs();
+        ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
+
+        if (dialogsList != null && !dialogsList.isEmpty()) {
+            multiChatHelper.tryJoinRoomChats(dialogsList);
+            parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
+            DatabaseManager.saveDialogs(context, dialogsList);
+        }
+
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS,  dialogsList);
+        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS,  parcelableQBDialog);
+
         return bundle;
     }
 }

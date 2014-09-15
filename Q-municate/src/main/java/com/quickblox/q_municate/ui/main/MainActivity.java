@@ -11,19 +11,21 @@ import android.view.Menu;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.ParcelableQBDialog;
-import com.quickblox.q_municate.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.q_municate.qb.commands.QBLoadUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.DialogsFragment;
+import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
@@ -34,6 +36,7 @@ import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -176,7 +179,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onFailAction(String action) {
-        if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)){
+        if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)) {
             loadChatsDialogs();
         }
     }
@@ -185,12 +188,13 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            ArrayList<ParcelableQBDialog> parcelableDialogs =  bundle.getParcelableArrayList(
+            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            QBJoinGroupDialogCommand.start(MainActivity.this, parcelableDialogs);
-            //TODO may be move this in command to execute async
-            ArrayList<QBDialog> dialogs = ChatDialogUtils.parcelableDialogsToDialogs(parcelableDialogs);
-            DatabaseManager.saveDialogs(MainActivity.this, dialogs);
+            if (!parcelableDialogsList.isEmpty()) {
+                ArrayList<QBDialog> dialogsList = ChatDialogUtils.parcelableDialogsToDialogs(
+                        parcelableDialogsList);
+                new FindUnknownFriendsTask(MainActivity.this).execute(dialogsList, null);
+            }
         }
     }
 

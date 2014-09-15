@@ -26,6 +26,7 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -160,11 +161,12 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, User friend, String dialogId) {
+    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
-        String fullname = friend.getFullName();
+
+        String fullname = user.getFullName();
 
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
@@ -182,7 +184,10 @@ public abstract class BaseChatHelper extends BaseHelper {
     protected void updateDialogByNotification(QBChatMessage chatMessage) {
         long time = DateUtils.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
-        saveDialogToCache(context, dialog);
+        if(dialog != null) {
+            new FindUnknownFriendsTask(context).execute(null, dialog);
+            saveDialogToCache(context, dialog);
+        }
     }
 
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {

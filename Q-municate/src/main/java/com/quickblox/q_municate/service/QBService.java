@@ -33,6 +33,7 @@ import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
+import com.quickblox.q_municate.qb.commands.QBLoadUserCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginChatCommand;
@@ -155,6 +156,7 @@ public class QBService extends Service {
         registerChangePasswordCommand();
         registerResetPasswordCommand();
         registerUpdateUserCommand();
+        registerLoadUserCommand();
 
         registerAddFriendCommand();
         registerAcceptFriendCommand();
@@ -329,6 +331,12 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.UPDATE_USER_ACTION, updateUserCommand);
     }
 
+    private void registerLoadUserCommand() {
+        QBLoadUserCommand loadUserCommand = new QBLoadUserCommand(this, friendListHelper,
+                QBServiceConsts.LOAD_USER_SUCCESS_ACTION, QBServiceConsts.LOAD_USER_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.LOAD_USER_ACTION, loadUserCommand);
+    }
+
     private void registerResetPasswordCommand() {
         QBResetPasswordCommand resetPasswordCommand = new QBResetPasswordCommand(this, authHelper,
                 QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, QBServiceConsts.RESET_PASSWORD_FAIL_ACTION);
@@ -443,7 +451,8 @@ public class QBService extends Service {
 
     private void registerLoadChatsDialogsCommand() {
         QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatRestHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatRestHelper, multiChatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);

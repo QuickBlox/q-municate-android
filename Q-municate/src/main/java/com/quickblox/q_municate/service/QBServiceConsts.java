@@ -25,7 +25,8 @@ public class QBServiceConsts {
     public static final String SOCIAL_LOGIN_ACTION = "social_login_action";
     public static final String UPDATE_USER_ACTION = "update_user_action";
     public static final String LOAD_FRIENDS_ACTION = "friends_load_action";
-    public static final String LOAD_USERS_ACTION = "user_search_action";
+    public static final String LOAD_USERS_ACTION = "users_search_action";
+    public static final String LOAD_USER_ACTION = "user_search_action";
     public static final String SEND_MESSAGE_ACTION = "send_message_action";
     public static final String SEND_GROUP_MESSAGE_ACTION = "send_group_message_action";
     public static final String LOAD_ATTACH_FILE_ACTION = "load_attach_file_action";
@@ -75,8 +76,10 @@ public class QBServiceConsts {
     public static final String UPDATE_USER_FAIL_ACTION = "update_user_fail_action";
     public static final String LOAD_FRIENDS_SUCCESS_ACTION = "friends_load_success_action";
     public static final String LOAD_FRIENDS_FAIL_ACTION = "friends_load_fail_action";
-    public static final String LOAD_USERS_SUCCESS_ACTION = "user_search_success_action";
-    public static final String LOAD_USERS_FAIL_ACTION = "user_search_fail_action";
+    public static final String LOAD_USERS_SUCCESS_ACTION = "users_search_success_action";
+    public static final String LOAD_USERS_FAIL_ACTION = "users_search_fail_action";
+    public static final String LOAD_USER_SUCCESS_ACTION = "user_search_success_action";
+    public static final String LOAD_USER_FAIL_ACTION = "user_search_fail_action";
     public static final String SEND_MESSAGE_SUCCESS_ACTION = "send_message_success_action";
     public static final String SEND_MESSAGE_FAIL_ACTION = "send_message_fail_action";
     public static final String LOAD_ATTACH_FILE_SUCCESS_ACTION = "load_attach_file_success_action";

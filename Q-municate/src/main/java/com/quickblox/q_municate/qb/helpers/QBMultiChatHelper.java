@@ -24,6 +24,7 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
+import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -261,6 +262,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         roomJidId = dialog.getRoomJid();
         if (roomJidId != null && !QBDialogType.PRIVATE.equals(dialog.getType())) {
             tryJoinRoomChat(dialog);
+            new FindUnknownFriendsTask(context).execute(null, dialog);
             saveDialogToCache(context, dialog);
         }
     }
@@ -269,7 +271,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
         @Override
         public void processMessage(QBRoomChat roomChat, QBChatMessage chatMessage) {
-            User friend = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+            User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
             String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
@@ -283,12 +285,18 @@ public class QBMultiChatHelper extends BaseChatHelper {
                 isRead = true;
             }
 
+            if(user == null) {
+                user = new User();
+                user.setUserId(chatMessage.getSenderId());
+                user.setFullName(chatMessage.getSenderId() + Consts.EMPTY_STRING);
+            }
+
             saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
                     chatMessage.getBody(), attachUrl, time, isRead, isDelivered));
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
-                notifyMessageReceived(chatMessage, friend, dialogId);
+                notifyMessageReceived(chatMessage, user, dialogId);
             }
         }
 

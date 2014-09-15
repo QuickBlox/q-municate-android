@@ -161,6 +161,20 @@ public class DatabaseManager {
         return relationStatus;
     }
 
+    public static boolean isUserInBase(Context context, int searchId) {
+        String condition = FriendTable.Cols.USER_ID + " = " + searchId;
+
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(UserTable.CONTENT_URI, null, condition, null, null);
+
+        boolean isUserInBase = cursor.getCount() > Consts.ZERO_INT_VALUE;
+
+        cursor.close();
+
+        return isUserInBase;
+    }
+
     public static boolean isFriendInBase(Context context, int searchId) {
         int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
         int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);

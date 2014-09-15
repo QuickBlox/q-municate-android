@@ -19,9 +19,11 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.model.ParcelableQBDialog;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
@@ -156,9 +158,9 @@ public class DialogsFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
-            ArrayList<QBDialog> dialogsList = (ArrayList<QBDialog>) bundle.getSerializable(
+            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (dialogsList.isEmpty()) {
+            if (parcelableDialogsList.isEmpty()) {
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
