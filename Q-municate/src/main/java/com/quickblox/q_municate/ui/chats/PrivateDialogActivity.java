@@ -38,6 +38,7 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import java.io.File;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
@@ -143,7 +144,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initListView() {
         messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
-        messagesListView.setAdapter(messagesAdapter);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
     private void initActionBar() {

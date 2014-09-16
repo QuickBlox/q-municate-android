@@ -6,15 +6,12 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <ListView
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/messages_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:divider="@null"
-        android:dividerHeight="10dp"
-        android:paddingBottom="5dp"
-        android:transcriptMode="alwaysScroll" />
+        android:transcriptMode="alwaysScroll"/>
 
     <include layout="@layout/view_message_typing_status" />
 

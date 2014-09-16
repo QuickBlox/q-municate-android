@@ -164,6 +164,11 @@ public class QBFriendListHelper extends BaseHelper {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
         User user = loadUser(userId);
+
+        if (user == null) {
+            return;
+        }
+
         Friend friend = FriendUtils.createFriend(rosterEntry);
 
         checkAlertShowing(friend);

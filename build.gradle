@@ -16,7 +16,7 @@ allprojects {
 ext.compileSdkVersion = 19
 ext.buildToolsVersion = '19.1.0'
 
-ext.versionName = '1.0.59'
+ext.versionName = '1.0.60'
 ext.versionCode = 2
 
 ext.prodDebug = true
@@ -27,3 +27,4 @@ ext.universalImageLoaderVersion = '1.9.1'
 ext.nineoldandroidsVersion = '2.4.0'
 ext.googlePlayServicesVersion = '4.+'
 ext.croutonVersion = '1.8.4'
+ext.stickyHeaderVersion = '2.1.5'

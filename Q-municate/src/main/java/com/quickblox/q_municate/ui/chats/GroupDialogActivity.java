@@ -31,6 +31,8 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import java.io.File;
 import java.util.ArrayList;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private String groupName;
@@ -143,7 +145,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void initListView() {
         messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
                 dialog);
-        messagesListView.setAdapter(messagesAdapter);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
     private void updateActionBar() {

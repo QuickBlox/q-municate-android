@@ -50,10 +50,12 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.io.File;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     protected EditText chatEditText;
-    protected ListView messagesListView;
+    protected StickyListHeadersListView messagesListView;
     protected EditText messageEditText;
     protected TextView messageTextView;
     protected ImageButton sendButton;

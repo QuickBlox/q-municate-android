@@ -14,6 +14,13 @@ public class DateUtils {
         return timeString;
     }
 
+    public static String longToMessageListHeader(long dateLong) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(dateLong * MILLIS_VALUE);
+        String timeString = new SimpleDateFormat("EEE").format(calendar.getTime());
+        return timeString;
+    }
+
     public static long getCurrentTime() {
         return System.currentTimeMillis() / MILLIS_VALUE;
     }

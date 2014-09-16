@@ -24,6 +24,7 @@ dependencies {
     compile "de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.crashlytics.android:crashlytics:1.+'
+    compile "se.emilsjolander:stickylistheaders:${rootProject.stickyHeaderVersion}"
 }
 
 task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs') {
