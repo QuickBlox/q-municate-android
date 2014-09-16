@@ -63,6 +63,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         initListView();
         startLoadDialogMessages();
+        setCurrentDialog(dialog);
 
         registerForContextMenu(messagesListView);
     }

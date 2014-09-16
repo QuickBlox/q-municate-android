@@ -13,19 +13,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NavUtils;
-import android.view.View;
-import android.widget.TextView;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public abstract class BaseActivity extends Activity {
 
@@ -41,9 +39,6 @@ public abstract class BaseActivity extends Activity {
     protected SuccessAction successAction;
     protected ActivityDelegator activityDelegator;
 
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
@@ -80,13 +75,6 @@ public abstract class BaseActivity extends Activity {
         activityDelegator.removeAction(action);
     }
 
-    public void showNewMessageAlert(String sender, String message) {
-        newMessageTextView.setText(message);
-        senderMessageTextView.setText(sender);
-        Crouton.cancelAllCroutons();
-        Crouton.show(this, newMessageView);
-    }
-
     public void updateBroadcastActionList() {
         activityDelegator.updateBroadcastActionList();
     }
@@ -100,7 +88,6 @@ public abstract class BaseActivity extends Activity {
         successAction = new SuccessAction();
         activityDelegator = new ActivityDelegator(this, new GlobalListener());
         activityDelegator.onCreate();
-        initUI();
     }
 
     @Override
@@ -167,12 +154,6 @@ public abstract class BaseActivity extends Activity {
         transaction.commit();
     }
 
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-    }
-
     private void unbindService() {
         if (bounded) {
             unbindService(serviceConnection);
@@ -222,9 +203,10 @@ public abstract class BaseActivity extends Activity {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-            String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-            showNewMessageAlert(sender, message);
+            boolean isSplashActivity = activityDelegator.getContext() instanceof SplashActivity;
+            if(!isSplashActivity) {
+                activityDelegator.onReceiveMessage(extras);
+            }
         }
 
         @Override

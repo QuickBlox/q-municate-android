@@ -41,6 +41,7 @@
     <dimen name="dlg_avatar_new_message_wh">30dp</dimen>
 
     <dimen name="chat_input_message_height">50dp</dimen>
+    <dimen name="chat_button_reply_height">30dp</dimen>
     <dimen name="chat_emoji_item_size">30dp</dimen>
     <dimen name="chat_emoji_item_preview_size">25dp</dimen>
     <dimen name="chat_emojis_tab_height">50dp</dimen>

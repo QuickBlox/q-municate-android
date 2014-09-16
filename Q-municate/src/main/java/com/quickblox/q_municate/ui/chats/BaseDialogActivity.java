@@ -142,15 +142,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    @Override
-    protected void onReceiveMessage(Bundle extras) {
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
-        if (!isFromCurrentChat) {
-            super.onReceiveMessage(extras);
-        }
-    }
-
     private void startMessageTypingAnimation() {
         messageTypingAnimationDrawable.start();
     }

@@ -13,9 +13,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.view.View;
-import android.widget.TextView;
 
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
@@ -26,8 +25,6 @@ import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class BaseFragmentActivity extends FragmentActivity implements QBLogeable {
 
@@ -43,23 +40,14 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected SuccessAction successAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
+    private QBDialog currentDialog;
     private boolean doubleBackToExitPressedOnce;
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
-    private ActivityDelegator activityDelegator;
+    protected ActivityDelegator activityDelegator;
 
     public BaseFragmentActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
-    }
-
-    public void showNewMessageAlert(String sender, String message) {
-        newMessageTextView.setText(message);
-        senderMessageTextView.setText(sender);
-        Crouton.cancelAllCroutons();
-        Crouton.show(this, newMessageView);
     }
 
     public FailAction getFailAction() {
@@ -95,7 +83,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         successAction = new SuccessAction();
         activityDelegator = new ActivityDelegator(this, new GlobalListener());
         activityDelegator.onCreate();
-        initUI();
     }
 
     @Override
@@ -129,10 +116,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         unbindService();
     }
 
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+    protected void setCurrentDialog(QBDialog dialog) {
+        currentDialog = dialog;
     }
 
     private void unbindService() {
@@ -204,12 +189,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
-    protected void onReceiveMessage(Bundle extras) {
-        String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        showNewMessageAlert(sender, message);
-    }
-
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();
@@ -239,7 +218,14 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            onReceiveMessage(extras);
+            if(currentDialog == null) {
+                return;
+            }
+            String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+            boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
+            if (!isFromCurrentChat) {
+                activityDelegator.onReceiveMessage(extras);
+            }
         }
 
         @Override

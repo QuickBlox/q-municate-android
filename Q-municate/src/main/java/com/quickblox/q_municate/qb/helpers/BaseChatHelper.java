@@ -161,12 +161,10 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId) {
+    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId, boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = getMessageBody(chatMessage);
         String extraChatMessage;
-
-        String fullName = user.getFullName();
 
         if (TextUtils.isEmpty(messageBody)) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
@@ -175,8 +173,9 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
 
         intent.putExtra(QBServiceConsts.EXTRA_CHAT_MESSAGE, extraChatMessage);
-        intent.putExtra(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE, fullName);
+        intent.putExtra(QBServiceConsts.EXTRA_USER, user);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
+        intent.putExtra(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE, isPrivateMessage);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }

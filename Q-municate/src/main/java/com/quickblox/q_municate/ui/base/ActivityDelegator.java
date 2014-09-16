@@ -9,16 +9,24 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.facebook.Session;
 import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -27,6 +35,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
 public class ActivityDelegator extends BaseActivityDelegator {
@@ -37,20 +47,72 @@ public class ActivityDelegator extends BaseActivityDelegator {
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
     private GlobalActionsListener actionsListener;
     private Handler handler;
+    private User senderUser;
+    private QBDialog messagesDialog;
+    private boolean isPrivateMessage;
+
+    private View newMessageView;
+    private TextView newMessageTextView;
+    private TextView senderMessageTextView;
+    private Button replyMessageButton;
 
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
         this.context = context;
+        initUI();
+        initListeners();
+    }
+
+    private void initUI() {
+        newMessageView = ((Activity) context).getLayoutInflater().inflate(R.layout.list_item_new_message,
+                null);
+        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+        replyMessageButton = (Button) newMessageView.findViewById(R.id.replay_button);
+    }
+
+    private void initListeners() {
+        replyMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isPrivateMessage) {
+                    startPrivateChatActivity();
+                } else {
+                    startGroupChatActivity();
+                }
+                Crouton.cancelAllCroutons();
+            }
+        });
+    }
+
+    private void startPrivateChatActivity() {
+        PrivateDialogActivity.start(context, senderUser, messagesDialog);
+    }
+
+    private void startGroupChatActivity() {
+        GroupDialogActivity.start(context, messagesDialog);
     }
 
     public void showFriendAlert(String message) {
         AlertDialog alertDialog = AlertDialog.newInstance(message);
-        if (context instanceof BaseActivity) {
-            alertDialog.show(((BaseActivity) context).getFragmentManager(), null);
-        } else {
-            alertDialog.show(((BaseFragmentActivity) context).getFragmentManager(), null);
-        }
+        alertDialog.show(((Activity) context).getFragmentManager(), null);
+    }
+
+    public void showNewMessageAlert(User senderUser, String message) {
+        newMessageTextView.setText(message);
+        senderMessageTextView.setText(senderUser.getFullName());
+        Crouton.cancelAllCroutons();
+        Crouton.show((Activity) context, newMessageView);
+    }
+
+    protected void onReceiveMessage(Bundle extras) {
+        senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        messagesDialog = DatabaseManager.getDialogByDialogId(context, dialogId);
+        isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
+        showNewMessageAlert(senderUser, message);
     }
 
     public void forceRelogin() {
@@ -102,6 +164,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
 
     public void onPause() {
         unregisterBroadcastReceiver();
+        Crouton.cancelAllCroutons();
     }
 
     public void onResume() {

@@ -67,6 +67,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         initActionBar();
         startLoadDialogMessages();
         registerStatusChangingObserver();
+        setCurrentDialog(dialog);
     }
 
     @Override

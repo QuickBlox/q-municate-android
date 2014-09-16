@@ -20,6 +20,8 @@
     <color name="button_null_background_pressed_color">#e4f4ff</color>
     <color name="button_end_call_normal_color">#ff0000</color>
     <color name="button_end_call_pressed_color">#e4f4ff</color>
+    <color name="button_blue_normal_color">#0d70b3</color>
+    <color name="button_blue_pressed_color">#ff0d5389</color>
 
     <color name="avatar_border_color">#ffffff</color>
     <color name="circle_view_mask_color">#ffffff</color>

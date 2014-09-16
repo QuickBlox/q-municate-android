@@ -279,6 +279,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
             String packetId = chatMessage.getPacketId();
             boolean isRead = false;
             boolean isDelivered = false;
+            boolean isPrivateMessage = false;
 
             Integer userId = AppSession.getSession().getUser().getId();
             if (chatMessage.getSenderId().equals(userId)) {
@@ -296,7 +297,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
-                notifyMessageReceived(chatMessage, user, dialogId);
+                notifyMessageReceived(chatMessage, user, dialogId, isPrivateMessage);
             }
         }
 
