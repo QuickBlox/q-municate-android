@@ -174,6 +174,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             ErrorUtils.showError(this, e);
         }
         messageEditText.setText(Consts.EMPTY_STRING);
+        isNeedToScrollMessages = true;
         scrollListView();
     }
 

@@ -63,6 +63,10 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
+    public void setVisibilityProgressBar(boolean visibility) {
+        activityDelegator.setVisibilityProgressBar(visibility);
+    }
+
     public void addAction(String action, Command command) {
         activityDelegator.addAction(action, command);
     }

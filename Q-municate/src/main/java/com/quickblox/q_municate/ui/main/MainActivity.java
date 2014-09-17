@@ -12,24 +12,30 @@ import android.view.Window;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.ParcelableQBDialog;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.DialogsFragment;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
+import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
 import com.quickblox.q_municate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.q_municate.ui.settings.SettingsFragment;
 import com.quickblox.q_municate.utils.ChatDialogUtils;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
@@ -51,6 +57,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        context.startActivity(intent);
+    }
+
+    public static void start(Context context, Intent oldIntent) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, oldIntent.getStringExtra(
+                QBServiceConsts.EXTRA_DIALOG_ID));
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, oldIntent.getStringExtra(
+                QBServiceConsts.EXTRA_USER_ID));
         context.startActivity(intent);
     }
 
@@ -164,10 +179,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void loadFriendsList() {
+        setVisibilityProgressBar(true);
         QBLoadFriendListCommand.start(this);
     }
 
     private void loadChatsDialogs() {
+        setVisibilityProgressBar(true);
         QBLoadDialogsCommand.start(this);
     }
 
@@ -179,15 +196,45 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onFailAction(String action) {
+        setVisibilityProgressBar(false);
         if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)) {
             loadChatsDialogs();
         }
+    }
+
+    private void startDialog() {
+        Intent intent = getIntent();
+        String dialogId = intent.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
+        long userId = Long.parseLong(intent.getStringExtra(QBServiceConsts.EXTRA_USER_ID));
+        QBDialog dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
+        if (dialog.getType() == QBDialogType.PRIVATE) {
+            startPrivateChatActivity(dialog, userId);
+        } else {
+            startGroupChatActivity(dialog);
+        }
+    }
+
+    private void startPrivateChatActivity(QBDialog dialog, long userId) {
+        User occupantUser = DatabaseManager.getUserById(this, userId);
+        if (occupantUser != null && userId != Consts.ZERO_INT_VALUE) {
+            PrivateDialogActivity.start(this, occupantUser, dialog);
+        }
+    }
+
+    private void startGroupChatActivity(QBDialog dialog) {
+        GroupDialogActivity.start(this, dialog);
     }
 
     private class LoadDialogsSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
+            setVisibilityProgressBar(false);
+
+            if (getIntent().hasExtra(QBServiceConsts.EXTRA_DIALOG_ID)) {
+                startDialog();
+            }
+
             ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
             if (!parcelableDialogsList.isEmpty()) {

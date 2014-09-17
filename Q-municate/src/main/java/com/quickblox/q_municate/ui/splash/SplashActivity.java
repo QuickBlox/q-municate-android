@@ -145,7 +145,12 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startMainActivity() {
-        MainActivity.start(SplashActivity.this);
+        Intent intent = getIntent();
+        if (intent.hasExtra(QBServiceConsts.EXTRA_DIALOG_ID)) {
+            MainActivity.start(SplashActivity.this, intent);
+        } else {
+            MainActivity.start(SplashActivity.this);
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

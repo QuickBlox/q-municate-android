@@ -189,6 +189,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     }
 
+    public void setVisibilityProgressBar(boolean visibility) {
+        activityDelegator.setVisibilityProgressBar(visibility);
+    }
+
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();

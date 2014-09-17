@@ -439,7 +439,7 @@ public class DatabaseManager {
         return dialog;
     }
 
-    public static User getUserById(Context context, int userId) {
+    public static User getUserById(Context context, long userId) {
         Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
                 UserTable.Cols.USER_ID + " = " + userId, null, null);
         User user = null;
@@ -450,7 +450,7 @@ public class DatabaseManager {
         return user;
     }
 
-    public static Friend getFriendById(Context context, int friendId) {
+    public static Friend getFriendById(Context context, long friendId) {
         Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
                 FriendTable.Cols.USER_ID + " = " + friendId, null, null);
         Friend friend = null;

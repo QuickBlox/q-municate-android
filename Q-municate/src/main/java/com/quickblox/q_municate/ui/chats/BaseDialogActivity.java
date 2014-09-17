@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.chats;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +22,6 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -31,6 +32,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
@@ -78,6 +80,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
+    private ContentObserver messagesTableContentObserver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -122,6 +125,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         isNeedToScrollMessages = true;
 
         hideSmileLayout();
+        registerContentObservers();
     }
 
     @Override
@@ -206,6 +210,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (chatHelper != null) {
             chatHelper.closeChat(dialog, generateBundleToInitDialog());
         }
+        unregisterContentObservers();
         removeActions();
     }
 
@@ -359,6 +364,26 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
+    private void registerContentObservers() {
+        messagesTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                int messagesListViewSize = messagesListView.getCount();
+                isNeedToScrollMessages = true;
+                onScrollToBottom();
+                onScrollToBottom();
+            }
+        };
+
+        getContentResolver().registerContentObserver(MessageTable.CONTENT_URI, true,
+                messagesTableContentObserver);
+    }
+
+    private void unregisterContentObservers() {
+        getContentResolver().unregisterContentObserver(messagesTableContentObserver);
+    }
+
     private void setSmilePanelIcon(int resourceId) {
         smilePanelImageButton.setImageResource(resourceId);
     }
@@ -375,7 +400,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void scrollListView() {
         if (isNeedToScrollMessages) {
             isNeedToScrollMessages = false;
-            messagesListView.setSelection(messagesAdapter.getCount() - 1);
+            if(!messagesAdapter.isEmpty()) {
+                messagesListView.setSelection(messagesAdapter.getCount() - 1);
+            }
         }
     }
 
@@ -383,8 +410,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (dialog == null) {
             return;
         }
-
-        showProgress();
 
         MessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
         if (lastReadMessage == null) {
@@ -424,7 +449,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            hideProgress();
         }
     }
 }

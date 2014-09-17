@@ -173,6 +173,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             ErrorUtils.showError(this, exc);
         }
         messageEditText.setText(Consts.EMPTY_STRING);
+        isNeedToScrollMessages = true;
         scrollListView();
     }
 

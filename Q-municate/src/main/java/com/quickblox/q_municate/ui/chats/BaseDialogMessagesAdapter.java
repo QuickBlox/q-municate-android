@@ -160,7 +160,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
         if (cursor != null) {
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-            holder.headerTextView.setText(DateUtils.longToMessageListHeader(time));
+            holder.headerTextView.setText(DateUtils.longToMessageListHeaderDate(time));
         }
 
         return convertView;
@@ -173,13 +173,14 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         if (getCursor().getCount() > Consts.ZERO_INT_VALUE) {
             Cursor cursor = (Cursor) getItem(position);
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-            timeString = DateUtils.longToMessageListHeader(time);
+            timeString = DateUtils.longToMessageListHeaderDate(time);
         } else {
             return Consts.ZERO_INT_VALUE;
         }
 
         if (!TextUtils.isEmpty(timeString)) {
-            return timeString.subSequence(Consts.ZERO_INT_VALUE, 1).charAt(Consts.ZERO_INT_VALUE);
+            return timeString.subSequence(Consts.ZERO_INT_VALUE, timeString.length() - 1).charAt(
+                    Consts.ZERO_INT_VALUE);
         } else {
             return Consts.ZERO_INT_VALUE;
         }

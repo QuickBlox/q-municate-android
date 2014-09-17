@@ -2,10 +2,13 @@ package com.quickblox.q_municate.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class DateUtils {
 
     private static long MILLIS_VALUE = 1000;
+    private static String STRING_TODAY = "Today";
+    private static String STRING_YESTERDAY = "Yesterday";
 
     public static String longToMessageDate(long dateLong) {
         Calendar calendar = Calendar.getInstance();
@@ -14,10 +17,25 @@ public class DateUtils {
         return timeString;
     }
 
-    public static String longToMessageListHeader(long dateLong) {
+    public static String longToMessageListHeaderDate(long dateLong) {
+        String timeString;
+
+        Locale locale = new Locale("en");
+
         Calendar calendar = Calendar.getInstance();
+        int currentDate = calendar.getTime().getDate();
+
         calendar.setTimeInMillis(dateLong * MILLIS_VALUE);
-        String timeString = new SimpleDateFormat("EEE").format(calendar.getTime());
+        int inputDate = calendar.getTime().getDate();
+
+        if (inputDate == currentDate) {
+            timeString = STRING_TODAY;
+        } else if (inputDate == currentDate - 1) {
+            timeString = STRING_YESTERDAY;
+        } else {
+            timeString = new SimpleDateFormat("EEEE", locale).format(calendar.getTime()) + ", " + inputDate;
+        }
+
         return timeString;
     }
 

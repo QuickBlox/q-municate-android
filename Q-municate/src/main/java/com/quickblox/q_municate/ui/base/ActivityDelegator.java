@@ -41,7 +41,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
 public class ActivityDelegator extends BaseActivityDelegator {
 
-    private Context context;
+    private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
@@ -59,13 +59,13 @@ public class ActivityDelegator extends BaseActivityDelegator {
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
-        this.context = context;
+        this.activity = (Activity) context;
         initUI();
         initListeners();
     }
 
     private void initUI() {
-        newMessageView = ((Activity) context).getLayoutInflater().inflate(R.layout.list_item_new_message,
+        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message,
                 null);
         newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
         senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
@@ -87,46 +87,46 @@ public class ActivityDelegator extends BaseActivityDelegator {
     }
 
     private void startPrivateChatActivity() {
-        PrivateDialogActivity.start(context, senderUser, messagesDialog);
+        PrivateDialogActivity.start(activity, senderUser, messagesDialog);
     }
 
     private void startGroupChatActivity() {
-        GroupDialogActivity.start(context, messagesDialog);
+        GroupDialogActivity.start(activity, messagesDialog);
     }
 
     public void showFriendAlert(String message) {
         AlertDialog alertDialog = AlertDialog.newInstance(message);
-        alertDialog.show(((Activity) context).getFragmentManager(), null);
+        alertDialog.show(activity.getFragmentManager(), null);
     }
 
     public void showNewMessageAlert(User senderUser, String message) {
         newMessageTextView.setText(message);
         senderMessageTextView.setText(senderUser.getFullName());
         Crouton.cancelAllCroutons();
-        Crouton.show((Activity) context, newMessageView);
+        Crouton.show((Activity) activity, newMessageView);
     }
 
     protected void onReceiveMessage(Bundle extras) {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        messagesDialog = DatabaseManager.getDialogByDialogId(context, dialogId);
+        messagesDialog = DatabaseManager.getDialogByDialogId(activity, dialogId);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         showNewMessageAlert(senderUser, message);
     }
 
     public void forceRelogin() {
-        ErrorUtils.showError(getContext(), getContext().getString(
+        ErrorUtils.showError(activity, activity.getString(
                 R.string.dlg_force_relogin_on_token_required));
-        SplashActivity.start(getContext());
-        ((Activity) getContext()).finish();
+        SplashActivity.start(activity);
+        activity.finish();
     }
 
     public void refreshSession() {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
-            QBLoginRestCommand.start(getContext(), AppSession.getSession().getUser());
+            QBLoginRestCommand.start(activity, AppSession.getSession().getUser());
         } else {
-            QBLoginRestWithSocialCommand.start(getContext(), QBProvider.FACEBOOK,
+            QBLoginRestWithSocialCommand.start(activity, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);
         }
     }
@@ -134,6 +134,10 @@ public class ActivityDelegator extends BaseActivityDelegator {
     public void onCreate() {
         broadcastReceiver = new BaseBroadcastReceiver();
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
+    }
+
+    public void setVisibilityProgressBar(boolean visibility) {
+        activity.setProgressBarIndeterminateVisibility(visibility);
     }
 
     public void addAction(String action, Command command) {
@@ -154,12 +158,12 @@ public class ActivityDelegator extends BaseActivityDelegator {
     }
 
     public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
         IntentFilter intentFilter = new IntentFilter();
         for (String commandName : broadcastCommandMap.keySet()) {
             intentFilter.addAction(commandName);
         }
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(broadcastReceiver, intentFilter);
     }
 
     public void onPause() {
@@ -178,13 +182,13 @@ public class ActivityDelegator extends BaseActivityDelegator {
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(globalBroadcastReceiver,
+        LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
     }
 
     private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(globalBroadcastReceiver);
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(globalBroadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
     }
 
     private Handler getHandler() {

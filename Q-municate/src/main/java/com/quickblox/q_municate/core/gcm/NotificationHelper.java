@@ -12,6 +12,8 @@ public class NotificationHelper {
     public static final String ACTION_VIDEO_CALL = "com.quickblox.qmunicate.VIDEO_CALL";
     public static final String ACTION_AUDIO_CALL = "com.quickblox.qmunicate.AUDIO_CALL";
     public static final String MESSAGE = "message";
+    public static final String DIALOG_ID = "dialog_id";
+    public static final String USER_ID = "user_id";
 
     public static final String CALL_TYPE = "call";
 

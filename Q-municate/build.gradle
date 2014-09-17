@@ -49,12 +49,6 @@ android {
         versionName rootProject.versionName
     }
     signingConfigs {
-        debug {
-            storeFile file('../cert/debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
         release {
             storeFile file('keystore/qmun.jks')
             storePassword 'Injoit00'
@@ -63,11 +57,6 @@ android {
         }
     }
     buildTypes {
-        debug {
-            debuggable rootProject.devDebug
-            signingConfig signingConfigs.debug
-            zipAlign true
-        }
         release {
             debuggable rootProject.prodDebug
             signingConfig signingConfigs.release

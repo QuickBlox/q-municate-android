@@ -13,19 +13,19 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.core.gcm.NotificationHelper;
 import com.quickblox.q_municate.model.PushMessage;
+import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.PrefsHelper;
 
 public class GCMIntentService extends IntentService {
 
     public final static int NOTIFICATION_ID = 1;
-    public final static long VIBRATOR_DURATION = 300;
+    public final static long VIBRATOR_DURATION = 1500;
 
-    private final static String TAG = GCMIntentService.class.getSimpleName();
-
-    private NotificationManager mNotificationManager;
-    private NotificationCompat.Builder builder;
+    private NotificationManager notificationManager;
+    private String message;
+    private String dialogId;
+    private String userId;
 
     public GCMIntentService() {
         super("GcmIntentService");
@@ -37,15 +37,8 @@ public class GCMIntentService extends IntentService {
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+        if (!extras.isEmpty()) {
             if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                //sendNotification("Send error: " + extras.toString());
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_DELETED.equals(messageType)) {
-               /* sendNotification("Deleted messages on server: " +
-                        extras.toString());*/
-            } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 parseMessage(extras);
             }
@@ -54,26 +47,31 @@ public class GCMIntentService extends IntentService {
     }
 
     private void parseMessage(Bundle extras) {
-        String message = extras.getString(NotificationHelper.MESSAGE, "");
-        sendNotification(message);
+        message = extras.getString(NotificationHelper.MESSAGE);
+        dialogId = extras.getString(NotificationHelper.DIALOG_ID);
+        userId = extras.getString(NotificationHelper.USER_ID);
+
+        sendNotification();
     }
 
-    private void sendNotification(String msg) {
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    private void sendNotification() {
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, Consts.ZERO_INT_VALUE, intent,
-                Consts.ZERO_INT_VALUE);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(
+        PendingIntent contentIntent = PendingIntent.getActivity(this, Consts.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(
                 R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
-                new NotificationCompat.BigTextStyle().bigText(msg)).setContentText(msg).setVibrate(
+                new NotificationCompat.BigTextStyle().bigText(message)).setContentText(message).setVibrate(
                 new long[]{Consts.ZERO_INT_VALUE, VIBRATOR_DURATION});
 
-        mBuilder.setAutoCancel(true);
-        mBuilder.setContentIntent(contentIntent);
-        mBuilder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+        builder.setAutoCancel(true);
+        builder.setContentIntent(contentIntent);
+        builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     private void sendBroadcast(PushMessage message) {
