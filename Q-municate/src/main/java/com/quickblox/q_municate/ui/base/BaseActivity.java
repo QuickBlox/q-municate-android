@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NavUtils;
+import android.view.Window;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -63,8 +64,12 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    public void setVisibilityProgressBar(boolean visibility) {
-        activityDelegator.setVisibilityProgressBar(visibility);
+    public void hideActionBarProgress() {
+        activityDelegator.hideActionBarProgress();
+    }
+
+    public void showActionBarProgress() {
+        activityDelegator.showActionBarProgress();
     }
 
     public void addAction(String action, Command command) {
@@ -85,6 +90,7 @@ public abstract class BaseActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();

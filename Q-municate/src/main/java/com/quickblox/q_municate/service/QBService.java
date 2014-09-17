@@ -278,7 +278,8 @@ public class QBService extends Service {
 
     private void registerLogoutAndDestroyChatCommand() {
         QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        ServiceCommand logoutCommand = new QBLogoutAndDestroyChatCommand(this, chatRestHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        ServiceCommand logoutCommand = new QBLogoutAndDestroyChatCommand(this, chatRestHelper, multiChatHelper,
                 QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION, logoutCommand);
     }

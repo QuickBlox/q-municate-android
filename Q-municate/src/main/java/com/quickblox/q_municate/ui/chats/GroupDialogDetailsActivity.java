@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -126,6 +127,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initUIWithData() {
+        Log.d("debug_statuses", "APP: groupDialog.getOccupantsCount() = " + groupDialog.getOccupantsCount());
+        Log.d("debug_statuses", "APP: groupDialog.getOnlineOccupantsCount() = " + groupDialog.getOnlineOccupantsCount());
+
+        for (User user : groupDialog.getOccupantList()) {
+            Log.d("debug_statuses", "APP: user = " + user.getFullName() + " (" + user.getUserId() + "), online = " + user.isOnline());
+        }
+
         groupNameEditText.setText(groupDialog.getName());
         participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
         onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,

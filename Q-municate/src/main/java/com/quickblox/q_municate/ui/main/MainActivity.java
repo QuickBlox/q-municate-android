@@ -54,6 +54,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private GSMHelper gsmHelper;
+    private boolean isExtrasForOpeningDialog;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -119,17 +120,19 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+//        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        isExtrasForOpeningDialog = getIntent().hasExtra(QBServiceConsts.EXTRA_DIALOG_ID);
         useDoubleBackPressed = true;
 
         gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
+        checkVisibilityProgressBars();
 
         if (!isImportInitialized()) {
             showProgress();
@@ -142,6 +145,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
+    }
+
+    private void checkVisibilityProgressBars() {
+        if (isExtrasForOpeningDialog) {
+            hideActionBarProgress();
+            showProgress();
+        } else {
+            showActionBarProgress();
+        }
     }
 
     private boolean isImportInitialized() {
@@ -179,12 +191,10 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void loadFriendsList() {
-        setVisibilityProgressBar(true);
         QBLoadFriendListCommand.start(this);
     }
 
     private void loadChatsDialogs() {
-        setVisibilityProgressBar(true);
         QBLoadDialogsCommand.start(this);
     }
 
@@ -196,7 +206,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onFailAction(String action) {
-        setVisibilityProgressBar(false);
+        hideActionBarProgress();
+        hideProgress();
         if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)) {
             loadChatsDialogs();
         }
@@ -229,9 +240,10 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            setVisibilityProgressBar(false);
+            hideActionBarProgress();
+            hideProgress();
 
-            if (getIntent().hasExtra(QBServiceConsts.EXTRA_DIALOG_ID)) {
+            if (isExtrasForOpeningDialog) {
                 startDialog();
             }
 

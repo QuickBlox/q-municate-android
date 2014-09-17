@@ -21,6 +21,7 @@ import com.quickblox.q_municate.ui.authorization.landing.UserAgreementDialog;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.PrefsHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
@@ -112,6 +113,7 @@ public class BaseAuthActivity extends BaseActivity {
         AppSession.saveRememberMe(saveRememberMe);
         DatabaseManager.clearAllCache(context);
         MainActivity.start(context);
+        KeyboardUtils.hideKeyboard(this);
         finish();
     }
 

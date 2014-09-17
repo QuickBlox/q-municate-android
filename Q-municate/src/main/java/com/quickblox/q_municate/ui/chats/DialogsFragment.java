@@ -23,7 +23,6 @@ import com.quickblox.q_municate.model.ParcelableQBDialog;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.utils.ChatDialogUtils;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
@@ -92,7 +91,15 @@ public class DialogsFragment extends BaseFragment {
     public void onResume() {
         Crouton.cancelAllCroutons();
         checkVisibilityEmptyLabel();
+        checkVisibilityProgressBars();
         super.onResume();
+    }
+
+    private void checkVisibilityProgressBars() {
+        if (dialogsAdapter.isEmpty()) {
+            baseActivity.showProgress();
+            baseActivity.hideActionBarProgress();
+        }
     }
 
     private void initChatsDialogs() {

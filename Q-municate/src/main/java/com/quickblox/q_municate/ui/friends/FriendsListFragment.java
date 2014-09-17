@@ -363,7 +363,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchTimer.cancel();
         searchTimer = new Timer();
         searchTimer.schedule(new SearchTimerTask(), SEARCH_DELAY);
-        baseActivity.setVisibilityProgressBar(true);
+        baseActivity.showActionBarProgress();
     }
 
     private void startUsersListLoader() {
@@ -494,7 +494,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
             initFriendsListForSearch();
             checkVisibilityEmptyLabel();
-            baseActivity.setVisibilityProgressBar(false);
+            baseActivity.hideActionBarProgress();
         }
     }
 
@@ -504,7 +504,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void execute(Bundle bundle) {
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
-            baseActivity.setVisibilityProgressBar(false);
+            baseActivity.hideActionBarProgress();
         }
     }
 

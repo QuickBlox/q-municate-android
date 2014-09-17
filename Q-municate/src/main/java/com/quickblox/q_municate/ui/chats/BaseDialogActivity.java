@@ -369,10 +369,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
             @Override
             public void onChange(boolean selfChange) {
-                int messagesListViewSize = messagesListView.getCount();
-                isNeedToScrollMessages = true;
-                onScrollToBottom();
-                onScrollToBottom();
+//                isNeedToScrollMessages = true;
+//                onScrollToBottom();
             }
         };
 
@@ -400,9 +398,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void scrollListView() {
         if (isNeedToScrollMessages) {
             isNeedToScrollMessages = false;
-            if(!messagesAdapter.isEmpty()) {
-                messagesListView.setSelection(messagesAdapter.getCount() - 1);
-            }
+            messagesListView.setSelection(messagesAdapter.getCount() - 1);
         }
     }
 
@@ -410,6 +406,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (dialog == null) {
             return;
         }
+
+        showActionBarProgress();
 
         MessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
         if (lastReadMessage == null) {
@@ -449,6 +447,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            hideActionBarProgress();
         }
     }
 }

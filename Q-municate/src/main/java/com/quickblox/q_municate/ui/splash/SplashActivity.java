@@ -42,7 +42,6 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
-        setContentView(R.layout.activity_splash);
 
         addActions();
 
@@ -59,6 +58,8 @@ public class SplashActivity extends BaseActivity {
         } else {
             startLanding();
         }
+
+        setContentView(R.layout.activity_splash);
     }
 
     private void checkStartExistSession(String userEmail, String userPassword){
@@ -67,8 +68,7 @@ public class SplashActivity extends BaseActivity {
         if ( ( isEmailEntered && isPasswordEntered ) ||
                 (isLoggedViaFB(isPasswordEntered)) ){
                            runExistSession(userEmail, userPassword);
-        }
-        else {
+        } else {
             startLanding();
         }
     }

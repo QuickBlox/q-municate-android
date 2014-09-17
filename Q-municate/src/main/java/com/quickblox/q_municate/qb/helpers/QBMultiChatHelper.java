@@ -46,6 +46,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
     private QBNotificationChatListener notificationChatListener = new RoomNotificationListener();
     private QBDialog currentDialog;
+    private List<QBDialog> dialogsList;
 
     public QBMultiChatHelper(Context context) {
         super(context);
@@ -113,6 +114,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public void tryJoinRoomChats(List<QBDialog> chatDialogsList) {
         if (!chatDialogsList.isEmpty()) {
+            dialogsList = chatDialogsList;
             for (QBDialog dialog : chatDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                     tryJoinRoomChat(dialog);
@@ -204,6 +206,15 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
         return new ArrayList<Integer>(roomChatManager.getRoom(roomJid).getOnlineRoomUserIds());
+    }
+
+    public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
+        for (QBDialog dialog : dialogsList) {
+            if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
+                QBRoomChat roomChat = roomChatManager.getRoom(dialog.getRoomJid());
+                roomChat.leave();
+            }
+        }
     }
 
     public void leaveRoomChat(

@@ -103,7 +103,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
         newMessageTextView.setText(message);
         senderMessageTextView.setText(senderUser.getFullName());
         Crouton.cancelAllCroutons();
-        Crouton.show((Activity) activity, newMessageView);
+        Crouton.show(activity, newMessageView);
     }
 
     protected void onReceiveMessage(Bundle extras) {
@@ -136,7 +136,15 @@ public class ActivityDelegator extends BaseActivityDelegator {
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
     }
 
-    public void setVisibilityProgressBar(boolean visibility) {
+    public void hideActionBarProgress() {
+        setVisibilityActionBarProgress(false);
+    }
+
+    public void showActionBarProgress() {
+        setVisibilityActionBarProgress(true);
+    }
+
+    public void setVisibilityActionBarProgress(boolean visibility) {
         activity.setProgressBarIndeterminateVisibility(visibility);
     }
 

@@ -66,12 +66,12 @@ public class FriendUtils {
         return friendsList;
     }
 
-    public static Map<Integer, User> createFriendMap(List<QBUser> userList) {
-        Map<Integer, User> friendMap = new HashMap<Integer, User>();
+    public static Map<Integer, User> createUserMap(List<QBUser> userList) {
+        Map<Integer, User> userHashMap = new HashMap<Integer, User>();
         for (QBUser user : userList) {
-            friendMap.put(user.getId(), createUser(user));
+            userHashMap.put(user.getId(), createUser(user));
         }
-        return friendMap;
+        return userHashMap;
     }
 
     public static ArrayList<Integer> getFriendIdsList(List<QBUser> friendList) {
