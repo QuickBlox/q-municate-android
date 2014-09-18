@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.core.command.ServiceCommand;
+import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -31,7 +32,14 @@ public class QBInitChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        QBUser user;
+
+        if (extras == null) {
+            user = AppSession.getSession().getUser();
+        } else {
+            user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        }
+
         privateChatHelper.init(QBChatService.getInstance(), user);
         multiChatHelper.init(QBChatService.getInstance(), user);
         return extras;

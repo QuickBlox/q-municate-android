@@ -245,11 +245,15 @@ public class QBService extends Service {
         QBLoginAndJoinDialogsCommand joinGroupChatsCommand = new QBLoginAndJoinDialogsCommand(this,
                 QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION);
-        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
-        joinGroupChatsCommand.addCommand(loginChatCommand);
+
+//        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
+//        joinGroupChatsCommand.addCommand(loginChatCommand);
+
+        addLoginChatAndInitCommands(joinGroupChatsCommand);
 
         ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
         joinGroupChatsCommand.addCommand(joinChatCommand);
+
         serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, joinGroupChatsCommand);
     }
 

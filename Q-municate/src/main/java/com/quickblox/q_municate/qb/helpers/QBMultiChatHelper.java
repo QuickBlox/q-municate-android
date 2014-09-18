@@ -201,7 +201,9 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
         QBRoomChat roomChat = createChatIfNotExist(dialog);
-        roomChat.join();
+        if (!roomChat.isJoined()) {
+            roomChat.join();
+        }
     }
 
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
@@ -212,7 +214,9 @@ public class QBMultiChatHelper extends BaseChatHelper {
         for (QBDialog dialog : dialogsList) {
             if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                 QBRoomChat roomChat = roomChatManager.getRoom(dialog.getRoomJid());
-                roomChat.leave();
+                if (roomChat != null && roomChat.isJoined()) {
+                    roomChat.leave();
+                }
             }
         }
     }

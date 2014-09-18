@@ -28,7 +28,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
-        chatDestroyed = chatDestroyed && !isLogedIn();
+        chatDestroyed = chatDestroyed && !isLoggedIn();
         if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
@@ -55,22 +55,24 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         lo.g("onActivityStopped" + numberOfActivitiesInForeground);
 
         if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
-            boolean isLogedIn = isLogedIn();
+            boolean isLogedIn = isLoggedIn();
             if (!isLogedIn) {
                 return;
             }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
-                QBLogoutAndDestroyChatCommand.start(activity, false);
+                QBLogoutAndDestroyChatCommand.start(activity, true);
             }
         }
     }
 
-    private boolean isLogedIn() {
+    private boolean isLoggedIn() {
         boolean result = false;
         try {
-            result = QBChatService.getInstance()
-                    .isLoggedIn(); //Chat service isn't initialized  -> return false
+            if (QBChatService.isInitialized()) {
+                result = QBChatService.getInstance()
+                        .isLoggedIn();
+            }
         } catch (IllegalStateException e) {
             ErrorUtils.logError(e);
         }
