@@ -244,6 +244,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsList() {
+        baseActivity.showActionBarProgress();
         createHeadersCursor();
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, null,
@@ -267,6 +268,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListView.setGroupIndicator(null);
 
         expandAllGroups(headersCursor);
+
+        baseActivity.hideActionBarProgress();
     }
 
     private void startFriendDetailsActivity(int userId) {

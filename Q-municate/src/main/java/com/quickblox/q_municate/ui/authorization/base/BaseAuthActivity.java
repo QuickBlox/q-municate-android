@@ -113,7 +113,6 @@ public class BaseAuthActivity extends BaseActivity {
         AppSession.saveRememberMe(saveRememberMe);
         DatabaseManager.clearAllCache(context);
         MainActivity.start(context);
-        KeyboardUtils.hideKeyboard(this);
         finish();
     }
 
