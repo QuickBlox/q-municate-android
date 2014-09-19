@@ -46,7 +46,9 @@ public class QBLoadUsersCommand extends ServiceCommand {
         usersList.remove(FriendUtils.createUser(AppSession.getSession().getUser()));
 
         Bundle params = new Bundle();
+        params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
         params.putSerializable(QBServiceConsts.EXTRA_USERS, (java.io.Serializable) usersList);
+
         return params;
     }
 

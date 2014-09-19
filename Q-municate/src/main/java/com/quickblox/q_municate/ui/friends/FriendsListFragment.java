@@ -49,7 +49,7 @@ import java.util.TimerTask;
 
 public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener {
 
-    private static final int SEARCH_DELAY = 500;
+    private static final int SEARCH_DELAY = 1000;
 
     private State state;
     private String constraint;
@@ -283,7 +283,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         headersCursor = new MatrixCursor(
                 new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
 
-        int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity, relationStatusNoneId);
+        int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
+                relationStatusNoneId);
         int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
 
         if (countRequestsFriends > Consts.ZERO_INT_VALUE) {
@@ -386,7 +387,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (state == State.GLOBAL_LIST) {
             emptyListTextView.setVisibility(View.GONE);
         } else {
-            int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity, relationStatusNoneId);
+            int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
+                    relationStatusNoneId);
             int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
 
             if ((countFriends + countRequestsFriends + usersList.size()) > Consts.ZERO_INT_VALUE) {
@@ -488,11 +490,16 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
-            usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
-            searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
-            initFriendsListForSearch();
-            checkVisibilityEmptyLabel();
-            baseActivity.hideActionBarProgress();
+            String constraint = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
+            if (FriendsListFragment.this.constraint.equals(constraint)) {
+                usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
+                searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
+                initFriendsListForSearch();
+                checkVisibilityEmptyLabel();
+                baseActivity.hideActionBarProgress();
+            } else {
+                onQueryTextChange(constraint);
+            }
         }
     }
 
