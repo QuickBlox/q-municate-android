@@ -14,4 +14,10 @@
         android:textSize="@dimen/text_size"
         android:textStyle="bold" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/header_date_textview"
+        android:background="@color/chat_background_color" />
+
 </RelativeLayout>
