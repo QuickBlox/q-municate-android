@@ -3,6 +3,7 @@ package com.quickblox.q_municate.db;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
@@ -251,6 +252,31 @@ public class DatabaseManager {
         return cursor;
     }
 
+    public static int getAllFriendsCount(Context context) {
+        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusFromId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusBothId + " OR "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusToId + " OR ("
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
+
+        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
+                sortOrder);
+
+        int countFriends = cursor.getCount();
+
+        cursor.close();
+
+        return countFriends;
+    }
+
     public static Cursor getAllFriends(Context context, int relationStatusId) {
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND "
                 + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
@@ -262,6 +288,23 @@ public class DatabaseManager {
                 sortOrder);
 
         return cursor;
+    }
+
+    public static int getAllFriendsCountByRelation(Context context, int relationStatusId) {
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND "
+                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
+
+        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
+                sortOrder);
+
+        int countFriends = cursor.getCount();
+
+        cursor.close();
+
+        return countFriends;
     }
 
     public static List<User> getAllFriendsList(Context context) {
@@ -374,6 +417,11 @@ public class DatabaseManager {
 
     public static Cursor getAllDialogs(Context context) {
         return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
+                DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
+    }
+
+    public static CursorLoader getAllDialogsCursorLoader(Context context) {
+        return new CursorLoader(context, DialogTable.CONTENT_URI, null, null, null,
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
     }
 

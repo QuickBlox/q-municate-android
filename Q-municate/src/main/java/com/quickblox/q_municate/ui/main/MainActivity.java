@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
-import android.view.Window;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -50,6 +49,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_FEEDBACK_FRAGMENT = 4;
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
@@ -120,8 +120,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
