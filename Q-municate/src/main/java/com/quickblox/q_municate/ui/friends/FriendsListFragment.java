@@ -144,16 +144,16 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        initUI(rootView);
-        initListeners();
-        registerContentObservers();
-
         resources = getResources();
         friendOperationAction = new FriendOperationAction();
         relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(baseActivity,
                 QBFriendListHelper.RELATION_STATUS_NONE);
         usersList = Collections.emptyList();
         searchTimer = new Timer();
+
+        initUI(rootView);
+        initListeners();
+        registerContentObservers();
 
         return rootView;
     }
@@ -283,9 +283,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         headersCursor = new MatrixCursor(
                 new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
 
-        int countRequestsFriends = DatabaseManager.getAllFriends(baseActivity, relationStatusNoneId)
-                .getCount();
-        int countFriends = DatabaseManager.getAllFriends(baseActivity).getCount();
+        int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity, relationStatusNoneId);
+        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
 
         if (countRequestsFriends > Consts.ZERO_INT_VALUE) {
             headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
@@ -387,9 +386,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (state == State.GLOBAL_LIST) {
             emptyListTextView.setVisibility(View.GONE);
         } else {
-            int countRequestsFriends = DatabaseManager.getAllFriends(baseActivity, relationStatusNoneId)
-                    .getCount();
-            int countFriends = DatabaseManager.getAllFriends(baseActivity).getCount();
+            int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity, relationStatusNoneId);
+            int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
 
             if ((countFriends + countRequestsFriends + usersList.size()) > Consts.ZERO_INT_VALUE) {
                 emptyListTextView.setVisibility(View.GONE);

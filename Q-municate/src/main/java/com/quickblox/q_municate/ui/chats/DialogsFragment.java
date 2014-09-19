@@ -1,5 +1,7 @@
 package com.quickblox.q_municate.ui.chats;
 
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -31,7 +33,9 @@ import java.util.ArrayList;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class DialogsFragment extends BaseFragment {
+public class DialogsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int DIALOGS_LOADER_ID = 0;
 
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
@@ -53,12 +57,32 @@ public class DialogsFragment extends BaseFragment {
 
         initUI(view);
         initListeners();
-        initChatsDialogs();
         Crouton.cancelAllCroutons();
 
         addActions();
+        initCursorLoaders();
 
         return view;
+    }
+
+    private void initCursorLoaders() {
+        getLoaderManager().initLoader(DIALOGS_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return DatabaseManager.getAllDialogsCursorLoader(baseActivity);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor dialogsCursor) {
+        initChatsDialogs(dialogsCursor);
+        checkVisibilityEmptyLabel();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     private void initUI(View view) {
@@ -90,8 +114,10 @@ public class DialogsFragment extends BaseFragment {
     @Override
     public void onResume() {
         Crouton.cancelAllCroutons();
-        checkVisibilityEmptyLabel();
-        checkVisibilityProgressBars();
+        if( dialogsAdapter != null) {
+            checkVisibilityEmptyLabel();
+            checkVisibilityProgressBars();
+        }
         super.onResume();
     }
 
@@ -102,8 +128,8 @@ public class DialogsFragment extends BaseFragment {
         }
     }
 
-    private void initChatsDialogs() {
-        dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
+    private void initChatsDialogs(Cursor dialogsCursor) {
+        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
         dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -124,10 +150,6 @@ public class DialogsFragment extends BaseFragment {
 
     private void startGroupChatActivity(QBDialog dialog) {
         GroupDialogActivity.start(baseActivity, dialog);
-    }
-
-    private Cursor getAllChats() {
-        return DatabaseManager.getAllDialogs(baseActivity);
     }
 
     @Override
