@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/online_imageview"
+        android:layout_toLeftOf="@+id/actions_friend_linearlayout"
         android:layout_toRightOf="@id/avatar_imageview"
         android:orientation="vertical">
 
@@ -33,8 +33,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Friend fullName"
-            android:textSize="20sp" />
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="Friend fullName Friend fullName Friend fullName Friend fullName"
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/status_textview"
@@ -47,6 +49,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/actions_friend_linearlayout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
@@ -91,8 +94,7 @@
             android:id="@+id/online_imageview"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_gravity="center"
             android:src="@drawable/badge_online"
             android:visibility="gone" />
     </LinearLayout>

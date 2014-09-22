@@ -31,7 +31,8 @@ public class QBServiceConsts {
     public static final String SEND_GROUP_MESSAGE_ACTION = "send_group_message_action";
     public static final String LOAD_ATTACH_FILE_ACTION = "load_attach_file_action";
     public static final String INIT_FRIEND_LIST_ACTION = "init friend list action";
-    public static final String INIT_CHAT_ACTION = "init_chat_action";
+    public static final String INIT_CHATS_ACTION = "init_chats_action";
+    public static final String INIT_CHAT_SERVICE_ACTION = "init_chat_service_action";
     public static final String INIT_VIDEO_CHAT_ACTION = "init_video_chat_action";
     public static final String SIGNUP_REST_ACTION = "signup_rest_action";
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
@@ -92,8 +93,10 @@ public class QBServiceConsts {
     public static final String LOGIN_CHAT_FAIL_ACTION = "login_chat_fail_action";
     public static final String LOGOUT_CHAT_SUCCESS_ACTION = "logout_chat_success_action";
     public static final String LOGOUT_CHAT_FAIL_ACTION = "logout_chat_fail_action";
-    public static final String INIT_CHAT_SUCCESS_ACTION = "init_chat_success_action";
-    public static final String INIT_CHAT_FAIL_ACTION = "init_chat_fail_action";
+    public static final String INIT_CHATS_SUCCESS_ACTION = "init_chats_success_action";
+    public static final String INIT_CHATS_FAIL_ACTION = "init_chats_fail_action";
+    public static final String INIT_CHAT_SERVICE_SUCCESS_ACTION = "init_chat_service_success_action";
+    public static final String INIT_CHAT_SERVICE_FAIL_ACTION = "init_chat_service_fail_action";
     public static final String INIT_VIDEO_CHAT_SUCCESS_ACTION = "init_video_chat_success_action";
     public static final String INIT_VIDEO_CHAT_FAIL_ACTION = "init_video_chat_fail_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION = "logout_and_destroy_chat_success_action";

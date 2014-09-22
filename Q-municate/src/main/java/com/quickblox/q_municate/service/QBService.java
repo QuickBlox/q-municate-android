@@ -23,7 +23,8 @@ import com.quickblox.q_municate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate.qb.commands.QBGetFileCommand;
 import com.quickblox.q_municate.qb.commands.QBImportFriendsCommand;
-import com.quickblox.q_municate.qb.commands.QBInitChatCommand;
+import com.quickblox.q_municate.qb.commands.QBInitChatsCommand;
+import com.quickblox.q_municate.qb.commands.QBInitChatServiceCommand;
 import com.quickblox.q_municate.qb.commands.QBInitFriendListCommand;
 import com.quickblox.q_municate.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate.qb.commands.QBJoinGroupDialogCommand;
@@ -435,23 +436,27 @@ public class QBService extends Service {
     }
 
     private void addLoginChatAndInitCommands(CompositeServiceCommand loginCommand) {
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
         QBPrivateChatHelper chatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
         QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
-        QBInitChatCommand initChatCommand = new QBInitChatCommand(this, chatHelper, multiChatHelper,
-                QBServiceConsts.INIT_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_CHAT_FAIL_ACTION);
-        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+
+        QBInitChatServiceCommand initChatServiceCommand = new QBInitChatServiceCommand(this, chatRestHelper,
+                QBServiceConsts.INIT_CHAT_SERVICE_SUCCESS_ACTION, QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION);
         QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
-        QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
-                QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
         QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper,
                 QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
                 QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
+        QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, chatHelper, multiChatHelper,
+                QBServiceConsts.INIT_CHATS_SUCCESS_ACTION, QBServiceConsts.INIT_CHATS_FAIL_ACTION);
+        QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
+                QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
 
+        loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
-        loginCommand.addCommand(initChatCommand);
-        loginCommand.addCommand(initVideoChatCommand);
         loginCommand.addCommand(initFriendListCommand);
+        loginCommand.addCommand(initChatsCommand);
+        loginCommand.addCommand(initVideoChatCommand);
     }
 
     private void registerLoadChatsDialogsCommand() {

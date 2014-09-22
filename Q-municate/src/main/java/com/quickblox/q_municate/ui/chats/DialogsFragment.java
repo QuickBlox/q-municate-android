@@ -189,7 +189,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         public void execute(Bundle bundle) {
             ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (parcelableDialogsList.isEmpty()) {
+            if (parcelableDialogsList == null) {
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }

@@ -35,14 +35,17 @@ public class QBChatRestHelper extends BaseHelper {
 
     private ConnectionListener connectionListener = new ChatConnectionListener();
 
-    public synchronized void login(
-            QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
+    public synchronized void initChatService() {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             QBChatService.setDefaultPacketReplyTimeout(Consts.DEFAULT_PACKET_REPLY_TIMEOUT);
             chatService = QBChatService.getInstance();
             chatService.addConnectionListener(connectionListener);
         }
+    }
+
+    public synchronized void login(
+            QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);

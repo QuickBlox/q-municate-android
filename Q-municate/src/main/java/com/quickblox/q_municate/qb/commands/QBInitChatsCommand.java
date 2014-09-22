@@ -13,12 +13,12 @@ import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 
-public class QBInitChatCommand extends ServiceCommand {
+public class QBInitChatsCommand extends ServiceCommand {
 
     private QBPrivateChatHelper privateChatHelper;
     private QBMultiChatHelper multiChatHelper;
 
-    public QBInitChatCommand(Context context, QBPrivateChatHelper privateChatHelper,
+    public QBInitChatsCommand(Context context, QBPrivateChatHelper privateChatHelper,
             QBMultiChatHelper multiChatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
         this.privateChatHelper = privateChatHelper;
@@ -26,7 +26,7 @@ public class QBInitChatCommand extends ServiceCommand {
     }
 
     public static void start(Context context) {
-        Intent intent = new Intent(QBServiceConsts.INIT_CHAT_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.INIT_CHATS_ACTION, null, context, QBService.class);
         context.startService(intent);
     }
 
@@ -42,6 +42,7 @@ public class QBInitChatCommand extends ServiceCommand {
 
         privateChatHelper.init(QBChatService.getInstance(), user);
         multiChatHelper.init(QBChatService.getInstance(), user);
+
         return extras;
     }
 }

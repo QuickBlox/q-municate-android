@@ -501,7 +501,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 checkVisibilityEmptyLabel();
                 baseActivity.hideActionBarProgress();
             } else {
-                onQueryTextChange(constraint);
+                onQueryTextChange(FriendsListFragment.this.constraint);
             }
         }
     }

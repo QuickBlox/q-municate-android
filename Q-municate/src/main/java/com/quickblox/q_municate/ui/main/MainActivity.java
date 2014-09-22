@@ -247,7 +247,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
             ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (!parcelableDialogsList.isEmpty()) {
+            if (parcelableDialogsList != null && !parcelableDialogsList.isEmpty()) {
                 ArrayList<QBDialog> dialogsList = ChatDialogUtils.parcelableDialogsToDialogs(
                         parcelableDialogsList);
                 new FindUnknownFriendsTask(MainActivity.this).execute(dialogsList, null);

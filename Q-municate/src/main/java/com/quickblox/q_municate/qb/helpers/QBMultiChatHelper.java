@@ -211,11 +211,13 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
-        for (QBDialog dialog : dialogsList) {
-            if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
-                QBRoomChat roomChat = roomChatManager.getRoom(dialog.getRoomJid());
-                if (roomChat != null && roomChat.isJoined()) {
-                    roomChat.leave();
+        if (dialogsList != null) {
+            for (QBDialog dialog : dialogsList) {
+                if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    QBRoomChat roomChat = roomChatManager.getRoom(dialog.getRoomJid());
+                    if (roomChat != null && roomChat.isJoined()) {
+                        roomChat.leave();
+                    }
                 }
             }
         }
