@@ -24,6 +24,5 @@ ext.devDebug = false
 
 // Dependencies versions
 ext.universalImageLoaderVersion = '1.9.1'
-ext.nineoldandroidsVersion = '2.4.0'
-ext.googlePlayServicesVersion = '5.+'
+ext.googlePlayServicesVersion = '5.0.+'
 ext.croutonVersion = '1.8.4'
