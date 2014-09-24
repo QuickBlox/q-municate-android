@@ -114,18 +114,10 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onResume() {
         Crouton.cancelAllCroutons();
-        if( dialogsAdapter != null) {
+        if (dialogsAdapter != null) {
             checkVisibilityEmptyLabel();
-            checkVisibilityProgressBars();
         }
         super.onResume();
-    }
-
-    private void checkVisibilityProgressBars() {
-        if (dialogsAdapter.isEmpty()) {
-            baseActivity.showProgress();
-            baseActivity.hideActionBarProgress();
-        }
     }
 
     private void initChatsDialogs(Cursor dialogsCursor) {

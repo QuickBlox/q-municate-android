@@ -2,6 +2,7 @@ package com.quickblox.q_municate.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class DateUtils {
@@ -33,7 +34,9 @@ public class DateUtils {
         } else if (inputDate == currentDate - 1) {
             timeString = STRING_YESTERDAY;
         } else {
-            timeString = new SimpleDateFormat("EEEE", locale).format(calendar.getTime()) + ", " + inputDate;
+            Date time = calendar.getTime();
+            timeString = new SimpleDateFormat("EEEE", locale).format(time) + ", " + inputDate  + " " +
+                    new SimpleDateFormat("MMMM", locale).format(time);
         }
 
         return timeString;

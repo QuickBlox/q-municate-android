@@ -202,8 +202,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
         MenuInflater m = getMenuInflater();
         m.inflate(R.menu.group_dialog_ctx_menu, menu);
     }

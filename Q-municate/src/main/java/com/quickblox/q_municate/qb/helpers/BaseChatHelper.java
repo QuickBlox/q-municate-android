@@ -80,14 +80,6 @@ public abstract class BaseChatHelper extends BaseHelper {
         notificationChatListeners.add(notificationChatListener);
     }
 
-    protected String getMessageBody(QBChatMessage chatMessage) {
-        String messageBody = chatMessage.getBody();
-        if (TextUtils.isEmpty(messageBody)) {
-            messageBody = Consts.EMPTY_STRING;
-        }
-        return messageBody;
-    }
-
     protected void saveDialogToCache(Context context, QBDialog dialog) {
         DatabaseManager.saveDialog(context, dialog);
     }
@@ -163,10 +155,10 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId, boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
-        String messageBody = getMessageBody(chatMessage);
+        String messageBody = chatMessage.getBody();
         String extraChatMessage;
 
-        if (TextUtils.isEmpty(messageBody)) {
+        if (!chatMessage.getAttachments().isEmpty()) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
@@ -182,7 +174,7 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     protected void updateDialogByNotification(QBChatMessage chatMessage) {
         long time = DateUtils.getCurrentTime();
-        QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
+        QBDialog dialog = ChatUtils.parseDialogFromMessageForUpdate(context, chatMessage, time);
         if(dialog != null) {
             new FindUnknownFriendsTask(context).execute(null, dialog);
             saveDialogToCache(context, dialog);

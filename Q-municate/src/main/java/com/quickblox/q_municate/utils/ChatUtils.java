@@ -20,6 +20,7 @@ import java.util.List;
 public class ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
+    public static final int NOT_RESET_COUNTER = -1;
 
     public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
     public static final String PROPERTY_ROOM_NAME = "name";
@@ -58,7 +59,32 @@ public class ChatUtils {
         return Consts.EMPTY_STRING;
     }
 
-    public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
+    public static QBDialog parseDialogFromMessageForUpdate(Context context, QBMessage chatMessage, long dateSent) {
+        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
+        String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
+        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = chatMessage.getProperty(PROPERTY_PHOTO_URL);
+
+        QBDialog dialog = new QBDialog(dialogId);
+        dialog.setRoomJid(roomJid);
+        dialog.setPhotoUrl(photoUrl);
+        dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
+        dialog.setName(dialogName);
+
+        if (!chatMessage.getAttachments().isEmpty()) {
+            dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
+        } else if (!TextUtils.isEmpty(chatMessage.getBody())) {
+            dialog.setLastMessage(chatMessage.getBody());
+        }
+
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(NOT_RESET_COUNTER);
+
+        return dialog;
+    }
+
+    public static QBDialog parseDialogFromMessage(Context context, QBMessage chatMessage, String lastMessage, long dateSent) {
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -77,7 +103,13 @@ public class ChatUtils {
                 dialog.setType(dialogType);
             }
         }
-        dialog.setLastMessage(lastMessage);
+
+        if (!chatMessage.getAttachments().isEmpty()) {
+            dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
+        } else if (!TextUtils.isEmpty(lastMessage)) {
+            dialog.setLastMessage(lastMessage);
+        }
+
         dialog.setLastMessageDateSent(dateSent);
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;

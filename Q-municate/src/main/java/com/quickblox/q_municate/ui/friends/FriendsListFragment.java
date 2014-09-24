@@ -83,7 +83,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onResume() {
         super.onResume();
-        initFriendsList();
+        if (State.GLOBAL_LIST.equals(state)) {
+            initFriendsListForSearch();
+        } else {
+            initFriendsList();
+        }
         checkVisibilityEmptyLabel();
     }
 

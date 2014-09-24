@@ -175,7 +175,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
         time = DateUtils.getCurrentTime();
-        QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
+        QBDialog dialog = ChatUtils.parseDialogFromMessage(context, chatMessage, chatMessage.getBody(), time);
         if (QBDialogType.PRIVATE.equals(dialog.getType())) {
             saveDialogToCache(context, dialog);
         }

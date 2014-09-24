@@ -121,8 +121,7 @@ public class SplashActivity extends BaseActivity {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(Consts.TOKEN_VALID_TIME_IN_MINUTES))){
             QBLoginAndJoinDialogsCommand.start(this);
-        }
-        else{
+        } else {
             doAutoLogin(userEmail, userPassword);
         }
     }

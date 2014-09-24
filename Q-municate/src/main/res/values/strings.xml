@@ -80,6 +80,7 @@
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
     <string name="frl_alrt_reject_friend">%1$s has rejected your contact request.</string>
     <string name="frl_alrt_accepted_friend">%1$s has accepted your contact request. </string>
+    <string name="frl_alrt_deleted_friend">%1$s has deleted you from contacts list. </string>
 
     // Friend Details
     <string name="frd_title">Details</string>

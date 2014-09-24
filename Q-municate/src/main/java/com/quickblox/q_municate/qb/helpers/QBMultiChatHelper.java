@@ -275,7 +275,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         long time;
         String roomJidId;
         time = DateUtils.getCurrentTime();
-        QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
+        QBDialog dialog = ChatUtils.parseDialogFromMessage(context, chatMessage, chatMessage.getBody(), time);
         roomJidId = dialog.getRoomJid();
         if (roomJidId != null && !QBDialogType.PRIVATE.equals(dialog.getType())) {
             tryJoinRoomChat(dialog);

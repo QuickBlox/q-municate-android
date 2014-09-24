@@ -24,14 +24,10 @@ import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
-import org.apache.harmony.javax.security.sasl.SaslException;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.RosterPacket;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -91,17 +87,21 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void rejectFriend(int userId) throws Exception {
         roster.reject(userId);
+        clearRosterEntry(userId);
         deleteUser(userId);
+    }
+
+    private void clearRosterEntry(int userId) throws Exception {
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry != null && roster.contains(userId)) {
+            roster.removeEntry(rosterEntry);
+        }
     }
 
     public void removeFriend(int userId) throws Exception {
         roster.unsubscribe(userId);
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
-        if (rosterEntry != null && roster.contains(userId)) {
-            roster.removeEntry(rosterEntry);
-        } else {
-            deleteUser(userId);
-        }
+        clearRosterEntry(userId);
+        deleteUser(userId);
     }
 
     private boolean isNotInvited(int userId) {
@@ -156,6 +156,13 @@ public class QBFriendListHelper extends BaseHelper {
 
         fillUsersWithRosterData(usersList);
 
+//        for (Friend friend : friendsList) {
+//            Log.d("test_roster", "APP. updateFriend(), friend.isAskStatus() = " + friend
+//                            .isAskStatus() + ", friend.getRelationStatus() = " + friend
+//                            .getRelationStatus() + ", friend.isRequestedFriend() = " + friend
+//                            .isRequestedFriend());
+//        }
+
         savePeople(usersList, friendsList);
     }
 
@@ -180,29 +187,40 @@ public class QBFriendListHelper extends BaseHelper {
 
         fillUserOnlineStatus(user);
 
+        Friend oldFriend = DatabaseManager.getFriendById(context, friend.getUserId());
+        if (oldFriend != null) {
+            checkAlertShowing(friend, oldFriend);
+        }
+
         saveUser(user);
         saveFriend(friend);
 
 //        Log.d("test_roster",
 //                "APP. updateFriend(), friend.isAskStatus() = " + friend.isAskStatus()
 //                + ", friend.getRelationStatus() = " + friend.getRelationStatus()
+//                + ", friend.getId() = " + friend.getUserId()
 //                + ", friend.isRequestedFriend() = " + friend.isRequestedFriend());
-
-        checkAlertShowing(friend);
     }
 
-    private void checkAlertShowing(Friend newFriend) {
-//        Log.d("test_roster", "APP. checkAlertShowing()");
-        String alertMessage;
-        Friend oldFriend = DatabaseManager.getFriendById(context, newFriend.getUserId());
+    private void checkAlertShowing(Friend newFriend, Friend oldFriend) {
+        String alertMessage = null;
+
         String friendName = DatabaseManager.getUserById(context, newFriend.getUserId()).getFullName();
-        if(oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE)) {
-//            Log.d("test_roster", "APP. checkAlertShowing() - 1");
+
+        boolean friendRejectedMe = oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
+        boolean friendAcceptedMe = oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_TO);
+        boolean friendDeletedMe = (oldFriend.getRelationStatus().equals(RELATION_STATUS_TO) || oldFriend.getRelationStatus().equals(RELATION_STATUS_FROM)
+                || oldFriend.getRelationStatus().equals(RELATION_STATUS_BOTH)) && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
+
+        if (friendRejectedMe) {
             alertMessage = context.getString(R.string.frl_alrt_reject_friend, friendName);
-            notifyFriendAlert(alertMessage);
-        } else if (oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_TO)) {
-//            Log.d("test_roster", "APP. checkAlertShowing() - 2");
+        } else if (friendAcceptedMe) {
             alertMessage = context.getString(R.string.frl_alrt_accepted_friend, friendName);
+        } else if (friendDeletedMe) {
+            alertMessage = context.getString(R.string.frl_alrt_deleted_friend, friendName);
+        }
+
+        if (alertMessage != null) {
             notifyFriendAlert(alertMessage);
         }
     }
@@ -211,6 +229,13 @@ public class QBFriendListHelper extends BaseHelper {
         Intent intent = new Intent(QBServiceConsts.FRIEND_ALERT_SHOW);
         intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE, message);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private void addedFriends(Collection<Integer> userIdsList, boolean requestedFriend) throws QBResponseException {
+        for (Integer userId : userIdsList) {
+            createFriend(userId, requestedFriend);
+            notifyContactRequest();
+        }
     }
 
     private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
@@ -309,8 +334,9 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesAdded(Collection<Integer> userIdsList) {
             try {
-//                Log.d("test_roster", "APP. entriesAdded()");
+                Log.d("test_roster", "APP. entriesAdded()");
                 updateFriends(userIdsList);
+//                addedFriends(userIdsList, true);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_ADDED_ERROR, e);
             }
