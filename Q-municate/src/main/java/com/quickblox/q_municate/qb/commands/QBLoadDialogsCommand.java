@@ -40,9 +40,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
-            multiChatHelper.tryJoinRoomChats(dialogsList);
             parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
             DatabaseManager.saveDialogs(context, dialogsList);
+            multiChatHelper.tryJoinRoomChats(dialogsList);
         }
 
         Bundle bundle = new Bundle();
