@@ -9,8 +9,9 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="35dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:paddingBottom="10dp">
 
         <com.quickblox.q_municate.ui.views.RoundedImageView
             style="@style/AvatarImageView"
