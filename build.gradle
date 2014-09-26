@@ -16,10 +16,10 @@ allprojects {
 ext.compileSdkVersion = 19
 ext.buildToolsVersion = '19.1.0'
 
-ext.versionName = '1.0.71'
-ext.versionCode = 15
+ext.versionName = '1.0.8'
+ext.versionCode = 20
 
-ext.prodDebug = true
+ext.prodDebug = false
 ext.devDebug = false
 
 // Dependencies versions

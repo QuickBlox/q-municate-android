@@ -8,10 +8,16 @@ import com.quickblox.q_municate.R;
 
 public class Consts {
 
-    // QuickBlox
+    // Q-municate
     public static final String QB_APP_ID = "13318";
     public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
     public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
+
+//    // Tuul
+//    public static final String QB_APP_ID = "13984";
+//    public static final String QB_AUTH_KEY = "ZSzYFdLCWXLTGus";
+//    public static final String QB_AUTH_SECRET = "KzXxyxRLsauKBYH";
+
     public static final String QB_DOMAIN = "api.stage.quickblox.com";
 
     // Friend list consts
