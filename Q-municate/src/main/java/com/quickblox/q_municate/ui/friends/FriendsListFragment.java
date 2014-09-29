@@ -112,8 +112,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             @Override
             public void onChange(boolean selfChange) {
-                initFriendsList();
-                checkVisibilityEmptyLabel();
+                checkInitFriendsList();
             }
         };
 
@@ -121,8 +120,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             @Override
             public void onChange(boolean selfChange) {
-                initFriendsList();
-                checkVisibilityEmptyLabel();
+                checkInitFriendsList();
             }
         };
 
@@ -130,6 +128,16 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 userTableContentObserver);
         baseActivity.getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
                 friendTableContentObserver);
+    }
+
+    private void checkInitFriendsList() {
+        if (State.GLOBAL_LIST.equals(state)) {
+            initFriendsListForSearch();
+            checkVisibilityEmptyLabel();
+        } else {
+            initFriendsList();
+            checkVisibilityEmptyLabel();
+        }
     }
 
     private void unregisterContentObservers() {

@@ -231,13 +231,6 @@ public class QBFriendListHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private void addedFriends(Collection<Integer> userIdsList, boolean requestedFriend) throws QBResponseException {
-        for (Integer userId : userIdsList) {
-            createFriend(userId, requestedFriend);
-            notifyContactRequest();
-        }
-    }
-
     private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
 //        Log.d("test_roster", "APP. createFriend(), true");
         User user = loadUser(userId);

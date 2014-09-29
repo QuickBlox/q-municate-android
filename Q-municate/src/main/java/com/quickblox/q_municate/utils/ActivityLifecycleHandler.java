@@ -68,13 +68,8 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     private boolean isLoggedIn() {
         boolean result = false;
-        try {
-            if (QBChatService.isInitialized()) {
-                result = QBChatService.getInstance()
-                        .isLoggedIn();
-            }
-        } catch (IllegalStateException e) {
-            ErrorUtils.logError(e);
+        if (QBChatService.isInitialized()) {
+            result = QBChatService.getInstance().isLoggedIn();
         }
         return result;
     }
