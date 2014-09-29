@@ -3,7 +3,7 @@ package com.quickblox.q_municate.utils;
 import android.content.Context;
 import android.database.MatrixCursor;
 
-import com.quickblox.module.chat.QBRosterEntry;
+import com.quickblox.module.chat.model.QBRosterEntry;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;

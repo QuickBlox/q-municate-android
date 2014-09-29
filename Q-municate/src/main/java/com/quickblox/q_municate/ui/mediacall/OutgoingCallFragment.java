@@ -15,7 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.quickblox.internal.core.exception.QBVideoException;
-import com.quickblox.module.chat.exceptions.QBChatException;
+import com.quickblox.module.chat.exception.QBChatException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.VideoSenderChannel;

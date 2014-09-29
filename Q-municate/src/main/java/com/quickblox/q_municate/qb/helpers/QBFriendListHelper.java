@@ -9,11 +9,11 @@ import android.util.Log;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPresence;
 import com.quickblox.module.chat.QBRoster;
-import com.quickblox.module.chat.QBRosterEntry;
 import com.quickblox.module.chat.listeners.QBRosterListener;
 import com.quickblox.module.chat.listeners.QBSubscriptionListener;
+import com.quickblox.module.chat.model.QBPresence;
+import com.quickblox.module.chat.model.QBRosterEntry;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
@@ -25,7 +25,6 @@ import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
@@ -127,7 +126,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public User loadUser(int userId) throws QBResponseException {
-        QBUser user = QBUsers.getUser(new QBUser(userId));
+        QBUser user = QBUsers.getUser(userId);
         return FriendUtils.createUser(user);
     }
 
