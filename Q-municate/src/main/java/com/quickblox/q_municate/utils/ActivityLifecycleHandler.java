@@ -16,7 +16,6 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     private static final boolean SHOULD_START_MULTICHAT = true;
     private int numberOfActivitiesInForeground;
     private boolean chatDestroyed = false;
-    Lo lo = new Lo(this);
 
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
@@ -25,7 +24,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     public void onActivityResumed(Activity activity) {
-        lo.g("onActivityResumed" + numberOfActivitiesInForeground);
+        Lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
         chatDestroyed = chatDestroyed && !isLoggedIn();
@@ -52,7 +51,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         if (activity instanceof QBLogeable) {
             --numberOfActivitiesInForeground;
         }
-        lo.g("onActivityStopped" + numberOfActivitiesInForeground);
+        Lo.g("onActivityStopped" + numberOfActivitiesInForeground);
 
         if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
             boolean isLogedIn = isLoggedIn();

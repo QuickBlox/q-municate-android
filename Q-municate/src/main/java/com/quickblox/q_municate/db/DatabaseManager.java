@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.QBHistoryMessage;
+import com.quickblox.module.chat.model.QBChatHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
@@ -461,7 +461,7 @@ public class DatabaseManager {
         dialog.setLastMessage(lastMessage);
         dialog.setLastMessageUserId(lastMessageUserId);
         dialog.setLastMessageDateSent(dateSent);
-        dialog.setPhotoUrl(photoUrl);
+        dialog.setPhoto(photoUrl);
         dialog.setType(QBDialogType.parseByCode(type));
 
         return dialog;
@@ -582,10 +582,10 @@ public class DatabaseManager {
         context.getContentResolver().delete(DialogTable.CONTENT_URI, null, null);
     }
 
-    public static void saveChatMessages(Context context, List<QBHistoryMessage> messagesList,
+    public static void saveChatMessages(Context context, List<QBChatHistoryMessage> messagesList,
             String dialogId) {
-        for (QBHistoryMessage historyMessage : messagesList) {
-            String messageId = historyMessage.getMessageId();
+        for (QBChatHistoryMessage historyMessage : messagesList) {
+            String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
             long time = historyMessage.getDateSent();
@@ -669,7 +669,7 @@ public class DatabaseManager {
         }
 
         values.put(DialogTable.Cols.NAME, dialog.getName());
-        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhotoUrl());
+        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhoto());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 dialog.getOccupants()));
 
@@ -712,7 +712,7 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.LAST_MESSAGE_USER_ID, dialog.getLastMessageUserId());
         values.put(DialogTable.Cols.LAST_DATE_SENT, dialog.getLastMessageDateSent());
         String occupantsIdsString = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
-        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhotoUrl());
+        values.put(DialogTable.Cols.PHOTO_URL, dialog.getPhoto());
         values.put(DialogTable.Cols.OCCUPANTS_IDS, occupantsIdsString);
         values.put(DialogTable.Cols.TYPE, dialog.getType().getCode());
         return values;

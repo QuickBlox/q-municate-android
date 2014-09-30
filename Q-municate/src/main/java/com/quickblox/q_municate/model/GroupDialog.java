@@ -19,7 +19,7 @@ public class GroupDialog extends Dialog {
         super(dialog);
         roomJid = dialog.getRoomJid();
         occupantList = new ArrayList<User>();
-        photoUrl = dialog.getPhotoUrl();
+        photoUrl = dialog.getPhoto();
     }
 
     public String getPhotoUrl() {

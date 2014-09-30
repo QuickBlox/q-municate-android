@@ -152,8 +152,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         actionBar.setTitle(groupName);
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
-        if (!TextUtils.isEmpty(dialog.getPhotoUrl())) {
-            loadLogoActionBar(dialog.getPhotoUrl());
+        if (!TextUtils.isEmpty(dialog.getPhoto())) {
+            loadLogoActionBar(dialog.getPhoto());
         }
     }
 

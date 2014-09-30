@@ -9,15 +9,15 @@ import android.text.TextUtils;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.helper.StringifyArrayList;
 import com.quickblox.module.chat.QBChat;
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBChatState;
-import com.quickblox.module.chat.QBChatStateListener;
-import com.quickblox.module.chat.QBChatStateManager;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
+import com.quickblox.module.chat.exception.QBChatException;
+import com.quickblox.module.chat.listeners.QBIsTypingListener;
+import com.quickblox.module.chat.listeners.QBMessageListener;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.module.chat.model.QBAttachment;
+import com.quickblox.module.chat.model.QBChatMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
@@ -44,7 +44,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     protected QBUser chatCreator;
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
-    protected QBChatStateManager chatStateManager;
+    protected PrivateChatIsTypingListener privateChatIsTypingListener;
 
     private QBPrivateChatManagerListener privateChatManagerListener;
     private List<QBNotificationChatListener> notificationChatListeners;
@@ -52,7 +52,10 @@ public abstract class BaseChatHelper extends BaseHelper {
     public BaseChatHelper(Context context) {
         super(context);
         privateChatMessageListener = new PrivateChatMessageListener();
+        //
         privateChatManagerListener = new PrivateChatManagerListener();
+        privateChatIsTypingListener = new PrivateChatIsTypingListener();
+        //
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
     }
 
@@ -71,8 +74,6 @@ public abstract class BaseChatHelper extends BaseHelper {
         this.chatService = chatService;
         privateChatManager = chatService.getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
-        chatStateManager = chatService.getChatStateManager();
-        chatStateManager.subscribeOnPrivateChat(privateChatManager);
         this.chatCreator = chatCreator;
     }
 
@@ -108,7 +109,9 @@ public abstract class BaseChatHelper extends BaseHelper {
             boolean isRead) throws QBResponseException {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageId);
-        QBChatService.updateMessage(dialogId, messagesIdsList);
+
+        QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
+
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
 
@@ -194,13 +197,15 @@ public abstract class BaseChatHelper extends BaseHelper {
         @Override
         public void chatCreated(QBPrivateChat privateChat, boolean b) {
             privateChat.addMessageListener(privateChatMessageListener);
+            privateChat.addIsTypingListener(privateChatIsTypingListener);
         }
     }
 
-    private class PrivateChatMessageListener implements QBChatStateListener<QBPrivateChat> {
 
+
+    private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
         @Override
-        public void processMessage(QBPrivateChat privateChat, QBChatMessage chatMessage) {
+        public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
             if (ChatUtils.isNotificationMessage(chatMessage)) {
                 for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
                     notificationChatListener.onReceivedNotification(chatMessage.getProperty(
@@ -212,8 +217,30 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
 
         @Override
-        public void stateChanged(QBPrivateChat privateChat, int chatParticipant, QBChatState chatState) {
-            //TODO VF add composing state changed
+        public void processError(QBPrivateChat privateChat, QBChatException error, QBChatMessage originMessage){
+
         }
-    }
+
+        @Override
+        public void processMessageDelivered(QBPrivateChat privateChat, String messageID){
+
+        }
+
+        @Override
+        public void processMessageRead(QBPrivateChat privateChat, String messageID){
+
+        }
+    };
+
+    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat>{
+        @Override
+        public void processUserIsTyping(QBPrivateChat qbPrivateChat) {
+
+        }
+
+        @Override
+        public void processUserStopTyping(QBPrivateChat qbPrivateChat) {
+
+        }
+    };
 }

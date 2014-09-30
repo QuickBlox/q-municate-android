@@ -37,7 +37,7 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
                 QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        QBDialog dialog = multiChatHelper.createRoomChat(roomName, ChatUtils.getFriendIdsList(friendList));
+        QBDialog dialog = multiChatHelper.createGroupChat(roomName, ChatUtils.getFriendIdsList(friendList));
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
     }

@@ -3,11 +3,11 @@ package com.quickblox.q_municate.utils;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.module.chat.QBMessage;
 import com.quickblox.module.chat.model.QBAttachment;
+import com.quickblox.module.chat.model.QBChatMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.module.chat.model.QBMessage;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.model.AppSession;
@@ -68,7 +68,7 @@ public class ChatUtils {
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
-        dialog.setPhotoUrl(photoUrl);
+        dialog.setPhoto(photoUrl);
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
 
@@ -94,7 +94,7 @@ public class ChatUtils {
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
-        dialog.setPhotoUrl(photoUrl);
+        dialog.setPhoto(photoUrl);
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
         if (dialogTypeCode != null) {
@@ -151,7 +151,7 @@ public class ChatUtils {
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
-        String photoUrl = dialog.getPhotoUrl();
+        String photoUrl = dialog.getPhoto();
         String dialogTypeCode = String.valueOf(dialog.getType().getCode());
 
         QBUser user = AppSession.getSession().getUser();
@@ -194,7 +194,7 @@ public class ChatUtils {
         String dialogId = String.valueOf(dialog.getDialogId());
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
-        String photoUrl = dialog.getPhotoUrl();
+        String photoUrl = dialog.getPhoto();
 
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT);

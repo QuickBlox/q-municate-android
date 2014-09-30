@@ -4,11 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.module.chat.model.QBChatMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
@@ -56,8 +56,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         sendPrivateMessage(chatMessage, userId, dialogId);
         String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-        String messageId = chatMessage.getPacketId();
-        String packetId = chatMessage.getPacketId();
+        String messageId = chatMessage.getId();
+        String packetId = chatMessage.getId();
         if (dialogId != null) {
             saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatCreator.getId(),
                     chatMessage.getBody(), attachUrl, time, true, false));
@@ -103,7 +103,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        String packetId = chatMessage.getPacketId();
+        String packetId = chatMessage.getId();
         saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
                 chatMessage.getBody(), attachUrl, time, false, false));
         notifyMessageReceived(chatMessage, user, dialogId, isPrivateMessage);
