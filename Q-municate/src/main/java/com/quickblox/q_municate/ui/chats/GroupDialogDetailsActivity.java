@@ -113,6 +113,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         groupNameEditText = _findViewById(R.id.name_textview);
         participantsTextView = _findViewById(R.id.participants_textview);

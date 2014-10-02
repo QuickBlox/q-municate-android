@@ -164,6 +164,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
         addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new ImportFriendsSuccessAction());
+        addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
     }
 
     private void initNavigationDrawer() {
@@ -230,6 +232,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         }
     }
 
+    private void importFriendsFinished() {
+        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        hideProgress();
+    }
+
     private void startGroupChatActivity(QBDialog dialog) {
         GroupDialogActivity.start(this, dialog);
     }
@@ -273,6 +280,22 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         @Override
         public void execute(Bundle bundle) throws Exception {
             loadChatsDialogs();
+        }
+    }
+
+    private class ImportFriendsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
+        }
+    }
+
+    private class ImportFriendsFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            importFriendsFinished();
         }
     }
 }

@@ -147,8 +147,12 @@ public abstract class BaseActivity extends Activity {
 
     protected void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        NavUtils.navigateUpTo(this, intent);
+        if (intent == null) {
+            finish();
+        } else {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            NavUtils.navigateUpTo(this, intent);
+        }
     }
 
     @SuppressWarnings("unchecked")

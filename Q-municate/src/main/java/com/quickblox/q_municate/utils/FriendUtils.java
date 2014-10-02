@@ -10,6 +10,7 @@ import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 
 import org.jivesoftware.smack.packet.RosterPacket;
@@ -23,12 +24,13 @@ import java.util.Map;
 public class FriendUtils {
 
     public static User createUser(QBUser qbUser) {
+        qbUser.setCustomDataClass(UserCustomData.class);
         User user = new User();
         user.setUserId(qbUser.getId());
         user.setFullName(qbUser.getFullName());
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
-        user.setAvatarUrl(qbUser.getWebsite());
+        user.setAvatarUrl(((UserCustomData) qbUser.getCustomDataAsObject()).getAvatar_url());
         return user;
     }
 

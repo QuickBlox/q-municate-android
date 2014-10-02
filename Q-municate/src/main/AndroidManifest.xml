@@ -47,6 +47,7 @@
             android:name="com.quickblox.q_municate.ui.authorization.landing.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.quickblox.q_municate.ui.authorization.login.LoginActivity"

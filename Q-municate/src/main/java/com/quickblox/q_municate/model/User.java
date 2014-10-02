@@ -14,7 +14,7 @@ public class User implements Serializable {
     private String login;
     private String phone;
     private String webSite;
-    private String customData;
+    private UserCustomData userCustomData;
     private Date lastRequestAt;
     private String externalId;
     private String facebookId;
@@ -35,7 +35,7 @@ public class User implements Serializable {
         this.login = user.getLogin();
         this.phone = user.getPhone();
         this.webSite = user.getWebsite();
-        this.customData = user.getCustomData();
+//        this.customData = user.getCustomDataMap();
         this.lastRequestAt = user.getLastRequestAt();
         this.externalId = user.getExternalId();
         this.facebookId = user.getFacebookId();
@@ -74,12 +74,12 @@ public class User implements Serializable {
         this.webSite = webSite;
     }
 
-    public String getCustomData() {
-        return customData;
+    public UserCustomData getUserCustomData() {
+        return userCustomData;
     }
 
-    public void setCustomData(String customData) {
-        this.customData = customData;
+    public void setUserCustomData(UserCustomData userCustomData) {
+        this.userCustomData = userCustomData;
     }
 
     public Date getLastRequestAt() {

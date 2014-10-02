@@ -20,7 +20,6 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;
@@ -36,11 +35,9 @@ import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.PrefsHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -243,10 +240,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
 
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION,
-                new ImportFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
-
         baseActivity.updateBroadcastActionList();
     }
 
@@ -385,11 +378,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         QBLoadUsersCommand.start(baseActivity, constraint);
     }
 
-    private void importFriendsFinished() {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        baseActivity.hideProgress();
-    }
-
     private void showErrorToast(String error) {
         if (errorToast != null) {
             errorToast.cancel();
@@ -525,23 +513,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
             baseActivity.hideActionBarProgress();
-        }
-    }
-
-    private class ImportFriendsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            importFriendsFinished();
-        }
-    }
-
-    private class ImportFriendsFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            importFriendsFinished();
-            DialogUtils.showLong(baseActivity, getResources().getString(R.string.dlg_no_friends_for_import));
         }
     }
 

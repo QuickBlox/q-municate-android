@@ -22,6 +22,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -41,9 +42,6 @@ import java.io.File;
 public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
         View.OnClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
-    private static String fullnameOld;
-    private static String phoneOld;
-    private static String statusOld;
     private LinearLayout changeAvatarLinearLayout;
     private RoundedImageView avatarImageView;
     private LinearLayout emailLinearLayout;
@@ -56,14 +54,18 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private EditText statusEditText;
     private ImageUtils imageUtils;
     private Bitmap avatarBitmapCurrent;
-    private String fullnameCurrent;
+    private String fullNameCurrent;
     private String phoneCurrent;
     private String statusCurrent;
+    private String fullNameOld;
+    private String phoneOld;
+    private String statusOld;
     private QBUser user;
     private boolean isNeedUpdateAvatar;
     private Object actionMode;
     private boolean closeActionMode;
     private Uri outputUri;
+    private UserCustomData userCustomData;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -108,9 +110,10 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void initUIWithUsersData() {
+        userCustomData = (UserCustomData) user.getCustomDataAsObject();
         loadAvatar();
-        fullnameOld = user.getFullName();
-        fullNameEditText.setText(fullnameOld);
+        fullNameOld = user.getFullName();
+        fullNameEditText.setText(fullNameOld);
         if (TextUtils.isEmpty(user.getEmail())) {
             emailLinearLayout.setVisibility(View.GONE);
         } else {
@@ -119,7 +122,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         }
         phoneOld = user.getPhone();
         phoneEditText.setText(phoneOld);
-        statusOld = user.getCustomData();
+        statusOld = userCustomData.getStatus();
         statusEditText.setText(statusOld);
     }
 
@@ -129,8 +132,10 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void loadAvatar() {
-        String url = user.getWebsite();
-        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        String url = userCustomData.getAvatar_url();
+        if (!TextUtils.isEmpty(url)) {
+            ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        }
     }
 
     private void initTextChangedListeners() {
@@ -264,7 +269,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void updateCurrentUserData() {
-        fullnameCurrent = fullNameEditText.getText().toString();
+        fullNameCurrent = fullNameEditText.getText().toString();
         phoneCurrent = phoneEditText.getText().toString();
         statusCurrent = statusEditText.getText().toString();
     }
@@ -277,7 +282,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private boolean isUserDataChanged() {
-        return isNeedUpdateAvatar || !fullnameCurrent.equals(fullnameOld) || !phoneCurrent.equals(
+        return isNeedUpdateAvatar || !fullNameCurrent.equals(fullNameOld) || !phoneCurrent.equals(
                 phoneOld) || !statusCurrent.equals(statusOld);
     }
 
@@ -289,9 +294,10 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
         showProgress();
 
-        user.setFullName(fullnameCurrent);
+        user.setFullName(fullNameCurrent);
         user.setPhone(phoneCurrent);
-        user.setCustomData(statusCurrent);
+        userCustomData.setStatus(statusCurrent);
+        user.setCustomDataAsObject(userCustomData);
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
@@ -305,20 +311,20 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private boolean isUserDataCorrect() {
-        return fullnameCurrent.length() > Consts.ZERO_INT_VALUE;
+        return fullNameCurrent.length() > Consts.ZERO_INT_VALUE;
     }
 
     private void updateOldUserData() {
-        fullnameOld = fullNameEditText.getText().toString();
+        fullNameOld = fullNameEditText.getText().toString();
         phoneOld = phoneEditText.getText().toString();
         statusOld = statusEditText.getText().toString();
         isNeedUpdateAvatar = false;
     }
 
     private void resetUserData() {
-        user.setFullName(fullnameOld);
+        user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        user.setCustomData(statusOld);
+        ((UserCustomData)user.getCustomDataAsObject()).setStatus(statusOld);
         isNeedUpdateAvatar = false;
     }
 
