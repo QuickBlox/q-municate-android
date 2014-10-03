@@ -1,9 +1,11 @@
 package com.quickblox.q_municate.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
@@ -17,11 +19,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS {0} ({1})";
     public static final String KEY_DROP_TABLE = "DROP TABLE IF EXISTS {0}";
 
+    private Context context;
     private static final int CURRENT_DB_VERSION = 1;
     private static final String DB_NAME = "qmun.db";
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, CURRENT_DB_VERSION);
+        this.context = context;
     }
 
     @Override
@@ -78,6 +82,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(FriendsRelationTable.Cols.RELATION_STATUS_ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
                 .append(FriendsRelationTable.Cols.RELATION_STATUS).append(" TEXT");
         createTable(db, FriendsRelationTable.TABLE_NAME, friendsRelationTableFields.toString());
+        initFriendsRelationTable(db);
     }
 
     private void createMessageTable(SQLiteDatabase db) {
@@ -130,5 +135,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void createTable(SQLiteDatabase db, String name, String fields) {
         String query = MessageFormat.format(DatabaseHelper.KEY_CREATE_TABLE, name, fields);
         db.execSQL(query);
+    }
+
+    private void initFriendsRelationTable(SQLiteDatabase db) {
+        ContentValues values = new ContentValues();
+
+        String[] relationStatusesArray = context.getResources().getStringArray(R.array.friends_relation_statuses_array);
+
+        for (int i = 0; i < relationStatusesArray.length; i++) {
+            values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatusesArray[i]);
+            db.insert(FriendsRelationTable.TABLE_NAME, null, values);
+        }
     }
 }

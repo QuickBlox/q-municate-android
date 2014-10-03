@@ -22,8 +22,8 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
@@ -47,7 +47,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
     private QBNotificationChatListener notificationChatListener = new RoomNotificationListener();
     private QBDialog currentDialog;
-    private List<QBDialog> dialogsList;
+    private List<QBDialog> groupDialogsList;
 
     public QBMultiChatHelper(Context context) {
         super(context);
@@ -114,12 +114,21 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public void tryJoinRoomChats(List<QBDialog> chatDialogsList) {
         if (!chatDialogsList.isEmpty()) {
-            dialogsList = chatDialogsList;
+            initGroupDialogsList();
             for (QBDialog dialog : chatDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    groupDialogsList.add(dialog);
                     tryJoinRoomChat(dialog);
                 }
             }
+        }
+    }
+
+    private void initGroupDialogsList() {
+        if (groupDialogsList == null) {
+            groupDialogsList = new ArrayList<QBDialog>();
+        } else {
+            groupDialogsList.clear();
         }
     }
 
@@ -220,13 +229,11 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void leaveDialogs() throws XMPPException, SmackException.NotConnectedException {
-        if (dialogsList != null) {
-            for (QBDialog dialog : dialogsList) {
-                if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
-                    QBGroupChat roomChat = groupChatManager.getGroupChat(dialog.getRoomJid());
-                    if (roomChat != null && roomChat.isJoined()) {
-                        roomChat.leave();
-                    }
+        if (groupDialogsList != null) {
+            for (QBDialog dialog : groupDialogsList) {
+                QBGroupChat roomChat = groupChatManager.getGroupChat(dialog.getRoomJid());
+                if (roomChat != null && roomChat.isJoined()) {
+                    roomChat.leave();
                 }
             }
         }
@@ -305,7 +312,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
             String packetId = chatMessage.getId();
             boolean isRead = false;
             boolean isDelivered = false;
-            boolean isPrivateMessage = false;
 
             Integer userId = AppSession.getSession().getUser().getId();
             if (chatMessage.getSenderId().equals(userId)) {
@@ -323,7 +329,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list
-                notifyMessageReceived(chatMessage, user, dialogId, isPrivateMessage);
+                notifyMessageReceived(chatMessage, user, dialogId, false);
             }
         }
 

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.facebook.Session;
 import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.module.auth.model.QBSession;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
@@ -41,7 +42,9 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
 public class ActivityDelegator extends BaseActivityDelegator {
 
-    private Activity activity;
+    protected Activity activity;
+    protected boolean isPrivateMessage;
+
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
@@ -49,48 +52,25 @@ public class ActivityDelegator extends BaseActivityDelegator {
     private Handler handler;
     private User senderUser;
     private QBDialog messagesDialog;
-    private boolean isPrivateMessage;
+    private ActivityUIDelegator activityUIDelegator;
 
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
-    private Button replyMessageButton;
+    public ActivityDelegator(Context context) {
+        super(context);
+        this.activity = (Activity) context;
+    }
 
     public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
         this.activity = (Activity) context;
-        initUI();
-        initListeners();
+        activityUIDelegator = new ActivityUIDelegator(context);
     }
 
-    private void initUI() {
-        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message,
-                null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-        replyMessageButton = (Button) newMessageView.findViewById(R.id.replay_button);
-    }
-
-    private void initListeners() {
-        replyMessageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isPrivateMessage) {
-                    startPrivateChatActivity();
-                } else {
-                    startGroupChatActivity();
-                }
-                Crouton.cancelAllCroutons();
-            }
-        });
-    }
-
-    private void startPrivateChatActivity() {
+    protected void startPrivateChatActivity() {
         PrivateDialogActivity.start(activity, senderUser, messagesDialog);
     }
 
-    private void startGroupChatActivity() {
+    protected void startGroupChatActivity() {
         GroupDialogActivity.start(activity, messagesDialog);
     }
 
@@ -99,20 +79,13 @@ public class ActivityDelegator extends BaseActivityDelegator {
         alertDialog.show(activity.getFragmentManager(), null);
     }
 
-    public void showNewMessageAlert(User senderUser, String message) {
-        newMessageTextView.setText(message);
-        senderMessageTextView.setText(senderUser.getFullName());
-        Crouton.cancelAllCroutons();
-        Crouton.show(activity, newMessageView);
-    }
-
     protected void onReceiveMessage(Bundle extras) {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         messagesDialog = DatabaseManager.getDialogByDialogId(activity, dialogId);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
-        showNewMessageAlert(senderUser, message);
+        activityUIDelegator.showNewMessageAlert(senderUser, message);
     }
 
     public void forceRelogin() {

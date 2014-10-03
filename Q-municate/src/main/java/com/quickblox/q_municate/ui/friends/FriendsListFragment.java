@@ -28,7 +28,7 @@ import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
-import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
+import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -375,7 +375,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void startUsersListLoader() {
-        QBLoadUsersCommand.start(baseActivity, constraint);
+        QBFindUsersCommand.start(baseActivity, constraint);
     }
 
     private void showErrorToast(String error) {

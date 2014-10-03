@@ -21,6 +21,7 @@ import com.quickblox.q_municate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate.qb.commands.QBChangePasswordCommand;
 import com.quickblox.q_municate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBGetFileCommand;
 import com.quickblox.q_municate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.q_municate.qb.commands.QBInitChatsCommand;
@@ -35,7 +36,6 @@ import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadUserCommand;
-import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginChatCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginCommand;
@@ -65,6 +65,7 @@ import com.quickblox.q_municate.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.Consts;
@@ -86,6 +87,7 @@ public class QBService extends Service {
     public static final int FRIEND_LIST_HELPER = 4;
     public static final int VIDEO_CHAT_HELPER = 5;
     public static final int CHAT_REST_HELPER = 6;
+    public static final int REST_HELPER = 7;
 
     private static final String TAG = QBService.class.getSimpleName();
 
@@ -133,6 +135,8 @@ public class QBService extends Service {
         helpers.put(FRIEND_LIST_HELPER, friendListHelper);
         videoChatHelper = new QBVideoChatHelper(this);
         helpers.put(VIDEO_CHAT_HELPER, videoChatHelper);
+        QBRestHelper restHelper = new QBRestHelper(this);
+        helpers.put(REST_HELPER, restHelper);
     }
 
     private void initChatHelpers() {
@@ -326,7 +330,7 @@ public class QBService extends Service {
     }
 
     private void registerLoadUsersCommand() {
-        QBLoadUsersCommand userSearchCommand = new QBLoadUsersCommand(this,
+        QBFindUsersCommand userSearchCommand = new QBFindUsersCommand(this,
                 QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, QBServiceConsts.LOAD_USERS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_USERS_ACTION, userSearchCommand);
     }
@@ -338,7 +342,8 @@ public class QBService extends Service {
     }
 
     private void registerLoadUserCommand() {
-        QBLoadUserCommand loadUserCommand = new QBLoadUserCommand(this, friendListHelper,
+        QBRestHelper restHelper = (QBRestHelper) getHelper(REST_HELPER);
+        QBLoadUserCommand loadUserCommand = new QBLoadUserCommand(this, restHelper,
                 QBServiceConsts.LOAD_USER_SUCCESS_ACTION, QBServiceConsts.LOAD_USER_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_USER_ACTION, loadUserCommand);
     }

@@ -52,12 +52,12 @@ public class FriendUtils {
         return friend;
     }
 
-    public static List<User> createUsersList(List<QBUser> userList) {
-        List<User> friends = new ArrayList<User>();
-        for (QBUser user : userList) {
-            friends.add(createUser(user));
+    public static List<User> createUsersList(Collection<QBUser> usersList) {
+        List<User> users = new ArrayList<User>();
+        for (QBUser user : usersList) {
+            users.add(createUser(user));
         }
-        return friends;
+        return users;
     }
 
     public static List<Friend> createFriendsList(Collection<QBRosterEntry> rosterEntryCollection) {

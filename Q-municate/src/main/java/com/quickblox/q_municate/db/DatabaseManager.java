@@ -25,6 +25,7 @@ import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +41,12 @@ public class DatabaseManager {
             if (!isUserRequested(context, friend.getUserId())) {
                 saveFriend(context, friend);
             }
+        }
+    }
+
+    public static void saveUsers(Context context, Collection<User> usersList) {
+        for (User user : usersList) {
+            saveUser(context, user);
         }
     }
 
@@ -62,8 +69,6 @@ public class DatabaseManager {
     }
 
     public static void saveFriend(Context context, Friend friend) {
-        initFriendsRelationStatuses(context);
-
         int relationStatusId = getRelationStatusIdByName(context, friend.getRelationStatus());
 
         friend.setRelationStatusId(relationStatusId);
@@ -94,18 +99,6 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.IS_REQUESTED_FRIEND, friend.isRequestedFriend());
 
         return values;
-    }
-
-    private static void initFriendsRelationStatuses(Context context) {
-        ContentValues values = new ContentValues();
-        ContentResolver resolver = context.getContentResolver();
-
-        String[] relationStatusesArray = context.getResources().getStringArray(R.array.friends_relation_statuses_array);
-
-        for (int i = 0; i < relationStatusesArray.length; i++) {
-            values.put(FriendsRelationTable.Cols.RELATION_STATUS, relationStatusesArray[i]);
-            resolver.insert(FriendsRelationTable.CONTENT_URI, values);
-        }
     }
 
     public static boolean isUserRequested(Context context, int userId) {

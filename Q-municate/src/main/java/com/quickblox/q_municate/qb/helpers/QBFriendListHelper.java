@@ -56,6 +56,7 @@ public class QBFriendListHelper extends BaseHelper {
     // with presence that is sent on login by default
     private static final int STATUS_PRESENCE_PRIORITY = 1;
 
+    private QBRestHelper restHelper;
     private QBRoster roster;
 
     public QBFriendListHelper(Context context) {
@@ -67,6 +68,7 @@ public class QBFriendListHelper extends BaseHelper {
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addSubscriptionListener(new SubscriptionListener());
         roster.addRosterListener(new RosterListener());
+        restHelper = new QBRestHelper(context);
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -125,11 +127,6 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    public User loadUser(int userId) throws QBResponseException {
-        QBUser user = QBUsers.getUser(userId);
-        return FriendUtils.createUser(user);
-    }
-
     public List<Integer> updateFriendList() throws QBResponseException {
         Collection<QBRosterEntry> rosterEntryCollection;
         List<Integer> userIdsList = new ArrayList<Integer>();
@@ -176,7 +173,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User user = loadUser(userId);
+        User user = restHelper.loadUser(userId);
 
         if (user == null) {
             return;
@@ -232,7 +229,7 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
 //        Log.d("test_roster", "APP. createFriend(), true");
-        User user = loadUser(userId);
+        User user = restHelper.loadUser(userId);
         Friend friend = FriendUtils.createFriend(userId, requestedFriend);
 
         fillUserOnlineStatus(user);

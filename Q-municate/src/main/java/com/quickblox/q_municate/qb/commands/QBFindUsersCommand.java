@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class QBLoadUsersCommand extends ServiceCommand {
+public class QBFindUsersCommand extends ServiceCommand {
 
-    public QBLoadUsersCommand(Context context, String successAction, String failAction) {
+    public QBFindUsersCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 

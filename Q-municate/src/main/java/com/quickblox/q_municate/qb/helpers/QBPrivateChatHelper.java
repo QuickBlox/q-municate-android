@@ -97,7 +97,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String messageId;
         long time;
         String attachUrl;
-        boolean isPrivateMessage = true;
 
         messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
         time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT));
@@ -106,7 +105,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String packetId = chatMessage.getId();
         saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
                 chatMessage.getBody(), attachUrl, time, false, false));
-        notifyMessageReceived(chatMessage, user, dialogId, isPrivateMessage);
+        notifyMessageReceived(chatMessage, user, dialogId, true);
     }
 
     private QBPrivateChat createChat(int opponentId) throws QBResponseException {
