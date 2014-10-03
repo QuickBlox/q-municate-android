@@ -33,7 +33,7 @@ public class QBChatRestHelper extends BaseHelper {
 
     private ConnectionListener connectionListener = new ChatConnectionListener();
 
-    public synchronized void initChatService() {
+    public synchronized void initChatService() throws XMPPException, SmackException {
         if (!QBChatService.isInitialized()) {
             QBChatService.init(context);
             QBChatService.setDefaultPacketReplyTimeout(Consts.DEFAULT_PACKET_REPLY_TIMEOUT);
@@ -43,9 +43,10 @@ public class QBChatRestHelper extends BaseHelper {
     }
 
     public synchronized void login(
-            QBUser user) throws XMPPException, IOException, SmackException, QBResponseException {
+            QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
+            chatService.enableCarbons();
             chatService.startAutoSendPresence(AUTO_PRESENCE_INTERVAL_IN_SECONDS);
         }
     }
