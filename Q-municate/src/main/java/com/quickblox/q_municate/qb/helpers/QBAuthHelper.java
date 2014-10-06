@@ -16,6 +16,8 @@ import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.utils.Consts;
 
+import org.json.JSONException;
+
 import java.io.File;
 
 public class QBAuthHelper extends BaseHelper {
@@ -95,7 +97,12 @@ public class QBAuthHelper extends BaseHelper {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
 
         UserCustomData userCustomDataNew;
-        UserCustomData userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+        UserCustomData userCustomDataOld = null;
+        try {
+            userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         if (userCustomDataOld != null) {
             userCustomDataNew = new UserCustomData(qbFile.getPublicUrl(), userCustomDataOld.getStatus(),

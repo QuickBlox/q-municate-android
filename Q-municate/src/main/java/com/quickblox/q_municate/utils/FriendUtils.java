@@ -14,6 +14,7 @@ import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 
 import org.jivesoftware.smack.packet.RosterPacket;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,18 @@ public class FriendUtils {
         user.setFullName(qbUser.getFullName());
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
-        user.setAvatarUrl(((UserCustomData) qbUser.getCustomDataAsObject()).getAvatar_url());
+
+        UserCustomData userCustomData = null;
+        try {
+            userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (userCustomData != null) {
+            user.setAvatarUrl(userCustomData.getAvatar_url());
+        }
+
         return user;
     }
 

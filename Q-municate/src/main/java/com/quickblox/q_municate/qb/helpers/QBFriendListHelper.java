@@ -64,9 +64,8 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void init() {
-        roster = QBChatService.getInstance().getRoster();
+        roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, new SubscriptionListener());
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
-        roster.addSubscriptionListener(new SubscriptionListener());
         roster.addRosterListener(new RosterListener());
         restHelper = new QBRestHelper(context);
     }
@@ -152,12 +151,12 @@ public class QBFriendListHelper extends BaseHelper {
 
         fillUsersWithRosterData(usersList);
 
-//        for (Friend friend : friendsList) {
-//            Log.d("test_roster", "APP. updateFriend(), friend.isAskStatus() = " + friend
-//                            .isAskStatus() + ", friend.getRelationStatus() = " + friend
-//                            .getRelationStatus() + ", friend.isRequestedFriend() = " + friend
-//                            .isRequestedFriend());
-//        }
+        for (Friend friend : friendsList) {
+            Log.d("test_roster", "APP. updateFriend(), friend.isAskStatus() = " + friend
+                            .isAskStatus() + ", friend.getRelationStatus() = " + friend
+                            .getRelationStatus() + ", friend.isRequestedFriend() = " + friend
+                            .isRequestedFriend());
+        }
 
         savePeople(usersList, friendsList);
     }
@@ -169,8 +168,6 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void updateFriend(int userId) throws QBResponseException {
-//        Log.d("test_roster", "APP. updateFriend()");
-
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
         User user = restHelper.loadUser(userId);
@@ -190,12 +187,6 @@ public class QBFriendListHelper extends BaseHelper {
 
         saveUser(user);
         saveFriend(friend);
-
-//        Log.d("test_roster",
-//                "APP. updateFriend(), friend.isAskStatus() = " + friend.isAskStatus()
-//                + ", friend.getRelationStatus() = " + friend.getRelationStatus()
-//                + ", friend.getId() = " + friend.getUserId()
-//                + ", friend.isRequestedFriend() = " + friend.isRequestedFriend());
     }
 
     private void checkAlertShowing(Friend newFriend, Friend oldFriend) {
@@ -228,14 +219,14 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
-//        Log.d("test_roster", "APP. createFriend(), true");
+        Log.d("test_roster", "APP. createFriend(), " + requestedFriend);
         User user = restHelper.loadUser(userId);
         Friend friend = FriendUtils.createFriend(userId, requestedFriend);
-
         fillUserOnlineStatus(user);
 
         saveUser(user);
         saveFriend(friend);
+        Log.d("test_roster", "APP. createFriend(), " + requestedFriend + ", end");
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
@@ -313,7 +304,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesDeleted(Collection<Integer> userIdsList) {
             try {
-//                Log.d("test_roster", "APP. entriesDeleted()");
+                Log.d("test_roster", "APP. entriesDeleted()");
                 deleteUsers(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_DELETED_ERROR, e);
@@ -322,19 +313,18 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void entriesAdded(Collection<Integer> userIdsList) {
-            try {
-                Log.d("test_roster", "APP. entriesAdded()");
-                updateFriends(userIdsList);
-//                addedFriends(userIdsList, true);
-            } catch (QBResponseException e) {
-                Log.e(TAG, ENTRIES_ADDED_ERROR, e);
-            }
+            Log.d("test_roster", "APP. entriesAdded()");
+//            try {
+//                addedFriends(userIdsList);
+//            } catch (QBResponseException e) {
+//                Log.e(TAG, ENTRIES_ADDED_ERROR, e);
+//            }
         }
 
         @Override
         public void entriesUpdated(Collection<Integer> userIdsList) {
             try {
-//                Log.d("test_roster", "APP. entriesUpdated()");
+                Log.d("test_roster", "APP. entriesUpdated()");
                 updateFriends(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
@@ -353,11 +343,17 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
+    private void addedFriends(Collection<Integer> userIdsList) throws QBResponseException {
+        for (Integer userId : userIdsList) {
+            createFriend(userId, true);
+        }
+    }
+
     private class SubscriptionListener implements QBSubscriptionListener {
 
         @Override
         public void subscriptionRequested(int userId) {
-//            Log.d("test_roster", "APP. subscriptionRequested()");
+            Log.d("test_roster", "APP. subscriptionRequested()");
             try {
                 createFriend(userId, true);
                 notifyContactRequest();

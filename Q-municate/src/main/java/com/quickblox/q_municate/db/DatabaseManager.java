@@ -258,12 +258,10 @@ public class DatabaseManager {
     }
 
     public static int getAllFriendsCountByRelation(Context context, int relationStatusId) {
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
+        String condition = FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND " + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, new String[] {"count(*)"},
-                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
+        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, new String[] {"count(*)"}, condition, null, null);
 
         return processResultCount(cursor);
     }

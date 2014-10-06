@@ -37,6 +37,8 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.soundcloud.android.crop.Crop;
 
+import org.json.JSONException;
+
 import java.io.File;
 
 public class ProfileActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
@@ -110,19 +112,30 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void initUIWithUsersData() {
-        userCustomData = (UserCustomData) user.getCustomDataAsObject();
+        try {
+            userCustomData = (UserCustomData) user.getCustomDataAsObject();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         loadAvatar();
         fullNameOld = user.getFullName();
         fullNameEditText.setText(fullNameOld);
+
         if (TextUtils.isEmpty(user.getEmail())) {
             emailLinearLayout.setVisibility(View.GONE);
         } else {
             emailLinearLayout.setVisibility(View.VISIBLE);
             emailTextView.setText(user.getEmail());
         }
+
         phoneOld = user.getPhone();
         phoneEditText.setText(phoneOld);
-        statusOld = userCustomData.getStatus();
+
+        if (userCustomData != null) {
+            statusOld = userCustomData.getStatus();
+        }
+
         statusEditText.setText(statusOld);
     }
 
@@ -324,7 +337,11 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void resetUserData() {
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        ((UserCustomData)user.getCustomDataAsObject()).setStatus(statusOld);
+        try {
+            ((UserCustomData)user.getCustomDataAsObject()).setStatus(statusOld);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         isNeedUpdateAvatar = false;
     }
 
