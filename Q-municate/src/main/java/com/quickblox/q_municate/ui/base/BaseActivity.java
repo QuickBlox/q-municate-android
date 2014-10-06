@@ -20,7 +20,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.DialogUtils;
@@ -38,7 +37,7 @@ public abstract class BaseActivity extends Activity {
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
-    protected ActivityDelegator activityDelegator;
+    protected ActivityHelper activityHelper;
 
     private boolean doubleBackToExitPressedOnce;
     private boolean bounded;
@@ -65,27 +64,27 @@ public abstract class BaseActivity extends Activity {
     }
 
     public void hideActionBarProgress() {
-        activityDelegator.hideActionBarProgress();
+        activityHelper.hideActionBarProgress();
     }
 
     public void showActionBarProgress() {
-        activityDelegator.showActionBarProgress();
+        activityHelper.showActionBarProgress();
     }
 
     public void addAction(String action, Command command) {
-        activityDelegator.addAction(action, command);
+        activityHelper.addAction(action, command);
     }
 
     public boolean hasAction(String action) {
-        return activityDelegator.hasAction(action);
+        return activityHelper.hasAction(action);
     }
 
     public void removeAction(String action) {
-        activityDelegator.removeAction(action);
+        activityHelper.removeAction(action);
     }
 
     public void updateBroadcastActionList() {
-        activityDelegator.updateBroadcastActionList();
+        activityHelper.updateBroadcastActionList();
     }
 
     @Override
@@ -96,8 +95,8 @@ public abstract class BaseActivity extends Activity {
         actionBar = getActionBar();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityDelegator = new ActivityDelegator(this, new GlobalListener());
-        activityDelegator.onCreate();
+        activityHelper = new ActivityHelper(this, new GlobalListener());
+        activityHelper.onCreate();
     }
 
     @Override
@@ -109,13 +108,13 @@ public abstract class BaseActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        activityDelegator.onResume();
+        activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
     @Override
     protected void onPause() {
-        activityDelegator.onPause();
+        activityHelper.onPause();
         super.onPause();
     }
 
@@ -213,32 +212,32 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    private class GlobalListener implements ActivityDelegator.GlobalActionsListener {
+    private class GlobalListener implements ActivityHelper.GlobalActionsListener {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            boolean isSplashActivity = activityDelegator.getContext() instanceof SplashActivity;
+            boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
             if(!isSplashActivity) {
-                activityDelegator.onReceiveMessage(extras);
+                activityHelper.onReceiveMessage(extras);
             }
         }
 
         @Override
         public void onReceiveForceReloginAction(Bundle extras) {
-            activityDelegator.forceRelogin();
+            activityHelper.forceRelogin();
         }
 
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
             showProgress();
-            activityDelegator.refreshSession();
+            activityHelper.refreshSession();
         }
 
         @Override
         public void onReceiveFriendActionAction(Bundle extras) {
             String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
-            activityDelegator.showFriendAlert(alertMessage);
+            activityHelper.showFriendAlert(alertMessage);
         }
     }
 

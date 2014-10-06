@@ -45,7 +45,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     private boolean doubleBackToExitPressedOnce;
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
-    protected ActivityDelegator activityDelegator;
+    protected ActivityHelper activityHelper;
 
     public BaseFragmentActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -83,20 +83,20 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         actionBar = getActionBar();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityDelegator = new ActivityDelegator(this, new GlobalListener());
-        activityDelegator.onCreate();
+        activityHelper = new ActivityHelper(this, new GlobalListener());
+        activityHelper.onCreate();
     }
 
     @Override
     protected void onPause() {
-        activityDelegator.onPause();
+        activityHelper.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        activityDelegator.onResume();
+        activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
@@ -134,7 +134,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void updateBroadcastActionList() {
-        activityDelegator.updateBroadcastActionList();
+        activityHelper.updateBroadcastActionList();
     }
 
     public void showProgress() {
@@ -148,11 +148,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void addAction(String action, Command command) {
-        activityDelegator.addAction(action, command);
+        activityHelper.addAction(action, command);
     }
 
     public void removeAction(String action) {
-        activityDelegator.removeAction(action);
+        activityHelper.removeAction(action);
     }
 
     protected void onConnectedToService(QBService service) {
@@ -196,11 +196,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void hideActionBarProgress() {
-        activityDelegator.hideActionBarProgress();
+        activityHelper.hideActionBarProgress();
     }
 
     public void showActionBarProgress() {
-        activityDelegator.showActionBarProgress();
+        activityHelper.showActionBarProgress();
     }
 
     @Override
@@ -228,7 +228,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
     }
 
-    private class GlobalListener implements ActivityDelegator.GlobalActionsListener {
+    private class GlobalListener implements ActivityHelper.GlobalActionsListener {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
@@ -238,26 +238,26 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
             boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
             if (!isFromCurrentChat) {
-                activityDelegator.onReceiveMessage(extras);
+                activityHelper.onReceiveMessage(extras);
             }
         }
 
         @Override
         public void onReceiveForceReloginAction(Bundle extras) {
-            activityDelegator.forceRelogin();
+            activityHelper.forceRelogin();
         }
 
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseFragmentActivity.this, getString(R.string.dlg_refresh_session));
             showProgress();
-            activityDelegator.refreshSession();
+            activityHelper.refreshSession();
         }
 
         @Override
         public void onReceiveFriendActionAction(Bundle extras) {
             String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
-            activityDelegator.showFriendAlert(alertMessage);
+            activityHelper.showFriendAlert(alertMessage);
         }
     }
 
