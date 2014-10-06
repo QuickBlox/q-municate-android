@@ -22,6 +22,7 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
@@ -79,8 +80,10 @@ public class QBMultiChatHelper extends BaseChatHelper {
     private void sendRoomMessage(QBChatMessage chatMessage, String roomJId,
             String dialogId) throws QBResponseException {
         groupChat = groupChatManager.getGroupChat(roomJId);
+        QBDialog existingDialog = null;
         if (groupChat == null) {
-            return;
+            existingDialog = ChatUtils.getExistDialogById(context, dialogId);
+            groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
         String error = null;
         if (!TextUtils.isEmpty(dialogId)) {
@@ -92,10 +95,18 @@ public class QBMultiChatHelper extends BaseChatHelper {
             error = context.getString(R.string.dlg_fail_send_msg);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
+        } catch (IllegalStateException e) {
+            ErrorUtils.showError(context, context.getString(R.string.dlg_not_joined_room));
+            tryJoinRoomChat(existingDialog);
         }
         if (error != null) {
             throw new QBResponseException(error);
         }
+    }
+
+    private QBGroupChat createChatIfNotExist(String dialogId) throws QBResponseException {
+        QBDialog existingDialog = ChatUtils.getExistDialogById(context, dialogId);
+        return  (QBGroupChat) createChatLocally(existingDialog, null);
     }
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {

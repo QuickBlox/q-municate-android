@@ -219,6 +219,7 @@
     <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
+    <string name="dlg_not_joined_room">You have not joined chat room! Please wait…</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>

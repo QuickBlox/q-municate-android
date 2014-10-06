@@ -278,4 +278,8 @@ public class ChatUtils {
             return null;
         }
     }
+
+    public static QBDialog getExistDialogById(Context context, String dialogId) {
+        return DatabaseManager.getDialogByDialogId(context, dialogId);
+    }
 }
