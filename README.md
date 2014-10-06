@@ -720,3 +720,7 @@ If you want to build your own app using Q-municate as a basis, please do the fol
    ![App credentials](http://files.quickblox.com/app_credentials.png)
  6. Copy credentials (App ID, Authorization key, Authorization secret) into your Q-municate project code in Consts.java<br />
  7. Enjoy!
+ 
+PS Running Q-municate on Android simulator
+In Android if you never had Android device connected to PC you probably don't have Google Play services installed. In that case you need to install Google Play services on top of simulator, here is a link that should help with that: 
+http://www.techrepublic.com/article/pro-tip-install-google-play-services-on-android-emulator-genymotion/
