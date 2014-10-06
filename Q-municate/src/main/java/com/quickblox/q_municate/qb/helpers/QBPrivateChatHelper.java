@@ -65,11 +65,11 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     @Override
-    public QBPrivateChat createChatLocally(QBDialog currentDialog,
+    public QBPrivateChat createChatLocally(QBDialog dialog,
             Bundle additional) throws QBResponseException {
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         QBPrivateChat privateChat = createChat(opponentId);
-        this.currentDialog = currentDialog;
+        this.currentDialog = dialog;
         return privateChat;
     }
 

@@ -217,6 +217,20 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(QBServiceConsts.EXTRA_OPPONENT, opponentFriend);
+        outState.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        opponentFriend = (User) savedInstanceState.getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (QBDialog) savedInstanceState.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
@@ -226,13 +240,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onPause() {
         super.onPause();
-        currentOpponent = null;
+//        if () {
+//
+//        }
         Crouton.cancelAllCroutons();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        currentOpponent = null;
         unregisterStatusChangingObserver();
     }
 }

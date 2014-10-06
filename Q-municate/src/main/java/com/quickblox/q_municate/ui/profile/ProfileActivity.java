@@ -31,6 +31,7 @@ import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
+import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
@@ -115,7 +116,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         try {
             userCustomData = (UserCustomData) user.getCustomDataAsObject();
         } catch (JSONException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
         }
 
         loadAvatar();
@@ -340,7 +341,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         try {
             ((UserCustomData)user.getCustomDataAsObject()).setStatus(statusOld);
         } catch (JSONException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
         }
         isNeedUpdateAvatar = false;
     }

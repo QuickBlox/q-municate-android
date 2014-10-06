@@ -36,7 +36,9 @@ public class FriendUtils {
         try {
             userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
         } catch (JSONException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
         }
 
         if (userCustomData != null) {

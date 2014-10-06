@@ -137,6 +137,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onConnectedToService(QBService service) {
+        createChatLocally();
+    }
+
+    protected void createChatLocally() {
         if (chatHelper == null) {
             chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
             try {

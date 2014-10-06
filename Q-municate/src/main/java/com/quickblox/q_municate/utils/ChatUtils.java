@@ -1,6 +1,7 @@
 package com.quickblox.q_municate.utils;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.module.chat.model.QBAttachment;
@@ -10,8 +11,10 @@ import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.chat.model.QBMessage;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.service.QBServiceConsts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -258,5 +261,21 @@ public class ChatUtils {
             }
         }
         return roomJidList;
+    }
+
+    public static Bundle getBundleForCreatePrivateChat(int userId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, userId);
+        return bundle;
+    }
+
+    public static QBDialog getExistPrivateDialog(Context context, int opponentId) {
+        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(context, opponentId,
+                QBDialogType.PRIVATE);
+        if (!dialogList.isEmpty()) {
+            return dialogList.get(0);
+        } else {
+            return null;
+        }
     }
 }

@@ -52,10 +52,8 @@ public abstract class BaseChatHelper extends BaseHelper {
     public BaseChatHelper(Context context) {
         super(context);
         privateChatMessageListener = new PrivateChatMessageListener();
-        //
         privateChatManagerListener = new PrivateChatManagerListener();
         privateChatIsTypingListener = new PrivateChatIsTypingListener();
-        //
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
     }
 
@@ -66,7 +64,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     /*
     Call this method when you want start chating by existing dialog
      */
-    public abstract QBChat createChatLocally(QBDialog dialogId, Bundle additional) throws QBResponseException;
+    public abstract QBChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException;
 
     public abstract void closeChat(QBDialog dialogId, Bundle additional);
 
@@ -123,7 +121,7 @@ public abstract class BaseChatHelper extends BaseHelper {
             String dialogId) throws QBResponseException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
-            throw new QBResponseException("Private chat was not created!");
+            createChatIfNotExist(opponentId);
         }
         if (!TextUtils.isEmpty(dialogId)) {
             chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
@@ -139,6 +137,11 @@ public abstract class BaseChatHelper extends BaseHelper {
         if (error != null) {
             throw new QBResponseException(error);
         }
+    }
+
+    private QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {
+        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, opponentId);
+        return  (QBPrivateChat) createChatLocally(existingPrivateDialog, ChatUtils.getBundleForCreatePrivateChat(opponentId));
     }
 
     protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId,
@@ -200,8 +203,6 @@ public abstract class BaseChatHelper extends BaseHelper {
             privateChat.addIsTypingListener(privateChatIsTypingListener);
         }
     }
-
-
 
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
         @Override

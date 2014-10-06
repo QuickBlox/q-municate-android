@@ -32,6 +32,7 @@ import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
+import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -208,22 +209,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void chatClickListener(View view) {
-        QBDialog existingPrivateDialog = getExistPrivateDialog(friend.getUserId());
+        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
         if (existingPrivateDialog != null) {
             PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
         } else {
             showProgress();
             QBCreatePrivateChatCommand.start(this, friend);
-        }
-    }
-
-    private QBDialog getExistPrivateDialog(int opponentId) {
-        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(this, opponentId,
-                QBDialogType.PRIVATE);
-        if (!dialogList.isEmpty()) {
-            return dialogList.get(0);
-        } else {
-            return null;
         }
     }
 

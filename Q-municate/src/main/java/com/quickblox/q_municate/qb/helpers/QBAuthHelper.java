@@ -15,6 +15,7 @@ import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
 
 import org.json.JSONException;
 
@@ -101,7 +102,7 @@ public class QBAuthHelper extends BaseHelper {
         try {
             userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
         } catch (JSONException e) {
-            e.printStackTrace();
+            ErrorUtils.logError(e);
         }
 
         if (userCustomDataOld != null) {
