@@ -121,7 +121,7 @@ public abstract class BaseChatHelper extends BaseHelper {
             String dialogId) throws QBResponseException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
         if (privateChat == null) {
-            createChatIfNotExist(opponentId);
+            privateChat = createChatIfNotExist(opponentId);
         }
         if (!TextUtils.isEmpty(dialogId)) {
             chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);

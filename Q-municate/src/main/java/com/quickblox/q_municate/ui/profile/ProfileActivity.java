@@ -146,9 +146,9 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void loadAvatar() {
-        String url = userCustomData.getAvatar_url();
-        if (!TextUtils.isEmpty(url)) {
-            ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatar_url())) {
+            ImageLoader.getInstance().displayImage(userCustomData.getAvatar_url(),
+                    avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }
 
