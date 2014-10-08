@@ -13,7 +13,6 @@ import com.quickblox.q_municate.ui.base.QBLogeable;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 
-    private static final boolean SHOULD_START_MULTICHAT = true;
     private int numberOfActivitiesInForeground;
     private boolean chatDestroyed = false;
 

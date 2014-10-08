@@ -1,5 +1,7 @@
 package com.quickblox.q_municate.model;
 
+import com.quickblox.q_municate.utils.Consts;
+
 import java.io.Serializable;
 
 public class UserCustomData implements Serializable{
@@ -9,6 +11,8 @@ public class UserCustomData implements Serializable{
     private int is_import;
 
     public UserCustomData() {
+        avatar_url = Consts.EMPTY_STRING;
+        status = Consts.EMPTY_STRING;
     }
 
     public UserCustomData(String avatar_url, String status, int is_import) {

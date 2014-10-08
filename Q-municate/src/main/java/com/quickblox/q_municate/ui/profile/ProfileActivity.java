@@ -69,6 +69,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private boolean closeActionMode;
     private Uri outputUri;
     private UserCustomData userCustomData;
+    private ActionModeCallback actionModeCallback;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -82,6 +83,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         useDoubleBackPressed = false;
         user = AppSession.getSession().getUser();
         imageUtils = new ImageUtils(this);
+        actionModeCallback = new ActionModeCallback();
 
         initUI();
         initListeners();
@@ -242,7 +244,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         if (actionMode != null) {
             return;
         }
-        actionMode = startActionMode(new ActionModeCallback());
+        actionMode = startActionMode(actionModeCallback);
     }
 
     public void changeAvatarOnClick() {

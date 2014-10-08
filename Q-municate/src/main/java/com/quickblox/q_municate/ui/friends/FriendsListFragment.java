@@ -66,6 +66,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private int relationStatusNoneId;
     private Resources resources;
     private Timer searchTimer;
+    private int selectedPositionList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -109,6 +110,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             @Override
             public void onChange(boolean selfChange) {
+                selectedPositionList = friendsListView.getFirstVisiblePosition();
                 checkInitFriendsList();
             }
         };
@@ -273,6 +275,10 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListView.setGroupIndicator(null);
 
         expandAllGroups(headersCursor);
+
+        if (selectedPositionList != Consts.ZERO_INT_VALUE) {
+            friendsListView.setSelection(selectedPositionList);
+        }
 
         baseActivity.hideActionBarProgress();
     }
