@@ -116,6 +116,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         actionCancelView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 resetUserData();
+                initUIWithUsersData();
                 hideAction();
             }
         });
