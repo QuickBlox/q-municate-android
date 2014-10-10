@@ -6,17 +6,20 @@ import android.os.Bundle;
 
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.qb.helpers.QBChatRestHelper;
+import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 
 public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
 
     private QBChatRestHelper chatRestHelper;
+    private QBMultiChatHelper multiChatHelper;
 
-    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
+    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, QBMultiChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatRestHelper = chatRestHelper;
+        this.multiChatHelper = multiChatHelper;
     }
 
     public static void start(Context context, boolean destroyChat) {
@@ -36,6 +39,7 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
             destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
         }
         if(chatRestHelper != null && chatRestHelper.isLoggedIn()) {
+            multiChatHelper.leaveDialogs();
             chatRestHelper.logout();
             if (destroy) {
                 chatRestHelper.destroy();

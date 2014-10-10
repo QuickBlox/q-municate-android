@@ -13,8 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NavUtils;
-import android.view.View;
-import android.widget.TextView;
+import android.view.Window;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -22,10 +21,9 @@ import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public abstract class BaseActivity extends Activity {
 
@@ -39,11 +37,8 @@ public abstract class BaseActivity extends Activity {
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
-    protected ActivityDelegator activityDelegator;
+    protected ActivityHelper activityHelper;
 
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
     private boolean doubleBackToExitPressedOnce;
     private boolean bounded;
     private ServiceConnection serviceConnection = new QBChatServiceConnection();
@@ -68,39 +63,40 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
+    public void hideActionBarProgress() {
+        activityHelper.hideActionBarProgress();
+    }
+
+    public void showActionBarProgress() {
+        activityHelper.showActionBarProgress();
+    }
+
     public void addAction(String action, Command command) {
-        activityDelegator.addAction(action, command);
+        activityHelper.addAction(action, command);
     }
 
     public boolean hasAction(String action) {
-        return activityDelegator.hasAction(action);
+        return activityHelper.hasAction(action);
     }
 
     public void removeAction(String action) {
-        activityDelegator.removeAction(action);
-    }
-
-    public void showNewMessageAlert(String sender, String message) {
-        newMessageTextView.setText(message);
-        senderMessageTextView.setText(sender);
-        Crouton.cancelAllCroutons();
-        Crouton.show(this, newMessageView);
+        activityHelper.removeAction(action);
     }
 
     public void updateBroadcastActionList() {
-        activityDelegator.updateBroadcastActionList();
+        activityHelper.updateBroadcastActionList();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
         app = App.getInstance();
         actionBar = getActionBar();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityDelegator = new ActivityDelegator(this, new GlobalListener());
-        activityDelegator.onCreate();
-        initUI();
+        activityHelper = new ActivityHelper(this, new GlobalListener());
+        activityHelper.onCreate();
     }
 
     @Override
@@ -112,13 +108,13 @@ public abstract class BaseActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        activityDelegator.onResume();
+        activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
     @Override
     protected void onPause() {
-        activityDelegator.onPause();
+        activityHelper.onPause();
         super.onPause();
     }
 
@@ -150,8 +146,12 @@ public abstract class BaseActivity extends Activity {
 
     protected void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        NavUtils.navigateUpTo(this, intent);
+        if (intent == null) {
+            finish();
+        } else {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            NavUtils.navigateUpTo(this, intent);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -165,12 +165,6 @@ public abstract class BaseActivity extends Activity {
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);
         transaction.commit();
-    }
-
-    private void initUI() {
-        newMessageView = getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
     }
 
     private void unbindService() {
@@ -218,24 +212,32 @@ public abstract class BaseActivity extends Activity {
         }
     }
 
-    private class GlobalListener implements  ActivityDelegator.GlobalActionsListener {
+    private class GlobalListener implements ActivityHelper.GlobalActionsListener {
+
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            String sender = extras.getString(QBServiceConsts.EXTRA_SENDER_CHAT_MESSAGE);
-            String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-            showNewMessageAlert(sender, message);
+            boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
+            if(!isSplashActivity) {
+                activityHelper.onReceiveMessage(extras);
+            }
         }
 
         @Override
         public void onReceiveForceReloginAction(Bundle extras) {
-            activityDelegator.forceRelogin();
+            activityHelper.forceRelogin();
         }
 
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
             showProgress();
-            activityDelegator.refreshSession();
+            activityHelper.refreshSession();
+        }
+
+        @Override
+        public void onReceiveFriendActionAction(Bundle extras) {
+            String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
+            activityHelper.showFriendAlert(alertMessage);
         }
     }
 

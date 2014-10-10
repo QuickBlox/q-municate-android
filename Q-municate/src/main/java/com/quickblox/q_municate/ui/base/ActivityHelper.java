@@ -19,6 +19,7 @@ import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate.utils.ErrorUtils;
 
@@ -27,32 +28,47 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-//This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
-public class ActivityDelegator extends BaseActivityDelegator {
+import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+//This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
+public class ActivityHelper extends BaseActivityDelegator {
+
+    private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
     private GlobalActionsListener actionsListener;
     private Handler handler;
+    private ActivityUIHelper activityUIHelper;
 
-    public ActivityDelegator(Context context, GlobalActionsListener actionsListener) {
+    public ActivityHelper(Context context, GlobalActionsListener actionsListener) {
         super(context);
         this.actionsListener = actionsListener;
+        activity = (Activity) context;
+        activityUIHelper = new ActivityUIHelper(activity);
+    }
+
+    public void showFriendAlert(String message) {
+        AlertDialog alertDialog = AlertDialog.newInstance(message);
+        alertDialog.show(activity.getFragmentManager(), null);
+    }
+
+    protected void onReceiveMessage(Bundle extras) {
+        activityUIHelper.onReceiveMessage(extras);
     }
 
     public void forceRelogin() {
-        ErrorUtils.showError(getContext(), getContext().getString(
+        ErrorUtils.showError(activity, activity.getString(
                 R.string.dlg_force_relogin_on_token_required));
-        SplashActivity.start(getContext());
-        ((Activity) getContext()).finish();
+        SplashActivity.start(activity);
+        activity.finish();
     }
 
     public void refreshSession() {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
-            QBLoginRestCommand.start(getContext(), AppSession.getSession().getUser());
+            QBLoginRestCommand.start(activity, AppSession.getSession().getUser());
         } else {
-            QBLoginRestWithSocialCommand.start(getContext(), QBProvider.FACEBOOK,
+            QBLoginRestWithSocialCommand.start(activity, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);
         }
     }
@@ -60,6 +76,18 @@ public class ActivityDelegator extends BaseActivityDelegator {
     public void onCreate() {
         broadcastReceiver = new BaseBroadcastReceiver();
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
+    }
+
+    public void hideActionBarProgress() {
+        setVisibilityActionBarProgress(false);
+    }
+
+    public void showActionBarProgress() {
+        setVisibilityActionBarProgress(true);
+    }
+
+    public void setVisibilityActionBarProgress(boolean visibility) {
+        activity.setProgressBarIndeterminateVisibility(visibility);
     }
 
     public void addAction(String action, Command command) {
@@ -80,16 +108,17 @@ public class ActivityDelegator extends BaseActivityDelegator {
     }
 
     public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
         IntentFilter intentFilter = new IntentFilter();
         for (String commandName : broadcastCommandMap.keySet()) {
             intentFilter.addAction(commandName);
         }
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(broadcastReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(broadcastReceiver, intentFilter);
     }
 
     public void onPause() {
         unregisterBroadcastReceiver();
+        Crouton.cancelAllCroutons();
     }
 
     public void onResume() {
@@ -102,13 +131,14 @@ public class ActivityDelegator extends BaseActivityDelegator {
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(globalBroadcastReceiver,
+        globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
+        LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
     }
 
     private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(globalBroadcastReceiver);
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(globalBroadcastReceiver);
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
     }
 
     private Handler getHandler() {
@@ -116,6 +146,17 @@ public class ActivityDelegator extends BaseActivityDelegator {
             handler = new Handler();
         }
         return handler;
+    }
+
+    public interface GlobalActionsListener {
+
+        public void onReceiveChatMessageAction(Bundle extras);
+
+        public void onReceiveForceReloginAction(Bundle extras);
+
+        public void onReceiveRefreshSessionAction(Bundle extras);
+
+        public void onReceiveFriendActionAction(Bundle extras);
     }
 
     private class BaseBroadcastReceiver extends BroadcastReceiver {
@@ -148,7 +189,7 @@ public class ActivityDelegator extends BaseActivityDelegator {
     private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceive(Context context,final Intent intent) {
+        public void onReceive(Context context, final Intent intent) {
             getHandler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -165,18 +206,13 @@ public class ActivityDelegator extends BaseActivityDelegator {
                         if (actionsListener != null) {
                             actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
                         }
+                    } else if (QBServiceConsts.FRIEND_ALERT_SHOW.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveFriendActionAction(intent.getExtras());
+                        }
                     }
                 }
             });
         }
-    }
-
-    public interface GlobalActionsListener {
-
-        public void onReceiveChatMessageAction(Bundle extras);
-
-        public void onReceiveForceReloginAction(Bundle extras);
-
-        public void onReceiveRefreshSessionAction(Bundle extras);
     }
 }

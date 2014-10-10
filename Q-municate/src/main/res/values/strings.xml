@@ -13,7 +13,7 @@
     <string name="acb_chat_attach_title">Add attach</string>
 
     // Navigation Drawer
-    <string name="nvd_title_friends">Friends</string>
+    <string name="nvd_title_contacts">Contacts</string>
     <string name="nvd_title_web_room">Web room</string>
     <string name="nvd_title_chats">Chats</string>
     <string name="nvd_title_settings">Settings</string>
@@ -23,8 +23,8 @@
     <string name="nvd_close">Close navigation drawer</string>
 
     <string-array name="nvd_items_array">
-        <item>Friends</item>
         <item>Chats</item>
+        <item>Contacts</item>
         <item>Invite Friends</item>
         <item>Settings</item>
         <item>Give Feedback</item>
@@ -72,6 +72,15 @@
     <string name="frl_all_users">All Users</string>
     <string name="frl_no_friends">Oops…\nYou don\'t have any friends,\ntap search icon to find them \nor invite new ones.</string>
     <string name="frl_not_found_users">Sorry… no users</string>
+    <string name="frl_pending_status">Waiting…</string>
+    <string name="frl_pending_request_status">Pending contact request</string>
+    <string name="frl_column_header_name_requests">Requests</string>
+    <string name="frl_column_header_name_contacts">My Contacts</string>
+    <string name="frl_column_header_name_all_users">All Users</string>
+    <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
+    <string name="frl_alrt_reject_friend">%1$s has rejected your contact request.</string>
+    <string name="frl_alrt_accepted_friend">%1$s has accepted your contact request. </string>
+    <string name="frl_alrt_deleted_friend">%1$s has deleted you from contacts list. </string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -79,11 +88,13 @@
     <string name="frd_audio_call">Audio Call</string>
     <string name="frd_chat">Chat</string>
     <string name="frd_mobile">MOBILE</string>
+    <string name="frd_dlg_remove_friend">Do you really want to delete %1$s  from your contact list?</string>
 
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
     <string name="dlg_no_chats">Oops…\nYou don\'t have any chats, \ntap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dlg_reply">Reply</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
@@ -172,7 +183,7 @@
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
-    <string name="dlg_not_fullname_field_entered">Please enter fullname</string>
+    <string name="dlg_not_fullname_field_entered">Please enter fullName</string>
     <string name="dlg_not_email_field_entered">Please enter email</string>
     <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
@@ -180,10 +191,10 @@
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_done">Done</string>
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>
-    <string name="dlg_remove_user">Remove user</string>
     <string name="dlg_password_changed">Password changed</string>
     <string name="dlg_no_facebook_friends">No Facebook friends</string>
     <string name="dlg_no_contacts_friends">No Contacts friends</string>
@@ -209,6 +220,7 @@
     <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
+    <string name="dlg_not_joined_room">You have not joined chat room! Please wait…</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
@@ -217,112 +229,13 @@
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
 
-    //Tips
-    <string name="tip_friend_list">Lorem ipsum dolor sit amet, mea ei adhuc platonem.
-        Vel enim modus semper no, vim docendi definitionem id. Ad est idque menandri
-        patrioque, vis no case eligendi singulis. Ei pri virtute petentium, sea ea agam
-        partem nostrud, verear euripidis mel ea. Vix no errem saepe essent, id vel assum
-        vituperatoribus. Eruditi denique complectitur et vix, eu eum idque tractatos,
-        has no viris vidisse abhorreant. Eu errem eruditi volumus eam, tempor conclusionemque
-        usu ei.
-
-        Sea ne omnium scriptorem, vix an graeci utamur accumsan. Per augue delectus ea, dicant
-        option tibique ius eu. In has graecis philosophia, duo an delectus maluisset corrumpit.
-        Te sit ludus aperiri. Id per eripuit percipit definitiones, quaestio qualisque similique
-        ea nam, ei quo omnis rebum percipitur.
-
-        Enim scaevola ea est, nihil definitiones at vix, mel putent tamquam consulatu te. Cu pri
-        option scripserit, admodum voluptatum in vim. Virtute scriptorem at qui, luptatum accusamus
-        no nam. Cu vix debet scripserit, natum noster abhorreant nam ne. Iriure disputando eam no
-        . Labores invidunt at has.
-
-        Ea viris copiosae appetere has, an cum error dicant alterum, suas erant graece id ius. Pro
-        cu alia euripidis, vix dicam impedit alienum ad. Eam te tota dolore appetere, vis et eius
-        evertitur interesset. Duis reprimique et his, novum intellegat duo id, pri ad invidunt
-        reformidans complectitur. Eu sed perfecto delicata.
-
-        Cum ex lorem placerat, in lobortis pertinax mel. An pro nulla scripta delicatissimi. Eos
-        sint dolores inciderint et, quando posidonium comprehensam ea pri, no usu voluptatum
-        repudiandae. Sea illud ridens luptatum no. No his novum eirmod praesent.</string>
-    <string name="tip_friend_list_button">Find friends </string>
-    <string name="tip_chats_list">Lorem ipsum dolor sit amet, mea ei adhuc platonem.
-        Vel enim modus semper no, vim docendi definitionem id. Ad est idque menandri
-        patrioque, vis no case eligendi singulis. Ei pri virtute petentium, sea ea agam
-        partem nostrud, verear euripidis mel ea. Vix no errem saepe essent, id vel assum
-        vituperatoribus. Eruditi denique complectitur et vix, eu eum idque tractatos,
-        has no viris vidisse abhorreant. Eu errem eruditi volumus eam, tempor conclusionemque
-        usu ei.
-
-        Sea ne omnium scriptorem, vix an graeci utamur accumsan. Per augue delectus ea, dicant
-        option tibique ius eu. In has graecis philosophia, duo an delectus maluisset corrumpit.
-        Te sit ludus aperiri. Id per eripuit percipit definitiones, quaestio qualisque similique
-        ea nam, ei quo omnis rebum percipitur.
-
-        Enim scaevola ea est, nihil definitiones at vix, mel putent tamquam consulatu te. Cu pri
-        option scripserit, admodum voluptatum in vim. Virtute scriptorem at qui, luptatum accusamus
-        no nam. Cu vix debet scripserit, natum noster abhorreant nam ne. Iriure disputando eam no
-        . Labores invidunt at has.
-
-        Ea viris copiosae appetere has, an cum error dicant alterum, suas erant graece id ius. Pro
-        cu alia euripidis, vix dicam impedit alienum ad. Eam te tota dolore appetere, vis et eius
-        evertitur interesset. Duis reprimique et his, novum intellegat duo id, pri ad invidunt
-        reformidans complectitur. Eu sed perfecto delicata.
-
-        Cum ex lorem placerat, in lobortis pertinax mel. An pro nulla scripta delicatissimi. Eos
-        sint dolores inciderint et, quando posidonium comprehensam ea pri, no usu voluptatum
-        repudiandae. Sea illud ridens luptatum no. No his novum eirmod praesent.</string>
-    <string name="tip_settings">Lorem ipsum dolor sit amet, mea ei adhuc platonem.
-        Vel enim modus semper no, vim docendi definitionem id. Ad est idque menandri
-        patrioque, vis no case eligendi singulis. Ei pri virtute petentium, sea ea agam
-        partem nostrud, verear euripidis mel ea. Vix no errem saepe essent, id vel assum
-        vituperatoribus. Eruditi denique complectitur et vix, eu eum idque tractatos,
-        has no viris vidisse abhorreant. Eu errem eruditi volumus eam, tempor conclusionemque
-        usu ei.
-
-        Sea ne omnium scriptorem, vix an graeci utamur accumsan. Per augue delectus ea, dicant
-        option tibique ius eu. In has graecis philosophia, duo an delectus maluisset corrumpit.
-        Te sit ludus aperiri. Id per eripuit percipit definitiones, quaestio qualisque similique
-        ea nam, ei quo omnis rebum percipitur.
-
-        Enim scaevola ea est, nihil definitiones at vix, mel putent tamquam consulatu te. Cu pri
-        option scripserit, admodum voluptatum in vim. Virtute scriptorem at qui, luptatum accusamus
-        no nam. Cu vix debet scripserit, natum noster abhorreant nam ne. Iriure disputando eam no
-        . Labores invidunt at has.
-
-        Ea viris copiosae appetere has, an cum error dicant alterum, suas erant graece id ius. Pro
-        cu alia euripidis, vix dicam impedit alienum ad. Eam te tota dolore appetere, vis et eius
-        evertitur interesset. Duis reprimique et his, novum intellegat duo id, pri ad invidunt
-        reformidans complectitur. Eu sed perfecto delicata.
-
-        Cum ex lorem placerat, in lobortis pertinax mel. An pro nulla scripta delicatissimi. Eos
-        sint dolores inciderint et, quando posidonium comprehensam ea pri, no usu voluptatum
-        repudiandae. Sea illud ridens luptatum no. No his novum eirmod praesent.</string>
-    <string name="tip_invite_friends">Lorem ipsum dolor sit amet, mea ei adhuc platonem.
-        Vel enim modus semper no, vim docendi definitionem id. Ad est idque menandri
-        patrioque, vis no case eligendi singulis. Ei pri virtute petentium, sea ea agam
-        partem nostrud, verear euripidis mel ea. Vix no errem saepe essent, id vel assum
-        vituperatoribus. Eruditi denique complectitur et vix, eu eum idque tractatos,
-        has no viris vidisse abhorreant. Eu errem eruditi volumus eam, tempor conclusionemque
-        usu ei.
-
-        Sea ne omnium scriptorem, vix an graeci utamur accumsan. Per augue delectus ea, dicant
-        option tibique ius eu. In has graecis philosophia, duo an delectus maluisset corrumpit.
-        Te sit ludus aperiri. Id per eripuit percipit definitiones, quaestio qualisque similique
-        ea nam, ei quo omnis rebum percipitur.
-
-        Enim scaevola ea est, nihil definitiones at vix, mel putent tamquam consulatu te. Cu pri
-        option scripserit, admodum voluptatum in vim. Virtute scriptorem at qui, luptatum accusamus
-        no nam. Cu vix debet scripserit, natum noster abhorreant nam ne. Iriure disputando eam no
-        . Labores invidunt at has.
-
-        Ea viris copiosae appetere has, an cum error dicant alterum, suas erant graece id ius. Pro
-        cu alia euripidis, vix dicam impedit alienum ad. Eam te tota dolore appetere, vis et eius
-        evertitur interesset. Duis reprimique et his, novum intellegat duo id, pri ad invidunt
-        reformidans complectitur. Eu sed perfecto delicata.
-
-        Cum ex lorem placerat, in lobortis pertinax mel. An pro nulla scripta delicatissimi. Eos
-        sint dolores inciderint et, quando posidonium comprehensam ea pri, no usu voluptatum
-        repudiandae. Sea illud ridens luptatum no. No his novum eirmod praesent.</string>
+    <string-array name="friends_relation_statuses_array">
+        <item>none</item>
+        <item>to</item>
+        <item>both</item>
+        <item>from</item>
+        <item>remove</item>
+    </string-array>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>

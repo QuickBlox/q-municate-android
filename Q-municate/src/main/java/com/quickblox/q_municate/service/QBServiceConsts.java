@@ -6,6 +6,9 @@ public class QBServiceConsts {
     //main actions
     public static final String COMMAND_ACTION = "action";
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
+    public static final String ACCEPT_FRIEND_ACTION = "accept_friend_action";
+    public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
+    public static final String REJECT_FRIEND_ACTION = "reject_friend_action";
     public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";
     public static final String GET_FILE_ACTION = "get_file_action";
@@ -17,18 +20,19 @@ public class QBServiceConsts {
     public static final String LOGOUT_REST_ACTION = "logout_rest_action";
     public static final String LOGOUT_CHAT_ACTION = "logout_chat_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_ACTION = "logout_and_destroy_chat_action";
-    public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
     public static final String RESET_PASSWORD_ACTION = "reset_password_action";
     public static final String SIGNUP_ACTION = "signup_action";
     public static final String SOCIAL_LOGIN_ACTION = "social_login_action";
     public static final String UPDATE_USER_ACTION = "update_user_action";
     public static final String LOAD_FRIENDS_ACTION = "friends_load_action";
-    public static final String LOAD_USERS_ACTION = "user_search_action";
+    public static final String LOAD_USERS_ACTION = "users_search_action";
+    public static final String LOAD_USER_ACTION = "user_search_action";
     public static final String SEND_MESSAGE_ACTION = "send_message_action";
     public static final String SEND_GROUP_MESSAGE_ACTION = "send_group_message_action";
     public static final String LOAD_ATTACH_FILE_ACTION = "load_attach_file_action";
     public static final String INIT_FRIEND_LIST_ACTION = "init friend list action";
-    public static final String INIT_CHAT_ACTION = "init_chat_action";
+    public static final String INIT_CHATS_ACTION = "init_chats_action";
+    public static final String INIT_CHAT_SERVICE_ACTION = "init_chat_service_action";
     public static final String INIT_VIDEO_CHAT_ACTION = "init_video_chat_action";
     public static final String SIGNUP_REST_ACTION = "signup_rest_action";
     public static final String CREATE_GROUP_CHAT_ACTION = "create_group_chat_action";
@@ -49,6 +53,12 @@ public class QBServiceConsts {
     //success and fail actions
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
     public static final String ADD_FRIEND_FAIL_ACTION = "add_friend_fail_action";
+    public static final String ACCEPT_FRIEND_SUCCESS_ACTION = "accept_friend_success_action";
+    public static final String ACCEPT_FRIEND_FAIL_ACTION = "accept_friend_fail_action";
+    public static final String REMOVE_FRIEND_SUCCESS_ACTION = "remove_friend_success_action";
+    public static final String REMOVE_FRIEND_FAIL_ACTION = "remove_friend_fail_action";
+    public static final String REJECT_FRIEND_SUCCESS_ACTION = "reject_friend_success_action";
+    public static final String REJECT_FRIEND_FAIL_ACTION = "reject_friend_fail_action";
     public static final String IMPORT_FRIENDS_SUCCESS_ACTION = "import_friends_success_action";
     public static final String IMPORT_FRIENDS_FAIL_ACTION = "import_friends_fail_action";
     public static final String CHANGE_PASSWORD_SUCCESS_ACTION = "change_password_success_action";
@@ -59,8 +69,6 @@ public class QBServiceConsts {
     public static final String LOGIN_FAIL_ACTION = "login_fail_action";
     public static final String LOGOUT_SUCCESS_ACTION = "logout_success_action";
     public static final String LOGOUT_FAIL_ACTION = "logout_fail_action";
-    public static final String REMOVE_FRIEND_SUCCESS_ACTION = "remove_friend_success_action";
-    public static final String REMOVE_FRIEND_FAIL_ACTION = "remove_friend_fail_action";
     public static final String RESET_PASSWORD_SUCCESS_ACTION = "reset_password_success_action";
     public static final String RESET_PASSWORD_FAIL_ACTION = "reset_password_fail_action";
     public static final String SIGNUP_SUCCESS_ACTION = "signup_success_action";
@@ -69,8 +77,10 @@ public class QBServiceConsts {
     public static final String UPDATE_USER_FAIL_ACTION = "update_user_fail_action";
     public static final String LOAD_FRIENDS_SUCCESS_ACTION = "friends_load_success_action";
     public static final String LOAD_FRIENDS_FAIL_ACTION = "friends_load_fail_action";
-    public static final String LOAD_USERS_SUCCESS_ACTION = "user_search_success_action";
-    public static final String LOAD_USERS_FAIL_ACTION = "user_search_fail_action";
+    public static final String LOAD_USERS_SUCCESS_ACTION = "users_search_success_action";
+    public static final String LOAD_USERS_FAIL_ACTION = "users_search_fail_action";
+    public static final String LOAD_USER_SUCCESS_ACTION = "user_search_success_action";
+    public static final String LOAD_USER_FAIL_ACTION = "user_search_fail_action";
     public static final String SEND_MESSAGE_SUCCESS_ACTION = "send_message_success_action";
     public static final String SEND_MESSAGE_FAIL_ACTION = "send_message_fail_action";
     public static final String LOAD_ATTACH_FILE_SUCCESS_ACTION = "load_attach_file_success_action";
@@ -83,8 +93,10 @@ public class QBServiceConsts {
     public static final String LOGIN_CHAT_FAIL_ACTION = "login_chat_fail_action";
     public static final String LOGOUT_CHAT_SUCCESS_ACTION = "logout_chat_success_action";
     public static final String LOGOUT_CHAT_FAIL_ACTION = "logout_chat_fail_action";
-    public static final String INIT_CHAT_SUCCESS_ACTION = "init_chat_success_action";
-    public static final String INIT_CHAT_FAIL_ACTION = "init_chat_fail_action";
+    public static final String INIT_CHATS_SUCCESS_ACTION = "init_chats_success_action";
+    public static final String INIT_CHATS_FAIL_ACTION = "init_chats_fail_action";
+    public static final String INIT_CHAT_SERVICE_SUCCESS_ACTION = "init_chat_service_success_action";
+    public static final String INIT_CHAT_SERVICE_FAIL_ACTION = "init_chat_service_fail_action";
     public static final String INIT_VIDEO_CHAT_SUCCESS_ACTION = "init_video_chat_success_action";
     public static final String INIT_VIDEO_CHAT_FAIL_ACTION = "init_video_chat_fail_action";
     public static final String LOGOUT_AND_DESTROY_CHAT_SUCCESS_ACTION = "logout_and_destroy_chat_success_action";
@@ -119,7 +131,7 @@ public class QBServiceConsts {
     public static final String UPDATE_GROUP_NAME_FAIL_ACTION = "update_group_name_fail_action";
     public static final String LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION = "login_and_join_chats_sucess_action";
     public static final String LOGIN_AND_JOIN_CHATS_FAIL_ACTION = "login_and_join_chats_fail_action";
-    public static final String FRIEND_STATUS_CHANGED_ACTION = "friend_status_changed_action";
+    public static final String USER_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
     public static final String UPDATE_GROUP_PHOTO_SUCCESS_ACTION = "update_group_photo_success_action";
@@ -127,9 +139,10 @@ public class QBServiceConsts {
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
-    public static final String EXTRA_SENDER_CHAT_MESSAGE = "sender_chat_message";
     public static final String EXTRA_ROOM_JID = "room_jid_id";
-    public static final String EXTRA_USER = "qb_user";
+    public static final String EXTRA_IS_PRIVATE_MESSAGE = "is_private_message";
+    public static final String EXTRA_USER = "user";
+    public static final String EXTRA_USERS = "users";
     public static final String EXTRA_ERROR = "error";
     public static final String EXTRA_ERROR_CODE = "error_code";
     public static final String EXTRA_FRIEND = "friend";
@@ -168,12 +181,15 @@ public class QBServiceConsts {
     public static final String EXTRA_EMOJIS = "emojis";
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_FILE_PATH = "file_path";
+    public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
 
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
+    public static final String GOT_CONTACT_REQUEST = "got_contact_request";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";
     public static final String FORCE_RELOGIN = "force_relogin";
     public static final String REFRESH_SESSION = "refresh_session";
+    public static final String FRIEND_ALERT_SHOW = "friend_alert";
     public static final String AUTH_ACTION_TYPE = "authorize_type";
     public static final int AUTH_TYPE_REGISTRATION = 1;
     public static final int AUTH_TYPE_LOGIN = 2;

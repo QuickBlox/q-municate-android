@@ -16,7 +16,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -33,7 +33,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     private static final String TAG = CallActivity.class.getSimpleName();
 
-    private Friend opponent;
+    private User opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
     private WebRTC.MEDIA_STREAM call_type;
@@ -46,7 +46,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private QBVideoChatHelper videoChatHelper;
     private ConnectionConfig currentConfig;
 
-    public static void start(Context context, Friend friend, WebRTC.MEDIA_STREAM callType) {
+    public static void start(Context context, User friend, WebRTC.MEDIA_STREAM callType) {
         Log.i (TAG,  "Friend.isOnline() = " + friend.isOnline());
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.EXTRA_FRIEND, friend);
@@ -111,7 +111,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     protected void onConnectedToService() {
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
-            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getId());
+            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();
                 signalingChannel.addSignalingListener(messageHandler);
@@ -160,7 +160,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
         sessionId = extras.getString(WebRTC.SESSION_ID_EXTENSION, "");
-        opponent = (Friend) extras.getSerializable(Consts.EXTRA_FRIEND);
+        opponent = (User) extras.getSerializable(Consts.EXTRA_FRIEND);
         if (call_direction_type != null) {
             if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
                 sessionDescriptionWrapper = extras.getParcelable(Consts.REMOTE_DESCRIPTION);
@@ -173,11 +173,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         Log.i(TAG, "opponentId=" + opponent);
     }
 
-    private void notifyFriendOnCall(Friend friend){
+    private void notifyFriendOnCall(User friend){
         if (!friend.isOnline()) {
             String callMsg = getResources().getString(R.string.dlg_offline_call,
                     AppSession.getSession().getUser().getFullName());
-            QBSendPushCommand.start(this, callMsg, friend.getId());
+            QBSendPushCommand.start(this, callMsg, friend.getUserId());
         }
     }
 
@@ -205,7 +205,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         }
     }
 
-    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, Friend opponentId,
+    private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, User opponentId,
             WebRTC.MEDIA_STREAM callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);

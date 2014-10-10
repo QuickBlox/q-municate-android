@@ -26,7 +26,7 @@ import android.widget.TextView;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBLogoutCommand;
@@ -49,18 +49,18 @@ public class NavigationDrawerFragment extends BaseFragment {
     private static View fragmentContainerView;
     private Resources resources;
     private ListView drawerListView;
-    private TextView fullnameTextView;
+    private TextView fullNameTextView;
     private ImageButton logoutButton;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private UpdateCountUnreadDialogsListener updateCountUnreadDialogsListener;
+    private NavigationDrawerCounterListener navigationDrawerCounterListener;
     private ActionBarDrawerToggle drawerToggle;
     private int currentSelectedPosition = 0;
     private boolean fromSavedInstanceState;
     private boolean userLearnedDrawer;
-    private boolean isMissedMessage;
     private NavigationDrawerAdapter navigationDrawerAdapter;
     private BroadcastReceiver countUnreadDialogsBroadcastReceiver;
+    private BroadcastReceiver countContactRequestBroadcastReceiver;
 
     public static boolean isDrawerOpen() {
         return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
@@ -79,16 +79,19 @@ public class NavigationDrawerFragment extends BaseFragment {
             fromSavedInstanceState = true;
         }
 
-        if (isMissedMessage) {
-            currentSelectedPosition = MainActivity.ID_CHATS_LIST_FRAGMENT;
-            saveMissedMessageFlag(false);
-        }
-
         selectItem(currentSelectedPosition);
 
+        initLocalBroadcastManagers();
+    }
+
+    private void initLocalBroadcastManagers() {
         countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
+        countContactRequestBroadcastReceiver = new CountContactRequestsBroadcastReceiver();
+
         LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countContactRequestBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CONTACT_REQUEST));
     }
 
     @Override
@@ -122,7 +125,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         super.onResume();
         QBUser user = AppSession.getSession().getUser();
         if (user != null) {
-            fullnameTextView.setText(user.getFullName());
+            fullNameTextView.setText(user.getFullName());
         }
         addActions();
     }
@@ -180,11 +183,6 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initPrefValues() {
         PrefsHelper prefsHelper = App.getInstance().getPrefsHelper();
         userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
-        isMissedMessage = prefsHelper.getPref(PrefsHelper.PREF_MISSED_MESSAGE, false);
-    }
-
-    private void saveMissedMessageFlag(boolean isMissedMessage) {
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_MISSED_MESSAGE, isMissedMessage);
     }
 
     private void selectItem(int position) {
@@ -203,13 +201,13 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initNavigationAdapter() {
         navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
         drawerListView.setAdapter(navigationDrawerAdapter);
-        updateCountUnreadDialogsListener = navigationDrawerAdapter;
+        navigationDrawerCounterListener = navigationDrawerAdapter;
     }
 
     private void initUI(View rootView) {
         drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
         logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
-        fullnameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
+        fullNameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
     }
 
     private void initListeners() {
@@ -257,8 +255,12 @@ public class NavigationDrawerFragment extends BaseFragment {
         App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
     }
 
-    private int getCounterUnreadDialogs() {
+    private int getCountUnreadDialogs() {
         return DatabaseManager.getCountUnreadDialogs(baseActivity);
+    }
+
+    private int getCountContactRequests() {
+        return DatabaseManager.getCountContactRequests(baseActivity);
     }
 
     public interface NavigationDrawerCallbacks {
@@ -266,9 +268,10 @@ public class NavigationDrawerFragment extends BaseFragment {
         void onNavigationDrawerItemSelected(int position);
     }
 
-    public interface UpdateCountUnreadDialogsListener {
+    public interface NavigationDrawerCounterListener {
 
         public void onUpdateCountUnreadDialogs(int count);
+        public void onUpdateCountContactRequests(int count);
     }
 
     private class CountUnreadDialogsBroadcastReceiver extends BroadcastReceiver {
@@ -277,8 +280,16 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
+                navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
             }
+        }
+    }
+
+    private class CountContactRequestsBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            navigationDrawerCounterListener.onUpdateCountContactRequests(getCountContactRequests());
         }
     }
 
@@ -303,7 +314,8 @@ public class NavigationDrawerFragment extends BaseFragment {
                 saveUserLearnedDrawer();
             }
 
-            updateCountUnreadDialogsListener.onUpdateCountUnreadDialogs(getCounterUnreadDialogs());
+            navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
+            navigationDrawerCounterListener.onUpdateCountContactRequests(getCountContactRequests());
         }
 
         @Override

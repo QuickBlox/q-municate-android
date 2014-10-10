@@ -3,9 +3,9 @@ package com.quickblox.q_municate.ui.chats;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
@@ -13,6 +13,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,7 +22,6 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -30,8 +30,9 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
@@ -51,10 +52,12 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.io.File;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     protected EditText chatEditText;
-    protected ListView messagesListView;
+    protected StickyListHeadersListView messagesListView;
     protected EditText messageEditText;
     protected TextView messageTextView;
     protected ImageButton sendButton;
@@ -74,8 +77,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean needToShowSmileLayout;
     private ImageView messageTypingBoxImageView;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
+    private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
+    private ContentObserver messagesTableContentObserver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -109,6 +114,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
+        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
 
         initUI();
         initListeners();
@@ -119,6 +125,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         isNeedToScrollMessages = true;
 
         hideSmileLayout();
+        registerContentObservers();
     }
 
     @Override
@@ -130,6 +137,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onConnectedToService(QBService service) {
+        createChatLocally();
+    }
+
+    protected void createChatLocally() {
         if (chatHelper == null) {
             chatHelper = (BaseChatHelper) service.getHelper(chatHelperIdentifier);
             try {
@@ -138,15 +149,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 ErrorUtils.showError(this, e.getMessage());
                 finish();
             }
-        }
-    }
-
-    @Override
-    protected void onReceiveMessage(Bundle extras) {
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        boolean isFromCurrentChat = dialogId != null && dialogId.equals(this.dialogId);
-        if (!isFromCurrentChat) {
-            super.onReceiveMessage(extras);
         }
     }
 
@@ -185,6 +187,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void addActions() {
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, loadAttachFileSuccessAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -210,6 +214,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (chatHelper != null) {
             chatHelper.closeChat(dialog, generateBundleToInitDialog());
         }
+        unregisterContentObservers();
         removeActions();
     }
 
@@ -363,6 +368,24 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
+    private void registerContentObservers() {
+        messagesTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+//                isNeedToScrollMessages = true;
+//                onScrollToBottom();
+            }
+        };
+
+        getContentResolver().registerContentObserver(MessageTable.CONTENT_URI, true,
+                messagesTableContentObserver);
+    }
+
+    private void unregisterContentObservers() {
+        getContentResolver().unregisterContentObserver(messagesTableContentObserver);
+    }
+
     private void setSmilePanelIcon(int resourceId) {
         smilePanelImageButton.setImageResource(resourceId);
     }
@@ -387,6 +410,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (dialog == null) {
             return;
         }
+
+        showActionBarProgress();
+
         MessageCache lastReadMessage = DatabaseManager.getLastReadMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, Consts.ZERO_LONG_VALUE);
@@ -418,6 +444,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             QBFile file = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
             onFileLoaded(file);
             hideProgress();
+        }
+    }
+
+    public class LoadDialogMessagesSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideActionBarProgress();
         }
     }
 }

@@ -9,21 +9,21 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.Utils;
 
 //TODO VF maybe move this logic to Dialog class
-public class ParcelableQBDialog implements Parcelable{
+public class ParcelableQBDialog implements Parcelable {
 
+    public static final Parcelable.Creator<ParcelableQBDialog> CREATOR = new Parcelable.Creator<ParcelableQBDialog>() {
+        public ParcelableQBDialog createFromParcel(Parcel in) {
+            return new ParcelableQBDialog(in);
+        }
+
+        public ParcelableQBDialog[] newArray(int size) {
+            return new ParcelableQBDialog[size];
+        }
+    };
     private QBDialog dialog;
 
-    public ParcelableQBDialog(QBDialog dialog){
+    public ParcelableQBDialog(QBDialog dialog) {
         this.dialog = dialog;
-    }
-
-    public QBDialog getDialog() {
-        return dialog;
-    }
-
-    @Override
-    public int describeContents() {
-        return Consts.NOT_INITIALIZED_VALUE;
     }
 
     public ParcelableQBDialog(Parcel inputParcel) {
@@ -38,6 +38,15 @@ public class ParcelableQBDialog implements Parcelable{
         dialog.setOccupantsIds(Utils.toArrayList(occupantArray));
     }
 
+    public QBDialog getDialog() {
+        return dialog;
+    }
+
+    @Override
+    public int describeContents() {
+        return Consts.NOT_INITIALIZED_VALUE;
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(dialog.getDialogId());
@@ -50,14 +59,4 @@ public class ParcelableQBDialog implements Parcelable{
         parcel.writeInt(occupantArray.length);
         parcel.writeIntArray(occupantArray);
     }
-
-    public static final Parcelable.Creator<ParcelableQBDialog> CREATOR = new Parcelable.Creator<ParcelableQBDialog>() {
-        public ParcelableQBDialog createFromParcel(Parcel in) {
-            return new ParcelableQBDialog(in);
-        }
-
-        public ParcelableQBDialog[] newArray(int size) {
-            return new ParcelableQBDialog[size];
-        }
-    };
 }

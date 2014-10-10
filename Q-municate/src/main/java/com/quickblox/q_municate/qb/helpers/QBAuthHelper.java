@@ -12,7 +12,12 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.model.LoginType;
+import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ErrorUtils;
+
+import org.json.JSONException;
 
 import java.io.File;
 
@@ -27,6 +32,7 @@ public class QBAuthHelper extends BaseHelper {
         QBAuth.createSession();
         String password = inputUser.getPassword();
         user = QBUsers.signIn(inputUser);
+        user.setCustomDataClass(UserCustomData.class);
         String token = QBAuth.getBaseService().getToken();
         user.setPassword(password);
         AppSession.startSession(LoginType.EMAIL, user, token);
@@ -39,6 +45,7 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
+        user.setCustomDataClass(UserCustomData.class);
         String token = QBAuth.getBaseService().getToken();
         AppSession.startSession(LoginType.FACEBOOK, user, token);
         return user;
@@ -46,19 +53,27 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser signup(QBUser inputUser, File file) throws QBResponseException, BaseServiceException {
         QBUser user;
+        UserCustomData userCustomData = new UserCustomData();
+
         QBAuth.createSession();
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
+        inputUser.setCustomDataAsObject(userCustomData);
+
         user = QBUsers.signUpSignInTask(inputUser);
-        if (null != file) {
+
+        if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-            user.setWebsite(qbFile.getPublicUrl());
+            userCustomData.setAvatar_url(qbFile.getPublicUrl());
+            inputUser.setCustomDataAsObject(userCustomData);
             user = QBUsers.updateUser(inputUser);
         }
+
+        user.setCustomDataClass(UserCustomData.class);
         user.setPassword(password);
         String token = QBAuth.getBaseService().getToken();
         AppSession.startSession(LoginType.EMAIL, user, token);
-        return inputUser;
+        return user;
     }
 
     public void logout() throws QBResponseException {
@@ -74,14 +89,31 @@ public class QBAuthHelper extends BaseHelper {
         QBUser user;
         String password = inputUser.getPassword();
         user = QBUsers.updateUser(inputUser);
+        user.setCustomDataClass(UserCustomData.class);
         user.setPassword(password);
         return user;
     }
 
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-        user.setWebsite(qbFile.getPublicUrl());
-        user.setFileId(qbFile.getId());
+
+        UserCustomData userCustomDataNew;
+        UserCustomData userCustomDataOld = null;
+        try {
+            userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+        } catch (JSONException e) {
+            ErrorUtils.logError(e);
+        }
+
+        if (userCustomDataOld != null) {
+            userCustomDataNew = new UserCustomData(qbFile.getPublicUrl(), userCustomDataOld.getStatus(),
+                    userCustomDataOld.isIs_import());
+        } else {
+            userCustomDataNew = new UserCustomData(qbFile.getPublicUrl(), null, Consts.ZERO_INT_VALUE);
+        }
+
+        user.setCustomDataAsObject(userCustomDataNew);
+
         return updateUser(user);
     }
 

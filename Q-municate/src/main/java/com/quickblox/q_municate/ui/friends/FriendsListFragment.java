@@ -1,9 +1,12 @@
 package com.quickblox.q_municate.ui.friends;
 
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.DataSetObserver;
+import android.database.MatrixCursor;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,53 +14,59 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.FilterQueryProvider;
-import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.UserTable;
+import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
-import com.quickblox.q_municate.qb.commands.QBLoadUsersCommand;
+import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
+import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
+import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.FriendUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.PrefsHelper;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class FriendsListFragment extends BaseFragment implements AdapterView.OnItemClickListener, SearchView.OnQueryTextListener, FilterQueryProvider {
+public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener {
 
-    private static final String TAG = FriendsListFragment.class.getSimpleName();
-    private List<Friend> usersList;
-    private UserListAdapter usersListAdapter;
-    private LinearLayout globalSearchLayout;
+    private static final int SEARCH_DELAY = 1000;
+
     private State state;
     private String constraint;
-    private ListView friendsListView;
-    private TextView friendsTitle;
+    private ExpandableListView friendsListView;
     private TextView emptyListTextView;
-    private View friendsListViewTitle;
     private FriendsListCursorAdapter friendsListAdapter;
-    private int positionCounter;
-    private boolean isNeedToHideSearchView;
-    private Cursor friendsCursor;
-    private SearchOnActionExpandListener searchListener;
+    private SearchOnActionExpandListener searchOnActionExpandListener;
     private MenuItem searchItem;
     private SearchView searchView;
-    private static boolean isFriendsListLoaded = false;
     private Toast errorToast;
+    private ContentObserver userTableContentObserver;
+    private ContentObserver friendTableContentObserver;
+    private MatrixCursor headersCursor;
+    private List<User> usersList;
+    private MatrixCursor searchResultCursor;
+    private FriendOperationAction friendOperationAction;
+    private int relationStatusNoneId;
+    private Resources resources;
+    private Timer searchTimer;
+    private int selectedPositionList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -70,43 +79,75 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (State.GLOBAL_LIST.equals(state)) {
+            initFriendsListForSearch();
+        } else {
+            initFriendsList();
+        }
+        checkVisibilityEmptyLabel();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        unregisterContentObservers();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-        searchListener = new SearchOnActionExpandListener();
+        searchOnActionExpandListener = new SearchOnActionExpandListener();
         searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(searchListener);
+        searchItem.setOnActionExpandListener(searchOnActionExpandListener);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                friendsTitle.setText(R.string.frl_friends);
-                positionCounter++;
-                friendsListView.setAdapter(null);
-                friendsListView.addHeaderView(friendsListViewTitle);
-                friendsListView.addFooterView(globalSearchLayout);
-                friendsListView.setAdapter(friendsListAdapter);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+    private void registerContentObservers() {
+        userTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                selectedPositionList = friendsListView.getFirstVisiblePosition();
+                checkInitFriendsList();
+            }
+        };
+
+        friendTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                checkInitFriendsList();
+            }
+        };
+
+        baseActivity.getContentResolver().registerContentObserver(UserTable.CONTENT_URI, true,
+                userTableContentObserver);
+        baseActivity.getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
+                friendTableContentObserver);
+    }
+
+    private void checkInitFriendsList() {
+        if (State.GLOBAL_LIST.equals(state)) {
+            initFriendsListForSearch();
+            checkVisibilityEmptyLabel();
+        } else {
+            initFriendsList();
+            checkVisibilityEmptyLabel();
         }
     }
 
-    @Override
-    public Cursor runQuery(CharSequence constraint) {
-        if (TextUtils.isEmpty(constraint)) {
-            return null;
-        }
-        return DatabaseManager.getFriendsByFullname(baseActivity, constraint.toString());
+    private void unregisterContentObservers() {
+        baseActivity.getContentResolver().unregisterContentObserver(userTableContentObserver);
+        baseActivity.getContentResolver().unregisterContentObserver(friendTableContentObserver);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        title = getString(R.string.nvd_title_friends);
+        title = getString(R.string.nvd_title_contacts);
         state = State.FRIENDS_LIST;
     }
 
@@ -114,15 +155,24 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        initUI(rootView, layoutInflater);
-        initListeners();
-        initGlobalSearchButton(layoutInflater);
-        initFriendsList();
+        resources = getResources();
+        friendOperationAction = new FriendOperationAction();
+        relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(baseActivity,
+                QBFriendListHelper.RELATION_STATUS_NONE);
+        usersList = Collections.emptyList();
+        searchTimer = new Timer();
 
-        //        TipsManager.showTipWithButtonsIfNotShownYet(this, getActivity().getString(R.string.tip_friend_list),
-        //                new FriendsListTipButtonClicker(this));
+        initUI(rootView);
+        initListeners();
+        registerContentObservers();
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        addActions();
     }
 
     private void initListeners() {
@@ -133,12 +183,30 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
                 return false;
             }
         });
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        addActions();
+        friendsListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                // nothing do
+                return true;
+            }
+        });
+
+        friendsListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
+                    int childPosition, long id) {
+                Cursor selectedItem = friendsListAdapter.getChild(groupPosition, childPosition);
+                if (selectedItem.getCount() != Consts.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
+                    User selectedUser = DatabaseManager.getUserFromCursor(selectedItem);
+                    boolean isFriend = DatabaseManager.isFriendInBase(baseActivity, selectedUser.getUserId());
+                    if (isFriend) {
+                        startFriendDetailsActivity(selectedUser.getUserId());
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -150,132 +218,170 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
     @Override
     public boolean onQueryTextChange(String newText) {
         constraint = newText;
-        friendsListAdapter.setFilterQueryProvider(this);
-        if (state == State.FRIENDS_LIST && isNeedToHideSearchView) {
-            friendsListAdapter.getFilter().filter(newText);
-            friendsListAdapter.setSearchCharacters(newText);
-        } else if (state == State.GLOBAL_LIST) {
-            startUsersListLoader(newText);
+
+        if (State.GLOBAL_LIST.equals(state)) {
+            checkUsersListLoader();
         }
+
         return true;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        Cursor selectedItem = (Cursor) friendsListAdapter.getItem(position - positionCounter);
-        if (selectedItem.getCount() != Consts.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
-            FriendDetailsActivity.start(baseActivity, DatabaseManager.getFriendFromCursor(selectedItem).getId());
-        }
-    }
-
-    public MenuItem getSearchItem() {
-        return searchItem;
     }
 
     private void addActions() {
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
+
+        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
+
+        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
+        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
+
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
+
         baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new ImportFriendsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
+        baseActivity.addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
+
         baseActivity.updateBroadcastActionList();
     }
 
-    private void initUI(View view, LayoutInflater layoutInflater) {
-        friendsListView = (ListView) view.findViewById(R.id.friends_listview);
-        friendsListViewTitle = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
-        friendsTitle = (TextView) friendsListViewTitle.findViewById(R.id.listTitle);
+    private void initUI(View view) {
+        friendsListView = (ExpandableListView) view.findViewById(R.id.friends_expandablelistview);
         emptyListTextView = (TextView) view.findViewById(R.id.empty_list_textview);
     }
 
-    private void initGlobalSearchButton(LayoutInflater inflater) {
-        globalSearchLayout = (LinearLayout) inflater.inflate(R.layout.view_global_search_button, null);
-        globalSearchLayout.findViewById(R.id.globalSearchButton).setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        startGlobalSearch();
-                    }
-                }
-        );
-    }
-
     private void initFriendsList() {
-        if (friendsCursor != null && !friendsCursor.isClosed()) {
-            friendsCursor.close();
-        }
-        friendsCursor = getAllFriends();
-        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, friendsCursor);
-        friendsListAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                if(!isNeedToHideSearchView) {
-                    checkVisibilityEmptyLabel();
-                }
-            }
-        });
+        baseActivity.showActionBarProgress();
+        createHeadersCursor();
+
+        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, null,
+                friendOperationAction, false);
+
+        updateFriendsList();
+    }
+
+    private void initFriendsListForSearch() {
+        createHeadersForSearchCursor();
+
+        friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
+                friendOperationAction, true);
+        friendsListAdapter.setSearchCharacters(constraint);
+
+        updateFriendsList();
+    }
+
+    private void updateFriendsList() {
         friendsListView.setAdapter(friendsListAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
-        friendsListView.setOnItemClickListener(this);
-        if(isFriendsListLoaded) {
-            checkVisibilityEmptyLabel();
+        friendsListView.setGroupIndicator(null);
+
+        expandAllGroups(headersCursor);
+
+        if (selectedPositionList != Consts.ZERO_INT_VALUE) {
+            friendsListView.setSelection(selectedPositionList);
+        }
+
+        baseActivity.hideActionBarProgress();
+    }
+
+    private void startFriendDetailsActivity(int userId) {
+        FriendDetailsActivity.start(baseActivity, userId);
+    }
+
+    private void expandAllGroups(Cursor headersCursor) {
+        for (int i = 0; i < headersCursor.getCount(); i++) {
+            friendsListView.expandGroup(i);
         }
     }
 
-    private void startGlobalSearch() {
-        state = State.GLOBAL_LIST;
-        friendsListView.removeFooterView(globalSearchLayout);
-        initUserList();
+    private void createHeadersCursor() {
+        headersCursor = new MatrixCursor(
+                new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
+
+        int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
+                relationStatusNoneId);
+        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+
+        if (countRequestsFriends > Consts.ZERO_INT_VALUE) {
+            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
+                    QBFriendListHelper.RELATION_STATUS_NONE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_NONE, resources
+                    .getString(R.string.frl_column_header_name_requests)});
+        }
+
+        if (countFriends > Consts.ZERO_INT_VALUE) {
+            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
+                    QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, resources
+                    .getString(R.string.frl_column_header_name_contacts)});
+        }
+
+        if (state == State.GLOBAL_LIST) {
+            headersCursor.addRow(
+                    new String[]{QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_ALL_USERS, resources
+                            .getString(R.string.frl_column_header_name_all_users)});
+        }
     }
 
-    private Cursor getAllFriends() {
-        return DatabaseManager.getAllFriends(baseActivity);
+    private void createHeadersForSearchCursor() {
+        headersCursor = new MatrixCursor(
+                new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
+
+        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
+
+        if (countFriends > Consts.ZERO_INT_VALUE) {
+            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
+                    QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, resources
+                    .getString(R.string.frl_column_header_name_contacts)});
+        }
+
+        if (state == State.GLOBAL_LIST) {
+            headersCursor.addRow(
+                    new String[]{QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_ALL_USERS, resources
+                            .getString(R.string.frl_column_header_name_all_users)});
+        }
     }
 
-    private void initUserList() {
-        usersList = new ArrayList<Friend>();
-        usersListAdapter = new UserListAdapter(baseActivity, usersList,
-                new UserListAdapter.UserListListener() {
-                    @Override
-                    public void onUserSelected(int position) {
-                        addToFriendList(usersList.get(position));
-                    }
-                });
-
-        friendsTitle.setText(R.string.frl_all_users);
-
-        friendsListView.setSelector(android.R.color.transparent);
-        friendsListView.setAdapter(usersListAdapter);
-        friendsListView.setOnItemClickListener(null);
-
-        startUsersListLoader(constraint);
-    }
-
-    private void addToFriendList(final Friend friend) {
+    private void addToFriendList(final int userId) {
         baseActivity.showProgress();
-        QBAddFriendCommand.start(baseActivity, friend);
+        QBAddFriendCommand.start(baseActivity, userId);
         KeyboardUtils.hideKeyboard(baseActivity);
         searchView.clearFocus();
     }
 
-    private void startUsersListLoader(String newText) {
-        QBLoadUsersCommand.start(baseActivity, newText);
-        usersListAdapter.setSearchCharacters(newText);
+    private void acceptUser(final int userId) {
+        baseActivity.showProgress();
+        QBAcceptFriendCommand.start(baseActivity, userId);
     }
 
-    private void updateUsersList(List<Friend> friendsList) {
-        usersList.clear();
-        usersList.addAll(friendsList);
-        usersListAdapter.notifyDataSetChanged();
+    private void rejectUser(final int userId) {
+        showRejectUserDialog(userId);
     }
 
-    private void importFriendsFinished() {
-        isFriendsListLoaded = true;
-        App.getInstance().getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        baseActivity.hideProgress();
+    private void showRejectUserDialog(final int userId) {
+        User user = DatabaseManager.getUserById(baseActivity, userId);
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(R.string.frl_dlg_reject_friend, user.getFullName()));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                baseActivity.showProgress();
+                QBRejectFriendCommand.start(baseActivity, userId);
+            }
+        });
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show(getFragmentManager(), null);
+    }
+
+    private void checkUsersListLoader() {
+        searchTimer.cancel();
+        searchTimer = new Timer();
+        searchTimer.schedule(new SearchTimerTask(), SEARCH_DELAY);
+        baseActivity.showActionBarProgress();
+    }
+
+    private void startUsersListLoader() {
+        QBFindUsersCommand.start(baseActivity, constraint);
     }
 
     private void showErrorToast(String error) {
@@ -286,43 +392,79 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         errorToast.show();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(!isNeedToHideSearchView) {
-            checkVisibilityEmptyLabel();
+    private void checkVisibilityEmptyLabel() {
+        if (state == State.GLOBAL_LIST) {
+            emptyListTextView.setVisibility(View.GONE);
+        } else {
+            int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
+                    relationStatusNoneId);
+            int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+
+            if ((countFriends + countRequestsFriends + usersList.size()) > Consts.ZERO_INT_VALUE) {
+                emptyListTextView.setVisibility(View.GONE);
+            } else {
+                emptyListTextView.setVisibility(View.VISIBLE);
+                friendsListView.setAdapter((ExpandableListAdapter) null);
+            }
         }
     }
 
-    private void checkVisibilityEmptyLabel() {
-        emptyListTextView.setVisibility(friendsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+    private enum State {FRIENDS_LIST, GLOBAL_LIST}
+
+    public interface FriendOperationListener {
+
+        void onAddUserClicked(int userId);
+
+        void onAcceptUserClicked(int userId);
+
+        void onRejectUserClicked(int userId);
     }
 
-    private enum State {FRIENDS_LIST, GLOBAL_LIST}
+    private class SearchTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            startUsersListLoader();
+        }
+    }
 
     private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
 
         @Override
         public boolean onMenuItemActionExpand(MenuItem item) {
-            isNeedToHideSearchView = true;
-            emptyListTextView.setVisibility(View.GONE);
+            state = State.GLOBAL_LIST;
             return true;
         }
 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
             state = State.FRIENDS_LIST;
-            baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
-            if (isNeedToHideSearchView) {
-                isNeedToHideSearchView = false;
-                friendsListAdapter.setSearchCharacters(null);
-                friendsListAdapter.setFilterQueryProvider(null);
-                friendsListView.removeFooterView(globalSearchLayout);
-                friendsListView.removeHeaderView(friendsListViewTitle);
-                positionCounter--;
-                initFriendsList();
-            }
+
+            initFriendsList();
+
+            friendsListAdapter.setSearchCharacters(null);
+            usersList.clear();
+            checkVisibilityEmptyLabel();
+
             return true;
+        }
+    }
+
+    private class FriendOperationAction implements FriendOperationListener {
+
+        @Override
+        public void onAddUserClicked(int userId) {
+            addToFriendList(userId);
+        }
+
+        @Override
+        public void onAcceptUserClicked(int userId) {
+            acceptUser(userId);
+        }
+
+        @Override
+        public void onRejectUserClicked(int userId) {
+            rejectUser(userId);
         }
     }
 
@@ -330,8 +472,26 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            usersListAdapter.notifyDataSetChanged();
             baseActivity.hideProgress();
+            searchItem.collapseActionView();
+        }
+    }
+
+    private class AcceptFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
+            initFriendsList();
+        }
+    }
+
+    private class RejectFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            baseActivity.hideProgress();
+            initFriendsList();
         }
     }
 
@@ -339,8 +499,16 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
 
         @Override
         public void execute(Bundle bundle) {
-            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
-            updateUsersList(friendsList);
+            String constraint = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
+            if (FriendsListFragment.this.constraint.equals(constraint)) {
+                usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
+                searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
+                initFriendsListForSearch();
+                checkVisibilityEmptyLabel();
+                baseActivity.hideActionBarProgress();
+            } else {
+                onQueryTextChange(FriendsListFragment.this.constraint);
+            }
         }
     }
 
@@ -350,35 +518,16 @@ public class FriendsListFragment extends BaseFragment implements AdapterView.OnI
         public void execute(Bundle bundle) {
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
-        }
-    }
-
-    private class ImportFriendsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            importFriendsFinished();
-        }
-    }
-
-    private class ImportFriendsFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            importFriendsFinished();
-            DialogUtils.showLong(baseActivity, getResources().getString(R.string.dlg_no_friends_for_import));
+            baseActivity.hideActionBarProgress();
         }
     }
 
     private class LoadFriendsSuccessAction implements Command {
 
         @Override
-        public void execute(Bundle bundle){
-            List<Friend> friendsList = (List<Friend>) bundle.getSerializable(QBServiceConsts.EXTRA_FRIENDS);
-            isFriendsListLoaded = true;
-            if (friendsList.isEmpty()) {
-                emptyListTextView.setVisibility(View.VISIBLE);
-            }
+        public void execute(Bundle bundle) {
+            initFriendsList();
+            checkVisibilityEmptyLabel();
         }
     }
 }

@@ -42,7 +42,6 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
-        setContentView(R.layout.activity_splash);
 
         addActions();
 
@@ -59,6 +58,8 @@ public class SplashActivity extends BaseActivity {
         } else {
             startLanding();
         }
+
+        setContentView(R.layout.activity_splash);
     }
 
     private void checkStartExistSession(String userEmail, String userPassword){
@@ -67,8 +68,7 @@ public class SplashActivity extends BaseActivity {
         if ( ( isEmailEntered && isPasswordEntered ) ||
                 (isLoggedViaFB(isPasswordEntered)) ){
                            runExistSession(userEmail, userPassword);
-        }
-        else {
+        } else {
             startLanding();
         }
     }
@@ -121,8 +121,7 @@ public class SplashActivity extends BaseActivity {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(Consts.TOKEN_VALID_TIME_IN_MINUTES))){
             QBLoginAndJoinDialogsCommand.start(this);
-        }
-        else{
+        } else {
             doAutoLogin(userEmail, userPassword);
         }
     }
@@ -145,7 +144,12 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startMainActivity() {
-        MainActivity.start(SplashActivity.this);
+        Intent intent = getIntent();
+        if (intent.hasExtra(QBServiceConsts.EXTRA_DIALOG_ID)) {
+            MainActivity.start(SplashActivity.this, intent);
+        } else {
+            MainActivity.start(SplashActivity.this);
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

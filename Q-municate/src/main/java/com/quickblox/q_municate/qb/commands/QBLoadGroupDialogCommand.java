@@ -8,9 +8,9 @@ import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.ServiceCommand;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -19,6 +19,8 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FriendUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,16 +58,28 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
-        Map<Integer, Friend> friendMap = FriendUtils.createFriendMap(userList);
+        Map<Integer, User> friendMap = FriendUtils.createUserMap(userList);
         for (Integer onlineParticipantId : onlineParticipantIdsList) {
             friendMap.get(onlineParticipantId).setOnline(true);
         }
 
-        ArrayList<Friend> friendList = new ArrayList<Friend>(friendMap.values());
+        ArrayList<User> friendList = new ArrayList<User>(friendMap.values());
+        Collections.sort(friendList, new UserComparator());
         groupDialog.setOccupantList(friendList);
 
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG, groupDialog);
         return params;
+    }
+
+    private class UserComparator implements Comparator<User> {
+
+        @Override
+        public int compare(User firstUser, User secondUser) {
+            if (firstUser.getFullName() == null || secondUser.getFullName() == null) {
+                return Consts.ZERO_INT_VALUE;
+            }
+            return String.CASE_INSENSITIVE_ORDER.compare(firstUser.getFullName(), secondUser.getFullName());
+        }
     }
 }

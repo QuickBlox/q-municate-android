@@ -17,9 +17,9 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.caching.tables.MessageTable;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.MessageTable;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -31,6 +31,8 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import java.io.File;
 import java.util.ArrayList;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private String groupName;
@@ -39,7 +41,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
     }
 
-    public static void start(Context context, ArrayList<Friend> friends) {
+    public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
         context.startActivity(intent);
@@ -63,6 +65,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         initListView();
         startLoadDialogMessages();
+        setCurrentDialog(dialog);
 
         registerForContextMenu(messagesListView);
     }
@@ -142,15 +145,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private void initListView() {
         messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
                 dialog);
-        messagesListView.setAdapter(messagesAdapter);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
     private void updateActionBar() {
         actionBar.setTitle(groupName);
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
-        if (!TextUtils.isEmpty(dialog.getPhotoUrl())) {
-            loadLogoActionBar(dialog.getPhotoUrl());
+        if (!TextUtils.isEmpty(dialog.getPhoto())) {
+            loadLogoActionBar(dialog.getPhoto());
         }
     }
 
@@ -171,6 +174,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             ErrorUtils.showError(this, e);
         }
         messageEditText.setText(Consts.EMPTY_STRING);
+        isNeedToScrollMessages = true;
         scrollListView();
     }
 
@@ -197,12 +201,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater m = getMenuInflater();
-        m.inflate(R.menu.group_dialog_ctx_menu, menu);
-    }
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, view, menuInfo);
+//        MenuInflater m = getMenuInflater();
+//        m.inflate(R.menu.group_dialog_ctx_menu, menu);
+//    }
 
     @Override
     protected void onResume() {

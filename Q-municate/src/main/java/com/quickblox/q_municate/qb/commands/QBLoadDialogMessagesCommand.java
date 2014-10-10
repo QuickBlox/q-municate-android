@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.module.chat.QBHistoryMessage;
+import com.quickblox.module.chat.model.QBChatHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate.service.QBService;
@@ -36,7 +36,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
-        List<QBHistoryMessage> dialogMessagesList = chatRestHelper.getDialogMessages(dialog, lastDateLoad);
+        List<QBChatHistoryMessage> dialogMessagesList = chatRestHelper.getDialogMessages(dialog, lastDateLoad);
         if (dialogMessagesList != null) {
             DatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
         }

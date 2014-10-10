@@ -70,8 +70,7 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
 
         ArrayList<QBSubscription> subscriptions = null;
         try {
-            subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId,
-                    QBEnvironment.DEVELOPMENT);
+            subscriptions = QBMessages.subscribeToPushNotificationsTask(regId, deviceId, QBEnvironment.PRODUCTION);
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }

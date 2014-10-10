@@ -22,11 +22,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.GroupDialog;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
@@ -94,11 +94,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         initUI();
         initUIWithData();
         addActions();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         startLoadGroupDialog();
     }
 
@@ -118,6 +113,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         groupNameEditText = _findViewById(R.id.name_textview);
         participantsTextView = _findViewById(R.id.participants_textview);
@@ -130,7 +127,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
         onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
                 groupDialog.getOnlineOccupantsCount(), groupDialog.getOccupantsCount()));
-        loadAvatar(groupDialog.getPhotoUrl());
+        if (!isNeedUpdateAvatar) {
+            loadAvatar(groupDialog.getPhotoUrl());
+        }
         updateOldGroupData();
     }
 
@@ -214,15 +213,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         return super.onOptionsItemSelected(item);
     }
 
-    private void startAddFriendsActivity() {
-        int countUnselectedFriendsInChat = DatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
-        if (countUnselectedFriendsInChat != Consts.ZERO_INT_VALUE) {
-            AddFriendsToGroupActivity.start(this, groupDialog);
-        } else {
-            DialogUtils.showLong(this, getResources().getString(R.string.gdd_all_friends_is_in_group));
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Crop.REQUEST_CROP) {
@@ -236,6 +226,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void startAddFriendsActivity() {
+        int countUnselectedFriendsInChat = DatabaseManager.getFriendsFilteredByIds(this,
+                FriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
+        if (countUnselectedFriendsInChat != Consts.ZERO_INT_VALUE) {
+            AddFriendsToGroupActivity.start(this, groupDialog);
+        } else {
+            DialogUtils.showLong(this, getResources().getString(R.string.gdd_all_friends_is_in_group));
+        }
     }
 
     private void handleCrop(int resultCode, Intent result) {
@@ -304,18 +304,18 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     @Override
     public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        Friend selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
         if (selectedFriend != null) {
             startFriendProfile(selectedFriend);
         }
     }
 
-    private void startFriendProfile(Friend selectedFriend) {
+    private void startFriendProfile(User selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
-        if (currentUser.getId() == selectedFriend.getId()) {
+        if (currentUser.getId() == selectedFriend.getUserId()) {
             ProfileActivity.start(GroupDialogDetailsActivity.this);
         } else {
-            FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getId());
+            FriendDetailsActivity.start(GroupDialogDetailsActivity.this, selectedFriend.getUserId());
         }
     }
 

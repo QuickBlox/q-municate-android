@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>
@@ -10,6 +10,7 @@
         <item name="android:background">@color/action_bar_background_color</item>
         <item name="android:displayOptions">showTitle</item>
         <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
+        <item name="android:indeterminateProgressStyle">@style/IndeterminateProgressStyle</item>
     </style>
 
     <!-- ActionBar title body -->
@@ -53,6 +54,52 @@
         <item name="android:layout_gravity">center|top</item>
         <item name="android:scaleType">centerCrop</item>
         <item name="android:src">@drawable/placeholder_user</item>
+    </style>
+
+    <style name="IndeterminateProgressStyle" parent="@android:style/Widget.ProgressBar">
+        <item name="android:minHeight">24dp</item>
+        <item name="android:maxHeight">24dp</item>
+        <item name="android:minWidth">32dp</item>
+        <item name="android:maxWidth">32dp</item>
+    </style>
+
+    <style name="DoneCancelBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/action_bar_height</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:divider">@drawable/ic_action_divider</item>
+        <item name="android:showDividers" tools:ignore="NewApi">middle</item>
+        <item name="android:dividerPadding" tools:ignore="NewApi">12dp</item>
+        <item name="android:background">@color/action_button_bar</item>
+    </style>
+
+    <style name="ActionButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/action_selectable_background</item>
+    </style>
+
+    <style name="ActionButtonText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingRight">20dp</item> <!-- Offsets left drawable -->
+        <item name="android:drawablePadding">8dp</item>
+        <item name="android:textColor">@color/action_button_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="ActionButtonText.Done">
+        <item name="android:drawableLeft">@drawable/ic_action_done</item>
+        <item name="android:text">@string/dlg_done</item>
+    </style>
+
+    <style name="ActionButtonText.Cancel">
+        <item name="android:drawableLeft">@drawable/ic_action_cancel</item>
+        <item name="android:text">@string/dlg_cancel</item>
     </style>
 
 </resources>

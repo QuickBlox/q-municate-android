@@ -19,6 +19,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':facebook')
     compile project(':cropper')
+    compile project(':stickyListHeaders')
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
     compile "de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}"
@@ -39,11 +40,11 @@ tasks.withType(Compile) {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 19
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
         versionName rootProject.versionName
     }
@@ -69,4 +70,5 @@ android {
     lintOptions {
         abortOnError false
     }
+
 }

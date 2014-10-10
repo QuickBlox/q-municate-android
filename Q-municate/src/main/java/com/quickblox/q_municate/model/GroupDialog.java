@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class GroupDialog extends Dialog {
 
     private String roomJid;
-    private ArrayList<Friend> occupantList;
+    private ArrayList<User> occupantList;
     private int unreadMessageCount;
     private String photoUrl;
 
@@ -18,8 +18,8 @@ public class GroupDialog extends Dialog {
     public GroupDialog(QBDialog dialog) {
         super(dialog);
         roomJid = dialog.getRoomJid();
-        occupantList = new ArrayList<Friend>();
-        photoUrl = dialog.getPhotoUrl();
+        occupantList = new ArrayList<User>();
+        photoUrl = dialog.getPhoto();
     }
 
     public String getPhotoUrl() {
@@ -43,11 +43,11 @@ public class GroupDialog extends Dialog {
         this.roomJid = roomJid;
     }
 
-    public ArrayList<Friend> getOccupantList() {
+    public ArrayList<User> getOccupantList() {
         return occupantList;
     }
 
-    public void setOccupantList(ArrayList<Friend> occupantList) {
+    public void setOccupantList(ArrayList<User> occupantList) {
         this.occupantList = occupantList;
     }
 
@@ -65,7 +65,7 @@ public class GroupDialog extends Dialog {
 
     public int getOnlineOccupantsCount() {
         int onlineOccupantsCount = 0;
-        for (Friend friend : occupantList) {
+        for (User friend : occupantList) {
             if (friend.isOnline()) {
                 onlineOccupantsCount++;
             }
