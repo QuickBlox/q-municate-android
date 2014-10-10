@@ -66,7 +66,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         friendCursor = DatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
         initListView();
         initActionBar();
-        startLoadDialogMessages();
         registerStatusChangingObserver();
         setCurrentDialog(dialog);
     }
@@ -217,32 +216,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(QBServiceConsts.EXTRA_OPPONENT, opponentFriend);
-        outState.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        opponentFriend = (User) savedInstanceState.getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (QBDialog) savedInstanceState.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         scrollListView();
+        startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        if () {
-//
-//        }
         Crouton.cancelAllCroutons();
     }
 
