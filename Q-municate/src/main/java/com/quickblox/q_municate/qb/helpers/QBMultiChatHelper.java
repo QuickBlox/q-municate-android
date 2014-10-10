@@ -104,11 +104,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    private QBGroupChat createChatIfNotExist(String dialogId) throws QBResponseException {
-        QBDialog existingDialog = ChatUtils.getExistDialogById(context, dialogId);
-        return  (QBGroupChat) createChatLocally(existingDialog, null);
-    }
-
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {
         QBChatMessage chatMessage = getQBChatMessage(context.getString(
                 R.string.dlg_attached_last_message), file);
