@@ -191,6 +191,7 @@
     <string name="dlg_empty_email">Email can\'t be empty</string>
     <string name="dlg_ok">OK</string>
     <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_done">Done</string>
     <string name="dlg_user_updated">User saved</string>
     <string name="dlg_logout">Logout</string>
     <string name="dlg_confirm">Are you sure?</string>

@@ -52,4 +52,9 @@
 
     <color name="dlg_message_name_color">#0d70b3</color>
 
+    <color name="action_button_bar">#f3f3f3</color>
+    <color name="action_button_text">#666666</color>
+    <color name="action_selector_pressed">#1a000000</color>
+    <color name="action_selector_focused">#77000000</color>
+
 </resources>

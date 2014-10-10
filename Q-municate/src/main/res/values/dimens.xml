@@ -58,4 +58,6 @@
     <dimen name="crop_view_width">300dp</dimen>
     <dimen name="crop_view_height">300dp</dimen>
 
+    <dimen name="action_bar_height">48dp</dimen>
+
 </resources>

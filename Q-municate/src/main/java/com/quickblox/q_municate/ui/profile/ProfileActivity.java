@@ -7,9 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.ActionMode;
-import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -26,7 +23,6 @@ import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
@@ -55,6 +51,10 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private EditText fullNameEditText;
     private EditText phoneEditText;
     private EditText statusEditText;
+    private View actionView;
+    private View actionCancelView;
+    private View actionDoneView;
+
     private ImageUtils imageUtils;
     private Bitmap avatarBitmapCurrent;
     private String fullNameCurrent;
@@ -65,11 +65,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private String statusOld;
     private QBUser user;
     private boolean isNeedUpdateAvatar;
-    private Object actionMode;
-    private boolean closeActionMode;
     private Uri outputUri;
     private UserCustomData userCustomData;
-    private ActionModeCallback actionModeCallback;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ProfileActivity.class);
@@ -83,7 +80,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         useDoubleBackPressed = false;
         user = AppSession.getSession().getUser();
         imageUtils = new ImageUtils(this);
-        actionModeCallback = new ActionModeCallback();
 
         initUI();
         initListeners();
@@ -91,9 +87,13 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         initBroadcastActionList();
         initTextChangedListeners();
         updateOldUserData();
+        hideAction();
     }
 
     private void initUI() {
+        actionView = _findViewById(R.id.action_view);
+        actionCancelView = _findViewById(R.id.action_cancel_view);
+        actionDoneView = _findViewById(R.id.action_done_view);
         changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         emailLinearLayout = _findViewById(R.id.email_linearlayout);
@@ -112,6 +112,19 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         changeFullNameRelativeLayout.setOnClickListener(this);
         changePhoneRelativeLayout.setOnClickListener(this);
         changeStatusRelativeLayout.setOnClickListener(this);
+
+        actionCancelView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                resetUserData();
+                hideAction();
+            }
+        });
+
+        actionDoneView.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                updateUserData();
+            }
+        });
     }
 
     private void initUIWithUsersData() {
@@ -181,19 +194,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            resetUserData();
-            closeActionMode = true;
-            ((ActionMode) actionMode).finish();
-            return true;
-        } else {
-            closeActionMode = false;
-        }
-        return super.dispatchKeyEvent(event);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -223,7 +223,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
             isNeedUpdateAvatar = true;
             avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
-            startAction();
+            showAction();
         } else if (resultCode == Crop.RESULT_ERROR) {
             DialogUtils.showLong(this, Crop.getError(result).getMessage());
         }
@@ -238,13 +238,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     public void onUriScaledBitmapReceived(Uri originalUri) {
         hideProgress();
         startCropActivity(originalUri);
-    }
-
-    private void startAction() {
-        if (actionMode != null) {
-            return;
-        }
-        actionMode = startActionMode(actionModeCallback);
     }
 
     public void changeAvatarOnClick() {
@@ -341,18 +334,32 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
         try {
-            ((UserCustomData)user.getCustomDataAsObject()).setStatus(statusOld);
+            ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
         } catch (JSONException e) {
             ErrorUtils.logError(e);
         }
         isNeedUpdateAvatar = false;
     }
 
+    private boolean isActionViewVisible() {
+        return actionView.getVisibility() == View.VISIBLE;
+    }
+
+    private void showAction() {
+        actionView.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAction() {
+        actionView.setVisibility(View.GONE);
+    }
+
     private class TextWatcherListener extends SimpleTextWatcher {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            startAction();
+            if (!isActionViewVisible()) {
+                showAction();
+            }
         }
     }
 
@@ -367,22 +374,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         }
     }
 
-    private class ActionModeCallback extends SimpleActionModeCallback {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            if (!closeActionMode) {
-                updateUserData();
-            }
-            actionMode = null;
-        }
-    }
-
     private class UpdateUserSuccessAction implements Command {
 
         @Override
@@ -390,6 +381,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             AppSession.getSession().updateUser(user);
             updateOldUserData();
+            hideAction();
             hideProgress();
         }
     }
