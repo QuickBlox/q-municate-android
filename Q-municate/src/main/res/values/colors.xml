@@ -20,9 +20,12 @@
     <color name="button_null_background_pressed_color">#e4f4ff</color>
     <color name="button_end_call_normal_color">#ff0000</color>
     <color name="button_end_call_pressed_color">#e4f4ff</color>
+    <color name="button_blue_normal_color">#0d70b3</color>
+    <color name="button_blue_pressed_color">#ff0d5389</color>
 
     <color name="avatar_border_color">#ffffff</color>
     <color name="circle_view_mask_color">#ffffff</color>
+    <color name="header_date_color">#ffd5d5d5</color>
 
     <color name="menu_item_background_pressed_color">#1cba48</color>
     <color name="menu_item_background_longpressed_color">#ff9de8a2</color>
@@ -48,5 +51,10 @@
     <color name="screen_call_timer_text_color">#999999</color>
 
     <color name="dlg_message_name_color">#0d70b3</color>
+
+    <color name="action_button_bar">#f3f3f3</color>
+    <color name="action_button_text">#666666</color>
+    <color name="action_selector_pressed">#1a000000</color>
+    <color name="action_selector_focused">#77000000</color>
 
 </resources>

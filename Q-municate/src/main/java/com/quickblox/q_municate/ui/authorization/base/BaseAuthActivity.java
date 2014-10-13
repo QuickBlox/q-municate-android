@@ -13,7 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.module.auth.model.QBProvider;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.qb.commands.QBLoginRestWithSocialCommand;
@@ -21,6 +21,7 @@ import com.quickblox.q_municate.ui.authorization.landing.UserAgreementDialog;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.PrefsHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 

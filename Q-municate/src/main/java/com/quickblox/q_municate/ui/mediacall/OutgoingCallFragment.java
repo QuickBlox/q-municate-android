@@ -15,7 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.quickblox.internal.core.exception.QBVideoException;
-import com.quickblox.module.chat.exceptions.QBChatException;
+import com.quickblox.module.chat.exception.QBChatException;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.module.videochat_webrtc.QBVideoChat;
 import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
@@ -28,7 +28,7 @@ import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -48,7 +48,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();
     protected QBVideoChat videoChat;
-    protected Friend opponent;
+    protected User opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescription remoteSessionDescription;
     private boolean bounded;
@@ -80,7 +80,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     protected abstract int getContentView();
 
-    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, Friend friend,
+    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, User friend,
             Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
             QBSignalingChannel.PLATFORM platform,
             QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
@@ -166,7 +166,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
-        opponent = (Friend) getArguments().getSerializable(Consts.EXTRA_FRIEND);
+        opponent = (User) getArguments().getSerializable(Consts.EXTRA_FRIEND);
         call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
                 WebRTC.PLATFORM_EXTENSION);
@@ -304,9 +304,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private void onConnectedToService() {
         videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
         if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getId());
+            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
         } else {
-            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getId());
+            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getUserId());
         }
         if (signalingChannel != null && isExistActivity()) {
             tryInitChat();

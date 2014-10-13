@@ -1,40 +1,93 @@
 package com.quickblox.q_municate.utils;
 
+import android.content.Context;
+import android.database.MatrixCursor;
+
+import com.quickblox.module.chat.model.QBRosterEntry;
 import com.quickblox.module.users.model.QBUser;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.FriendTable;
+import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.model.UserCustomData;
+import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
+
+import org.jivesoftware.smack.packet.RosterPacket;
+import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class FriendUtils {
 
-    public static Friend createFriend(QBUser user) {
+    public static User createUser(QBUser qbUser) {
+        qbUser.setCustomDataClass(UserCustomData.class);
+        User user = new User();
+        user.setUserId(qbUser.getId());
+        user.setFullName(qbUser.getFullName());
+        user.setEmail(qbUser.getEmail());
+        user.setPhone(qbUser.getPhone());
+
+        UserCustomData userCustomData = null;
+        try {
+            userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
+        } catch (JSONException e) {
+            ErrorUtils.logError(e);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
+
+        if (userCustomData != null) {
+            user.setAvatarUrl(userCustomData.getAvatar_url());
+        }
+
+        return user;
+    }
+
+    public static Friend createFriend(QBRosterEntry rosterEntry) {
         Friend friend = new Friend();
-        friend.setId(user.getId());
-        friend.setFullname(user.getFullName());
-        friend.setEmail(user.getEmail());
-        friend.setPhone(user.getPhone());
-        friend.setFileId(user.getFileId());
-        friend.setAvatarUrl(user.getWebsite());
+        friend.setUserId(rosterEntry.getUserId());
+        friend.setRelationStatus(rosterEntry.getType().name());
+        if(RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus())) {
+            friend.setAskStatus(true);
+        }
         return friend;
     }
 
-    public static List<Friend> createFriendList(List<QBUser> userList) {
-        List<Friend> friends = new ArrayList<Friend>();
-        for (QBUser user : userList) {
-            friends.add(createFriend(user));
-        }
-        return friends;
+    public static Friend createFriend(int userId, boolean requestedFriend) {
+        Friend friend = new Friend();
+        friend.setUserId(userId);
+        friend.setRelationStatus(RosterPacket.ItemType.none.name());
+        friend.setRequestedFriend(requestedFriend);
+        return friend;
     }
 
-    public static Map<Integer, Friend> createFriendMap(List<QBUser> userList) {
-        Map<Integer, Friend> friendMap = new HashMap<Integer, Friend>();
-        for (QBUser user : userList) {
-            friendMap.put(user.getId(), createFriend(user));
+    public static List<User> createUsersList(Collection<QBUser> usersList) {
+        List<User> users = new ArrayList<User>();
+        for (QBUser user : usersList) {
+            users.add(createUser(user));
         }
-        return friendMap;
+        return users;
+    }
+
+    public static List<Friend> createFriendsList(Collection<QBRosterEntry> rosterEntryCollection) {
+        List<Friend> friendsList = new ArrayList<Friend>();
+        for (QBRosterEntry rosterEntry : rosterEntryCollection) {
+            friendsList.add(createFriend(rosterEntry));
+        }
+        return friendsList;
+    }
+
+    public static Map<Integer, User> createUserMap(List<QBUser> userList) {
+        Map<Integer, User> userHashMap = new HashMap<Integer, User>();
+        for (QBUser user : userList) {
+            userHashMap.put(user.getId(), createUser(user));
+        }
+        return userHashMap;
     }
 
     public static ArrayList<Integer> getFriendIdsList(List<QBUser> friendList) {
@@ -45,11 +98,37 @@ public class FriendUtils {
         return friendIdsList;
     }
 
-    public static ArrayList<Integer> getFriendIds(List<Friend> friendList) {
+    public static ArrayList<Integer> getFriendIds(List<User> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (Friend friend : friendList) {
-            friendIdsList.add(friend.getId());
+        for (User friend : friendList) {
+            friendIdsList.add(friend.getUserId());
         }
         return friendIdsList;
+    }
+
+    public static List<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection){
+        List<Integer> userIds = new ArrayList<Integer>();
+        for (QBRosterEntry entry : rosterEntryCollection) {
+            userIds.add(entry.getUserId());
+        }
+        return userIds;
+    }
+
+    public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
+        MatrixCursor usersCursor = new MatrixCursor(
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK, FriendTable.Cols.IS_REQUESTED_FRIEND});
+
+        List<User> friendsList = DatabaseManager.getAllFriendsList(context);
+
+        for (User user : usersList) {
+            if (!friendsList.contains(user)) {
+                usersCursor.addRow(new String[]{user.getUserId() + Consts.EMPTY_STRING, user
+                        .getUserId() + Consts.EMPTY_STRING, user.getFullName(), user.getEmail(), user
+                        .getPhone(), user.getAvatarUrl(), user
+                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING});
+            }
+        }
+
+        return usersCursor;
     }
 }

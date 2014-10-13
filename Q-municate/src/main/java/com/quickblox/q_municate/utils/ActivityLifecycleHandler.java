@@ -13,10 +13,8 @@ import com.quickblox.q_municate.ui.base.QBLogeable;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 
-    private static final boolean SHOULD_START_MULTICHAT = true;
     private int numberOfActivitiesInForeground;
     private boolean chatDestroyed = false;
-    Lo lo = new Lo(this);
 
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
@@ -25,10 +23,10 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     public void onActivityResumed(Activity activity) {
-        lo.g("onActivityResumed" + numberOfActivitiesInForeground);
+        Lo.g("onActivityResumed" + numberOfActivitiesInForeground);
         //Count only our app logeable activity
         boolean activityLogeable = isActivityLogeable(activity);
-        chatDestroyed = chatDestroyed && !isLogedIn();
+        chatDestroyed = chatDestroyed && !isLoggedIn();
         if (numberOfActivitiesInForeground == 0 && chatDestroyed && activityLogeable) {
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
@@ -52,27 +50,24 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
         if (activity instanceof QBLogeable) {
             --numberOfActivitiesInForeground;
         }
-        lo.g("onActivityStopped" + numberOfActivitiesInForeground);
+        Lo.g("onActivityStopped" + numberOfActivitiesInForeground);
 
         if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
-            boolean isLogedIn = isLogedIn();
+            boolean isLogedIn = isLoggedIn();
             if (!isLogedIn) {
                 return;
             }
             chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
-                QBLogoutAndDestroyChatCommand.start(activity, false);
+                QBLogoutAndDestroyChatCommand.start(activity, true);
             }
         }
     }
 
-    private boolean isLogedIn() {
+    private boolean isLoggedIn() {
         boolean result = false;
-        try {
-            result = QBChatService.getInstance()
-                    .isLoggedIn(); //Chat service isn't initialized  -> return false
-        } catch (IllegalStateException e) {
-            ErrorUtils.logError(e);
+        if (QBChatService.isInitialized()) {
+            result = QBChatService.getInstance().isLoggedIn();
         }
         return result;
     }

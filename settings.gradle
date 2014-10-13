@@ -1,1 +1,1 @@
-include ':Q-municate', ':facebook', ':cropper'
+include ':Q-municate', ':facebook', ':cropper', ':stickyListHeaders'

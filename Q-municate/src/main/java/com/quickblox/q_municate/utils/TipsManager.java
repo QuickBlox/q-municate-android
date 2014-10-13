@@ -55,7 +55,8 @@ public class TipsManager {
             return;
         }
         pHelper.savePref(fragment.getClass().getName(), true);
-        String title = fragment.getActivity().getString(R.string.tip_friend_list_button);
+//        String title = fragment.getActivity().getString(R.string.tip_friend_list_button);
+        String title = "";
         showTip(fragment.getActivity(), tipText, listener, title);
     }
 

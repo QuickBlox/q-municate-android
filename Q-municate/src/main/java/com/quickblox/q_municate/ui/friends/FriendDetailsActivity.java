@@ -19,18 +19,20 @@ import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
+import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
@@ -47,7 +49,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView phoneTextView;
     private View phoneView;
 
-    private Friend friend;
+    private User friend;
     private Cursor friendCursor;
     private ContentObserver statusContentObserver;
 
@@ -64,7 +66,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         canPerformLogout.set(true);
         int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
         friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
-        friend = DatabaseManager.getFriendById(this, friendId);
+        friend = DatabaseManager.getUserById(this, friendId);
         initUI();
         registerStatusChangingObserver();
         initUIWithFriendsData();
@@ -86,7 +88,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
             @Override
             public void onChange(boolean selfChange) {
-                friend = DatabaseManager.getFriendById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getId());
+                friend = DatabaseManager.getUserById(FriendDetailsActivity.this,
+                        FriendDetailsActivity.this.friend.getUserId());
                 setOnlineStatus(friend);
             }
 
@@ -125,7 +128,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void setName() {
-        nameTextView.setText(friend.getFullname());
+        nameTextView.setText(friend.getFullName());
     }
 
     private void setPhone() {
@@ -137,7 +140,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneTextView.setText(friend.getPhone());
     }
 
-    private void setOnlineStatus(Friend friend) {
+    private void setOnlineStatus(User friend) {
         if (friend.isOnline()) {
             onlineImageView.setVisibility(View.VISIBLE);
         } else {
@@ -165,33 +168,38 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            //TODO implement
-            //            case R.id.action_delete:
-            //                showRemoveUserDialog();
-            //                return true;
+            case R.id.action_delete:
+                showRemoveUserDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     private void showRemoveUserDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_remove_user, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
+                R.string.frd_dlg_remove_friend, friend.getFullName()));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
-                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend);
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend.getUserId());
             }
         });
-        dialog.show(getFragmentManager(), null);
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show(getFragmentManager(), null);
     }
 
     public void videoCallClickListener(View view) {
         callToUser(friend, WebRTC.MEDIA_STREAM.VIDEO);
     }
 
-    private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
-        if (friend.getId() != AppSession.getSession().getUser().getId()) {
+    private void callToUser(User friend, WebRTC.MEDIA_STREAM callType) {
+        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }
@@ -201,22 +209,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void chatClickListener(View view) {
-        QBDialog existingPrivateDialog = getExistPrivateDialog(friend.getId());
+        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
         if (existingPrivateDialog != null) {
             PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
         } else {
             showProgress();
             QBCreatePrivateChatCommand.start(this, friend);
-        }
-    }
-
-    private QBDialog getExistPrivateDialog(int opponentId) {
-        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(this, opponentId,
-                QBDialogType.PRIVATE);
-        if (!dialogList.isEmpty()) {
-            return dialogList.get(0);
-        } else {
-            return null;
         }
     }
 

@@ -5,16 +5,15 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.FriendUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
@@ -41,7 +40,7 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     }
 
     @Override
-    protected void onFriendsSelected(ArrayList<Friend> selectedFriends) {
+    protected void onFriendsSelected(ArrayList<User> selectedFriends) {
         showProgress();
         QBAddFriendsToGroupCommand.start(this, dialog.getId(), FriendUtils.getFriendIds(selectedFriends));
     }

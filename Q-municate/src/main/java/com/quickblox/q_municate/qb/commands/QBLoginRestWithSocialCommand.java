@@ -9,9 +9,11 @@ import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.ServiceCommand;
+import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.PrefsHelper;
 
 public class QBLoginRestWithSocialCommand extends ServiceCommand {
@@ -54,10 +56,22 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
     }
 
     private QBUser getUserWithAvatar(QBUser user) {
+        String avatarUrl = context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId());
         QBUser newUser = new QBUser();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
-        newUser.setWebsite(context.getString(R.string.inf_url_to_facebook_avatar, user.getFacebookId()));
+        newUser.setCustomDataAsObject(getUserCustomData(avatarUrl));
+        newUser.setCustomDataClass(UserCustomData.class);
+
+        // TODO temp field
+        newUser.setWebsite(avatarUrl);
+        // end todo
+
         return newUser;
+    }
+
+    private UserCustomData getUserCustomData(String avatarUrl) {
+        int isImport = 1;
+        return new UserCustomData(avatarUrl, Consts.EMPTY_STRING, isImport);
     }
 }

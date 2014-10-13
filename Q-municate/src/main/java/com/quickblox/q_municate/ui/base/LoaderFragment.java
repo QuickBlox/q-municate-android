@@ -25,11 +25,6 @@ public abstract class LoaderFragment<T> extends BaseFragment implements OnLoadFi
     }
 
     @Override
-    public <L extends Loader<?>> L getLoader(int id) {
-        return loaderHelper.getLoader(id);
-    }
-
-    @Override
     public void onLoaderReset(Loader<LoaderResult<T>> loader) {
         loaderHelper.onLoaderReset(loader);
     }
@@ -42,5 +37,10 @@ public abstract class LoaderFragment<T> extends BaseFragment implements OnLoadFi
     @Override
     public BaseLoader<T> runLoader(int id, BaseLoader.Args args) {
         return loaderHelper.runLoader(id, args);
+    }
+
+    @Override
+    public <L extends Loader<?>> L getLoader(int id) {
+        return loaderHelper.getLoader(id);
     }
 }

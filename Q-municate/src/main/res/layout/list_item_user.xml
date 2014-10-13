@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="15dp"
-            android:text="Friend fullname"
+            android:text="Friend fullName"
             android:textSize="20sp" />
 
     </LinearLayout>

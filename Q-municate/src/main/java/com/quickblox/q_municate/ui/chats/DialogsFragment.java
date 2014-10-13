@@ -1,5 +1,7 @@
 package com.quickblox.q_municate.ui.chats;
 
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -17,9 +19,10 @@ import android.widget.TextView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.ParcelableQBDialog;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -30,7 +33,9 @@ import java.util.ArrayList;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class DialogsFragment extends BaseFragment {
+public class DialogsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int DIALOGS_LOADER_ID = 0;
 
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
@@ -52,12 +57,32 @@ public class DialogsFragment extends BaseFragment {
 
         initUI(view);
         initListeners();
-        initChatsDialogs();
         Crouton.cancelAllCroutons();
 
         addActions();
+        initCursorLoaders();
 
         return view;
+    }
+
+    private void initCursorLoaders() {
+        getLoaderManager().initLoader(DIALOGS_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return DatabaseManager.getAllDialogsCursorLoader(baseActivity);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor dialogsCursor) {
+        initChatsDialogs(dialogsCursor);
+        checkVisibilityEmptyLabel();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     private void initUI(View view) {
@@ -89,12 +114,14 @@ public class DialogsFragment extends BaseFragment {
     @Override
     public void onResume() {
         Crouton.cancelAllCroutons();
-        checkVisibilityEmptyLabel();
+        if (dialogsAdapter != null) {
+            checkVisibilityEmptyLabel();
+        }
         super.onResume();
     }
 
-    private void initChatsDialogs() {
-        dialogsAdapter = new DialogsAdapter(baseActivity, getAllChats());
+    private void initChatsDialogs(Cursor dialogsCursor) {
+        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
         dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -107,7 +134,7 @@ public class DialogsFragment extends BaseFragment {
 
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
-        Friend occupant = dialogsAdapter.getOccupantById(occupantId);
+        User occupant = dialogsAdapter.getOccupantById(occupantId);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
         }
@@ -115,10 +142,6 @@ public class DialogsFragment extends BaseFragment {
 
     private void startGroupChatActivity(QBDialog dialog) {
         GroupDialogActivity.start(baseActivity, dialog);
-    }
-
-    private Cursor getAllChats() {
-        return DatabaseManager.getAllDialogs(baseActivity);
     }
 
     @Override
@@ -156,9 +179,9 @@ public class DialogsFragment extends BaseFragment {
 
         @Override
         public void execute(Bundle bundle) {
-            ArrayList<QBDialog> dialogsList = (ArrayList<QBDialog>) bundle.getSerializable(
+            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (dialogsList.isEmpty()) {
+            if (parcelableDialogsList == null) {
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }

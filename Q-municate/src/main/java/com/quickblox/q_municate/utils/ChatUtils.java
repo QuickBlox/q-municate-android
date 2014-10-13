@@ -1,17 +1,20 @@
 package com.quickblox.q_municate.utils;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.QBChatMessage;
-import com.quickblox.module.chat.QBMessage;
 import com.quickblox.module.chat.model.QBAttachment;
+import com.quickblox.module.chat.model.QBChatMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.module.chat.model.QBMessage;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.service.QBServiceConsts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +23,7 @@ import java.util.List;
 public class ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
+    public static final int NOT_RESET_COUNTER = -1;
 
     public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
     public static final String PROPERTY_ROOM_NAME = "name";
@@ -58,7 +62,32 @@ public class ChatUtils {
         return Consts.EMPTY_STRING;
     }
 
-    public static QBDialog parseDialogFromMessage(QBMessage chatMessage, String lastMessage, long dateSent) {
+    public static QBDialog parseDialogFromMessageForUpdate(Context context, QBMessage chatMessage, long dateSent) {
+        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
+        String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
+        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = chatMessage.getProperty(PROPERTY_PHOTO_URL);
+
+        QBDialog dialog = new QBDialog(dialogId);
+        dialog.setRoomJid(roomJid);
+        dialog.setPhoto(photoUrl);
+        dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
+        dialog.setName(dialogName);
+
+        if (!chatMessage.getAttachments().isEmpty()) {
+            dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
+        } else if (!TextUtils.isEmpty(chatMessage.getBody())) {
+            dialog.setLastMessage(chatMessage.getBody());
+        }
+
+        dialog.setLastMessageDateSent(dateSent);
+        dialog.setUnreadMessageCount(NOT_RESET_COUNTER);
+
+        return dialog;
+    }
+
+    public static QBDialog parseDialogFromMessage(Context context, QBMessage chatMessage, String lastMessage, long dateSent) {
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -68,7 +97,7 @@ public class ChatUtils {
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
-        dialog.setPhotoUrl(photoUrl);
+        dialog.setPhoto(photoUrl);
         dialog.setOccupantsIds(getOccupantsIdsListFromString(occupantsIds));
         dialog.setName(dialogName);
         if (dialogTypeCode != null) {
@@ -77,7 +106,13 @@ public class ChatUtils {
                 dialog.setType(dialogType);
             }
         }
-        dialog.setLastMessage(lastMessage);
+
+        if (!chatMessage.getAttachments().isEmpty()) {
+            dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
+        } else if (!TextUtils.isEmpty(lastMessage)) {
+            dialog.setLastMessage(lastMessage);
+        }
+
         dialog.setLastMessageDateSent(dateSent);
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
@@ -119,7 +154,7 @@ public class ChatUtils {
         String roomJid = dialog.getRoomJid();
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
-        String photoUrl = dialog.getPhotoUrl();
+        String photoUrl = dialog.getPhoto();
         String dialogTypeCode = String.valueOf(dialog.getType().getCode());
 
         QBUser user = AppSession.getSession().getUser();
@@ -162,7 +197,7 @@ public class ChatUtils {
         String dialogId = String.valueOf(dialog.getDialogId());
         String occupantsIds = getOccupantsIdsStringFromList(dialog.getOccupants());
         String dialogName = dialog.getName();
-        String photoUrl = dialog.getPhotoUrl();
+        String photoUrl = dialog.getPhoto();
 
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT);
@@ -201,10 +236,10 @@ public class ChatUtils {
         return occupantsIdsList;
     }
 
-    public static ArrayList<Integer> getFriendIdsList(List<Friend> friendList) {
+    public static ArrayList<Integer> getFriendIdsList(List<User> friendList) {
         ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
-        for (Friend friend : friendList) {
-            friendIdsList.add(friend.getId());
+        for (User friend : friendList) {
+            friendIdsList.add(friend.getUserId());
         }
         return friendIdsList;
     }
@@ -226,5 +261,25 @@ public class ChatUtils {
             }
         }
         return roomJidList;
+    }
+
+    public static Bundle getBundleForCreatePrivateChat(int userId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, userId);
+        return bundle;
+    }
+
+    public static QBDialog getExistPrivateDialog(Context context, int opponentId) {
+        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(context, opponentId,
+                QBDialogType.PRIVATE);
+        if (!dialogList.isEmpty()) {
+            return dialogList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public static QBDialog getExistDialogById(Context context, String dialogId) {
+        return DatabaseManager.getDialogByDialogId(context, dialogId);
     }
 }

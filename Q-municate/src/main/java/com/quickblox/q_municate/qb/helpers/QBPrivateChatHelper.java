@@ -4,19 +4,19 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatMessage;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBPrivateChatManager;
 import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.module.chat.model.QBChatMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.module.content.QBContent;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -56,8 +56,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         sendPrivateMessage(chatMessage, userId, dialogId);
         String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-        String messageId = chatMessage.getPacketId();
-        String packetId = chatMessage.getPacketId();
+        String messageId = chatMessage.getId();
+        String packetId = chatMessage.getId();
         if (dialogId != null) {
             saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatCreator.getId(),
                     chatMessage.getBody(), attachUrl, time, true, false));
@@ -65,11 +65,11 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     @Override
-    public QBPrivateChat createChatLocally(QBDialog currentDialog,
+    public QBPrivateChat createChatLocally(QBDialog dialog,
             Bundle additional) throws QBResponseException {
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         QBPrivateChat privateChat = createChat(opponentId);
-        this.currentDialog = currentDialog;
+        this.currentDialog = dialog;
         return privateChat;
     }
 
@@ -87,10 +87,11 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        Friend friend = DatabaseManager.getFriendById(context, chatMessage.getSenderId());
-        if (friend == null) {
-            friend = new Friend();
-            friend.setFullname(Consts.EMPTY_STRING + chatMessage.getSenderId());
+        User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+
+        if (user == null) {
+            user = new User();
+            user.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
 
         String messageId;
@@ -101,10 +102,10 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        String packetId = chatMessage.getPacketId();
+        String packetId = chatMessage.getId();
         saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
                 chatMessage.getBody(), attachUrl, time, false, false));
-        notifyMessageReceived(chatMessage, friend, dialogId);
+        notifyMessageReceived(chatMessage, user, dialogId, true);
     }
 
     private QBPrivateChat createChat(int opponentId) throws QBResponseException {
@@ -172,9 +173,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
-        String attachUrl = null;
         time = DateUtils.getCurrentTime();
-        QBDialog dialog = ChatUtils.parseDialogFromMessage(chatMessage, chatMessage.getBody(), time);
+        QBDialog dialog = ChatUtils.parseDialogFromMessage(context, chatMessage, chatMessage.getBody(), time);
         if (QBDialogType.PRIVATE.equals(dialog.getType())) {
             saveDialogToCache(context, dialog);
         }

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:background="@drawable/list_item_background_selector"
+    android:orientation="horizontal"
     android:padding="10dp">
 
     <com.quickblox.q_municate.ui.views.RoundedImageView
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/online_imageview"
+        android:layout_toLeftOf="@+id/actions_friend_linearlayout"
         android:layout_toRightOf="@id/avatar_imageview"
         android:orientation="vertical">
 
@@ -33,8 +33,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Friend fullname"
-            android:textSize="20sp" />
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="Friend fullName Friend fullName Friend fullName Friend fullName"
+            android:textSize="@dimen/text_size" />
 
         <TextView
             android:id="@+id/status_textview"
@@ -42,15 +44,59 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="status"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/dark_gray"
             android:textSize="15sp" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@id/online_imageview"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+    <LinearLayout
+        android:id="@+id/actions_friend_linearlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/badge_online" />
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/add_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_general_selector"
+            android:src="@drawable/ic_add_friend"
+            android:padding="10dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/reject_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_general_selector"
+            android:padding="10dp"
+            android:src="@drawable/ic_friend_reject"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/divider_view"
+            android:layout_width="@dimen/divider_width"
+            android:layout_height="match_parent"
+            android:background="@color/dark_gray"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/accept_friend_imagebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_general_selector"
+            android:padding="10dp"
+            android:src="@drawable/ic_friend_accept"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/online_imageview"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:src="@drawable/badge_online"
+            android:visibility="gone" />
+    </LinearLayout>
+
 </RelativeLayout>

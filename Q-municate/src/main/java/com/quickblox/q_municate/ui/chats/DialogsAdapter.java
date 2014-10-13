@@ -9,8 +9,8 @@ import android.widget.TextView;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -45,8 +45,8 @@ public class DialogsAdapter extends BaseCursorAdapter {
 
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
-            Friend occupant = getOccupantById(occupantId);
-            viewHolder.nameTextView.setText(occupant.getFullname());
+            User occupant = getOccupantById(occupantId);
+            viewHolder.nameTextView.setText(occupant.getFullName());
             viewHolder.userCountTextView.setVisibility(View.GONE);
             displayAvatarImage(getAvatarUrlForFriend(occupant), viewHolder.avatarImageView);
         } else {
@@ -54,7 +54,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
             viewHolder.userCountTextView.setVisibility(View.VISIBLE);
             viewHolder.userCountTextView.setText(dialog.getOccupants().size() + Consts.EMPTY_STRING);
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
-            displayGroupPhotoImage(dialog.getPhotoUrl(), viewHolder.avatarImageView);
+            displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
         }
 
         if (dialog.getUnreadMessageCount() > Consts.ZERO_INT_VALUE) {
@@ -67,12 +67,12 @@ public class DialogsAdapter extends BaseCursorAdapter {
         viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
     }
 
-    public Friend getOccupantById(int occupantId) {
-        Friend friend = DatabaseManager.getFriendById(context, occupantId);
+    public User getOccupantById(int occupantId) {
+        User friend = DatabaseManager.getUserById(context, occupantId);
         if (friend == null) {
-            friend = new Friend();
-            friend.setId(occupantId);
-            friend.setFullname(occupantId + Consts.EMPTY_STRING);
+            friend = new User();
+            friend.setUserId(occupantId);
+            friend.setFullName(occupantId + Consts.EMPTY_STRING);
         }
         return friend;
     }

@@ -12,8 +12,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.DatabaseManager;
-import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 
@@ -25,12 +25,12 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     private LayoutInflater layoutInflater;
     private NewDialogCounterFriendsListener counterChangedListener;
     private int counterFriends;
-    private List<Friend> selectedFriends;
+    private List<User> selectedFriends;
     private SparseBooleanArray sparseArrayCheckBoxes;
 
     public DialogsSelectableFriendsAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
-        selectedFriends = new ArrayList<Friend>();
+        selectedFriends = new ArrayList<User>();
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         sparseArrayCheckBoxes = new SparseBooleanArray(cursor.getCount());
     }
@@ -60,11 +60,11 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, final Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final Friend friend = DatabaseManager.getFriendFromCursor(cursor);
+        final User friend = DatabaseManager.getUserFromCursor(cursor);
 
-        viewHolder.nameTextView.setText(friend.getFullname());
+        viewHolder.nameTextView.setText(friend.getFullName());
         viewHolder.statusMessageTextView.setText(friend.getStatus());
-        viewHolder.nameTextView.setText(friend.getFullname());
+        viewHolder.nameTextView.setText(friend.getFullName());
 
         if (friend.isOnline()) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
@@ -120,8 +120,8 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         }
     }
 
-    public ArrayList<Friend> getSelectedFriends() {
-        return (ArrayList<Friend>) selectedFriends;
+    public ArrayList<User> getSelectedFriends() {
+        return (ArrayList<User>) selectedFriends;
     }
 
     private static class ViewHolder {

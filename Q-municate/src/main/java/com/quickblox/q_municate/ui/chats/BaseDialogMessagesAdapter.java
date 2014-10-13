@@ -4,7 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -17,11 +19,12 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.caching.tables.MessageTable;
+import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 
@@ -30,7 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener {
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
+public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
@@ -133,6 +138,57 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     protected void setViewVisibility(View view, int visibility) {
         view.setVisibility(visibility);
+    }
+
+    @Override
+    public View getHeaderView(int position, View convertView, ViewGroup parent) {
+        HeaderViewHolder holder;
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > Consts.ZERO_INT_VALUE) {
+            cursor = (Cursor) getItem(position);
+        }
+
+        if (convertView == null) {
+            holder = new HeaderViewHolder();
+            convertView = layoutInflater.inflate(R.layout.list_item_chat_sticky_header_date, parent, false);
+            holder.headerTextView = (TextView) convertView.findViewById(R.id.header_date_textview);
+            convertView.setTag(holder);
+        } else {
+            holder = (HeaderViewHolder) convertView.getTag();
+        }
+
+        if (cursor != null) {
+            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+            holder.headerTextView.setText(DateUtils.longToMessageListHeaderDate(time));
+        }
+
+        return convertView;
+    }
+
+    @Override
+    public long getHeaderId(int position) {
+        String timeString;
+
+        if (getCursor().getCount() > Consts.ZERO_INT_VALUE) {
+            Cursor cursor = (Cursor) getItem(position);
+            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+            timeString = DateUtils.longToMessageListHeaderDate(time);
+        } else {
+            return Consts.ZERO_INT_VALUE;
+        }
+
+        if (!TextUtils.isEmpty(timeString)) {
+            return timeString.subSequence(Consts.ZERO_INT_VALUE, timeString.length() - 1).charAt(
+                    Consts.ZERO_INT_VALUE);
+        } else {
+            return Consts.ZERO_INT_VALUE;
+        }
+    }
+
+    private class HeaderViewHolder {
+
+        TextView headerTextView;
     }
 
     public class ImageLoadingListener extends SimpleImageLoadingListener {
