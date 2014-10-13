@@ -45,6 +45,11 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
+
+        if (user.getCustomDataAsObject()) {
+
+        }
+
         user.setCustomDataClass(UserCustomData.class);
         String token = QBAuth.getBaseService().getToken();
         AppSession.startSession(LoginType.FACEBOOK, user, token);
@@ -87,6 +92,10 @@ public class QBAuthHelper extends BaseHelper {
 
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
+
+        UserCustomData userCustomData = getUserCustomData(inputUser);
+        inputUser.setCustomDataAsObject(userCustomData);
+
         String password = inputUser.getPassword();
         user = QBUsers.updateUser(inputUser);
         user.setCustomDataClass(UserCustomData.class);
@@ -97,8 +106,17 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
 
+        UserCustomData userCustomData = getUserCustomData(user);
+        userCustomData.setAvatar_url(qbFile.getPublicUrl());
+        user.setCustomDataAsObject(userCustomData);
+
+        return updateUser(user);
+    }
+
+    private UserCustomData getUserCustomData(QBUser user) {
         UserCustomData userCustomDataNew;
         UserCustomData userCustomDataOld = null;
+
         try {
             userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
         } catch (JSONException e) {
@@ -106,15 +124,13 @@ public class QBAuthHelper extends BaseHelper {
         }
 
         if (userCustomDataOld != null) {
-            userCustomDataNew = new UserCustomData(qbFile.getPublicUrl(), userCustomDataOld.getStatus(),
+            userCustomDataNew = new UserCustomData(userCustomDataOld.getAvatar_url(), userCustomDataOld.getStatus(),
                     userCustomDataOld.isIs_import());
         } else {
-            userCustomDataNew = new UserCustomData(qbFile.getPublicUrl(), null, Consts.ZERO_INT_VALUE);
+            userCustomDataNew = new UserCustomData();
         }
 
-        user.setCustomDataAsObject(userCustomDataNew);
-
-        return updateUser(user);
+        return userCustomDataNew;
     }
 
     public void resetPassword(String email) throws QBResponseException {

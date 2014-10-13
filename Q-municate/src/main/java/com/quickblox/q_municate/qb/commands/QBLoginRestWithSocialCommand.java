@@ -62,6 +62,7 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         newUser.setPassword(user.getPassword());
         newUser.setCustomDataAsObject(getUserCustomData(avatarUrl));
         newUser.setCustomDataClass(UserCustomData.class);
+
         // TODO temp field
         newUser.setWebsite(avatarUrl);
         // end todo
