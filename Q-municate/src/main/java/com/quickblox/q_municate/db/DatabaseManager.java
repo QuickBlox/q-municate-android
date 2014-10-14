@@ -575,6 +575,7 @@ public class DatabaseManager {
 
     public static void saveChatMessages(Context context, List<QBChatHistoryMessage> messagesList,
             String dialogId) {
+        MessageCache messageCache = null;
         for (QBChatHistoryMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
@@ -585,10 +586,14 @@ public class DatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            MessageCache messageCache = new MessageCache(messageId, dialogId, null, senderId, message,
+            messageCache = new MessageCache(messageId, dialogId, null, senderId, message,
                     attachURL, time, true, true);
 
             saveChatMessage(context, messageCache);
+        }
+        if (messageCache != null) {
+            updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
+                    messageCache.getSenderId(), Consts.ZERO_INT_VALUE);
         }
     }
 
@@ -613,8 +618,14 @@ public class DatabaseManager {
         values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
         context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
 
+        int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
+
+        if (!messageCache.isRead()) {
+            countUnreadMessagesLocal = ++countUnreadMessagesLocal;
+        }
+
         updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
-                messageCache.getSenderId());
+                messageCache.getSenderId(), countUnreadMessagesLocal);
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -710,11 +721,11 @@ public class DatabaseManager {
     }
 
     public static void updateDialog(Context context, String dialogId, String lastMessage, long dateSent,
-            long lastSenderId) {
+            long lastSenderId, int countUnreadMessages) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, getCountUnreadMessagesByRoomJid(context,
-                dialogId));
+
+        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, countUnreadMessages);
 
         if (TextUtils.isEmpty(lastMessage)) {
             values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
@@ -728,12 +739,15 @@ public class DatabaseManager {
         resolver.update(DialogTable.CONTENT_URI, values, condition, null);
     }
 
-    public static int getCountUnreadMessagesByRoomJid(Context context, String dialogId) {
-        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.IS_READ + " = 0 AND " + MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'",
-                null, null);
-        int countMessages = cursor.getCount();
-        cursor.close();
+    public static int getCountUnreadMessagesByDialogIdLocal(Context context, String dialogId) {
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null, DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
+        int countMessages = Consts.ZERO_INT_VALUE;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            countMessages = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.COUNT_UNREAD_MESSAGES));
+            cursor.close();
+        }
+
         return countMessages;
     }
 
@@ -751,14 +765,17 @@ public class DatabaseManager {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
-            String roomJidId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+            String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
             String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
             long lastSenderId = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
             values.put(MessageTable.Cols.IS_READ, isRead);
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
             cursor.close();
-            updateDialog(context, roomJidId, message, time, lastSenderId);
+
+            int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, dialogId);
+            countUnreadMessagesLocal = --countUnreadMessagesLocal;
+            updateDialog(context, dialogId, message, time, lastSenderId, countUnreadMessagesLocal);
         }
     }
 
