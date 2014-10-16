@@ -21,7 +21,6 @@ ext.versionName = '1.0.91'
 ext.versionCode = 25
 
 ext.prodDebug = true
-ext.devDebug = false
 
 // Dependencies versions
 ext.universalImageLoaderVersion = '1.9.1'
