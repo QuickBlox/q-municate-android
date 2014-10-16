@@ -131,8 +131,9 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     public void updateDialog(QBDialog dialog) {
+        int countUnreadDialog = DatabaseManager.getCountUnreadMessagesByDialogIdLocal(context, dialog.getDialogId());
         DatabaseManager.updateDialog(context, dialog.getDialogId(), dialog.getLastMessage(),
-                dialog.getLastMessageDateSent(), dialog.getLastMessageUserId());
+                dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 
     public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
