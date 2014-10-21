@@ -141,13 +141,15 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void setOnlineStatus(User friend) {
-        if (friend.isOnline()) {
-            onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            onlineImageView.setVisibility(View.GONE);
+        if (friend != null) {
+            if (friend.isOnline()) {
+                onlineImageView.setVisibility(View.VISIBLE);
+            } else {
+                onlineImageView.setVisibility(View.GONE);
+            }
+            statusTextView.setText(friend.getStatus());
+            onlineStatusTextView.setText(friend.getOnlineStatus());
         }
-        statusTextView.setText(friend.getStatus());
-        onlineStatusTextView.setText(friend.getOnlineStatus());
     }
 
     private void loadAvatar() {
