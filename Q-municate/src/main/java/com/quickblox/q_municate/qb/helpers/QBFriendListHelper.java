@@ -170,16 +170,16 @@ public class QBFriendListHelper extends BaseHelper {
         }
 
         Friend friend = FriendUtils.createFriend(rosterEntry);
-
-        fillUserOnlineStatus(user);
-
         Friend oldFriend = DatabaseManager.getFriendById(context, friend.getUserId());
+
+        saveUser(user);
+        saveFriend(friend);
+
         if (oldFriend != null) {
             checkAlertShowing(friend, oldFriend);
         }
 
-        saveUser(user);
-        saveFriend(friend);
+        fillUserOnlineStatus(user);
     }
 
     private void checkAlertShowing(Friend newFriend, Friend oldFriend) {
@@ -192,12 +192,21 @@ public class QBFriendListHelper extends BaseHelper {
         boolean friendDeletedMe = (oldFriend.getRelationStatus().equals(RELATION_STATUS_TO) || oldFriend.getRelationStatus().equals(RELATION_STATUS_FROM)
                 || oldFriend.getRelationStatus().equals(RELATION_STATUS_BOTH)) && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
 
-        if (friendRejectedMe) {
-            alertMessage = context.getString(R.string.frl_alrt_reject_friend, friendName);
+        if (friendRejectedMe || friendDeletedMe) {
+            try {
+                clearRosterEntry(newFriend.getUserId());
+                deleteUser(newFriend.getUserId());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (friendRejectedMe) {
+                alertMessage = context.getString(R.string.frl_alrt_reject_friend, friendName);
+            } else if (friendDeletedMe) {
+                alertMessage = context.getString(R.string.frl_alrt_deleted_friend, friendName);
+            }
         } else if (friendAcceptedMe) {
             alertMessage = context.getString(R.string.frl_alrt_accepted_friend, friendName);
-        } else if (friendDeletedMe) {
-            alertMessage = context.getString(R.string.frl_alrt_deleted_friend, friendName);
         }
 
         if (alertMessage != null) {
@@ -236,8 +245,10 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void fillUserOnlineStatus(User user) {
-        QBPresence presence = roster.getPresence(user.getUserId());
-        fillUserOnlineStatus(user, presence);
+        if (roster != null) {
+            QBPresence presence = roster.getPresence(user.getUserId());
+            fillUserOnlineStatus(user, presence);
+        }
     }
 
     private void fillFriendStatus(User friend) {
@@ -273,6 +284,10 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void saveFriend(Friend friend) {
         DatabaseManager.saveFriend(context, friend);
+    }
+
+    private void deleteFriend1(int userId) {
+        DatabaseManager.deleteFriendById(context, userId);
     }
 
     private void deleteUser(int userId) {

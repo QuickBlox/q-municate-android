@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.quickblox.q_municate.model.InviteFriend;
 import com.quickblox.q_municate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.q_municate.utils.Consts;
@@ -42,7 +43,7 @@ public class ImportFriends {
     }
 
     private List<String> getIdsList(List<InviteFriend> friendsList) {
-        if(friendsList.isEmpty()) {
+        if (friendsList.isEmpty()) {
             return new ArrayList<String>();
         }
         List<String> idsList = new ArrayList<String>();
@@ -56,21 +57,22 @@ public class ImportFriends {
         realFriendsCallbacks++;
         if (realFriendsCallbacks == expectedFriendsCallbacks) {
             realFriendsCallbacks = Consts.ZERO_INT_VALUE;
-            QBImportFriendsCommand.start(activity, getIdsList(friendsFacebookList), getIdsList(friendsContactsList));
+            QBImportFriendsCommand.start(activity, getIdsList(friendsFacebookList), getIdsList(
+                    friendsContactsList));
         }
     }
 
     private void getFacebookFriendsList() {
-        Request.executeMyFriendsRequestAsync(Session.getActiveSession(), new Request.GraphUserListCallback() {
+        Request.newMyFriendsRequest(Session.getActiveSession(), new Request.GraphUserListCallback() {
 
             @Override
-            public void onCompleted(List<com.facebook.model.GraphUser> users, Response response) {
+            public void onCompleted(List<GraphUser> users, Response response) {
                 for (com.facebook.model.GraphUser user : users) {
                     friendsFacebookList.add(new InviteFriend(user.getId(), user.getName(), user.getLink(),
                             InviteFriend.VIA_FACEBOOK_TYPE, null, false));
                 }
                 fiendsReceived();
             }
-        });
+        }).executeAsync();
     }
 }

@@ -645,9 +645,15 @@ public class DatabaseManager {
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
-    public static boolean deleteUserById(Context context, int userId) {
+    public static boolean deleteFriendById(Context context, int userId) {
         int deletedRow = context.getContentResolver().delete(FriendTable.CONTENT_URI,
                 FriendTable.Cols.USER_ID + " = " + userId, null);
+        return deletedRow > Consts.ZERO_INT_VALUE;
+    }
+
+    public static boolean deleteUserById(Context context, int userId) {
+        int deletedRow = context.getContentResolver().delete(UserTable.CONTENT_URI,
+                UserTable.Cols.USER_ID + " = " + userId, null);
         return deletedRow > Consts.ZERO_INT_VALUE;
     }
 
