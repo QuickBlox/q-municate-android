@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/header_date_color">
+    android:background="@color/header_date_color"
+    android:alpha="0.9">
 
     <TextView
         android:id="@+id/header_date_textview"

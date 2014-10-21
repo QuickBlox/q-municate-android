@@ -76,7 +76,7 @@ public class FacebookHelper {
         TipsManager.setIsJustLogined(true);
         Session session = Session.getActiveSession();
         if (!session.isOpened() && !session.isClosed()) {
-            session.openForRead(new Session.OpenRequest(activity).setCallback(facebookStatusCallback));
+            session.openForRead(new Session.OpenRequest(activity).setPermissions(Arrays.asList("user_friends")).setCallback(facebookStatusCallback));
         } else {
             Session.openActiveSession(activity, true, facebookStatusCallback);
         }
