@@ -197,7 +197,7 @@ public class QBFriendListHelper extends BaseHelper {
                 clearRosterEntry(newFriend.getUserId());
                 deleteUser(newFriend.getUserId());
             } catch (Exception e) {
-                e.printStackTrace();
+                ErrorUtils.logError(e);
             }
 
             if (friendRejectedMe) {
