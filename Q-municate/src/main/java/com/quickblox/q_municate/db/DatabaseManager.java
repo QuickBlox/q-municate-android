@@ -18,6 +18,7 @@ import com.quickblox.q_municate.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
@@ -422,9 +423,13 @@ public class DatabaseManager {
                 MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         boolean isDelivered = cursor.getInt(cursor.getColumnIndex(
                 MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
+        FriendsNotificationType friendsNotificationType = FriendsNotificationType.parseByCode(
+                cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
 
         MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time,
                 isRead, isDelivered);
+
+        messageCache.setFriendsNotificationType(friendsNotificationType);
 
         return messageCache;
     }
@@ -583,11 +588,19 @@ public class DatabaseManager {
             long time = historyMessage.getDateSent();
 
             String attachURL;
+            String friendsMessageType;
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
             messageCache = new MessageCache(messageId, dialogId, null, senderId, message,
                     attachURL, time, true, true);
+
+            if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
+                friendsMessageType = historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString();
+                if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(friendsMessageType)) {
+                    messageCache.setFriendsNotificationType(FriendsNotificationType.REQUEST);
+                }
+            }
 
             saveChatMessage(context, messageCache);
         }
@@ -610,6 +623,10 @@ public class DatabaseManager {
             values.put(MessageTable.Cols.BODY, body);
         } else {
             values.put(MessageTable.Cols.BODY, Html.fromHtml(body).toString());
+        }
+
+        if (messageCache.getFriendsNotificationType() != null) {
+            values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE, messageCache.getFriendsNotificationType().getCode());
         }
 
         values.put(MessageTable.Cols.TIME, messageCache.getTime());

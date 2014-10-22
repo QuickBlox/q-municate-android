@@ -6,17 +6,20 @@ import android.os.Bundle;
 
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
 
 public class QBInitFriendListCommand extends ServiceCommand {
 
     private QBFriendListHelper friendListHelper;
+    private QBPrivateChatHelper privateChatHelper;
 
-    public QBInitFriendListCommand(Context context, QBFriendListHelper friendListHelper, String successAction,
+    public QBInitFriendListCommand(Context context, QBFriendListHelper friendListHelper, QBPrivateChatHelper privateChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.friendListHelper = friendListHelper;
+        this.privateChatHelper = privateChatHelper;
     }
 
     public static void start(Context context) {
@@ -26,7 +29,7 @@ public class QBInitFriendListCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        friendListHelper.init();
+        friendListHelper.init(privateChatHelper);
         return extras;
     }
 }

@@ -42,6 +42,7 @@ public class ChatUtils {
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
     public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
     public static final String PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS = "3";
+    public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST = "4";
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = AppSession.getSession().getUser();
@@ -209,6 +210,16 @@ public class ChatUtils {
         if (!TextUtils.isEmpty(photoUrl)) {
             chatMessage.setProperty(PROPERTY_PHOTO_URL, photoUrl);
         }
+        return chatMessage;
+    }
+
+    public static QBChatMessage createNotificationMessageForFriendsRequest(Context context) {
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody(context.getResources().getString(R.string.friends_request_message));
+        chatMessage.setProperty(ChatUtils.PROPERTY_SAVE_TO_HISTORY, ChatUtils.VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST);
+        long time = DateUtils.getCurrentTime();
+        chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         return chatMessage;
     }
 

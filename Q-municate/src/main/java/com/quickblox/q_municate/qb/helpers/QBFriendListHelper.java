@@ -9,9 +9,12 @@ import android.util.Log;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.chat.QBChatService;
+import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBRoster;
 import com.quickblox.module.chat.listeners.QBRosterListener;
 import com.quickblox.module.chat.listeners.QBSubscriptionListener;
+import com.quickblox.module.chat.model.QBChatMessage;
+import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBPresence;
 import com.quickblox.module.chat.model.QBRosterEntry;
 import com.quickblox.module.users.QBUsers;
@@ -20,7 +23,13 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.q_municate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.utils.ChatUtils;
+import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
@@ -33,17 +42,14 @@ import java.util.List;
 
 public class QBFriendListHelper extends BaseHelper {
 
-    private static final String TAG = QBFriendListHelper.class.getSimpleName();
-
     public static final String RELATION_STATUS_NONE = "none";
     public static final String RELATION_STATUS_TO = "to";
     public static final String RELATION_STATUS_FROM = "from";
     public static final String RELATION_STATUS_BOTH = "both";
     public static final String RELATION_STATUS_REMOVE = "remove";
     public static final String RELATION_STATUS_ALL_USERS = "all_users";
-
     public static final int VALUE_RELATION_STATUS_ALL_USERS = 10;
-
+    private static final String TAG = QBFriendListHelper.class.getSimpleName();
     private static final String PRESENCE_CHANGE_ERROR = "Presence change error: could not find friend in DB by id = ";
     private static final String ENTRIES_UPDATING_ERROR = "Failed to update friends list";
     private static final String ENTRIES_ADDED_ERROR = "Failed to add friends to list";
@@ -58,14 +64,17 @@ public class QBFriendListHelper extends BaseHelper {
 
     private QBRestHelper restHelper;
     private QBRoster roster;
+    private QBPrivateChatHelper privateChatHelper;
 
     public QBFriendListHelper(Context context) {
         super(context);
     }
 
-    public void init() {
+    public void init(QBPrivateChatHelper privateChatHelper) {
+        this.privateChatHelper = privateChatHelper;
         restHelper = new QBRestHelper(context);
-        roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual, new SubscriptionListener());
+        roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
+                new SubscriptionListener());
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
     }
@@ -79,6 +88,16 @@ public class QBFriendListHelper extends BaseHelper {
     public void addFriend(int userId) throws Exception {
         createFriend(userId, false);
         sendInvitation(userId);
+        sendNotificationToFriend(userId);
+    }
+
+    private void sendNotificationToFriend(int userId) throws QBResponseException {
+        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
+        if (existingPrivateDialog == null) {
+            existingPrivateDialog = privateChatHelper.createPrivateChatOnRest(userId);
+        }
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
     }
 
     public void acceptFriend(int userId) throws Exception {
@@ -187,10 +206,13 @@ public class QBFriendListHelper extends BaseHelper {
 
         String friendName = DatabaseManager.getUserById(context, newFriend.getUserId()).getFullName();
 
-        boolean friendRejectedMe = oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
-        boolean friendAcceptedMe = oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(RELATION_STATUS_TO);
-        boolean friendDeletedMe = (oldFriend.getRelationStatus().equals(RELATION_STATUS_TO) || oldFriend.getRelationStatus().equals(RELATION_STATUS_FROM)
-                || oldFriend.getRelationStatus().equals(RELATION_STATUS_BOTH)) && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
+        boolean friendRejectedMe = oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend
+                .getRelationStatus().equals(RELATION_STATUS_NONE);
+        boolean friendAcceptedMe = oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(
+                RELATION_STATUS_TO);
+        boolean friendDeletedMe = (oldFriend.getRelationStatus().equals(RELATION_STATUS_TO) || oldFriend
+                .getRelationStatus().equals(RELATION_STATUS_FROM) || oldFriend.getRelationStatus().equals(
+                RELATION_STATUS_BOTH)) && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
 
         if (friendRejectedMe || friendDeletedMe) {
             try {
@@ -305,6 +327,12 @@ public class QBFriendListHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    private void addedFriends(Collection<Integer> userIdsList) throws QBResponseException {
+        for (Integer userId : userIdsList) {
+            createFriend(userId, true);
+        }
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -338,12 +366,6 @@ public class QBFriendListHelper extends BaseHelper {
                 fillUserOnlineStatus(user, presence);
                 DatabaseManager.saveUser(context, user);
             }
-        }
-    }
-
-    private void addedFriends(Collection<Integer> userIdsList) throws QBResponseException {
-        for (Integer userId : userIdsList) {
-            createFriend(userId, true);
         }
     }
 

@@ -117,30 +117,11 @@ public abstract class BaseChatHelper extends BaseHelper {
         DatabaseManager.updateMessageDeliveryStatus(context, messageId, isDelivered);
     }
 
-    protected void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
-            String dialogId) throws QBResponseException {
-        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
-        if (privateChat == null) {
-            privateChat = createChatIfNotExist(opponentId);
-        }
-        if (!TextUtils.isEmpty(dialogId)) {
-            chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
-        }
-        String error = null;
-        try {
-            privateChat.sendMessage(chatMessage);
-        }catch (XMPPException e){
-            error = context.getString(R.string.dlg_fail_connection);
-        } catch (SmackException.NotConnectedException e) {
-            error = context.getString(R.string.dlg_fail_connection);
-        }
-        if (error != null) {
-            throw new QBResponseException(error);
-        }
-    }
-
-    private QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {
+    public QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {
         QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, opponentId);
+        if (existingPrivateDialog == null) {
+
+        }
         return  (QBPrivateChat) createChatLocally(existingPrivateDialog, ChatUtils.getBundleForCreatePrivateChat(opponentId));
     }
 

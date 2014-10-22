@@ -2,6 +2,7 @@ package com.quickblox.q_municate.qb.helpers;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.QBChatService;
@@ -16,6 +17,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.service.QBServiceConsts;
@@ -24,6 +26,9 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.Utils;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 
@@ -44,6 +49,28 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
         sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
+    }
+
+    public void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
+            String dialogId) throws QBResponseException {
+        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        if (privateChat == null) {
+            privateChat = createChatIfNotExist(opponentId);
+        }
+        if (!TextUtils.isEmpty(dialogId)) {
+            chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
+        }
+        String error = null;
+        try {
+            privateChat.sendMessage(chatMessage);
+        }catch (XMPPException e){
+            error = context.getString(R.string.dlg_fail_connection);
+        } catch (SmackException.NotConnectedException e) {
+            error = context.getString(R.string.dlg_fail_connection);
+        }
+        if (error != null) {
+            throw new QBResponseException(error);
+        }
     }
 
     private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
@@ -94,6 +121,13 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             user.setFullName(Consts.EMPTY_STRING + chatMessage.getSenderId());
         }
 
+        MessageCache messageCache = parseReceivedMessage(chatMessage);
+
+        saveMessageToCache(messageCache);
+        notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), true);
+    }
+
+    private MessageCache parseReceivedMessage(QBChatMessage chatMessage) {
         String messageId;
         long time;
         String attachUrl;
@@ -103,9 +137,10 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         String packetId = chatMessage.getId();
-        saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
-                chatMessage.getBody(), attachUrl, time, false, false));
-        notifyMessageReceived(chatMessage, user, dialogId, true);
+        MessageCache messageCache = new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
+                chatMessage.getBody(), attachUrl, time, false, false);
+
+        return messageCache;
     }
 
     private QBPrivateChat createChat(int opponentId) throws QBResponseException {
@@ -197,9 +232,18 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(
                     notificationType)) {
                 messageDeliveryStatusReceived(chatMessage);
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(
+                    notificationType)) {
+                friendRequestMessageReceived(chatMessage);
             } else {
                 updateDialogByNotification(chatMessage);
             }
         }
+    }
+
+    private void friendRequestMessageReceived(QBChatMessage chatMessage) {
+        MessageCache messageCache = parseReceivedMessage(chatMessage);
+        messageCache.setFriendsNotificationType(FriendsNotificationType.REQUEST);
+        saveMessageToCache(messageCache);
     }
 }
