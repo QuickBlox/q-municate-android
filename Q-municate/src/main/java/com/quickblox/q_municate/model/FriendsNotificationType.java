@@ -1,7 +1,7 @@
 package com.quickblox.q_municate.model;
 
 public enum FriendsNotificationType {
-    REQUEST(1), REJECT(2), REMOVED(3);
+    REQUEST(4), ACCEPT(5), REJECT(6), REMOVE(7);
 
     private int code;
 

@@ -88,9 +88,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
             @Override
             public void onChange(boolean selfChange) {
-                friend = DatabaseManager.getUserById(FriendDetailsActivity.this,
-                        FriendDetailsActivity.this.friend.getUserId());
-                setOnlineStatus(friend);
+                if (FriendDetailsActivity.this.friend !=null) {
+                    friend = DatabaseManager.getUserById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getUserId());
+                    setOnlineStatus(friend);
+                }
             }
 
             @Override
@@ -140,15 +141,15 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneTextView.setText(friend.getPhone());
     }
 
-    private void setOnlineStatus(User friend) {
-        if (friend != null) {
-            if (friend.isOnline()) {
+    private void setOnlineStatus(User user) {
+        if (user != null) {
+            if (user.isOnline()) {
                 onlineImageView.setVisibility(View.VISIBLE);
             } else {
                 onlineImageView.setVisibility(View.GONE);
             }
-            statusTextView.setText(friend.getStatus());
-            onlineStatusTextView.setText(friend.getOnlineStatus());
+            statusTextView.setText(user.getStatus());
+            onlineStatusTextView.setText(user.getOnlineStatus());
         }
     }
 

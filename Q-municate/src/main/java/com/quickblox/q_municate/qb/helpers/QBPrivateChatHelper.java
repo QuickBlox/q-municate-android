@@ -232,18 +232,23 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(
                     notificationType)) {
                 messageDeliveryStatusReceived(chatMessage);
-            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(
-                    notificationType)) {
-                friendRequestMessageReceived(chatMessage);
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(notificationType)) {
+                friendRequestMessageReceived(chatMessage, FriendsNotificationType.REQUEST);
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST.equals(notificationType)) {
+                friendRequestMessageReceived(chatMessage, FriendsNotificationType.ACCEPT);
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST.equals(notificationType)) {
+                friendRequestMessageReceived(chatMessage, FriendsNotificationType.REJECT);
+            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST.equals(notificationType)) {
+                friendRequestMessageReceived(chatMessage, FriendsNotificationType.REMOVE);
             } else {
                 updateDialogByNotification(chatMessage);
             }
         }
     }
 
-    private void friendRequestMessageReceived(QBChatMessage chatMessage) {
+    private void friendRequestMessageReceived(QBChatMessage chatMessage, FriendsNotificationType type) {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
-        messageCache.setFriendsNotificationType(FriendsNotificationType.REQUEST);
+        messageCache.setFriendsNotificationType(type);
         saveMessageToCache(messageCache);
     }
 }

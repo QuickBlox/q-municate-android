@@ -29,8 +29,8 @@ import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;
+import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
@@ -78,7 +78,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
-    private ContentObserver messagesTableContentObserver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -186,6 +185,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
         addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
+        addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
+        addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -430,6 +433,24 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             hideActionBarProgress();
+        }
+    }
+
+    private class AcceptFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            //            initFriendsList();
+        }
+    }
+
+    private class RejectFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+            //            initFriendsList();
         }
     }
 }

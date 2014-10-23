@@ -11,12 +11,14 @@ import android.text.TextUtils;
 import com.quickblox.module.chat.model.QBChatHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.db.tables.UserTable;
+import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.MessageCache;
@@ -588,7 +590,7 @@ public class DatabaseManager {
             long time = historyMessage.getDateSent();
 
             String attachURL;
-            String friendsMessageType;
+            int friendsMessageTypeCode;
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
@@ -596,9 +598,13 @@ public class DatabaseManager {
                     attachURL, time, true, true);
 
             if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
-                friendsMessageType = historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString();
-                if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(friendsMessageType)) {
-                    messageCache.setFriendsNotificationType(FriendsNotificationType.REQUEST);
+                friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
+                if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(friendsMessageTypeCode + Consts.EMPTY_STRING)
+                        || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST.equals(friendsMessageTypeCode + Consts.EMPTY_STRING)
+                        || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST.equals(friendsMessageTypeCode + Consts.EMPTY_STRING)
+                        || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST.equals(friendsMessageTypeCode + Consts.EMPTY_STRING)) {
+                    messageCache.setFriendsNotificationType(FriendsNotificationType.parseByCode(
+                            friendsMessageTypeCode));
                 }
             }
 
@@ -612,22 +618,17 @@ public class DatabaseManager {
 
     public static void saveChatMessage(Context context, MessageCache messageCache) {
         ContentValues values = new ContentValues();
-        String body = messageCache.getMessage();
 
         values.put(MessageTable.Cols.ID, messageCache.getId());
         values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
         values.put(MessageTable.Cols.PACKET_ID, messageCache.getPacketId());
         values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
 
-        if (TextUtils.isEmpty(body)) {
-            values.put(MessageTable.Cols.BODY, body);
-        } else {
-            values.put(MessageTable.Cols.BODY, Html.fromHtml(body).toString());
-        }
-
         if (messageCache.getFriendsNotificationType() != null) {
             values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE, messageCache.getFriendsNotificationType().getCode());
         }
+
+        values.put(MessageTable.Cols.BODY, parseMessageBody(context, messageCache));
 
         values.put(MessageTable.Cols.TIME, messageCache.getTime());
         values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
@@ -643,6 +644,43 @@ public class DatabaseManager {
 
         updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
                 messageCache.getSenderId(), countUnreadMessagesLocal);
+    }
+
+    private static String parseMessageBody(Context context, MessageCache messageCache) {
+        String resultMessage = messageCache.getMessage();
+
+        if (messageCache.getFriendsNotificationType() != null) {
+            QBUser user = AppSession.getSession().getUser();
+            boolean ownMessage = user.getId().equals(messageCache.getSenderId());
+
+            boolean acceptMessage = FriendsNotificationType.ACCEPT.equals(messageCache.getFriendsNotificationType());
+            boolean rejectMessage = FriendsNotificationType.REJECT.equals(messageCache.getFriendsNotificationType());
+            boolean removeMessage = FriendsNotificationType.REMOVE.equals(messageCache.getFriendsNotificationType());
+
+            if (acceptMessage) {
+                if (ownMessage) {
+                    resultMessage = context.getResources().getString(R.string.frl_friends_request_accept_message_for_me);
+                }
+            } else if (rejectMessage) {
+                if (ownMessage) {
+                    resultMessage = context.getResources().getString(R.string.frl_friends_request_reject_message_for_me);
+                }
+            } else if (removeMessage) {
+                if (ownMessage) {
+                    resultMessage = context.getResources().getString(R.string.frl_friends_request_remove_message_for_me);
+                }
+            } else {
+                if (ownMessage) {
+                    resultMessage = context.getResources().getString(R.string.frl_friends_request_message_for_me);
+                }
+            }
+        } else {
+            if (!TextUtils.isEmpty(messageCache.getMessage())) {
+                resultMessage =  Html.fromHtml(messageCache.getMessage()).toString();
+            }
+        }
+
+        return resultMessage;
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {

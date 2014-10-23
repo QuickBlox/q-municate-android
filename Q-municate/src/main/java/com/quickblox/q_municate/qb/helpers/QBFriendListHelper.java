@@ -9,7 +9,6 @@ import android.util.Log;
 import com.quickblox.internal.core.exception.QBResponseException;
 import com.quickblox.internal.core.request.QBPagedRequestBuilder;
 import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
 import com.quickblox.module.chat.QBRoster;
 import com.quickblox.module.chat.listeners.QBRosterListener;
 import com.quickblox.module.chat.listeners.QBSubscriptionListener;
@@ -19,17 +18,11 @@ import com.quickblox.module.chat.model.QBPresence;
 import com.quickblox.module.chat.model.QBRosterEntry;
 import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
-import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
-import com.quickblox.q_municate.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.utils.ChatUtils;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
 
@@ -82,32 +75,47 @@ public class QBFriendListHelper extends BaseHelper {
     public void inviteFriend(int userId) throws Exception {
         if (isNotInvited(userId)) {
             sendInvitation(userId);
+
+            QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+            sendNotificationToFriend(chatMessage, userId);
         }
     }
 
     public void addFriend(int userId) throws Exception {
         createFriend(userId, false);
         sendInvitation(userId);
-        sendNotificationToFriend(userId);
+
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+        sendNotificationToFriend(chatMessage, userId);
     }
 
-    private void sendNotificationToFriend(int userId) throws QBResponseException {
+    private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
+        QBDialog existingPrivateDialog = createPrivateDialog(userId);
+        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
+    }
+
+    private QBDialog createPrivateDialog(int userId) throws QBResponseException {
         QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
         if (existingPrivateDialog == null) {
             existingPrivateDialog = privateChatHelper.createPrivateChatOnRest(userId);
         }
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
-        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
+        return existingPrivateDialog;
     }
 
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
+
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForAcceptFriendsRequest(context);
+        sendNotificationToFriend(chatMessage, userId);
     }
 
     public void rejectFriend(int userId) throws Exception {
         roster.reject(userId);
         clearRosterEntry(userId);
-        deleteUser(userId);
+        deleteFriend(userId);
+
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRejectFriendsRequest(context);
+        sendNotificationToFriend(chatMessage, userId);
     }
 
     private void clearRosterEntry(int userId) throws Exception {
@@ -120,7 +128,10 @@ public class QBFriendListHelper extends BaseHelper {
     public void removeFriend(int userId) throws Exception {
         roster.unsubscribe(userId);
         clearRosterEntry(userId);
-        deleteUser(userId);
+        deleteFriend(userId);
+
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRemoveFriendsRequest(context);
+        sendNotificationToFriend(chatMessage, userId);
     }
 
     private boolean isNotInvited(int userId) {
@@ -189,51 +200,11 @@ public class QBFriendListHelper extends BaseHelper {
         }
 
         Friend friend = FriendUtils.createFriend(rosterEntry);
-        Friend oldFriend = DatabaseManager.getFriendById(context, friend.getUserId());
 
         saveUser(user);
         saveFriend(friend);
 
-        if (oldFriend != null) {
-            checkAlertShowing(friend, oldFriend);
-        }
-
         fillUserOnlineStatus(user);
-    }
-
-    private void checkAlertShowing(Friend newFriend, Friend oldFriend) {
-        String alertMessage = null;
-
-        String friendName = DatabaseManager.getUserById(context, newFriend.getUserId()).getFullName();
-
-        boolean friendRejectedMe = oldFriend.isAskStatus() && !newFriend.isAskStatus() && newFriend
-                .getRelationStatus().equals(RELATION_STATUS_NONE);
-        boolean friendAcceptedMe = oldFriend.isAskStatus() && newFriend.getRelationStatus().equals(
-                RELATION_STATUS_TO);
-        boolean friendDeletedMe = (oldFriend.getRelationStatus().equals(RELATION_STATUS_TO) || oldFriend
-                .getRelationStatus().equals(RELATION_STATUS_FROM) || oldFriend.getRelationStatus().equals(
-                RELATION_STATUS_BOTH)) && newFriend.getRelationStatus().equals(RELATION_STATUS_NONE);
-
-        if (friendRejectedMe || friendDeletedMe) {
-            try {
-                clearRosterEntry(newFriend.getUserId());
-                deleteUser(newFriend.getUserId());
-            } catch (Exception e) {
-                ErrorUtils.logError(e);
-            }
-
-            if (friendRejectedMe) {
-                alertMessage = context.getString(R.string.frl_alrt_reject_friend, friendName);
-            } else if (friendDeletedMe) {
-                alertMessage = context.getString(R.string.frl_alrt_deleted_friend, friendName);
-            }
-        } else if (friendAcceptedMe) {
-            alertMessage = context.getString(R.string.frl_alrt_accepted_friend, friendName);
-        }
-
-        if (alertMessage != null) {
-            notifyFriendAlert(alertMessage);
-        }
     }
 
     protected void notifyFriendAlert(String message) {
@@ -308,7 +279,7 @@ public class QBFriendListHelper extends BaseHelper {
         DatabaseManager.saveFriend(context, friend);
     }
 
-    private void deleteFriend1(int userId) {
+    private void deleteFriend(int userId) {
         DatabaseManager.deleteFriendById(context, userId);
     }
 

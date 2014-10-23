@@ -78,9 +78,14 @@
     <string name="frl_column_header_name_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
-    <string name="frl_alrt_reject_friend">%1$s has rejected your contact request.</string>
-    <string name="frl_alrt_accepted_friend">%1$s has accepted your contact request. </string>
-    <string name="frl_alrt_deleted_friend">%1$s has deleted you from contacts list. </string>
+    <string name="frl_friends_request_message_for_friend">%1$s has sent a request to you </string>
+    <string name="frl_friends_request_message_for_me">Your request has been sent </string>
+    <string name="frl_friends_request_accept_message_for_friend">%1$s has accepted your contact request</string>
+    <string name="frl_friends_request_accept_message_for_me">You have accepted a request </string>
+    <string name="frl_friends_request_reject_message_for_friend">Your request has been rejected </string>
+    <string name="frl_friends_request_reject_message_for_me">You have rejected a request</string>
+    <string name="frl_friends_request_remove_message_for_friend">%1$s has delete you from contacts </string>
+    <string name="frl_friends_request_remove_message_for_me">Contact has deleted from your contacts </string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -247,8 +252,6 @@
     <string name="uploading_file">Uploading… Please wait</string>
     <string name="user_created_room">%1$s created group chat</string>
     <string name="user_read_message">%1$s read message</string>
-    <string name="friends_request_message">Please add me as a contact</string>
-
     <string name="label_done">Done</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>

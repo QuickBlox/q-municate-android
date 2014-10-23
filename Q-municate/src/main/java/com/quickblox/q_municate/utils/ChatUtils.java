@@ -42,7 +42,11 @@ public class ChatUtils {
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
     public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
     public static final String PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS = "3";
+
     public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST = "4";
+    public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST = "5";
+    public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST = "6";
+    public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST = "7";
 
     public static int getOccupantIdFromList(ArrayList<Integer> occupantsIdsList) {
         QBUser user = AppSession.getSession().getUser();
@@ -214,10 +218,31 @@ public class ChatUtils {
     }
 
     public static QBChatMessage createNotificationMessageForFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_message_for_friend,
+                PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST);
+    }
+
+    public static QBChatMessage createNotificationMessageForAcceptFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_accept_message_for_friend,
+                PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST);
+    }
+
+    public static QBChatMessage createNotificationMessageForRejectFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_reject_message_for_friend,
+                PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST);
+    }
+
+    public static QBChatMessage createNotificationMessageForRemoveFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_remove_message_for_friend,
+                PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST);
+    }
+
+    private static QBChatMessage createChatMessageForFriendsRequests(Context context, int messageResourceId, String requestType) {
+        QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody(context.getResources().getString(R.string.friends_request_message));
+        chatMessage.setBody(context.getResources().getString(messageResourceId, user.getFullName()));
         chatMessage.setProperty(ChatUtils.PROPERTY_SAVE_TO_HISTORY, ChatUtils.VALUE_SAVE_TO_HISTORY);
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, requestType);
         long time = DateUtils.getCurrentTime();
         chatMessage.setProperty(PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
         return chatMessage;

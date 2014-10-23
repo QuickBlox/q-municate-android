@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.friends;
 
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -26,14 +25,11 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
-import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
@@ -230,12 +226,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
 
-        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
-
-        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
 
@@ -346,33 +336,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchView.clearFocus();
     }
 
-    private void acceptUser(final int userId) {
-        baseActivity.showProgress();
-        QBAcceptFriendCommand.start(baseActivity, userId);
-    }
-
-    private void rejectUser(final int userId) {
-        showRejectUserDialog(userId);
-    }
-
-    private void showRejectUserDialog(final int userId) {
-        User user = DatabaseManager.getUserById(baseActivity, userId);
-        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(R.string.frl_dlg_reject_friend, user.getFullName()));
-        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                baseActivity.showProgress();
-                QBRejectFriendCommand.start(baseActivity, userId);
-            }
-        });
-        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        alertDialog.show(getFragmentManager(), null);
-    }
-
     private void checkUsersListLoader() {
         searchTimer.cancel();
         searchTimer = new Timer();
@@ -414,10 +377,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public interface FriendOperationListener {
 
         void onAddUserClicked(int userId);
-
-        void onAcceptUserClicked(int userId);
-
-        void onRejectUserClicked(int userId);
     }
 
     private class SearchTimerTask extends TimerTask {
@@ -456,16 +415,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void onAddUserClicked(int userId) {
             addToFriendList(userId);
         }
-
-        @Override
-        public void onAcceptUserClicked(int userId) {
-            acceptUser(userId);
-        }
-
-        @Override
-        public void onRejectUserClicked(int userId) {
-            rejectUser(userId);
-        }
     }
 
     private class AddFriendSuccessAction implements Command {
@@ -474,24 +423,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();
             searchItem.collapseActionView();
-        }
-    }
-
-    private class AcceptFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
-            initFriendsList();
-        }
-    }
-
-    private class RejectFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
-            initFriendsList();
         }
     }
 

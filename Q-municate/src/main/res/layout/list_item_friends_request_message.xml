@@ -2,23 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/list_item_background_selector"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
     <TextView
         android:id="@+id/time_text_message_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="12-25"
-        android:textColor="@color/dark_gray" />
+        android:textColor="@color/dark_gray"
+        android:background="@color/white"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/list_item_background_selector"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="5dp">
 
         <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
             android:id="@+id/message_textview"
@@ -28,7 +29,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Friend fullName Friend fullName Friend fullName Friend fullName"
+            android:gravity="center"
             android:textColor="@color/gray"
             android:textSize="@dimen/text_size" />
 
@@ -49,9 +50,9 @@
             <View
                 android:id="@+id/divider_view"
                 android:layout_width="@dimen/divider_width"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:background="@color/dark_gray"
-                android:visibility="visible" />
+                android:padding="1dp"/>
 
             <ImageButton
                 android:id="@+id/accept_friend_imagebutton"
