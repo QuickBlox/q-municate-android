@@ -82,7 +82,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void addFriend(int userId) throws Exception {
-        createFriend(userId, false);
+        createFriend(userId);
         sendInvitation(userId);
 
         QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
@@ -207,15 +207,9 @@ public class QBFriendListHelper extends BaseHelper {
         fillUserOnlineStatus(user);
     }
 
-    protected void notifyFriendAlert(String message) {
-        Intent intent = new Intent(QBServiceConsts.FRIEND_ALERT_SHOW);
-        intent.putExtra(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE, message);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    private void createFriend(int userId, boolean requestedFriend) throws QBResponseException {
+    private void createFriend(int userId) throws QBResponseException {
         User user = restHelper.loadUser(userId);
-        Friend friend = FriendUtils.createFriend(userId, requestedFriend);
+        Friend friend = FriendUtils.createFriend(userId);
         fillUserOnlineStatus(user);
 
         saveUser(user);
@@ -296,7 +290,7 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void addedFriends(Collection<Integer> userIdsList) throws QBResponseException {
         for (Integer userId : userIdsList) {
-            createFriend(userId, true);
+            createFriend(userId);
         }
     }
 
@@ -341,7 +335,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                createFriend(userId, true);
+                createFriend(userId);
                 notifyContactRequest();
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);

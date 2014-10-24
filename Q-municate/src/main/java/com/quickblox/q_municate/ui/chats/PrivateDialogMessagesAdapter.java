@@ -27,6 +27,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private static int TYPE_OPPONENT_MESSAGE = 2;
     private static int COMMON_TYPE_COUNT = 3;
 
+    private static int EMPTY_POSITION = -1;
+
+    private int lastRequestPosition = EMPTY_POSITION;
+    private int lastInfoRequestPosition = EMPTY_POSITION;
     private PrivateDialogActivity.FriendOperationListener friendOperationListener;
 
     public PrivateDialogMessagesAdapter(Context context,
@@ -118,31 +122,23 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
 
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
-        boolean friendsRequestMessage = FriendsNotificationType.REQUEST.equals(messageCache.getFriendsNotificationType());
-        boolean friendsInfoRequestMessage = messageCache.getFriendsNotificationType() != null && !friendsRequestMessage;
+        boolean friendsRequestMessage = FriendsNotificationType.REQUEST.equals(
+                messageCache.getFriendsNotificationType());
+        boolean friendsInfoRequestMessage = messageCache
+                .getFriendsNotificationType() != null && !friendsRequestMessage;
 
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
 
-            if (ownMessage) {
-                setVisibilityFriendsActions(viewHolder, View.GONE);
-            } else {
-                boolean isFriend = DatabaseManager.isFriendInBase(context, messageCache.getSenderId());
-                if (!isFriend) {
-                    setVisibilityFriendsActions(viewHolder, View.VISIBLE);
-                    initListeners(viewHolder, messageCache.getSenderId());
-                } else {
-                    setVisibilityFriendsActions(viewHolder, View.GONE);
-                }
-            }
-
+            setVisibilityFriendsActions(viewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
 
+            lastInfoRequestPosition = cursor.getPosition();
         } else if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
             resetUI(viewHolder);
 
@@ -166,10 +162,32 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     messageCache.isDelivered()));
         }
 
-        if (!messageCache.isRead() && !friendsRequestMessage && !friendsInfoRequestMessage) {
+        if (!messageCache.isRead()) {
             messageCache.setRead(true);
             QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
+
+        // check if last message is request message
+        boolean lastRequestMessage = cursor.getPosition() == cursor.getCount() - 1 && friendsRequestMessage;
+        if (lastRequestMessage) {
+            findLastFriendsRequestForCursor(cursor);
+        }
+
+        // check if friend was rejected/deleted.
+        if (lastRequestPosition != EMPTY_POSITION && lastRequestPosition < lastInfoRequestPosition) {
+            lastRequestPosition = EMPTY_POSITION;
+        } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == cursor.getPosition())) { // set visible friends actions
+            setVisibilityFriendsActions(viewHolder, View.VISIBLE);
+            initListeners(viewHolder, messageCache.getSenderId());
+        }
+    }
+
+    public void clearLastRequestMessagePosition() {
+        lastRequestPosition = EMPTY_POSITION;
+    }
+
+    public void findLastFriendsRequestMessagesPosition() {
+        new FindLastFriendsRequestThread().run();
     }
 
     private void setVisibilityFriendsActions(ViewHolder viewHolder, int visibility) {
@@ -192,5 +210,41 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 friendOperationListener.onRejectUserClicked(userId);
             }
         });
+    }
+
+    private void findLastFriendsRequest() {
+        Cursor cursor = getCursor();
+        for (int i = 0; i < getCursor().getCount(); i++) {
+            cursor.moveToPosition(i);
+            findLastFriendsRequestForCursor(cursor);
+        }
+    }
+
+    private void findLastFriendsRequestForCursor(Cursor cursor) {
+        boolean ownMessage;
+        boolean friendsRequestMessage;
+        boolean isFriend;
+
+        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        if (messageCache.getFriendsNotificationType() != null) {
+            ownMessage = isOwnMessage(messageCache.getSenderId());
+            friendsRequestMessage = FriendsNotificationType.REQUEST.equals(
+                    messageCache.getFriendsNotificationType());
+
+            if (friendsRequestMessage && !ownMessage) {
+                isFriend = DatabaseManager.isFriendInBase(context, messageCache.getSenderId());
+                if (!isFriend) {
+                    lastRequestPosition = cursor.getPosition();
+                }
+            }
+        }
+    }
+
+    private class FindLastFriendsRequestThread extends Thread {
+
+        @Override
+        public void run() {
+            findLastFriendsRequest();
+        }
     }
 }

@@ -31,7 +31,8 @@
             android:maxLines="2"
             android:gravity="center"
             android:textColor="@color/gray"
-            android:textSize="@dimen/text_size" />
+            android:textSize="@dimen/text_size"
+            android:paddingRight="5dp" />
 
         <LinearLayout
             android:id="@+id/actions_friend_linearlayout"

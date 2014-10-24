@@ -171,6 +171,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
                 getAllDialogMessagesByDialogId(), this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
     }
 
     private void initActionBar() {

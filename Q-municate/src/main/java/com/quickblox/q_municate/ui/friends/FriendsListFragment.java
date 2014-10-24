@@ -239,7 +239,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     private void initFriendsList() {
         baseActivity.showActionBarProgress();
-        createHeadersCursor();
+
+        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+        createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, null,
                 friendOperationAction, false);
@@ -248,7 +250,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        createHeadersForSearchCursor();
+        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
+        createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
                 friendOperationAction, true);
@@ -280,30 +283,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
-    private void createHeadersCursor() {
+    private void createHeadersCursor(int countFriends) {
         headersCursor = new MatrixCursor(
                 new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
-
-        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
-
-        if (countFriends > Consts.ZERO_INT_VALUE) {
-            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
-                    QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, resources
-                    .getString(R.string.frl_column_header_name_contacts)});
-        }
-
-        if (state == State.GLOBAL_LIST) {
-            headersCursor.addRow(
-                    new String[]{QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_ALL_USERS, resources
-                            .getString(R.string.frl_column_header_name_all_users)});
-        }
-    }
-
-    private void createHeadersForSearchCursor() {
-        headersCursor = new MatrixCursor(
-                new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
-
-        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
 
         if (countFriends > Consts.ZERO_INT_VALUE) {
             headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,

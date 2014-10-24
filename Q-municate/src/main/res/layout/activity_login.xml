@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/lgn_email_hint"
         android:inputType="textEmailAddress"
-        android:maxLength="128"
-        android:text="sergey8@ser.com" />
+        android:maxLength="128" />
 
     <EditText
         android:id="@+id/password_edittext"
@@ -22,8 +21,7 @@
         android:layout_marginTop="30dp"
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
-        android:maxLength="256"
-        android:text="serik111" />
+        android:maxLength="256" />
 
     <CheckBox
         android:id="@+id/remember_me_checkbox"

@@ -58,11 +58,10 @@ public class FriendUtils {
         return friend;
     }
 
-    public static Friend createFriend(int userId, boolean requestedFriend) {
+    public static Friend createFriend(int userId) {
         Friend friend = new Friend();
         friend.setUserId(userId);
         friend.setRelationStatus(RosterPacket.ItemType.none.name());
-        friend.setRequestedFriend(requestedFriend);
         return friend;
     }
 
@@ -116,7 +115,7 @@ public class FriendUtils {
 
     public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
         MatrixCursor usersCursor = new MatrixCursor(
-                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK, FriendTable.Cols.IS_REQUESTED_FRIEND});
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK});
 
         List<User> friendsList = DatabaseManager.getAllFriendsList(context);
 
@@ -125,7 +124,7 @@ public class FriendUtils {
                 usersCursor.addRow(new String[]{user.getUserId() + Consts.EMPTY_STRING, user
                         .getUserId() + Consts.EMPTY_STRING, user.getFullName(), user.getEmail(), user
                         .getPhone(), user.getAvatarUrl(), user
-                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING});
+                        .getStatus(), Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, Consts.ZERO_INT_VALUE + Consts.EMPTY_STRING});
             }
         }
 

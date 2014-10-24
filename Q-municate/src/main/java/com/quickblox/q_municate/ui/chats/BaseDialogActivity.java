@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.chats;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -440,6 +439,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
             hideProgress();
             startLoadDialogMessages();
         }
@@ -449,6 +449,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
             hideProgress();
             startLoadDialogMessages();
         }
