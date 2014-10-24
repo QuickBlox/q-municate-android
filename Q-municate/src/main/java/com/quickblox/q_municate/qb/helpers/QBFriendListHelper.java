@@ -283,13 +283,9 @@ public class QBFriendListHelper extends BaseHelper {
         DatabaseManager.deleteFriendById(context, userId);
     }
 
-    private void deleteUser(int userId) {
-        DatabaseManager.deleteUserById(context, userId);
-    }
-
-    private void deleteUsers(Collection<Integer> userIdsList) throws QBResponseException {
+    private void deleteFriends(Collection<Integer> userIdsList) throws QBResponseException {
         for (Integer userId : userIdsList) {
-            deleteUser(userId);
+            deleteFriend(userId);
         }
     }
 
@@ -309,7 +305,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesDeleted(Collection<Integer> userIdsList) {
             try {
-                deleteUsers(userIdsList);
+                deleteFriends(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_DELETED_ERROR, e);
             }

@@ -126,23 +126,22 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
 
             if (ownMessage) {
-                setViewVisibility(viewHolder.acceptFriendImageView, View.GONE);
-                setViewVisibility(viewHolder.dividerView, View.GONE);
-                setViewVisibility(viewHolder.rejectFriendImageView, View.GONE);
+                setVisibilityFriendsActions(viewHolder, View.GONE);
             } else {
-                setViewVisibility(viewHolder.acceptFriendImageView, View.VISIBLE);
-                setViewVisibility(viewHolder.dividerView, View.VISIBLE);
-                setViewVisibility(viewHolder.rejectFriendImageView, View.VISIBLE);
-                initListeners(viewHolder, messageCache.getSenderId());
+                boolean isFriend = DatabaseManager.isFriendInBase(context, messageCache.getSenderId());
+                if (!isFriend) {
+                    setVisibilityFriendsActions(viewHolder, View.VISIBLE);
+                    initListeners(viewHolder, messageCache.getSenderId());
+                } else {
+                    setVisibilityFriendsActions(viewHolder, View.GONE);
+                }
             }
 
         } else if (friendsInfoRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
 
-            setViewVisibility(viewHolder.acceptFriendImageView, View.GONE);
-            setViewVisibility(viewHolder.dividerView, View.GONE);
-            setViewVisibility(viewHolder.rejectFriendImageView, View.GONE);
+            setVisibilityFriendsActions(viewHolder, View.GONE);
 
         } else if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
             resetUI(viewHolder);
@@ -171,6 +170,12 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             messageCache.setRead(true);
             QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
         }
+    }
+
+    private void setVisibilityFriendsActions(ViewHolder viewHolder, int visibility) {
+        setViewVisibility(viewHolder.acceptFriendImageView, visibility);
+        setViewVisibility(viewHolder.dividerView, visibility);
+        setViewVisibility(viewHolder.rejectFriendImageView, visibility);
     }
 
     private void initListeners(ViewHolder viewHolder, final int userId) {

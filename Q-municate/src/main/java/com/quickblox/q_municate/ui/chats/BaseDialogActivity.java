@@ -441,7 +441,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            //            initFriendsList();
+            startLoadDialogMessages();
         }
     }
 
@@ -450,7 +450,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             hideProgress();
-            //            initFriendsList();
+            startLoadDialogMessages();
         }
     }
 }

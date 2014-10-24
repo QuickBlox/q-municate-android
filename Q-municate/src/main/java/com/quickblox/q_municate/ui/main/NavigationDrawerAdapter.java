@@ -14,7 +14,6 @@ import java.util.List;
 public class NavigationDrawerAdapter extends BaseListAdapter<String> implements NavigationDrawerFragment.NavigationDrawerCounterListener {
 
     private TextView counterUnreadChatsDialogsTextView;
-    private TextView counterContactRequestsTextView;
 
     public NavigationDrawerAdapter(BaseActivity activity, List<String> objects) {
         super(activity, objects);
@@ -27,8 +26,6 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
 
         String chatItem = resources.getStringArray(
                 R.array.nvd_items_array)[MainActivity.ID_CHATS_LIST_FRAGMENT];
-        String contactsItem = resources.getStringArray(
-                R.array.nvd_items_array)[MainActivity.ID_CONTACTS_LIST_FRAGMENT];
 
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_navigation_drawer, null);
@@ -45,10 +42,6 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
             counterUnreadChatsDialogsTextView = viewHolder.counterTextView;
         }
 
-        if (data.equals(contactsItem)) {
-            counterContactRequestsTextView = viewHolder.counterTextView;
-        }
-
         viewHolder.nameTextView.setText(data);
 
         return convertView;
@@ -57,11 +50,6 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
     @Override
     public void onUpdateCountUnreadDialogs(int count) {
         updateCounter(counterUnreadChatsDialogsTextView, count);
-    }
-
-    @Override
-    public void onUpdateCountContactRequests(int count) {
-        updateCounter(counterContactRequestsTextView, count);
     }
 
     private void updateCounter(TextView counterTextView, int count) {
