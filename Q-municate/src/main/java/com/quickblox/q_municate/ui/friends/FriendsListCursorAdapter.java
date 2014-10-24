@@ -33,7 +33,6 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private Context context;
     private Resources resources;
     private FriendsListFragment.FriendOperationListener friendOperationListener;
-    private int relationStatusNoneId;
     private int relationStatusAllUsersId;
     private MatrixCursor usersCursor;
     private boolean forSearch;
@@ -45,7 +44,6 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         this.friendOperationListener = friendOperationListener;
         this.usersCursor = usersCursor;
         resources = context.getResources();
-        relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
         relationStatusAllUsersId = QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS;
         this.forSearch = forSearch;
     }
@@ -65,9 +63,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
                 return DatabaseManager.getFriendsByFullName(context, searchCharacters);
             }
         } else {
-            if (relationStatusId == relationStatusNoneId) {
-                return DatabaseManager.getAllFriends(context, relationStatusId);
-            } else if (relationStatusId == relationStatusAllUsersId) {
+            if (relationStatusId == relationStatusAllUsersId) {
                 return usersCursor;
             } else {
                 return DatabaseManager.getAllFriends(context);
@@ -157,15 +153,10 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
                     .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
                     .equals(QBFriendListHelper.RELATION_STATUS_TO);
             boolean isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && isAskStatus;
-            boolean isPendingFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && !isAskStatus;
             if (isAddedFriend) {
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 viewHolder.onlineImageView.setVisibility(View.GONE);
                 status = resources.getString(R.string.frl_pending_request_status);
-            } else if (isPendingFriend) {
-                viewHolder.addFriendImageView.setVisibility(View.GONE);
-                viewHolder.onlineImageView.setVisibility(View.GONE);
-                status = resources.getString(R.string.frl_pending_status);
             } else if (isAllFriends) {
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 setStatusVisibility(viewHolder, user.isOnline());

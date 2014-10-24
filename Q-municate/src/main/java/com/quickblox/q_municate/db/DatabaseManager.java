@@ -555,17 +555,6 @@ public class DatabaseManager {
         return count;
     }
 
-    public static int getCountContactRequests(Context context) {
-        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
-        Cursor cursor = getAllFriends(context, relationStatusNoneId);
-
-        int count = cursor.getCount();
-
-        cursor.close();
-
-        return count;
-    }
-
     public static Cursor getAllDialogMessagesByDialogId(Context context, String dialogId) {
         return context.getContentResolver().query(MessageTable.CONTENT_URI, null,
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,

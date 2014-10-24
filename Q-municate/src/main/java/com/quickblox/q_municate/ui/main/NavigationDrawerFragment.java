@@ -255,10 +255,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         return DatabaseManager.getCountUnreadDialogs(baseActivity);
     }
 
-    private int getCountContactRequests() {
-        return DatabaseManager.getCountContactRequests(baseActivity);
-    }
-
     public interface NavigationDrawerCallbacks {
 
         void onNavigationDrawerItemSelected(int position);
