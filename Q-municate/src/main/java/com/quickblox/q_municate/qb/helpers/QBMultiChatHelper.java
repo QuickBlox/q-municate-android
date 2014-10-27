@@ -173,11 +173,15 @@ public class QBMultiChatHelper extends BaseChatHelper {
                 notifyFriendOnUpdateChat(dialog, friendId);
             } catch (QBResponseException responseException) {
                 ErrorUtils.logError(responseException);
+            } catch (SmackException.NotConnectedException e) {
+                ErrorUtils.logError(e);
+            } catch (XMPPException e) {
+                ErrorUtils.logError(e);
             }
         }
     }
 
-    private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws QBResponseException {
+    private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
         long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
         if (chat == null) {
@@ -185,14 +189,10 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
         QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
         chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
-        try {
-            chat.sendMessage(chatMessage);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
+        chat.sendMessage(chatMessage);
     }
 
-    private void notifyFriendOnUpdateChat(QBDialog dialog, Integer friendId) throws QBResponseException {
+    private void notifyFriendOnUpdateChat(QBDialog dialog, Integer friendId) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
         long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
         if (chat == null) {
@@ -200,11 +200,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
         QBChatMessage chatMessage = ChatUtils.createUpdateChatNotificationMessage(dialog);
         chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + Consts.EMPTY_STRING);
-        try {
-            chat.sendMessage(chatMessage);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
+        chat.sendMessage(chatMessage);
     }
 
     private QBGroupChat createChatIfNotExist(QBDialog dialog) throws QBResponseException {

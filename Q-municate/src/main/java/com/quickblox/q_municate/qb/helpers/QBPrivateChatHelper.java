@@ -174,11 +174,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
         QBDialog dialog = privateChatManager.createDialog(opponentId);
         saveDialogToCache(context, dialog);
-        try {
-            notifyFriendCreatedPrivateChat(dialog, opponentId);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
+        notifyFriendCreatedPrivateChat(dialog, opponentId);
         return dialog;
     }
 

@@ -23,6 +23,7 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
@@ -48,6 +49,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private User opponentFriend;
     private ContentObserver statusContentObserver;
+    private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
     private FriendOperationAction friendOperationAction;
 
@@ -72,7 +74,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         friendCursor = DatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
         initListView();
         initActionBar();
-        registerStatusChangingObserver();
+        registerContentObservers();
         setCurrentDialog(dialog);
     }
 
@@ -120,13 +122,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return bundle;
     }
 
-    private void registerStatusChangingObserver() {
+    private void registerContentObservers() {
         statusContentObserver = new ContentObserver(new Handler()) {
-
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
-            }
 
             @Override
             public void onChange(boolean selfChange) {
@@ -136,11 +133,24 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             }
         };
         friendCursor.registerContentObserver(statusContentObserver);
+
+        friendsTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                checkMessageSendingPossibility();
+            }
+        };
+        getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true, friendsTableContentObserver);
     }
 
     private void unregisterStatusChangingObserver() {
         if (friendCursor != null && statusContentObserver != null) {
             friendCursor.unregisterContentObserver(statusContentObserver);
+        }
+
+        if (friendsTableContentObserver != null) {
+            getContentResolver().unregisterContentObserver(friendsTableContentObserver);
         }
     }
 
@@ -242,6 +252,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
         startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
+
+        checkMessageSendingPossibility();
+    }
+
+    private void checkMessageSendingPossibility() {
+        if (!DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId())) {
+            messageEditText.setEnabled(false);
+        } else {
+            messageEditText.setEnabled(true);
+        }
     }
 
     private void acceptUser(final int userId) {
