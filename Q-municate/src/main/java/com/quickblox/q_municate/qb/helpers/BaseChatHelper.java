@@ -95,7 +95,7 @@ public abstract class BaseChatHelper extends BaseHelper {
         return chatMessage;
     }
 
-    public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
+    public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws Exception {
         updateStatusMessage(dialog.getDialogId(), messageCache.getId(), messageCache.isRead());
         sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(),
                 messageCache.getSenderId(), dialog.getType().getCode());

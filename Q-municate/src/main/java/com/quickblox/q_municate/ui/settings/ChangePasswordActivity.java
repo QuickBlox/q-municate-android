@@ -13,6 +13,8 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBChangePasswordCommand;
+import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
+import com.quickblox.q_municate.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -90,8 +92,10 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private void addActions() {
         addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
-        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginChatSuccessAction());
-        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, new LogoutChatSuccessAction());
+        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginChatSuccessAction());
+        addAction(QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -109,21 +113,29 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         AppSession.getSession().updateUser(user);
     }
 
-    private void relogin(){
+    private void logoutChat(){
         showProgress();
-        QBReloginCommand.start(ChangePasswordActivity.this);
+        QBLogoutAndDestroyChatCommand.start(this, true);
     }
 
     @Override
     protected void onFailAction(String action) {
         super.onFailAction(action);
-        if(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION.equals(action)){
+        if (QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION.equals(action) || QBServiceConsts.LOGIN_FAIL_ACTION.equals(action)) {
             hideProgress();
             finish();
         }
     }
 
-    private class ReloginChatSuccessAction implements Command {
+    private class LogoutChatSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBLoginAndJoinDialogsCommand.start(ChangePasswordActivity.this);
+        }
+    }
+
+    private class LoginChatSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -138,9 +150,8 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             saveUserCredentials(user);
-            hideProgress();
             DialogUtils.showLong(ChangePasswordActivity.this, getString(R.string.dlg_password_changed));
-            relogin();
+            logoutChat();
         }
     }
 

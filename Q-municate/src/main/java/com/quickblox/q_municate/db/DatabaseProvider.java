@@ -7,10 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
-import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.utils.Consts;
 
@@ -48,13 +48,13 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             }
             case UserTable.USER_FRIEND_PATH_TOKEN: {
-                result = doQuery(db, uri, UserTable.TABLE_NAME + ", " + FriendTable.TABLE_NAME, projection, selection, selectionArgs,
-                        sortOrder);
+                result = doQuery(db, uri, UserTable.TABLE_NAME + ", " + FriendTable.TABLE_NAME, projection,
+                        selection, selectionArgs, sortOrder);
                 break;
             }
             case FriendsRelationTable.PATH_TOKEN: {
-                result = doQuery(db, uri, FriendsRelationTable.TABLE_NAME, projection, selection, selectionArgs,
-                        sortOrder);
+                result = doQuery(db, uri, FriendsRelationTable.TABLE_NAME, projection, selection,
+                        selectionArgs, sortOrder);
                 break;
             }
             case DialogTable.PATH_TOKEN: {
@@ -68,18 +68,6 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             }
         }
-
-        return result;
-    }
-
-    private Cursor doQuery(SQLiteDatabase db, Uri uri, String tableName, String[] projection,
-            String selection, String[] selectionArgs, String sortOrder) {
-
-        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        builder.setTables(tableName);
-        Cursor result = builder.query(db, projection, selection, selectionArgs, sortOrder, null, null);
-
-        result.setNotificationUri(getContext().getContentResolver(), uri);
 
         return result;
     }
@@ -107,7 +95,8 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             }
             case FriendsRelationTable.PATH_TOKEN: {
-                result = doInsert(db, FriendsRelationTable.TABLE_NAME, FriendsRelationTable.CONTENT_URI, uri, values);
+                result = doInsert(db, FriendsRelationTable.TABLE_NAME, FriendsRelationTable.CONTENT_URI, uri,
+                        values);
                 break;
             }
             case DialogTable.PATH_TOKEN: {
@@ -115,8 +104,7 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             }
             case MessageTable.PATH_TOKEN: {
-                result = doInsert(db, MessageTable.TABLE_NAME, MessageTable.CONTENT_URI, uri,
-                        values);
+                result = doInsert(db, MessageTable.TABLE_NAME, MessageTable.CONTENT_URI, uri, values);
                 break;
             }
         }
@@ -233,6 +221,18 @@ public class DatabaseProvider extends ContentProvider {
                 break;
             }
         }
+
+        return result;
+    }
+
+    private Cursor doQuery(SQLiteDatabase db, Uri uri, String tableName, String[] projection,
+            String selection, String[] selectionArgs, String sortOrder) {
+
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables(tableName);
+        Cursor result = builder.query(db, projection, selection, selectionArgs, sortOrder, null, null);
+
+        result.setNotificationUri(getContext().getContentResolver(), uri);
 
         return result;
     }

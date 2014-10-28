@@ -257,11 +257,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        if (!DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId())) {
-            messageEditText.setEnabled(false);
-        } else {
-            messageEditText.setEnabled(true);
-        }
+        messageEditText.setEnabled(DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId()));
     }
 
     private void acceptUser(final int userId) {

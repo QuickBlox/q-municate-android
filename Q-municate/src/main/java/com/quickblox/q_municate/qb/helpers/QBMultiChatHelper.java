@@ -139,7 +139,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public QBDialog createGroupChat(String name,
-                                    List<Integer> friendIdsList) throws SmackException, XMPPException, QBResponseException {
+                                    List<Integer> friendIdsList) throws Exception {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
 
         QBDialog dialogToCreate = new QBDialog();
@@ -156,7 +156,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     private void inviteFriendsToRoom(QBDialog dialog,
-            List<Integer> friendIdsList) throws XMPPException, SmackException {
+            List<Integer> friendIdsList) throws Exception {
         for (Integer friendId : friendIdsList) {
             try {
                 notifyFriendAboutInvitation(dialog, friendId);
@@ -181,7 +181,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
+    private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws Exception {
         long time = DateUtils.getCurrentTime();
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
         if (chat == null) {
@@ -251,7 +251,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         DatabaseManager.deleteDialogByRoomJid(context, roomJid);
     }
 
-    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws QBResponseException, XMPPException, SmackException {
+    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws Exception {
         QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
