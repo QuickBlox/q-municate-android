@@ -96,17 +96,16 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void updateStatusMessage(QBDialog dialog, MessageCache messageCache) throws Exception {
-        updateStatusMessage(dialog.getDialogId(), messageCache.getId(), messageCache.isRead());
-        sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(),
-                messageCache.getSenderId(), dialog.getType().getCode());
+        updateStatusMessage(/*dialog.getDialogId(), */ messageCache.getId(), messageCache.isRead());
+//        sendMessageDeliveryStatus(messageCache.getPacketId(), messageCache.getId(),
+//                messageCache.getSenderId(), dialog.getType().getCode());
     }
 
-    public void updateStatusMessage(String dialogId, String messageId,
-            boolean isRead) throws QBResponseException {
-        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
-        messagesIdsList.add(messageId);
+    public void updateStatusMessage(/*String dialogId, */String messageId, boolean isRead)/* throws QBResponseException*/ {
+//        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
+//        messagesIdsList.add(messageId);
 
-        QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
+//        QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
 
         DatabaseManager.updateStatusMessage(context, messageId, isRead);
     }
@@ -121,16 +120,16 @@ public abstract class BaseChatHelper extends BaseHelper {
                 ChatUtils.getBundleForCreatePrivateChat(opponentId));
     }
 
-    protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId,
-            int dialogTypeCode) throws XMPPException, SmackException.NotConnectedException {
-        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
-        if (chat == null) {
-            chat = chatService.getPrivateChatManager().createChat(friendId, null);
-        }
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context,
-                packedId, messageId, dialogTypeCode);
-        chat.sendMessage(chatMessage);
-    }
+//    protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId,
+//            int dialogTypeCode) throws XMPPException, SmackException.NotConnectedException {
+//        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
+//        if (chat == null) {
+//            chat = chatService.getPrivateChatManager().createChat(friendId, null);
+//        }
+//        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForDeliveryStatusRead(context,
+//                packedId, messageId, dialogTypeCode);
+//        chat.sendMessage(chatMessage);
+//    }
 
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
             boolean isPrivateMessage) {
@@ -200,12 +199,12 @@ public abstract class BaseChatHelper extends BaseHelper {
 
         @Override
         public void processMessageDelivered(QBPrivateChat privateChat, String messageID) {
-
+            updateMessageStatusDelivered(messageID, true);
         }
 
         @Override
         public void processMessageRead(QBPrivateChat privateChat, String messageID) {
-
+            updateStatusMessage(messageID, true);
         }
     }
 

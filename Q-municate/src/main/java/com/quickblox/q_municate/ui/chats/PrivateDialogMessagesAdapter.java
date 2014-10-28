@@ -162,10 +162,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     messageCache.isDelivered()));
         }
 
-        if (!messageCache.isRead()) {
-            messageCache.setRead(true);
-            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
-        }
+//        if (!messageCache.isRead()) {
+//            messageCache.setRead(true);
+//            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
+//        }
 
         // check if last message is request message
         boolean lastRequestMessage = cursor.getPosition() == cursor.getCount() - 1 && friendsRequestMessage;

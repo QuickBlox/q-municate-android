@@ -248,14 +248,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-//        QBUser sender = AppSession.getSession().getUser();
-//        if (sender != null) {
-//            QBUser userOpponent = Utils.friendToUser(opponent);
-//            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type,
-//                    Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
-//            callTimer = new Timer();
-//            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
-//        }
+        QBUser sender = AppSession.getSession().getUser();
+        if (sender != null) {
+            QBUser userOpponent = Utils.friendToUser(opponent);
+            currentConnectionConfig = videoChat.call(userOpponent, call_type,
+                    Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
+            callTimer = new Timer();
+            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
+        }
     }
 
     private void connectToService() {

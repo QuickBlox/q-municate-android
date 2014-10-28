@@ -212,12 +212,12 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         }
     }
 
-    private void messageDeliveryStatusReceived(QBChatMessage chatMessage) {
-        String messageId;
-        boolean messageDelivered = true;
-        messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
-        updateMessageStatusDelivered(messageId, messageDelivered);
-    }
+//    private void messageDeliveryStatusReceived(QBChatMessage chatMessage) {
+//        String messageId;
+//        boolean messageDelivered = true;
+//        messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
+//        updateMessageStatusDelivered(messageId, messageDelivered);
+//    }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
@@ -225,9 +225,9 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT.equals(notificationType)) {
                 createDialogByNotification(chatMessage);
-            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(
+            /* } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(
                     notificationType)) {
-                messageDeliveryStatusReceived(chatMessage);
+                messageDeliveryStatusReceived(chatMessage); */
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, FriendsNotificationType.REQUEST);
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST.equals(notificationType)) {
