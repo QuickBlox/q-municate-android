@@ -4,12 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.model.QBAttachment;
-import com.quickblox.module.chat.model.QBChatMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.chat.model.QBMessage;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBMessage;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;

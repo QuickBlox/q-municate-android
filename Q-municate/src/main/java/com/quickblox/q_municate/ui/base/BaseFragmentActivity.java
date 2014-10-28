@@ -15,7 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;

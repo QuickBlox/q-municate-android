@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;

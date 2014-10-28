@@ -15,9 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.videochat_webrtc.WebRTC;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;
@@ -198,17 +197,17 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(friend, WebRTC.MEDIA_STREAM.VIDEO);
+        callToUser(friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
     }
 
-    private void callToUser(User friend, WebRTC.MEDIA_STREAM callType) {
+    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(FriendDetailsActivity.this, friend, callType);
         }
     }
 
     public void voiceCallClickListener(View view) {
-        callToUser(friend, WebRTC.MEDIA_STREAM.AUDIO);
+        callToUser(friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
     }
 
     public void chatClickListener(View view) {

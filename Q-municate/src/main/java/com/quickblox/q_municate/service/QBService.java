@@ -10,8 +10,8 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatService;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;

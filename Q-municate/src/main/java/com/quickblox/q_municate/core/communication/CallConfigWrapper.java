@@ -3,7 +3,7 @@ package com.quickblox.q_municate.core.communication;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.quickblox.module.videochat_webrtc.model.CallConfig;
+import com.quickblox.videochat.webrtc.model.CallConfig;
 
 public class CallConfigWrapper implements Parcelable {
 
@@ -21,7 +21,5 @@ public class CallConfigWrapper implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-
-
     }
 }

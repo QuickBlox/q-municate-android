@@ -4,21 +4,18 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.facebook.Session;
-import com.quickblox.internal.core.exception.BaseServiceException;
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.auth.QBAuth;
-import com.quickblox.module.auth.model.QBSession;
-import com.quickblox.module.content.QBContent;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.QBUsers;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.auth.QBAuth;
+import com.quickblox.auth.model.QBSession;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.LoginType;
 import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.ErrorUtils;
-
-import org.json.JSONException;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
 import java.io.File;
 
@@ -135,11 +132,8 @@ public class QBAuthHelper extends BaseHelper {
 
         UserCustomData userCustomDataNew = null;
         UserCustomData userCustomDataOld = null;
-        try {
-            userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        }
+
+        userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
 
         if (userCustomDataOld != null) {
             userCustomDataNew = userCustomDataOld;
@@ -156,16 +150,17 @@ public class QBAuthHelper extends BaseHelper {
 
     // TODO: temp method
     private boolean isUpdatedUserCustomData(QBUser user) {
-        try {
-            if (TextUtils.isEmpty(user.getCustomData())) {
-                return false;
-            }
-            UserCustomData userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
+        if (TextUtils.isEmpty(user.getCustomData())) {
             return false;
         }
-        return true;
+
+        UserCustomData userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+
+        if (userCustomDataOld != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void resetPassword(String email) throws QBResponseException {

@@ -5,30 +5,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.internal.core.helper.StringifyArrayList;
-import com.quickblox.module.chat.QBChat;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.exception.QBChatException;
-import com.quickblox.module.chat.listeners.QBIsTypingListener;
-import com.quickblox.module.chat.listeners.QBMessageListener;
-import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
-import com.quickblox.module.chat.model.QBAttachment;
-import com.quickblox.module.chat.model.QBChatMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.QBChat;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBIsTypingListener;
+import com.quickblox.chat.listeners.QBMessageListener;
+import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.MessageCache;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.utils.ChatUtils;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -117,7 +117,8 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     public QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {
         QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, opponentId);
-        return  (QBPrivateChat) createChatLocally(existingPrivateDialog, ChatUtils.getBundleForCreatePrivateChat(opponentId));
+        return (QBPrivateChat) createChatLocally(existingPrivateDialog,
+                ChatUtils.getBundleForCreatePrivateChat(opponentId));
     }
 
     protected void sendMessageDeliveryStatus(String packedId, String messageId, int friendId,
@@ -131,7 +132,8 @@ public abstract class BaseChatHelper extends BaseHelper {
         chat.sendMessage(chatMessage);
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId, boolean isPrivateMessage) {
+    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
+            boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
@@ -153,7 +155,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     protected void updateDialogByNotification(QBChatMessage chatMessage) {
         long time = DateUtils.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessageForUpdate(context, chatMessage, time);
-        if(dialog != null) {
+        if (dialog != null) {
             new FindUnknownFriendsTask(context).execute(null, dialog);
             saveDialogToCache(context, dialog);
         }
@@ -177,6 +179,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     private class PrivateChatMessageListener implements QBMessageListener<QBPrivateChat> {
+
         @Override
         public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
             if (ChatUtils.isNotificationMessage(chatMessage)) {
@@ -190,22 +193,24 @@ public abstract class BaseChatHelper extends BaseHelper {
         }
 
         @Override
-        public void processError(QBPrivateChat privateChat, QBChatException error, QBChatMessage originMessage){
+        public void processError(QBPrivateChat privateChat, QBChatException error,
+                QBChatMessage originMessage) {
 
         }
 
         @Override
-        public void processMessageDelivered(QBPrivateChat privateChat, String messageID){
+        public void processMessageDelivered(QBPrivateChat privateChat, String messageID) {
 
         }
 
         @Override
-        public void processMessageRead(QBPrivateChat privateChat, String messageID){
+        public void processMessageRead(QBPrivateChat privateChat, String messageID) {
 
         }
     }
 
-    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat>{
+    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat> {
+
         @Override
         public void processUserIsTyping(QBPrivateChat qbPrivateChat) {
 

@@ -24,9 +24,9 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;

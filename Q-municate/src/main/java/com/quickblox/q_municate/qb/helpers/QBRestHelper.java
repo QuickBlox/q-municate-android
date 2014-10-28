@@ -2,11 +2,11 @@ package com.quickblox.q_municate.qb.helpers;
 
 import android.content.Context;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.users.QBUsers;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.utils.FriendUtils;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;
 

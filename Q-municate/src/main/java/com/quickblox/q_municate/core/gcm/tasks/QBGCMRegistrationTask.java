@@ -7,11 +7,11 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.messages.QBMessages;
-import com.quickblox.module.messages.model.QBEnvironment;
-import com.quickblox.module.messages.model.QBSubscription;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.messages.QBMessages;
+import com.quickblox.messages.model.QBEnvironment;
+import com.quickblox.messages.model.QBSubscription;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.core.concurrency.BaseProgressTask;
 import com.quickblox.q_municate.model.AppSession;

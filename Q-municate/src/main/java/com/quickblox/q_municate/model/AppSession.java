@@ -2,10 +2,10 @@ package com.quickblox.q_municate.model;
 
 import android.text.TextUtils;
 
-import com.quickblox.internal.core.exception.BaseServiceException;
-import com.quickblox.internal.core.server.BaseService;
-import com.quickblox.module.auth.QBAuth;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.server.BaseService;
+import com.quickblox.auth.QBAuth;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ErrorUtils;

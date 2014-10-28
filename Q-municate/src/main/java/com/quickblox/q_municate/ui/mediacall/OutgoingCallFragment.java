@@ -14,17 +14,8 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
-import com.quickblox.internal.core.exception.QBVideoException;
-import com.quickblox.module.chat.exception.QBChatException;
-import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.QBVideoChat;
-import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
-import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.module.videochat_webrtc.model.CallConfig;
-import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.render.VideoStreamsView;
-import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
-import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
+import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate.model.AppSession;
@@ -37,6 +28,11 @@ import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.Utils;
+import com.quickblox.videochat.webrtc.QBVideoChat;
+import com.quickblox.videochat.webrtc.exception.QBVideoException;
+import com.quickblox.videochat.webrtc.model.CallConfig;
+import com.quickblox.videochat.webrtc.model.ConnectionConfig;
+import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
 
 import org.webrtc.SessionDescription;
 
@@ -53,7 +49,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private SessionDescription remoteSessionDescription;
     private boolean bounded;
     private QBService service;
-    private WebRTC.MEDIA_STREAM call_type;
+    private com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM call_type;
     private Timer callTimer;
     private ServiceConnection serviceConnection = new ChetServiceConnection();
     private OutgoingCallListener outgoingCallListener;
@@ -81,17 +77,17 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract int getContentView();
 
     public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, User friend,
-            Consts.CALL_DIRECTION_TYPE type, WebRTC.MEDIA_STREAM callType, String sessionId,
+            Consts.CALL_DIRECTION_TYPE type, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType, String sessionId,
             QBSignalingChannel.PLATFORM platform,
             QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
         Bundle args = new Bundle();
         args.putSerializable(Consts.EXTRA_FRIEND, friend);
         args.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
-        args.putSerializable(WebRTC.ORIENTATION_EXTENSION, deviceOrientation);
-        args.putSerializable(WebRTC.PLATFORM_EXTENSION, platform);
+        args.putSerializable(com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION, deviceOrientation);
+        args.putSerializable(com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION, platform);
         args.putParcelable(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
-        args.putString(WebRTC.SESSION_ID_EXTENSION, sessionId);
+        args.putString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, sessionId);
         return args;
     }
 
@@ -167,12 +163,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (User) getArguments().getSerializable(Consts.EXTRA_FRIEND);
-        call_type = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
+        call_type = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
-                WebRTC.PLATFORM_EXTENSION);
+                com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION);
         deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
-                WebRTC.ORIENTATION_EXTENSION);
-        sessionId = getArguments().getString(WebRTC.SESSION_ID_EXTENSION, "");
+                com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION);
+        sessionId = getArguments().getString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, "");
     }
 
     @Override
@@ -334,14 +330,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {
 
         @Override
-        public void onCaptureFail(WebRTC.MEDIA_STREAM media_stream, String s) {
+        public void onCaptureFail(com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM media_stream, String s) {
             if (isExistActivity()) {
                 ErrorUtils.showError(getActivity(), s);
             }
         }
 
         @Override
-        public void onCaptureSuccess(WebRTC.MEDIA_STREAM media_stream) {
+        public void onCaptureSuccess(com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM media_stream) {
 
         }
     }

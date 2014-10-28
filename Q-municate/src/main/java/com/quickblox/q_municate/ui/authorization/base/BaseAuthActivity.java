@@ -10,8 +10,8 @@ import android.widget.EditText;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.quickblox.module.auth.model.QBProvider;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.auth.model.QBProvider;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;

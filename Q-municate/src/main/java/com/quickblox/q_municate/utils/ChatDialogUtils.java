@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.utils;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.model.ParcelableQBDialog;
 
 import java.util.ArrayList;

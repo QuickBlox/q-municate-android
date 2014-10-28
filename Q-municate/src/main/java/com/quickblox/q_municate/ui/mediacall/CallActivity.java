@@ -5,13 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.quickblox.module.users.model.QBUser;
-import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
-import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
-import com.quickblox.module.videochat_webrtc.signalings.SignalingIgnoreFilter;
-import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
+import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBVideoChannel;
+import com.quickblox.videochat.webrtc.model.ConnectionConfig;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
@@ -28,6 +24,8 @@ import com.quickblox.q_municate.ui.voicecall.VoiceCallFragment;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.Utils;
+import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
+import com.quickblox.videochat.webrtc.signaling.SignalingIgnoreFilter;
 
 public class CallActivity extends BaseLogeableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
@@ -36,8 +34,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private User opponent;
     private Consts.CALL_DIRECTION_TYPE call_direction_type;
     private SessionDescriptionWrapper sessionDescriptionWrapper;
-    private WebRTC.MEDIA_STREAM call_type;
-    private VideoSenderChannel signalingChannel;
+    private com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM call_type;
+    private QBVideoChannel signalingChannel;
     private MediaPlayerManager mediaPlayer;
     private String sessionId;
     private QBSignalingChannel.PLATFORM remotePlatform;
@@ -46,7 +44,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private QBVideoChatHelper videoChatHelper;
     private ConnectionConfig currentConfig;
 
-    public static void start(Context context, User friend, WebRTC.MEDIA_STREAM callType) {
+    public static void start(Context context, User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         Log.i (TAG,  "Friend.isOnline() = " + friend.isOnline());
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(Consts.EXTRA_FRIEND, friend);
@@ -153,13 +151,14 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void parseIntentExtras(Bundle extras) {
         call_direction_type = (Consts.CALL_DIRECTION_TYPE) extras.getSerializable(
                 Consts.CALL_DIRECTION_TYPE_EXTRA);
-        call_type = (WebRTC.MEDIA_STREAM) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
-        remotePlatform = (QBSignalingChannel.PLATFORM) extras.getSerializable(WebRTC.PLATFORM_EXTENSION);
+        call_type = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM) extras.getSerializable(Consts.CALL_TYPE_EXTRA);
+        remotePlatform = (QBSignalingChannel.PLATFORM) extras.getSerializable(
+                com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION);
         deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) extras.getSerializable(
-                WebRTC.ORIENTATION_EXTENSION);
+                com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION);
         Log.i(TAG, "call_direction_type=" + call_direction_type);
         Log.i(TAG, "call_type=" + call_type);
-        sessionId = extras.getString(WebRTC.SESSION_ID_EXTENSION, "");
+        sessionId = extras.getString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, "");
         opponent = (User) extras.getSerializable(Consts.EXTRA_FRIEND);
         if (call_direction_type != null) {
             if (Consts.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
@@ -183,7 +182,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     private void showOutgoingFragment() {
         playOutgoingRingtone();
-        OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
+        OutgoingCallFragment outgoingCallFragment = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(
                 call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.CALL_DIRECTION_TYPE_EXTRA, call_direction_type);
@@ -206,10 +205,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void showOutgoingFragment(SessionDescriptionWrapper sessionDescriptionWrapper, User opponentId,
-            WebRTC.MEDIA_STREAM callType, String sessionId) {
+            com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType, String sessionId) {
         Bundle bundle = VideoCallFragment.generateArguments(sessionDescriptionWrapper, opponentId,
                 call_direction_type, callType, sessionId, remotePlatform, deviceOrientation);
-        OutgoingCallFragment outgoingCallFragment = (WebRTC.MEDIA_STREAM.VIDEO.equals(
+        OutgoingCallFragment outgoingCallFragment = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(
                 call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
         outgoingCallFragment.setArguments(bundle);
         setCurrentFragment(outgoingCallFragment);

@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.model;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 
 import java.io.Serializable;
 

@@ -3,15 +3,15 @@ package com.quickblox.q_municate.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.internal.module.custom.request.QBCustomObjectRequestBuilder;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.model.QBChatHistoryMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.model.QBChatHistoryMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.Lo;
+import com.quickblox.core.request.QBCustomObjectRequestBuilder;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.SmackException;
@@ -81,7 +81,7 @@ public class QBChatRestHelper extends BaseHelper {
         QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
         customObjectRequestBuilder.setPagesLimit(Consts.DIALOG_MESSAGES_PER_PAGE);
         if (lastDateLoad != Consts.ZERO_LONG_VALUE) {
-            customObjectRequestBuilder.gt(com.quickblox.internal.module.chat.Consts.MESSAGE_DATE_SENT,
+            customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT,
                     lastDateLoad);
         } else {
             deleteMessagesByDialogId(dialog.getDialogId());

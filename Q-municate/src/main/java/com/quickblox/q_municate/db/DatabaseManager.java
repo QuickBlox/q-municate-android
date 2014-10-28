@@ -8,10 +8,10 @@ import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.model.QBChatHistoryMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBChatHistoryMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.FriendTable;

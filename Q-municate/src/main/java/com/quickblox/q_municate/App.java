@@ -4,8 +4,8 @@ import android.app.Application;
 import android.content.Context;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
-import com.quickblox.module.chat.QBChatService;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.Consts;

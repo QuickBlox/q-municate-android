@@ -5,8 +5,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.model.User;
 
 import java.io.IOException;
