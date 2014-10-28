@@ -275,5 +275,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public TextView timeAttachMessageTextView;
         public ProgressBar verticalProgressBar;
         public ProgressBar centeredProgressBar;
+        public ImageView acceptFriendImageView;
+        public View dividerView;
+        public ImageView rejectFriendImageView;
     }
 }

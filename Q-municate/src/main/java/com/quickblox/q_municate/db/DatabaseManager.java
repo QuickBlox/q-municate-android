@@ -11,13 +11,16 @@ import android.text.TextUtils;
 import com.quickblox.module.chat.model.QBChatHistoryMessage;
 import com.quickblox.module.chat.model.QBDialog;
 import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.db.tables.UserTable;
+import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
@@ -26,21 +29,23 @@ import com.quickblox.q_municate.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class DatabaseManager {
 
     private static String USER_FRIEND_RELATION_KEY = UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " = " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID;
+
+    private static Map<String, Integer> relationStatusesMap;
 
     public static void savePeople(Context context, List<User> usersList, List<Friend> friendsList) {
         for (User user : usersList) {
             saveUser(context, user);
         }
         for (Friend friend : friendsList) {
-            if (!isUserRequested(context, friend.getUserId())) {
-                saveFriend(context, friend);
-            }
+            saveFriend(context, friend);
         }
     }
 
@@ -96,27 +101,8 @@ public class DatabaseManager {
         values.put(FriendTable.Cols.USER_ID, friend.getUserId());
         values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
         values.put(FriendTable.Cols.IS_STATUS_ASK, friend.isAskStatus());
-        values.put(FriendTable.Cols.IS_REQUESTED_FRIEND, friend.isRequestedFriend());
 
         return values;
-    }
-
-    public static boolean isUserRequested(Context context, int userId) {
-        boolean isUserRequested = false;
-
-        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
-                FriendTable.Cols.USER_ID + " = " + userId, null, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            isUserRequested = cursor.getInt(cursor.getColumnIndex(
-                    FriendTable.Cols.IS_REQUESTED_FRIEND)) > Consts.ZERO_INT_VALUE;
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return isUserRequested;
     }
 
     public static int getRelationStatusIdByName(Context context, String relationStatus) {
@@ -135,6 +121,30 @@ public class DatabaseManager {
         }
 
         return relationStatusId;
+    }
+
+    private static Map<String, Integer> getRelationStatusesMap(Context context) {
+        Map<String, Integer> relationStatusesMap = new HashMap<String, Integer>();
+
+        Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null, null, null,
+                null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_FROM, cursor.getInt(
+                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_TO, cursor.getInt(
+                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_BOTH, cursor.getInt(
+                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_NONE, cursor.getInt(
+                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return relationStatusesMap;
     }
 
     public static String getRelationStatusNameById(Context context, int relationStatusId) {
@@ -170,14 +180,16 @@ public class DatabaseManager {
     }
 
     public static boolean isFriendInBase(Context context, int searchId) {
-        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context,
+                QBFriendListHelper.RELATION_STATUS_NONE);
 
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " != " + relationStatusNoneId +
                 " AND (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID + " = " + searchId + ")";
 
         ContentResolver resolver = context.getContentResolver();
 
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null,
+                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
 
         boolean isFriendInBase = cursor.getCount() > Consts.ZERO_INT_VALUE;
 
@@ -187,7 +199,16 @@ public class DatabaseManager {
     }
 
     public static Cursor getFriendsByFullName(Context context, String fullName) {
-        String condition = UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
+        if (relationStatusesMap == null) {
+            relationStatusesMap = getRelationStatusesMap(context);
+        }
+
+        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
+
+        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
 
         String sorting = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
@@ -196,7 +217,8 @@ public class DatabaseManager {
         if (TextUtils.isEmpty(fullName)) {
             cursor = getAllFriends(context);
         } else {
-            cursor = context.getContentResolver().query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, sorting);
+            cursor = context.getContentResolver().query(UserTable.USER_FRIEND_CONTENT_URI, null,
+                    USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, sorting);
         }
 
         if (cursor != null) {
@@ -205,63 +227,43 @@ public class DatabaseManager {
 
         return cursor;
     }
-    
-    public static Cursor getAllFriends(Context context) {
-        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
-        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
-        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
-        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
 
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + ","
-                + relationStatusToId + "," + relationStatusBothId + ") " + " OR ("
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
+    public static Cursor getAllFriends(Context context) {
+        if (relationStatusesMap == null) {
+            relationStatusesMap = getRelationStatusesMap(context);
+        }
+
+        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
+
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
 
         String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
-                sortOrder);
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null,
+                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, sortOrder);
 
         return cursor;
     }
 
     public static int getAllFriendsCount(Context context) {
-        int relationStatusFromId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_FROM);
-        int relationStatusToId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_TO);
-        int relationStatusBothId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_BOTH);
-        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
+        if (relationStatusesMap == null) {
+            relationStatusesMap = getRelationStatusesMap(context);
+        }
 
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + ","
-                + relationStatusToId + "," + relationStatusBothId + ") " + " OR ("
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
+        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
 
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, new String[] {"count(*)"}, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
-                null);
-
-        return processResultCount(cursor);
-    }
-
-    public static Cursor getAllFriends(Context context, int relationStatusId) {
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND "
-                + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
-
-        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null, USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null,
-                sortOrder);
-
-        return cursor;
-    }
-
-    public static int getAllFriendsCountByRelation(Context context, int relationStatusId) {
-        String condition = FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusId + " AND " + FriendTable.Cols.IS_REQUESTED_FRIEND + " = 1";
-
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, new String[] {"count(*)"}, condition, null, null);
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, new String[]{"count(*)"},
+                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
 
         return processResultCount(cursor);
     }
@@ -422,9 +424,13 @@ public class DatabaseManager {
                 MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         boolean isDelivered = cursor.getInt(cursor.getColumnIndex(
                 MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
+        FriendsNotificationType friendsNotificationType = FriendsNotificationType.parseByCode(cursor.getInt(
+                cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
 
         MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time,
                 isRead, isDelivered);
+
+        messageCache.setFriendsNotificationType(friendsNotificationType);
 
         return messageCache;
     }
@@ -511,12 +517,10 @@ public class DatabaseManager {
         int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.USER_ID));
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
         boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > 0;
-        boolean isRequestedFriend = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_REQUESTED_FRIEND)) > 0;
 
         Friend friend = new Friend(id);
         friend.setRelationStatusId(relationStatusId);
         friend.setAskStatus(isAskStatus);
-        friend.setRequestedFriend(isRequestedFriend);
 
         return friend;
     }
@@ -540,17 +544,6 @@ public class DatabaseManager {
     public static int getCountUnreadDialogs(Context context) {
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
-
-        int count = cursor.getCount();
-
-        cursor.close();
-
-        return count;
-    }
-
-    public static int getCountContactRequests(Context context) {
-        int relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
-        Cursor cursor = getAllFriends(context, relationStatusNoneId);
 
         int count = cursor.getCount();
 
@@ -583,34 +576,54 @@ public class DatabaseManager {
             long time = historyMessage.getDateSent();
 
             String attachURL;
+            int friendsMessageTypeCode;
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            messageCache = new MessageCache(messageId, dialogId, null, senderId, message,
-                    attachURL, time, true, true);
+            messageCache = new MessageCache(messageId, dialogId, null, senderId, message, attachURL, time,
+                    true, true);
+
+            if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
+                friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
+                        ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
+                if (isFriendsMessageTypeCode(friendsMessageTypeCode)) {
+                    messageCache.setFriendsNotificationType(FriendsNotificationType.parseByCode(
+                            friendsMessageTypeCode));
+                }
+            }
 
             saveChatMessage(context, messageCache);
         }
         if (messageCache != null) {
-            updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
-                    messageCache.getSenderId(), Consts.ZERO_INT_VALUE);
+            updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(),
+                    messageCache.getTime(), messageCache.getSenderId(), Consts.ZERO_INT_VALUE);
         }
+    }
+
+    private static boolean isFriendsMessageTypeCode(int friendsMessageTypeCode) {
+        return ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(
+                friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING);
     }
 
     public static void saveChatMessage(Context context, MessageCache messageCache) {
         ContentValues values = new ContentValues();
-        String body = messageCache.getMessage();
+        String body;
 
         values.put(MessageTable.Cols.ID, messageCache.getId());
         values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
         values.put(MessageTable.Cols.PACKET_ID, messageCache.getPacketId());
         values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
 
-        if (TextUtils.isEmpty(body)) {
-            values.put(MessageTable.Cols.BODY, body);
-        } else {
-            values.put(MessageTable.Cols.BODY, Html.fromHtml(body).toString());
+        if (messageCache.getFriendsNotificationType() != null) {
+            values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE,
+                    messageCache.getFriendsNotificationType().getCode());
         }
+
+        body = parseMessageBody(context, messageCache);
+        values.put(MessageTable.Cols.BODY, body);
 
         values.put(MessageTable.Cols.TIME, messageCache.getTime());
         values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
@@ -618,14 +631,55 @@ public class DatabaseManager {
         values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
         context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
 
-        int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
+        int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context,
+                messageCache.getDialogId());
 
         if (!messageCache.isRead()) {
             countUnreadMessagesLocal = ++countUnreadMessagesLocal;
         }
 
-        updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(), messageCache.getTime(),
+        updateDialog(context, messageCache.getDialogId(), body, messageCache.getTime(),
                 messageCache.getSenderId(), countUnreadMessagesLocal);
+    }
+
+    private static String parseMessageBody(Context context, MessageCache messageCache) {
+        String resultMessage = messageCache.getMessage();
+
+        if (messageCache.getFriendsNotificationType() != null) {
+            QBUser user = AppSession.getSession().getUser();
+            boolean ownMessage = user.getId().equals(messageCache.getSenderId());
+
+            if (ownMessage) {
+                switch (messageCache.getFriendsNotificationType()) {
+                    case REQUEST: {
+                        resultMessage = context.getResources().getString(
+                                R.string.frl_friends_request_message_for_me);
+                        break;
+                    }
+                    case ACCEPT: {
+                        resultMessage = context.getResources().getString(
+                                R.string.frl_friends_request_accept_message_for_me);
+                        break;
+                    }
+                    case REJECT: {
+                        resultMessage = context.getResources().getString(
+                                R.string.frl_friends_request_reject_message_for_me);
+                        break;
+                    }
+                    case REMOVE: {
+                        resultMessage = context.getResources().getString(
+                                R.string.frl_friends_request_remove_message_for_me);
+                    }
+                }
+
+            }
+        } else {
+            if (!TextUtils.isEmpty(messageCache.getMessage())) {
+                resultMessage = Html.fromHtml(messageCache.getMessage()).toString();
+            }
+        }
+
+        return resultMessage;
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -681,7 +735,8 @@ public class DatabaseManager {
         values.put(DialogTable.Cols.OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 dialog.getOccupants()));
 
-        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(), dialog.getLastMessageDateSent());
+        String bodyLastMessage = getLastMessage(context, dialog.getLastMessage(),
+                dialog.getLastMessageDateSent());
 
         if (dialog.getUnreadMessageCount() != ChatUtils.NOT_RESET_COUNTER) {
             values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, dialog.getUnreadMessageCount());
@@ -746,7 +801,8 @@ public class DatabaseManager {
     }
 
     public static int getCountUnreadMessagesByDialogIdLocal(Context context, String dialogId) {
-        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null, DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
         int countMessages = Consts.ZERO_INT_VALUE;
 
         if (cursor != null && cursor.moveToFirst()) {

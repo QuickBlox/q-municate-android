@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -22,13 +23,17 @@ import com.quickblox.module.content.model.QBFile;
 import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
+import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
+import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -44,7 +49,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private User opponentFriend;
     private ContentObserver statusContentObserver;
+    private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
+    private FriendOperationAction friendOperationAction;
 
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
@@ -60,14 +67,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        friendOperationAction = new FriendOperationAction();
         opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
         friendCursor = DatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
         initListView();
         initActionBar();
-        registerStatusChangingObserver();
+        registerContentObservers();
         setCurrentDialog(dialog);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Crouton.cancelAllCroutons();
     }
 
     @Override
@@ -75,6 +89,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         if (!messagesAdapter.isEmpty()) {
             startUpdateChatDialog();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        currentOpponent = null;
+        unregisterStatusChangingObserver();
     }
 
     @Override
@@ -94,7 +115,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
     }
 
-    private void registerStatusChangingObserver() {
+    @Override
+    protected Bundle generateBundleToInitDialog() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        return bundle;
+    }
+
+    private void registerContentObservers() {
         statusContentObserver = new ContentObserver(new Handler()) {
 
             @Override
@@ -103,18 +131,26 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                         PrivateDialogActivity.this.opponentFriend.getUserId());
                 setOnlineStatus(opponentFriend);
             }
-
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
-            }
         };
         friendCursor.registerContentObserver(statusContentObserver);
+
+        friendsTableContentObserver = new ContentObserver(new Handler()) {
+
+            @Override
+            public void onChange(boolean selfChange) {
+                checkMessageSendingPossibility();
+            }
+        };
+        getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true, friendsTableContentObserver);
     }
 
     private void unregisterStatusChangingObserver() {
-        if (friendCursor != null && statusContentObserver != null ) {
+        if (friendCursor != null && statusContentObserver != null) {
             friendCursor.unregisterContentObserver(statusContentObserver);
+        }
+
+        if (friendsTableContentObserver != null) {
+            getContentResolver().unregisterContentObserver(friendsTableContentObserver);
         }
     }
 
@@ -142,15 +178,17 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initListView() {
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this, dialog);
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
+                getAllDialogMessagesByDialogId(), this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
     }
 
     private void initActionBar() {
         actionBar.setTitle(opponentFriend.getFullName());
         actionBar.setSubtitle(opponentFriend.getOnlineStatus());
         actionBar.setLogo(R.drawable.placeholder_user);
-        if(!TextUtils.isEmpty(opponentFriend.getAvatarUrl())) {
+        if (!TextUtils.isEmpty(opponentFriend.getAvatarUrl())) {
             loadLogoActionBar(opponentFriend.getAvatarUrl());
         }
     }
@@ -184,13 +222,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected Bundle generateBundleToInitDialog() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
-        return bundle;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -221,18 +252,59 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
         startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
+
+        checkMessageSendingPossibility();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Crouton.cancelAllCroutons();
+    private void checkMessageSendingPossibility() {
+        messageEditText.setEnabled(DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId()));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        currentOpponent = null;
-        unregisterStatusChangingObserver();
+    private void acceptUser(final int userId) {
+        showProgress();
+        QBAcceptFriendCommand.start(this, userId);
+    }
+
+    private void rejectUser(final int userId) {
+        showRejectUserDialog(userId);
+    }
+
+    private void showRejectUserDialog(final int userId) {
+        User user = DatabaseManager.getUserById(this, userId);
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
+                R.string.frl_dlg_reject_friend, user.getFullName()));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showProgress();
+                QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
+            }
+        });
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show(getFragmentManager(), null);
+    }
+
+    public interface FriendOperationListener {
+
+        void onAcceptUserClicked(int userId);
+
+        void onRejectUserClicked(int userId);
+    }
+
+    private class FriendOperationAction implements FriendOperationListener {
+
+        @Override
+        public void onAcceptUserClicked(int userId) {
+            acceptUser(userId);
+        }
+
+        @Override
+        public void onRejectUserClicked(int userId) {
+            rejectUser(userId);
+        }
     }
 }

@@ -65,7 +65,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(FriendTable.Cols.ID).append(" INTEGER PRIMARY KEY AUTOINCREMENT, ")
                 .append(FriendTable.Cols.USER_ID).append(" INTEGER, ")
                 .append(FriendTable.Cols.IS_STATUS_ASK).append(" INTEGER, ")
-                .append(FriendTable.Cols.IS_REQUESTED_FRIEND).append(" INTEGER, ")
                 .append(FriendTable.Cols.RELATION_STATUS_ID).append(" INTEGER, FOREIGN KEY (")
                 .append(FriendTable.Cols.USER_ID).append(") REFERENCES ")
                 .append(UserTable.TABLE_NAME).append(" (")
@@ -96,7 +95,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(MessageTable.Cols.TIME).append(" LONG, ")
                 .append(MessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
                 .append(MessageTable.Cols.IS_READ).append(" INTEGER, ")
-                .append(MessageTable.Cols.IS_DELIVERED).append(" INTEGER");
+                .append(MessageTable.Cols.IS_DELIVERED).append(" INTEGER, ")
+                .append(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE).append(" INTEGER");
         createTable(db, MessageTable.TABLE_NAME, messageTableFields.toString());
     }
 

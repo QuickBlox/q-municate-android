@@ -18,7 +18,12 @@ public class QBRestHelper extends BaseHelper {
 
     public User loadUser(int userId) throws QBResponseException {
         QBUser user = QBUsers.getUser(userId);
-        return FriendUtils.createUser(user);
+
+        if (user == null) {
+            return null;
+        } else {
+            return FriendUtils.createUser(user);
+        }
     }
 
     public Collection<User> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {

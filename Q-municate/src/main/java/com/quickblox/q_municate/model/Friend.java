@@ -8,7 +8,6 @@ public class Friend implements Serializable {
     private int relationStatusId;
     private String relationStatus;
     private boolean isAskStatus;
-    private boolean isRequestedFriend;
 
     public Friend() {
     }
@@ -17,19 +16,10 @@ public class Friend implements Serializable {
         this.userId = userId;
     }
 
-    public Friend(Integer userId, String relationStatus, boolean isAskStatus, boolean isRequestedFriend) {
+    public Friend(Integer userId, String relationStatus, boolean isAskStatus) {
         this.userId = userId;
         this.relationStatus = relationStatus;
         this.isAskStatus = isAskStatus;
-        this.isRequestedFriend = isRequestedFriend;
-    }
-
-    public boolean isRequestedFriend() {
-        return isRequestedFriend;
-    }
-
-    public void setRequestedFriend(boolean isRequestedFriend) {
-        this.isRequestedFriend = isRequestedFriend;
     }
 
     public boolean isAskStatus() {

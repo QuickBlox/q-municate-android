@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.friends;
 
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -26,14 +25,11 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.UserTable;
 import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
-import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.FriendUtils;
@@ -63,7 +59,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private List<User> usersList;
     private MatrixCursor searchResultCursor;
     private FriendOperationAction friendOperationAction;
-    private int relationStatusNoneId;
     private Resources resources;
     private Timer searchTimer;
     private int selectedPositionList;
@@ -157,8 +152,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         resources = getResources();
         friendOperationAction = new FriendOperationAction();
-        relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(baseActivity,
-                QBFriendListHelper.RELATION_STATUS_NONE);
         usersList = Collections.emptyList();
         searchTimer = new Timer();
 
@@ -230,12 +223,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
         baseActivity.addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
 
-        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
-
-        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
-        baseActivity.addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, new UserSearchSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_USERS_FAIL_ACTION, new UserSearchFailAction());
 
@@ -252,7 +239,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     private void initFriendsList() {
         baseActivity.showActionBarProgress();
-        createHeadersCursor();
+
+        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+        createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, null,
                 friendOperationAction, false);
@@ -261,7 +250,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        createHeadersForSearchCursor();
+        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
+        createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
                 friendOperationAction, true);
@@ -293,38 +283,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
-    private void createHeadersCursor() {
+    private void createHeadersCursor(int countFriends) {
         headersCursor = new MatrixCursor(
                 new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
-
-        int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
-                relationStatusNoneId);
-        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
-
-        if (countRequestsFriends > Consts.ZERO_INT_VALUE) {
-            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
-                    QBFriendListHelper.RELATION_STATUS_NONE) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_NONE, resources
-                    .getString(R.string.frl_column_header_name_requests)});
-        }
-
-        if (countFriends > Consts.ZERO_INT_VALUE) {
-            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
-                    QBFriendListHelper.RELATION_STATUS_BOTH) + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, resources
-                    .getString(R.string.frl_column_header_name_contacts)});
-        }
-
-        if (state == State.GLOBAL_LIST) {
-            headersCursor.addRow(
-                    new String[]{QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + Consts.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_ALL_USERS, resources
-                            .getString(R.string.frl_column_header_name_all_users)});
-        }
-    }
-
-    private void createHeadersForSearchCursor() {
-        headersCursor = new MatrixCursor(
-                new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
-
-        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
 
         if (countFriends > Consts.ZERO_INT_VALUE) {
             headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
@@ -344,33 +305,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         QBAddFriendCommand.start(baseActivity, userId);
         KeyboardUtils.hideKeyboard(baseActivity);
         searchView.clearFocus();
-    }
-
-    private void acceptUser(final int userId) {
-        baseActivity.showProgress();
-        QBAcceptFriendCommand.start(baseActivity, userId);
-    }
-
-    private void rejectUser(final int userId) {
-        showRejectUserDialog(userId);
-    }
-
-    private void showRejectUserDialog(final int userId) {
-        User user = DatabaseManager.getUserById(baseActivity, userId);
-        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(R.string.frl_dlg_reject_friend, user.getFullName()));
-        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                baseActivity.showProgress();
-                QBRejectFriendCommand.start(baseActivity, userId);
-            }
-        });
-        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        alertDialog.show(getFragmentManager(), null);
     }
 
     private void checkUsersListLoader() {
@@ -396,11 +330,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (state == State.GLOBAL_LIST) {
             emptyListTextView.setVisibility(View.GONE);
         } else {
-            int countRequestsFriends = DatabaseManager.getAllFriendsCountByRelation(baseActivity,
-                    relationStatusNoneId);
             int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
 
-            if ((countFriends + countRequestsFriends + usersList.size()) > Consts.ZERO_INT_VALUE) {
+            if ((countFriends + usersList.size()) > Consts.ZERO_INT_VALUE) {
                 emptyListTextView.setVisibility(View.GONE);
             } else {
                 emptyListTextView.setVisibility(View.VISIBLE);
@@ -414,10 +346,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public interface FriendOperationListener {
 
         void onAddUserClicked(int userId);
-
-        void onAcceptUserClicked(int userId);
-
-        void onRejectUserClicked(int userId);
     }
 
     private class SearchTimerTask extends TimerTask {
@@ -456,16 +384,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void onAddUserClicked(int userId) {
             addToFriendList(userId);
         }
-
-        @Override
-        public void onAcceptUserClicked(int userId) {
-            acceptUser(userId);
-        }
-
-        @Override
-        public void onRejectUserClicked(int userId) {
-            rejectUser(userId);
-        }
     }
 
     private class AddFriendSuccessAction implements Command {
@@ -474,24 +392,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void execute(Bundle bundle) {
             baseActivity.hideProgress();
             searchItem.collapseActionView();
-        }
-    }
-
-    private class AcceptFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
-            initFriendsList();
-        }
-    }
-
-    private class RejectFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            baseActivity.hideProgress();
-            initFriendsList();
         }
     }
 

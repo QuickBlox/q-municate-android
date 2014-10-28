@@ -13,6 +13,7 @@ public class MessageCache implements Serializable {
     private long time;
     private boolean isRead;
     private boolean isDelivered;
+    private FriendsNotificationType friendsNotificationType;
 
     public MessageCache(String id, String dialogId, String packetId, Integer senderId, String message,
             String attachUrl, long time, boolean isRead, boolean isDelivered) {
@@ -25,6 +26,14 @@ public class MessageCache implements Serializable {
         this.time = time;
         this.isRead = isRead;
         this.isDelivered = isDelivered;
+    }
+
+    public FriendsNotificationType getFriendsNotificationType() {
+        return friendsNotificationType;
+    }
+
+    public void setFriendsNotificationType(FriendsNotificationType friendsNotificationType) {
+        this.friendsNotificationType = friendsNotificationType;
     }
 
     public boolean isDelivered() {

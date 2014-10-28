@@ -22,5 +22,6 @@ public class MessageTable {
         public static final String ATTACH_FILE_ID = "attach_file_id";
         public static final String IS_READ = "is_read";
         public static final String IS_DELIVERED = "is_delivered";
+        public static final String FRIENDS_NOTIFICATION_TYPE = "friends_notification_type";
     }
 }

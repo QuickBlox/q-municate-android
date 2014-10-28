@@ -33,7 +33,6 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     private Context context;
     private Resources resources;
     private FriendsListFragment.FriendOperationListener friendOperationListener;
-    private int relationStatusNoneId;
     private int relationStatusAllUsersId;
     private MatrixCursor usersCursor;
     private boolean forSearch;
@@ -45,7 +44,6 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         this.friendOperationListener = friendOperationListener;
         this.usersCursor = usersCursor;
         resources = context.getResources();
-        relationStatusNoneId = DatabaseManager.getRelationStatusIdByName(context, QBFriendListHelper.RELATION_STATUS_NONE);
         relationStatusAllUsersId = QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS;
         this.forSearch = forSearch;
     }
@@ -65,9 +63,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
                 return DatabaseManager.getFriendsByFullName(context, searchCharacters);
             }
         } else {
-            if (relationStatusId == relationStatusNoneId) {
-                return DatabaseManager.getAllFriends(context, relationStatusId);
-            } else if (relationStatusId == relationStatusAllUsersId) {
+            if (relationStatusId == relationStatusAllUsersId) {
                 return usersCursor;
             } else {
                 return DatabaseManager.getAllFriends(context);
@@ -98,10 +94,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         viewHolder.fullNameTextView = (TextView) view.findViewById(R.id.name_textview);
         viewHolder.statusTextView = (TextView) view.findViewById(R.id.status_textview);
-        viewHolder.dividerView = view.findViewById(R.id.divider_view);
         viewHolder.addFriendImageView = (ImageView) view.findViewById(R.id.add_friend_imagebutton);
-        viewHolder.acceptFriendImageView = (ImageView) view.findViewById(R.id.accept_friend_imagebutton);
-        viewHolder.rejectFriendImageView = (ImageView) view.findViewById(R.id.reject_friend_imagebutton);
         viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
 
         view.setTag(viewHolder);
@@ -139,20 +132,6 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
                 friendOperationListener.onAddUserClicked(userId);
             }
         });
-
-        viewHolder.acceptFriendImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                friendOperationListener.onAcceptUserClicked(userId);
-            }
-        });
-
-        viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                friendOperationListener.onRejectUserClicked(userId);
-            }
-        });
     }
 
     private void setStatusVisibility(ViewHolder viewHolder, boolean status) {
@@ -174,26 +153,12 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
                     .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
                     .equals(QBFriendListHelper.RELATION_STATUS_TO);
             boolean isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && isAskStatus;
-            boolean isPendingFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && !isAskStatus;
             if (isAddedFriend) {
-                viewHolder.dividerView.setVisibility(View.GONE);
-                viewHolder.acceptFriendImageView.setVisibility(View.GONE);
-                viewHolder.rejectFriendImageView.setVisibility(View.GONE);
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 viewHolder.onlineImageView.setVisibility(View.GONE);
                 status = resources.getString(R.string.frl_pending_request_status);
-            } else if (isPendingFriend) {
-                viewHolder.dividerView.setVisibility(View.VISIBLE);
-                viewHolder.acceptFriendImageView.setVisibility(View.VISIBLE);
-                viewHolder.rejectFriendImageView.setVisibility(View.VISIBLE);
-                viewHolder.addFriendImageView.setVisibility(View.GONE);
-                viewHolder.onlineImageView.setVisibility(View.GONE);
-                status = resources.getString(R.string.frl_pending_status);
             } else if (isAllFriends) {
-                viewHolder.dividerView.setVisibility(View.GONE);
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
-                viewHolder.acceptFriendImageView.setVisibility(View.GONE);
-                viewHolder.rejectFriendImageView.setVisibility(View.GONE);
                 setStatusVisibility(viewHolder, user.isOnline());
                 status = user.getOnlineStatus();
             }
@@ -201,10 +166,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
 
         if (relationStatusId == relationStatusAllUsersId) {
             viewHolder.addFriendImageView.setVisibility(View.VISIBLE);
-            viewHolder.dividerView.setVisibility(View.GONE);
             viewHolder.onlineImageView.setVisibility(View.GONE);
-            viewHolder.acceptFriendImageView.setVisibility(View.GONE);
-            viewHolder.rejectFriendImageView.setVisibility(View.GONE);
         }
 
         viewHolder.statusTextView.setText(status);
@@ -223,10 +185,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         public RoundedImageView avatarImageView;
         public TextView fullNameTextView;
         public TextView statusTextView;
-        public View dividerView;
         public ImageView addFriendImageView;
-        public ImageView acceptFriendImageView;
-        public ImageView rejectFriendImageView;
         public ImageView onlineImageView;
     }
 }
