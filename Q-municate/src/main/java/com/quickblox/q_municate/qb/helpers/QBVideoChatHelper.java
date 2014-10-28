@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.quickblox.chat.QBSignaling;
+import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBWebRTCSignaling;
@@ -82,14 +84,14 @@ public class QBVideoChatHelper extends BaseHelper {
         return signalingChannel;
     }
 
-    private class SignalingManagerListener implements QBSignalingManagerListener {
+    private class SignalingManagerListener implements QBVideoChatSignalingManagerListener {
 
         @Override
-        public void signalingCreated(QBWebRTCSignaling qbSignaling, boolean createdLocally) {
+        public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
             if (!createdLocally) {
-                QBVideoChannel signalingChannel = new QBVideoChannel(qbSignaling);
+                QBVideoChannel signalingChannel = new QBVideoChannel((QBWebRTCSignaling) qbSignaling);
                 signalingChannel.addSignalingListener(videoSignalingListener);
-                activeChannelMap.put(qbSignaling.getParticipant(), signalingChannel);
+                activeChannelMap.put(((QBWebRTCSignaling)qbSignaling).getParticipant(), signalingChannel);
             }
         }
     }
@@ -99,7 +101,7 @@ public class QBVideoChatHelper extends BaseHelper {
         return (session != null );
     }
 
-    private class VideoSignalingListener extends SignalingListener {
+    private class VideoSignalingListener extends QBVideoChatWebRTCSignalingListenerImpl {
 
         @Override
         public void onError(QBSignalingChannel.PacketType state, QBChatException e) {

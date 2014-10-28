@@ -129,11 +129,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void initUIWithUsersData() {
-        try {
-            userCustomData = (UserCustomData) user.getCustomDataAsObject();
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        }
+        userCustomData = (UserCustomData) user.getCustomDataAsObject();
 
         loadAvatar();
         fullNameOld = user.getFullName();
@@ -334,11 +330,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void resetUserData() {
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        try {
-            ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        }
+        ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
+
         isNeedUpdateAvatar = false;
     }
 

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBVideoChannel;
+import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
 import com.quickblox.videochat.webrtc.model.ConnectionConfig;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -221,7 +222,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         setCurrentFragment(incomingCallFragment);
     }
 
-    private class ChatMessageHandler extends SignalingListenerImpl {
+    private class ChatMessageHandler extends QBVideoChatWebRTCSignalingListenerImpl {
 
         @Override
         public void onStop(ConnectionConfig connectionConfig) {

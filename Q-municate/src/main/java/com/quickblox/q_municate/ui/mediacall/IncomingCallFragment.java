@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseFragment;

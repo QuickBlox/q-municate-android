@@ -28,11 +28,14 @@ import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.MediaUtils;
 import com.quickblox.q_municate.utils.Utils;
+import com.quickblox.videochat.webrtc.QBVideoChannel;
 import com.quickblox.videochat.webrtc.QBVideoChat;
 import com.quickblox.videochat.webrtc.exception.QBVideoException;
+import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
 import com.quickblox.videochat.webrtc.model.CallConfig;
 import com.quickblox.videochat.webrtc.model.ConnectionConfig;
 import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
+import com.quickblox.videochat.webrtc.view.QBVideoStreamView;
 
 import org.webrtc.SessionDescription;
 
@@ -54,10 +57,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private ServiceConnection serviceConnection = new ChetServiceConnection();
     private OutgoingCallListener outgoingCallListener;
     private String sessionId;
-    private QBSignalingChannel.SignalingListener signalingMessageHandler;
+    private QBVideoChatWebRTCSignalingListenerImpl signalingMessageHandler;
     private QBSignalingChannel.PLATFORM remotePlatform;
     private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
-    private VideoSenderChannel signalingChannel;
+    private QBVideoChannel signalingChannel;
     private QBVideoChatHelper videoChatHelper;
     private ConnectionConfig currentConnectionConfig;
 
@@ -145,7 +148,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void reInitChatIfExist(View rootView) {
-        VideoStreamsView videoView = (VideoStreamsView) rootView.findViewById(R.id.ownVideoScreenImageView);
+        QBVideoStreamView videoView = (QBVideoStreamView) rootView.findViewById(R.id.ownVideoScreenImageView);
         if (videoChat != null && videoView != null) {
             videoChat.setVideoView(videoView);
         }
@@ -195,7 +198,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (videoChat != null) {
             return;
         }
-        VideoStreamsView videoView = (VideoStreamsView) getView().findViewById(R.id.ownVideoScreenImageView);
+        QBVideoStreamView videoView = (QBVideoStreamView) getView().findViewById(R.id.ownVideoScreenImageView);
         videoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
         videoChat.setMediaCaptureCallback(new MediaCapturerHandler());
         signalingMessageHandler = new VideoChatMessageHandler();
@@ -245,14 +248,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startCall() {
-        QBUser sender = AppSession.getSession().getUser();
-        if (sender != null) {
-            QBUser userOpponent = Utils.friendToUser(opponent);
-            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type,
-                    Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
-            callTimer = new Timer();
-            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
-        }
+//        QBUser sender = AppSession.getSession().getUser();
+//        if (sender != null) {
+//            QBUser userOpponent = Utils.friendToUser(opponent);
+//            currentConnectionConfig = videoChat.call(userOpponent, sender, call_type,
+//                    Consts.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
+//            callTimer = new Timer();
+//            callTimer.schedule(new CancelCallTimerTask(), Consts.DEFAULT_DIALING_TIME);
+//        }
     }
 
     private void connectToService() {
@@ -342,7 +345,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    private class VideoChatMessageHandler extends SignalingListenerImpl {
+    private class VideoChatMessageHandler extends QBVideoChatWebRTCSignalingListenerImpl {
 
         @Override
         public void onAccepted(ConnectionConfig connectionConfig) {
