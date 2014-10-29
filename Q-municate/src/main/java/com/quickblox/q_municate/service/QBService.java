@@ -55,7 +55,7 @@ import com.quickblox.q_municate.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageReadCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;
@@ -491,10 +491,10 @@ public class QBService extends Service {
 
     private void registerUpdateStatusMessageCommand() {
         QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
-        QBUpdateStatusMessageCommand updateStatusMessageCommand = new QBUpdateStatusMessageCommand(this,
+        QBUpdateStatusMessageReadCommand updateStatusMessageCommand = new QBUpdateStatusMessageReadCommand(this,
                 privateChatHelper, QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_STATUS_MESSAGE_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, updateStatusMessageCommand);
+        serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_READ_ACTION, updateStatusMessageCommand);
     }
 
     private void registerSendPUshCommand() {
@@ -605,8 +605,8 @@ public class QBService extends Service {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
             if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-                ((BaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(QBChatService.getInstance(), AppSession.getSession().getUser());
-                ((BaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(QBChatService.getInstance(), AppSession.getSession().getUser());
+                ((BaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
+                ((BaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance(),
                         CallActivity.class);
             }

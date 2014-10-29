@@ -15,7 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.MessageCache;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageReadCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -142,30 +142,26 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         } else if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
             resetUI(viewHolder);
 
-            setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage,
-                    messageCache.isDelivered());
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
             resetUI(viewHolder);
 
-            setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage,
-                    messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
         }
 
         if (ownMessage && !friendsRequestMessage && !friendsInfoRequestMessage) {
-            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(
-                    messageCache.isDelivered()));
+            setMessageStatus(view, viewHolder, R.id.text_message_delivery_status_imageview,
+                    messageCache.isDelivered(), messageCache.isRead());
         }
 
-//        if (!messageCache.isRead()) {
-//            messageCache.setRead(true);
-//            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
-//        }
+        if (!messageCache.isRead() && !ownMessage) {
+            messageCache.setRead(true);
+            QBUpdateStatusMessageReadCommand.start(context, dialog, messageCache);
+        }
 
         // check if last message is request message
         boolean lastRequestMessage = cursor.getPosition() == cursor.getCount() - 1 && friendsRequestMessage;

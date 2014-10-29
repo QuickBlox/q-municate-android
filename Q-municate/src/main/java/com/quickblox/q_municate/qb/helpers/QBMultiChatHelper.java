@@ -70,8 +70,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
         sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
-    public void init(QBChatService chatService, QBUser user) {
-        super.init(chatService, user);
+    public void init(QBUser user) {
+        super.init(user);
         groupChatManager = chatService.getGroupChatManager();
         addNotificationChatListener(notificationChatListener);
     }

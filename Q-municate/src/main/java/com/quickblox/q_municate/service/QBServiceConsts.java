@@ -45,7 +45,7 @@ public class QBServiceConsts {
     public static final String LEAVE_GROUP_DIALOG_ACTION = "leave_group_group_action";
     public static final String ADD_FRIENDS_TO_GROUP_ACTION = "add_friends_to_group_action";
     public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
-    public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
+    public static final String UPDATE_STATUS_MESSAGE_READ_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
     public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
     public static final String RE_LOGIN_IN_CHAT_ACTION = "relogin_in_chat";
@@ -167,6 +167,7 @@ public class QBServiceConsts {
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
+    public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";

@@ -83,23 +83,22 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         }
     }
 
-    protected int getMessageDeliveredIconId(boolean deliveredStatus) {
+    protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
         int iconResourceId;
-        if (deliveredStatus) {
+        if (isDelivered && isRead) {
             iconResourceId = R.drawable.ic_status_mes_sent_received;
-        } else {
+        } else if (isDelivered) {
             iconResourceId = R.drawable.ic_status_mes_sent;
+        } else {
+            iconResourceId = 0;
         }
         return iconResourceId;
     }
 
-    protected void setDeliveryStatus(View view, ViewHolder viewHolder, int resourceId, boolean ownMessage,
-            boolean messageDelivered) {
-        if (ownMessage) {
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
-            viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageDeliveredIconId(
-                    messageDelivered));
-        }
+    protected void setMessageStatus(View view, ViewHolder viewHolder, int resourceId,
+            boolean messageDelivered, boolean messageRead) {
+        viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
+        viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
     }
 
     protected void resetUI(ViewHolder viewHolder) {

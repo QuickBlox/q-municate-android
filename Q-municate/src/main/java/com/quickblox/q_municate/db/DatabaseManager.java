@@ -334,6 +334,19 @@ public class DatabaseManager {
         return dialog;
     }
 
+    public static String getDialogByMessageId(Context context, String messageId) {
+        String dialogId = null;
+        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
+                MessageTable.Cols.ID + " = '" + messageId + "'", null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+            cursor.close();
+        }
+
+        return dialogId;
+    }
+
     public static QBDialog getDialogByRoomJid(Context context, String roomJid) {
         QBDialog dialog = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
@@ -581,7 +594,7 @@ public class DatabaseManager {
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
             messageCache = new MessageCache(messageId, dialogId, null, senderId, message, attachURL, time,
-                    true, true);
+                    historyMessage.isRead(), true);
 
             if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
@@ -821,7 +834,7 @@ public class DatabaseManager {
         // TODO clear something else
     }
 
-    public static void updateStatusMessage(Context context, String messageId, boolean isRead) {
+    public static void updateStatusMessageRead(Context context, String messageId, boolean isRead) {
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -841,7 +854,7 @@ public class DatabaseManager {
         }
     }
 
-    public static void updateMessageDeliveryStatus(Context context, String messageId, boolean isDelivered) {
+    public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
