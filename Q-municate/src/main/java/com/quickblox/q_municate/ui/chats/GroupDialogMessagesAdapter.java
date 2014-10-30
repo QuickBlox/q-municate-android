@@ -88,8 +88,6 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         if (ownMessage) {
             avatarUrl = getAvatarUrlForCurrentUser();
         } else {
-            setMessageStatus(view, viewHolder, R.id.text_message_delivery_status_imageview,
-                    messageCache.isDelivered(), messageCache.isRead());
             User senderFriend = DatabaseManager.getUserById(context, messageCache.getSenderId());
             if (senderFriend != null) {
                 senderName = senderFriend.getFullName();
@@ -102,14 +100,10 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         }
 
         if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
-//            setMessageStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage,
-//                    messageCache.isDelivered(), messageCache.isRead());
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
-//            setMessageStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage,
-//                    messageCache.isDelivered(), messageCache.isRead());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             viewHolder.messageTextView.setText(messageCache.getMessage());

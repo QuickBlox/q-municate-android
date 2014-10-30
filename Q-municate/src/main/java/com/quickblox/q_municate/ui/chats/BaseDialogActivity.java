@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
@@ -321,14 +322,27 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
     }
 
+    private void setSendButtonVisibility(CharSequence charSequence) {
+        if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
+            sendButton.setEnabled(false);
+        } else {
+            sendButton.setEnabled(true);
+        }
+    }
+
     private void initListeners() {
         messageEditText.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 hideSmileLayout();
-                if (!isTypingNow) {
-                    startTypingMessage();
+
+                // TODO: now it is possible only for Private chats
+                if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    if (!isTypingNow) {
+                        startTypingMessage();
+                    }
                 }
+
                 return false;
             }
         });
@@ -338,17 +352,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                 super.onTextChanged(charSequence, start, before, count);
-                if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
-                    sendButton.setEnabled(false);
-                } else {
-                    sendButton.setEnabled(true);
-                }
+                setSendButtonVisibility(charSequence);
 
-                if (!isTypingNow) {
-                    startTypingMessage();
+                // TODO: now it is possible only for Private chats
+                if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    if (!isTypingNow) {
+                        startTypingMessage();
+                    }
+                    checkStopTyping();
                 }
-
-                checkStopTyping();
             }
         });
 
