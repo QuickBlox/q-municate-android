@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,11 +32,14 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.MessageCache;
+import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate.qb.commands.QBLoadDialogMessagesCommand;
+import com.quickblox.q_municate.qb.commands.QBSendTypingStatusCommand;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;
+import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
@@ -48,10 +52,14 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+
+    private static final int TYPING_DELAY = 1000;
 
     protected EditText chatEditText;
     protected StickyListHeadersListView messagesListView;
@@ -68,15 +76,19 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
     protected BaseChatHelper chatHelper;
+    protected User opponentFriend;
 
     private int keyboardHeight;
     private View rootView;
     private boolean needToShowSmileLayout;
+    private View messageTypingView;
     private ImageView messageTypingBoxImageView;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
+    private Timer typingTimer;
+    private boolean isTypingNow;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -111,6 +123,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
+        typingTimer = new Timer();
 
         initUI();
         initListeners();
@@ -147,8 +160,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    private void startMessageTypingAnimation() {
+    protected void startMessageTypingAnimation() {
+        messageTypingView.setVisibility(View.VISIBLE);
         messageTypingAnimationDrawable.start();
+    }
+
+    protected void stopMessageTypingAnimation() {
+        messageTypingView.setVisibility(View.GONE);
+        messageTypingAnimationDrawable.stop();
     }
 
     protected void attachButtonOnClick() {
@@ -188,6 +207,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.GET_TYPING_STATUS_SUCCESS_ACTION, new GetTypingStatusSuccessAction());
+        addAction(QBServiceConsts.GET_TYPING_STATUS_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -295,7 +316,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         smilePanelImageButton = _findViewById(R.id.smile_panel_imagebutton);
         sendButton.setEnabled(false);
         messageTextView = _findViewById(R.id.message_textview);
-        messageTypingBoxImageView = (ImageView) findViewById(R.id.message_typing_box_imageview);
+        messageTypingView = _findViewById(R.id.message_typing_view);
+        messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
     }
 
@@ -304,6 +326,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             @Override
             public boolean onTouch(View view, MotionEvent event) {
                 hideSmileLayout();
+                if (!isTypingNow) {
+                    startTypingMessage();
+                }
                 return false;
             }
         });
@@ -318,6 +343,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 } else {
                     sendButton.setEnabled(true);
                 }
+
+                if (!isTypingNow) {
+                    startTypingMessage();
+                }
+
+                checkStopTyping();
             }
         });
 
@@ -349,6 +380,30 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                         }
                     }
                 });
+    }
+
+    private void checkStopTyping() {
+        typingTimer.cancel();
+        typingTimer = new Timer();
+        typingTimer.schedule(new TypingTimerTask(), TYPING_DELAY);
+    }
+
+    private class TypingTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            stopTypingMessage();
+        }
+    }
+
+    private void startTypingMessage() {
+        isTypingNow = true;
+        QBSendTypingStatusCommand.start(BaseDialogActivity.this, opponentFriend.getUserId(), true);
+    }
+
+    private void stopTypingMessage() {
+        isTypingNow = false;
+        QBSendTypingStatusCommand.start(BaseDialogActivity.this, opponentFriend.getUserId(), false);
     }
 
     private void initKeyboardHeight() {
@@ -452,6 +507,19 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
             hideProgress();
             startLoadDialogMessages();
+        }
+    }
+
+    private class GetTypingStatusSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            boolean isTyping = bundle.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+            if (isTyping) {
+                startMessageTypingAnimation();
+            } else {
+                stopMessageTypingAnimation();
+            }
         }
     }
 }

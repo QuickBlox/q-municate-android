@@ -23,6 +23,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBGetTypingStatusCommand;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
 import com.quickblox.q_municate.utils.ChatUtils;
@@ -30,6 +31,9 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -113,6 +117,28 @@ public abstract class BaseChatHelper extends BaseHelper {
 
     public void updateMessageStatusDeliveredLocal(String messageId, boolean isDelivered) {
         DatabaseManager.updateMessageStatusDelivered(context, messageId, isDelivered);
+    }
+
+    public void sendIsTypingToServer(int opponentId) {
+        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        try {
+            privateChat.sendIsTypingNotification();
+        } catch (XMPPException e) {
+            ErrorUtils.logError(e);
+        } catch (SmackException.NotConnectedException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    public void sendStopTypingToServer(int opponentId) {
+        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        try {
+            privateChat.sendStopTypingNotification();
+        } catch (XMPPException e) {
+            ErrorUtils.logError(e);
+        } catch (SmackException.NotConnectedException e) {
+            ErrorUtils.logError(e);
+        }
     }
 
     public QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {
@@ -206,12 +232,12 @@ public abstract class BaseChatHelper extends BaseHelper {
 
         @Override
         public void processUserIsTyping(QBPrivateChat qbPrivateChat) {
-
+            QBGetTypingStatusCommand.start(context, true);
         }
 
         @Override
         public void processUserStopTyping(QBPrivateChat qbPrivateChat) {
-
+            QBGetTypingStatusCommand.start(context, false);
         }
     }
 }

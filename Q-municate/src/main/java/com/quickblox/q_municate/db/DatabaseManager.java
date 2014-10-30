@@ -129,15 +129,13 @@ public class DatabaseManager {
         Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null, null, null,
                 null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_FROM, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_TO, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_BOTH, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_NONE, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            while (!cursor.isLast()) {
+                relationStatusesMap.put(cursor.getString(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS)), cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+                cursor.moveToNext();
+            }
         }
 
         if (cursor != null) {

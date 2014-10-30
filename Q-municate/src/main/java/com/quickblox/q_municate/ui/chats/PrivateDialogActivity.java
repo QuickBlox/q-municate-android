@@ -46,7 +46,6 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
-    private User opponentFriend;
     private ContentObserver statusContentObserver;
     private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;

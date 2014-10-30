@@ -23,6 +23,7 @@ import com.quickblox.q_municate.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate.qb.commands.QBGetFileCommand;
+import com.quickblox.q_municate.qb.commands.QBGetTypingStatusCommand;
 import com.quickblox.q_municate.qb.commands.QBImportFriendsCommand;
 import com.quickblox.q_municate.qb.commands.QBInitChatsCommand;
 import com.quickblox.q_municate.qb.commands.QBInitChatServiceCommand;
@@ -51,6 +52,7 @@ import com.quickblox.q_municate.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate.qb.commands.QBSendGroupDialogMessageCommand;
 import com.quickblox.q_municate.qb.commands.QBSendPrivateChatMessageCommand;
+import com.quickblox.q_municate.qb.commands.QBSendTypingStatusCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
@@ -189,6 +191,8 @@ public class QBService extends Service {
         registerUpdateChatDialogCommand();
         registerLoadDialogMessagesCommand();
         registerUpdateStatusMessageCommand();
+        registerSendTypingStatusCommand();
+        registerGetTypingStatusCommand();
         registerSendPUshCommand();
         registerLoginAndJoinGroupChat();
         registerReloginCommand();
@@ -495,6 +499,22 @@ public class QBService extends Service {
                 privateChatHelper, QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_STATUS_MESSAGE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_READ_ACTION, updateStatusMessageCommand);
+    }
+
+    private void registerSendTypingStatusCommand() {
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBSendTypingStatusCommand sendTypingStatusCommand = new QBSendTypingStatusCommand(this,
+                privateChatHelper, QBServiceConsts.SEND_TYPING_STATUS_SUCCESS_ACTION,
+                QBServiceConsts.SEND_TYPING_STATUS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.SEND_TYPING_STATUS_ACTION, sendTypingStatusCommand);
+    }
+
+    private void registerGetTypingStatusCommand() {
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBGetTypingStatusCommand getTypingStatusCommand = new QBGetTypingStatusCommand(this,
+                QBServiceConsts.GET_TYPING_STATUS_SUCCESS_ACTION,
+                QBServiceConsts.GET_TYPING_STATUS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.GET_TYPING_STATUS_ACTION, getTypingStatusCommand);
     }
 
     private void registerSendPUshCommand() {

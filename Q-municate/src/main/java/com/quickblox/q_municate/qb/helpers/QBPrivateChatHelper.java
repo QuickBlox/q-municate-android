@@ -163,6 +163,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     @Override
     public void chatCreated(QBPrivateChat privateChat, boolean createdLocally) {
         privateChat.addMessageListener(privateChatMessageListener);
+        privateChat.addIsTypingListener(privateChatIsTypingListener);
     }
 
     public void updateDialog(QBDialog dialog) {
