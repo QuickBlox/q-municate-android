@@ -4,12 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.model.QBAttachment;
-import com.quickblox.module.chat.model.QBChatMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.chat.model.QBMessage;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBAttachment;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBMessage;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
@@ -35,13 +35,10 @@ public class ChatUtils {
     public static final String PROPERTY_MESSAGE_ID = "message_id";
     public static final String PROPERTY_DATE_SENT = "date_sent";
     public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
-    public static final String PROPERTY_MESSAGE_DELIVERY_STATUS_READ = "message_delivery_status_read";
     public static final String VALUE_SAVE_TO_HISTORY = "1";
-    public static final String VALUE_MESSAGE_DELIVERY_STATUS_READ = "1";
 
     public static final String PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT = "1";
     public static final String PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT = "2";
-    public static final String PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS = "3";
 
     public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST = "4";
     public static final String PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST = "5";
@@ -178,23 +175,6 @@ public class ChatUtils {
             chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
         }
         chatMessage.setProperty(PROPERTY_DIALOG_TYPE_CODE, dialogTypeCode);
-        return chatMessage;
-    }
-
-    public static QBChatMessage createNotificationMessageForDeliveryStatusRead(Context context, String packedId, String messageId, int dialogTypeCode) {
-        QBChatMessage chatMessage = new QBChatMessage();
-        QBUser user = AppSession.getSession().getUser();
-        String dialogTypeCodeString = String.valueOf(dialogTypeCode);
-        QBDialogType dialogType = parseDialogType(dialogTypeCodeString);
-        chatMessage.setBody(context.getResources().getString(R.string.user_read_message, user.getFullName()));
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS);
-        chatMessage.setProperty(PROPERTY_MESSAGE_DELIVERY_STATUS_READ, VALUE_MESSAGE_DELIVERY_STATUS_READ);
-        if(QBDialogType.PRIVATE.equals(dialogType)) {
-            chatMessage.setProperty(PROPERTY_MESSAGE_ID, packedId);
-        } else {
-            chatMessage.setProperty(PROPERTY_MESSAGE_ID, messageId);
-        }
-        chatMessage.setProperty(PROPERTY_DIALOG_TYPE_CODE, dialogTypeCodeString);
         return chatMessage;
     }
 

@@ -10,8 +10,8 @@ import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;

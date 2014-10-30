@@ -3,8 +3,7 @@ package com.quickblox.q_municate.utils;
 import android.content.Context;
 import android.database.MatrixCursor;
 
-import com.quickblox.module.chat.model.QBRosterEntry;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.UserTable;
@@ -12,9 +11,9 @@ import com.quickblox.q_municate.model.Friend;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.model.UserCustomData;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.packet.RosterPacket;
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,13 +32,7 @@ public class FriendUtils {
         user.setPhone(qbUser.getPhone());
 
         UserCustomData userCustomData = null;
-        try {
-            userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
+        userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
 
         if (userCustomData != null) {
             user.setAvatarUrl(userCustomData.getAvatar_url());

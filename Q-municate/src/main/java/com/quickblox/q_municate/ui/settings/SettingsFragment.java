@@ -10,7 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;

@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.core.command.Command;

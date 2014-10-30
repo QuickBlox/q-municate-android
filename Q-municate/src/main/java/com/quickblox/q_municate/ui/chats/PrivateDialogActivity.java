@@ -16,11 +16,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.videochat_webrtc.WebRTC;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;
@@ -47,7 +46,6 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
-    private User opponentFriend;
     private ContentObserver statusContentObserver;
     private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
@@ -231,16 +229,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                 attachButtonOnClick();
                 return true;
             case R.id.action_audio_call:
-                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.AUDIO);
+                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
                 return true;
             case R.id.action_video_call:
-                callToUser(opponentFriend, WebRTC.MEDIA_STREAM.VIDEO);
+                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void callToUser(User friend, WebRTC.MEDIA_STREAM callType) {
+    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }

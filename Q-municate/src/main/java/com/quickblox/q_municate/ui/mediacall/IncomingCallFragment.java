@@ -10,7 +10,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.videochat_webrtc.WebRTC;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -22,7 +21,7 @@ import com.quickblox.q_municate.utils.ErrorUtils;
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = IncomingCallFragment.class.getSimpleName();
-    private WebRTC.MEDIA_STREAM callType;
+    private com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType;
 
     private IncomingCallClickListener incomingCallClickListener;
     private User friend;
@@ -34,7 +33,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         public void onDenyClick();
     }
 
-    public static IncomingCallFragment newInstance(WebRTC.MEDIA_STREAM callType, User friend) {
+    public static IncomingCallFragment newInstance(com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType, User friend) {
         IncomingCallFragment fragment = new IncomingCallFragment();
         Bundle args = new Bundle();
         args.putSerializable(Consts.CALL_TYPE_EXTRA, callType);
@@ -46,9 +45,9 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_popup_call, container, false);
-        callType = (WebRTC.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
+        callType = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM) getArguments().getSerializable(Consts.CALL_TYPE_EXTRA);
         friend = (User) getArguments().getSerializable(Consts.EXTRA_FRIEND);
-        boolean isVideoCall = WebRTC.MEDIA_STREAM.VIDEO.equals(callType);
+        boolean isVideoCall = com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(callType);
         ((ImageButton) rootView.findViewById(R.id.acceptCallButton)).setImageResource(
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(

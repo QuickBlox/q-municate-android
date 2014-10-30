@@ -3,7 +3,7 @@ package com.quickblox.q_municate.core.concurrency;
 import android.app.Activity;
 import android.app.DialogFragment;
 
-import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 

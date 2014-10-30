@@ -10,7 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.core.gcm.NotificationHelper;
 import com.quickblox.q_municate.model.PushMessage;
 import com.quickblox.q_municate.service.QBServiceConsts;

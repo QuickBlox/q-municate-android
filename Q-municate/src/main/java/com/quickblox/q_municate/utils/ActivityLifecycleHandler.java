@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.module.chat.QBChatService;
+import com.quickblox.core.helper.Lo;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate.qb.commands.QBLogoutAndDestroyChatCommand;

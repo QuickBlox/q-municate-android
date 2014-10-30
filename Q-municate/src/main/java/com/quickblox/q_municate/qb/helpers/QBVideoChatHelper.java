@@ -4,22 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.quickblox.internal.core.helper.Lo;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBWebRTCSignaling;
-import com.quickblox.module.chat.exception.QBChatException;
-import com.quickblox.module.chat.listeners.QBSignalingManagerListener;
-import com.quickblox.module.videochat_webrtc.VideoSenderChannel;
-import com.quickblox.module.videochat_webrtc.WebRTC;
-import com.quickblox.module.videochat_webrtc.model.CallConfig;
-import com.quickblox.module.videochat_webrtc.model.ConnectionConfig;
-import com.quickblox.module.videochat_webrtc.signalings.QBSignalingChannel;
-import com.quickblox.module.videochat_webrtc.utils.SignalingListenerImpl;
+import com.quickblox.chat.QBSignaling;
+import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+import com.quickblox.core.helper.Lo;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBWebRTCSignaling;
+import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.q_municate.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.helpers.call.WorkingSessionPull;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FriendUtils;
+import com.quickblox.videochat.webrtc.QBVideoChannel;
+import com.quickblox.videochat.webrtc.model.CallConfig;
+import com.quickblox.videochat.webrtc.listener.*;
+import com.quickblox.videochat.webrtc.model.ConnectionConfig;
+import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
     private QBChatService chatService;
     private Class<? extends Activity> activityClass;
-    private Map<Integer, VideoSenderChannel> activeChannelMap = new HashMap<Integer, VideoSenderChannel>(
+    private Map<Integer, QBVideoChannel> activeChannelMap = new HashMap<Integer, QBVideoChannel>(
             ACTIVE_SESSIONS_DEFAULT_SIZE);
 
     private WorkingSessionPull workingSessionPull = new WorkingSessionPull(ACTIVE_SESSIONS_DEFAULT_SIZE);
@@ -47,7 +47,7 @@ public class QBVideoChatHelper extends BaseHelper {
         super(context);
     }
 
-    public VideoSenderChannel getSignalingChannel(int participantId) {
+    public QBVideoChannel getSignalingChannel(int participantId) {
         return activeChannelMap.get(participantId);
     }
 
@@ -75,23 +75,23 @@ public class QBVideoChatHelper extends BaseHelper {
         scheduler.schedule(clearSessionTask, Consts.DEFAULT_CLEAR_SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    public VideoSenderChannel makeSignalingChannel(int participantId) {
+    public QBVideoChannel makeSignalingChannel(int participantId) {
         QBWebRTCSignaling signaling = QBChatService.getInstance().getVideoChatWebRTCSignalingManager().createSignaling(
                 participantId, null);
-        VideoSenderChannel signalingChannel = new VideoSenderChannel(signaling);
+        QBVideoChannel signalingChannel = new QBVideoChannel(signaling);
         signalingChannel.addSignalingListener(videoSignalingListener);
         activeChannelMap.put(participantId, signalingChannel);
         return signalingChannel;
     }
 
-    private class SignalingManagerListener implements QBSignalingManagerListener {
+    private class SignalingManagerListener implements QBVideoChatSignalingManagerListener {
 
         @Override
-        public void signalingCreated(QBWebRTCSignaling qbSignaling, boolean createdLocally) {
+        public void signalingCreated(QBSignaling qbSignaling, boolean createdLocally) {
             if (!createdLocally) {
-                VideoSenderChannel signalingChannel = new VideoSenderChannel(qbSignaling);
+                QBVideoChannel signalingChannel = new QBVideoChannel((QBWebRTCSignaling) qbSignaling);
                 signalingChannel.addSignalingListener(videoSignalingListener);
-                activeChannelMap.put(qbSignaling.getParticipant(), signalingChannel);
+                activeChannelMap.put(((QBWebRTCSignaling)qbSignaling).getParticipant(), signalingChannel);
             }
         }
     }
@@ -101,7 +101,7 @@ public class QBVideoChatHelper extends BaseHelper {
         return (session != null );
     }
 
-    private class VideoSignalingListener extends SignalingListenerImpl {
+    private class VideoSignalingListener extends QBVideoChatWebRTCSignalingListenerImpl {
 
         @Override
         public void onError(QBSignalingChannel.PacketType state, QBChatException e) {
@@ -122,10 +122,10 @@ public class QBVideoChatHelper extends BaseHelper {
                     callConfig.getSessionDescription());
             Intent intent = new Intent(context, activityClass);
             intent.putExtra(Consts.CALL_DIRECTION_TYPE_EXTRA, Consts.CALL_DIRECTION_TYPE.INCOMING);
-            intent.putExtra(WebRTC.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
-            intent.putExtra(WebRTC.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());
+            intent.putExtra(com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION, callConfig.getDevicePlatform());
+            intent.putExtra(com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION, callConfig.getDeviceOrientation());
             intent.putExtra(Consts.CALL_TYPE_EXTRA, callConfig.getCallStreamType());
-            intent.putExtra(WebRTC.SESSION_ID_EXTENSION, sessionId);
+            intent.putExtra(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, sessionId);
             User friend = FriendUtils.createUser(callConfig.getFromUser());
             intent.putExtra(Consts.EXTRA_FRIEND, friend);
             intent.putExtra(Consts.REMOTE_DESCRIPTION, sessionDescriptionWrapper);

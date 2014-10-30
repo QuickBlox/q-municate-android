@@ -8,10 +8,10 @@ import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
 
-import com.quickblox.module.chat.model.QBChatHistoryMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBChatHistoryMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.DialogTable;
 import com.quickblox.q_municate.db.tables.FriendTable;
@@ -129,15 +129,13 @@ public class DatabaseManager {
         Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null, null, null,
                 null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_FROM, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_TO, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_BOTH, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-            relationStatusesMap.put(QBFriendListHelper.RELATION_STATUS_NONE, cursor.getInt(
-                    cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            while (!cursor.isLast()) {
+                relationStatusesMap.put(cursor.getString(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS)), cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+                cursor.moveToNext();
+            }
         }
 
         if (cursor != null) {
@@ -332,6 +330,19 @@ public class DatabaseManager {
         }
 
         return dialog;
+    }
+
+    public static String getDialogByMessageId(Context context, String messageId) {
+        String dialogId = null;
+        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
+                MessageTable.Cols.ID + " = '" + messageId + "'", null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+            cursor.close();
+        }
+
+        return dialogId;
     }
 
     public static QBDialog getDialogByRoomJid(Context context, String roomJid) {
@@ -581,7 +592,7 @@ public class DatabaseManager {
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
             messageCache = new MessageCache(messageId, dialogId, null, senderId, message, attachURL, time,
-                    true, true);
+                    historyMessage.isRead(), true);
 
             if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
@@ -821,7 +832,7 @@ public class DatabaseManager {
         // TODO clear something else
     }
 
-    public static void updateStatusMessage(Context context, String messageId, boolean isRead) {
+    public static void updateStatusMessageRead(Context context, String messageId, boolean isRead) {
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -841,7 +852,7 @@ public class DatabaseManager {
         }
     }
 
-    public static void updateMessageDeliveryStatus(Context context, String messageId, boolean isDelivered) {
+    public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();

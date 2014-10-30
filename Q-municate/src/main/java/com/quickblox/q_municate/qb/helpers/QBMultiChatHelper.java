@@ -4,25 +4,23 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.internal.module.custom.request.QBCustomObjectUpdateBuilder;
-import com.quickblox.module.chat.QBChat;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBGroupChat;
-import com.quickblox.module.chat.QBGroupChatManager;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.exception.QBChatException;
-import com.quickblox.module.chat.listeners.QBMessageListener;
-import com.quickblox.module.chat.model.QBChatMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.content.QBContent;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.QBChat;
+import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChat;
+import com.quickblox.chat.QBGroupChatManager;
+import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBMessageListener;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBCustomObjectUpdateBuilder;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
-import com.quickblox.q_municate.model.GroupDialog;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
@@ -31,6 +29,7 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.Utils;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -71,8 +70,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
         sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
-    public void init(QBChatService chatService, QBUser user) {
-        super.init(chatService, user);
+    public void init(QBUser user) {
+        super.init(user);
         groupChatManager = chatService.getGroupChatManager();
         addNotificationChatListener(notificationChatListener);
     }
@@ -255,7 +254,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
-        requestBuilder.push(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
+        requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
                 userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
 
@@ -266,7 +265,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         QBDialog dialog = DatabaseManager.getDialogByRoomJid(context, roomJid);
 
         QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
-        requestBuilder.pullAll(com.quickblox.internal.module.chat.Consts.DIALOG_OCCUPANTS,
+        requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
                 userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
     }

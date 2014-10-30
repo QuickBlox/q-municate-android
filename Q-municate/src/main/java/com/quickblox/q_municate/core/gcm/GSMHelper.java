@@ -5,7 +5,7 @@ import android.app.Activity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.core.gcm.tasks.QBGCMRegistrationTask;
 import com.quickblox.q_municate.utils.Consts;

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.errors.QBChatErrorsConstants;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.helpers.QBAuthHelper;

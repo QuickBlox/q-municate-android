@@ -3,8 +3,8 @@ package com.quickblox.q_municate.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.Utils;
 

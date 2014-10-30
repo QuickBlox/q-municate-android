@@ -19,8 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.db.DatabaseManager;

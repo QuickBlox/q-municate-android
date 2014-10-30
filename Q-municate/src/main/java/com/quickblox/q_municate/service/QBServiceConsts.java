@@ -45,10 +45,12 @@ public class QBServiceConsts {
     public static final String LEAVE_GROUP_DIALOG_ACTION = "leave_group_group_action";
     public static final String ADD_FRIENDS_TO_GROUP_ACTION = "add_friends_to_group_action";
     public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
-    public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
+    public static final String UPDATE_STATUS_MESSAGE_READ_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
     public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
     public static final String RE_LOGIN_IN_CHAT_ACTION = "relogin_in_chat";
+    public static final String SEND_TYPING_STATUS_ACTION = "send_typing_status_action";
+    public static final String GET_TYPING_STATUS_ACTION = "get_typing_status_action";
 
     //success and fail actions
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
@@ -136,6 +138,10 @@ public class QBServiceConsts {
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
     public static final String UPDATE_GROUP_PHOTO_SUCCESS_ACTION = "update_group_photo_success_action";
     public static final String UPDATE_GROUP_PHOTO_FAIL_ACTION = "update_group_photo_fail_action";
+    public static final String SEND_TYPING_STATUS_SUCCESS_ACTION = "send_typing_status_success_action";
+    public static final String SEND_TYPING_STATUS_FAIL_ACTION = "send_typing_status_fail_action";
+    public static final String GET_TYPING_STATUS_SUCCESS_ACTION = "get_typing_status_success_action";
+    public static final String GET_TYPING_STATUS_FAIL_ACTION = "get_typing_status_fail_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
@@ -167,6 +173,7 @@ public class QBServiceConsts {
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
+    public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
@@ -182,6 +189,7 @@ public class QBServiceConsts {
     public static final String EXTRA_MESSAGE = "message";
     public static final String EXTRA_FILE_PATH = "file_path";
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
+    public static final String EXTRA_IS_TYPING = "is_typing";
 
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String GOT_CONTACT_REQUEST = "got_contact_request";

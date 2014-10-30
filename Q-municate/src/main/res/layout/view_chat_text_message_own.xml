@@ -41,7 +41,6 @@
             android:layout_height="match_parent"
             android:layout_gravity="top"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_status_mes_sent"
             android:paddingLeft="5dp" />
 
     </LinearLayout>

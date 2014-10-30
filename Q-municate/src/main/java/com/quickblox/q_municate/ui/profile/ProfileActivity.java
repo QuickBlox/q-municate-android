@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;
@@ -129,11 +129,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     }
 
     private void initUIWithUsersData() {
-        try {
-            userCustomData = (UserCustomData) user.getCustomDataAsObject();
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        }
+        userCustomData = (UserCustomData) user.getCustomDataAsObject();
 
         loadAvatar();
         fullNameOld = user.getFullName();
@@ -334,11 +330,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void resetUserData() {
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        try {
-            ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
-        } catch (JSONException e) {
-            ErrorUtils.logError(e);
-        }
+        ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
+
         isNeedUpdateAvatar = false;
     }
 

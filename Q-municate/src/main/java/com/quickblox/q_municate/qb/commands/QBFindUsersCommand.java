@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.request.QBPagedRequestBuilder;
-import com.quickblox.module.users.QBUsers;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;

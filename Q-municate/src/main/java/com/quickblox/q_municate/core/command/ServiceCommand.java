@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.quickblox.internal.core.exception.QBResponseException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ErrorUtils;
 

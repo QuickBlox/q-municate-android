@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.messages.QBMessages;
-import com.quickblox.module.messages.model.QBEvent;
+import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.messages.QBMessages;
+import com.quickblox.messages.model.QBEvent;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.core.gcm.NotificationHelper;
 import com.quickblox.q_municate.qb.helpers.QBFriendListHelper;

@@ -10,13 +10,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.quickblox.module.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageReadCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -100,22 +100,18 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         }
 
         if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
-            setDeliveryStatus(view, viewHolder, R.id.attach_message_delivery_status_imageview, ownMessage,
-                    messageCache.isDelivered());
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
-            setDeliveryStatus(view, viewHolder, R.id.text_message_delivery_status_imageview, ownMessage,
-                    messageCache.isDelivered());
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             viewHolder.messageTextView.setText(messageCache.getMessage());
         }
 
-        if (!messageCache.isRead()) {
+        if (!messageCache.isRead() && ownMessage) {
             messageCache.setRead(true);
-            QBUpdateStatusMessageCommand.start(context, dialog, messageCache);
+            QBUpdateStatusMessageReadCommand.start(context, dialog, messageCache);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

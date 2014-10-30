@@ -5,7 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.User;

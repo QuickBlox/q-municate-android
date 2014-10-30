@@ -1,9 +1,9 @@
 package com.quickblox.q_municate.core.gcm;
 
-import com.quickblox.internal.core.helper.StringifyArrayList;
-import com.quickblox.module.messages.model.QBEnvironment;
-import com.quickblox.module.messages.model.QBEvent;
-import com.quickblox.module.messages.model.QBNotificationType;
+import com.quickblox.core.helper.StringifyArrayList;
+import com.quickblox.messages.model.QBEnvironment;
+import com.quickblox.messages.model.QBEvent;
+import com.quickblox.messages.model.QBNotificationType;
 
 import java.util.List;
 

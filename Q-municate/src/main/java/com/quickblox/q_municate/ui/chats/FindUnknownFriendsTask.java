@@ -4,8 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.qb.commands.QBLoadUserCommand;

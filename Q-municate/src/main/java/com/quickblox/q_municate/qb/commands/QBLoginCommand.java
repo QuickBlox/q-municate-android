@@ -3,7 +3,7 @@ package com.quickblox.q_municate.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate.service.QBService;
 import com.quickblox.q_municate.service.QBServiceConsts;

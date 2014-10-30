@@ -4,17 +4,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.quickblox.internal.core.exception.QBResponseException;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.QBPrivateChat;
-import com.quickblox.module.chat.QBPrivateChatManager;
-import com.quickblox.module.chat.listeners.QBPrivateChatManagerListener;
-import com.quickblox.module.chat.model.QBChatMessage;
-import com.quickblox.module.chat.model.QBDialog;
-import com.quickblox.module.chat.model.QBDialogType;
-import com.quickblox.module.content.QBContent;
-import com.quickblox.module.content.model.QBFile;
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.QBPrivateChatManager;
+import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.model.QBChatMessage;
+import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.content.QBContent;
+import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.FriendsNotificationType;
@@ -26,6 +24,7 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.Utils;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
@@ -54,6 +53,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     public void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
             String dialogId) throws QBResponseException {
         QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        chatMessage.setMarkable(true);
         if (privateChat == null) {
             privateChat = createChatIfNotExist(opponentId);
         }
@@ -87,7 +87,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String packetId = chatMessage.getId();
         if (dialogId != null) {
             saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatCreator.getId(),
-                    chatMessage.getBody(), attachUrl, time, true, false));
+                    chatMessage.getBody(), attachUrl, time, false, false));
         }
     }
 
@@ -105,8 +105,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         currentDialog = null;
     }
 
-    public void init(QBChatService chatService, QBUser user) {
-        super.init(chatService, user);
+    public void init(QBUser user) {
+        super.init(user);
         privateChatManager = chatService.getPrivateChatManager();
         notificationChatListener = new PrivateChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
@@ -163,6 +163,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     @Override
     public void chatCreated(QBPrivateChat privateChat, boolean createdLocally) {
         privateChat.addMessageListener(privateChatMessageListener);
+        privateChat.addIsTypingListener(privateChatIsTypingListener);
     }
 
     public void updateDialog(QBDialog dialog) {
@@ -176,10 +177,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         saveDialogToCache(context, dialog);
         notifyFriendCreatedPrivateChat(dialog, opponentId);
         return dialog;
-    }
-
-    public void closeChat(int opponentId) {
-        currentDialog = null;
     }
 
     private void notifyFriendCreatedPrivateChat(QBDialog dialog, int opponentId) throws QBResponseException {
@@ -212,22 +209,12 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         }
     }
 
-    private void messageDeliveryStatusReceived(QBChatMessage chatMessage) {
-        String messageId;
-        boolean messageDelivered = true;
-        messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID);
-        updateMessageStatusDelivered(messageId, messageDelivered);
-    }
-
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT.equals(notificationType)) {
                 createDialogByNotification(chatMessage);
-            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_MESSAGE_DELIVERY_STATUS.equals(
-                    notificationType)) {
-                messageDeliveryStatusReceived(chatMessage);
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, FriendsNotificationType.REQUEST);
             } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST.equals(notificationType)) {

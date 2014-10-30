@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.module.content.model.QBFile;
+import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.core.command.ServiceCommand;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate.service.QBService;

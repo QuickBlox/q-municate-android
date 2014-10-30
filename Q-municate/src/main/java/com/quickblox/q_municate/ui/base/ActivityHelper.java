@@ -11,7 +11,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.facebook.Session;
-import com.quickblox.module.auth.model.QBProvider;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
 import com.quickblox.q_municate.model.AppSession;

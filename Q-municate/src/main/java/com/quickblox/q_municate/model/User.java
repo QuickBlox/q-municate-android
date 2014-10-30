@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.model;
 
-import com.quickblox.module.users.model.QBUser;
+import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.utils.OnlineStatusHelper;
 
 import java.io.Serializable;
