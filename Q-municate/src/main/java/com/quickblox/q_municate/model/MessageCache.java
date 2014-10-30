@@ -6,26 +6,26 @@ public class MessageCache implements Serializable {
 
     private String id;
     private String dialogId;
-    private String packetId;
     private Integer senderId;
     private String message;
     private String attachUrl;
     private long time;
     private boolean isRead;
     private boolean isDelivered;
+    private boolean isSync;
     private FriendsNotificationType friendsNotificationType;
 
-    public MessageCache(String id, String dialogId, String packetId, Integer senderId, String message,
-            String attachUrl, long time, boolean isRead, boolean isDelivered) {
+    public MessageCache(String id, String dialogId, Integer senderId, String message, String attachUrl,
+            long time, boolean isRead, boolean isDelivered, boolean isSync) {
         this.id = id;
         this.dialogId = dialogId;
-        this.packetId = packetId;
         this.senderId = senderId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
         this.isRead = isRead;
         this.isDelivered = isDelivered;
+        this.isSync = isSync;
     }
 
     public FriendsNotificationType getFriendsNotificationType() {
@@ -34,6 +34,14 @@ public class MessageCache implements Serializable {
 
     public void setFriendsNotificationType(FriendsNotificationType friendsNotificationType) {
         this.friendsNotificationType = friendsNotificationType;
+    }
+
+    public boolean isSync() {
+        return isSync;
+    }
+
+    public void setSync(boolean isSync) {
+        this.isSync = isSync;
     }
 
     public boolean isDelivered() {
@@ -102,13 +110,5 @@ public class MessageCache implements Serializable {
 
     public void setDialogId(String dialogId) {
         this.dialogId = dialogId;
-    }
-
-    public String getPacketId() {
-        return packetId;
-    }
-
-    public void setPacketId(String packetId) {
-        this.packetId = packetId;
     }
 }

@@ -8,18 +8,19 @@ import android.view.KeyEvent;
 
 public class ProgressDialog extends DialogFragment {
 
-    private int messageId;
+    private static final String ARGS_MESSAGE_ID = "message_id";
 
     public static ProgressDialog newInstance(int messageId) {
-        return new ProgressDialog(messageId);
-    }
-
-    private ProgressDialog(int messageId) {
-        this.messageId = messageId;
+        ProgressDialog progressDialog = new ProgressDialog();
+        Bundle args = new Bundle();
+        args.putInt(ARGS_MESSAGE_ID, messageId);
+        progressDialog.setArguments(args);
+        return progressDialog;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        int messageId = getArguments().getInt(ARGS_MESSAGE_ID);
         android.app.ProgressDialog dialog = new android.app.ProgressDialog(getActivity());
         dialog.setMessage(getString(messageId));
         dialog.setIndeterminate(true);
@@ -35,10 +36,5 @@ public class ProgressDialog extends DialogFragment {
         dialog.setOnKeyListener(keyListener);
 
         return dialog;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putInt("das", messageId);
     }
 }

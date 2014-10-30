@@ -84,10 +84,9 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
         long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
         String messageId = chatMessage.getId();
-        String packetId = chatMessage.getId();
         if (dialogId != null) {
-            saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatCreator.getId(),
-                    chatMessage.getBody(), attachUrl, time, false, false));
+            saveMessageToCache(new MessageCache(messageId, dialogId, chatCreator.getId(),
+                    chatMessage.getBody(), attachUrl, time, false, false, true));
         }
     }
 
@@ -136,9 +135,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        String packetId = chatMessage.getId();
-        MessageCache messageCache = new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
-                chatMessage.getBody(), attachUrl, time, false, false);
+        MessageCache messageCache = new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
+                chatMessage.getBody(), attachUrl, time, false, false, false);
 
         return messageCache;
     }

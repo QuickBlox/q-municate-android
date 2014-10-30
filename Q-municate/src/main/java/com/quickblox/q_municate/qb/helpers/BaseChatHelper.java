@@ -58,7 +58,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void saveMessageToCache(MessageCache messageCache) {
-        DatabaseManager.saveChatMessage(context, messageCache);
+        DatabaseManager.saveChatMessage(context, messageCache, false);
     }
 
     /*

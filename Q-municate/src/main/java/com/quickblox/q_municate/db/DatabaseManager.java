@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.q_municate.App;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.tables.DialogTable;
@@ -133,7 +134,8 @@ public class DatabaseManager {
             cursor.moveToFirst();
 
             while (!cursor.isLast()) {
-                relationStatusesMap.put(cursor.getString(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS)), cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
+                relationStatusesMap.put(cursor.getString(cursor.getColumnIndex(
+                        FriendsRelationTable.Cols.RELATION_STATUS)), cursor.getInt(cursor.getColumnIndex(FriendsRelationTable.Cols.RELATION_STATUS_ID)));
                 cursor.moveToNext();
             }
         }
@@ -335,7 +337,7 @@ public class DatabaseManager {
     public static String getDialogByMessageId(Context context, String messageId) {
         String dialogId = null;
         Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.ID + " = '" + messageId + "'", null, null);
+                MessageTable.Cols.MESSAGE_ID + " = '" + messageId + "'", null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
@@ -424,9 +426,8 @@ public class DatabaseManager {
     }
 
     public static MessageCache getMessageCacheFromCursor(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ID));
+        String id = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.MESSAGE_ID));
         String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
-        String packetId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.PACKET_ID));
         Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
         String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
         long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
@@ -435,11 +436,13 @@ public class DatabaseManager {
                 MessageTable.Cols.IS_READ)) > Consts.ZERO_INT_VALUE;
         boolean isDelivered = cursor.getInt(cursor.getColumnIndex(
                 MessageTable.Cols.IS_DELIVERED)) > Consts.ZERO_INT_VALUE;
+        boolean isSync = cursor.getInt(cursor.getColumnIndex(
+                MessageTable.Cols.IS_SYNC)) > Consts.ZERO_INT_VALUE;
         FriendsNotificationType friendsNotificationType = FriendsNotificationType.parseByCode(cursor.getInt(
                 cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
 
-        MessageCache messageCache = new MessageCache(id, dialogId, packetId, senderId, body, attachUrl, time,
-                isRead, isDelivered);
+        MessageCache messageCache = new MessageCache(id, dialogId, senderId, body, attachUrl, time,
+                isRead, isDelivered, isSync);
 
         messageCache.setFriendsNotificationType(friendsNotificationType);
 
@@ -536,12 +539,11 @@ public class DatabaseManager {
         return friend;
     }
 
-    public static MessageCache getLastReadMessage(Context context, QBDialog dialog) {
+    public static MessageCache getLastSyncMessage(Context context, QBDialog dialog) {
         MessageCache messageCache = null;
 
         Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " +
-                        MessageTable.Cols.IS_READ + " > 0", null,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " + MessageTable.Cols.IS_SYNC + " > 0", null,
                 MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
 
         if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
@@ -591,8 +593,8 @@ public class DatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            messageCache = new MessageCache(messageId, dialogId, null, senderId, message, attachURL, time,
-                    historyMessage.isRead(), true);
+            messageCache = new MessageCache(messageId, dialogId, senderId, message, attachURL, time,
+                    historyMessage.isRead(), true, true);
 
             if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
@@ -603,11 +605,7 @@ public class DatabaseManager {
                 }
             }
 
-            saveChatMessage(context, messageCache);
-        }
-        if (messageCache != null) {
-            updateDialog(context, messageCache.getDialogId(), messageCache.getMessage(),
-                    messageCache.getTime(), messageCache.getSenderId(), Consts.ZERO_INT_VALUE);
+            saveChatMessage(context, messageCache, true);
         }
     }
 
@@ -619,14 +617,17 @@ public class DatabaseManager {
                 .equals(friendsMessageTypeCode + Consts.EMPTY_STRING);
     }
 
-    public static void saveChatMessage(Context context, MessageCache messageCache) {
-        ContentValues values = new ContentValues();
-        String body;
+    public static void saveChatMessage(Context context, MessageCache messageCache, boolean fromHistory) {
+        int countUnreadMessagesLocal;
+        boolean ownMessage = AppSession.getSession().getUser().getId() == messageCache.getSenderId();
 
-        values.put(MessageTable.Cols.ID, messageCache.getId());
-        values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
-        values.put(MessageTable.Cols.PACKET_ID, messageCache.getPacketId());
-        values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
+        ContentValues values = new ContentValues();
+
+        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageCache.getId() + "'";
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
+
+        String body;
 
         if (messageCache.getFriendsNotificationType() != null) {
             values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE,
@@ -640,15 +641,25 @@ public class DatabaseManager {
         values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
         values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
         values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
-        context.getContentResolver().insert(MessageTable.CONTENT_URI, values);
+        values.put(MessageTable.Cols.IS_SYNC, messageCache.isSync());
 
-        int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context,
-                messageCache.getDialogId());
-
-        if (!messageCache.isRead()) {
-            countUnreadMessagesLocal = ++countUnreadMessagesLocal;
+        if (cursor != null && cursor.getCount() > Consts.ZERO_INT_VALUE) {
+            resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+        } else {
+            values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
+            values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
+            values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
+            resolver.insert(MessageTable.CONTENT_URI, values);
         }
 
+        if (fromHistory) {
+            countUnreadMessagesLocal = Consts.ZERO_INT_VALUE;
+        } else if (!messageCache.isSync() && !ownMessage) {
+            countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
+            countUnreadMessagesLocal = ++countUnreadMessagesLocal;
+        } else {
+            countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
+        }
         updateDialog(context, messageCache.getDialogId(), body, messageCache.getTime(),
                 messageCache.getSenderId(), countUnreadMessagesLocal);
     }
@@ -797,7 +808,9 @@ public class DatabaseManager {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
 
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, countUnreadMessages);
+        if (countUnreadMessages >= Consts.ZERO_INT_VALUE) {
+            values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, countUnreadMessages);
+        }
 
         if (TextUtils.isEmpty(lastMessage)) {
             values.put(DialogTable.Cols.LAST_MESSAGE, lastMessage);
@@ -834,7 +847,7 @@ public class DatabaseManager {
 
     public static void updateStatusMessageRead(Context context, String messageId, boolean isRead) {
         ContentValues values = new ContentValues();
-        String condition = MessageTable.Cols.ID + "='" + messageId + "'";
+        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -854,7 +867,7 @@ public class DatabaseManager {
 
     public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
         ContentValues values = new ContentValues();
-        String condition = MessageTable.Cols.ID + "='" + messageId + "'";
+        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {

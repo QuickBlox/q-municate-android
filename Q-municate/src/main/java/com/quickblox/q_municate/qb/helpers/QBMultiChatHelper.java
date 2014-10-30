@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.chat.QBChat;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBGroupChat;
 import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChat;
@@ -20,7 +19,6 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBCustomObjectUpdateBuilder;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
-import com.quickblox.q_municate.model.AppSession;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.ui.chats.FindUnknownFriendsTask;
@@ -310,14 +308,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
             String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
             long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
             String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
-            String packetId = chatMessage.getId();
-            boolean isRead = false;
-            boolean isDelivered = false;
-
-            Integer userId = AppSession.getSession().getUser().getId();
-            if (chatMessage.getSenderId().equals(userId)) {
-                isRead = true;
-            }
 
             if(user == null) {
                 user = new User();
@@ -325,8 +315,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
                 user.setFullName(chatMessage.getSenderId() + Consts.EMPTY_STRING);
             }
 
-            saveMessageToCache(new MessageCache(messageId, dialogId, packetId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, isRead, isDelivered));
+            saveMessageToCache(new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
+                    chatMessage.getBody(), attachUrl, time, false, false, false));
 
             if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
                 // TODO IS handle logic when friend is not in the friend list

@@ -9,26 +9,24 @@ import com.quickblox.q_municate.utils.DialogUtils;
 
 public class AlertDialog extends DialogFragment {
 
-    private String message;
+    private static final String ARGS_MESSAGE = "message";
+
     private DialogInterface.OnClickListener positiveButtonListener;
     private DialogInterface.OnClickListener negativeButtonListener;
 
     public static AlertDialog newInstance(String message) {
-        return new AlertDialog(message);
-    }
-
-    public AlertDialog(String message) {
-        this.message = message;
+        AlertDialog alertDialog = new AlertDialog();
+        Bundle args = new Bundle();
+        args.putString(ARGS_MESSAGE, message);
+        alertDialog.setArguments(args);
+        return alertDialog;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        String message = getArguments().getString(ARGS_MESSAGE);
         return DialogUtils.createDialog(getActivity(), message, positiveButtonListener,
                 negativeButtonListener);
-    }
-
-    public void setMessageId(String message) {
-        this.message = message;
     }
 
     public void setPositiveButton(final DialogInterface.OnClickListener listener) {

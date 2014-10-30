@@ -87,15 +87,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void createMessageTable(SQLiteDatabase db) {
         StringBuilder messageTableFields = new StringBuilder();
         messageTableFields
-                .append(MessageTable.Cols.ID).append(" TEXT PRIMARY KEY, ")
-                .append(MessageTable.Cols.DIALOG_ID).append(" INTEGER, ")
-                .append(MessageTable.Cols.PACKET_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.ID).append(" INTEGER PRIMARY KEY, ")
+                .append(MessageTable.Cols.MESSAGE_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.DIALOG_ID).append(" TEXT, ")
                 .append(MessageTable.Cols.SENDER_ID).append(" INTEGER, ")
                 .append(MessageTable.Cols.BODY).append(" TEXT, ")
                 .append(MessageTable.Cols.TIME).append(" LONG, ")
                 .append(MessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
                 .append(MessageTable.Cols.IS_READ).append(" INTEGER, ")
                 .append(MessageTable.Cols.IS_DELIVERED).append(" INTEGER, ")
+                .append(MessageTable.Cols.IS_SYNC).append(" INTEGER, ")
                 .append(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE).append(" INTEGER");
         createTable(db, MessageTable.TABLE_NAME, messageTableFields.toString());
     }

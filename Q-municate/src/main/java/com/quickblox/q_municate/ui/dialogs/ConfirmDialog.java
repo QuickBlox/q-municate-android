@@ -9,31 +9,26 @@ import com.quickblox.q_municate.utils.DialogUtils;
 
 public class ConfirmDialog extends DialogFragment {
 
-    private int titleId;
-    private int messageId;
+    private static final String ARGS_TITLE_ID = "title_id";
+    private static final String ARGS_MESSAGE_ID = "message_id";
+
     private DialogInterface.OnClickListener positiveButtonListener;
     private DialogInterface.OnClickListener negativeButtonListener;
 
     public static ConfirmDialog newInstance(int titleId, int messageId) {
-        return new ConfirmDialog(titleId, messageId);
-    }
-
-    public ConfirmDialog(int titleId, int messageId) {
-        this.titleId = titleId;
-        this.messageId = messageId;
+        ConfirmDialog confirmDialog = new ConfirmDialog();
+        Bundle args = new Bundle();
+        args.putInt(ARGS_TITLE_ID, titleId);
+        args.putInt(ARGS_MESSAGE_ID, messageId);
+        confirmDialog.setArguments(args);
+        return confirmDialog;
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        int titleId = getArguments().getInt(ARGS_TITLE_ID);
+        int messageId = getArguments().getInt(ARGS_MESSAGE_ID);
         return DialogUtils.createDialog(getActivity(), titleId, messageId, positiveButtonListener, negativeButtonListener);
-    }
-
-    public void setTitleId(int titleId) {
-        this.titleId = titleId;
-    }
-
-    public void setMessageId(int messageId) {
-        this.messageId = messageId;
     }
 
     public void setPositiveButton(final DialogInterface.OnClickListener listener) {

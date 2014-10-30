@@ -85,7 +85,7 @@
     <string name="frl_friends_request_reject_message_for_friend">Your request has been rejected </string>
     <string name="frl_friends_request_reject_message_for_me">You have rejected a request</string>
     <string name="frl_friends_request_remove_message_for_friend">%1$s has delete you from contacts </string>
-    <string name="frl_friends_request_remove_message_for_me">Contact has deleted from your contacts </string>
+    <string name="frl_friends_request_remove_message_for_me">User has been deleted from your contacts </string>
 
     // Friend Details
     <string name="frd_title">Details</string>
