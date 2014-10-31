@@ -120,7 +120,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void sendIsTypingToServer(int opponentId) {
-        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        QBPrivateChat privateChat = getPrivateChatByOpponent(opponentId);
         try {
             privateChat.sendIsTypingNotification();
         } catch (XMPPException e) {
@@ -131,7 +131,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void sendStopTypingToServer(int opponentId) {
-        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        QBPrivateChat privateChat = getPrivateChatByOpponent(opponentId);
         try {
             privateChat.sendStopTypingNotification();
         } catch (XMPPException e) {
@@ -139,6 +139,15 @@ public abstract class BaseChatHelper extends BaseHelper {
         } catch (SmackException.NotConnectedException e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    private QBPrivateChat getPrivateChatByOpponent(int opponentId) {
+        QBPrivateChat privateChat = privateChatManager.getChat(opponentId);
+        if (privateChat == null) {
+            privateChat = privateChatManager.createChat(opponentId, privateChatMessageListener);
+            privateChat.addIsTypingListener(privateChatIsTypingListener);
+        }
+        return privateChat;
     }
 
     public QBPrivateChat createChatIfNotExist(int opponentId) throws QBResponseException {

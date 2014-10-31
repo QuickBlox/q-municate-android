@@ -100,6 +100,7 @@
     <string name="dlg_hint_message">Type a message</string>
     <string name="dlg_no_chats">Oops…\nYou don\'t have any chats, \ntap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
     <string name="dlg_reply">Reply</string>
+    <string name="dlg_user_is_not_friend">User is not your friend</string>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>

@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -140,6 +141,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         super.onPause();
         onUpdateChatDialog();
         hideSmileLayout();
+
+        // TODO: now it is possible only for Private chats
+        if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+            if (isTypingNow) {
+                stopTypingMessage();
+            }
+        }
     }
 
     @Override
