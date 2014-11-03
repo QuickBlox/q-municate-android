@@ -36,6 +36,7 @@ import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 
@@ -221,6 +222,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean isFriend = DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId());
+        if (!isFriend && item.getItemId() != android.R.id.home) {
+            DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(R.string.dlg_user_is_not_friend));
+            return true;
+        }
         switch (item.getItemId()) {
             case android.R.id.home:
                 navigateToParent();
@@ -255,7 +261,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        messageEditText.setEnabled(DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId()));
+        boolean isFriend = DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId());
+        messageEditText.setEnabled(isFriend);
     }
 
     private void acceptUser(final int userId) {
