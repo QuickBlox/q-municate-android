@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
+import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -30,6 +31,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChatManagerListener {
 
@@ -70,7 +72,29 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
         }
         if (error != null) {
             throw new QBResponseException(error);
+        } else {
+            savePrivateMessageToCache(chatMessage, dialogId);
         }
+    }
+
+    private void savePrivateMessageToCache(QBChatMessage chatMessage, String dialogId) {
+        String messageId = chatMessage.getId();
+        int friendsMessageTypeCode;
+        long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
+        String attachUrl = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(chatMessage.getAttachments()));
+        MessageCache messageCache = new MessageCache(messageId, dialogId, chatCreator.getId(),
+                chatMessage.getBody(), attachUrl, time, false, false, true);
+
+        if (chatMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
+            friendsMessageTypeCode = Integer.parseInt(chatMessage.getProperty(
+                    ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
+            if (ChatUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
+                messageCache.setFriendsNotificationType(FriendsNotificationType.parseByCode(
+                        friendsMessageTypeCode));
+            }
+        }
+
+        saveMessageToCache(messageCache);
     }
 
     private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
@@ -81,13 +105,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
             dialogId = currentDialog.getDialogId();
         }
         sendPrivateMessage(chatMessage, userId, dialogId);
-        String attachUrl = file != null ? file.getPublicUrl() : Consts.EMPTY_STRING;
-        long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-        String messageId = chatMessage.getId();
-        if (dialogId != null) {
-            saveMessageToCache(new MessageCache(messageId, dialogId, chatCreator.getId(),
-                    chatMessage.getBody(), attachUrl, time, false, false, true));
-        }
     }
 
     @Override

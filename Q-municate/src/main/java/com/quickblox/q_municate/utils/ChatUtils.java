@@ -298,4 +298,12 @@ public class ChatUtils {
     public static QBDialog getExistDialogById(Context context, String dialogId) {
         return DatabaseManager.getDialogByDialogId(context, dialogId);
     }
+
+    public static boolean isFriendsMessageTypeCode(int friendsMessageTypeCode) {
+        return ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(
+                friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST
+                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING);
+    }
 }

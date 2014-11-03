@@ -18,6 +18,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.Friend;
+import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.service.QBServiceConsts;
 import com.quickblox.q_municate.utils.ChatUtils;

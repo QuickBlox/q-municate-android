@@ -599,7 +599,7 @@ public class DatabaseManager {
             if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
                         ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
-                if (isFriendsMessageTypeCode(friendsMessageTypeCode)) {
+                if (ChatUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
                     messageCache.setFriendsNotificationType(FriendsNotificationType.parseByCode(
                             friendsMessageTypeCode));
                 }
@@ -607,14 +607,6 @@ public class DatabaseManager {
 
             saveChatMessage(context, messageCache, true);
         }
-    }
-
-    private static boolean isFriendsMessageTypeCode(int friendsMessageTypeCode) {
-        return ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST.equals(
-                friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST
-                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST
-                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING) || ChatUtils.PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST
-                .equals(friendsMessageTypeCode + Consts.EMPTY_STRING);
     }
 
     public static void saveChatMessage(Context context, MessageCache messageCache, boolean fromHistory) {
