@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -173,6 +174,7 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
+            QBLoadDialogsCommand.start(SplashActivity.this);
             startMainActivity();
             finish();
         }

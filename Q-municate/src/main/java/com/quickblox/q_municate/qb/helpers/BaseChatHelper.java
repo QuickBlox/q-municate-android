@@ -76,7 +76,9 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void addNotificationChatListener(QBNotificationChatListener notificationChatListener) {
-        notificationChatListeners.add(notificationChatListener);
+        if (!notificationChatListeners.contains(notificationChatListener)) {
+            notificationChatListeners.add(notificationChatListener);
+        }
     }
 
     protected void saveDialogToCache(Context context, QBDialog dialog) {
