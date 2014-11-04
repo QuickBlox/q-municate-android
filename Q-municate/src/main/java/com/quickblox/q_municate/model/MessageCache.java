@@ -15,6 +15,9 @@ public class MessageCache implements Serializable {
     private boolean isSync;
     private FriendsNotificationType friendsNotificationType;
 
+    public MessageCache() {
+    }
+
     public MessageCache(String id, String dialogId, Integer senderId, String message, String attachUrl,
             long time, boolean isRead, boolean isDelivered, boolean isSync) {
         this.id = id;

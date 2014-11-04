@@ -15,7 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.model.FriendsNotificationType;
 import com.quickblox.q_municate.model.MessageCache;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageReadCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
@@ -160,7 +160,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!messageCache.isRead() && !ownMessage) {
             messageCache.setRead(true);
-            QBUpdateStatusMessageReadCommand.start(context, dialog, messageCache);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, true);
         }
 
         // check if last message is request message

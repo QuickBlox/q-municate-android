@@ -57,7 +57,7 @@ import com.quickblox.q_municate.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateGroupDialogCommand;
-import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageReadCommand;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate.qb.helpers.BaseChatHelper;
@@ -495,10 +495,10 @@ public class QBService extends Service {
 
     private void registerUpdateStatusMessageCommand() {
         QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
-        QBUpdateStatusMessageReadCommand updateStatusMessageCommand = new QBUpdateStatusMessageReadCommand(this,
+        QBUpdateStatusMessageCommand updateStatusMessageCommand = new QBUpdateStatusMessageCommand(this,
                 privateChatHelper, QBServiceConsts.UPDATE_STATUS_MESSAGE_SUCCESS_ACTION,
                 QBServiceConsts.UPDATE_STATUS_MESSAGE_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_READ_ACTION, updateStatusMessageCommand);
+        serviceCommandMap.put(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, updateStatusMessageCommand);
     }
 
     private void registerSendTypingStatusCommand() {

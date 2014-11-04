@@ -28,7 +28,6 @@ public class DialogsAdapter extends BaseCursorAdapter {
         convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-        viewHolder.userCountTextView = (TextView) convertView.findViewById(R.id.user_count_textview);
         viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
         viewHolder.lastMessageTextView = (TextView) convertView.findViewById(R.id.last_message_textview);
         viewHolder.unreadMessagesTextView = (TextView) convertView.findViewById(
@@ -47,12 +46,9 @@ public class DialogsAdapter extends BaseCursorAdapter {
             int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
             User occupant = getOccupantById(occupantId);
             viewHolder.nameTextView.setText(occupant.getFullName());
-            viewHolder.userCountTextView.setVisibility(View.GONE);
             displayAvatarImage(getAvatarUrlForFriend(occupant), viewHolder.avatarImageView);
         } else {
             viewHolder.nameTextView.setText(dialog.getName());
-            viewHolder.userCountTextView.setVisibility(View.VISIBLE);
-            viewHolder.userCountTextView.setText(dialog.getOccupants().size() + Consts.EMPTY_STRING);
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
             displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
         }
@@ -80,7 +76,6 @@ public class DialogsAdapter extends BaseCursorAdapter {
     private static class ViewHolder {
 
         public RoundedImageView avatarImageView;
-        public TextView userCountTextView;
         public TextView nameTextView;
         public TextView lastMessageTextView;
         public TextView unreadMessagesTextView;

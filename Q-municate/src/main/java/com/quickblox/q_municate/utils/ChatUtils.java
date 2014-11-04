@@ -198,22 +198,22 @@ public class ChatUtils {
     }
 
     public static QBChatMessage createNotificationMessageForFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_message_for_friend,
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
                 PROPERTY_NOTIFICATION_TYPE_FRIENDS_REQUEST);
     }
 
     public static QBChatMessage createNotificationMessageForAcceptFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_accept_message_for_friend,
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
                 PROPERTY_NOTIFICATION_TYPE_FRIENDS_ACCEPT_REQUEST);
     }
 
     public static QBChatMessage createNotificationMessageForRejectFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_reject_message_for_friend,
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
                 PROPERTY_NOTIFICATION_TYPE_FRIENDS_REJECT_REQUEST);
     }
 
     public static QBChatMessage createNotificationMessageForRemoveFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_request_remove_message_for_friend,
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
                 PROPERTY_NOTIFICATION_TYPE_FRIENDS_REMOVE_REQUEST);
     }
 

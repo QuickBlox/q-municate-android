@@ -42,6 +42,8 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     public QBPrivateChatHelper(Context context) {
         super(context);
+        notificationChatListener = new PrivateChatNotificationListener();
+        addNotificationChatListener(notificationChatListener);
     }
 
     public void sendPrivateMessage(String message, int userId) throws QBResponseException {
@@ -124,8 +126,6 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     public void init(QBUser user) {
         super.init(user);
         privateChatManager = chatService.getPrivateChatManager();
-        notificationChatListener = new PrivateChatNotificationListener();
-        addNotificationChatListener(notificationChatListener);
     }
 
     @Override

@@ -49,6 +49,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public QBMultiChatHelper(Context context) {
         super(context);
+        addNotificationChatListener(notificationChatListener);
     }
 
     @Override
@@ -71,7 +72,6 @@ public class QBMultiChatHelper extends BaseChatHelper {
     public void init(QBUser user) {
         super.init(user);
         groupChatManager = chatService.getGroupChatManager();
-        addNotificationChatListener(notificationChatListener);
     }
 
     private void sendRoomMessage(QBChatMessage chatMessage, String roomJId,

@@ -16,6 +16,7 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
+import com.quickblox.q_municate.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -106,6 +107,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             viewHolder.messageTextView.setText(messageCache.getMessage());
+        }
+
+        if (!messageCache.isRead() && !ownMessage) {
+            messageCache.setRead(true);
+            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

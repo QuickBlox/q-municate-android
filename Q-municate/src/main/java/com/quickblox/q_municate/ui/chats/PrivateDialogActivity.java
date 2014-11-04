@@ -25,6 +25,7 @@ import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.FriendTable;
 import com.quickblox.q_municate.db.tables.MessageTable;
 import com.quickblox.q_municate.model.AppSession;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate.qb.commands.QBRejectFriendCommand;
@@ -166,12 +167,17 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private QBDialog getDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
-        Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
-        dialog.setLastMessage(lastMessage);
-        dialog.setLastMessageDateSent(DateUtils.getCurrentTime());
+
+        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        if (messageCache.getFriendsNotificationType() == null) {
+            dialog.setLastMessage(messageCache.getMessage());
+        } else {
+            dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
+        }
+
+        dialog.setLastMessageDateSent(messageCache.getTime());
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
-        dialog.setLastMessageUserId(senderId);
+        dialog.setLastMessageUserId(messageCache.getSenderId());
         dialog.setType(QBDialogType.PRIVATE);
         return dialog;
     }

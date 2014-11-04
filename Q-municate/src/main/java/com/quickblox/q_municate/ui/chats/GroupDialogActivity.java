@@ -19,6 +19,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.db.DatabaseManager;
 import com.quickblox.q_municate.db.tables.MessageTable;
+import com.quickblox.q_municate.model.MessageCache;
 import com.quickblox.q_municate.model.User;
 import com.quickblox.q_municate.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate.qb.helpers.QBMultiChatHelper;
@@ -126,10 +127,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     private QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-        String lastMessage = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
-        long dateSent = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-        dialog.setLastMessage(lastMessage);
-        dialog.setLastMessageDateSent(dateSent);
+
+        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        if (messageCache.getFriendsNotificationType() == null) {
+            dialog.setLastMessage(messageCache.getMessage());
+        } else {
+            dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
+        }
+
+        dialog.setLastMessageDateSent(messageCache.getTime());
         dialog.setUnreadMessageCount(Consts.ZERO_INT_VALUE);
         return dialog;
     }

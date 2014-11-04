@@ -663,30 +663,32 @@ public class DatabaseManager {
             QBUser user = AppSession.getSession().getUser();
             boolean ownMessage = user.getId().equals(messageCache.getSenderId());
 
-            if (ownMessage) {
                 switch (messageCache.getFriendsNotificationType()) {
                     case REQUEST: {
-                        resultMessage = context.getResources().getString(
-                                R.string.frl_friends_request_message_for_me);
+                        resultMessage = ownMessage
+                                ? context.getResources().getString(R.string.frl_friends_request_message_for_me)
+                                : context.getResources().getString(R.string.frl_friends_request_message_for_friend);
                         break;
                     }
                     case ACCEPT: {
-                        resultMessage = context.getResources().getString(
-                                R.string.frl_friends_request_accept_message_for_me);
+                        resultMessage = ownMessage
+                                ? context.getResources().getString(R.string.frl_friends_request_accept_message_for_me)
+                                : context.getResources().getString(R.string.frl_friends_request_accept_message_for_friend);
                         break;
                     }
                     case REJECT: {
-                        resultMessage = context.getResources().getString(
-                                R.string.frl_friends_request_reject_message_for_me);
+                        resultMessage = ownMessage
+                                ? context.getResources().getString(R.string.frl_friends_request_reject_message_for_me)
+                                : context.getResources().getString(R.string.frl_friends_request_reject_message_for_friend);
                         break;
                     }
                     case REMOVE: {
-                        resultMessage = context.getResources().getString(
-                                R.string.frl_friends_request_remove_message_for_me);
+                        resultMessage = ownMessage
+                                ? context.getResources().getString(R.string.frl_friends_request_remove_message_for_me)
+                                : context.getResources().getString(R.string.frl_friends_request_remove_message_for_friend);
                     }
                 }
 
-            }
         } else {
             if (!TextUtils.isEmpty(messageCache.getMessage())) {
                 resultMessage = Html.fromHtml(messageCache.getMessage()).toString();
@@ -837,9 +839,9 @@ public class DatabaseManager {
         // TODO clear something else
     }
 
-    public static void updateStatusMessageRead(Context context, String messageId, boolean isRead) {
+    public static void updateStatusMessage(Context context, MessageCache messageCache) {
         ContentValues values = new ContentValues();
-        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
+        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageCache.getId() + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -847,7 +849,7 @@ public class DatabaseManager {
             String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
             long lastSenderId = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
-            values.put(MessageTable.Cols.IS_READ, isRead);
+            values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
             cursor.close();
 

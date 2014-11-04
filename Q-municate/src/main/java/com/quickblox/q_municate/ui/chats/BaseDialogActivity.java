@@ -532,11 +532,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            boolean isTyping = bundle.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-            if (isTyping) {
-                startMessageTypingAnimation();
-            } else {
-                stopMessageTypingAnimation();
+            // TODO: now it is possible only for Private chats
+            if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+                boolean isTyping = bundle.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                if (isTyping) {
+                    startMessageTypingAnimation();
+                } else {
+                    stopMessageTypingAnimation();
+                }
             }
         }
     }

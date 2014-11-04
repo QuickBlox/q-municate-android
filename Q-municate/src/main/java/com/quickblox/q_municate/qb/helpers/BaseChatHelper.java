@@ -99,22 +99,24 @@ public abstract class BaseChatHelper extends BaseHelper {
         return chatMessage;
     }
 
-    public void updateStatusMessageRead(String dialogId, MessageCache messageCache) throws Exception {
-        updateStatusMessageReadServer(dialogId, messageCache);
-        updateStatusMessageReadLocal(messageCache.getId(), messageCache.isRead());
+    public void updateStatusMessageRead(String dialogId, MessageCache messageCache, boolean forPrivate) throws Exception {
+        updateStatusMessageReadServer(dialogId, messageCache, forPrivate);
+        updateStatusMessageLocal(messageCache);
     }
 
-    public void updateStatusMessageReadServer(String dialogId, MessageCache messageCache) throws Exception {
+    public void updateStatusMessageReadServer(String dialogId, MessageCache messageCache, boolean fromPrivate) throws Exception {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
         messagesIdsList.add(messageCache.getId());
         QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
 
-        QBPrivateChat privateChat = privateChatManager.getChat(messageCache.getSenderId());
-        privateChat.readMessage(messageCache.getId());
+        if (fromPrivate) {
+            QBPrivateChat privateChat = privateChatManager.getChat(messageCache.getSenderId());
+            privateChat.readMessage(messageCache.getId());
+        }
     }
 
-    public void updateStatusMessageReadLocal(String messageId, boolean isRead) throws QBResponseException {
-        DatabaseManager.updateStatusMessageRead(context, messageId, isRead);
+    public void updateStatusMessageLocal(MessageCache messageCache) throws QBResponseException {
+        DatabaseManager.updateStatusMessage(context, messageCache);
     }
 
     public void updateMessageStatusDeliveredLocal(String messageId, boolean isDelivered) {
@@ -223,7 +225,10 @@ public abstract class BaseChatHelper extends BaseHelper {
         @Override
         public void processMessageRead(QBPrivateChat privateChat, String messageId) {
             try {
-                updateStatusMessageReadLocal(messageId, true);
+                MessageCache messageCache = new MessageCache();
+                messageCache.setId(messageId);
+                messageCache.setRead(true);
+                updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
             }
