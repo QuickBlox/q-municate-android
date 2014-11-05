@@ -228,6 +228,8 @@
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
     <string name="dlg_not_joined_room">You have not joined chat room! Please wait…</string>
+    <string name="error_bad_timestamp">base Bad timestamp</string>
+    <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>

@@ -17,7 +17,7 @@ ext.compileSdkVersion = 19
 ext.buildToolsVersion = '19.1.0'
 ext.minSdkVersion = 14
 ext.targetSdkVersion = 14
-ext.versionName = '1.0.98'
+ext.versionName = '1.0.99'
 ext.versionCode = 25
 
 ext.prodDebug = true

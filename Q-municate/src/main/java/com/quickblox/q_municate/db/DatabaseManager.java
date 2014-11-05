@@ -294,14 +294,29 @@ public class DatabaseManager {
     }
 
     public static Cursor getFriendsFilteredByIds(Context context, List<Integer> friendIdsList) {
-        String selection = prepareFriendsFilter(friendIdsList);
-        return context.getContentResolver().query(UserTable.CONTENT_URI, null, selection, null,
-                UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC");
+        String selection = prepareFriendsFilter(context, friendIdsList);
+        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+        return context.getContentResolver().query(UserTable.USER_FRIEND_CONTENT_URI, null,
+                USER_FRIEND_RELATION_KEY + " AND (" + selection + ")", null, sortOrder);
     }
 
-    private static String prepareFriendsFilter(List<Integer> friendIdsList) {
+    private static String prepareFriendsFilter(Context context, List<Integer> friendIdsList) {
+        if (relationStatusesMap == null) {
+            relationStatusesMap = getRelationStatusesMap(context);
+        }
+
+        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
+
         String condition = String.format("('%s')", TextUtils.join("','", friendIdsList));
-        return UserTable.Cols.USER_ID + " NOT IN " + condition;
+        String conditionResult = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID +
+                " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " +
+                " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId +
+                " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " NOT IN " + condition;
+
+        return conditionResult;
     }
 
     public static void deleteAllFriends(Context context) {
