@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.quickblox.q_municate.utils.DialogUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.command.Command;
@@ -61,7 +62,7 @@ public class LandingActivity extends BaseAuthActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new SocialLoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, new SocialLoginFailAction());
         updateBroadcastActionList();
     }
 
@@ -76,6 +77,23 @@ public class LandingActivity extends BaseAuthActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             startMainActivity(LandingActivity.this, user, true);
+        }
+    }
+
+    private class SocialLoginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            String errorMessage = exception.getMessage();
+
+            // TODO: temp decision
+            if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
+                errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
+            }
+
+            DialogUtils.showLong(LandingActivity.this, errorMessage);
+            hideProgress();
         }
     }
 }

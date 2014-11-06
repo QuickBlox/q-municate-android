@@ -198,7 +198,14 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
-            validationUtils.setError(exception.getMessage());
+            String errorMessage = exception.getMessage();
+
+            // TODO: temp decision
+            if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
+                errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
+            }
+
+            validationUtils.setError(errorMessage);
             hideProgress();
         }
     }
