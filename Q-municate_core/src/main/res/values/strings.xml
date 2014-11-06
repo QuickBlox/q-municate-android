@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="dlg_ok">OK</string>
+    <string name="dlg_cancel">Cancel</string>
+    <string name="dlg_attached_last_message">Attachment</string>
+    <string name="dlg_fail_send_msg">Errors occurred while sending msg! Please, try later</string>
+    <string name="dlg_fail_connection">Sorry, connection lost. It will be reestablished when the Internet will be available.</string>
+    <string name="dlg_not_joined_room">You have not joined chat room! Please wait…</string>
+    <string name="dlg_fail_create_groupchat">Errors occurred while creating group chat! Please, try later</string>
+    <string name="dlg_fail_create_chat">Errors occurred while creating chat! Please, try later</string>
+    <string name="dlg_fail_upload_attach">Errors occurred during loading file</string>
+
+    <string name="frl_online">Online</string>
+    <string name="frl_offline">Offline</string>
+
+    <string name="frl_friends_request_message_for_friend">User has sent a request to you </string>
+    <string name="frl_friends_request_message_for_me">Your request has been sent </string>
+    <string name="frl_friends_request_accept_message_for_friend">User has accepted your contact request</string>
+    <string name="frl_friends_request_accept_message_for_me">You have accepted a request </string>
+    <string name="frl_friends_request_reject_message_for_friend">Your request has been rejected </string>
+    <string name="frl_friends_request_reject_message_for_me">You have rejected a request</string>
+    <string name="frl_friends_request_remove_message_for_friend">User has deleted you from contacts </string>
+    <string name="frl_friends_request_remove_message_for_me">User has been deleted from your contacts </string>
+    <string name="frl_friends_contact_request">Contact request </string>
+
+    <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
+    <string name="user_created_room">%1$s created group chat</string>
+    <string name="file_was_attached">file was attached</string>
+
+    <string-array name="friends_relation_statuses_array">
+        <item>none</item>
+        <item>to</item>
+        <item>both</item>
+        <item>from</item>
+        <item>remove</item>
+    </string-array>
+
+</resources>
