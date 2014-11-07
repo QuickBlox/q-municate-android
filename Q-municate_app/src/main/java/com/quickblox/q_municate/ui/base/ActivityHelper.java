@@ -132,6 +132,7 @@ public class ActivityHelper extends BaseActivityDelegator {
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
+        globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
     }

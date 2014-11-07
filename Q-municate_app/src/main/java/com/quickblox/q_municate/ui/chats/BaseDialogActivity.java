@@ -1,7 +1,10 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +40,6 @@ import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.commands.QBSendTypingStatusCommand;
 import com.quickblox.q_municate_core.qb.helpers.BaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -89,6 +92,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
+    private BroadcastReceiver typingMessageBroadcastReceiver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -133,7 +137,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         isNeedToScrollMessages = true;
 
+        initLocalBroadcastManagers();
         hideSmileLayout();
+    }
+
+    private void initLocalBroadcastManagers() {
+        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
     }
 
     @Override
@@ -214,8 +225,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.GET_TYPING_STATUS_SUCCESS_ACTION, new GetTypingStatusSuccessAction());
-        addAction(QBServiceConsts.GET_TYPING_STATUS_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -416,12 +425,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void startTypingMessage() {
         isTypingNow = true;
-        QBSendTypingStatusCommand.start(BaseDialogActivity.this, opponentFriend.getUserId(), true);
+        chatHelper.sendIsTypingToServer(opponentFriend.getUserId());
     }
 
     private void stopTypingMessage() {
         isTypingNow = false;
-        QBSendTypingStatusCommand.start(BaseDialogActivity.this, opponentFriend.getUserId(), false);
+        chatHelper.sendStopTypingToServer(opponentFriend.getUserId());
     }
 
     private void initKeyboardHeight() {
@@ -528,13 +537,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    private class GetTypingStatusSuccessAction implements Command {
+    private class TypingStatusBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void execute(Bundle bundle) {
+        public void onReceive(Context context, Intent intent) {
+            Bundle extras = intent.getExtras();
             // TODO: now it is possible only for Private chats
             if(QBDialogType.PRIVATE.equals(dialog.getType())) {
-                boolean isTyping = bundle.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
                 if (isTyping) {
                     startMessageTypingAnimation();
                 } else {

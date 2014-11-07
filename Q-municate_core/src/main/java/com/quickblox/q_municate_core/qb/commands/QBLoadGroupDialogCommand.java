@@ -33,7 +33,6 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = chatHelper;
     }
 
-    // TODO изменил сигнатуру
     public static void start(Context context, QBDialog dialog, String roomJid) {
         Intent intent = new Intent(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);

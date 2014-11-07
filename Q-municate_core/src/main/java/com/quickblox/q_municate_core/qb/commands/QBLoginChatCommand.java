@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -32,16 +33,14 @@ public class QBLoginChatCommand extends ServiceCommand {
         this.chatRestHelper = chatRestHelper;
     }
 
-    // TODO
-    public static void start(Context context, QBUser currentUser) {
+    public static void start(Context context) {
         Intent intent = new Intent(QBServiceConsts.LOGIN_CHAT_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_USER, currentUser);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBUser currentUser = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        QBUser currentUser = AppSession.getSession().getUser();
         // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
         tryLogin(currentUser);
         if (!chatRestHelper.isLoggedIn()) {
@@ -50,7 +49,7 @@ public class QBLoginChatCommand extends ServiceCommand {
         return extras;
     }
 
-    private void tryLogin(QBUser currentUser) throws XMPPException, IOException, SmackException, QBResponseException {
+    private void tryLogin(QBUser currentUser) throws XMPPException, IOException, SmackException {
         long startTime = new Date().getTime();
         long currentTime = startTime;
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {

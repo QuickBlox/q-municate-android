@@ -23,7 +23,6 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBGetTypingStatusCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -180,6 +179,12 @@ public abstract class BaseChatHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    protected void notifyMessageTyping(boolean isTyping) {
+        Intent intent = new Intent(QBServiceConsts.TYPING_MESSAGE);
+        intent.putExtra(QBServiceConsts.EXTRA_IS_TYPING, isTyping);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     protected void updateDialogByNotification(QBChatMessage chatMessage) {
         long time = DateUtilsCore.getCurrentTime();
         QBDialog dialog = ChatUtils.parseDialogFromMessageForUpdate(context, chatMessage, time);
@@ -247,13 +252,13 @@ public abstract class BaseChatHelper extends BaseHelper {
     private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat> {
 
         @Override
-        public void processUserIsTyping(QBPrivateChat qbPrivateChat) {
-            QBGetTypingStatusCommand.start(context, true);
+        public void processUserIsTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(true);
         }
 
         @Override
-        public void processUserStopTyping(QBPrivateChat qbPrivateChat) {
-            QBGetTypingStatusCommand.start(context, false);
+        public void processUserStopTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(false);
         }
     }
 }
