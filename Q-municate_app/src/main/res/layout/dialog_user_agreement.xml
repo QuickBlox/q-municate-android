@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <TextView
+        android:id="@+id/user_agreement_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/button_general_selector"
+        android:clickable="true"
+        android:gravity="center"
+        android:text="@string/uag_user_agreement"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size" />
+
+</LinearLayout>

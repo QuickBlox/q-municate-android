@@ -1,1 +1,5 @@
-include ':Q-municate', ':facebook', ':cropper', ':stickyListHeaders'
+include ':Q-municate_app'
+include ':Q-municate_core'
+include ':facebook'
+include ':cropper'
+include ':stickyListHeaders'

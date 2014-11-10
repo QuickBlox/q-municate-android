@@ -1,0 +1,11 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/badge_participants_counter_color" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/white" />
+    <corners
+        android:bottomLeftRadius="@dimen/corners_middle_value"
+        android:bottomRightRadius="@dimen/corners_middle_value"
+        android:topLeftRadius="@dimen/corners_middle_value"
+        android:topRightRadius="@dimen/corners_middle_value" />
+</shape>

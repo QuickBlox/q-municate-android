@@ -1,0 +1,59 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/emojis_relativelayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/chat_emoji_panel_color">
+
+    <LinearLayout
+        android:id="@+id/emojis_tab_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/chat_emojis_tab_height"
+        android:orientation="horizontal"
+        android:background="@color/chat_emoji_tabs_color">
+
+        <ImageButton
+            android:id="@+id/emoji_tab_people_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:src="@drawable/ic_smiles" />
+
+        <ImageButton
+            android:id="@+id/emoji_tab_nature_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:src="@drawable/ic_flowers" />
+
+        <ImageButton
+            android:id="@+id/emoji_tab_objects_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:src="@drawable/ic_alert" />
+
+        <ImageButton
+            android:id="@+id/emoji_tab_cars_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:src="@drawable/ic_car" />
+
+        <ImageButton
+            android:id="@+id/emoji_tab_punctuation_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:src="@drawable/ic_symb" />
+
+        <ImageButton
+            android:id="@+id/emojis_backspace_imagebutton"
+            style="@style/EmojiTabImageButton"
+            android:background="@color/dark_gray"
+            android:src="@drawable/ic_backspace" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/black" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/emojis_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

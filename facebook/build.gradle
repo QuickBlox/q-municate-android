@@ -7,11 +7,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 19
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
     }
     lintOptions {
         abortOnError false
@@ -25,9 +25,5 @@ android {
     }
     lintOptions {
         abortOnError false
-    }
-    productFlavors {
-    }
-    buildTypes {
     }
 }

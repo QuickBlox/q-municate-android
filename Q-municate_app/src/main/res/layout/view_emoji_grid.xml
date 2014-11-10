@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridView android:id="@+id/emojis_gridview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnWidth="@dimen/chat_emoji_item_size"
+    android:horizontalSpacing="5dp"
+    android:numColumns="auto_fit"
+    android:padding="5dp"
+    android:scrollbars="vertical"
+    android:verticalSpacing="5dp" />

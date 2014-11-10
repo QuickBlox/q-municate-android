@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="action_bar_background_color">#0d70b3</color>
+    <color name="link_text_color">#0d70b3</color>
+
+    <color name="badge_participants_counter_color">#0d70b3</color>
+    <color name="badge_unread_messages_counter_color">#d20000</color>
+    <color name="badge_online_color">#1cba48</color>
+
+    <color name="button_global_search_normal_color">#00bf28</color>
+    <color name="button_global_search_pressed_color">#00851c</color>
+    <color name="button_sign_up_normal_green_color">#00bf28</color>
+    <color name="button_sign_up_pressed_green_color">#00851c</color>
+    <color name="button_sign_up_normal_blue_color">#0077cb</color>
+    <color name="button_sign_up_pressed_blue_color">#00538e</color>
+    <color name="button_facebook_normal_color">#3b5998</color>
+    <color name="button_facebook_pressed_color">#ff265198</color>
+    <color name="button_log_in_normal_color">#00bf28</color>
+    <color name="button_log_in_pressed_color">#00851c</color>
+    <color name="button_null_background_pressed_color">#e4f4ff</color>
+    <color name="button_end_call_normal_color">#ff0000</color>
+    <color name="button_end_call_pressed_color">#e4f4ff</color>
+    <color name="button_blue_normal_color">#0d70b3</color>
+    <color name="button_blue_pressed_color">#ff0d5389</color>
+
+    <color name="avatar_border_color">#ffffff</color>
+    <color name="circle_view_mask_color">#ffffff</color>
+    <color name="header_date_color">#ffd5d5d5</color>
+
+    <color name="menu_item_background_pressed_color">#1cba48</color>
+    <color name="menu_item_background_longpressed_color">#ff9de8a2</color>
+    <color name="menu_item_background_activated_color">#1cba48</color>
+    <color name="list_item_background_pressed_color">#e4f4ff</color>
+
+    <color name="light_gray">#ffefefef</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="gray">#999999</color>
+    <color name="dark_gray">#ff6c6c6c</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#1cba48</color>
+    <color name="blue">#0d70b3</color>
+    <color name="light_blue">#ff0d8cd1</color>
+
+    <color name="chat_background_color">#f5f5f5</color>
+    <color name="chat_emoji_panel_color">#ff303030</color>
+    <color name="chat_emoji_tabs_color">#ff202020</color>
+    <color name="chat_attach_background_color">#ffd9d9d9</color>
+
+    <color name="screen_call_background_color">#333333</color>
+    <color name="screen_call_timer_text_color">#999999</color>
+
+    <color name="dlg_message_name_color">#0d70b3</color>
+
+    <color name="action_button_bar">#f3f3f3</color>
+    <color name="action_button_text">#666666</color>
+    <color name="action_selector_pressed">#1a000000</color>
+    <color name="action_selector_focused">#77000000</color>
+
+</resources>

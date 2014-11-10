@@ -719,7 +719,9 @@ If you want to build your own app using Q-municate as a basis, please do the fol
  5. Click on the app title in the list to reveal the app details:
    ![App credentials](http://files.quickblox.com/app_credentials.png)
  6. Copy credentials (App ID, Authorization key, Authorization secret) into your Q-municate project code in Consts.java<br />
- 7. Enjoy!
+ 7. Note! To enable automatic push notifications in chat to offline users follow Setup GCM guide 
+   ![Setup GCM](http://quickblox.com/developers/SimpleSample-messages_users-android#Setup_GCM)
+ 8. Enjoy!
  
 PS Running Q-municate on Android simulator
 In Android if you never had Android device connected to PC you probably don't have Google Play services installed. In that case you need to install Google Play services on top of simulator, here is a link that should help with that: 

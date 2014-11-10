@@ -1,0 +1,21 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/message_typing_view"
+    android:layout_width="@dimen/chat_message_typing_view_width"
+    android:layout_height="@dimen/chat_message_typing_view_height"
+    android:layout_margin="10dp"
+    android:visibility="gone">
+
+    <ImageView
+        android:layout_width="@dimen/chat_message_typing_view_width"
+        android:layout_height="@dimen/chat_message_typing_view_height"
+        android:background="@drawable/left_bubble"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+        android:id="@+id/message_typing_box_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@anim/chat_message_typing_loading"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>

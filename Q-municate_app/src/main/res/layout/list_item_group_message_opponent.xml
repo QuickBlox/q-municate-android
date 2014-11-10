@@ -1,0 +1,101 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <com.quickblox.q_municate.ui.views.RoundedImageView
+        style="@style/AvatarImageView"
+        android:id="@+id/avatar_imageview"
+        android:layout_width="@dimen/image_view_small_avatar_layout_width"
+        android:layout_height="@dimen/image_view_small_avatar_layout_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        app:border_color="@color/dark_gray"
+        app:border_width="@dimen/avatar_border_width"
+        app:oval="true" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/avatar_imageview"
+        android:animateLayoutChanges="true"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <include layout="@layout/view_chat_progress_bars" />
+
+            <GridLayout
+                android:id="@+id/text_message_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/chat_babble_margin"
+                android:background="@drawable/left_bubble"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:columnCount="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/name_textview"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:ellipsize="end"
+                        android:singleLine="true"
+                        android:textColor="@color/blue"
+                        android:textSize="@dimen/text_size"
+                        android:textStyle="bold"
+                        android:gravity="left" />
+
+                    <TextView
+                        android:id="@+id/time_text_message_textview"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.5"
+                        android:paddingRight="7dp"
+                        android:singleLine="true"
+                        android:paddingTop="3dp"
+                        android:textColor="@color/black"
+                        android:gravity="right|top" />
+
+                </LinearLayout>
+
+                <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+                    android:id="@+id/message_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|left"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_small"
+                    emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
+
+            </GridLayout>
+
+            <include layout="@layout/view_chat_attach_message_opponent" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

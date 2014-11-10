@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/popupMainLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/screen_call_background_color"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/act_call_margin_top"
+                android:gravity="center"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/act_call_name_size" />
+
+            <TextView
+                android:id="@+id/callTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/cll_incoming_call_audio"
+                android:textColor="@color/screen_call_timer_text_color"
+                android:textSize="@dimen/act_call_name_size" />
+
+        </LinearLayout>
+
+        <com.quickblox.q_municate.ui.views.RoundedImageView
+            style="@style/AvatarImageView"
+            android:id="@+id/avatar_imageview"
+            android:layout_width="@dimen/act_call_avatar_size"
+            android:layout_height="@dimen/act_call_avatar_size"
+            android:layout_alignParentTop="false"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/act_call_margin_top"
+            app:border_color="@color/dark_gray"
+            app:border_width="@dimen/avatar_border_width"
+            app:oval="true" />
+
+        <LinearLayout
+            android:id="@+id/controlPanelRelativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <ImageButton
+                android:id="@+id/denyCallButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_centerInParent="true"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_red_oval_selector"
+                android:src="@drawable/ic_encall" />
+
+            <ImageButton
+                android:id="@+id/acceptCallButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center|right"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/button_green_oval_selector"
+                android:src="@drawable/ic_call" />
+
+
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

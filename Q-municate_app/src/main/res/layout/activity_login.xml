@@ -1,0 +1,92 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="true"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/email_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/lgn_email_hint"
+        android:inputType="textEmailAddress"
+        android:maxLength="128" />
+
+    <EditText
+        android:id="@+id/password_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:hint="@string/lgn_password_hint"
+        android:inputType="textPassword"
+        android:maxLength="256" />
+
+    <CheckBox
+        android:id="@+id/remember_me_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="@string/lgn_remember_me"
+        android:textColor="@color/gray"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/button_log_in_selector"
+        android:onClick="loginOnClickListener"
+        android:text="@string/lgn_login"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/button_text_size" />
+
+    <RelativeLayout
+        android:id="@+id/connect_facebook_button"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/button_connect_facebook_oval_selector"
+        android:clickable="true"
+        android:onClick="connectFacebookOnClickListener">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/button_icon_margin"
+                android:src="@drawable/ic_fb" />
+
+            <TextView
+                android:id="@+id/connect_facebook_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/lnd_connect_with_facebook"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/button_text_size" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/forgot_password_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/button_general_selector"
+        android:clickable="true"
+        android:onClick="forgotPasswordOnClickListener"
+        android:padding="5dp"
+        android:text="@string/lgn_forgot_password"
+        android:textColor="@color/gray"
+        android:textSize="18sp" />
+
+</LinearLayout>

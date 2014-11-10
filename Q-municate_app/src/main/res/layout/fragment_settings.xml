@@ -1,0 +1,80 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp">
+
+    <Button
+        android:id="@+id/profile_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_general_selector"
+        android:gravity="left"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"
+        android:text="@string/stn_profile"
+        android:textSize="@dimen/text_size" />
+
+    <include layout="@layout/view_separator_gray" />
+
+    <Switch
+        android:id="@+id/push_notification_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"
+        android:text="@string/stn_push_notifivation"
+        android:textSize="@dimen/text_size" />
+
+    <LinearLayout
+        android:id="@+id/change_password_linearlyout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_separator_gray" />
+
+        <Button
+            android:id="@+id/change_password_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_general_selector"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:text="@string/stn_change_password"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
+
+    <include layout="@layout/view_separator_gray" />
+
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_general_selector"
+        android:gravity="left"
+        android:paddingBottom="14dp"
+        android:paddingTop="14dp"
+        android:text="@string/stn_logout"
+        android:textSize="@dimen/text_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/view_separator_gray" />
+
+        <TextView
+            android:id="@+id/version_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:textSize="@dimen/text_size" />
+    </LinearLayout>
+</LinearLayout>

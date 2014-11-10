@@ -1,0 +1,48 @@
+<LinearLayout android:id="@+id/text_message_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/chat_babble_margin"
+    android:background="@drawable/right_bubble"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:visibility="gone">
+
+    <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+        android:id="@+id/message_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|left"
+        android:layout_weight="1"
+        android:paddingRight="5dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_small"
+        emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingRight="12dp"
+        android:paddingTop="3dp">
+
+        <TextView
+            android:id="@+id/time_text_message_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:alpha="0.5"
+            android:textColor="@color/white" />
+
+        <ImageView
+            android:id="@+id/text_message_delivery_status_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:scaleType="fitCenter"
+            android:paddingLeft="5dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

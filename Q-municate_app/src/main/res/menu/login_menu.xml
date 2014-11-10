@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_register"
+        android:showAsAction="ifRoom"
+        android:title="@string/sup_sign_up" />
+</menu>

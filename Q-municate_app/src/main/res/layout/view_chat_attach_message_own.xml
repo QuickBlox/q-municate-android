@@ -1,0 +1,50 @@
+<RelativeLayout
+    android:id="@+id/attach_message_relativelayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/chat_attach_width"
+    android:layout_height="@dimen/chat_attach_height"
+    android:orientation="horizontal"
+    android:padding="5dp"
+    android:visibility="gone">
+
+    <com.quickblox.q_municate.ui.views.MaskedImageView
+        android:id="@+id/attach_imageview"
+        android:layout_width="@dimen/chat_attach_width"
+        android:layout_height="@dimen/chat_attach_height"
+        android:layout_marginTop="4dp"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerCrop"
+        app:mask="@drawable/right_bubble"
+        android:src="@null" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:alpha="0.5"
+        android:background="@drawable/badge_attach_message_time"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/time_attach_message_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:textColor="@color/black" />
+
+        <ImageView
+            android:id="@+id/attach_message_delivery_status_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:paddingLeft="5dp"
+            android:scaleType="fitCenter" />
+
+    </LinearLayout>
+
+</RelativeLayout>
