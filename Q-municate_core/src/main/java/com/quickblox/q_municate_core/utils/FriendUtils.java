@@ -31,8 +31,7 @@ public class FriendUtils {
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
 
-        UserCustomData userCustomData = null;
-        userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
+        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
         if (userCustomData != null) {
             user.setAvatarUrl(userCustomData.getAvatar_url());

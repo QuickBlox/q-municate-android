@@ -9,6 +9,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
@@ -59,8 +60,7 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         QBUser newUser = new QBUser();
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
-        newUser.setCustomDataAsObject(getUserCustomData(avatarUrl));
-        newUser.setCustomDataClass(UserCustomData.class);
+        newUser.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
 
         // TODO temp field
         newUser.setWebsite(avatarUrl);
@@ -70,7 +70,7 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        int isImport = 1;
+        String isImport = "1";
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
 }

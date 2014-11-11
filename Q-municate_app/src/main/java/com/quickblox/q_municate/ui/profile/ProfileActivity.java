@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -126,8 +127,16 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         });
     }
 
+    private void initCustomData() {
+        userCustomData = Utils.customDataToObject(user.getCustomData());
+
+        if (userCustomData == null) {
+            userCustomData = new UserCustomData();
+        }
+    }
+
     private void initUIWithUsersData() {
-        userCustomData = (UserCustomData) user.getCustomDataAsObject();
+        initCustomData();
 
         loadAvatar();
         fullNameOld = user.getFullName();
@@ -143,9 +152,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         phoneOld = user.getPhone();
         phoneEditText.setText(phoneOld);
 
-        if (userCustomData != null) {
-            statusOld = userCustomData.getStatus();
-        }
+        statusOld = userCustomData.getStatus();
 
         statusEditText.setText(statusOld);
     }
@@ -301,7 +308,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         user.setFullName(fullNameCurrent);
         user.setPhone(phoneCurrent);
         userCustomData.setStatus(statusCurrent);
-        user.setCustomDataAsObject(userCustomData);
+        user.setCustomData(Utils.customDataToString(userCustomData));
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
@@ -328,7 +335,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void resetUserData() {
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
+        initCustomData();
 
         isNeedUpdateAvatar = false;
     }

@@ -3,11 +3,16 @@ package com.quickblox.q_municate_core.utils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.users.model.QBUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -99,5 +104,62 @@ public class Utils {
 
     public static boolean validateNotNull(Object object){
         return object != null;
+    }
+
+    public static String customDataToString(UserCustomData userCustomData) {
+        JSONObject jsonObject = new JSONObject();
+
+        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatar_url());
+        setJsonValue(jsonObject, UserCustomData.TAG_STATUS, userCustomData.getStatus());
+        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isIs_import());
+
+        return jsonObject.toString();
+    }
+
+    private static String getJsonValue(JSONObject jsonObject, String key) {
+        String value = "";
+
+        try {
+            value = jsonObject.getString(key);
+        } catch (JSONException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return value;
+    }
+
+    private static void setJsonValue(JSONObject jsonObject, String key, String value) {
+        if (!TextUtils.isEmpty(value)) {
+            try {
+                jsonObject.put(key, value);
+            } catch (JSONException e) {
+                ErrorUtils.logError(e);
+            }
+        }
+    }
+
+    public static UserCustomData customDataToObject(String userCustomDataString) {
+        if (TextUtils.isEmpty(userCustomDataString)) {
+            return new UserCustomData();
+        }
+
+        JSONObject jsonObject = null;
+        String avatarUrl = "";
+        String status = "";
+        String isImport = "";
+
+        try {
+            jsonObject = new JSONObject(userCustomDataString);
+        } catch (JSONException e) {
+            ErrorUtils.logError(e);
+        }
+
+        if (jsonObject != null) {
+            avatarUrl = getJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL);
+            status = getJsonValue(jsonObject, UserCustomData.TAG_STATUS);
+            isImport = getJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT);
+        }
+
+        return new UserCustomData(avatarUrl, status, isImport);
     }
 }
