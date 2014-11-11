@@ -7,6 +7,11 @@ public class ConstsCore {
     public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
     public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
 
+    //    // Q-municate dev
+    //    public static final String QB_APP_ID = "14542";
+    //    public static final String QB_AUTH_KEY = "rJqAFphrSnpyZW2";
+    //    public static final String QB_AUTH_SECRET = "tTEB2wK-dU8X3Ra";
+
     public static final String QB_DOMAIN = "api.stage.quickblox.com";
 
     // Friend list consts

@@ -10,6 +10,7 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
@@ -24,6 +25,8 @@ import org.json.JSONObject;
 import java.io.File;
 
 public class QBAuthHelper extends BaseHelper {
+
+    private static final String TAG_ANDROID = "android";
 
     public QBAuthHelper(Context context) {
         super(context);
@@ -54,7 +57,6 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-        user.setCustomDataClass(UserCustomData.class);
 
         // TODO: temp block
         if (!isUpdatedUserCustomData(user)) {
@@ -77,6 +79,10 @@ public class QBAuthHelper extends BaseHelper {
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
         inputUser.setCustomData(Utils.customDataToString(userCustomData));
+
+        StringifyArrayList<String> stringifyArrayList = new StringifyArrayList<String>();
+        stringifyArrayList.add(TAG_ANDROID);
+        inputUser.setTags(stringifyArrayList);
 
         user = QBUsers.signUpSignInTask(inputUser);
 
@@ -119,6 +125,7 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
         user.setWebsite(qbFile.getPublicUrl());
+        user.setFileId(qbFile.getId());
 
         UserCustomData userCustomData = getUserCustomData(user);
         userCustomData.setAvatar_url(qbFile.getPublicUrl());
