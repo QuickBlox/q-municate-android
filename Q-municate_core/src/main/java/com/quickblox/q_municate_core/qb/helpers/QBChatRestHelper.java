@@ -8,7 +8,7 @@ import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
-import com.quickblox.core.request.QBCustomObjectRequestBuilder;
+import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
@@ -68,7 +68,7 @@ public class QBChatRestHelper extends BaseHelper {
 
     public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
         Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
                 bundle);
@@ -78,7 +78,7 @@ public class QBChatRestHelper extends BaseHelper {
     public List<QBChatHistoryMessage> getDialogMessages(QBDialog dialog,
             long lastDateLoad) throws QBResponseException {
         Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
+        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
         if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
             customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT,

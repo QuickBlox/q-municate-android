@@ -16,7 +16,7 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBCustomObjectUpdateBuilder;
+import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
@@ -252,7 +252,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws Exception {
         QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
 
-        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
+        QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
                 userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
@@ -263,23 +263,23 @@ public class QBMultiChatHelper extends BaseChatHelper {
     public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
         QBDialog dialog = DatabaseManager.getDialogByRoomJid(context, roomJid);
 
-        QBCustomObjectUpdateBuilder requestBuilder = new QBCustomObjectUpdateBuilder();
+        QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
                 userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
     }
 
     public void updateDialog(QBDialog dialog) throws QBResponseException {
-        updateDialog(dialog, (QBCustomObjectUpdateBuilder) null);
+        updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
     public void updateDialog(QBDialog dialog, File inputFile) throws QBResponseException {
         QBFile file = QBContent.uploadFileTask(inputFile, true, (String) null);
         dialog.setPhoto(file.getPublicUrl());
-        updateDialog(dialog, (QBCustomObjectUpdateBuilder) null);
+        updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
-    private void updateDialog(QBDialog dialog, QBCustomObjectUpdateBuilder requestBuilder) throws QBResponseException {
+    private void updateDialog(QBDialog dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = groupChatManager.updateDialog(dialog, requestBuilder);
         ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
         friendsList.remove(chatCreator.getId());

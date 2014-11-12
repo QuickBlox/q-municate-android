@@ -89,8 +89,16 @@ public abstract class BaseChatHelper extends BaseHelper {
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
         if (file != null) {
+            // TODO temp value
+            String contentType = "image/jpeg";
+
             QBAttachment attachment = new QBAttachment(QBAttachment.PHOTO_TYPE);
+            attachment.setId(file.getUid());
+            attachment.setName(file.getName());
+            attachment.setContentType(contentType);
             attachment.setUrl(file.getPublicUrl());
+            attachment.setSize(file.getSize());
+
             chatMessage.addAttachment(attachment);
         }
         chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
