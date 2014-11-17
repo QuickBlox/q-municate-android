@@ -12,7 +12,6 @@ import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
@@ -21,7 +20,7 @@ import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.Friend;
-import com.quickblox.q_municate_core.models.FriendsNotificationType;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -452,13 +451,13 @@ public class DatabaseManager {
                 MessageTable.Cols.IS_DELIVERED)) > ConstsCore.ZERO_INT_VALUE;
         boolean isSync = cursor.getInt(cursor.getColumnIndex(
                 MessageTable.Cols.IS_SYNC)) > ConstsCore.ZERO_INT_VALUE;
-        FriendsNotificationType friendsNotificationType = FriendsNotificationType.parseByCode(cursor.getInt(
-                cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
+        MessagesNotificationType messagesNotificationType = MessagesNotificationType.parseByCode(
+                cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
 
         MessageCache messageCache = new MessageCache(id, dialogId, senderId, body, attachUrl, time,
                 isRead, isDelivered, isSync);
 
-        messageCache.setFriendsNotificationType(friendsNotificationType);
+        messageCache.setMessagesNotificationType(messagesNotificationType);
 
         return messageCache;
     }
@@ -614,8 +613,11 @@ public class DatabaseManager {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
                         ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
                 if (ChatUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
-                    messageCache.setFriendsNotificationType(FriendsNotificationType.parseByCode(
+                    messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
                             friendsMessageTypeCode));
+                } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
+                    messageCache.setMessage(ChatUtils.getNotificationMessage(context, historyMessage));
+                    messageCache.setMessagesNotificationType(ChatUtils.getNotificationMessageType(historyMessage));
                 }
             }
 
@@ -635,9 +637,9 @@ public class DatabaseManager {
 
         String body;
 
-        if (messageCache.getFriendsNotificationType() != null) {
+        if (messageCache.getMessagesNotificationType() != null) {
             values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE,
-                    messageCache.getFriendsNotificationType().getCode());
+                    messageCache.getMessagesNotificationType().getCode());
         }
 
         body = parseMessageBody(context, messageCache);
@@ -673,36 +675,9 @@ public class DatabaseManager {
     private static String parseMessageBody(Context context, MessageCache messageCache) {
         String resultMessage = messageCache.getMessage();
 
-        if (messageCache.getFriendsNotificationType() != null) {
-            QBUser user = AppSession.getSession().getUser();
-            boolean ownMessage = user.getId().equals(messageCache.getSenderId());
-
-                switch (messageCache.getFriendsNotificationType()) {
-                    case REQUEST: {
-                        resultMessage = ownMessage
-                                ? context.getResources().getString(R.string.frl_friends_request_message_for_me)
-                                : context.getResources().getString(R.string.frl_friends_request_message_for_friend);
-                        break;
-                    }
-                    case ACCEPT: {
-                        resultMessage = ownMessage
-                                ? context.getResources().getString(R.string.frl_friends_request_accept_message_for_me)
-                                : context.getResources().getString(R.string.frl_friends_request_accept_message_for_friend);
-                        break;
-                    }
-                    case REJECT: {
-                        resultMessage = ownMessage
-                                ? context.getResources().getString(R.string.frl_friends_request_reject_message_for_me)
-                                : context.getResources().getString(R.string.frl_friends_request_reject_message_for_friend);
-                        break;
-                    }
-                    case REMOVE: {
-                        resultMessage = ownMessage
-                                ? context.getResources().getString(R.string.frl_friends_request_remove_message_for_me)
-                                : context.getResources().getString(R.string.frl_friends_request_remove_message_for_friend);
-                    }
-                }
-
+        if (messageCache.getMessagesNotificationType() != null
+                && !ChatUtils.isNotificationMessageUpdateDialog(messageCache.getMessagesNotificationType().getCode())) {
+            resultMessage = ChatUtils.getResourceBodyForNotificationType(context, messageCache.getMessagesNotificationType(), messageCache);
         } else {
             if (!TextUtils.isEmpty(messageCache.getMessage())) {
                 resultMessage = Html.fromHtml(messageCache.getMessage()).toString();

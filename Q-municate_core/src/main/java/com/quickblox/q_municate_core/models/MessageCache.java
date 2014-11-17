@@ -13,7 +13,7 @@ public class MessageCache implements Serializable {
     private boolean isRead;
     private boolean isDelivered;
     private boolean isSync;
-    private FriendsNotificationType friendsNotificationType;
+    private MessagesNotificationType messagesNotificationType;
 
     public MessageCache() {
     }
@@ -31,12 +31,12 @@ public class MessageCache implements Serializable {
         this.isSync = isSync;
     }
 
-    public FriendsNotificationType getFriendsNotificationType() {
-        return friendsNotificationType;
+    public MessagesNotificationType getMessagesNotificationType() {
+        return messagesNotificationType;
     }
 
-    public void setFriendsNotificationType(FriendsNotificationType friendsNotificationType) {
-        this.friendsNotificationType = friendsNotificationType;
+    public void setMessagesNotificationType(MessagesNotificationType messagesNotificationType) {
+        this.messagesNotificationType = messagesNotificationType;
     }
 
     public boolean isSync() {

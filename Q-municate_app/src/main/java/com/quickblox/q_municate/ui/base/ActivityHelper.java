@@ -2,11 +2,14 @@ package com.quickblox.q_municate.ui.base;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -18,6 +21,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
@@ -31,7 +35,7 @@ import java.util.Set;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
-public class ActivityHelper extends BaseActivityDelegator {
+public class ActivityHelper extends BaseActivityHelper {
 
     private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
@@ -39,13 +43,21 @@ public class ActivityHelper extends BaseActivityDelegator {
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
     private GlobalActionsListener actionsListener;
     private Handler handler;
+    protected QBService service;
     private ActivityUIHelper activityUIHelper;
 
-    public ActivityHelper(Context context, GlobalActionsListener actionsListener) {
+    private boolean bounded;
+    private ServiceConnection serviceConnection;
+    private ServiceConnectionListener serviceConnectionListener;
+
+    public ActivityHelper(Context context, GlobalActionsListener actionsListener,
+            ServiceConnectionListener serviceConnectionListener) {
         super(context);
         this.actionsListener = actionsListener;
+        this.serviceConnectionListener = serviceConnectionListener;
         activity = (Activity) context;
         activityUIHelper = new ActivityUIHelper(activity);
+        serviceConnection = new QBChatServiceConnection();
     }
 
     public void showFriendAlert(String message) {
@@ -124,6 +136,14 @@ public class ActivityHelper extends BaseActivityDelegator {
     public void onResume() {
         registerGlobalReceiver();
         updateBroadcastActionList();
+    }
+
+    protected void onStart() {
+        connectToService();
+    }
+
+    public void onStop() {
+        unbindService();
     }
 
     private void registerGlobalReceiver() {
@@ -215,5 +235,36 @@ public class ActivityHelper extends BaseActivityDelegator {
                 }
             });
         }
+    }
+
+    private void unbindService() {
+        if (bounded) {
+            activity.unbindService(serviceConnection);
+        }
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(activity, QBService.class);
+        activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private class QBChatServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            bounded = true;
+            service = ((QBService.QBServiceBinder) binder).getService();
+            serviceConnectionListener.onConnectedToService(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    }
+
+    public interface ServiceConnectionListener {
+
+        public void onConnectedToService(QBService service);
     }
 }

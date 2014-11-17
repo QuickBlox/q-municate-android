@@ -20,20 +20,8 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.FriendUtils;
-import com.quickblox.users.model.QBUser;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.GroupDialog;
-import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
@@ -41,13 +29,32 @@ import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.GroupDialog;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener, AdapterView.OnItemClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
@@ -69,7 +76,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private Uri outputUri;
 
     private Bitmap avatarBitmapCurrent;
-    private QBDialog dialogCurrent;
+    private QBDialog currentDialog;
     private String groupNameCurrent;
 
     private String photoUrlOld;
@@ -77,6 +84,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
+    private QBMultiChatHelper multiChatHelper;
+
+    private List<MessagesNotificationType> currentNotificationTypeList;
+    private ArrayList<Integer> addedFriendIdsList;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -89,13 +100,23 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        dialogCurrent = DatabaseManager.getDialogByDialogId(this, dialogId);
-        groupDialog = new GroupDialog(dialogCurrent);
+        currentDialog = DatabaseManager.getDialogByDialogId(this, dialogId);
+        groupDialog = new GroupDialog(currentDialog);
         imageUtils = new ImageUtils(this);
+
         initUI();
         initUIWithData();
         addActions();
         startLoadGroupDialog();
+
+        currentNotificationTypeList = new ArrayList<MessagesNotificationType>();
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        if (multiChatHelper == null) {
+            multiChatHelper = (QBMultiChatHelper) service.getHelper(QBService.MULTI_CHAT_HELPER);
+        }
     }
 
     @Override
@@ -105,7 +126,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void startLoadGroupDialog() {
-        QBLoadGroupDialogCommand.start(this, dialogCurrent, groupDialog.getRoomJid());
+        QBLoadGroupDialogCommand.start(this, currentDialog, groupDialog.getRoomJid());
     }
 
     public void changeAvatarOnClick(View view) {
@@ -147,14 +168,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void addActions() {
         UpdateGroupFailAction updateGroupFailAction = new UpdateGroupFailAction();
+
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION, new LoadGroupDialogSuccessAction());
         addAction(QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION, failAction);
+
         addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
         addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION, new UpdateGroupNameSuccessAction());
-        addAction(QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION, updateGroupFailAction);
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateGroupPhotoSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, updateGroupFailAction);
+
+        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
+        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, updateGroupFailAction);
+
         updateBroadcastActionList();
     }
 
@@ -167,11 +190,17 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                showProgress();
-                QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
+                leaveGroup();
             }
         });
         dialog.show(getFragmentManager(), null);
+    }
+
+    private void leaveGroup() {
+        showProgress();
+        currentNotificationTypeList.add(MessagesNotificationType.LEAVE_DIALOG);
+        sendNotificationToGroup();
+        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
     }
 
     private void initTextChangedListeners() {
@@ -218,6 +247,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, data);
+        } else if (requestCode == AddFriendsToGroupActivity.RESULT_ADDED_FRIENDS) {
+            handleAddedFriends(data);
         } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
             Uri originalUri = data.getData();
             if (originalUri != null) {
@@ -227,6 +258,12 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void handleAddedFriends(Intent data) {
+        addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
+        currentNotificationTypeList.add(MessagesNotificationType.ADDED_DIALOG);
+        sendNotificationToGroup();
     }
 
     private void startAddFriendsActivity() {
@@ -283,15 +320,33 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             return;
         }
 
-        dialogCurrent.setName(groupNameCurrent);
+        if (!currentDialog.getName().equals(groupNameCurrent)) {
+            currentDialog.setName(groupNameCurrent);
+
+            currentNotificationTypeList.add(MessagesNotificationType.NAME_DIALOG);
+        }
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
+
+            currentNotificationTypeList.add(MessagesNotificationType.PHOTO_DIALOG);
         } else {
-            startUpdatingGroupDialog(null);
+            updateGroupDialog(null);
         }
 
         showProgress();
+    }
+
+    private void sendNotificationToGroup() {
+        for (MessagesNotificationType messagesNotificationType : currentNotificationTypeList) {
+            try {
+                multiChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType, addedFriendIdsList);
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
+                hideProgress();
+            }
+        }
+        currentNotificationTypeList.clear();
     }
 
     private boolean isUserDataCorrect() {
@@ -326,13 +381,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         loadAvatar(photoUrlOld);
     }
 
-    private void startUpdatingGroupDialog(File imageFile) {
-        QBUpdateGroupDialogCommand.start(this, dialogCurrent, imageFile);
+    private void updateGroupDialog(File imageFile) {
+        QBUpdateGroupDialogCommand.start(this, currentDialog, imageFile);
     }
 
     @Override
     public void onCachedImageFileReceived(File imageFile) {
-        startUpdatingGroupDialog(imageFile);
+        updateGroupDialog(imageFile);
     }
 
     @Override
@@ -379,17 +434,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         }
     }
 
-    private class UpdateGroupFailAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
-            resetGroupData();
-            hideProgress();
-        }
-    }
-
     private class LeaveGroupDialogSuccessAction implements Command {
 
         @Override
@@ -400,16 +444,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         }
     }
 
-    private class UpdateGroupNameSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            updateOldGroupData();
-            hideProgress();
-        }
-    }
-
-    private class UpdateGroupPhotoSuccessAction implements Command {
+    private class UpdateGroupDialogSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -417,6 +452,19 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this,
                     dialog.getDialogId()));
             updateOldGroupData();
+
+            sendNotificationToGroup();
+            hideProgress();
+        }
+    }
+
+    private class UpdateGroupFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
+            resetGroupData();
             hideProgress();
         }
     }

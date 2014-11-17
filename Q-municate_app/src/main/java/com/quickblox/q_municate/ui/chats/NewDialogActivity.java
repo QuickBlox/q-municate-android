@@ -7,18 +7,25 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.ArrayList;
 
 public class NewDialogActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
+
+    private QBMultiChatHelper multiChatHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewDialogActivity.class);
@@ -29,6 +36,13 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     protected void onResume() {
         super.onResume();
         addActions();
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        if (multiChatHelper == null) {
+            multiChatHelper = (QBMultiChatHelper) service.getHelper(QBService.MULTI_CHAT_HELPER);
+        }
     }
 
     @Override
@@ -70,6 +84,15 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
         return userFullname + ", " + friendsFullnames;
     }
 
+    private void sendNotificationToGroup(QBDialog dialog) {
+        try {
+            multiChatHelper.sendNotificationToFriends(dialog, MessagesNotificationType.CREATE_DIALOG,
+                    ChatUtils.getOccupantIdsWithoutUser(dialog.getOccupants()));
+        } catch (QBResponseException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
     private class CreateChatSuccessAction implements Command {
 
         @Override
@@ -78,6 +101,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog.getRoomJid() != null) {
                 GroupDialogActivity.start(NewDialogActivity.this, dialog);
+                sendNotificationToGroup(dialog);
                 finish();
             } else {
                 ErrorUtils.showError(NewDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));

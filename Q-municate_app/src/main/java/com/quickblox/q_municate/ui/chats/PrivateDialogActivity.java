@@ -167,10 +167,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
-        if (messageCache.getFriendsNotificationType() == null) {
+        if (messageCache.getMessagesNotificationType() == null) {
             dialog.setLastMessage(messageCache.getMessage());
         } else {
-            dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
+            dialog.setLastMessage(getResources().getString(R.string.notification_message));
         }
 
         dialog.setLastMessageDateSent(messageCache.getTime());

@@ -20,6 +20,7 @@ import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -35,6 +36,7 @@ import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class QBMultiChatHelper extends BaseChatHelper {
@@ -269,22 +271,28 @@ public class QBMultiChatHelper extends BaseChatHelper {
         updateDialog(dialog, requestBuilder);
     }
 
-    public void updateDialog(QBDialog dialog) throws QBResponseException {
-        updateDialog(dialog, (QBRequestUpdateBuilder) null);
+    public QBDialog updateDialog(QBDialog dialog) throws QBResponseException {
+        return updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
-    public void updateDialog(QBDialog dialog, File inputFile) throws QBResponseException {
+    public QBDialog updateDialog(QBDialog dialog, File inputFile) throws QBResponseException {
         QBFile file = QBContent.uploadFileTask(inputFile, true, (String) null);
         dialog.setPhoto(file.getPublicUrl());
-        updateDialog(dialog, (QBRequestUpdateBuilder) null);
+        return updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
-    private void updateDialog(QBDialog dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
+    private QBDialog updateDialog(QBDialog dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = groupChatManager.updateDialog(dialog, requestBuilder);
         ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
         friendsList.remove(chatCreator.getId());
         notifyFriendsRoomUpdate(updatedDialog, friendsList);
         DatabaseManager.saveDialog(context, updatedDialog);
+        return updatedDialog;
+    }
+
+    public void sendNotificationToFriends(QBDialog dialog, MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) throws QBResponseException {
+        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForUpdateDialog(context, dialog, messagesNotificationType, addedFriendIdsList);
+        sendRoomMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
     }
 
     private void createDialogByNotification(QBChatMessage chatMessage) {
@@ -304,25 +312,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
         @Override
         public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-            User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
-            String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
-            String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-            long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-            String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
-
-            if(user == null) {
-                user = new User();
-                user.setUserId(chatMessage.getSenderId());
-                user.setFullName(chatMessage.getSenderId() + ConstsCore.EMPTY_STRING);
-            }
-
-            saveMessageToCache(new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
-                    chatMessage.getBody(), attachUrl, time, false, false, false));
-
-            if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
-                // TODO IS handle logic when friend is not in the friend list
-                notifyMessageReceived(chatMessage, user, dialogId, false);
-            }
+            onRoomMessageReceived(groupChat, chatMessage);
         }
 
         @Override
@@ -338,6 +328,36 @@ public class QBMultiChatHelper extends BaseChatHelper {
         @Override
         public void processMessageRead(QBGroupChat groupChat, String messageID){
             // never called
+        }
+    }
+
+    private void onRoomMessageReceived(QBGroupChat groupChat, QBChatMessage chatMessage) {
+        User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+        String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
+        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
+        long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
+        String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
+        MessageCache messageCache;
+
+        if(user == null) {
+            user = new User();
+            user.setUserId(chatMessage.getSenderId());
+            user.setFullName(chatMessage.getSenderId() + ConstsCore.EMPTY_STRING);
+        }
+
+        messageCache = new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
+                chatMessage.getBody(), attachUrl, time, false, false, false);
+
+        if (ChatUtils.isNotificationMessage(chatMessage)) {
+            messageCache.setMessagesNotificationType(ChatUtils.getNotificationMessageType(chatMessage));
+            messageCache.setMessage(ChatUtils.getNotificationMessage(context, chatMessage));
+        }
+
+        saveMessageToCache(messageCache);
+
+        if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
+            // TODO IS handle logic when friend is not in the friend list
+            notifyMessageReceived(chatMessage, user, dialogId, false);
         }
     }
 

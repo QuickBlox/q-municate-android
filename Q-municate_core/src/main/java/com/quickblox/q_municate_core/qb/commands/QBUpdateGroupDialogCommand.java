@@ -23,7 +23,7 @@ public class QBUpdateGroupDialogCommand extends ServiceCommand {
     }
 
     public static void start(Context context, QBDialog dialog, File file) {
-        Intent intent = new Intent(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.UPDATE_GROUP_DIALOG_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_FILE, file);
         context.startService(intent);
@@ -34,12 +34,15 @@ public class QBUpdateGroupDialogCommand extends ServiceCommand {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        if (file == null) {
-            multiChatHelper.updateDialog(dialog);
+        if(file == null) {
+            dialog = multiChatHelper.updateDialog(dialog);
         } else {
-            multiChatHelper.updateDialog(dialog, file);
+            dialog = multiChatHelper.updateDialog(dialog, file);
         }
 
-        return extras;
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
+
+        return bundle;
     }
 }

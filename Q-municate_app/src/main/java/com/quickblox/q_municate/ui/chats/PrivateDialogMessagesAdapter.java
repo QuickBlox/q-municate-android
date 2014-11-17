@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.db.DatabaseManager;
-import com.quickblox.q_municate_core.models.FriendsNotificationType;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
@@ -21,11 +21,6 @@ import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
 
 public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
-
-    private static int TYPE_REQUEST_MESSAGE = 0;
-    private static int TYPE_OWN_MESSAGE = 1;
-    private static int TYPE_OPPONENT_MESSAGE = 2;
-    private static int COMMON_TYPE_COUNT = 3;
 
     private static int EMPTY_POSITION = -1;
 
@@ -45,7 +40,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private int getItemViewType(Cursor cursor) {
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
-        boolean friendsRequestMessage = messageCache.getFriendsNotificationType() != null;
+        boolean friendsRequestMessage = messageCache.getMessagesNotificationType() != null;
 
         if (!friendsRequestMessage) {
             if (ownMessage) {
@@ -77,7 +72,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
 
-        if (messageCache.getFriendsNotificationType() == null) {
+        if (messageCache.getMessagesNotificationType() == null) {
             if (ownMessage) {
                 view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
             } else {
@@ -100,7 +95,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     R.drawable.vertical_progressbar));
             viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_friends_request_message, null, true);
+            view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
 
             viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
             viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
@@ -122,10 +117,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
 
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
-        boolean friendsRequestMessage = FriendsNotificationType.REQUEST.equals(
-                messageCache.getFriendsNotificationType());
+        boolean friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
+                messageCache.getMessagesNotificationType());
         boolean friendsInfoRequestMessage = messageCache
-                .getFriendsNotificationType() != null && !friendsRequestMessage;
+                .getMessagesNotificationType() != null && !friendsRequestMessage;
 
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());
@@ -222,10 +217,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean isFriend;
 
         MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
-        if (messageCache.getFriendsNotificationType() != null) {
+        if (messageCache.getMessagesNotificationType() != null) {
             ownMessage = isOwnMessage(messageCache.getSenderId());
-            friendsRequestMessage = FriendsNotificationType.REQUEST.equals(
-                    messageCache.getFriendsNotificationType());
+            friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
+                    messageCache.getMessagesNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {
                 isFriend = DatabaseManager.isFriendInBase(context, messageCache.getSenderId());

@@ -179,7 +179,7 @@ public class QBService extends Service {
         registerLoadGroupDialogCommand();
         registerLeaveGroupDialogCommand();
         registerAddFriendsToGroupCommand();
-        registerUpdateGroupNameCommand();
+        registerUpdateGroupDialogCommand();
 
         registerGetFileCommand();
         registerLoadAttachFileCommand();
@@ -206,12 +206,12 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOGIN_REST_SOCIAL_ACTION, loginRestCommand);
     }
 
-    private void registerUpdateGroupNameCommand() {
+    private void registerUpdateGroupDialogCommand() {
         QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
         QBUpdateGroupDialogCommand updateGroupNameCommand = new QBUpdateGroupDialogCommand(this, multiChatHelper,
-                QBServiceConsts.UPDATE_GROUP_NAME_SUCCESS_ACTION,
-                QBServiceConsts.UPDATE_GROUP_NAME_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_NAME_ACTION, updateGroupNameCommand);
+                QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION,
+                QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_DIALOG_ACTION, updateGroupNameCommand);
     }
 
     private void registerAddFriendsToGroupCommand() {

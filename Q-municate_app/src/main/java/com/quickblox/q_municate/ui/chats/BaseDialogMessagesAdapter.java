@@ -38,6 +38,11 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
+    protected static int TYPE_REQUEST_MESSAGE = 0;
+    protected static int TYPE_OWN_MESSAGE = 1;
+    protected static int TYPE_OPPONENT_MESSAGE = 2;
+    protected static int COMMON_TYPE_COUNT = 3;
+
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
     protected ScrollMessagesListener scrollMessagesListener;
