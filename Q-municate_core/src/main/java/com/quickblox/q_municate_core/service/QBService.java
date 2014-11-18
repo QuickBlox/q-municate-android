@@ -49,8 +49,6 @@ import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
-import com.quickblox.q_municate_core.qb.commands.QBSendGroupDialogMessageCommand;
-import com.quickblox.q_municate_core.qb.commands.QBSendPrivateChatMessageCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
@@ -174,8 +172,6 @@ public class QBService extends Service {
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
         registerJoinGroupChat();
-        registerSendMessageCommand();
-        registerSendGroupMessageCommand();
         registerLoadGroupDialogCommand();
         registerLeaveGroupDialogCommand();
         registerAddFriendsToGroupCommand();
@@ -301,22 +297,6 @@ public class QBService extends Service {
         ServiceCommand getFileCommand = new QBGetFileCommand(this, QBServiceConsts.GET_FILE_SUCCESS_ACTION,
                 QBServiceConsts.GET_FILE_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.GET_FILE_ACTION, getFileCommand);
-    }
-
-    private void registerSendMessageCommand() {
-        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
-        QBSendPrivateChatMessageCommand sendMessageCommand = new QBSendPrivateChatMessageCommand(this,
-                privateChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
-                QBServiceConsts.SEND_MESSAGE_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.SEND_MESSAGE_ACTION, sendMessageCommand);
-    }
-
-    private void registerSendGroupMessageCommand() {
-        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
-        QBSendGroupDialogMessageCommand sendMessageCommand = new QBSendGroupDialogMessageCommand(this,
-                multiChatHelper, QBServiceConsts.SEND_MESSAGE_SUCCESS_ACTION,
-                QBServiceConsts.SEND_MESSAGE_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.SEND_GROUP_MESSAGE_ACTION, sendMessageCommand);
     }
 
     private void registerLoadFriendsCommand() {
