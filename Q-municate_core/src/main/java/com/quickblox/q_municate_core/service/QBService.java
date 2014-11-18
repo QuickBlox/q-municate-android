@@ -21,6 +21,7 @@ import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.qb.commands.QBGetFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBImportFriendsCommand;
@@ -187,6 +188,7 @@ public class QBService extends Service {
         registerSendPUshCommand();
         registerLoginAndJoinGroupChat();
         registerReloginCommand();
+        registerDeleteDialogCommand();
     }
 
     private void registerLoginRestCommand() {
@@ -275,6 +277,13 @@ public class QBService extends Service {
         ServiceCommand loginCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_ACTION, loginCommand);
+    }
+
+    private void registerDeleteDialogCommand() {
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        ServiceCommand deleteDialogCommand = new QBDeleteDialogCommand(this, chatRestHelper,
+                QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.DELETE_DIALOG_ACTION, deleteDialogCommand);
     }
 
     private void registerLogoutAndDestroyChatCommand() {

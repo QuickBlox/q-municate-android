@@ -248,7 +248,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         userIdsList.add(chatCreator.getId());
         removeUsersFromRoom(roomJid, userIdsList);
 
-        DatabaseManager.deleteDialogByRoomJid(context, roomJid);
+        DatabaseManager.deleteDialogByDialogId(context, roomJid);
     }
 
     public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws Exception {

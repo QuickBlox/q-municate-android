@@ -66,7 +66,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 
-        registerForContextMenu(messagesListView);
+//        registerForContextMenu(messagesListView);
     }
 
     @Override

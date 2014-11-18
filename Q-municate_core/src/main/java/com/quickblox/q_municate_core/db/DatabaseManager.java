@@ -208,7 +208,7 @@ public class DatabaseManager {
 
         String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
 
-        String sorting = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+        String sorting = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         Cursor cursor;
 
@@ -238,7 +238,7 @@ public class DatabaseManager {
 
         String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
 
-        String sortOrder = UserTable.Cols.ID + " ORDER BY " + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
+        String sortOrder = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null,
@@ -354,6 +354,21 @@ public class DatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+            cursor.close();
+        }
+
+        return dialogId;
+    }
+
+    public static String getPrivateDialogIdByOpponentId(Context context, int opponentId) {
+        String dialogId = null;
+//        String condition = String.format("('%s')", opponentId);
+        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
+                DialogTable.Cols.OCCUPANTS_IDS + " like '%" + opponentId + "%'" + " AND " + DialogTable.Cols.TYPE + " = "
+                        + QBDialogType.PRIVATE.getCode(), null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
             cursor.close();
         }
 
@@ -860,8 +875,8 @@ public class DatabaseManager {
         }
     }
 
-    public static void deleteDialogByRoomJid(Context context, String roomJid) {
+    public static void deleteDialogByDialogId(Context context, String dialogId) {
         context.getContentResolver().delete(DialogTable.CONTENT_URI,
-                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null);
+                DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 }

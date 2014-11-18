@@ -98,6 +98,9 @@
     <string name="gdl_ctx_menu_video_call">Video Call</string>
     <string name="gdl_ctx_menu_profile">View Profile</string>
 
+    // Dialogs
+    <string name="dlgs_ctx_menu_remove">Delete dialog</string>
+
     // Group Dialog Details
     <string name="gdd_title">Group Details</string>
     <string name="gdd_leave_group">Leave group</string>
@@ -198,7 +201,7 @@
     <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
     <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
-    <string name="dlg_friend_removed">Friend is removed</string>
+    <string name="dlg_friend_removed">You have deleted %1$s from your contacts</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
     <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>

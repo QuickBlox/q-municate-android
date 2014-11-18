@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,12 +20,13 @@ import android.widget.TextView;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
@@ -61,6 +63,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
         addActions();
         initCursorLoaders();
+
+        registerForContextMenu(dialogsListView);
 
         return view;
     }
@@ -120,6 +124,38 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         super.onResume();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.dialogs_list_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                startNewDialogPage();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
+                QBDialog dialog = DatabaseManager.getDialogFromCursor(selectedChatCursor);
+                deleteDialog(dialog);
+                break;
+        }
+        return true;
+    }
+
+    private void deleteDialog(QBDialog dialog) {
+        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
+    }
+
     private void initChatsDialogs(Cursor dialogsCursor) {
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
         dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
@@ -144,21 +180,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         GroupDialogActivity.start(baseActivity, dialog);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.dialogs_list_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                startNewDialogPage();
-                break;
-        }
-        return true;
-    }
-
     private void startNewDialogPage() {
         boolean isFriends = DatabaseManager.getAllFriends(baseActivity).getCount() > ConstsCore.ZERO_INT_VALUE;
         if (isFriends) {
@@ -173,6 +194,13 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 new LoadChatsDialogsSuccessAction());
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        MenuInflater menuInflater = baseActivity.getMenuInflater();
+        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
     }
 
     private class LoadChatsDialogsSuccessAction implements Command {

@@ -398,7 +398,11 @@ public class ChatUtils {
     }
 
     private static String getFullNameById(Context context, int userId) {
-        return DatabaseManager.getUserById(context, userId).getFullName();
+        String fullName = DatabaseManager.getUserById(context, userId).getFullName();
+        if (fullName == null) {
+            return userId + ConstsCore.EMPTY_STRING;
+        }
+        return fullName;
     }
 
     public static MessagesNotificationType getNotificationMessageType(QBMessage chatMessage) {

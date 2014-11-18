@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -23,6 +24,7 @@ import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -217,6 +219,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         }
     }
 
+    private void deleteDialog() {
+        String dialogId = DatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
+        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
+    }
+
     private class CreateChatSuccessAction implements Command {
 
         @Override
@@ -236,7 +243,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
+            deleteDialog();
+            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed, friend.getFullName()));
             finish();
         }
     }

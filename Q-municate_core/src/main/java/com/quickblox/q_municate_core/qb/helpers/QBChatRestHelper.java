@@ -4,13 +4,17 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBGroupChatManager;
+import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.ConnectionListener;
@@ -97,6 +101,23 @@ public class QBChatRestHelper extends BaseHelper {
 
     private void deleteMessagesByDialogId(String dialogId) {
         DatabaseManager.deleteMessagesByDialogId(context, dialogId);
+    }
+
+    private void deleteDialogLocal(String dialogId) {
+        DatabaseManager.deleteDialogByDialogId(context, dialogId);
+    }
+
+    public void deleteDialog(String dialogId, QBDialogType dialogType) {
+        try {
+            if (QBDialogType.PRIVATE.equals(dialogType)) {
+                QBPrivateChatManager.deleteDialog(dialogId);
+            } else {
+                QBGroupChatManager.deleteDialog(dialogId);
+            }
+        } catch (QBResponseException e) {
+            ErrorUtils.logError(e);
+        }
+        deleteDialogLocal(dialogId);
     }
 
     private class ChatConnectionListener implements ConnectionListener {
