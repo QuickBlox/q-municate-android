@@ -1,13 +1,12 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
@@ -39,7 +38,7 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     protected Cursor getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
-        return DatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(
+        return UsersDatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(
                 dialog.getOccupantList()));
     }
 

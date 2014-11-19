@@ -12,7 +12,8 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
@@ -32,7 +33,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     private int getItemViewType(Cursor cursor) {
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
         boolean friendsRequestMessage = messageCache.getMessagesNotificationType() != null;
 
@@ -63,7 +64,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         View view;
         ViewHolder viewHolder = new ViewHolder();
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
 
         if (messageCache.getMessagesNotificationType() == null) {
@@ -108,7 +109,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String avatarUrl = null;
         String senderName;
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
 
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
         boolean notificationMessage = messageCache.getMessagesNotificationType() != null;
@@ -127,7 +128,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             if (ownMessage) {
                 avatarUrl = getAvatarUrlForCurrentUser();
             } else {
-                User senderFriend = DatabaseManager.getUserById(context, messageCache.getSenderId());
+                User senderFriend = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());
                 if (senderFriend != null) {
                     senderName = senderFriend.getFullName();
                     avatarUrl = getAvatarUrlForFriend(senderFriend);

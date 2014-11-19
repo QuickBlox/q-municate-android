@@ -15,7 +15,8 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
@@ -130,7 +131,7 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
 
     @Override
     protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
-        User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
 
         if (user == null) {
             user = new User();
@@ -182,9 +183,9 @@ public class QBPrivateChatHelper extends BaseChatHelper implements QBPrivateChat
     }
 
     public void updateDialog(QBDialog dialog) {
-        int countUnreadDialog = DatabaseManager.getCountUnreadMessagesByDialogIdLocal(context,
+        int countUnreadDialog = ChatDatabaseManager.getCountUnreadMessagesByDialogIdLocal(context,
                 dialog.getDialogId());
-        DatabaseManager.updateDialog(context, dialog.getDialogId(), dialog.getLastMessage(),
+        ChatDatabaseManager.updateDialog(context, dialog.getDialogId(), dialog.getLastMessage(),
                 dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 

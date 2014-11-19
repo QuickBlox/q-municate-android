@@ -20,7 +20,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -57,7 +57,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void saveMessageToCache(MessageCache messageCache) {
-        DatabaseManager.saveChatMessage(context, messageCache, false);
+        ChatDatabaseManager.saveChatMessage(context, messageCache, false);
     }
 
     /*
@@ -81,7 +81,7 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogToCache(Context context, QBDialog dialog) {
-        DatabaseManager.saveDialog(context, dialog);
+        ChatDatabaseManager.saveDialog(context, dialog);
     }
 
     protected QBChatMessage getQBChatMessage(String body, QBFile file) {
@@ -123,11 +123,11 @@ public abstract class BaseChatHelper extends BaseHelper {
     }
 
     public void updateStatusMessageLocal(MessageCache messageCache) throws QBResponseException {
-        DatabaseManager.updateStatusMessage(context, messageCache);
+        ChatDatabaseManager.updateStatusMessage(context, messageCache);
     }
 
     public void updateMessageStatusDeliveredLocal(String messageId, boolean isDelivered) {
-        DatabaseManager.updateMessageStatusDelivered(context, messageId, isDelivered);
+        ChatDatabaseManager.updateMessageStatusDelivered(context, messageId, isDelivered);
     }
 
     public void sendIsTypingToServer(int opponentId) {

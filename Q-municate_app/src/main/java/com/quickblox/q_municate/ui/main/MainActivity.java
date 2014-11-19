@@ -12,11 +12,11 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
@@ -217,7 +217,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         Intent intent = getIntent();
         String dialogId = intent.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
         long userId = Long.parseLong(intent.getStringExtra(QBServiceConsts.EXTRA_USER_ID));
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
+        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         if (dialog.getType() == QBDialogType.PRIVATE) {
             startPrivateChatActivity(dialog, userId);
         } else {
@@ -226,7 +226,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startPrivateChatActivity(QBDialog dialog, long userId) {
-        User occupantUser = DatabaseManager.getUserById(this, userId);
+        User occupantUser = UsersDatabaseManager.getUserById(this, userId);
         if (occupantUser != null && userId != ConstsCore.ZERO_INT_VALUE) {
             PrivateDialogActivity.start(this, occupantUser, dialog);
         }

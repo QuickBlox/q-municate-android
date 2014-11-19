@@ -23,10 +23,9 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCommand;
@@ -252,7 +251,7 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private int getCountUnreadDialogs() {
-        return DatabaseManager.getCountUnreadDialogs(baseActivity);
+        return ChatDatabaseManager.getCountUnreadDialogs(baseActivity);
     }
 
     public interface NavigationDrawerCallbacks {

@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
@@ -61,13 +61,13 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
             if (relationStatusId == relationStatusAllUsersId) {
                 return usersCursor;
             } else {
-                return DatabaseManager.getFriendsByFullName(context, searchCharacters);
+                return UsersDatabaseManager.getFriendsByFullNameWithPending(context, searchCharacters);
             }
         } else {
             if (relationStatusId == relationStatusAllUsersId) {
                 return usersCursor;
             } else {
-                return DatabaseManager.getAllFriends(context);
+                return UsersDatabaseManager.getAllFriendsWithPending(context);
             }
         }
     }
@@ -107,7 +107,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final User user = DatabaseManager.getUserFromCursor(cursor);
+        final User user = UsersDatabaseManager.getUserFromCursor(cursor);
 
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
         boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > ConstsCore.ZERO_INT_VALUE;
@@ -147,7 +147,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
             boolean isAskStatus) {
         String status = null;
 
-        String relationStatus = DatabaseManager.getRelationStatusNameById(context, relationStatusId);
+        String relationStatus = UsersDatabaseManager.getRelationStatusNameById(context, relationStatusId);
 
         if (!TextUtils.isEmpty(relationStatus)) {
             boolean isAllFriends = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus

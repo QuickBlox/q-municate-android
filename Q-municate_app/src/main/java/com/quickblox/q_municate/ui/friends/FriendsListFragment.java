@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -192,11 +192,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                     int childPosition, long id) {
                 Cursor selectedItem = friendsListAdapter.getChild(groupPosition, childPosition);
                 if (selectedItem.getCount() != ConstsCore.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
-                    User selectedUser = DatabaseManager.getUserFromCursor(selectedItem);
-                    boolean isFriend = DatabaseManager.isFriendInBase(baseActivity, selectedUser.getUserId());
-                    if (isFriend) {
-                        startFriendDetailsActivity(selectedUser.getUserId());
-                    }
+                    User selectedUser = UsersDatabaseManager.getUserFromCursor(selectedItem);
+                    startFriendDetailsActivity(selectedUser.getUserId());
                 }
                 return false;
             }
@@ -241,7 +238,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private void initFriendsList() {
         baseActivity.showActionBarProgress();
 
-        int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+        int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
         createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, null,
@@ -251,7 +248,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        int countFriends = DatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
+        int countFriends = UsersDatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
         createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
@@ -289,7 +286,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 new String[]{FriendsListCursorAdapter.HEADER_COLUMN_ID, FriendsListCursorAdapter.HEADER_COLUMN_STATUS_NAME, FriendsListCursorAdapter.HEADER_COLUMN_HEADER_NAME});
 
         if (countFriends > ConstsCore.ZERO_INT_VALUE) {
-            headersCursor.addRow(new String[]{DatabaseManager.getRelationStatusIdByName(baseActivity,
+            headersCursor.addRow(new String[]{UsersDatabaseManager.getRelationStatusIdByName(baseActivity,
                     QBFriendListHelper.RELATION_STATUS_BOTH) + ConstsCore.EMPTY_STRING, QBFriendListHelper.RELATION_STATUS_BOTH, resources
                     .getString(R.string.frl_column_header_name_contacts)});
         }
@@ -331,7 +328,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (state == State.GLOBAL_LIST) {
             emptyListTextView.setVisibility(View.GONE);
         } else {
-            int countFriends = DatabaseManager.getAllFriendsCount(baseActivity);
+            int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
 
             if ((countFriends + usersList.size()) > ConstsCore.ZERO_INT_VALUE) {
                 emptyListTextView.setVisibility(View.GONE);

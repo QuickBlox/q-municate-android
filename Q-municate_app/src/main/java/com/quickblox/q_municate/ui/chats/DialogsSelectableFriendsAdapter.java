@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -60,7 +60,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, final Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final User friend = DatabaseManager.getUserFromCursor(cursor);
+        final User friend = UsersDatabaseManager.getUserFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullName());
         viewHolder.statusMessageTextView.setText(friend.getStatus());

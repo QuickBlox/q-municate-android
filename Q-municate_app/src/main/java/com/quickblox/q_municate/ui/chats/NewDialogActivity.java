@@ -9,8 +9,8 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
@@ -53,7 +53,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
 
     @Override
     protected Cursor getFriends() {
-        return DatabaseManager.getAllFriends(this);
+        return UsersDatabaseManager.getAllFriends(this);
     }
 
     @Override

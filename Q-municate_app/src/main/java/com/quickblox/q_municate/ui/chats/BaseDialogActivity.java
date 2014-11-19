@@ -35,7 +35,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -231,7 +231,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onUpdateChatDialog();
 
     protected Cursor getAllDialogMessagesByDialogId() {
-        return DatabaseManager.getAllDialogMessagesByDialogId(this, dialogId);
+        return ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId);
     }
 
     @Override
@@ -475,7 +475,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-        MessageCache lastReadMessage = DatabaseManager.getLastSyncMessage(this, dialog);
+        MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
         } else {

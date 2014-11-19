@@ -9,7 +9,8 @@ import android.widget.TextView;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -40,7 +41,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        QBDialog dialog = DatabaseManager.getDialogFromCursor(cursor);
+        QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(cursor);
 
         if (dialog.getType().equals(QBDialogType.PRIVATE)) {
             int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
@@ -64,7 +65,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
     }
 
     public User getOccupantById(int occupantId) {
-        User friend = DatabaseManager.getUserById(context, occupantId);
+        User friend = UsersDatabaseManager.getUserById(context, occupantId);
         if (friend == null) {
             friend = new User();
             friend.setUserId(occupantId);

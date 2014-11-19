@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -38,7 +38,7 @@ public class QBLogoutCommand extends CompositeServiceCommand {
     }
 
     private void resetCacheData() {
-        DatabaseManager.clearAllCache(context);
+        ChatDatabaseManager.clearAllCache(context);
     }
 
     private void resetRememberMe() {

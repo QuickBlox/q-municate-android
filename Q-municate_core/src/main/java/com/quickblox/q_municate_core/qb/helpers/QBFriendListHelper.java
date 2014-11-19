@@ -16,7 +16,8 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -258,23 +259,23 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void deleteAllFriends() {
-        DatabaseManager.deleteAllFriends(context);
+        UsersDatabaseManager.deleteAllFriends(context);
     }
 
     private void saveUser(User user) {
-        DatabaseManager.saveUser(context, user);
+        UsersDatabaseManager.saveUser(context, user);
     }
 
     private void savePeople(List<User> usersList, List<Friend> friendsList) {
-        DatabaseManager.savePeople(context, usersList, friendsList);
+        UsersDatabaseManager.savePeople(context, usersList, friendsList);
     }
 
     private void saveFriend(Friend friend) {
-        DatabaseManager.saveFriend(context, friend);
+        UsersDatabaseManager.saveFriend(context, friend);
     }
 
     private void deleteFriend(int userId) {
-        DatabaseManager.deleteFriendById(context, userId);
+        ChatDatabaseManager.deleteFriendById(context, userId);
     }
 
     private void deleteFriends(Collection<Integer> userIdsList) throws QBResponseException {
@@ -320,12 +321,12 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = DatabaseManager.getUserById(context, presence.getUserId());
+            User user = UsersDatabaseManager.getUserById(context, presence.getUserId());
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
                 fillUserOnlineStatus(user, presence);
-                DatabaseManager.saveUser(context, user);
+                UsersDatabaseManager.saveUser(context, user);
             }
         }
     }

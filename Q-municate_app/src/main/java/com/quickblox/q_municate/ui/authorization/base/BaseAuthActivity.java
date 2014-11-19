@@ -11,9 +11,8 @@ import android.widget.EditText;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
@@ -110,7 +109,7 @@ public class BaseAuthActivity extends BaseActivity {
     protected void startMainActivity(Context context, QBUser user, boolean saveRememberMe) {
         AppSession.getSession().updateUser(user);
         AppSession.saveRememberMe(saveRememberMe);
-        DatabaseManager.clearAllCache(context);
+        ChatDatabaseManager.clearAllCache(context);
         MainActivity.start(context);
         finish();
     }

@@ -12,7 +12,7 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
@@ -93,18 +93,18 @@ public class QBChatRestHelper extends BaseHelper {
         List<QBChatHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
 
         if (dialogMessagesList != null) {
-            DatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
+            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
         }
 
         return dialogMessagesList;
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
-        DatabaseManager.deleteMessagesByDialogId(context, dialogId);
+        ChatDatabaseManager.deleteMessagesByDialogId(context, dialogId);
     }
 
     private void deleteDialogLocal(String dialogId) {
-        DatabaseManager.deleteDialogByDialogId(context, dialogId);
+        ChatDatabaseManager.deleteDialogByDialogId(context, dialogId);
     }
 
     public void deleteDialog(String dialogId, QBDialogType dialogType) {

@@ -22,7 +22,8 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
@@ -75,7 +76,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return DatabaseManager.getAllDialogsCursorLoader(baseActivity);
+        return ChatDatabaseManager.getAllDialogsCursorLoader(baseActivity);
     }
 
     @Override
@@ -101,7 +102,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
                 Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
-                QBDialog dialog = DatabaseManager.getDialogFromCursor(selectedChatCursor);
+                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
                 } else {
@@ -145,7 +146,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         switch (item.getItemId()) {
             case R.id.action_delete:
                 Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-                QBDialog dialog = DatabaseManager.getDialogFromCursor(selectedChatCursor);
+                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
                 deleteDialog(dialog);
                 break;
         }
@@ -181,7 +182,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     }
 
     private void startNewDialogPage() {
-        boolean isFriends = DatabaseManager.getAllFriends(baseActivity).getCount() > ConstsCore.ZERO_INT_VALUE;
+        boolean isFriends = UsersDatabaseManager.getAllFriends(baseActivity).getCount() > ConstsCore.ZERO_INT_VALUE;
         if (isFriends) {
             NewDialogActivity.start(baseActivity);
         } else {

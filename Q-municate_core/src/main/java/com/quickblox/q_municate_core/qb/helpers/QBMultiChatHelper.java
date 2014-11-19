@@ -18,7 +18,8 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
@@ -119,7 +120,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
 
     public void tryJoinRoomChats(List<QBDialog> chatDialogsList) {
         if (!chatDialogsList.isEmpty()) {
-            DatabaseManager.saveDialogs(context, chatDialogsList);
+            ChatDatabaseManager.saveDialogs(context, chatDialogsList);
             initGroupDialogsList();
             for (QBDialog dialog : chatDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
@@ -248,11 +249,11 @@ public class QBMultiChatHelper extends BaseChatHelper {
         userIdsList.add(chatCreator.getId());
         removeUsersFromRoom(roomJid, userIdsList);
 
-        DatabaseManager.deleteDialogByDialogId(context, roomJid);
+        ChatDatabaseManager.deleteDialogByDialogId(context, roomJid);
     }
 
     public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws Exception {
-        QBDialog dialog = DatabaseManager.getDialogByDialogId(context, dialogId);
+        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
@@ -263,7 +264,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
-        QBDialog dialog = DatabaseManager.getDialogByRoomJid(context, roomJid);
+        QBDialog dialog = ChatDatabaseManager.getDialogByRoomJid(context, roomJid);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
@@ -286,7 +287,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
         friendsList.remove(chatCreator.getId());
         notifyFriendsRoomUpdate(updatedDialog, friendsList);
-        DatabaseManager.saveDialog(context, updatedDialog);
+        ChatDatabaseManager.saveDialog(context, updatedDialog);
         return updatedDialog;
     }
 
@@ -332,7 +333,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     private void onRoomMessageReceived(QBGroupChat groupChat, QBChatMessage chatMessage) {
-        User user = DatabaseManager.getUserById(context, chatMessage.getSenderId());
+        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
         String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
         long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.MatrixCursor;
 
 import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.Friend;
@@ -109,7 +109,7 @@ public class FriendUtils {
         MatrixCursor usersCursor = new MatrixCursor(
                 new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK});
 
-        List<User> friendsList = DatabaseManager.getAllFriendsList(context);
+        List<User> friendsList = UsersDatabaseManager.getAllFriendsList(context);
 
         for (User user : usersList) {
             if (!friendsList.contains(user)) {

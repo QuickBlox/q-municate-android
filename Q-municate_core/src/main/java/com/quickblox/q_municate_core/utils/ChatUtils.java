@@ -11,10 +11,12 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBMessage;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.users.model.QBUser;
 
@@ -337,7 +339,7 @@ public class ChatUtils {
     }
 
     public static QBDialog getExistPrivateDialog(Context context, int opponentId) {
-        List<QBDialog> dialogList = DatabaseManager.getDialogsByOpponent(context, opponentId,
+        List<QBDialog> dialogList = ChatDatabaseManager.getDialogsByOpponent(context, opponentId,
                 QBDialogType.PRIVATE);
         if (!dialogList.isEmpty()) {
             return dialogList.get(0);
@@ -347,7 +349,7 @@ public class ChatUtils {
     }
 
     public static QBDialog getExistDialogById(Context context, String dialogId) {
-        return DatabaseManager.getDialogByDialogId(context, dialogId);
+        return ChatDatabaseManager.getDialogByDialogId(context, dialogId);
     }
 
     public static boolean isFriendsMessageTypeCode(int friendsMessageTypeCode) {
@@ -398,11 +400,11 @@ public class ChatUtils {
     }
 
     private static String getFullNameById(Context context, int userId) {
-        String fullName = DatabaseManager.getUserById(context, userId).getFullName();
-        if (fullName == null) {
+        User user = UsersDatabaseManager.getUserById(context, userId);
+        if (user == null) {
             return userId + ConstsCore.EMPTY_STRING;
         }
-        return fullName;
+        return user.getFullName();
     }
 
     public static MessagesNotificationType getNotificationMessageType(QBMessage chatMessage) {

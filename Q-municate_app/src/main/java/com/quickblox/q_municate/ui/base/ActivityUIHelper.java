@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
@@ -56,7 +56,7 @@ public class ActivityUIHelper {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        messagesDialog = DatabaseManager.getDialogByDialogId(activity, dialogId);
+        messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         showNewMessageAlert(senderUser, message);
     }

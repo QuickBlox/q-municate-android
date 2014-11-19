@@ -3,7 +3,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
@@ -23,7 +23,7 @@ public class QBRestHelper extends BaseHelper {
 
         if (user != null) {
             resultUser = FriendUtils.createUser(user);
-            DatabaseManager.saveUser(context, resultUser);
+            UsersDatabaseManager.saveUser(context, resultUser);
         }
 
         return resultUser;
@@ -35,7 +35,7 @@ public class QBRestHelper extends BaseHelper {
         Collection<User> usersListResult = FriendUtils.createUsersList(usersList);
 
         if (usersList != null) {
-            DatabaseManager.saveUsers(context, usersListResult);
+            UsersDatabaseManager.saveUsers(context, usersListResult);
         }
 
         return usersListResult;

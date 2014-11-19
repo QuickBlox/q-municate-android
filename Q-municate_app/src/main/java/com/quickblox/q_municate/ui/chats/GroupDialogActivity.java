@@ -16,7 +16,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
@@ -126,7 +126,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     private QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         if (messageCache.getMessagesNotificationType() == null) {
             dialog.setLastMessage(messageCache.getMessage());
         } else {
@@ -139,7 +139,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void updateChatData() {
-        dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
+        dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         if (dialog != null) {
             groupName = dialog.getName();
             updateActionBar();

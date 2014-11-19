@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
@@ -46,7 +46,7 @@ public class FindUnknownFriendsTask extends AsyncTask {
         List<Integer> occupantsList = dialog.getOccupants();
         List<Integer> usersIdsList = new ArrayList<Integer>();
         for (int occupantId : occupantsList) {
-            boolean isUserInBase = DatabaseManager.isUserInBase(context, occupantId);
+            boolean isUserInBase = UsersDatabaseManager.isUserInBase(context, occupantId);
             if (!isUserInBase && currentUserId != occupantId) {
                 usersIdsList.add(occupantId);
             }

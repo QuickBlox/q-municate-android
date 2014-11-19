@@ -34,7 +34,8 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -100,7 +101,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        currentDialog = DatabaseManager.getDialogByDialogId(this, dialogId);
+        currentDialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         groupDialog = new GroupDialog(currentDialog);
         imageUtils = new ImageUtils(this);
 
@@ -248,7 +249,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, data);
         } else if (requestCode == AddFriendsToGroupActivity.RESULT_ADDED_FRIENDS) {
-            handleAddedFriends(data);
+            if (data != null) {
+                handleAddedFriends(data);
+            }
         } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
             Uri originalUri = data.getData();
             if (originalUri != null) {
@@ -262,12 +265,14 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void handleAddedFriends(Intent data) {
         addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
-        currentNotificationTypeList.add(MessagesNotificationType.ADDED_DIALOG);
-        sendNotificationToGroup();
+        if (addedFriendIdsList != null) {
+            currentNotificationTypeList.add(MessagesNotificationType.ADDED_DIALOG);
+            sendNotificationToGroup();
+        }
     }
 
     private void startAddFriendsActivity() {
-        int countUnselectedFriendsInChat = DatabaseManager.getFriendsFilteredByIds(this,
+        int countUnselectedFriendsInChat = UsersDatabaseManager.getFriendsFilteredByIds(this,
                 FriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
@@ -449,8 +454,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            groupDialog = new GroupDialog(DatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this,
-                    dialog.getDialogId()));
+            groupDialog = new GroupDialog(ChatDatabaseManager.getDialogByDialogId(
+                    GroupDialogDetailsActivity.this, dialog.getDialogId()));
             updateOldGroupData();
 
             sendNotificationToGroup();

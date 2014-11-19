@@ -12,7 +12,8 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
@@ -38,7 +39,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     private int getItemViewType(Cursor cursor) {
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
         boolean friendsRequestMessage = messageCache.getMessagesNotificationType() != null;
 
@@ -69,7 +70,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         View view;
         ViewHolder viewHolder = new ViewHolder();
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
 
         if (messageCache.getMessagesNotificationType() == null) {
@@ -114,7 +115,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
 
         boolean ownMessage = isOwnMessage(messageCache.getSenderId());
         boolean friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
@@ -216,14 +217,14 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean friendsRequestMessage;
         boolean isFriend;
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         if (messageCache.getMessagesNotificationType() != null) {
             ownMessage = isOwnMessage(messageCache.getSenderId());
             friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
                     messageCache.getMessagesNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {
-                isFriend = DatabaseManager.isFriendInBase(context, messageCache.getSenderId());
+                isFriend = UsersDatabaseManager.isFriendInBase(context, messageCache.getSenderId());
                 if (!isFriend) {
                     lastRequestPosition = cursor.getPosition();
                 }

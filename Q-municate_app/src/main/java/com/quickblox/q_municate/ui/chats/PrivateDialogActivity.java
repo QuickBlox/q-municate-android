@@ -21,7 +21,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
@@ -69,7 +70,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
-        friendCursor = DatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
+        friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
         initListView();
         initActionBar();
         registerContentObservers();
@@ -125,7 +126,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
             @Override
             public void onChange(boolean selfChange) {
-                opponentFriend = DatabaseManager.getUserById(PrivateDialogActivity.this,
+                opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
                         PrivateDialogActivity.this.opponentFriend.getUserId());
                 setOnlineStatus(opponentFriend);
             }
@@ -166,7 +167,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private QBDialog getDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         if (messageCache.getMessagesNotificationType() == null) {
             dialog.setLastMessage(messageCache.getMessage());
         } else {
@@ -226,7 +227,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean isFriend = DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId());
+        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
+                opponentFriend.getUserId());
         if (!isFriend && item.getItemId() != android.R.id.home) {
             DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(R.string.dlg_user_is_not_friend));
             return true;
@@ -265,7 +267,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = DatabaseManager.isFriendInBase(PrivateDialogActivity.this, opponentFriend.getUserId());
+        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
+                opponentFriend.getUserId());
         messageEditText.setEnabled(isFriend);
     }
 
@@ -279,7 +282,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void showRejectUserDialog(final int userId) {
-        User user = DatabaseManager.getUserById(this, userId);
+        User user = UsersDatabaseManager.getUserById(this, userId);
         AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
                 R.string.frl_dlg_reject_friend, user.getFullName()));
         alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {

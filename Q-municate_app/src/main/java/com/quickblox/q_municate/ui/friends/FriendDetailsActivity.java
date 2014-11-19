@@ -20,7 +20,8 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
@@ -33,7 +34,6 @@ import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -63,8 +63,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         setContentView(R.layout.activity_friend_details);
         canPerformLogout.set(true);
         int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-        friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
-        friend = DatabaseManager.getUserById(this, friendId);
+        friendCursor = UsersDatabaseManager.getFriendCursorById(this, friendId);
+        friend = UsersDatabaseManager.getUserById(this, friendId);
         initUI();
         registerStatusChangingObserver();
         initUIWithFriendsData();
@@ -87,7 +87,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             @Override
             public void onChange(boolean selfChange) {
                 if (FriendDetailsActivity.this.friend !=null) {
-                    friend = DatabaseManager.getUserById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getUserId());
+                    friend = UsersDatabaseManager.getUserById(FriendDetailsActivity.this,
+                            FriendDetailsActivity.this.friend.getUserId());
                     setOnlineStatus(friend);
                 }
             }
@@ -220,7 +221,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void deleteDialog() {
-        String dialogId = DatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
+        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
         QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
