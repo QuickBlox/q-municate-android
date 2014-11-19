@@ -202,7 +202,9 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
-            CallActivity.start(FriendDetailsActivity.this, friend, callType);
+            if (checkFriendStatus(friend.getUserId())) {
+                CallActivity.start(FriendDetailsActivity.this, friend, callType);
+            }
         }
     }
 
@@ -210,13 +212,25 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         callToUser(friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
     }
 
-    public void chatClickListener(View view) {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
-        if (existingPrivateDialog != null) {
-            PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
+    private boolean checkFriendStatus(int userId) {
+        boolean isFriend = UsersDatabaseManager.isFriendInBase(this, userId);
+        if (isFriend) {
+            return true;
         } else {
-            showProgress();
-            QBCreatePrivateChatCommand.start(this, friend);
+            DialogUtils.showLong(this, getResources().getString(R.string.dlg_user_is_not_friend));
+            return false;
+        }
+    }
+
+    public void chatClickListener(View view) {
+        if (checkFriendStatus(friend.getUserId())) {
+            QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
+            if (existingPrivateDialog != null) {
+                PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
+            } else {
+                showProgress();
+                QBCreatePrivateChatCommand.start(this, friend);
+            }
         }
     }
 
