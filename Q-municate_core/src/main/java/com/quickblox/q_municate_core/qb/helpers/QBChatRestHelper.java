@@ -27,15 +27,14 @@ import java.util.List;
 
 public class QBChatRestHelper extends BaseHelper {
 
-    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
     private static final String TAG = QBChatRestHelper.class.getSimpleName();
+    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
     private QBChatService chatService;
+    private ConnectionListener connectionListener = new ChatConnectionListener();
 
     public QBChatRestHelper(Context context) {
         super(context);
     }
-
-    private ConnectionListener connectionListener = new ChatConnectionListener();
 
     public synchronized void initChatService() throws XMPPException, SmackException {
         if (!QBChatService.isInitialized()) {
@@ -46,8 +45,7 @@ public class QBChatRestHelper extends BaseHelper {
         }
     }
 
-    public synchronized void login(
-            QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.enableCarbons();
@@ -68,56 +66,6 @@ public class QBChatRestHelper extends BaseHelper {
 
     public boolean isLoggedIn() {
         return chatService != null && chatService.isLoggedIn();
-    }
-
-    public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
-        Bundle bundle = new Bundle();
-        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
-        List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
-                bundle);
-        return chatDialogsList;
-    }
-
-    public List<QBChatHistoryMessage> getDialogMessages(QBDialog dialog,
-            long lastDateLoad) throws QBResponseException {
-        Bundle bundle = new Bundle();
-        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
-        if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
-            customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT,
-                    lastDateLoad);
-        } else {
-            deleteMessagesByDialogId(dialog.getDialogId());
-        }
-        List<QBChatHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
-
-        if (dialogMessagesList != null) {
-            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
-
-        return dialogMessagesList;
-    }
-
-    private void deleteMessagesByDialogId(String dialogId) {
-        ChatDatabaseManager.deleteMessagesByDialogId(context, dialogId);
-    }
-
-    private void deleteDialogLocal(String dialogId) {
-        ChatDatabaseManager.deleteDialogByDialogId(context, dialogId);
-    }
-
-    public void deleteDialog(String dialogId, QBDialogType dialogType) {
-        try {
-            if (QBDialogType.PRIVATE.equals(dialogType)) {
-                QBPrivateChatManager.deleteDialog(dialogId);
-            } else {
-                QBGroupChatManager.deleteDialog(dialogId);
-            }
-        } catch (QBResponseException e) {
-            ErrorUtils.logError(e);
-        }
-        deleteDialogLocal(dialogId);
     }
 
     private class ChatConnectionListener implements ConnectionListener {

@@ -1,39 +1,47 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
+import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class FindUnknownFriendsTask extends AsyncTask {
+public class FindUnknownFriends {
 
     private Context context;
+    private QBDialog dialog;
+    private List<QBDialog> dialogsList;
+    private Set<Integer> loadIdsSet;
+    private QBUser currentUser;
 
-    public FindUnknownFriendsTask(Context context) {
-        this.context = context;
+    public FindUnknownFriends(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
+        init(context, currentUser);
+        this.dialogsList = dialogsList;
     }
 
-    @Override
-    protected Uri doInBackground(Object[] params) {
-        List<QBDialog> dialogsList = (List<QBDialog>) params[0];
-        QBDialog dialog = (QBDialog) params[1];
-        QBUser currentUser = AppSession.getSession().getUser();
+    public FindUnknownFriends(Context context, QBUser currentUser, QBDialog dialog) {
+        init(context, currentUser);
+        this.dialog = dialog;
+    }
 
+    private void init(Context context, QBUser currentUser) {
+        this.context = context;
+        this.currentUser = currentUser;
+        loadIdsSet = new HashSet<Integer>();
+    }
+
+    public void find() {
         if (dialogsList != null) {
             findUserInDialogsList(dialogsList, currentUser.getId());
         } else {
             findUserInDialog(dialog, currentUser.getId());
         }
-
-        return null;
     }
 
     private void findUserInDialogsList(List<QBDialog> dialogsList, int currentUserId) {
@@ -44,19 +52,18 @@ public class FindUnknownFriendsTask extends AsyncTask {
 
     private void findUserInDialog(QBDialog dialog, int currentUserId) {
         List<Integer> occupantsList = dialog.getOccupants();
-        List<Integer> usersIdsList = new ArrayList<Integer>();
         for (int occupantId : occupantsList) {
             boolean isUserInBase = UsersDatabaseManager.isUserInBase(context, occupantId);
             if (!isUserInBase && currentUserId != occupantId) {
-                usersIdsList.add(occupantId);
+                loadIdsSet.add(occupantId);
             }
         }
-        if (!usersIdsList.isEmpty()) {
+        if (!loadIdsSet.isEmpty()) {
             int oneElement = 1;
-            if (usersIdsList.size() == oneElement) {
-                startLoadUser(usersIdsList.get(0));
+            if (loadIdsSet.size() == oneElement) {
+                startLoadUser(loadIdsSet.iterator().next());
             } else {
-                startLoadUsers(usersIdsList);
+                startLoadUsers(new ArrayList<Integer>(loadIdsSet));
             }
         }
     }

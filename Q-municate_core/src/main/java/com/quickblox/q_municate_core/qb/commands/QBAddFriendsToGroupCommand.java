@@ -35,7 +35,7 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
 
-        multiChatHelper.addUsersToRoom(dialogId, friendIdsList);
+        multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
 
         return extras;
     }

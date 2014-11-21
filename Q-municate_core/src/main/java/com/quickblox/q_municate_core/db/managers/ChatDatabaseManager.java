@@ -19,6 +19,7 @@ import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
@@ -265,15 +266,15 @@ public class ChatDatabaseManager {
             messageCache = new MessageCache(messageId, dialogId, senderId, message, attachURL, time,
                     historyMessage.isRead(), true, true);
 
-            if (historyMessage.getProperty(ChatUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
+            if (historyMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
-                        ChatUtils.PROPERTY_NOTIFICATION_TYPE).toString());
-                if (ChatUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
+                        ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString());
+                if (ChatNotificationUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
                     messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
                             friendsMessageTypeCode));
-                } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
-                    messageCache.setMessage(ChatUtils.getNotificationMessage(context, historyMessage));
-                    messageCache.setMessagesNotificationType(ChatUtils.getNotificationMessageType(historyMessage));
+                } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
+                    messageCache.setMessage(ChatNotificationUtils.getNotificationMessage(context, historyMessage));
+                    messageCache.setMessagesNotificationType(ChatNotificationUtils.getNotificationMessageType(historyMessage));
                 }
             }
 
@@ -332,8 +333,8 @@ public class ChatDatabaseManager {
         String resultMessage = messageCache.getMessage();
 
         if (messageCache.getMessagesNotificationType() != null
-                && !ChatUtils.isNotificationMessageUpdateDialog(messageCache.getMessagesNotificationType().getCode())) {
-            resultMessage = ChatUtils.getResourceBodyForNotificationType(context, messageCache.getMessagesNotificationType(), messageCache);
+                && !ChatNotificationUtils.isNotificationMessageUpdateDialog(messageCache.getMessagesNotificationType().getCode())) {
+            resultMessage = ChatNotificationUtils.getResourceBodyForNotificationType(context, messageCache.getMessagesNotificationType(), messageCache);
         } else {
             if (!TextUtils.isEmpty(messageCache.getMessage())) {
                 resultMessage = Html.fromHtml(messageCache.getMessage()).toString();

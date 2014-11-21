@@ -106,7 +106,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onFileLoaded(QBFile file) {
         try {
-            ((QBPrivateChatHelper) chatHelper).sendPrivateMessageWithAttachImage(file,
+            ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessageWithAttachImage(file,
                     opponentFriend.getUserId());
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
@@ -208,7 +208,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     public void sendMessageOnClick(View view) {
         try {
-            ((QBPrivateChatHelper) chatHelper).sendPrivateMessage(messageEditText.getText().toString(),
+            ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(messageEditText.getText().toString(),
                     opponentFriend.getUserId());
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);

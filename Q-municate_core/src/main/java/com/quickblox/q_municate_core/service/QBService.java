@@ -57,7 +57,7 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
-import com.quickblox.q_municate_core.qb.helpers.BaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.BaseHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
@@ -280,8 +280,8 @@ public class QBService extends Service {
     }
 
     private void registerDeleteDialogCommand() {
-        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        ServiceCommand deleteDialogCommand = new QBDeleteDialogCommand(this, chatRestHelper,
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+        ServiceCommand deleteDialogCommand = new QBDeleteDialogCommand(this, multiChatHelper,
                 QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.DELETE_DIALOG_ACTION, deleteDialogCommand);
     }
@@ -450,9 +450,8 @@ public class QBService extends Service {
     }
 
     private void registerLoadChatsDialogsCommand() {
-        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
         QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
-        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, chatRestHelper, multiChatHelper,
+        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, multiChatHelper,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
@@ -467,9 +466,9 @@ public class QBService extends Service {
     }
 
     private void registerLoadDialogMessagesCommand() {
-        QBChatRestHelper chatHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
         QBLoadDialogMessagesCommand loadDialogMessagesCommand = new QBLoadDialogMessagesCommand(this,
-                chatHelper, QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION,
+                multiChatHelper, QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
         serviceCommandMap.put(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, loadDialogMessagesCommand);
     }
@@ -590,8 +589,8 @@ public class QBService extends Service {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
             if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-                ((BaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((BaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
+                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
+                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
             }
         }

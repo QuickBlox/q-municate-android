@@ -142,7 +142,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     protected void setViewVisibility(View view, int visibility) {
-        view.setVisibility(visibility);
+        if (view != null) {
+            view.setVisibility(visibility);
+        }
     }
 
     @Override

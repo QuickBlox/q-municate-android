@@ -21,7 +21,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
@@ -77,7 +77,8 @@ public class QBFriendListHelper extends BaseHelper {
         if (isNotInvited(userId)) {
             sendInvitation(userId);
 
-            QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+            QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(
+                    context);
             sendNotificationToFriend(chatMessage, userId);
         }
     }
@@ -86,27 +87,20 @@ public class QBFriendListHelper extends BaseHelper {
         createFriend(userId);
         sendInvitation(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
     private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = createPrivateDialog(userId);
+        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
         privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
-    }
-
-    private QBDialog createPrivateDialog(int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
-        if (existingPrivateDialog == null) {
-            existingPrivateDialog = privateChatHelper.createPrivateChatOnRest(userId);
-        }
-        return existingPrivateDialog;
     }
 
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForAcceptFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForAcceptFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -115,7 +109,8 @@ public class QBFriendListHelper extends BaseHelper {
         clearRosterEntry(userId);
         deleteFriend(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRejectFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRejectFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -131,7 +126,8 @@ public class QBFriendListHelper extends BaseHelper {
         clearRosterEntry(userId);
         deleteFriend(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRemoveFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 

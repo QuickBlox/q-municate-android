@@ -17,23 +17,24 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.mediacall.CallActivity;
-import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -47,6 +48,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView phoneTextView;
     private View phoneView;
 
+    private QBPrivateChatHelper privateChatHelper;
     private User friend;
     private Cursor friendCursor;
     private ContentObserver statusContentObserver;
@@ -85,17 +87,17 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         statusContentObserver = new ContentObserver(new Handler()) {
 
             @Override
+            public boolean deliverSelfNotifications() {
+                return true;
+            }
+
+            @Override
             public void onChange(boolean selfChange) {
-                if (FriendDetailsActivity.this.friend !=null) {
+                if (FriendDetailsActivity.this.friend != null) {
                     friend = UsersDatabaseManager.getUserById(FriendDetailsActivity.this,
                             FriendDetailsActivity.this.friend.getUserId());
                     setOnlineStatus(friend);
                 }
-            }
-
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
             }
         };
         friendCursor.registerContentObserver(statusContentObserver);
@@ -110,8 +112,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
     }
 
     private void initUIWithFriendsData() {
@@ -122,9 +122,37 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     @Override
+    public void onConnectedToService(QBService service) {
+        if (privateChatHelper == null) {
+            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterStatusChangingObserver();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.friend_details_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_delete:
+                showRemoveUserDialog();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void setName() {
@@ -155,27 +183,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private void loadAvatar() {
         String url = friend.getAvatarUrl();
         ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.friend_details_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            case R.id.action_delete:
-                showRemoveUserDialog();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     private void showRemoveUserDialog() {
@@ -224,12 +231,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     public void chatClickListener(View view) {
         if (checkFriendStatus(friend.getUserId())) {
-            QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
-            if (existingPrivateDialog != null) {
+            try {
+                QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(
+                        friend.getUserId());
                 PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
-            } else {
-                showProgress();
-                QBCreatePrivateChatCommand.start(this, friend);
+            } catch (QBResponseException e) {
+                ErrorUtils.showError(this, e);
             }
         }
     }
@@ -239,27 +246,13 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
-    private class CreateChatSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            if (dialog != null) {
-                PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);
-                finish();
-            } else {
-                ErrorUtils.showError(FriendDetailsActivity.this, getString(R.string.dlg_fail_create_chat));
-            }
-        }
-    }
-
     private class RemoveFriendSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
             deleteDialog();
-            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed, friend.getFullName()));
+            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed,
+                    friend.getFullName()));
             finish();
         }
     }

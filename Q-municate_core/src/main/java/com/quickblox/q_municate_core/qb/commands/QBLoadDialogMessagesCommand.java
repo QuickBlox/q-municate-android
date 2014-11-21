@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -15,12 +16,12 @@ import java.util.List;
 
 public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
-    private QBChatRestHelper chatRestHelper;
+    private QBBaseChatHelper baseChatHelper;
 
-    public QBLoadDialogMessagesCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
+    public QBLoadDialogMessagesCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
-        this.chatRestHelper = chatRestHelper;
+        this.baseChatHelper = baseChatHelper;
     }
 
     public static void start(Context context, QBDialog dialog, long lastDateLoad) {
@@ -35,7 +36,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
-        List<QBChatHistoryMessage> dialogMessagesList = chatRestHelper.getDialogMessages(dialog, lastDateLoad);
+        List<QBChatHistoryMessage> dialogMessagesList = baseChatHelper.getDialogMessages(dialog, lastDateLoad);
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
                 (java.io.Serializable) dialogMessagesList);

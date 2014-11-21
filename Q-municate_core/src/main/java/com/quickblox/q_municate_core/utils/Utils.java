@@ -122,7 +122,6 @@ public class Utils {
         try {
             value = jsonObject.getString(key);
         } catch (JSONException e) {
-            ErrorUtils.logError(e);
         }
 
         return value;

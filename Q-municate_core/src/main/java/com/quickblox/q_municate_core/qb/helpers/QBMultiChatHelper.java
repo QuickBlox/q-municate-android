@@ -2,14 +2,10 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
-import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChat;
-import com.quickblox.chat.exception.QBChatException;
-import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -23,11 +19,12 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriendsTask;
+import com.quickblox.q_municate_core.utils.FindUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
@@ -40,24 +37,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QBMultiChatHelper extends BaseChatHelper {
+public class QBMultiChatHelper extends QBBaseChatHelper {
 
     private static final String TAG = QBMultiChatHelper.class.getSimpleName();
-    private QBGroupChatManager groupChatManager;
-    private QBGroupChat groupChat;
-    private RoomChatMessageListener roomChatMessageListener = new RoomChatMessageListener();
-    private QBNotificationChatListener notificationChatListener = new RoomNotificationListener();
-    private QBDialog currentDialog;
+
+    private QBNotificationChatListener notificationChatListener;
     private List<QBDialog> groupDialogsList;
 
     public QBMultiChatHelper(Context context) {
         super(context);
+        notificationChatListener = new GroupChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
     }
 
     @Override
     public QBChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
-        QBGroupChat roomChat = createChatIfNotExist(dialog);
+        QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         currentDialog = dialog;
         return roomChat;
     }
@@ -67,28 +62,53 @@ public class QBMultiChatHelper extends BaseChatHelper {
         currentDialog = null;
     }
 
-    public void sendGroupMessage(String roomJidId, String message) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessage(message, null);
-        sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
-    }
-
     public void init(QBUser user) {
         super.init(user);
-        groupChatManager = chatService.getGroupChatManager();
     }
 
-    private void sendRoomMessage(QBChatMessage chatMessage, String roomJId,
+    @Override
+    protected void onGroupMessageReceived(QBGroupChat groupChat, QBChatMessage chatMessage) {
+        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
+
+        MessageCache messageCache;
+
+        if (user == null) {
+            user = ChatUtils.getTempUserFromChatMessage(chatMessage);
+        }
+
+        messageCache = parseReceivedMessage(chatMessage);
+
+        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+            messageCache.setMessagesNotificationType(ChatNotificationUtils.getNotificationMessageType(
+                    chatMessage));
+            messageCache.setMessage(ChatNotificationUtils.getNotificationMessage(context, chatMessage));
+        }
+
+        saveMessageToCache(messageCache);
+
+        if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
+            // TODO IS handle logic when friend is not in the friend list
+            notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), false);
+        }
+    }
+
+    public void sendGroupMessage(String roomJidId, String message) throws QBResponseException {
+        QBChatMessage chatMessage = getQBChatMessage(message, null);
+        sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
+    }
+
+    private void sendGroupMessage(QBChatMessage chatMessage, String roomJId,
             String dialogId) throws QBResponseException {
-        groupChat = groupChatManager.getGroupChat(roomJId);
+        QBGroupChat groupChat = groupChatManager.getGroupChat(roomJId);
         QBDialog existingDialog = null;
         if (groupChat == null) {
-            existingDialog = ChatUtils.getExistDialogById(context, dialogId);
+            existingDialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
             groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
         String error = null;
-        if (!TextUtils.isEmpty(dialogId)) {
-            chatMessage.setProperty(ChatUtils.PROPERTY_DIALOG_ID, dialogId);
-        }
+
+        addNecessaryPropertyForQBChatMessage(chatMessage, dialogId);
+
         try {
             groupChat.sendMessage(chatMessage);
         } catch (XMPPException e) {
@@ -105,9 +125,9 @@ public class QBMultiChatHelper extends BaseChatHelper {
     }
 
     public void sendGroupMessageWithAttachImage(String roomJidId, QBFile file) throws QBResponseException {
-        QBChatMessage chatMessage = getQBChatMessage(context.getString(
-                R.string.dlg_attached_last_message), file);
-        sendRoomMessage(chatMessage, roomJidId, currentDialog.getDialogId());
+        QBChatMessage chatMessage = getQBChatMessage(context.getString(R.string.dlg_attached_last_message),
+                file);
+        sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
     private void tryJoinRoomChat(QBDialog dialog) {
@@ -139,8 +159,7 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    public QBDialog createGroupChat(String name,
-                                    List<Integer> friendIdsList) throws Exception {
+    public QBDialog createGroupChat(String name, List<Integer> friendIdsList) throws Exception {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
 
         QBDialog dialogToCreate = new QBDialog();
@@ -151,24 +170,26 @@ public class QBMultiChatHelper extends BaseChatHelper {
         QBDialog dialog = groupChatManager.createDialog(dialogToCreate);
 
         joinRoomChat(dialog);
-        inviteFriendsToRoom(dialog, friendIdsList);
-        saveDialogToCache(context, dialog);
+
+        saveDialogToCache(dialog);
+
+        notifyFriendsAboutCreatingGroupChat(dialog, friendIdsList);
+
         return dialog;
     }
 
-    private void inviteFriendsToRoom(QBDialog dialog,
+    private void notifyFriendsAboutCreatingGroupChat(QBDialog dialog,
             List<Integer> friendIdsList) throws Exception {
         for (Integer friendId : friendIdsList) {
             try {
-                notifyFriendAboutInvitation(dialog, friendId);
-            } catch (QBResponseException responseException) {
-
+                notifyFriendAboutCreatingGroupChat(dialog, friendId);
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
             }
         }
     }
 
-    private void notifyFriendsRoomUpdate(QBDialog dialog,
-            List<Integer> friendIdsList) {
+    private void notifyFriendsRoomUpdate(QBDialog dialog, List<Integer> friendIdsList) {
         for (Integer friendId : friendIdsList) {
             try {
                 notifyFriendOnUpdateChat(dialog, friendId);
@@ -182,44 +203,40 @@ public class QBMultiChatHelper extends BaseChatHelper {
         }
     }
 
-    private void notifyFriendAboutInvitation(QBDialog dialog, Integer friendId) throws Exception {
+    private void notifyFriendAboutCreatingGroupChat(QBDialog dialog, Integer friendId) throws Exception {
+        QBChatMessage chatMessage = ChatNotificationUtils.messageToPrivateChatAboutCreatingGroupChat(context,
+                dialog);
+        sendPrivateMessage(chatMessage, friendId, dialog.getDialogId());
+    }
+
+    private void notifyFriendOnUpdateChat(QBDialog dialog,
+            Integer friendId) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
         long time = DateUtilsCore.getCurrentTime();
         QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
         if (chat == null) {
             chat = chatService.getPrivateChatManager().createChat(friendId, null);
         }
-        QBChatMessage chatMessage = ChatUtils.createRoomNotificationMessage(context, dialog);
-        chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
+        QBChatMessage chatMessage = ChatNotificationUtils.createUpdateChatNotificationMessage(dialog);
+        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
         chat.sendMessage(chatMessage);
     }
 
-    private void notifyFriendOnUpdateChat(QBDialog dialog, Integer friendId) throws QBResponseException, XMPPException, SmackException.NotConnectedException {
-        long time = DateUtilsCore.getCurrentTime();
-        QBPrivateChat chat = chatService.getPrivateChatManager().getChat(friendId);
-        if (chat == null) {
-            chat = chatService.getPrivateChatManager().createChat(friendId, null);
-        }
-        QBChatMessage chatMessage = ChatUtils.createUpdateChatNotificationMessage(dialog);
-        chatMessage.setProperty(ChatUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
-        chat.sendMessage(chatMessage);
-    }
-
-    private QBGroupChat createChatIfNotExist(QBDialog dialog) throws QBResponseException {
+    private QBGroupChat createGroupChatIfNotExist(QBDialog dialog) throws QBResponseException {
         boolean notNull = Utils.validateNotNull(groupChatManager);
-        if( !notNull){
+        if (!notNull) {
             ErrorUtils.logError(TAG, " groupChatManager is NULL");
             throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
         }
-        groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
+        QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
         if (groupChat == null) {
             groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
-            groupChat.addMessageListener(roomChatMessageListener);
+            groupChat.addMessageListener(groupChatMessageListener);
         }
         return groupChat;
     }
 
     public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
-        QBGroupChat roomChat = createChatIfNotExist(dialog);
+        QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         if (!roomChat.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();
             history.setMaxStanzas(0);
@@ -247,28 +264,26 @@ public class QBMultiChatHelper extends BaseChatHelper {
         groupChatManager.getGroupChat(roomJid).leave();
         List<Integer> userIdsList = new ArrayList<Integer>();
         userIdsList.add(chatCreator.getId());
-        removeUsersFromRoom(roomJid, userIdsList);
+        removeUsersFromDialog(roomJid, userIdsList);
 
         ChatDatabaseManager.deleteDialogByDialogId(context, roomJid);
     }
 
-    public void addUsersToRoom(String dialogId, List<Integer> userIdsList) throws Exception {
+    public void addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
-        requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
-                userIdsList.toArray());
+        requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
 
-        inviteFriendsToRoom(dialog, userIdsList);
+        notifyFriendsAboutCreatingGroupChat(dialog, userIdsList);
     }
 
-    public void removeUsersFromRoom(String roomJid, List<Integer> userIdsList) throws QBResponseException {
+    public void removeUsersFromDialog(String roomJid, List<Integer> userIdsList) throws QBResponseException {
         QBDialog dialog = ChatDatabaseManager.getDialogByRoomJid(context, roomJid);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
-        requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS,
-                userIdsList.toArray());
+        requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
         updateDialog(dialog, requestBuilder);
     }
 
@@ -282,7 +297,8 @@ public class QBMultiChatHelper extends BaseChatHelper {
         return updateDialog(dialog, (QBRequestUpdateBuilder) null);
     }
 
-    private QBDialog updateDialog(QBDialog dialog, QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
+    private QBDialog updateDialog(QBDialog dialog,
+            QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = groupChatManager.updateDialog(dialog, requestBuilder);
         ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
         friendsList.remove(chatCreator.getId());
@@ -291,84 +307,36 @@ public class QBMultiChatHelper extends BaseChatHelper {
         return updatedDialog;
     }
 
-    public void sendNotificationToFriends(QBDialog dialog, MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) throws QBResponseException {
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForUpdateDialog(context, dialog, messagesNotificationType, addedFriendIdsList);
-        sendRoomMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
+    public void sendNotificationToFriends(QBDialog dialog, MessagesNotificationType messagesNotificationType,
+            Collection<Integer> addedFriendIdsList) throws QBResponseException {
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForUpdateDialog(context,
+                dialog, messagesNotificationType, addedFriendIdsList);
+        sendGroupMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
     }
 
     private void createDialogByNotification(QBChatMessage chatMessage) {
         long time;
         String roomJidId;
         time = DateUtilsCore.getCurrentTime();
-        QBDialog dialog = ChatUtils.parseDialogFromMessage(context, chatMessage, chatMessage.getBody(), time);
+        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                chatMessage.getBody(), time, QBDialogType.GROUP);
         roomJidId = dialog.getRoomJid();
         if (roomJidId != null && !QBDialogType.PRIVATE.equals(dialog.getType())) {
             tryJoinRoomChat(dialog);
-            new FindUnknownFriendsTask(context).execute(null, dialog);
-            saveDialogToCache(context, dialog);
+            new FindUnknownFriends(context, chatCreator, dialog).find();
+            saveDialogToCache(dialog);
         }
     }
 
-    private class RoomChatMessageListener implements QBMessageListener<QBGroupChat> {
-
-        @Override
-        public void processMessage(QBGroupChat groupChat, QBChatMessage chatMessage) {
-            onRoomMessageReceived(groupChat, chatMessage);
-        }
-
-        @Override
-        public void processError(QBGroupChat groupChat, QBChatException error, QBChatMessage originMessage){
-
-        }
-
-        @Override
-        public void processMessageDelivered(QBGroupChat groupChat, String messageID){
-            // never called
-        }
-
-        @Override
-        public void processMessageRead(QBGroupChat groupChat, String messageID){
-            // never called
-        }
-    }
-
-    private void onRoomMessageReceived(QBGroupChat groupChat, QBChatMessage chatMessage) {
-        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
-        String attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
-        String dialogId = chatMessage.getProperty(ChatUtils.PROPERTY_DIALOG_ID);
-        long time = Long.parseLong(chatMessage.getProperty(ChatUtils.PROPERTY_DATE_SENT).toString());
-        String messageId = chatMessage.getProperty(ChatUtils.PROPERTY_MESSAGE_ID).toString();
-        MessageCache messageCache;
-
-        if(user == null) {
-            user = new User();
-            user.setUserId(chatMessage.getSenderId());
-            user.setFullName(chatMessage.getSenderId() + ConstsCore.EMPTY_STRING);
-        }
-
-        messageCache = new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
-                chatMessage.getBody(), attachUrl, time, false, false, false);
-
-        if (ChatUtils.isNotificationMessage(chatMessage)) {
-            messageCache.setMessagesNotificationType(ChatUtils.getNotificationMessageType(chatMessage));
-            messageCache.setMessage(ChatUtils.getNotificationMessage(context, chatMessage));
-        }
-
-        saveMessageToCache(messageCache);
-
-        if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
-            // TODO IS handle logic when friend is not in the friend list
-            notifyMessageReceived(chatMessage, user, dialogId, false);
-        }
-    }
-
-    private class RoomNotificationListener implements QBNotificationChatListener {
+    private class GroupChatNotificationListener implements QBNotificationChatListener {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_CREATE_CHAT.equals(notificationType)) {
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(
+                    notificationType)) {
                 createDialogByNotification(chatMessage);
-            } else if (ChatUtils.PROPERTY_NOTIFICATION_TYPE_UPDATE_CHAT.equals(notificationType)) {
+            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(
+                    notificationType)) {
                 updateDialogByNotification(chatMessage);
             }
         }

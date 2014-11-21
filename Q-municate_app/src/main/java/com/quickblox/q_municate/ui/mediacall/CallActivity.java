@@ -109,7 +109,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onConnectedToService(QBService service) {
         if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            videoChatHelper = (QBVideoChatHelper) getService().getHelper(QBService.VIDEO_CHAT_HELPER);
+            videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
             signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();

@@ -7,15 +7,15 @@ import android.os.Bundle;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.MessageCache;
-import com.quickblox.q_municate_core.qb.helpers.BaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
 public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
-    private BaseChatHelper baseChatHelper;
+    private QBBaseChatHelper baseChatHelper;
 
-    public QBUpdateStatusMessageCommand(Context context, BaseChatHelper baseChatHelper, String successAction,
+    public QBUpdateStatusMessageCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.baseChatHelper = baseChatHelper;

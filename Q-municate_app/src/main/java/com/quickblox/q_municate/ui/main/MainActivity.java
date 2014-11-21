@@ -18,14 +18,12 @@ import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.DialogsFragment;
-import com.quickblox.q_municate_core.utils.FindUnknownFriendsTask;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
@@ -33,12 +31,9 @@ import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
 import com.quickblox.q_municate.ui.invitefriends.InviteFriendsFragment;
 import com.quickblox.q_municate.ui.settings.SettingsFragment;
-import com.quickblox.q_municate_core.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-
-import java.util.ArrayList;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -252,13 +247,13 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 startDialog();
             }
 
-            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
-                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (parcelableDialogsList != null && !parcelableDialogsList.isEmpty()) {
-                ArrayList<QBDialog> dialogsList = ChatDialogUtils.parcelableDialogsToDialogs(
-                        parcelableDialogsList);
-                new FindUnknownFriendsTask(MainActivity.this).execute(dialogsList, null);
-            }
+//            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
+//                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
+//            if (parcelableDialogsList != null && !parcelableDialogsList.isEmpty()) {
+//                ArrayList<QBDialog> dialogsList = ChatDialogUtils.parcelableDialogsToDialogs(
+//                        parcelableDialogsList);
+//                new FindUnknownFriendsTask(MainActivity.this).execute(dialogsList, null);
+//            }
         }
     }
 

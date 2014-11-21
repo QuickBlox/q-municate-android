@@ -96,7 +96,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onFileLoaded(QBFile file) {
         try {
-            ((QBMultiChatHelper) chatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            ((QBMultiChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
@@ -172,7 +172,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     public void sendMessageOnClick(View view) {
         try {
-            ((QBMultiChatHelper) chatHelper).sendGroupMessage(dialog.getRoomJid(),
+            ((QBMultiChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
                     messageEditText.getText().toString());
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);

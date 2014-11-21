@@ -28,31 +28,31 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
-import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.helpers.BaseChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.io.File;
 import java.util.Timer;
@@ -60,7 +60,8 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener,
+        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
 
@@ -78,7 +79,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected BaseCursorAdapter messagesAdapter;
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
-    protected BaseChatHelper chatHelper;
+    protected QBBaseChatHelper baseChatHelper;
     protected User opponentFriend;
 
     private int keyboardHeight;
@@ -141,12 +142,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         hideSmileLayout();
     }
 
-    private void initLocalBroadcastManagers() {
-        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -166,11 +161,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         createChatLocally();
     }
 
+    private void initLocalBroadcastManagers() {
+        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+    }
+
     protected void createChatLocally() {
-        if (chatHelper == null) {
-            chatHelper = (BaseChatHelper) getService().getHelper(chatHelperIdentifier);
+        if (baseChatHelper == null) {
+            baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {
-                chatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+                baseChatHelper.createChatLocally(dialog, generateBundleToInitDialog());
             } catch (QBResponseException e) {
                 ErrorUtils.showError(this, e.getMessage());
                 finish();
@@ -247,8 +248,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (chatHelper != null) {
-            chatHelper.closeChat(dialog, generateBundleToInitDialog());
+        if (baseChatHelper != null) {
+            baseChatHelper.closeChat(dialog, generateBundleToInitDialog());
         }
         removeActions();
     }
@@ -352,7 +353,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 hideSmileLayout();
 
                 // TODO: now it is possible only for Private chats
-                if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                     if (!isTypingNow) {
                         startTypingMessage();
                     }
@@ -370,7 +371,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 setSendButtonVisibility(charSequence);
 
                 // TODO: now it is possible only for Private chats
-                if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                     if (!isTypingNow) {
                         startTypingMessage();
                     }
@@ -415,22 +416,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         typingTimer.schedule(new TypingTimerTask(), TYPING_DELAY);
     }
 
-    private class TypingTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            stopTypingMessage();
-        }
-    }
-
     private void startTypingMessage() {
         isTypingNow = true;
-        chatHelper.sendIsTypingToServer(opponentFriend.getUserId());
+        baseChatHelper.sendIsTypingToServer(opponentFriend.getUserId());
     }
 
     private void stopTypingMessage() {
         isTypingNow = false;
-        chatHelper.sendStopTypingToServer(opponentFriend.getUserId());
+        baseChatHelper.sendStopTypingToServer(opponentFriend.getUserId());
     }
 
     private void initKeyboardHeight() {
@@ -481,6 +474,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         } else {
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
+
+    private class TypingTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            stopTypingMessage();
         }
     }
 
@@ -543,7 +544,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             // TODO: now it is possible only for Private chats
-            if(QBDialogType.PRIVATE.equals(dialog.getType())) {
+            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                 boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
                 if (isTyping) {
                     startMessageTypingAnimation();

@@ -176,10 +176,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     }
 
-    public QBService getService() {
-        return activityHelper.service;
-    }
-
     public class FailAction implements Command {
 
         @Override

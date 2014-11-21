@@ -140,22 +140,22 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         return true;
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.action_delete:
-                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-                deleteDialog(dialog);
-                break;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item) {
+//        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        switch (item.getItemId()) {
+//            case R.id.action_delete:
+//                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
+//                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
+//                deleteDialog(dialog);
+//                break;
+//        }
+//        return true;
+//    }
 
-    private void deleteDialog(QBDialog dialog) {
-        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
-    }
+//    private void deleteDialog(QBDialog dialog) {
+//        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
+//    }
 
     private void initChatsDialogs(Cursor dialogsCursor) {
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
@@ -197,12 +197,12 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         baseActivity.updateBroadcastActionList();
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, view, menuInfo);
-        MenuInflater menuInflater = baseActivity.getMenuInflater();
-        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
-    }
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, view, menuInfo);
+//        MenuInflater menuInflater = baseActivity.getMenuInflater();
+//        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
+//    }
 
     private class LoadChatsDialogsSuccessAction implements Command {
 
