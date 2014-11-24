@@ -47,14 +47,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
     }
 
-    public QBDialog createPrivateDialogIfNotExist(int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
-        if (existingPrivateDialog == null) {
-            existingPrivateDialog = createPrivateChatOnRest(userId);
-        }
-        return existingPrivateDialog;
-    }
-
     private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
         QBChatMessage chatMessage;
         chatMessage = getQBChatMessage(message, file);
@@ -110,12 +102,12 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
                 dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 
-    public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
-        QBDialog dialog = privateChatManager.createDialog(opponentId);
-        saveDialogToCache(dialog);
-        //        notifyFriendCreatedPrivateChat(dialog, opponentId);
-        return dialog;
-    }
+//    public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
+//        QBDialog dialog = privateChatManager.createDialog(opponentId);
+//        saveDialogToCache(dialog);
+//        //        notifyFriendCreatedPrivateChat(dialog, opponentId);
+//        return dialog;
+//    }
 
     public QBFile loadAttachFile(File inputFile) throws Exception {
         QBFile file = null;
@@ -133,10 +125,13 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         MessageCache messageCache = parseReceivedMessage(chatMessage);
         messageCache.setMessagesNotificationType(type);
 
+        String lastMessage = ChatNotificationUtils.getBodyForFriendsNotificationMessage(context, type, messageCache);
+
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, chatMessage.getDialogId());
 
         if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                    lastMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(),
                     chatMessage.getSenderId());
             dialog.setOccupantsIds(occupantsIdsList);

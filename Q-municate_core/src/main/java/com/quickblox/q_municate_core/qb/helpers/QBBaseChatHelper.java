@@ -35,7 +35,7 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriends;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class QBBaseChatHelper extends BaseHelper {
+
+    private static final String TAG = QBBaseChatHelper.class.getSimpleName();
 
     protected QBChatService chatService;
     protected QBUser chatCreator;
@@ -73,7 +75,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void saveMessageToCache(MessageCache messageCache) {
-        ChatDatabaseManager.saveChatMessage(context, messageCache, false);
+        ChatDatabaseManager.saveChatMessageGlobal(context, messageCache);
     }
 
     /*
@@ -107,7 +109,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String error = null;
         try {
             privateChat.sendMessage(chatMessage);
-        }catch (XMPPException e){
+        } catch (XMPPException e) {
             error = context.getString(R.string.dlg_fail_connection);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
@@ -127,15 +129,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     private void savePrivateMessageToCache(QBChatMessage chatMessage, String dialogId) {
         String messageId = chatMessage.getId();
-        long time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT).toString());
-        String attachUrl = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(chatMessage.getAttachments()));
+        long time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT)
+                .toString());
+        String attachUrl = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(
+                chatMessage.getAttachments()));
 
         MessageCache messageCache = new MessageCache(messageId, dialogId, chatCreator.getId(),
                 chatMessage.getBody(), attachUrl, time, false, false, true);
 
-        int friendsMessageTypeCode = ChatNotificationUtils.getNotificationTypeIfExsist(chatMessage);
-
-        if (ChatNotificationUtils.isFriendsMessageTypeCode(friendsMessageTypeCode)) {
+        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+            int friendsMessageTypeCode = ChatNotificationUtils.getNotificationTypeIfExist(chatMessage);
             messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
                     friendsMessageTypeCode));
         }
@@ -209,7 +212,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
 
         chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
-        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY, ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY,
+                ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
 
         return chatMessage;
     }
@@ -284,6 +288,34 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return privateChat;
     }
 
+    public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
+        QBDialog dialog = privateChatManager.createDialog(opponentId);
+        saveDialogToCache(dialog);
+        return dialog;
+    }
+
+    public QBDialog createPrivateDialogIfNotExist(int userId) throws QBResponseException {
+        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
+        if (existingPrivateDialog == null) {
+            existingPrivateDialog = createPrivateChatOnRest(userId);
+        }
+        return existingPrivateDialog;
+    }
+
+    protected QBGroupChat createGroupChatIfNotExist(QBDialog dialog) throws QBResponseException {
+        boolean notNull = Utils.validateNotNull(groupChatManager);
+        if (!notNull) {
+            ErrorUtils.logError(TAG, " groupChatManager is NULL");
+            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
+        }
+        QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
+        if (groupChat == null) {
+            groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
+            groupChat.addMessageListener(groupChatMessageListener);
+        }
+        return groupChat;
+    }
+
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
             boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
@@ -308,15 +340,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         Intent intent = new Intent(QBServiceConsts.TYPING_MESSAGE);
         intent.putExtra(QBServiceConsts.EXTRA_IS_TYPING, isTyping);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    protected void updateDialogByNotification(QBChatMessage chatMessage) {
-        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                QBDialogType.GROUP);
-        if (dialog != null) {
-            new FindUnknownFriends(context, chatCreator, dialog).find();
-            saveDialogToCache(dialog);
-        }
     }
 
     protected MessageCache parseReceivedMessage(QBChatMessage chatMessage) {

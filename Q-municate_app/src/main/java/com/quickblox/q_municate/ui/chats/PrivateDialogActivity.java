@@ -26,6 +26,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
@@ -35,6 +36,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -168,16 +170,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        if (messageCache.getMessagesNotificationType() == null) {
+        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+
+        if (messagesNotificationType == null) {
             dialog.setLastMessage(messageCache.getMessage());
-        } else {
-            dialog.setLastMessage(getResources().getString(R.string.notification_message));
+        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
+            dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
+        } else if (ChatNotificationUtils.isUpdateDialogNotificationMessage(messagesNotificationType.getCode())) {
+            dialog.setLastMessage(messageCache.getMessage());
         }
 
         dialog.setLastMessageDateSent(messageCache.getTime());
         dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
         dialog.setLastMessageUserId(messageCache.getSenderId());
         dialog.setType(QBDialogType.PRIVATE);
+
         return dialog;
     }
 
