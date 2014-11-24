@@ -133,7 +133,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         if (messagesNotificationType == null) {
             dialog.setLastMessage(messageCache.getMessage());
-        } else if (ChatNotificationUtils.isUpdateDialogNotificationMessage(messagesNotificationType.getCode())) {
+        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
             dialog.setLastMessage(messageCache.getMessage());
         }
 

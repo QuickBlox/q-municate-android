@@ -176,7 +176,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             dialog.setLastMessage(messageCache.getMessage());
         } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
             dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
-        } else if (ChatNotificationUtils.isUpdateDialogNotificationMessage(messagesNotificationType.getCode())) {
+        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
             dialog.setLastMessage(messageCache.getMessage());
         }
 

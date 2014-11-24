@@ -58,8 +58,16 @@ public class ChatNotificationUtils {
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
         dialog.setPhoto(photoUrl);
-        dialog.setName(dialogName);
         dialog.setType(dialogType);
+
+        if (TextUtils.isEmpty(dialogName)) {
+            if (QBDialogType.PRIVATE.equals(dialogType)) {
+                dialog.setName(ChatUtils.getFullNamesFromOpponentId(context,
+                        AppSession.getSession().getUser(), occupantsIds));
+            } else {
+                dialog.setName(ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds));
+            }
+        }
 
         if (!TextUtils.isEmpty(occupantsIds)) {
             dialog.setOccupantsIds(ChatUtils.getOccupantsIdsListFromString(occupantsIds));
@@ -91,8 +99,7 @@ public class ChatNotificationUtils {
     }
 
     public static QBChatMessage messageToPrivateChatAboutCreatingGroupChat(Context context, QBDialog dialog) {
-        String occupantsIds = ChatUtils.getOccupantsIdsStringFromList(ChatUtils.getOccupantIdsWithoutUser(
-                dialog.getOccupants()));
+        String occupantsIds = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
 
         QBUser user = AppSession.getSession().getUser();
 
@@ -100,34 +107,7 @@ public class ChatNotificationUtils {
         chatMessage.setBody(context.getResources().getString(R.string.user_created_room, user.getFullName()));
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE);
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
-
-        return chatMessage;
-    }
-
-    public static QBChatMessage createChatNotificationMessageForCreating(QBDialog dialog) {
-        String occupantsIds = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
-
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
-        chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
-
-        return chatMessage;
-    }
-
-    public static QBChatMessage createUpdateChatNotificationMessage(QBDialog dialog) {
-        String occupantsIds = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
-        String dialogName = dialog.getName();
-        String photoUrl = dialog.getPhoto();
-
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
-        chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
-        if (!TextUtils.isEmpty(dialogName)) {
-            chatMessage.setProperty(PROPERTY_ROOM_NAME, dialogName);
-        }
-        if (!TextUtils.isEmpty(photoUrl)) {
-            chatMessage.setProperty(PROPERTY_ROOM_PHOTO, photoUrl);
-        }
+        chatMessage.setProperty(PROPERTY_ROOM_JID, dialog.getRoomJid());
 
         return chatMessage;
     }
@@ -139,72 +119,6 @@ public class ChatNotificationUtils {
                     PROPERTY_NOTIFICATION_TYPE).toString());
         }
         return friendsMessageTypeCode;
-    }
-
-    public static QBChatMessage createNotificationMessageForFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
-                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST);
-    }
-
-    public static QBChatMessage createNotificationMessageForAcceptFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
-                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT);
-    }
-
-    public static QBChatMessage createNotificationMessageForRejectFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
-                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT);
-    }
-
-    public static QBChatMessage createNotificationMessageForRemoveFriendsRequest(Context context) {
-        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
-                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE);
-    }
-
-    private static QBChatMessage createChatMessageForFriendsRequests(Context context, int messageResourceId,
-            String requestType) {
-        QBUser user = AppSession.getSession().getUser();
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setBody(context.getResources().getString(messageResourceId, user.getFullName()));
-        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, requestType);
-        return chatMessage;
-    }
-
-    public static QBChatMessage createNotificationMessageForUpdateDialog(Context context, QBDialog dialog,
-            MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) {
-        QBUser user = AppSession.getSession().getUser();
-        QBChatMessage chatMessage = new QBChatMessage();
-        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
-        chatMessage.setBody(context.getResources().getString(R.string.notification_message));
-
-        switch (messagesNotificationType) {
-            case ADDED_DIALOG: {
-                chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
-                        addedFriendIdsList));
-                break;
-            }
-            case NAME_DIALOG: {
-                chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
-                break;
-            }
-            case PHOTO_DIALOG: {
-                chatMessage.setProperty(PROPERTY_ROOM_PHOTO, dialog.getPhoto());
-                break;
-            }
-            case LEAVE_DIALOG: {
-                chatMessage.setProperty(PROPERTY_ROOM_LEAVE, user.getId() + ConstsCore.EMPTY_STRING);
-                break;
-            }
-            case CREATE_DIALOG: {
-                chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
-                        addedFriendIdsList));
-                break;
-            }
-        }
-
-        return chatMessage;
     }
 
     public static boolean isNotificationMessage(QBChatMessage chatMessage) {
@@ -220,7 +134,7 @@ public class ChatNotificationUtils {
     }
 
     public static String getBodyForFriendsNotificationMessage(Context context,
-            MessagesNotificationType messagesNotificationType, MessageCache messageCache) {
+                                                              MessagesNotificationType messagesNotificationType, MessageCache messageCache) {
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.notification_message);
         QBUser user = AppSession.getSession().getUser();
@@ -258,7 +172,73 @@ public class ChatNotificationUtils {
         return resultMessage;
     }
 
-    public static MessagesNotificationType getNotificationMessageType(QBMessage chatMessage) {
+    public static QBChatMessage createNotificationMessageForFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
+                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST);
+    }
+
+    public static QBChatMessage createNotificationMessageForAcceptFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
+                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT);
+    }
+
+    public static QBChatMessage createNotificationMessageForRejectFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
+                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT);
+    }
+
+    public static QBChatMessage createNotificationMessageForRemoveFriendsRequest(Context context) {
+        return createChatMessageForFriendsRequests(context, R.string.frl_friends_contact_request,
+                PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE);
+    }
+
+    private static QBChatMessage createChatMessageForFriendsRequests(Context context, int messageResourceId,
+            String requestType) {
+        QBUser user = AppSession.getSession().getUser();
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setBody(context.getResources().getString(messageResourceId, user.getFullName()));
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, requestType);
+        return chatMessage;
+    }
+
+    public static QBChatMessage createNotificationMessageForUpdateChat(Context context, QBDialog dialog,
+                                                                       MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) {
+        QBUser user = AppSession.getSession().getUser();
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
+        chatMessage.setBody(context.getResources().getString(R.string.notification_message));
+
+        switch (messagesNotificationType) {
+            case ADDED_DIALOG: {
+                chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
+                        addedFriendIdsList));
+                break;
+            }
+            case NAME_DIALOG: {
+                chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
+                break;
+            }
+            case PHOTO_DIALOG: {
+                chatMessage.setProperty(PROPERTY_ROOM_PHOTO, dialog.getPhoto());
+                break;
+            }
+            case LEAVE_DIALOG: {
+                chatMessage.setProperty(PROPERTY_ROOM_LEAVE, user.getId() + ConstsCore.EMPTY_STRING);
+                break;
+            }
+            case CREATE_DIALOG: {
+                chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
+                        addedFriendIdsList));
+                break;
+            }
+        }
+
+        return chatMessage;
+    }
+
+    public static MessagesNotificationType getUpdateChatNotificationMessageType(QBMessage chatMessage) {
         String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -290,7 +270,7 @@ public class ChatNotificationUtils {
         return null;
     }
 
-    public static String getBodyForChatNotificationMessage(Context context, QBMessage chatMessage) {
+    public static String getBodyForUpdateChatNotificationMessage(Context context, QBMessage chatMessage) {
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
         String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
@@ -331,7 +311,7 @@ public class ChatNotificationUtils {
         return resultMessage;
     }
 
-    public static boolean isUpdateDialogNotificationMessage(int messagesNotificationTypeCode) {
+    public static boolean isUpdateChatNotificationMessage(int messagesNotificationTypeCode) {
         return PROPERTY_TYPE_TO_GROUP_CHAT__CREATE.equals(
                 messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__ADDED_FRIENDS
                 .equals(messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__NAME

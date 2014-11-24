@@ -21,6 +21,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
+import com.quickblox.q_municate_core.utils.FindUnknownFriends;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
@@ -102,13 +103,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
                 dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 
-//    public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
-//        QBDialog dialog = privateChatManager.createDialog(opponentId);
-//        saveDialogToCache(dialog);
-//        //        notifyFriendCreatedPrivateChat(dialog, opponentId);
-//        return dialog;
-//    }
-
     public QBFile loadAttachFile(File inputFile) throws Exception {
         QBFile file = null;
 
@@ -141,11 +135,35 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         saveMessageToCache(messageCache);
     }
 
+    private void createDialogByNotification(QBChatMessage chatMessage) {
+        String roomJidId;
+
+        String lastMessage = ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
+                chatMessage);
+        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, chatMessage.getDialogId());
+
+        if (dialog == null) {
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                    lastMessage, QBDialogType.GROUP);
+            saveDialogToCache(dialog);
+        }
+
+        roomJidId = dialog.getRoomJid();
+        if (roomJidId != null) {
+            tryJoinRoomChat(dialog);
+            new FindUnknownFriends(context, chatCreator, dialog).find();
+            saveDialogToCache(dialog);
+        }
+    }
+
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(
+                    notificationType)) {
+                createDialogByNotification(chatMessage);
+            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REQUEST);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(

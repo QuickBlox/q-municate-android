@@ -8,11 +8,13 @@ import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
@@ -43,23 +45,12 @@ public class ChatUtils {
         return ConstsCore.EMPTY_STRING;
     }
 
-    public static QBDialogType parseDialogType(String dialogTypeString) {
-        QBDialogType dialogType = null;
-        try {
-            dialogType = QBDialogType.valueOf(dialogTypeString);
-        } catch (NumberFormatException e) {
-            ErrorUtils.logError(e);
-        }
-        return dialogType;
-    }
-
     public static ArrayList<Integer> createOccupantsIdsFromPrivateMessage(int currentUserId, int senderId) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>(2);
         occupantsIdsList.add(currentUserId);
         occupantsIdsList.add(senderId);
         return occupantsIdsList;
     }
-
 
     public static ArrayList<Integer> getOccupantsIdsListFromString(String occupantIds) {
         ArrayList<Integer> occupantIdsList = new ArrayList<Integer>();
@@ -89,14 +80,6 @@ public class ChatUtils {
         return TextUtils.join(OCCUPANT_IDS_DIVIDER, occupantIdsList);
     }
 
-    public static String[] getOccupantsIdsArrayFromList(ArrayList<Integer> occupantsList) {
-        String[] occupantsArray = new String[occupantsList.size()];
-        for (int i = 0; i < occupantsList.size(); i++) {
-            occupantsArray[i] = String.valueOf(occupantsList.get(i));
-        }
-        return occupantsArray;
-    }
-
     public static ArrayList<Integer> getOccupantsIdsListForCreatePrivateDialog(int opponentId) {
         QBUser user = AppSession.getSession().getUser();
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>();
@@ -112,16 +95,6 @@ public class ChatUtils {
             attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(attachments));
         }
         return attachURL;
-    }
-
-    public static List<String> getRoomJidListFromDialogs(List<QBDialog> dialogsList) {
-        List<String> roomJidList = new ArrayList<String>();
-        for (QBDialog dialog : dialogsList) {
-            if (dialog.getType() != QBDialogType.PRIVATE) {
-                roomJidList.add(dialog.getRoomJid());
-            }
-        }
-        return roomJidList;
     }
 
     public static User getTempUserFromChatMessage(QBChatMessage chatMessage) {
@@ -150,7 +123,14 @@ public class ChatUtils {
     public static String getFullNameById(Context context, int userId) {
         User user = UsersDatabaseManager.getUserById(context, userId);
         if (user == null) {
-            return userId + ConstsCore.EMPTY_STRING;
+            try {
+                QBUser qbUser = QBUsers.getUser(userId);
+                user = FriendUtils.createUser(qbUser);
+                UsersDatabaseManager.saveUser(context, user);
+                return qbUser.getFullName();
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
+            }
         }
         return user.getFullName();
     }
@@ -160,6 +140,17 @@ public class ChatUtils {
         StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
         for (Integer id : occupantsIdsList) {
             stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER);
+        }
+        return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 1);
+    }
+
+    public static String getFullNamesFromOpponentId(Context context, QBUser user, String occupantsIdsString) {
+        List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
+        StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
+        for (Integer id : occupantsIdsList) {
+            if (!user.getId().equals(id)) {
+                stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER);
+            }
         }
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 1);
     }

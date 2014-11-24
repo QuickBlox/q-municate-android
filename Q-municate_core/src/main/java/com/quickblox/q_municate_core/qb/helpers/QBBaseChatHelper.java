@@ -40,6 +40,7 @@ import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -314,6 +315,23 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             groupChat.addMessageListener(groupChatMessageListener);
         }
         return groupChat;
+    }
+
+    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
+        QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
+        if (!roomChat.isJoined()) {
+            DiscussionHistory history = new DiscussionHistory();
+            history.setMaxStanzas(0);
+            roomChat.join(history);
+        }
+    }
+
+    protected void tryJoinRoomChat(QBDialog dialog) {
+        try {
+            joinRoomChat(dialog);
+        } catch (Exception e) {
+            ErrorUtils.logError(e);
+        }
     }
 
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
