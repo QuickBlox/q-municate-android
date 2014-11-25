@@ -65,6 +65,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private static final int TYPING_DELAY = 1000;
 
+    protected Resources resources;
     protected EditText chatEditText;
     protected StickyListHeadersListView messagesListView;
     protected EditText messageEditText;
@@ -125,6 +126,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         rootView = getLayoutInflater().inflate(layoutResID, null);
         setContentView(rootView);
 
+        resources = getResources();
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();

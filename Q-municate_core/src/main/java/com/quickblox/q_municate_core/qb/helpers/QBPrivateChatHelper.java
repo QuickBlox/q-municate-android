@@ -125,13 +125,10 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         MessageCache messageCache = parseReceivedMessage(chatMessage);
         messageCache.setMessagesNotificationType(type);
 
-        String lastMessage = ChatNotificationUtils.getBodyForFriendsNotificationMessage(context, type, messageCache);
-
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, chatMessage.getDialogId());
 
         if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                    lastMessage, QBDialogType.PRIVATE);
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(),
                     chatMessage.getSenderId());
             dialog.setOccupantsIds(occupantsIdsList);

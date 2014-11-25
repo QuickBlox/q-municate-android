@@ -29,10 +29,10 @@
     <string name="cht_update_group_photo_message">%1$s has changed the chat picture</string>
     <string name="cht_update_group_added_message">%1$s has added %2$s</string>
     <string name="cht_update_group_leave_message">%1$s has left</string>
+    <string name="cht_notification_message">Notification message</string>
 
     <string name="inf_url_to_facebook_avatar">https://graph.facebook.com/%1$s/picture?type=large</string>
     <string name="file_was_attached">file was attached</string>
-    <string name="notification_message">Notification message</string>
     <string name="user_created_room">%1$s created group chat</string>
 
     <string-array name="friends_relation_statuses_array">

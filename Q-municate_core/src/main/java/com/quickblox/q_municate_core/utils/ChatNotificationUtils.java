@@ -177,7 +177,7 @@ public class ChatNotificationUtils {
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
-        chatMessage.setBody(context.getResources().getString(R.string.notification_message));
+        chatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
 
         switch (messagesNotificationType) {
             case ADDED_DIALOG: {
@@ -222,7 +222,7 @@ public class ChatNotificationUtils {
     public static String getBodyForFriendsNotificationMessage(Context context,
             MessagesNotificationType messagesNotificationType, MessageCache messageCache) {
         Resources resources = context.getResources();
-        String resultMessage = resources.getString(R.string.notification_message);
+        String resultMessage = resources.getString(R.string.cht_notification_message);
         QBUser user = AppSession.getSession().getUser();
         boolean ownMessage = user.getId().equals(messageCache.getSenderId());
 
@@ -297,7 +297,7 @@ public class ChatNotificationUtils {
         String leave = chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
 
         Resources resources = context.getResources();
-        String resultMessage = resources.getString(R.string.notification_message);
+        String resultMessage = resources.getString(R.string.cht_notification_message);
         QBUser user = AppSession.getSession().getUser();
         boolean ownMessage = user.getId().equals(chatMessage.getSenderId());
 

@@ -262,7 +262,6 @@ public class ChatDatabaseManager {
             countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
         }
 
-        String bodyForDialog;
         if (messageCache.getMessagesNotificationType() != null) {
             updateDialog(context, messageCache.getDialogId(), messageCache.getTime(),
                     messageCache.getSenderId(), countUnreadMessagesLocal);
