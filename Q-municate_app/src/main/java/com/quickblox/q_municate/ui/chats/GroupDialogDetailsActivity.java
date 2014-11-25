@@ -453,9 +453,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
         @Override
         public void execute(Bundle bundle) {
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            currentDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupDialog = new GroupDialog(ChatDatabaseManager.getDialogByDialogId(
-                    GroupDialogDetailsActivity.this, dialog.getDialogId()));
+                    GroupDialogDetailsActivity.this, currentDialog.getDialogId()));
             updateOldGroupData();
 
             sendNotificationToGroup();

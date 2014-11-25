@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/lgn_email_hint"
+        android:text="sergey1@ser.com"
         android:inputType="textEmailAddress"
         android:maxLength="128" />
 
@@ -21,6 +22,7 @@
         android:layout_marginTop="30dp"
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
+        android:text="serik111"
         android:maxLength="256" />
 
     <CheckBox

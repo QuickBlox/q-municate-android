@@ -92,7 +92,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId, chatMessage.getBody());
         privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
     }
 
@@ -115,10 +115,10 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void clearRosterEntry(int userId) throws Exception {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
-        if (rosterEntry != null && roster.contains(userId)) {
-            roster.removeEntry(rosterEntry);
-        }
+//        QBRosterEntry rosterEntry = roster.getEntry(userId);
+//        if (rosterEntry != null && roster.contains(userId)) {
+//            roster.removeEntry(rosterEntry);
+//        }
     }
 
     public void removeFriend(int userId) throws Exception {

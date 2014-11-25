@@ -242,8 +242,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void deleteDialog() {
-        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
-        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
+//        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
+//        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
     private class RemoveFriendSuccessAction implements Command {
