@@ -139,9 +139,9 @@ public class ChatUtils {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
         StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
         for (Integer id : occupantsIdsList) {
-            stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER);
+            stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER).append(" ");
         }
-        return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 1);
+        return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
 
     public static String getFullNamesFromOpponentId(Context context, QBUser user, String occupantsIdsString) {

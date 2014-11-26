@@ -102,10 +102,26 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public void sendPrivateMessage(QBChatMessage chatMessage, int opponentId,
             String dialogId) throws QBResponseException {
-        QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
-        chatMessage.setMarkable(true);
-
         addNecessaryPropertyForQBChatMessage(chatMessage, dialogId);
+
+        sendPrivateMessage(chatMessage, opponentId);
+        savePrivateMessageToCache(chatMessage, dialogId);
+    }
+
+    public void sendPrivateMessage(QBChatMessage chatMessageForSending, int opponentId, String dialogPrivateId,
+            String dialogGroupId, QBChatMessage chatMessageForSaving) throws QBResponseException {
+        addNecessaryPropertyForQBChatMessage(chatMessageForSending, dialogGroupId);
+        addNecessaryPropertyForQBChatMessage(chatMessageForSaving, dialogGroupId);
+
+        sendPrivateMessage(chatMessageForSending, opponentId);
+
+        savePrivateMessageToCache(chatMessageForSaving, dialogPrivateId);
+    }
+
+    private void sendPrivateMessage(QBChatMessage chatMessage, int opponentId) throws QBResponseException {
+        QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
+
+        chatMessage.setMarkable(true);
 
         String error = null;
         try {
@@ -117,8 +133,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
         if (error != null) {
             throw new QBResponseException(error);
-        } else {
-            savePrivateMessageToCache(chatMessage, dialogId);
         }
     }
 
@@ -298,9 +312,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
         if (existingPrivateDialog == null) {
             existingPrivateDialog = createPrivateChatOnRest(userId);
-            existingPrivateDialog.setLastMessage(lastMessage);
             saveDialogToCache(existingPrivateDialog);
         }
+        existingPrivateDialog.setLastMessage(lastMessage);
         return existingPrivateDialog;
     }
 

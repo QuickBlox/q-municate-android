@@ -48,6 +48,7 @@ import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -460,6 +461,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (isNeedToScrollMessages) {
             isNeedToScrollMessages = false;
             messagesListView.setSelection(messagesAdapter.getCount() - 1);
+        }
+    }
+
+    abstract QBDialog getQBDialog();
+
+    protected void startUpdateChatDialog() {
+        QBDialog dialog = getQBDialog();
+        if (dialog != null) {
+            QBUpdateDialogCommand.start(this, dialog);
         }
     }
 

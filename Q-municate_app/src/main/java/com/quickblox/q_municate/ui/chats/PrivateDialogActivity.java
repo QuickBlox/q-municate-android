@@ -30,7 +30,6 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -160,13 +159,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         actionBar.setSubtitle(friend.getOnlineStatus(this));
     }
 
-    private void startUpdateChatDialog() {
-        if (dialog != null) {
-            QBUpdateDialogCommand.start(this, getDialog());
-        }
-    }
-
-    private QBDialog getDialog() {
+    protected QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);

@@ -15,18 +15,17 @@ import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriends;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -182,8 +181,13 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog, Integer friendId) throws Exception {
-        QBChatMessage chatMessage = ChatNotificationUtils.messageToPrivateChatAboutCreatingGroupChat(context, dialog);
-        sendPrivateMessage(chatMessage, friendId, dialog.getDialogId());
+        QBUser user = AppSession.getSession().getUser();
+        QBChatMessage chatMessageForSending = ChatNotificationUtils.createMessageToPrivateChatAboutCreatingGroupChat(
+                dialog, context.getResources().getString(R.string.cht_notification_message));
+        QBChatMessage chatMessageForSaving = ChatNotificationUtils.createMessageToPrivateChatAboutCreatingGroupChat(
+                dialog, context.getResources().getString(R.string.user_created_room, user.getFullName()));
+        String privateDialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(context, friendId);
+        sendPrivateMessage(chatMessageForSending, friendId, privateDialogId, dialog.getDialogId(), chatMessageForSaving);
     }
 
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {
@@ -254,10 +258,11 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     private void updateDialogByNotification(QBChatMessage chatMessage) {
+        String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         String lastMessage = ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                 chatMessage);
-        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, chatMessage.getDialogId());
 
+        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
         if (dialog == null) {
             dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
                     lastMessage, QBDialogType.GROUP);

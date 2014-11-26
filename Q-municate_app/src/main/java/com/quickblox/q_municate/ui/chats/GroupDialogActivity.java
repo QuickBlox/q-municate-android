@@ -118,14 +118,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return null;
     }
 
-    private void startUpdateChatDialog() {
-        QBDialog dialog = getQBDialog();
-        if (dialog != null) {
-            QBUpdateDialogCommand.start(this, dialog);
-        }
-    }
-
-    private QBDialog getQBDialog() {
+    protected QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);

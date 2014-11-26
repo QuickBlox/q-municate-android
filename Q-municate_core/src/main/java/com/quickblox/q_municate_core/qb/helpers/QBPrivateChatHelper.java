@@ -20,13 +20,11 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.FindUnknownFriends;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateChatManagerListener {
 
@@ -115,9 +113,9 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         return file;
     }
 
-    private void friendRequestMessageReceived(QBChatMessage chatMessage, MessagesNotificationType type) {
+    private void friendRequestMessageReceived(QBChatMessage chatMessage, MessagesNotificationType messagesNotificationType) {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
-        messageCache.setMessagesNotificationType(type);
+        messageCache.setMessagesNotificationType(messagesNotificationType);
 
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, messageCache.getDialogId());
 
@@ -132,25 +130,27 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         saveMessageToCache(messageCache);
     }
 
-    private void createDialogByNotification(QBChatMessage chatMessage) {
+    private void createDialogByNotification(QBChatMessage chatMessage, MessagesNotificationType messagesNotificationType) {
+        MessageCache messageCache = parseReceivedMessage(chatMessage);
+        messageCache.setMessagesNotificationType(messagesNotificationType);
+
         String roomJidId;
 
-        String lastMessage = ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
-                chatMessage);
-        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, chatMessage.getDialogId());
-
-        if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                    lastMessage, QBDialogType.GROUP);
-            saveDialogToCache(dialog);
-        }
+        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                messageCache.getMessage(), QBDialogType.GROUP);
+        saveDialogToCache(dialog);
 
         roomJidId = dialog.getRoomJid();
         if (roomJidId != null) {
             tryJoinRoomChat(dialog);
             new FindUnknownFriends(context, chatCreator, dialog).find();
-            saveDialogToCache(dialog);
         }
+
+        String privateDialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(context, messageCache.getSenderId());
+        messageCache.setDialogId(privateDialogId);
+        messageCache.setMessage(context.getResources().getString(R.string.user_created_room,
+                ChatUtils.getFullNameById(context, chatMessage.getSenderId())));
+        saveMessageToCache(messageCache);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
@@ -159,7 +159,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(
                     notificationType)) {
-                createDialogByNotification(chatMessage);
+                createDialogByNotification(chatMessage, MessagesNotificationType.CREATE_DIALOG);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REQUEST);
