@@ -10,8 +10,11 @@ import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 public class QBUpdateStatusMessageCommand extends ServiceCommand {
+
+    private static String TAG = QBUpdateStatusMessageCommand.class.getName();
 
     private QBBaseChatHelper baseChatHelper;
 
@@ -35,7 +38,12 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         MessageCache messageCache = (MessageCache) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
         boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
 
-        baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
+        try {
+            baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, e + " --- dialogId = " + dialog.getDialogId()
+                    + ", messageId = " + messageCache.getId());
+        }
 
         return null;
     }

@@ -95,6 +95,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(
                     R.drawable.vertical_progressbar));
             viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
+            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
         } else {
             view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
 
@@ -141,6 +142,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
             displayAttachImage(messageCache.getAttachUrl(), viewHolder);
+
+            if (ownMessage) {
+                setMessageStatus(viewHolder, messageCache.isDelivered(), messageCache.isRead());
+            }
         } else {
             resetUI(viewHolder);
 
@@ -150,8 +155,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         }
 
         if (ownMessage && !friendsRequestMessage && !friendsInfoRequestMessage) {
-            setMessageStatus(view, viewHolder, R.id.text_message_delivery_status_imageview,
-                    messageCache.isDelivered(), messageCache.isRead());
+            setMessageStatus(viewHolder, messageCache.isDelivered(), messageCache.isRead());
         }
 
         if (!messageCache.isRead() && !ownMessage) {

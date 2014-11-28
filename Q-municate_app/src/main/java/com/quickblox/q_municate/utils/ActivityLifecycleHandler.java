@@ -32,7 +32,6 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
             boolean canLogin = chatDestroyed && AppSession.getSession().isSessionExist();
             if (canLogin) {
                 QBLoginAndJoinDialogsCommand.start(activity);
-                QBLoadDialogsCommand.start(activity);
             }
         }
         if (activityLogeable) {

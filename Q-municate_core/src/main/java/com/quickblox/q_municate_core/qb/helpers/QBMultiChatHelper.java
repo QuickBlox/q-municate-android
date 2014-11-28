@@ -128,7 +128,6 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
     public void tryJoinRoomChats(List<QBDialog> chatDialogsList) {
         if (!chatDialogsList.isEmpty()) {
-            ChatDatabaseManager.saveDialogs(context, chatDialogsList);
             initGroupDialogsList();
             for (QBDialog dialog : chatDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {

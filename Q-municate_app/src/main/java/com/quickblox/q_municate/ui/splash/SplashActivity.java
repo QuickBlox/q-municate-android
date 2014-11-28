@@ -174,7 +174,7 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoadDialogsCommand.start(SplashActivity.this);
+//            QBLoadDialogsCommand.start(SplashActivity.this);
             startMainActivity();
             finish();
         }

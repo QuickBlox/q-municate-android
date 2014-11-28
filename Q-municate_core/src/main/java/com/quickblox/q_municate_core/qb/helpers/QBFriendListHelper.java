@@ -115,10 +115,10 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void clearRosterEntry(int userId) throws Exception {
-//        QBRosterEntry rosterEntry = roster.getEntry(userId);
-//        if (rosterEntry != null && roster.contains(userId)) {
-//            roster.removeEntry(rosterEntry);
-//        }
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry != null && roster.contains(userId)) {
+            roster.removeEntry(rosterEntry);
+        }
     }
 
     public void removeFriend(int userId) throws Exception {

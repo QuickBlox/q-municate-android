@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -119,11 +118,6 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
         } else {
             resetUI(viewHolder);
-
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(
-                    R.id.text_message_delivery_status_imageview);
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(
-                    R.id.attach_message_delivery_status_imageview);
 
             if (ownMessage) {
                 avatarUrl = getAvatarUrlForCurrentUser();

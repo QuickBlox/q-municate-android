@@ -161,6 +161,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new ImportFriendsSuccessAction());
         addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
+        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
     }
 
     private void initNavigationDrawer() {
@@ -267,6 +268,14 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
+        }
+    }
+
+    private class LoginAndJoinChatsSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            loadChatsDialogs();
         }
     }
 

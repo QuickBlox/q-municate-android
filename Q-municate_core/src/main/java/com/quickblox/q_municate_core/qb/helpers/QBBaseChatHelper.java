@@ -165,12 +165,20 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         ChatDatabaseManager.saveDialog(context, dialog);
     }
 
+    protected void saveDialogsToCache(List<QBDialog> chatDialogsList) {
+        ChatDatabaseManager.saveDialogs(context, chatDialogsList);
+    }
+
     public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
         Bundle bundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
         List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
                 bundle);
+
+        if (chatDialogsList != null && !chatDialogsList.isEmpty()) {
+            saveDialogsToCache(chatDialogsList);
+        }
 
         return chatDialogsList;
     }
