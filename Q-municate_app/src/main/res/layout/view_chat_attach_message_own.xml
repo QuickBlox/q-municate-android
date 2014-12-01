@@ -38,7 +38,7 @@
             android:textColor="@color/black" />
 
         <ImageView
-            android:id="@+id/text_message_delivery_status_imageview"
+            android:id="@+id/attach_message_delivery_status_imageview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="top"

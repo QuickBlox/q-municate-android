@@ -101,9 +101,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         return iconResourceId;
     }
 
-    protected void setMessageStatus(ViewHolder viewHolder, boolean messageDelivered, boolean messageRead) {
-//        viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
-        viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
+    protected void setMessageStatus(ImageView imageView, boolean messageDelivered, boolean messageRead) {
+        imageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
     }
 
     protected void resetUI(ViewHolder viewHolder) {
@@ -275,6 +274,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public TextView nameTextView;
         public View textMessageView;
         public ImageView messageDeliveryStatusImageView;
+        public ImageView attachDeliveryStatusImageView;
         public RelativeLayout progressRelativeLayout;
         public RelativeLayout attachMessageRelativeLayout;
         public TextView messageTextView;

@@ -84,6 +84,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     R.id.attach_message_relativelayout);
             viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(
                     R.id.time_attach_message_textview);
+            viewHolder.attachDeliveryStatusImageView = (ImageView) view.findViewById(R.id.attach_message_delivery_status_imageview);
             viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(
                     R.id.progress_relativelayout);
             viewHolder.textMessageView = view.findViewById(R.id.text_message_view);
@@ -141,21 +142,24 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-            displayAttachImage(messageCache.getAttachUrl(), viewHolder);
 
             if (ownMessage) {
-                setMessageStatus(viewHolder, messageCache.isDelivered(), messageCache.isRead());
+                setMessageStatus(viewHolder.attachDeliveryStatusImageView, messageCache.isDelivered(),
+                        messageCache.isRead());
             }
+
+            displayAttachImage(messageCache.getAttachUrl(), viewHolder);
         } else {
             resetUI(viewHolder);
 
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-        }
 
-        if (ownMessage && !friendsRequestMessage && !friendsInfoRequestMessage) {
-            setMessageStatus(viewHolder, messageCache.isDelivered(), messageCache.isRead());
+            if (ownMessage) {
+                setMessageStatus(viewHolder.messageDeliveryStatusImageView, messageCache.isDelivered(),
+                        messageCache.isRead());
+            }
         }
 
         if (!messageCache.isRead() && !ownMessage) {
