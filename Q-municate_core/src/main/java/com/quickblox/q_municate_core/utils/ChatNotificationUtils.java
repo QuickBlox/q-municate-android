@@ -18,8 +18,6 @@ import java.util.Collection;
 
 public class ChatNotificationUtils {
 
-    public static final int NOT_RESET_COUNTER = -1;
-
     public static final String PROPERTY_OCCUPANTS_IDS = "occupants_ids";
     public static final String PROPERTY_ROOM_NAME = "room_name";
     public static final String PROPERTY_ROOM_LEAVE = "deleted_id";
@@ -27,7 +25,6 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_ROOM_JID = "room_jid";
     public static final String PROPERTY_DIALOG_ID = "dialog_id";
     public static final String PROPERTY_NOTIFICATION_TYPE = "notification_type";
-    public static final String PROPERTY_MESSAGE_ID = "message_id";
     public static final String PROPERTY_DATE_SENT = "date_sent";
     public static final String PROPERTY_SAVE_TO_HISTORY = "save_to_history";
 
@@ -66,6 +63,8 @@ public class ChatNotificationUtils {
             } else {
                 dialog.setName(ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds));
             }
+        } else {
+            dialog.setName(dialogName);
         }
 
         if (!TextUtils.isEmpty(occupantsIds)) {
@@ -105,6 +104,7 @@ public class ChatNotificationUtils {
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE);
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
         chatMessage.setProperty(PROPERTY_ROOM_JID, dialog.getRoomJid());
+        chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
 
         return chatMessage;
     }

@@ -21,6 +21,8 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
@@ -180,13 +182,11 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog, Integer friendId) throws Exception {
-        QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessageForSending = ChatNotificationUtils.createMessageToPrivateChatAboutCreatingGroupChat(
                 dialog, context.getResources().getString(R.string.cht_notification_message));
-        QBChatMessage chatMessageForSaving = ChatNotificationUtils.createMessageToPrivateChatAboutCreatingGroupChat(
-                dialog, context.getResources().getString(R.string.user_created_room, user.getFullName()));
-        String privateDialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(context, friendId);
-        sendPrivateMessage(chatMessageForSending, friendId, privateDialogId, dialog.getDialogId(), chatMessageForSaving);
+
+        addNecessaryPropertyForQBChatMessage(chatMessageForSending, dialog.getDialogId());
+        sendPrivateMessage(chatMessageForSending, friendId);
     }
 
     public List<Integer> getRoomOnlineParticipantList(String roomJid) throws XMPPException {

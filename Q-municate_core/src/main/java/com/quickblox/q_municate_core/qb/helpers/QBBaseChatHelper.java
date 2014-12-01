@@ -108,17 +108,17 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         savePrivateMessageToCache(chatMessage, dialogId);
     }
 
-    public void sendPrivateMessage(QBChatMessage chatMessageForSending, int opponentId, String dialogPrivateId,
+    public void sendPrivateMessage(QBChatMessage chatMessageForSending, int opponentId,
             String dialogGroupId, QBChatMessage chatMessageForSaving) throws QBResponseException {
         addNecessaryPropertyForQBChatMessage(chatMessageForSending, dialogGroupId);
         addNecessaryPropertyForQBChatMessage(chatMessageForSaving, dialogGroupId);
 
         sendPrivateMessage(chatMessageForSending, opponentId);
 
-        savePrivateMessageToCache(chatMessageForSaving, dialogPrivateId);
+        savePrivateMessageToCache(chatMessageForSaving, dialogGroupId);
     }
 
-    private void sendPrivateMessage(QBChatMessage chatMessage, int opponentId) throws QBResponseException {
+    public void sendPrivateMessage(QBChatMessage chatMessage, int opponentId) throws QBResponseException {
         QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
 
         chatMessage.setMarkable(true);
@@ -393,16 +393,14 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected MessageCache parseReceivedMessage(QBChatMessage chatMessage) {
-        String messageId;
         long time;
         String attachUrl;
 
-        messageId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_MESSAGE_ID);
         time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
 
-        MessageCache messageCache = new MessageCache(messageId, dialogId, chatMessage.getSenderId(),
+        MessageCache messageCache = new MessageCache(chatMessage.getId(), dialogId, chatMessage.getSenderId(),
                 chatMessage.getBody(), attachUrl, time, false, false, false);
 
         return messageCache;

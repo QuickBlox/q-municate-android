@@ -138,6 +138,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
 
         QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
                 messageCache.getMessage(), QBDialogType.GROUP);
+        dialog.setUnreadMessageCount(1);
         saveDialogToCache(dialog);
 
         roomJidId = dialog.getRoomJid();
@@ -145,12 +146,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
             tryJoinRoomChat(dialog);
             new FindUnknownFriends(context, chatCreator, dialog).find();
         }
-
-        String privateDialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(context, messageCache.getSenderId());
-        messageCache.setDialogId(privateDialogId);
-        messageCache.setMessage(context.getResources().getString(R.string.user_created_room,
-                ChatUtils.getFullNameById(context, chatMessage.getSenderId())));
-        saveMessageToCache(messageCache);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
