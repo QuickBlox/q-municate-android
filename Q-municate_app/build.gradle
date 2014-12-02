@@ -49,7 +49,6 @@ android {
         release {
             debuggable rootProject.prodDebug
             signingConfig signingConfigs.release
-            runProguard false
             proguardFile 'proguard.cfg'
         }
     }

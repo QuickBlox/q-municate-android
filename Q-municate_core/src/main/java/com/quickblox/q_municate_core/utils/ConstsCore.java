@@ -2,12 +2,12 @@ package com.quickblox.q_municate_core.utils;
 
 public class ConstsCore {
 
-    // Q-municate
+//    // Q-municate
 //    public static final String QB_APP_ID = "13318";
 //    public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
 //    public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
 
-    //    // Q-municate dev
+        // Q-municate dev
         public static final String QB_APP_ID = "14542";
         public static final String QB_AUTH_KEY = "rJqAFphrSnpyZW2";
         public static final String QB_AUTH_SECRET = "tTEB2wK-dU8X3Ra";
