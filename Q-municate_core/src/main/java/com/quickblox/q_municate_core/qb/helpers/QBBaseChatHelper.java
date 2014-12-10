@@ -12,7 +12,9 @@ import com.quickblox.chat.QBGroupChatManager;
 import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBPrivateChatManager;
 import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBIsTypingListener;
 import com.quickblox.chat.listeners.QBMessageListener;
+import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBChatMessage;
@@ -33,12 +35,10 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,18 +51,21 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     protected QBChatService chatService;
     protected QBUser chatCreator;
     protected QBDialog currentDialog;
-
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
-
     protected QBGroupChatManager groupChatManager;
     protected GroupChatMessageListener groupChatMessageListener;
 
+    private PrivateChatIsTypingListener privateChatIsTypingListener;
+    private PrivateChatManagerListener privateChatManagerListener;
     private List<QBNotificationChatListener> notificationChatListeners;
 
     public QBBaseChatHelper(Context context) {
         super(context);
         privateChatMessageListener = new PrivateChatMessageListener();
+        privateChatManagerListener = new PrivateChatManagerListener();
+        privateChatIsTypingListener = new PrivateChatIsTypingListener();
+
         groupChatMessageListener = new GroupChatMessageListener();
 
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
@@ -84,6 +87,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         this.chatCreator = chatCreator;
 
         privateChatManager = chatService.getPrivateChatManager();
+        privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
+
         groupChatManager = chatService.getGroupChatManager();
     }
 
@@ -284,37 +289,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return existingPrivateDialog;
     }
 
-    protected QBGroupChat createGroupChatIfNotExist(QBDialog dialog) throws QBResponseException {
-        boolean notNull = Utils.validateNotNull(groupChatManager);
-        if (!notNull) {
-            ErrorUtils.logError(TAG, " groupChatManager is NULL");
-            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
-        }
-        QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
-        if (groupChat == null) {
-            groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
-            groupChat.addMessageListener(groupChatMessageListener);
-        }
-        return groupChat;
-    }
-
-    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
-        QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
-        if (!roomChat.isJoined()) {
-            DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(0);
-            roomChat.join(history);
-        }
-    }
-
-    protected void tryJoinRoomChat(QBDialog dialog) {
-        try {
-            joinRoomChat(dialog);
-        } catch (Exception e) {
-            ErrorUtils.logError(e);
-        }
-    }
-
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
             boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
@@ -381,15 +355,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         ChatDatabaseManager.updateMessageStatusDelivered(context, messageId, isDelivered);
     }
 
-    public interface QBNotificationChatListener {
-
-        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
-    }
-
     public void onGroupMessageReceived(QBChat groupChat, final QBChatMessage chatMessage) {
     }
 
     public void onPrivateMessageReceived(QBChat privateChat, final QBChatMessage chatMessage) {
+    }
+
+    public interface QBNotificationChatListener {
+
+        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
     }
 
     private class GroupChatMessageListener implements QBMessageListener<QBGroupChat> {
@@ -450,6 +424,28 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
             }
+        }
+    }
+
+    private class PrivateChatManagerListener implements QBPrivateChatManagerListener {
+
+        @Override
+        public void chatCreated(QBPrivateChat privateChat, boolean b) {
+            privateChat.addMessageListener(privateChatMessageListener);
+            privateChat.addIsTypingListener(privateChatIsTypingListener);
+        }
+    }
+
+    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat> {
+
+        @Override
+        public void processUserIsTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(true);
+        }
+
+        @Override
+        public void processUserStopTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(false);
         }
     }
 }

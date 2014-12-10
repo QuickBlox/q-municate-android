@@ -5,8 +5,6 @@ import android.os.Bundle;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBPrivateChat;
-import com.quickblox.chat.listeners.QBIsTypingListener;
-import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -22,7 +20,6 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriends;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
@@ -33,16 +30,11 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     private static final String TAG = QBPrivateChatHelper.class.getSimpleName();
 
     private QBNotificationChatListener notificationChatListener;
-    private PrivateChatIsTypingListener privateChatIsTypingListener;
-    private PrivateChatManagerListener privateChatManagerListener;
 
     public QBPrivateChatHelper(Context context) {
         super(context);
         notificationChatListener = new PrivateChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
-
-        privateChatManagerListener = new PrivateChatManagerListener();
-        privateChatIsTypingListener = new PrivateChatIsTypingListener();
     }
 
     public void sendPrivateMessage(String message, int userId) throws QBResponseException {
@@ -78,7 +70,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     public void init(QBUser user) {
         super.init(user);
-        privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage chatMessage) {
@@ -133,33 +124,11 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         saveMessageToCache(messageCache);
     }
 
-    private void createDialogByNotification(QBChatMessage chatMessage,
-            MessagesNotificationType messagesNotificationType) {
-        MessageCache messageCache = parseReceivedMessage(chatMessage);
-        messageCache.setMessagesNotificationType(messagesNotificationType);
-
-        String roomJidId;
-
-        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                messageCache.getMessage(), QBDialogType.GROUP);
-        dialog.setUnreadMessageCount(1);
-        saveDialogToCache(dialog);
-
-        roomJidId = dialog.getRoomJid();
-        if (roomJidId != null) {
-            tryJoinRoomChat(dialog);
-            new FindUnknownFriends(context, chatCreator, dialog).find();
-        }
-    }
-
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(
-                    notificationType)) {
-                createDialogByNotification(chatMessage, MessagesNotificationType.CREATE_DIALOG);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REQUEST);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(
@@ -172,28 +141,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REMOVE);
             }
-        }
-    }
-
-    private class PrivateChatManagerListener implements QBPrivateChatManagerListener {
-
-        @Override
-        public void chatCreated(QBPrivateChat privateChat, boolean b) {
-            privateChat.addMessageListener(privateChatMessageListener);
-            privateChat.addIsTypingListener(privateChatIsTypingListener);
-        }
-    }
-
-    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat> {
-
-        @Override
-        public void processUserIsTyping(QBPrivateChat privateChat) {
-            notifyMessageTyping(true);
-        }
-
-        @Override
-        public void processUserStopTyping(QBPrivateChat privateChat) {
-            notifyMessageTyping(false);
         }
     }
 }
