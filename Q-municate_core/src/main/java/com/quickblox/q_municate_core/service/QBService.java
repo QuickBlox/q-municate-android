@@ -137,17 +137,6 @@ public class QBService extends Service {
         helpers.put(REST_HELPER, restHelper);
     }
 
-    private void initChatHelpers() {
-        QBPrivateChatHelper privateChatHelper = new QBPrivateChatHelper(this);
-        helpers.put(PRIVATE_CHAT_HELPER, privateChatHelper);
-        QBMultiChatHelper multiChatHelper = new QBMultiChatHelper(this);
-        helpers.put(MULTI_CHAT_HELPER, multiChatHelper);
-        friendListHelper = new QBFriendListHelper(this);
-        helpers.put(FRIEND_LIST_HELPER, friendListHelper);
-        videoChatHelper = new QBVideoChatHelper(this);
-        helpers.put(VIDEO_CHAT_HELPER, videoChatHelper);
-    }
-
     private void initCommands() {
         registerLoginRestCommand();
         registerLoginRestSocialCommand();

@@ -3,7 +3,9 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBPrivateChat;
+import com.quickblox.chat.listeners.QBIsTypingListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -26,16 +28,21 @@ import com.quickblox.users.model.QBUser;
 import java.io.File;
 import java.util.ArrayList;
 
-public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateChatManagerListener {
+public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     private static final String TAG = QBPrivateChatHelper.class.getSimpleName();
 
     private QBNotificationChatListener notificationChatListener;
+    private PrivateChatIsTypingListener privateChatIsTypingListener;
+    private PrivateChatManagerListener privateChatManagerListener;
 
     public QBPrivateChatHelper(Context context) {
         super(context);
         notificationChatListener = new PrivateChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
+
+        privateChatManagerListener = new PrivateChatManagerListener();
+        privateChatIsTypingListener = new PrivateChatIsTypingListener();
     }
 
     public void sendPrivateMessage(String message, int userId) throws QBResponseException {
@@ -71,10 +78,10 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
 
     public void init(QBUser user) {
         super.init(user);
+        privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
     }
 
-    @Override
-    protected void onPrivateMessageReceived(QBPrivateChat privateChat, QBChatMessage chatMessage) {
+    public void onPrivateMessageReceived(QBChat chat, QBChatMessage chatMessage) {
         User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
 
         if (user == null) {
@@ -86,12 +93,6 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         saveMessageToCache(messageCache);
 
         notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), true);
-    }
-
-    @Override
-    public void chatCreated(QBPrivateChat privateChat, boolean createdLocally) {
-        privateChat.addMessageListener(privateChatMessageListener);
-        privateChat.addIsTypingListener(privateChatIsTypingListener);
     }
 
     public void updateDialog(QBDialog dialog) {
@@ -113,16 +114,18 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         return file;
     }
 
-    private void friendRequestMessageReceived(QBChatMessage chatMessage, MessagesNotificationType messagesNotificationType) {
+    private void friendRequestMessageReceived(QBChatMessage chatMessage,
+            MessagesNotificationType messagesNotificationType) {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
         messageCache.setMessagesNotificationType(messagesNotificationType);
 
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, messageCache.getDialogId());
 
         if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, QBDialogType.PRIVATE);
-            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(),
-                    chatMessage.getSenderId());
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                    QBDialogType.PRIVATE);
+            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
+                    chatCreator.getId(), chatMessage.getSenderId());
             dialog.setOccupantsIds(occupantsIdsList);
             saveDialogToCache(dialog);
         }
@@ -130,7 +133,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
         saveMessageToCache(messageCache);
     }
 
-    private void createDialogByNotification(QBChatMessage chatMessage, MessagesNotificationType messagesNotificationType) {
+    private void createDialogByNotification(QBChatMessage chatMessage,
+            MessagesNotificationType messagesNotificationType) {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
         messageCache.setMessagesNotificationType(messagesNotificationType);
 
@@ -168,6 +172,28 @@ public class QBPrivateChatHelper extends QBBaseChatHelper implements QBPrivateCh
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REMOVE);
             }
+        }
+    }
+
+    private class PrivateChatManagerListener implements QBPrivateChatManagerListener {
+
+        @Override
+        public void chatCreated(QBPrivateChat privateChat, boolean b) {
+            privateChat.addMessageListener(privateChatMessageListener);
+            privateChat.addIsTypingListener(privateChatIsTypingListener);
+        }
+    }
+
+    private class PrivateChatIsTypingListener implements QBIsTypingListener<QBPrivateChat> {
+
+        @Override
+        public void processUserIsTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(true);
+        }
+
+        @Override
+        public void processUserStopTyping(QBPrivateChat privateChat) {
+            notifyMessageTyping(false);
         }
     }
 }

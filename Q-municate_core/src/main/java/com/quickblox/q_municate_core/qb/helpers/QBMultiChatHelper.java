@@ -15,14 +15,11 @@ import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
@@ -63,8 +60,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         super.init(user);
     }
 
-    @Override
-    protected void onGroupMessageReceived(QBGroupChat groupChat, QBChatMessage chatMessage) {
+    public void onGroupMessageReceived(QBChat chat, QBChatMessage chatMessage) {
         User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
 
         MessageCache messageCache;
@@ -76,8 +72,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         messageCache = parseReceivedMessage(chatMessage);
 
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
-            messageCache.setMessagesNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(
-                    chatMessage));
+            messageCache.setMessagesNotificationType(
+                    ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
             messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                     chatMessage));
         }
@@ -171,7 +167,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         return dialog;
     }
 
-    private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog, List<Integer> friendIdsList) throws Exception {
+    private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
+            List<Integer> friendIdsList) throws Exception {
         for (Integer friendId : friendIdsList) {
             try {
                 sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendId);
@@ -181,9 +178,11 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog, Integer friendId) throws Exception {
-        QBChatMessage chatMessageForSending = ChatNotificationUtils.createMessageToPrivateChatAboutCreatingGroupChat(
-                dialog, context.getResources().getString(R.string.cht_notification_message));
+    private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
+            Integer friendId) throws Exception {
+        QBChatMessage chatMessageForSending = ChatNotificationUtils
+                .createMessageToPrivateChatAboutCreatingGroupChat(dialog, context.getResources().getString(
+                        R.string.cht_notification_message));
 
         addNecessaryPropertyForQBChatMessage(chatMessageForSending, dialog.getDialogId());
         sendPrivateMessage(chatMessageForSending, friendId);
@@ -263,8 +262,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
         if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                    lastMessage, QBDialogType.GROUP);
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, lastMessage,
+                    QBDialogType.GROUP);
             saveDialogToCache(dialog);
         }
     }
@@ -273,7 +272,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(notificationType)) {
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(
+                    notificationType)) {
                 updateDialogByNotification(chatMessage);
             }
         }

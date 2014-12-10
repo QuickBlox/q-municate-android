@@ -154,7 +154,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         // TODO: now it is possible only for Private chats
         if (QBDialogType.PRIVATE.equals(dialog.getType())) {
             if (isTypingNow) {
-                stopTypingMessage();
+                isTypingNow = false;
+                sendTypingStatus();
             }
         }
     }
@@ -358,7 +359,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 // TODO: now it is possible only for Private chats
                 if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                     if (!isTypingNow) {
-                        startTypingMessage();
+                        isTypingNow = true;
+                        sendTypingStatus();
                     }
                 }
 
@@ -376,7 +378,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 // TODO: now it is possible only for Private chats
                 if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                     if (!isTypingNow) {
-                        startTypingMessage();
+                        isTypingNow = true;
+                        sendTypingStatus();
                     }
                     checkStopTyping();
                 }
@@ -419,14 +422,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         typingTimer.schedule(new TypingTimerTask(), TYPING_DELAY);
     }
 
-    private void startTypingMessage() {
-        isTypingNow = true;
-        baseChatHelper.sendIsTypingToServer(opponentFriend.getUserId());
-    }
-
-    private void stopTypingMessage() {
-        isTypingNow = false;
-        baseChatHelper.sendStopTypingToServer(opponentFriend.getUserId());
+    private void sendTypingStatus() {
+        baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
     }
 
     private void initKeyboardHeight() {
@@ -493,7 +490,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void run() {
-            stopTypingMessage();
+            isTypingNow = false;
+            sendTypingStatus();
         }
     }
 
