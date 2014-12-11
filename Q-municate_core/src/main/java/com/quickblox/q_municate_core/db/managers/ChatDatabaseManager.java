@@ -304,7 +304,8 @@ public class ChatDatabaseManager {
                 if (ChatNotificationUtils.isFriendsNotificationMessage(friendsMessageTypeCode)) {
                     messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
                             friendsMessageTypeCode));
-                } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
+                } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)
+                        || ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
                     messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                             historyMessage));
                     messageCache.setMessagesNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(historyMessage));

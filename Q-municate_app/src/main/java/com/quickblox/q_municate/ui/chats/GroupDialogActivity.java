@@ -20,7 +20,6 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -35,8 +34,6 @@ import java.util.ArrayList;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
-
-    private String groupName;
 
     public GroupDialogActivity() {
         super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
@@ -135,22 +132,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return dialog;
     }
 
-    private void updateChatData() {
-        dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
-        if (dialog != null) {
-            groupName = dialog.getName();
-            updateActionBar();
-        }
-    }
-
     private void initListView() {
         messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
                 dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
-    private void updateActionBar() {
-        actionBar.setTitle(groupName);
+    protected void updateActionBar() {
+        actionBar.setTitle(dialog.getName());
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
@@ -212,7 +201,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        updateChatData();
+        updateDialogData();
         scrollListView();
     }
 }

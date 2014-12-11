@@ -144,6 +144,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true, friendsTableContentObserver);
     }
 
+    @Override
+    protected void updateActionBar() {
+    }
+
     private void unregisterStatusChangingObserver() {
         if (friendCursor != null && statusContentObserver != null) {
             friendCursor.unregisterContentObserver(statusContentObserver);

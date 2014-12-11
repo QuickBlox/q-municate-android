@@ -61,8 +61,7 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener,
-        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
 
@@ -96,6 +95,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private Timer typingTimer;
     private boolean isTypingNow;
     private BroadcastReceiver typingMessageBroadcastReceiver;
+    private BroadcastReceiver updatingDialogBroadcastReceiver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -165,10 +165,23 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         createChatLocally();
     }
 
+    protected void updateDialogData() {
+        dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
+        if (dialog != null) {
+            updateActionBar();
+        }
+    }
+
+    protected abstract void updateActionBar();
+
     private void initLocalBroadcastManagers() {
         typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+
+       updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+       LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
     protected void createChatLocally() {
@@ -562,6 +575,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                     stopMessageTypingAnimation();
                 }
             }
+        }
+    }
+
+    private class UpdatingDialogBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateDialogData();
         }
     }
 }

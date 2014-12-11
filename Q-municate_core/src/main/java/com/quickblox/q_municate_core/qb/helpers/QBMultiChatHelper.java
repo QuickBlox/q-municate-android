@@ -1,7 +1,9 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
@@ -18,6 +20,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -79,6 +82,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
                     ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
             messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                     chatMessage));
+            updateDialogByNotification(chatMessage);
         }
 
         saveMessageToCache(messageCache);
@@ -163,8 +167,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendIdsList);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForUpdateChat(context,
-                dialog, MessagesNotificationType.CREATE_DIALOG, dialog.getOccupants());
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForCreateGroupChat(context, dialog.getOccupants());
         sendGroupMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
 
         return dialog;
@@ -291,15 +294,18 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
     private void updateDialogByNotification(QBChatMessage chatMessage) {
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
-        String lastMessage = ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
-                chatMessage);
-
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
-        if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage, lastMessage,
-                    QBDialogType.GROUP);
-            saveDialogToCache(dialog);
-        }
+
+        ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, dialog);
+
+        saveDialogToCache(dialog);
+
+        notifyUpdatingDialog();
+    }
+
+    protected void notifyUpdatingDialog() {
+        Intent intent = new Intent(QBServiceConsts.UPDATE_DIALOG);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private void createDialogByNotification(QBChatMessage chatMessage,
@@ -328,7 +334,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(
                     notificationType)) {
                 createDialogByNotification(chatMessage, MessagesNotificationType.CREATE_DIALOG);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(

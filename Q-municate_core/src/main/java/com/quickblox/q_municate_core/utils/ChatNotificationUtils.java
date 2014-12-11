@@ -30,8 +30,7 @@ public class ChatNotificationUtils {
 
     public static final String VALUE_SAVE_TO_HISTORY = "1";
 
-    public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE = "1";
-
+    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE = "1";
     public static final String PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE = "2";
     public static final String PROPERTY_TYPE_TO_GROUP_CHAT__ADDED_FRIENDS = "21";
     public static final String PROPERTY_TYPE_TO_GROUP_CHAT__NAME = "22";
@@ -96,12 +95,33 @@ public class ChatNotificationUtils {
         return dialog;
     }
 
+    public static void updateDialogFromQBMessage(Context context, QBMessage chatMessage, QBDialog dialog) {
+        String lastMessage = getBodyForUpdateChatNotificationMessage(context, chatMessage);
+        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+
+        dialog.setLastMessage(lastMessage);
+
+        if (!TextUtils.isEmpty(dialogName)) {
+            dialog.setName(dialogName);
+        }
+
+        if (!TextUtils.isEmpty(occupantsIds)) {
+            dialog.setOccupantsIds(ChatUtils.getOccupantsIdsListFromString(occupantsIds));
+        }
+
+        if (!TextUtils.isEmpty(photoUrl)) {
+            dialog.setPhoto(photoUrl);
+        }
+    }
+
     public static QBChatMessage createMessageToPrivateChatAboutCreatingGroupChat(QBDialog dialog, String body) {
         String occupantsIds = ChatUtils.getOccupantsIdsStringFromList(dialog.getOccupants());
 
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setBody(body);
-        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE);
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
         chatMessage.setProperty(PROPERTY_ROOM_JID, dialog.getRoomJid());
         chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
@@ -113,7 +133,7 @@ public class ChatNotificationUtils {
         int friendsMessageTypeCode = ConstsCore.ZERO_INT_VALUE;
         if (chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null) {
             String inputCode = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
-            if (PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
+            if (PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
                 friendsMessageTypeCode = MessagesNotificationType.CREATE_DIALOG.getCode();
             } else {
                 friendsMessageTypeCode = Integer.parseInt(inputCode);
@@ -197,6 +217,17 @@ public class ChatNotificationUtils {
         return chatMessage;
     }
 
+    public static QBChatMessage createNotificationMessageForCreateGroupChat(Context context,
+            Collection<Integer> addedFriendIdsList) {
+        QBChatMessage chatMessage = new QBChatMessage();
+        chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE);
+        chatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
+        chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
+                addedFriendIdsList));
+        return chatMessage;
+    }
+
     public static QBChatMessage createNotificationMessageForUpdateChat(Context context, QBDialog dialog,
                                                                        MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) {
         QBUser user = AppSession.getSession().getUser();
@@ -246,7 +277,7 @@ public class ChatNotificationUtils {
         }
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
-                PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE)) {
+                PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
             return MessagesNotificationType.CREATE_DIALOG;
         }
 
@@ -277,10 +308,12 @@ public class ChatNotificationUtils {
         QBUser user = AppSession.getSession().getUser();
         boolean ownMessage = user.getId().equals(chatMessage.getSenderId());
 
-        if (notificationType.equals(PROPERTY_TYPE_TO_PRIVATE_CHAT__GROUP_CHAT_CREATE)) {
-            resultMessage = ownMessage ? resources.getString(R.string.user_created_room,
-                    user.getFullName()) : resources.getString(
-                    R.string.user_created_room, ChatUtils.getFullNameById(context, chatMessage.getSenderId()));
+        if (notificationType.equals(PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
+            String fullNames = ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds);
+            resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_added_message,
+                    user.getFullName(), fullNames) : resources.getString(
+                    R.string.cht_update_group_added_message, ChatUtils.getFullNameById(context,
+                            chatMessage.getSenderId()), fullNames);
             return resultMessage;
         }
 
