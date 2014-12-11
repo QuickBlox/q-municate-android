@@ -9,11 +9,14 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.model.QBMessage;
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate_core.models.User;
 import com.quickblox.users.model.QBUser;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ChatNotificationUtils {
@@ -182,10 +185,16 @@ public class ChatNotificationUtils {
                 break;
             }
             case FRIENDS_REMOVE: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_remove_message_for_me, user.getFullName()) : resources
-                        .getString(R.string.frl_friends_request_remove_message_for_friend,
-                                ChatUtils.getFullNameById(context, messageCache.getSenderId()));
+                User deletedUser = UsersDatabaseManager.getUserById(context, messageCache.getRecipientId());
+                String fullName;
+                if (deletedUser == null) {
+                    fullName = ChatUtils.getFullNameById(context, messageCache.getRecipientId());
+                } else {
+                    fullName = deletedUser.getFullName();
+                }
+                resultMessage = ownMessage ?
+                        resources.getString(R.string.frl_friends_request_remove_message_for_me, fullName) :
+                        resources.getString(R.string.frl_friends_request_remove_message_for_friend, fullName);
                 break;
             }
         }
@@ -309,11 +318,17 @@ public class ChatNotificationUtils {
         boolean ownMessage = user.getId().equals(chatMessage.getSenderId());
 
         if (notificationType.equals(PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
-            String fullNames = ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds);
-            resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_added_message,
-                    user.getFullName(), fullNames) : resources.getString(
-                    R.string.cht_update_group_added_message, ChatUtils.getFullNameById(context,
-                            chatMessage.getSenderId()), fullNames);
+            String fullNames;
+
+            if (ownMessage) {
+                fullNames = ChatUtils.getFullNamesFromOpponentId(context, user, occupantsIds);
+                resultMessage = resources.getString(R.string.cht_update_group_added_message, user.getFullName(), fullNames);
+            } else {
+                fullNames = ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds);
+                resultMessage = resources.getString(R.string.cht_update_group_added_message, ChatUtils.getFullNameById(context,
+                                chatMessage.getSenderId()), fullNames);
+            }
+
             return resultMessage;
         }
 

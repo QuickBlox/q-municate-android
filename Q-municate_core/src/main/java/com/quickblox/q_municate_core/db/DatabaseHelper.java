@@ -91,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(MessageTable.Cols.MESSAGE_ID).append(" TEXT, ")
                 .append(MessageTable.Cols.DIALOG_ID).append(" TEXT, ")
                 .append(MessageTable.Cols.SENDER_ID).append(" INTEGER, ")
+                .append(MessageTable.Cols.RECIPIENT_ID).append(" INTEGER, ")
                 .append(MessageTable.Cols.BODY).append(" TEXT, ")
                 .append(MessageTable.Cols.TIME).append(" LONG, ")
                 .append(MessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")

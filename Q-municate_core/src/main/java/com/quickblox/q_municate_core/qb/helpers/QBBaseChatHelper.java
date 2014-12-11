@@ -134,8 +134,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                 .toString());
         String attachUrl = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(
                 chatMessage.getAttachments()));
+        Integer recipientId;
 
-        MessageCache messageCache = new MessageCache(messageId, dialogId, chatCreator.getId(),
+        if (chatMessage.getRecipientId() == null) {
+            recipientId = ConstsCore.ZERO_INT_VALUE;
+        } else {
+            recipientId = chatMessage.getRecipientId();
+        }
+
+        MessageCache messageCache = new MessageCache(messageId, dialogId, chatCreator.getId(), recipientId,
                 chatMessage.getBody(), attachUrl, time, false, false, true);
 
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
@@ -322,9 +329,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        Integer recipientId;
+
+        if (chatMessage.getRecipientId() == null) {
+            recipientId = ConstsCore.ZERO_INT_VALUE;
+        } else {
+            recipientId = chatMessage.getRecipientId();
+        }
 
         MessageCache messageCache = new MessageCache(chatMessage.getId(), dialogId, chatMessage.getSenderId(),
-                chatMessage.getBody(), attachUrl, time, false, false, false);
+                recipientId, chatMessage.getBody(), attachUrl, time, false, false, false);
 
         return messageCache;
     }

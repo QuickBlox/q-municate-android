@@ -160,6 +160,7 @@ public class ChatDatabaseManager {
         String id = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.MESSAGE_ID));
         String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
         Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
+        Integer recipientId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.RECIPIENT_ID));
         String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
         long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
         String attachUrl = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ATTACH_FILE_ID));
@@ -172,7 +173,7 @@ public class ChatDatabaseManager {
         MessagesNotificationType messagesNotificationType = MessagesNotificationType.parseByCode(
                 cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
 
-        MessageCache messageCache = new MessageCache(id, dialogId, senderId, body, attachUrl, time,
+        MessageCache messageCache = new MessageCache(id, dialogId, senderId, recipientId, body, attachUrl, time,
                 isRead, isDelivered, isSync);
 
         messageCache.setMessagesNotificationType(messagesNotificationType);
@@ -288,14 +289,21 @@ public class ChatDatabaseManager {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();
+            int recipientId;
             long time = historyMessage.getDateSent();
+
+            if (historyMessage.getRecipientId() == null) {
+                recipientId = ConstsCore.ZERO_INT_VALUE;
+            } else {
+                recipientId = historyMessage.getRecipientId();
+            }
 
             String attachURL;
             int friendsMessageTypeCode;
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
-            MessageCache messageCache = new MessageCache(messageId, dialogId, senderId, message, attachURL, time,
+            MessageCache messageCache = new MessageCache(messageId, dialogId, senderId, recipientId, message, attachURL, time,
                     historyMessage.isRead(), true, true);
 
             if (historyMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
@@ -344,6 +352,7 @@ public class ChatDatabaseManager {
             values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
             values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
             values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
+            values.put(MessageTable.Cols.RECIPIENT_ID, messageCache.getRecipientId());
             resolver.insert(MessageTable.CONTENT_URI, values);
         }
     }
@@ -530,10 +539,12 @@ public class ChatDatabaseManager {
             String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
             int lastSenderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
+            int recipientId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.RECIPIENT_ID));
 
             messageCache.setDialogId(dialogId);
             messageCache.setMessage(message);
             messageCache.setSenderId(lastSenderId);
+            messageCache.setRecipientId(recipientId);
             messageCache.setTime(time);
 
             values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
