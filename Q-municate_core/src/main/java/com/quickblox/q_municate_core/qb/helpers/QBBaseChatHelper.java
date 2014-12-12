@@ -207,9 +207,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public void deleteDialog(String dialogId, QBDialogType dialogType) {
         try {
             if (QBDialogType.PRIVATE.equals(dialogType)) {
-                QBPrivateChatManager.deleteDialog(dialogId);
+                QBChatService.getInstance().getPrivateChatManager().deleteDialog(dialogId);
             } else {
-                QBGroupChatManager.deleteDialog(dialogId);
+                QBChatService.getInstance().getGroupChatManager().deleteDialog(dialogId);
             }
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);

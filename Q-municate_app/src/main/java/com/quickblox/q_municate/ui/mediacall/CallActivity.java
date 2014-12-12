@@ -83,7 +83,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onConnectionClosed() {
         if (videoChatHelper != null && currentConfig != null){
-            videoChatHelper.closeSignalingChannel(currentConfig, CallActivity.class);
+            videoChatHelper.closeSignalingChannel(currentConfig);
         }
         unregisterListener();
         finish();
@@ -110,6 +110,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void onConnectedToService(QBService service) {
         if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+            videoChatHelper.initActivityClass(CallActivity.class);
             signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
             if (signalingChannel != null) {
                 messageHandler = new ChatMessageHandler();

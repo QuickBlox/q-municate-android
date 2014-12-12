@@ -2,7 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 public class ConstsCore {
 
-    // Q-municate
+    // Q-municate release
     public static final String QB_APP_ID = "13318";
     public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
     public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";

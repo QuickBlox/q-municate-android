@@ -16,7 +16,6 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.users.model.QBUser;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 public class ChatNotificationUtils {
