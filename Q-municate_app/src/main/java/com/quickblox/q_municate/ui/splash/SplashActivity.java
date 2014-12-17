@@ -8,11 +8,10 @@ import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -93,6 +92,8 @@ public class SplashActivity extends BaseActivity {
     public void onStart() {
         super.onStart();
         facebookHelper.onActivityStart();
+
+        EasyTracker.getInstance(this).activityStart(this);
     }
 
     @Override
@@ -103,8 +104,10 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     public void onStop() {
-        facebookHelper.onActivityStop();
         super.onStop();
+        facebookHelper.onActivityStop();
+
+        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override
@@ -174,7 +177,6 @@ public class SplashActivity extends BaseActivity {
 
         @Override
         public void execute(Bundle bundle) {
-//            QBLoadDialogsCommand.start(SplashActivity.this);
             startMainActivity();
             finish();
         }

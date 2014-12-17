@@ -27,7 +27,7 @@
     <string name="cht_update_group_create_message">%1$s has added %2$s</string>
     <string name="cht_update_group_name_message">%1$s has changed the chat name to %2$s</string>
     <string name="cht_update_group_photo_message">%1$s has changed the chat picture</string>
-    <string name="cht_update_group_added_message">%1$s has added %2$s</string>
+    <string name="cht_update_group_added_message">%1$s has added %2$s to the group chat</string>
     <string name="cht_update_group_leave_message">%1$s has left</string>
     <string name="cht_notification_message">Notification message</string>
 

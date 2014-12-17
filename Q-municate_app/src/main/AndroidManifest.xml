@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     package="com.quickblox.q_municate"
-    android:versionCode="1"
-    android:versionName="1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="preferExternal">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
     <uses-permission android:name="android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

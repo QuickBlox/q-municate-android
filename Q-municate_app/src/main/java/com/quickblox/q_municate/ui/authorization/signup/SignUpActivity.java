@@ -11,8 +11,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.analytics.tracking.android.EasyTracker;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
@@ -115,6 +115,18 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     private void startCropActivity(Uri originalUri) {
         outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
         new Crop(originalUri).output(outputUri).asSquare().start(this);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EasyTracker.getInstance(this).activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override

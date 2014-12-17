@@ -352,7 +352,13 @@ public class ChatDatabaseManager {
             values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
             values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
             values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
-            values.put(MessageTable.Cols.RECIPIENT_ID, messageCache.getRecipientId());
+
+            if (messageCache.getRecipientId() == null) {
+                values.put(MessageTable.Cols.RECIPIENT_ID, ConstsCore.ZERO_INT_VALUE);
+            } else {
+                values.put(MessageTable.Cols.RECIPIENT_ID, messageCache.getRecipientId());
+            }
+
             resolver.insert(MessageTable.CONTENT_URI, values);
         }
     }
