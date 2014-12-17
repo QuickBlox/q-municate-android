@@ -173,7 +173,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         return dialog;
     }
 
-    private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
+    public void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
             List<Integer> friendIdsList) throws Exception {
         for (Integer friendId : friendIdsList) {
             try {
@@ -216,7 +216,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         userIdsList.add(chatCreator.getId());
         removeUsersFromDialog(roomJid, userIdsList);
 
-        ChatDatabaseManager.deleteDialogByDialogId(context, roomJid);
+        ChatDatabaseManager.deleteDialogByRoomJid(context, roomJid);
     }
 
     protected QBGroupChat createGroupChatIfNotExist(QBDialog dialog) throws QBResponseException {
@@ -279,9 +279,6 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     private QBDialog updateDialog(QBDialog dialog,
             QBRequestUpdateBuilder requestBuilder) throws QBResponseException {
         QBDialog updatedDialog = groupChatManager.updateDialog(dialog, requestBuilder);
-        ArrayList<Integer> friendsList = new ArrayList<Integer>(updatedDialog.getOccupants());
-        friendsList.remove(chatCreator.getId());
-        ChatDatabaseManager.saveDialog(context, updatedDialog);
         return updatedDialog;
     }
 

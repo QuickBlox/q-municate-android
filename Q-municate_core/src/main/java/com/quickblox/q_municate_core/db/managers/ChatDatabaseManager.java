@@ -51,7 +51,7 @@ public class ChatDatabaseManager {
         return dialog;
     }
 
-    public static String getDialogByMessageId(Context context, String messageId) {
+    public static String getDialogIdByMessageId(Context context, String messageId) {
         String dialogId = null;
         Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
                 MessageTable.Cols.MESSAGE_ID + " = '" + messageId + "'", null, null);
@@ -579,5 +579,10 @@ public class ChatDatabaseManager {
     public static void deleteDialogByDialogId(Context context, String dialogId) {
         context.getContentResolver().delete(DialogTable.CONTENT_URI,
                 DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
+    }
+
+    public static void deleteDialogByRoomJid(Context context, String roomJid) {
+        context.getContentResolver().delete(DialogTable.CONTENT_URI,
+                DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null);
     }
 }

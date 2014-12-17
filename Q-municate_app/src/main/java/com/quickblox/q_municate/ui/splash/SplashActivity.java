@@ -134,6 +134,7 @@ public class SplashActivity extends BaseActivity {
         if (LoginType.EMAIL.equals(getCurrentLoginType())) {
             login(userEmail, userPassword);
         } else {
+            FacebookHelper.logout();
             facebookHelper.loginWithFacebook();
         }
     }

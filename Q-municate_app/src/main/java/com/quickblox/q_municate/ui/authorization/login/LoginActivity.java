@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
@@ -122,14 +124,18 @@ public class LoginActivity extends BaseAuthActivity {
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
-            String errorMessage = exception.getMessage();
+            String errorMessage;
 
             // TODO: temp decision
             if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
                 errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
+                validationUtils.setError(errorMessage);
+            } else if (exception.getMessage().equals(resources.getString(R.string.error_email_already_taken))
+                    && startedLoginType.equals(LoginType.FACEBOOK)) {
+                errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
+                DialogUtils.showLong(LoginActivity.this, errorMessage);
             }
 
-            validationUtils.setError(errorMessage);
             hideProgress();
         }
     }

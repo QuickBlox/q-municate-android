@@ -17,6 +17,7 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;
+import java.util.List;
 
 public class ChatNotificationUtils {
 
@@ -110,7 +111,18 @@ public class ChatNotificationUtils {
         }
 
         if (!TextUtils.isEmpty(occupantsIds)) {
-            dialog.setOccupantsIds(ChatUtils.getOccupantsIdsListFromString(occupantsIds));
+            List<Integer> oldOccupantsList = dialog.getOccupants();
+            List<Integer> newOccupantsList = ChatUtils.getOccupantsIdsListFromString(occupantsIds);
+
+            if (oldOccupantsList.equals(newOccupantsList)) {
+                return;
+            }
+
+            if (oldOccupantsList.contains(newOccupantsList.get(0))) {
+                dialog.getOccupants().removeAll(newOccupantsList);
+            } else {
+                dialog.getOccupants().addAll(newOccupantsList);
+            }
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {
@@ -320,10 +332,10 @@ public class ChatNotificationUtils {
             String fullNames;
 
             if (ownMessage) {
-                fullNames = ChatUtils.getFullNamesFromOpponentId(context, user, occupantsIds);
+                fullNames = ChatUtils.getFullNamesFromOpponentId(context, user.getId(), occupantsIds);
                 resultMessage = resources.getString(R.string.cht_update_group_added_message, user.getFullName(), fullNames);
             } else {
-                fullNames = ChatUtils.getFullNamesFromOpponentIds(context, occupantsIds);
+                fullNames = ChatUtils.getFullNamesFromOpponentId(context, chatMessage.getSenderId(), occupantsIds);
                 resultMessage = resources.getString(R.string.cht_update_group_added_message, ChatUtils.getFullNameById(context,
                                 chatMessage.getSenderId()), fullNames);
             }

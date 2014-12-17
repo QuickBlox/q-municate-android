@@ -137,21 +137,20 @@ public class ChatUtils {
 
     public static String getFullNamesFromOpponentIds(Context context, String occupantsIdsString) {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
+        return getFullNamesFromOpponentIdsList(context, occupantsIdsList);
+    }
+
+    public static String getFullNamesFromOpponentId(Context context, Integer userId, String occupantsIdsString) {
+        List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
+        occupantsIdsList.remove(userId);
+        return getFullNamesFromOpponentIdsList(context, occupantsIdsList);
+    }
+
+    private static String getFullNamesFromOpponentIdsList(Context context, List<Integer> occupantsIdsList) {
         StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
         for (Integer id : occupantsIdsList) {
             stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER).append(" ");
         }
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
-    }
-
-    public static String getFullNamesFromOpponentId(Context context, QBUser user, String occupantsIdsString) {
-        List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
-        StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
-        for (Integer id : occupantsIdsList) {
-            if (!user.getId().equals(id)) {
-                stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER);
-            }
-        }
-        return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 1);
     }
 }

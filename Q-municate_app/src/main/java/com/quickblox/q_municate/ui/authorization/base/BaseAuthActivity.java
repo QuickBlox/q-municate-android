@@ -89,13 +89,18 @@ public class BaseAuthActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     saveUserAgreementShowing();
-                    facebookHelper.loginWithFacebook();
+                    loginWithFacebook();
                 }
             };
             showUserAgreement(positiveUserAgreementOnClickListener, negativeUserAgreementOnClickListener);
         } else {
-            facebookHelper.loginWithFacebook();
+            loginWithFacebook();
         }
+    }
+
+    private void loginWithFacebook() {
+        FacebookHelper.logout(); // clearing old data
+        facebookHelper.loginWithFacebook();
     }
 
     protected void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,

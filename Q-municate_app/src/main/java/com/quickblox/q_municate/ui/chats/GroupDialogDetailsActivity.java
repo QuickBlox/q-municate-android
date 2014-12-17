@@ -266,6 +266,12 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void handleAddedFriends(Intent data) {
         addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
         if (addedFriendIdsList != null) {
+            try {
+                multiChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(currentDialog,
+                        addedFriendIdsList);
+            } catch (Exception e) {
+                ErrorUtils.logError(e);
+            }
             currentNotificationTypeList.add(MessagesNotificationType.ADDED_DIALOG);
             sendNotificationToGroup();
         }
