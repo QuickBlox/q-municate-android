@@ -11,23 +11,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.analytics.tracking.android.EasyTracker;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
@@ -69,6 +69,18 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
                         R.string.dlg_not_password_field_entered)});
 
         addActions();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        //        EasyTracker.getInstance(this).activityStart(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        //        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override
@@ -115,18 +127,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     private void startCropActivity(Uri originalUri) {
         outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
         new Crop(originalUri).output(outputUri).asSquare().start(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EasyTracker.getInstance(this).activityStart(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override
@@ -201,6 +201,8 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             startMainActivity(SignUpActivity.this, user, true);
+
+            AnalyticsUtils.pushAnalyticsData(SignUpActivity.this, user, "User Sign Up");
         }
     }
 

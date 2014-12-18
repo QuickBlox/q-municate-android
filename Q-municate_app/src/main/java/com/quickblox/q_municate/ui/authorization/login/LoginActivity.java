@@ -8,19 +8,19 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.utils.DialogUtils;
-import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBLoginCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.QBLoginCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.users.model.QBUser;
 
 public class LoginActivity extends BaseAuthActivity {
 
@@ -44,8 +44,7 @@ public class LoginActivity extends BaseAuthActivity {
         validationUtils = new ValidationUtils(LoginActivity.this,
                 new EditText[]{emailEditText, passwordEditText}, new String[]{resources.getString(
                 R.string.dlg_not_email_field_entered), resources.getString(
-                R.string.dlg_not_password_field_entered)}
-        );
+                R.string.dlg_not_password_field_entered)});
 
         addActions();
     }
@@ -115,6 +114,8 @@ public class LoginActivity extends BaseAuthActivity {
                 saveRememberMe = true;
             }
             startMainActivity(LoginActivity.this, user, saveRememberMe);
+
+            AnalyticsUtils.pushAnalyticsData(LoginActivity.this, user, "User Sign In");
         }
     }
 
@@ -130,8 +131,8 @@ public class LoginActivity extends BaseAuthActivity {
             if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
                 errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
                 validationUtils.setError(errorMessage);
-            } else if (exception.getMessage().equals(resources.getString(R.string.error_email_already_taken))
-                    && startedLoginType.equals(LoginType.FACEBOOK)) {
+            } else if (exception.getMessage().equals(resources.getString(
+                    R.string.error_email_already_taken)) && startedLoginType.equals(LoginType.FACEBOOK)) {
                 errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
                 DialogUtils.showLong(LoginActivity.this, errorMessage);
             }
