@@ -115,7 +115,7 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onCall(ConnectionConfig connectionConfig) {
             String sessionId = connectionConfig.getConnectionSession();
             Lo.g("onCall sessionId="+sessionId);
-            if ( isExistSameSession(sessionId) || workingSessionPull.existActive() ) {
+            if ( isExistSameSession(sessionId) || workingSessionPull.existActive() || activityClass == null) {
                 return;
             }
 

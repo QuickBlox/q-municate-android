@@ -1,5 +1,6 @@
 package com.quickblox.q_municate_core.qb.commands;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,14 +21,23 @@ public class QBInitVideoChatCommand extends ServiceCommand {
         this.videoChatHelper = videoChatHelper;
     }
 
-    public static void start(Context context) {
+    public static void start(Context context, Class<? extends Activity> callClass) {
         Intent intent = new Intent(QBServiceConsts.INIT_VIDEO_CHAT_ACTION, null, context, QBService.class);
+        intent.putExtra(QBServiceConsts.EXTRA_CALL_ACTIVITY, callClass);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        videoChatHelper.init(QBChatService.getInstance());
+        Class<? extends Activity> callClass = (Class<? extends Activity>) extras.getSerializable(QBServiceConsts.EXTRA_CALL_ACTIVITY);
+
+        if (callClass == null) { // global init
+            videoChatHelper.init(QBChatService.getInstance());
+        } else {
+            // init call activity
+            videoChatHelper.initActivityClass(callClass);
+        }
+
         return extras;
     }
 }

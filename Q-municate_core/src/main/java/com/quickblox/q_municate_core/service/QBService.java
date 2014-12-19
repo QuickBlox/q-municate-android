@@ -138,6 +138,8 @@ public class QBService extends Service {
     }
 
     private void initCommands() {
+        registerInitCallClassCommand();
+
         registerLoginRestCommand();
         registerLoginRestSocialCommand();
         registerLoginCommand();
@@ -428,14 +430,19 @@ public class QBService extends Service {
                 QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
         QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, multiChatHelper,
                 QBServiceConsts.INIT_CHATS_SUCCESS_ACTION, QBServiceConsts.INIT_CHATS_FAIL_ACTION);
-        QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
-                QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
+        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
 
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
         loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(initChatsCommand);
         loginCommand.addCommand(initVideoChatCommand);
+    }
+
+    private void registerInitCallClassCommand() {
+        QBInitVideoChatCommand initVideoChatCommand = new QBInitVideoChatCommand(this, videoChatHelper,
+                QBServiceConsts.INIT_VIDEO_CHAT_SUCCESS_ACTION, QBServiceConsts.INIT_VIDEO_CHAT_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.INIT_VIDEO_CHAT_ACTION, initVideoChatCommand);
     }
 
     private void registerLoadChatsDialogsCommand() {

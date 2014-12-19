@@ -13,12 +13,14 @@ import com.facebook.SessionState;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -138,6 +140,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
+
+        initVideoChat();
+    }
+
+    private void initVideoChat() {
+        QBInitVideoChatCommand.start(this, CallActivity.class);
     }
 
     private void checkVisibilityProgressBars() {

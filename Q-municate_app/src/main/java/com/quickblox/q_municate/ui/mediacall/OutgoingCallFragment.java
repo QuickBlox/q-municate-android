@@ -303,7 +303,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void onConnectedToService() {
         videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
-        videoChatHelper.initActivityClass(CallActivity.class);
         if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
         } else {
