@@ -31,10 +31,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public PrivateDialogMessagesAdapter(Context context,
             PrivateDialogActivity.FriendOperationListener friendOperationListener, Cursor cursor,
-            ScrollMessagesListener scrollMessagesListener, QBDialog dialog) {
+            ChatUIHelperListener chatUIHelperListener, QBDialog dialog) {
         super(context, cursor);
         this.friendOperationListener = friendOperationListener;
-        this.scrollMessagesListener = scrollMessagesListener;
+        this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
 

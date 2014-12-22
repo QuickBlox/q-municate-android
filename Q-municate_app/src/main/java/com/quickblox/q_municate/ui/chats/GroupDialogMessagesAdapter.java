@@ -25,9 +25,9 @@ import com.quickblox.q_municate.utils.DateUtils;
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     public GroupDialogMessagesAdapter(Context context, Cursor cursor,
-            ScrollMessagesListener scrollMessagesListener, QBDialog dialog) {
+            ChatUIHelperListener chatUIHelperListener, QBDialog dialog) {
         super(context, cursor);
-        this.scrollMessagesListener = scrollMessagesListener;
+        this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
 

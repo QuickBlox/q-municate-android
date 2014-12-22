@@ -61,7 +61,7 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ScrollMessagesListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
 
@@ -463,8 +463,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     @Override
-    public void onScrollToBottom() {
+    public void onScrollMessagesToBottom() {
         scrollListView();
+    }
+
+    @Override
+    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
+        this.canPerformLogout.set(canPerformLogout);
     }
 
     protected void scrollListView() {
@@ -582,7 +587,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            updateDialogData();
+            if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
+                updateDialogData();
+            }
         }
     }
 }

@@ -125,19 +125,7 @@ public class LoginActivity extends BaseAuthActivity {
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
-            String errorMessage;
-
-            // TODO: temp decision
-            if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
-                errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
-                validationUtils.setError(errorMessage);
-            } else if (exception.getMessage().equals(resources.getString(
-                    R.string.error_email_already_taken)) && startedLoginType.equals(LoginType.FACEBOOK)) {
-                errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
-                DialogUtils.showLong(LoginActivity.this, errorMessage);
-            }
-
-            hideProgress();
+            parseExceptionMessage(exception);
         }
     }
 }

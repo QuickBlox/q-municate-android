@@ -123,6 +123,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     @Override
     public void onUriScaledBitmapReceived(Uri originalUri) {
         hideProgress();
+        canPerformLogout.set(false);
         startCropActivity(originalUri);
     }
 

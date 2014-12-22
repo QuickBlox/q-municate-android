@@ -45,7 +45,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
-    protected ScrollMessagesListener scrollMessagesListener;
+    protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected QBDialog dialog;
     private Random random;
@@ -136,7 +136,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
-        imageUtils.showFullImage(context, absolutePath);
+        chatUIHelperListener.onScreenResetPossibilityPerformLogout(false);
+        imageUtils.showFullImage((android.app.Activity) context, absolutePath);
     }
 
     protected void setViewVisibility(View view, int visibility) {
@@ -231,7 +232,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
             updateUIAfterLoading();
 
-            scrollMessagesListener.onScrollToBottom();
+            chatUIHelperListener.onScrollMessagesToBottom();
         }
 
         private void updateUIAfterLoading() {

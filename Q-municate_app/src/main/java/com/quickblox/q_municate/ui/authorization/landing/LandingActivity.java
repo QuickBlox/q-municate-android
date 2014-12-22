@@ -86,18 +86,8 @@ public class LandingActivity extends BaseAuthActivity {
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            String errorMessage = exception.getMessage();
-
-            // TODO: temp decision
-            if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
-                errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
-            } else if (exception.getMessage().equals(resources.getString(R.string.error_email_already_taken))
-                    && startedLoginType.equals(LoginType.FACEBOOK)) {
-                errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
-            }
-
-            DialogUtils.showLong(LandingActivity.this, errorMessage);
-            hideProgress();
+            int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
+            parseExceptionMessage(exception);
         }
     }
 }

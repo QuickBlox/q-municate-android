@@ -11,7 +11,9 @@ import android.widget.EditText;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -127,6 +129,24 @@ public class BaseAuthActivity extends BaseActivity {
     protected boolean isUserAgreementShown() {
         PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
+    }
+
+    protected void parseExceptionMessage(Exception exception) {
+        String errorMessage = exception.getMessage();
+
+        hideProgress();
+
+        // TODO: temp decision
+        if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
+            errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
+        } else if (exception.getMessage().equals(resources.getString(
+                R.string.error_email_already_taken)) && startedLoginType.equals(LoginType.FACEBOOK)) {
+            errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
+            DialogUtils.showLong(BaseAuthActivity.this, errorMessage);
+            return;
+        }
+
+        validationUtils.setError(errorMessage);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

@@ -41,6 +41,7 @@ import java.lang.ref.WeakReference;
 public class ImageUtils {
 
     public static final int GALLERY_INTENT_CALLED = 1;
+    public static final int GALLERY_IMAGE_PREVIEWER_CALLED = 2;
 
     private static final String TEMP_FILE_NAME = "temp.png";
 
@@ -162,12 +163,12 @@ public class ImageUtils {
         activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
     }
 
-    public void showFullImage(Context context, String absolutePath) {
+    public void showFullImage(Activity activity, String absolutePath) {
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
         Uri uri = Uri.parse("file://" + absolutePath);
         intent.setDataAndType(uri, "image/*");
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, GALLERY_IMAGE_PREVIEWER_CALLED);
     }
 
     public Bitmap getRoundedBitmap(Bitmap bitmap) {
