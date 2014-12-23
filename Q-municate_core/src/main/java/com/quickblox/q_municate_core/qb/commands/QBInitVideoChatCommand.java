@@ -29,9 +29,9 @@ public class QBInitVideoChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        if (extras == null) { // global init
+        if (extras == null || extras.getSerializable(QBServiceConsts.EXTRA_CALL_ACTIVITY) == null) { // global init
             videoChatHelper.init(QBChatService.getInstance());
-        } else if (extras.getSerializable(QBServiceConsts.EXTRA_CALL_ACTIVITY) != null) {
+        } else {
             // init call activity
             videoChatHelper.initActivityClass((Class<? extends Activity>) extras.getSerializable(
                     QBServiceConsts.EXTRA_CALL_ACTIVITY));

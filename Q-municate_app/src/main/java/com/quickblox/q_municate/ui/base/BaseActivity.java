@@ -14,6 +14,7 @@ import android.view.Window;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
@@ -201,7 +202,8 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
             boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
-            if (!isSplashActivity) {
+            boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
+            if (!isSplashActivity && !isCallActivity) {
                 activityHelper.onReceiveMessage(extras);
             }
         }

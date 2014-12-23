@@ -1,8 +1,10 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
@@ -38,6 +40,7 @@ import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
@@ -53,6 +56,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.io.File;
@@ -179,8 +183,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
 
-       updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
-       LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogBroadcastReceiver,
+        updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
@@ -208,7 +212,26 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void attachButtonOnClick() {
         canPerformLogout.set(false);
-        imageUtils.getImage();
+
+        CharSequence[] itemsArray = resources.getStringArray(R.array.dlg_attach_types_array);
+
+        Dialog dialog = DialogUtils.createSingleChoiceItemsDialog(this, resources.getString(
+                R.string.dlg_select_attach_type), itemsArray, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        imageUtils.getCaptureImage();
+                        break;
+                    case 1:
+                        imageUtils.getImage();
+                        break;
+                }
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     @Override
@@ -255,7 +278,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
-        if (isGalleryCalled(requestCode) && resultCode == RESULT_OK) {
+        if ((isGalleryCalled(requestCode) || isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
             isNeedToScrollMessages = true;
             onFileSelected(data.getData());
         }
@@ -273,6 +296,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private boolean isGalleryCalled(int requestCode) {
         return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
+    }
+
+    private boolean isCaptureCalled(int requestCode) {
+        return ImageUtils.CAPTURE_CALLED == requestCode;
     }
 
     private void initActionBar() {
@@ -328,9 +355,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onFileSelected(Uri originalUri);
 
-    protected void startLoadAttachFile(File file) {
-        showProgress();
-        QBLoadAttachFileCommand.start(this, file);
+    protected void startLoadAttachFile(final File file) {
+        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
+                R.string.dlg_confirm_sending_attach));
+        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showProgress();
+                QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
+            }
+        });
+        alertDialog.show(getFragmentManager(), null);
     }
 
     protected abstract void onFileLoaded(QBFile file);

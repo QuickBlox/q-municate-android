@@ -75,4 +75,11 @@ public class DialogUtils {
 
         return builder.create();
     }
+
+    public static Dialog createSingleChoiceItemsDialog(Context context, String title, CharSequence[] itemsArray, DialogInterface.OnClickListener singleChoiceOnClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setSingleChoiceItems(itemsArray, -1, singleChoiceOnClickListener);
+        return builder.create();
+    }
 }

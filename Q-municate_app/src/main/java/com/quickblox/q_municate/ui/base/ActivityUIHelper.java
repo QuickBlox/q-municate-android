@@ -8,11 +8,11 @@ import android.widget.TextView;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -35,8 +35,7 @@ public class ActivityUIHelper {
     }
 
     private void initUI() {
-        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message,
-                null);
+        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message, null);
         newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
         senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
         replyMessageButton = (Button) newMessageView.findViewById(R.id.replay_button);
@@ -58,7 +57,9 @@ public class ActivityUIHelper {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
-        showNewMessageAlert(senderUser, message);
+        if (messagesDialog != null) {
+            showNewMessageAlert(senderUser, message);
+        }
     }
 
     public void showNewMessageAlert(User senderUser, String message) {

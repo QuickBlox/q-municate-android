@@ -42,6 +42,7 @@ public class ImageUtils {
 
     public static final int GALLERY_INTENT_CALLED = 1;
     public static final int GALLERY_IMAGE_PREVIEWER_CALLED = 2;
+    public static final int CAPTURE_CALLED = 3;
 
     private static final String TEMP_FILE_NAME = "temp.png";
 
@@ -143,6 +144,11 @@ public class ImageUtils {
         } else {
             return new Rect(ConstsCore.ZERO_INT_VALUE, ConstsCore.ZERO_INT_VALUE, dstWidth, dstHeight);
         }
+    }
+
+    public void getCaptureImage() {
+        Intent cameraIntent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        activity.startActivityForResult(cameraIntent, CAPTURE_CALLED);
     }
 
     public void getImage() {
