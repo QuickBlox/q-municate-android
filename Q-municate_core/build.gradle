@@ -20,7 +20,7 @@ task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native
     into 'lib/'
 }
 
-tasks.withType(Compile) {
+tasks.withType(JavaCompile) {
     compileTask -> compileTask.dependsOn(nativeLibsToJar)
 }
 
