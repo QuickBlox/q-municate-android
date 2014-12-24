@@ -58,6 +58,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.io.File;
 import java.util.Timer;
@@ -283,6 +284,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             onFileSelected(data.getData());
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+        if (isNeedToOpenDialog) {
+            finish();
+        }
     }
 
     @Override

@@ -51,19 +51,10 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private GSMHelper gsmHelper;
-    private boolean isExtrasForOpeningDialog;
+    private boolean isNeedToOpenDialog;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
-        context.startActivity(intent);
-    }
-
-    public static void start(Context context, Intent oldIntent) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, oldIntent.getStringExtra(
-                QBServiceConsts.EXTRA_DIALOG_ID));
-        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, oldIntent.getStringExtra(
-                QBServiceConsts.EXTRA_USER_ID));
         context.startActivity(intent);
     }
 
@@ -121,13 +112,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         setContentView(R.layout.activity_main);
 
-        isExtrasForOpeningDialog = getIntent().hasExtra(QBServiceConsts.EXTRA_DIALOG_ID);
         useDoubleBackPressed = true;
 
         gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
-        checkVisibilityProgressBars();
 
         if (!isImportInitialized()) {
             showProgress();
@@ -137,6 +126,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
+        showActionBarProgress();
         initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
@@ -146,15 +136,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void initVideoChat() {
         QBInitVideoChatCommand.start(this, CallActivity.class);
-    }
-
-    private void checkVisibilityProgressBars() {
-        if (isExtrasForOpeningDialog) {
-            hideActionBarProgress();
-            showProgress();
-        } else {
-            showActionBarProgress();
-        }
     }
 
     private boolean isImportInitialized() {
@@ -206,6 +187,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
+        checkVisibilityProgressBars();
+    }
+
+    private void checkVisibilityProgressBars() {
+        isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+        if (isNeedToOpenDialog) {
+            hideActionBarProgress();
+            showProgress();
+        }
     }
 
     @Override
@@ -218,15 +208,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startDialog() {
-        Intent intent = getIntent();
-        String dialogId = intent.getStringExtra(QBServiceConsts.EXTRA_DIALOG_ID);
-        long userId = Long.parseLong(intent.getStringExtra(QBServiceConsts.EXTRA_USER_ID));
+        String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
+        long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         if (dialog.getType() == QBDialogType.PRIVATE) {
             startPrivateChatActivity(dialog, userId);
         } else {
             startGroupChatActivity(dialog);
         }
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
     }
 
     private void startPrivateChatActivity(QBDialog dialog, long userId) {
@@ -252,17 +242,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             hideActionBarProgress();
             hideProgress();
 
-            if (isExtrasForOpeningDialog) {
+            if (isNeedToOpenDialog) {
                 startDialog();
             }
-
-//            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
-//                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-//            if (parcelableDialogsList != null && !parcelableDialogsList.isEmpty()) {
-//                ArrayList<QBDialog> dialogsList = ChatDialogUtils.parcelableDialogsToDialogs(
-//                        parcelableDialogsList);
-//                new FindUnknownFriendsTask(MainActivity.this).execute(dialogsList, null);
-//            }
         }
     }
 

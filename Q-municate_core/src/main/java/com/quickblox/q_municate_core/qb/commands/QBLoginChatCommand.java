@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.errors.QBChatErrorsConstants;
@@ -40,10 +41,13 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBUser currentUser = AppSession.getSession().getUser();
+        Log.d(TAG, "--- perform() ---");
+        final QBUser currentUser = AppSession.getSession().getUser();
         // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
         tryLogin(currentUser);
+
         if (!chatRestHelper.isLoggedIn()) {
+            Log.d(TAG, "--- tryLogin() ---> AUTHENTICATION_FAILED ---");
             throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
         }
         return extras;
@@ -55,8 +59,12 @@ public class QBLoginChatCommand extends ServiceCommand {
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
+                Log.d(TAG, "--- tryLogin() ---");
                 chatRestHelper.login(currentUser);
-            } catch (SmackException ignore) { /* NOP */ }
+            } catch (SmackException ignore) {
+                Log.d(TAG, "--- tryLogin() ---> SmackException --- ");
+                ignore.printStackTrace();
+            }
         }
     }
 }

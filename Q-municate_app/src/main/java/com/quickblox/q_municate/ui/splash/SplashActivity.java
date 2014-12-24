@@ -18,7 +18,6 @@ import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -95,7 +94,7 @@ public class SplashActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
+//        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
         addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
     }
@@ -125,7 +124,9 @@ public class SplashActivity extends BaseActivity {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
-            QBLoginAndJoinDialogsCommand.start(this);
+            startMainActivity();
+            finish();
+//            QBLoginAndJoinDialogsCommand.start(this);
         } else {
             doAutoLogin(userEmail, userPassword);
         }
@@ -150,12 +151,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startMainActivity() {
-        Intent intent = getIntent();
-        if (intent.hasExtra(QBServiceConsts.EXTRA_DIALOG_ID)) {
-            MainActivity.start(SplashActivity.this, intent);
-        } else {
-            MainActivity.start(SplashActivity.this);
-        }
+        MainActivity.start(SplashActivity.this);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
@@ -169,14 +165,14 @@ public class SplashActivity extends BaseActivity {
         }
     }
 
-    private class LoginAndJoinChatsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            startMainActivity();
-            finish();
-        }
-    }
+//    private class LoginAndJoinChatsSuccessAction implements Command {
+//
+//        @Override
+//        public void execute(Bundle bundle) {
+//            startMainActivity();
+//            finish();
+//        }
+//    }
 
     private class LoginSuccessAction implements Command {
 

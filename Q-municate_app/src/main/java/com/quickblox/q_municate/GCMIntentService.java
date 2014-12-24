@@ -8,13 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.models.PushMessage;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 
 public class GCMIntentService extends IntentService {
@@ -25,7 +27,7 @@ public class GCMIntentService extends IntentService {
     private NotificationManager notificationManager;
     private String message;
     private String dialogId;
-    private String userId;
+    private int userId;
 
     public GCMIntentService() {
         super("GcmIntentService");
@@ -49,7 +51,7 @@ public class GCMIntentService extends IntentService {
     private void parseMessage(Bundle extras) {
         message = extras.getString(NotificationHelper.MESSAGE);
         dialogId = extras.getString(NotificationHelper.DIALOG_ID);
-        userId = extras.getString(NotificationHelper.USER_ID);
+        userId = Integer.parseInt(extras.getString(NotificationHelper.USER_ID));
 
         sendNotification();
     }
@@ -58,8 +60,7 @@ public class GCMIntentService extends IntentService {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
-        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
+        saveOpeningDialogData(userId, dialogId);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -72,6 +73,15 @@ public class GCMIntentService extends IntentService {
         builder.setContentIntent(contentIntent);
         builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    private void saveOpeningDialogData(int userId, String dialogId) {
+        if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
+            PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
+            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
+            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
+            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
+        }
     }
 
     private void sendBroadcast(PushMessage message) {
