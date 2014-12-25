@@ -93,7 +93,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void sendGroupMessage(String roomJidId, String message) throws QBResponseException {
+    public void sendGroupMessage(String roomJidId, String message) throws QBResponseException, IllegalStateException {
         QBChatMessage chatMessage = getQBChatMessage(message, null);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
@@ -117,8 +117,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         } catch (IllegalStateException e) {
-            ErrorUtils.showError(context, context.getString(R.string.dlg_not_joined_room));
             tryJoinRoomChat(existingDialog);
+            throw new IllegalStateException(e);
         }
         if (error != null) {
             throw new QBResponseException(error);

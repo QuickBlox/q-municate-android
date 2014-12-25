@@ -211,15 +211,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     public void sendMessageOnClick(View view) {
-        try {
-            ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(messageEditText.getText().toString(),
-                    opponentFriend.getUserId());
-        } catch (QBResponseException exc) {
-            ErrorUtils.showError(this, exc);
-        }
-        messageEditText.setText(ConstsCore.EMPTY_STRING);
-        isNeedToScrollMessages = true;
-        scrollListView();
+        sendMessage(true);
     }
 
     @Override

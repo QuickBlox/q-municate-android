@@ -9,6 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.GCMIntentService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseActivity;
@@ -50,6 +51,10 @@ public class SplashActivity extends BaseActivity {
         String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
 
         boolean isRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+
+        if (getIntent().hasExtra(GCMIntentService.CLICKED_ON_PUSH)) {
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
+        }
 
         if (isRememberMe) {
             checkStartExistSession(userEmail, userPassword);
@@ -94,7 +99,6 @@ public class SplashActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
-//        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
         addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
     }
@@ -126,7 +130,6 @@ public class SplashActivity extends BaseActivity {
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
             startMainActivity();
             finish();
-//            QBLoginAndJoinDialogsCommand.start(this);
         } else {
             doAutoLogin(userEmail, userPassword);
         }
@@ -164,15 +167,6 @@ public class SplashActivity extends BaseActivity {
             }
         }
     }
-
-//    private class LoginAndJoinChatsSuccessAction implements Command {
-//
-//        @Override
-//        public void execute(Bundle bundle) {
-//            startMainActivity();
-//            finish();
-//        }
-//    }
 
     private class LoginSuccessAction implements Command {
 

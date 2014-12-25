@@ -157,15 +157,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     public void sendMessageOnClick(View view) {
-        try {
-            ((QBMultiChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
-                    messageEditText.getText().toString());
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
-        messageEditText.setText(ConstsCore.EMPTY_STRING);
-        isNeedToScrollMessages = true;
-        scrollListView();
+        sendMessage(false);
     }
 
     @Override

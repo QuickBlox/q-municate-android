@@ -53,6 +53,8 @@ import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -525,6 +527,31 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     abstract QBDialog getQBDialog();
+
+    protected void sendMessage(boolean privateMessage) {
+        boolean error = false;
+        try {
+            if (privateMessage) {
+                ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(messageEditText.getText().toString(),
+                        opponentFriend.getUserId());
+            } else {
+                ((QBMultiChatHelper)baseChatHelper).sendGroupMessage(dialog.getRoomJid(), messageEditText.getText().toString());
+            }
+        } catch (QBResponseException e) {
+            ErrorUtils.showError(this, e);
+            error = true;
+        } catch (IllegalStateException e) {
+            ErrorUtils.showError(this, this.getString(
+                    com.quickblox.q_municate_core.R.string.dlg_not_joined_room));
+            error = true;
+        }
+
+        if (!error) {
+            messageEditText.setText(ConstsCore.EMPTY_STRING);
+            isNeedToScrollMessages = true;
+            scrollListView();
+        }
+    }
 
     protected void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
