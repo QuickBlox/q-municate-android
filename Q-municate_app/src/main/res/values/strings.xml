@@ -96,7 +96,7 @@
 
     <string-array name="dlg_attach_types_array">
         <item>Take Photo</item>
-        <item>From Images</item>
+        <item>From Library</item>
     </string-array>
 
     // Group Dialog

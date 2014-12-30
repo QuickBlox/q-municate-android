@@ -283,7 +283,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         canPerformLogout.set(true);
         if ((isGalleryCalled(requestCode) || isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
             isNeedToScrollMessages = true;
-            onFileSelected(data.getData());
+            if (data.getData() == null) {
+                onFileSelected((Bitmap) data.getExtras().get("data"));
+            } else {
+                onFileSelected(data.getData());
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -367,14 +371,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onFileSelected(Uri originalUri);
 
+    protected abstract void onFileSelected(Bitmap bitmap);
+
     protected void startLoadAttachFile(final File file) {
-        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
+        final AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
                 R.string.dlg_confirm_sending_attach));
         alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
                 QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
+            }
+        });
+        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                alertDialog.dismiss();
             }
         });
         alertDialog.show(getFragmentManager(), null);

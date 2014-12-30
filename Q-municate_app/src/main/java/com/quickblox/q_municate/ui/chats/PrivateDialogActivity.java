@@ -65,6 +65,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
+    protected void onFileSelected(Bitmap bitmap) {
+        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         friendOperationAction = new FriendOperationAction();

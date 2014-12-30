@@ -93,6 +93,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
+    protected void onFileSelected(Bitmap bitmap) {
+        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
+    }
+
+    @Override
     protected void onFileLoaded(QBFile file) {
         try {
             ((QBMultiChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
