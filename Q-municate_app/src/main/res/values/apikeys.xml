@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    // release
     <string name="facebook_app_id">605405446247805</string>
+
+    // release web
+    <!--<string name="facebook_app_id">1445555125707161</string>-->
 </resources>

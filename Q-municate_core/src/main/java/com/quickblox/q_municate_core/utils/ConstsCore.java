@@ -7,6 +7,11 @@ public class ConstsCore {
     public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
     public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
 
+//    // Q-municate release web
+//    public static final String QB_APP_ID = "12496";
+//    public static final String QB_AUTH_KEY = "DxGShn2UtN5TUfd";
+//    public static final String QB_AUTH_SECRET = "gypfTzd3VbqYxsK";
+
 //    // Q-municate dev
 //    public static final String QB_APP_ID = "14542";
 //    public static final String QB_AUTH_KEY = "rJqAFphrSnpyZW2";
