@@ -208,6 +208,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startDialog() {
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
         long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
@@ -216,7 +217,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         } else {
             startGroupChatActivity(dialog);
         }
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
     }
 
     private void startPrivateChatActivity(QBDialog dialog, long userId) {

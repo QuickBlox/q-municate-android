@@ -49,9 +49,17 @@ public class GCMIntentService extends IntentService {
     }
 
     private void parseMessage(Bundle extras) {
-        message = extras.getString(NotificationHelper.MESSAGE);
-        dialogId = extras.getString(NotificationHelper.DIALOG_ID);
-        userId = Integer.parseInt(extras.getString(NotificationHelper.USER_ID));
+        if (extras.getString(NotificationHelper.MESSAGE) != null) {
+            message = extras.getString(NotificationHelper.MESSAGE);
+        }
+
+        if (extras.getString(NotificationHelper.USER_ID) != null) {
+            userId = Integer.parseInt(extras.getString(NotificationHelper.USER_ID));
+        }
+
+        if (extras.getString(NotificationHelper.DIALOG_ID) != null) {
+            dialogId = extras.getString(NotificationHelper.DIALOG_ID);
+        }
 
         sendNotification();
     }
@@ -60,9 +68,7 @@ public class GCMIntentService extends IntentService {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
-        intent.putExtra(CLICKED_ON_PUSH, true);
-
-        saveOpeningDialogData(userId, dialogId);
+        saveOpeningDialogData(intent, userId, dialogId);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -77,11 +83,14 @@ public class GCMIntentService extends IntentService {
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void saveOpeningDialogData(int userId, String dialogId) {
+    private void saveOpeningDialogData(Intent intent, int userId, String dialogId) {
         if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
             PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
+            intent.putExtra(CLICKED_ON_PUSH, true);
+        } else {
+            intent.putExtra(CLICKED_ON_PUSH, false);
         }
     }
 

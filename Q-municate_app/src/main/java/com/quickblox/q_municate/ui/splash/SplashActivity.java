@@ -53,7 +53,8 @@ public class SplashActivity extends BaseActivity {
         boolean isRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
 
         if (getIntent().hasExtra(GCMIntentService.CLICKED_ON_PUSH)) {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG,
+                    getIntent().getBooleanExtra(GCMIntentService.CLICKED_ON_PUSH, false));
         }
 
         if (isRememberMe) {

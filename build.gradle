@@ -20,7 +20,7 @@ ext.targetSdkVersion = 14
 ext.versionName = '1.0.9'
 ext.versionCode = 25
 
-ext.prodDebug = false
+ext.prodDebug = true
 
 // Dependencies versions
 ext.universalImageLoaderVersion = '1.9.1'
