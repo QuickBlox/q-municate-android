@@ -110,11 +110,11 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
         final User user = UsersDatabaseManager.getUserFromCursor(cursor);
 
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
-        boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > ConstsCore.ZERO_INT_VALUE;
+        boolean isPendingStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_PENDING_STATUS)) > ConstsCore.ZERO_INT_VALUE;
 
         viewHolder.fullNameTextView.setText(user.getFullName());
 
-        checkVisibilityItems(viewHolder, relationStatusId, user, isAskStatus);
+        checkVisibilityItems(viewHolder, relationStatusId, user, isPendingStatus);
 
         String avatarUrl = getAvatarUrlForUser(user);
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
@@ -144,7 +144,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
     }
 
     private void checkVisibilityItems(ViewHolder viewHolder, int relationStatusId, User user,
-            boolean isAskStatus) {
+            boolean isPendingStatus) {
         String status = null;
 
         String relationStatus = UsersDatabaseManager.getRelationStatusNameById(context, relationStatusId);
@@ -153,7 +153,7 @@ public class FriendsListCursorAdapter extends CursorTreeAdapter {
             boolean isAllFriends = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_BOTH) || relationStatus
                     .equals(QBFriendListHelper.RELATION_STATUS_FROM) || relationStatus
                     .equals(QBFriendListHelper.RELATION_STATUS_TO);
-            boolean isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && isAskStatus;
+            boolean isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && isPendingStatus;
             if (isAddedFriend) {
                 viewHolder.addFriendImageView.setVisibility(View.GONE);
                 viewHolder.onlineImageView.setVisibility(View.GONE);

@@ -44,18 +44,12 @@ public class FriendUtils {
         Friend friend = new Friend();
         friend.setUserId(rosterEntry.getUserId());
         friend.setRelationStatus(rosterEntry.getType().name());
-        if (isPendingFriend(rosterEntry)) {
-            friend.setAskStatus(true);
-        }
+        friend.setPendingStatus(isPendingFriend(rosterEntry));
         return friend;
     }
 
     public static boolean isPendingFriend(QBRosterEntry rosterEntry) {
         return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
-    }
-
-    public static boolean isAskedFriend(QBRosterEntry rosterEntry) {
-        return RosterPacket.ItemType.none.equals(rosterEntry.getType());
     }
 
     public static Friend createFriend(int userId) {
@@ -115,7 +109,7 @@ public class FriendUtils {
 
     public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
         MatrixCursor usersCursor = new MatrixCursor(
-                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK});
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_PENDING_STATUS});
 
         List<User> friendsList = UsersDatabaseManager.getAllFriendsList(context);
 

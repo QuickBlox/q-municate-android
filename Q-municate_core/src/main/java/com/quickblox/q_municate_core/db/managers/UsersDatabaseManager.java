@@ -85,7 +85,8 @@ public class UsersDatabaseManager {
 
         values.put(FriendTable.Cols.USER_ID, friend.getUserId());
         values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
-        values.put(FriendTable.Cols.IS_STATUS_ASK, friend.isAskStatus());
+        values.put(FriendTable.Cols.IS_PENDING_STATUS, friend.isPendingStatus());
+        values.put(FriendTable.Cols.IS_NEW_FRIEND_STATUS, friend.isNewFriendStatus());
 
         return values;
     }
@@ -183,6 +184,20 @@ public class UsersDatabaseManager {
         return isFriendInBase;
     }
 
+    public static boolean isFriendWithStatusNew(Context context, int searchId) {
+        String condition = FriendTable.Cols.USER_ID + " = " + searchId + " AND " + FriendTable.Cols.IS_NEW_FRIEND_STATUS + " = 1";
+
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, null, condition, null, null);
+
+        boolean isFriend = cursor.getCount() > ConstsCore.ZERO_INT_VALUE;
+
+        cursor.close();
+
+        return isFriend;
+    }
+
     public static Cursor getAllFriendsWithPending(Context context) {
         if (relationStatusesMap == null) {
             relationStatusesMap = getRelationStatusesMap(context);
@@ -193,7 +208,7 @@ public class UsersDatabaseManager {
         int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
         int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
 
-        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + "))";
+        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_PENDING_STATUS + " = 1" + "))";
 
         String sortOrder = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
@@ -214,7 +229,7 @@ public class UsersDatabaseManager {
         int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
         int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
 
-        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
+        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_PENDING_STATUS + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
 
         String sorting = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
 
@@ -311,7 +326,7 @@ public class UsersDatabaseManager {
         int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
         int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
 
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_STATUS_ASK + " = 1" + ")";
+        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_PENDING_STATUS + " = 1" + ")";
 
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, new String[]{"count(*)"},
@@ -429,11 +444,13 @@ public class UsersDatabaseManager {
     public static Friend getFriendFromCursor(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.USER_ID));
         int relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
-        boolean isAskStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_STATUS_ASK)) > 0;
+        boolean isPendingStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_PENDING_STATUS)) > 0;
+        boolean isNewFriendStatus = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.IS_NEW_FRIEND_STATUS)) > 0;
 
         Friend friend = new Friend(id);
         friend.setRelationStatusId(relationStatusId);
-        friend.setAskStatus(isAskStatus);
+        friend.setPendingStatus(isPendingStatus);
+        friend.setNewFriendStatus(isNewFriendStatus);
 
         return friend;
     }
