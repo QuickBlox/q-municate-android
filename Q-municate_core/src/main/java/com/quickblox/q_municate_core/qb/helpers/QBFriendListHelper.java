@@ -27,7 +27,6 @@ import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
@@ -75,19 +74,25 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void inviteFriend(int userId) throws Exception {
         if (isNotInvited(userId)) {
-            sendInvitation(userId);
-
-            QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(
-                    context);
-            sendNotificationToFriend(chatMessage, userId);
+            invite(userId);
         }
     }
 
     public void addFriend(int userId) throws Exception {
-        createFriend(userId);
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry != null && FriendUtils.isAskedFriend(rosterEntry)) {
+            acceptFriend(userId);
+        } else {
+            createFriend(userId);
+            invite(userId);
+        }
+    }
+
+    public void invite(int userId) throws Exception {
         sendInvitation(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -281,6 +286,13 @@ public class QBFriendListHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    private void checkForAutoSubscription(int userId) throws Exception {
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry != null && FriendUtils.isPendingFriend(rosterEntry)) {
+            acceptFriend(userId);
+        }
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -324,7 +336,11 @@ public class QBFriendListHelper extends BaseHelper {
             try {
                 createFriend(userId);
                 notifyContactRequest();
+
+                checkForAutoSubscription(userId);
             } catch (QBResponseException e) {
+                Log.e(TAG, SUBSCRIPTION_ERROR, e);
+            } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
         }

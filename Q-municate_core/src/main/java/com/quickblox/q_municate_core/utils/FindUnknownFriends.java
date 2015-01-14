@@ -3,11 +3,11 @@ package com.quickblox.q_municate_core.utils;
 import android.content.Context;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.users.model.QBUser;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +19,7 @@ public class FindUnknownFriends {
     private List<QBDialog> dialogsList;
     private Set<Integer> loadIdsSet;
     private QBUser currentUser;
+    private QBRestHelper restHelper;
 
     public FindUnknownFriends(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
         init(context, currentUser);
@@ -34,6 +35,7 @@ public class FindUnknownFriends {
         this.context = context;
         this.currentUser = currentUser;
         loadIdsSet = new HashSet<Integer>();
+        restHelper = new QBRestHelper(context);
     }
 
     public void find() {
@@ -48,6 +50,19 @@ public class FindUnknownFriends {
         for (QBDialog dialog : dialogsList) {
             findUserInDialog(dialog, currentUserId);
         }
+        if (!loadIdsSet.isEmpty()) {
+            int oneElement = 1;
+            try {
+                if (loadIdsSet.size() == oneElement) {
+                    int userId = loadIdsSet.iterator().next();
+                    restHelper.loadUser(userId);
+                } else {
+                    restHelper.loadUsers(loadIdsSet);
+                }
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
+            }
+        }
     }
 
     private void findUserInDialog(QBDialog dialog, int currentUserId) {
@@ -58,21 +73,5 @@ public class FindUnknownFriends {
                 loadIdsSet.add(occupantId);
             }
         }
-        if (!loadIdsSet.isEmpty()) {
-            int oneElement = 1;
-            if (loadIdsSet.size() == oneElement) {
-                startLoadUser(loadIdsSet.iterator().next());
-            } else {
-                startLoadUsers(new ArrayList<Integer>(loadIdsSet));
-            }
-        }
-    }
-
-    private void startLoadUser(int userId) {
-        QBLoadUserCommand.start(context, userId);
-    }
-
-    private void startLoadUsers(List<Integer> usersIdsList) {
-        QBLoadUserCommand.start(context, usersIdsList);
     }
 }

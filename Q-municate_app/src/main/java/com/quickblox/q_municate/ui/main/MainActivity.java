@@ -13,17 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.mediacall.CallActivity;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.DialogsFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
@@ -32,9 +22,19 @@ import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
 import com.quickblox.q_municate.ui.invitefriends.InviteFriendsFragment;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.SettingsFragment;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -180,7 +180,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void loadChatsDialogs() {
-        QBLoadDialogsCommand.start(this);
+        QBLoadDialogsCommand.start(MainActivity.this);
     }
 
     @Override
@@ -188,14 +188,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         super.onResume();
         gsmHelper.checkPlayServices();
         checkVisibilityProgressBars();
-    }
-
-    private void checkVisibilityProgressBars() {
-        isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        if (isNeedToOpenDialog) {
-            hideActionBarProgress();
-            showProgress();
-        }
     }
 
     @Override
@@ -207,10 +199,20 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         }
     }
 
+    private void checkVisibilityProgressBars() {
+        isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
+                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+        if (isNeedToOpenDialog) {
+            hideActionBarProgress();
+            showProgress();
+        }
+    }
+
     private void startDialog() {
         PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
-        long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
+        long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
+                ConstsCore.NOT_INITIALIZED_VALUE);
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         if (dialog.getType() == QBDialogType.PRIVATE) {
             startPrivateChatActivity(dialog, userId);

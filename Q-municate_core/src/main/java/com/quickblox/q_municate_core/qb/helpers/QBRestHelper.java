@@ -1,10 +1,13 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -30,7 +33,10 @@ public class QBRestHelper extends BaseHelper {
     }
 
     public Collection<User> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {
-        Collection<QBUser> usersList = (Collection<QBUser>) QBUsers.getUsersByIDs(usersIdsList, null);
+        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+        requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
+        requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
+        Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle());
 
         Collection<User> usersListResult = FriendUtils.createUsersList(usersList);
 

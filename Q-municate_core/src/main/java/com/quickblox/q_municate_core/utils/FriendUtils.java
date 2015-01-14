@@ -44,10 +44,18 @@ public class FriendUtils {
         Friend friend = new Friend();
         friend.setUserId(rosterEntry.getUserId());
         friend.setRelationStatus(rosterEntry.getType().name());
-        if (RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus())) {
+        if (isPendingFriend(rosterEntry)) {
             friend.setAskStatus(true);
         }
         return friend;
+    }
+
+    public static boolean isPendingFriend(QBRosterEntry rosterEntry) {
+        return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
+    }
+
+    public static boolean isAskedFriend(QBRosterEntry rosterEntry) {
+        return RosterPacket.ItemType.none.equals(rosterEntry.getType());
     }
 
     public static Friend createFriend(int userId) {

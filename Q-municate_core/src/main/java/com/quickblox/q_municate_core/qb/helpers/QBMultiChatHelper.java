@@ -93,7 +93,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void sendGroupMessage(String roomJidId, String message) throws QBResponseException, IllegalStateException {
+    public void sendGroupMessage(String roomJidId,
+            String message) throws QBResponseException, IllegalStateException {
         QBChatMessage chatMessage = getQBChatMessage(message, null);
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
@@ -167,7 +168,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendIdsList);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForCreateGroupChat(context, dialog.getOccupants());
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForCreateGroupChat(context,
+                dialog.getOccupants());
         sendGroupMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
 
         return dialog;

@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.qb.commands;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
@@ -38,7 +39,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
-            new FindUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
+            new FindUnknownFriendsTask().execute(dialogsList);
             parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
             multiChatHelper.tryJoinRoomChats(dialogsList);
         }
@@ -47,5 +48,15 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
 
         return bundle;
+    }
+
+    private class FindUnknownFriendsTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            List<QBDialog> dialogsList = (List<QBDialog>) params[0];
+            new FindUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
+            return null;
+        }
     }
 }
