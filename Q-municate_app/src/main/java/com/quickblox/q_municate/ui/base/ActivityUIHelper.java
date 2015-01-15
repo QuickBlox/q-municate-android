@@ -11,6 +11,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
@@ -22,7 +23,7 @@ public class ActivityUIHelper {
     private View newMessageView;
     private TextView newMessageTextView;
     private TextView senderMessageTextView;
-    private Button replyMessageButton;
+    private Button notificationActionButton;
 
     private User senderUser;
     private QBDialog messagesDialog;
@@ -38,26 +39,39 @@ public class ActivityUIHelper {
         newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message, null);
         newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
         senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-        replyMessageButton = (Button) newMessageView.findViewById(R.id.replay_button);
+        notificationActionButton = (Button) newMessageView.findViewById(R.id.notification_action_button);
     }
 
     private void initListeners() {
-        replyMessageButton.setOnClickListener(new View.OnClickListener() {
+        notificationActionButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                replyMessage();
+                showDialog();
             }
         });
     }
 
-    protected void onReceiveMessage(Bundle extras) {
+    protected void showChatMessageNotification(Bundle extras) {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
+        if (isMessagesDialogCorrect(extras)) {
+            showNewMessageAlert(senderUser, message);
+        }
+    }
+
+    private boolean isMessagesDialogCorrect(Bundle extras) {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
-        if (messagesDialog != null) {
+        return messagesDialog != null;
+    }
+
+    protected void showContactRequestNotification(Bundle extras) {
+        int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
+        User senderUser = UsersDatabaseManager.getUserById(activity, senderUserId);
+        String message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
+        if (isMessagesDialogCorrect(extras)) {
             showNewMessageAlert(senderUser, message);
         }
     }
@@ -69,7 +83,7 @@ public class ActivityUIHelper {
         Crouton.show(activity, newMessageView);
     }
 
-    protected void replyMessage() {
+    protected void showDialog() {
         if (isPrivateMessage) {
             startPrivateChatActivity();
         } else {

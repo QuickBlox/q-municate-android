@@ -60,13 +60,14 @@ public class ActivityHelper extends BaseActivityHelper {
         serviceConnection = new QBChatServiceConnection();
     }
 
-    public void showFriendAlert(String message) {
-        AlertDialog alertDialog = AlertDialog.newInstance(message);
-        alertDialog.show(activity.getFragmentManager(), null);
+    protected void onReceivedChatMessageNotification(Bundle extras) {
+
+        activityUIHelper.showChatMessageNotification(extras);
     }
 
-    protected void onReceiveMessage(Bundle extras) {
-        activityUIHelper.onReceiveMessage(extras);
+    protected void onReceivedContactRequestNotification(Bundle extras) {
+
+        activityUIHelper.showContactRequestNotification(extras);
     }
 
     public void forceRelogin() {
@@ -149,9 +150,9 @@ public class ActivityHelper extends BaseActivityHelper {
     private void registerGlobalReceiver() {
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
+        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
-        globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
@@ -177,7 +178,7 @@ public class ActivityHelper extends BaseActivityHelper {
 
         public void onReceiveRefreshSessionAction(Bundle extras);
 
-        public void onReceiveFriendActionAction(Bundle extras);
+        public void onReceiveContactRequestAction(Bundle extras);
     }
 
     private class BaseBroadcastReceiver extends BroadcastReceiver {
@@ -219,6 +220,10 @@ public class ActivityHelper extends BaseActivityHelper {
                         if (actionsListener != null) {
                             actionsListener.onReceiveChatMessageAction(intent.getExtras());
                         }
+                    } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
+                        if (actionsListener != null) {
+                            actionsListener.onReceiveContactRequestAction(intent.getExtras());
+                        }
                     } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                         if (actionsListener != null) {
                             actionsListener.onReceiveForceReloginAction(intent.getExtras());
@@ -226,10 +231,6 @@ public class ActivityHelper extends BaseActivityHelper {
                     } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
                         if (actionsListener != null) {
                             actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.FRIEND_ALERT_SHOW.equals(intent.getAction())) {
-                        if (actionsListener != null) {
-                            actionsListener.onReceiveFriendActionAction(intent.getExtras());
                         }
                     }
                 }

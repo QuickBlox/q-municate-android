@@ -222,10 +222,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             if (currentDialog == null) {
                 return;
             }
-            String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-            boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
-            if (!isFromCurrentChat) {
-                activityHelper.onReceiveMessage(extras);
+            if (!isFromCurrentDialog(extras)) {
+                activityHelper.onReceivedChatMessageNotification(extras);
             }
         }
 
@@ -242,9 +240,19 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
 
         @Override
-        public void onReceiveFriendActionAction(Bundle extras) {
-            String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
-            activityHelper.showFriendAlert(alertMessage);
+        public void onReceiveContactRequestAction(Bundle extras) {
+            if (currentDialog == null) {
+                return;
+            }
+            if (!isFromCurrentDialog(extras)) {
+                activityHelper.onReceivedContactRequestNotification(extras);
+            }
         }
+    }
+
+    private boolean isFromCurrentDialog(Bundle extras) {
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
+        return !isFromCurrentChat;
     }
 }

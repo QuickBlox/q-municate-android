@@ -16,6 +16,7 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
@@ -285,8 +286,12 @@ public class QBFriendListHelper extends BaseHelper {
         return UsersDatabaseManager.isFriendWithStatusNew(context, userId);
     }
 
-    private void notifyContactRequest() {
+    private void notifyContactRequest(int userId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
+
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(R.string.frl_friends_contact_request));
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
@@ -339,7 +344,7 @@ public class QBFriendListHelper extends BaseHelper {
         public void subscriptionRequested(int userId) {
             try {
                 createFriend(userId, true);
-                notifyContactRequest();
+                notifyContactRequest(userId);
 
                 checkForAutoSubscription(userId);
             } catch (QBResponseException e) {

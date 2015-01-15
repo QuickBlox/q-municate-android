@@ -173,6 +173,12 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     }
 
+    private boolean needShowReceivedNotification() {
+        boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
+        boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
+        return !isSplashActivity && !isCallActivity;
+    }
+
     protected void onSuccessAction(String action) {
 
     }
@@ -201,10 +207,8 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
-            boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
-            if (!isSplashActivity && !isCallActivity) {
-                activityHelper.onReceiveMessage(extras);
+            if (needShowReceivedNotification()) {
+                activityHelper.onReceivedChatMessageNotification(extras);
             }
         }
 
@@ -221,9 +225,10 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         }
 
         @Override
-        public void onReceiveFriendActionAction(Bundle extras) {
-            String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
-            activityHelper.showFriendAlert(alertMessage);
+        public void onReceiveContactRequestAction(Bundle extras) {
+            if (needShowReceivedNotification()) {
+                activityHelper.onReceivedContactRequestNotification(extras);
+            }
         }
     }
 }
