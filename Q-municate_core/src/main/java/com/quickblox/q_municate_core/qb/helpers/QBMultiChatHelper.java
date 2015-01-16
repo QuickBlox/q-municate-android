@@ -67,6 +67,10 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     public void onGroupMessageReceived(QBChat chat, QBChatMessage chatMessage) {
+        if (Utils.validateNotNull(chatMessage.getDialogId())) {
+            return;
+        }
+
         User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
 
         MessageCache messageCache;
@@ -228,7 +232,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
             throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
         }
         QBGroupChat groupChat = groupChatManager.getGroupChat(dialog.getRoomJid());
-        if (groupChat == null) {
+        if (groupChat == null && dialog.getRoomJid() != null) {
             groupChat = groupChatManager.createGroupChat(dialog.getRoomJid());
             groupChat.addMessageListener(groupChatMessageListener);
         }

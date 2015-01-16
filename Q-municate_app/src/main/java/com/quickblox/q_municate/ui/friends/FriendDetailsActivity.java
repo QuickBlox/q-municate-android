@@ -42,7 +42,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private RoundedImageView avatarImageView;
     private TextView nameTextView;
-    private TextView statusTextView;
+//    private TextView statusTextView;
     private ImageView onlineImageView;
     private TextView onlineStatusTextView;
     private TextView phoneTextView;
@@ -76,7 +76,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private void initUI() {
         avatarImageView = _findViewById(R.id.avatar_imageview);
         nameTextView = _findViewById(R.id.name_textview);
-        statusTextView = _findViewById(R.id.status_textview);
+//        statusTextView = _findViewById(R.id.status_textview);
         onlineImageView = _findViewById(R.id.online_imageview);
         onlineStatusTextView = _findViewById(R.id.online_status_textview);
         phoneTextView = _findViewById(R.id.phone_textview);
@@ -175,7 +175,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             } else {
                 onlineImageView.setVisibility(View.GONE);
             }
-            statusTextView.setText(user.getStatus());
+//            statusTextView.setText(user.getStatus());
             onlineStatusTextView.setText(user.getOnlineStatus(this));
         }
     }
@@ -242,8 +242,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void deleteDialog() {
-//        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
-//        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
+        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, friend.getUserId());
+        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
     private class RemoveFriendSuccessAction implements Command {

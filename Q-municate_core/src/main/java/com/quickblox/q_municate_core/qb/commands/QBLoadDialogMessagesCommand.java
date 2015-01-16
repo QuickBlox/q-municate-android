@@ -36,7 +36,9 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
+
         List<QBChatHistoryMessage> dialogMessagesList = baseChatHelper.getDialogMessages(dialog, lastDateLoad);
+
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
                 (java.io.Serializable) dialogMessagesList);

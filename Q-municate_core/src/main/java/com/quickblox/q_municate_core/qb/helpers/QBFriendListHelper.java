@@ -195,18 +195,20 @@ public class QBFriendListHelper extends BaseHelper {
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User user = restHelper.loadUser(userId);
+        User newUser = restHelper.loadUser(userId);
 
-        if (user == null) {
+        if (newUser == null) {
             return;
         }
 
         Friend friend = FriendUtils.createFriend(rosterEntry);
 
-        saveUser(user);
+        newUser.setOnline(isFriendOnline(roster.getPresence(userId)));
+
+        saveUser(newUser);
         saveFriend(friend);
 
-        fillUserOnlineStatus(user);
+        fillUserOnlineStatus(newUser);
     }
 
     private void createFriend(int userId, boolean isNewFriendStatus) throws QBResponseException {
@@ -241,18 +243,22 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    //    private void fillFriendStatus(User friend) {
-    //        QBPresence presence = roster.getPresence(friend.getUserId());
-    //        friend.setStatus(presence.getStatus());
-    //    }
-
     private void fillUserOnlineStatus(User user, QBPresence presence) {
-        if (QBPresence.Type.online.equals(presence.getType())) {
+        if (isFriendOnline(presence)) {
             user.setOnline(true);
         } else {
             user.setOnline(false);
         }
     }
+
+    private boolean isFriendOnline(QBPresence presence) {
+        return QBPresence.Type.online.equals(presence.getType());
+    }
+
+    //    private void fillFriendStatus(User friend) {
+    //        QBPresence presence = roster.getPresence(friend.getUserId());
+    //        friend.setStatus(presence.getStatus());
+    //    }
 
     //    public void sendStatus(String status) throws SmackException.NotConnectedException {
     //        QBPresence presence = new QBPresence(QBPresence.Type.online, status, STATUS_PRESENCE_PRIORITY,
@@ -293,13 +299,6 @@ public class QBFriendListHelper extends BaseHelper {
         intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    private void checkForAutoSubscription(int userId) throws Exception {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
-        if (rosterEntry != null && FriendUtils.isPendingFriend(rosterEntry)) {
-            acceptFriend(userId);
-        }
     }
 
     private class RosterListener implements QBRosterListener {
@@ -345,8 +344,6 @@ public class QBFriendListHelper extends BaseHelper {
             try {
                 createFriend(userId, true);
                 notifyContactRequest(userId);
-
-                checkForAutoSubscription(userId);
             } catch (QBResponseException e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             } catch (Exception e) {

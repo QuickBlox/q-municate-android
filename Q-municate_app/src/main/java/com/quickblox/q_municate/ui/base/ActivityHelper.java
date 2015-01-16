@@ -16,6 +16,7 @@ import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -23,8 +24,6 @@ import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.HashMap;
@@ -216,20 +215,14 @@ public class ActivityHelper extends BaseActivityHelper {
                 @Override
                 public void run() {
                     Bundle extras = intent.getExtras();
-                    if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                    if (actionsListener != null) {
+                        if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
                             actionsListener.onReceiveChatMessageAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                        } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
                             actionsListener.onReceiveContactRequestAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                        } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                             actionsListener.onReceiveForceReloginAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                        } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
                             actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
                         }
                     }

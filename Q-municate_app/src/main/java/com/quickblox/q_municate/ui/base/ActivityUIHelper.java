@@ -55,23 +55,25 @@ public class ActivityUIHelper {
     protected void showChatMessageNotification(Bundle extras) {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        if (isMessagesDialogCorrect(extras)) {
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
+        if (isMessagesDialogCorrect(dialogId)) {
             showNewMessageAlert(senderUser, message);
         }
     }
 
-    private boolean isMessagesDialogCorrect(Bundle extras) {
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+    private boolean isMessagesDialogCorrect(String dialogId) {
         messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
-        isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         return messagesDialog != null;
     }
 
     protected void showContactRequestNotification(Bundle extras) {
         int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        User senderUser = UsersDatabaseManager.getUserById(activity, senderUserId);
+        senderUser = UsersDatabaseManager.getUserById(activity, senderUserId);
         String message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
-        if (isMessagesDialogCorrect(extras)) {
+        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(activity, senderUserId);
+        isPrivateMessage = true;
+        if (isMessagesDialogCorrect(dialogId)) {
             showNewMessageAlert(senderUser, message);
         }
     }

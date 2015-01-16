@@ -205,6 +205,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         if (isNeedToOpenDialog) {
             hideActionBarProgress();
             showProgress();
+        } else {
+            hideProgress();
         }
     }
 

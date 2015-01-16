@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FriendUtils;
@@ -22,13 +21,7 @@ public class QBRestHelper extends BaseHelper {
 
     public User loadUser(int userId) throws QBResponseException {
         QBUser user = QBUsers.getUser(userId);
-        User resultUser = null;
-
-        if (user != null) {
-            resultUser = FriendUtils.createUser(user);
-            UsersDatabaseManager.saveUser(context, resultUser);
-        }
-
+        User resultUser = FriendUtils.createUser(user);
         return resultUser;
     }
 
@@ -37,13 +30,7 @@ public class QBRestHelper extends BaseHelper {
         requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
         Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle());
-
         Collection<User> usersListResult = FriendUtils.createUsersList(usersList);
-
-        if (usersList != null) {
-            UsersDatabaseManager.saveUsers(context, usersListResult);
-        }
-
         return usersListResult;
     }
 }

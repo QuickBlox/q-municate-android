@@ -25,7 +25,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_gravity="center">
 
             <TextView
                 android:id="@+id/name_textview"
@@ -35,13 +36,13 @@
                 android:layout_marginTop="5dp"
                 android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/status_textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
+            <!--<TextView-->
+                <!--android:id="@+id/status_textview"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:textColor="@android:color/darker_gray"-->
+                <!--android:textSize="15sp" />-->
         </LinearLayout>
     </LinearLayout>
 

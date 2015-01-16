@@ -196,16 +196,16 @@ public class ChatNotificationUtils {
                 break;
             }
             case FRIENDS_REMOVE: {
-                User deletedUser = UsersDatabaseManager.getUserById(context, messageCache.getRecipientId());
-                String fullName;
-                if (deletedUser == null) {
-                    fullName = ChatUtils.getFullNameById(context, messageCache.getRecipientId());
+                User opponentUser;
+
+                if (messageCache.getRecipientId().intValue() == user.getId().intValue()) {
+                    opponentUser = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());
+                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_friend, opponentUser.getFullName());
                 } else {
-                    fullName = deletedUser.getFullName();
+                    opponentUser = UsersDatabaseManager.getUserById(context, messageCache.getRecipientId());
+                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me, opponentUser.getFullName());
                 }
-                resultMessage = ownMessage ?
-                        resources.getString(R.string.frl_friends_request_remove_message_for_me, fullName) :
-                        resources.getString(R.string.frl_friends_request_remove_message_for_friend, fullName);
+
                 break;
             }
         }
