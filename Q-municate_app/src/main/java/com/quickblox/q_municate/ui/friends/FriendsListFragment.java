@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
@@ -30,11 +32,9 @@ import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FriendUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -189,7 +189,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
-                    int childPosition, long id) {
+                                        int childPosition, long id) {
                 Cursor selectedItem = friendsListAdapter.getChild(groupPosition, childPosition);
                 if (selectedItem.getCount() != ConstsCore.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
                     User selectedUser = UsersDatabaseManager.getUserFromCursor(selectedItem);
@@ -248,7 +248,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        int countFriends = UsersDatabaseManager.getFriendsByFullName(baseActivity, constraint).getCount();
+        int countFriends = UsersDatabaseManager.getFriendsByFullNameWithPending(baseActivity, constraint).getCount();
         createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
@@ -339,12 +339,13 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
-    private enum State {FRIENDS_LIST, GLOBAL_LIST}
-
-    public interface FriendOperationListener {
-
-        void onAddUserClicked(int userId);
+    private void initAfterSuccess() {
+        searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
+        initFriendsListForSearch();
+        checkVisibilityEmptyLabel();
     }
+
+    private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchTimerTask extends TimerTask {
 
@@ -388,8 +389,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public void execute(Bundle bundle) {
+            int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
+            User addedUser = UsersDatabaseManager.getUserById(baseActivity, userId);
+            usersList.remove(addedUser);
+            initAfterSuccess();
             baseActivity.hideProgress();
-            searchItem.collapseActionView();
         }
     }
 
@@ -400,9 +404,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             String constraint = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
             if (FriendsListFragment.this.constraint.equals(constraint)) {
                 usersList = (List<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
-                searchResultCursor = FriendUtils.createSearchResultCursor(baseActivity, usersList);
-                initFriendsListForSearch();
-                checkVisibilityEmptyLabel();
+                initAfterSuccess();
                 baseActivity.hideActionBarProgress();
             } else {
                 onQueryTextChange(FriendsListFragment.this.constraint);

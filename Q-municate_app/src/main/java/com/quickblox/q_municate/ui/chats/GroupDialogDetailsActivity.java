@@ -25,6 +25,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
+import com.quickblox.q_municate.ui.friends.FriendOperationListener;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
@@ -40,6 +41,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
@@ -90,6 +92,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private List<MessagesNotificationType> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
 
+    private FriendOperationAction friendOperationAction;
+
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG_ID, dialogId);
@@ -104,6 +108,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         currentDialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
         groupDialog = new GroupDialog(currentDialog);
         imageUtils = new ImageUtils(this);
+        friendOperationAction = new FriendOperationAction();
 
         initUI();
         initUIWithData();
@@ -180,11 +185,14 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, updateGroupFailAction);
 
+        addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
+
         updateBroadcastActionList();
     }
 
     protected GroupDialogOccupantsAdapter getFriendsAdapter() {
-        return new GroupDialogOccupantsAdapter(this, groupDialog.getOccupantList());
+        return new GroupDialogOccupantsAdapter(this, friendOperationAction, groupDialog.getOccupantList());
     }
 
     private void showLeaveGroupDialog() {
@@ -405,6 +413,38 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
 
+    }
+
+    private void addToFriendList(final int userId) {
+        showProgress();
+        QBAddFriendCommand.start(this, userId);
+    }
+
+    private class FriendOperationAction implements FriendOperationListener {
+
+        @Override
+        public void onAddUserClicked(int userId) {
+            addToFriendList(userId);
+        }
+    }
+
+    private class AddFriendSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            groupDialogOccupantsAdapter.notifyDataSetChanged();
+            hideProgress();
+        }
+    }
+
+    private class AddFriendFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
+            hideProgress();
+        }
     }
 
     private class GroupNameTextWatcherListener extends SimpleTextWatcher {

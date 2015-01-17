@@ -41,7 +41,7 @@ public class UsersDatabaseManager {
     }
 
     public static void saveUser(Context context, User user) {
-        ContentValues values = getContentValuesUserTable(context, user);
+        ContentValues values = getContentValuesUserTable(user);
 
         String condition = UserTable.Cols.USER_ID + "='" + user.getUserId() + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -163,6 +163,16 @@ public class UsersDatabaseManager {
         cursor.close();
 
         return isUserInBase;
+    }
+
+    public static boolean isFriendInBaseWithPending(Context context, int searchId) {
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.USER_ID + " = " + searchId, null, null);
+        boolean isFriendInBase = cursor.getCount() > ConstsCore.ZERO_INT_VALUE;
+
+        cursor.close();
+
+        return isFriendInBase;
     }
 
     public static boolean isFriendInBase(Context context, int searchId) {
@@ -349,7 +359,7 @@ public class UsersDatabaseManager {
 
     public static List<User> getAllFriendsList(Context context) {
         List<User> friendList = new ArrayList<User>();
-        Cursor cursor = getAllFriends(context);
+        Cursor cursor = getAllFriendsWithPending(context);
 
         while (cursor.moveToNext()) {
             friendList.add(getUserFromCursor(cursor));
@@ -455,14 +465,14 @@ public class UsersDatabaseManager {
         return friend;
     }
 
-    private static ContentValues getContentValuesUserTable(Context context, User user) {
+    private static ContentValues getContentValuesUserTable(User user) {
         ContentValues values = new ContentValues();
         values.put(UserTable.Cols.USER_ID, user.getUserId());
         values.put(UserTable.Cols.FULL_NAME, user.getFullName());
         values.put(UserTable.Cols.EMAIL, user.getEmail());
         values.put(UserTable.Cols.PHONE, user.getPhone());
         values.put(UserTable.Cols.AVATAR_URL, user.getAvatarUrl());
-        values.put(UserTable.Cols.STATUS, user.getOnlineStatus(context));
+        values.put(UserTable.Cols.STATUS, user.getStatus());
         values.put(UserTable.Cols.IS_ONLINE, user.isOnline());
         return values;
     }

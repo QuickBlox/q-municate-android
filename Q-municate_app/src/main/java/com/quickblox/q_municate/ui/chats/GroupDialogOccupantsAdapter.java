@@ -5,6 +5,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.q_municate.ui.friends.FriendOperationListener;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -17,8 +19,11 @@ import java.util.List;
 
 public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
-    public GroupDialogOccupantsAdapter(BaseActivity baseActivity, List<User> objectsList) {
+    private FriendOperationListener friendOperationListener;
+
+    public GroupDialogOccupantsAdapter(BaseActivity baseActivity, FriendOperationListener friendOperationListener, List<User> objectsList) {
         super(baseActivity, objectsList);
+        this.friendOperationListener = friendOperationListener;
     }
 
     @Override
@@ -33,8 +38,8 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             viewHolder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
-            viewHolder.onlineStatusMessageTextView = (TextView) convertView.findViewById(
-                    R.id.statusMessageTextView);
+            viewHolder.onlineStatusTextView = (TextView) convertView.findViewById(R.id.status_textview);
+            viewHolder.addFriendImageView = (ImageView) convertView.findViewById(R.id.add_friend_imagebutton);
 
             convertView.setTag(viewHolder);
         } else {
@@ -42,28 +47,40 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         }
 
         String fullName;
-        if (isFriend(user)) {
+        if (isFriendValid(user)) {
             fullName = user.getFullName();
-            viewHolder.onlineStatusMessageTextView.setVisibility(View.VISIBLE);
+            viewHolder.onlineStatusTextView.setVisibility(View.VISIBLE);
         } else {
             fullName = String.valueOf(user.getUserId());
-            viewHolder.onlineStatusMessageTextView.setVisibility(View.GONE);
+            viewHolder.onlineStatusTextView.setVisibility(View.GONE);
         }
         viewHolder.nameTextView.setText(fullName);
 
         setOnlineStatusVisibility(viewHolder, user);
+        viewHolder.addFriendImageView.setVisibility(isFriend(user) ? View.GONE : View.VISIBLE);
+
+        initListeners(viewHolder, user.getUserId());
 
         displayImage(user.getAvatarUrl(), viewHolder.avatarImageView);
 
         return convertView;
     }
 
+    private void initListeners(ViewHolder viewHolder, final int userId) {
+        viewHolder.addFriendImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                friendOperationListener.onAddUserClicked(userId);
+            }
+        });
+    }
+
     private void setOnlineStatusVisibility(ViewHolder viewHolder, User user) {
-        if(isMe(user)) {
+        if (isMe(user)) {
             user.setOnline(true);
         }
 
-        viewHolder.onlineStatusMessageTextView.setText(user.getOnlineStatus(baseActivity));
+        viewHolder.onlineStatusTextView.setText(user.getOnlineStatus(baseActivity));
         if (user.isOnline()) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
@@ -71,8 +88,14 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         }
     }
 
-    private boolean isFriend(User user) {
+    private boolean isFriendValid(User user) {
         return user.getFullName() != null;
+    }
+
+    private boolean isFriend(User user) {
+        boolean isFriend;
+        isFriend = isMe(user) ? true : UsersDatabaseManager.isFriendInBaseWithPending(baseActivity, user.getUserId());
+        return isFriend;
     }
 
     private boolean isMe(User inputUser) {
@@ -84,7 +107,8 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
         RoundedImageView avatarImageView;
         TextView nameTextView;
+        ImageView addFriendImageView;
         ImageView onlineImageView;
-        TextView onlineStatusMessageTextView;
+        TextView onlineStatusTextView;
     }
 }

@@ -35,6 +35,7 @@ public class FriendUtils {
 
         if (userCustomData != null) {
             user.setAvatarUrl(userCustomData.getAvatar_url());
+            user.setStatus(userCustomData.getStatus());
         }
 
         return user;

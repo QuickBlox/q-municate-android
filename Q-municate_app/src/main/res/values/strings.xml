@@ -79,6 +79,7 @@
 
     // Friend Details
     <string name="frd_title">Details</string>
+    <string name="frd_default_status">I enjoy using Q-municate!</string>
     <string name="frd_video_call">Video Call</string>
     <string name="frd_audio_call">Audio Call</string>
     <string name="frd_chat">Chat</string>

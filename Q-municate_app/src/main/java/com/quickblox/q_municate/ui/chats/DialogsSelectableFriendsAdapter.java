@@ -49,7 +49,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
-        viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.statusMessageTextView);
+        viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.status_textview);
         viewHolder.selectFriendCheckBox = (CheckBox) view.findViewById(R.id.selected_friend_checkbox);
 
         view.setTag(viewHolder);
@@ -63,7 +63,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         final User friend = UsersDatabaseManager.getUserFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullName());
-        viewHolder.statusMessageTextView.setText(friend.getStatus());
+        viewHolder.statusMessageTextView.setText(friend.getOnlineStatus(context));
         viewHolder.nameTextView.setText(friend.getFullName());
 
         if (friend.isOnline()) {
