@@ -24,7 +24,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriends;
+import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
@@ -326,7 +326,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         roomJidId = dialog.getRoomJid();
         if (roomJidId != null) {
             tryJoinRoomChat(dialog);
-            new FindUnknownFriends(context, chatCreator, dialog).find();
+            new FinderUnknownFriends(context, chatCreator, dialog).find();
         }
 
         User senderUser = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());

@@ -2,23 +2,6 @@ package com.quickblox.q_municate_core.utils;
 
 public class ConstsCore {
 
-//    // Q-municate release
-//    public static final String QB_APP_ID = "13318";
-//    public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
-//    public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
-
-//    // Q-municate release web
-//    public static final String QB_APP_ID = "12496";
-//    public static final String QB_AUTH_KEY = "DxGShn2UtN5TUfd";
-//    public static final String QB_AUTH_SECRET = "gypfTzd3VbqYxsK";
-
-    // Q-municate dev
-    public static final String QB_APP_ID = "14542";
-    public static final String QB_AUTH_KEY = "rJqAFphrSnpyZW2";
-    public static final String QB_AUTH_SECRET = "tTEB2wK-dU8X3Ra";
-
-    public static final String QB_DOMAIN = "api.stage.quickblox.com";
-
     // Friend list consts
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 500;

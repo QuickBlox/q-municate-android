@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FindUnknownFriends {
+public class FinderUnknownFriends {
 
     private Context context;
     private QBDialog dialog;
@@ -23,12 +23,12 @@ public class FindUnknownFriends {
     private QBUser currentUser;
     private QBRestHelper restHelper;
 
-    public FindUnknownFriends(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
+    public FinderUnknownFriends(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
         init(context, currentUser);
         this.dialogsList = dialogsList;
     }
 
-    public FindUnknownFriends(Context context, QBUser currentUser, QBDialog dialog) {
+    public FinderUnknownFriends(Context context, QBUser currentUser, QBDialog dialog) {
         init(context, currentUser);
         this.dialog = dialog;
     }

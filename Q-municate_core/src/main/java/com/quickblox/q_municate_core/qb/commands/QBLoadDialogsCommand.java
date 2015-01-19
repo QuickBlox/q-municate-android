@@ -13,7 +13,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatDialogUtils;
-import com.quickblox.q_municate_core.utils.FindUnknownFriends;
+import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         @Override
         protected Object doInBackground(Object[] params) {
             List<QBDialog> dialogsList = (List<QBDialog>) params[0];
-            new FindUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
+            new FinderUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
             return null;
         }
     }

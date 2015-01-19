@@ -8,6 +8,23 @@ import com.quickblox.q_municate.R;
 
 public class Consts {
 
+    //    // Q-municate release
+    //    public static final String QB_APP_ID = "13318";
+    //    public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
+    //    public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
+
+    //    // Q-municate release web
+    //    public static final String QB_APP_ID = "12496";
+    //    public static final String QB_AUTH_KEY = "DxGShn2UtN5TUfd";
+    //    public static final String QB_AUTH_SECRET = "gypfTzd3VbqYxsK";
+
+    // Q-municate dev
+    public static final String QB_APP_ID = "14542";
+    public static final String QB_AUTH_KEY = "rJqAFphrSnpyZW2";
+    public static final String QB_AUTH_SECRET = "tTEB2wK-dU8X3Ra";
+
+    public static final String QB_DOMAIN = "api.stage.quickblox.com";
+
     // Universal Image Loader
     public static final DisplayImageOptions UIL_DEFAULT_DISPLAY_OPTIONS = new DisplayImageOptions.Builder()
             .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2).bitmapConfig(Bitmap.Config.RGB_565)

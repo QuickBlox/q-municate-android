@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.qb.gson.Gson;
+import com.qb.gson.GsonBuilder;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.models.UserCustomData;
@@ -55,9 +57,9 @@ public class Utils {
         Log.d(Utils.class.getSimpleName(), "");
         List<String> errors = e.getErrors();
         for (String error : errors) {
-            Log.d(Utils.class.getSimpleName(), "error =" +error);
+            Log.d(Utils.class.getSimpleName(), "error =" + error);
             if (error.contains(msgError)) {
-                Log.d(Utils.class.getSimpleName(), error + " contains "+msgError);
+                Log.d(Utils.class.getSimpleName(), error + " contains " + msgError);
                 return true;
             }
         }
@@ -85,24 +87,24 @@ public class Utils {
         return user;
     }
 
-    public static int[] toIntArray(List<Integer> integerList)  {
+    public static int[] toIntArray(List<Integer> integerList) {
         int[] intArray = new int[integerList.size()];
         int i = 0;
-        for (Integer e : integerList)
+        for (Integer e : integerList) {
             intArray[i++] = e.intValue();
+        }
         return intArray;
     }
 
-    public static ArrayList<Integer> toArrayList(int[] itemArray)  {
+    public static ArrayList<Integer> toArrayList(int[] itemArray) {
         ArrayList<Integer> integerList = new ArrayList<Integer>(itemArray.length);
-        int i = 0;
         for (int item : itemArray) {
             integerList.add(item);
         }
         return integerList;
     }
 
-    public static boolean validateNotNull(Object object){
+    public static boolean validateNotNull(Object object) {
         return object != null;
     }
 
@@ -114,17 +116,6 @@ public class Utils {
         setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isIs_import());
 
         return jsonObject.toString();
-    }
-
-    private static String getJsonValue(JSONObject jsonObject, String key) {
-        String value = "";
-
-        try {
-            value = jsonObject.getString(key);
-        } catch (JSONException e) {
-        }
-
-        return value;
     }
 
     private static void setJsonValue(JSONObject jsonObject, String key, String value) {
@@ -142,23 +133,17 @@ public class Utils {
             return new UserCustomData();
         }
 
-        JSONObject jsonObject = null;
-        String avatarUrl = "";
-        String status = "";
-        String isImport = "";
+        UserCustomData userCustomData = null;
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        Gson gson = gsonBuilder.create();
 
         try {
-            jsonObject = new JSONObject(userCustomDataString);
-        } catch (JSONException e) {
+            userCustomData = gson.fromJson(userCustomDataString, UserCustomData.class);
+        } catch (com.qb.gson.JsonSyntaxException e) {
             ErrorUtils.logError(e);
         }
 
-        if (jsonObject != null) {
-            avatarUrl = getJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL);
-            status = getJsonValue(jsonObject, UserCustomData.TAG_STATUS);
-            isImport = getJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT);
-        }
-
-        return new UserCustomData(avatarUrl, status, isImport);
+        return userCustomData;
     }
 }
