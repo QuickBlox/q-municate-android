@@ -46,6 +46,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     private TextView emptyListTextView;
     private ContentObserver userTableContentObserver;
     private Cursor dialogsCursor;
+    private int selectedPositionList;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -79,6 +80,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
             @Override
             public void onChange(boolean selfChange) {
+                selectedPositionList = dialogsListView.getFirstVisiblePosition();
                 initCursorLoaders();
             }
         };
@@ -194,6 +196,10 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             }
         });
         dialogsListView.setAdapter(dialogsAdapter);
+
+        if (selectedPositionList != ConstsCore.ZERO_INT_VALUE) {
+            dialogsListView.setSelection(selectedPositionList);
+        }
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {

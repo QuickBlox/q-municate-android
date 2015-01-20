@@ -142,6 +142,12 @@ public class ChatDatabaseManager {
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
     }
 
+    public static CursorLoader getAllDialogMessagesLoaderByDialogId(Context context, String dialogId) {
+        return new CursorLoader(context, MessageTable.CONTENT_URI, null,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
+                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
+    }
+
     public static List<QBDialog> getDialogs(Context context) {
         Cursor allDialogsCursor = getAllDialogs(context);
         List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());

@@ -61,7 +61,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        initListView();
+
+        initCursorLoaders();
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 
@@ -120,6 +121,15 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return null;
     }
 
+    @Override
+    protected void initListView(Cursor messagesCursor) {
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this,
+                dialog);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        isNeedToScrollMessages = true;
+        scrollListView();
+    }
+
     protected QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
@@ -135,12 +145,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         dialog.setLastMessageDateSent(messageCache.getTime());
         dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
         return dialog;
-    }
-
-    private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
-                dialog);
-        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
     protected void updateActionBar() {
@@ -199,6 +203,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         updateDialogData();
-        scrollListView();
+
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            scrollListView();
+        }
     }
 }

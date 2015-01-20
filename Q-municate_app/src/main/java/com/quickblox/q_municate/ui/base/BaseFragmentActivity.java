@@ -253,6 +253,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     private boolean isFromCurrentDialog(Bundle extras) {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
-        return !isFromCurrentChat;
+        return isFromCurrentChat;
     }
 }

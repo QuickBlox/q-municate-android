@@ -77,7 +77,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
         friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
-        initListView();
+
+        initCursorLoaders();
         initActionBar();
         registerContentObservers();
         setCurrentDialog(dialog);
@@ -190,11 +191,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return dialog;
     }
 
-    private void initListView() {
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
-                getAllDialogMessagesByDialogId(), this, dialog);
+    @Override
+    protected void initListView(Cursor messagesCursor) {
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesCursor, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        isNeedToScrollMessages = true;
+        scrollListView();
     }
 
     private void initActionBar() {
@@ -260,7 +263,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onResume() {
         super.onResume();
-        scrollListView();
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            scrollListView();
+        }
+
         startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
 

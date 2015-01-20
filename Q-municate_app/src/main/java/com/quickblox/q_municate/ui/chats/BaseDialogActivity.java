@@ -2,11 +2,13 @@ package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
 import android.app.Dialog;
+import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.Loader;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -68,9 +70,11 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener,
+        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
+    private static final int MESSAGES_LOADER_ID = 0;
 
     protected Resources resources;
     protected EditText chatEditText;
@@ -274,10 +278,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void onUpdateChatDialog();
 
-    protected Cursor getAllDialogMessagesByDialogId() {
-        return ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
@@ -295,7 +295,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
+                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         if (isNeedToOpenDialog) {
             finish();
         }
@@ -412,6 +413,26 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingView = _findViewById(R.id.message_typing_view);
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
+    }
+
+    protected void initCursorLoaders() {
+        getLoaderManager().initLoader(MESSAGES_LOADER_ID, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return ChatDatabaseManager.getAllDialogMessagesLoaderByDialogId(this, dialogId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
+        initListView(messagesCursor);
+    }
+
+    protected abstract void initListView(Cursor messagesCursor);
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
     }
 
     private void setSendButtonVisibility(CharSequence charSequence) {

@@ -128,11 +128,10 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private void checkInitFriendsList() {
         if (State.GLOBAL_LIST.equals(state)) {
             initFriendsListForSearch();
-            checkVisibilityEmptyLabel();
         } else {
             initFriendsList();
-            checkVisibilityEmptyLabel();
         }
+        checkVisibilityEmptyLabel();
     }
 
     private void unregisterContentObservers() {
