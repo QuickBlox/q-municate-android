@@ -49,12 +49,11 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     protected ImageUtils imageUtils;
     protected QBDialog dialog;
     private Random random;
-    private Map<Integer, Integer> colorsMap;
+    private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
 
     public BaseDialogMessagesAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         random = new Random();
-        colorsMap = new HashMap<Integer, Integer>();
         imageUtils = new ImageUtils((android.app.Activity) context);
     }
 

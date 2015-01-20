@@ -70,8 +70,7 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener,
-        EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
     private static final int MESSAGES_LOADER_ID = 0;
@@ -156,6 +155,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         hideSmileLayout();
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -168,6 +168,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 isTypingNow = false;
                 sendTypingStatus();
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
+                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+        if (isNeedToOpenDialog) {
+            finish();
         }
     }
 
@@ -290,16 +300,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
-                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        if (isNeedToOpenDialog) {
-            finish();
-        }
     }
 
     @Override
@@ -426,14 +426,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
-        initListView(messagesCursor);
+        if (messagesAdapter == null) {
+            initListView(messagesCursor);
+        } else {
+            messagesAdapter.swapCursor(messagesCursor);
+        }
     }
-
-    protected abstract void initListView(Cursor messagesCursor);
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
+
+    protected abstract void initListView(Cursor messagesCursor);
 
     private void setSendButtonVisibility(CharSequence charSequence) {
         if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
@@ -565,10 +569,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         boolean error = false;
         try {
             if (privateMessage) {
-                ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(messageEditText.getText().toString(),
-                        opponentFriend.getUserId());
+                ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
+                        messageEditText.getText().toString(), opponentFriend.getUserId());
             } else {
-                ((QBMultiChatHelper)baseChatHelper).sendGroupMessage(dialog.getRoomJid(), messageEditText.getText().toString());
+                ((QBMultiChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
+                        messageEditText.getText().toString());
             }
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);

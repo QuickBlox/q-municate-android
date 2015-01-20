@@ -67,7 +67,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     public void onGroupMessageReceived(QBChat chat, QBChatMessage chatMessage) {
-        if (Utils.validateNotNull(chatMessage.getDialogId())) {
+        if (!Utils.validateNotNull(chatMessage.getDialogId())) {
             return;
         }
 
