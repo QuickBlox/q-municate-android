@@ -92,7 +92,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onUpdateChatDialog() {
-        if (!messagesAdapter.isEmpty()) {
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
             startUpdateChatDialog();
         }
     }

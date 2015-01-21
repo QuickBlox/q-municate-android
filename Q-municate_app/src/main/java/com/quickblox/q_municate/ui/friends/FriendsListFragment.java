@@ -247,7 +247,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        int countFriends = UsersDatabaseManager.getFriendsByFullNameWithPending(baseActivity, constraint).getCount();
+        int countFriends = UsersDatabaseManager.getAllFriendsCountByFullNameWithPending(baseActivity, constraint);
         createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,

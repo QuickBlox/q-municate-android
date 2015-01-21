@@ -326,6 +326,25 @@ public class UsersDatabaseManager {
         return processResultCount(cursor);
     }
 
+    public static int getAllFriendsCountByFullNameWithPending(Context context, String fullName) {
+        if (relationStatusesMap == null) {
+            relationStatusesMap = getRelationStatusesMap(context);
+        }
+
+        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
+        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
+        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
+        int relationStatusNoneId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_NONE);
+
+        String condition = "(" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ") " + " OR (" + FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " = " + relationStatusNoneId + " AND " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.IS_PENDING_STATUS + " = 1" + ")) AND " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " like '%" + fullName + "%'";
+
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, new String[]{"count(*)"},
+                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, null);
+
+        return processResultCount(cursor);
+    }
+
     public static int getAllFriendsCountWithPending(Context context) {
         if (relationStatusesMap == null) {
             relationStatusesMap = getRelationStatusesMap(context);

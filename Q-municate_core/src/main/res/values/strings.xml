@@ -14,15 +14,15 @@
     <string name="frl_online">Online</string>
     <string name="frl_offline">Offline</string>
 
-    <string name="frl_friends_request_message_for_friend">%1$s has sent a request to you </string>
+    <string name="frl_friends_request_message_for_friend">%1$s has sent a request to you</string>
     <string name="frl_friends_request_message_for_me">Your request has been sent</string>
     <string name="frl_friends_request_accept_message_for_friend">Your request has been accepted</string>
-    <string name="frl_friends_request_accept_message_for_me">You have accepted a request </string>
+    <string name="frl_friends_request_accept_message_for_me">You have accepted a request</string>
     <string name="frl_friends_request_reject_message_for_friend">Your request has been rejected</string>
     <string name="frl_friends_request_reject_message_for_me">You have rejected a request</string>
-    <string name="frl_friends_request_remove_message_for_friend">%1$s has deleted you from the contact list </string>
+    <string name="frl_friends_request_remove_message_for_friend">%1$s has deleted you from the contact list</string>
     <string name="frl_friends_request_remove_message_for_me">You have deleted %1$s from the contact list</string>
-    <string name="frl_friends_contact_request">Contact request </string>
+    <string name="frl_friends_contact_request">Contact request</string>
 
     <string name="cht_update_group_create_message">%1$s has added %2$s</string>
     <string name="cht_update_group_name_message">%1$s has changed the chat name to %2$s</string>
