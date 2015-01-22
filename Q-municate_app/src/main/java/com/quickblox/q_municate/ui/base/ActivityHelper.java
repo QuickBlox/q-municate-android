@@ -36,13 +36,13 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
 public class ActivityHelper extends BaseActivityHelper {
 
+    protected QBService service;
     private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
     private GlobalActionsListener actionsListener;
     private Handler handler;
-    protected QBService service;
     private ActivityUIHelper activityUIHelper;
 
     private boolean bounded;
@@ -60,18 +60,15 @@ public class ActivityHelper extends BaseActivityHelper {
     }
 
     protected void onReceivedChatMessageNotification(Bundle extras) {
-
         activityUIHelper.showChatMessageNotification(extras);
     }
 
     protected void onReceivedContactRequestNotification(Bundle extras) {
-
         activityUIHelper.showContactRequestNotification(extras);
     }
 
     public void forceRelogin() {
-        ErrorUtils.showError(activity, activity.getString(
-                R.string.dlg_force_relogin_on_token_required));
+        ErrorUtils.showError(activity, activity.getString(R.string.dlg_force_relogin_on_token_required));
         SplashActivity.start(activity);
         activity.finish();
     }
@@ -169,6 +166,17 @@ public class ActivityHelper extends BaseActivityHelper {
         return handler;
     }
 
+    private void unbindService() {
+        if (bounded) {
+            activity.unbindService(serviceConnection);
+        }
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(activity, QBService.class);
+        activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     public interface GlobalActionsListener {
 
         public void onReceiveChatMessageAction(Bundle extras);
@@ -178,6 +186,11 @@ public class ActivityHelper extends BaseActivityHelper {
         public void onReceiveRefreshSessionAction(Bundle extras);
 
         public void onReceiveContactRequestAction(Bundle extras);
+    }
+
+    public interface ServiceConnectionListener {
+
+        public void onConnectedToService(QBService service);
     }
 
     private class BaseBroadcastReceiver extends BroadcastReceiver {
@@ -231,17 +244,6 @@ public class ActivityHelper extends BaseActivityHelper {
         }
     }
 
-    private void unbindService() {
-        if (bounded) {
-            activity.unbindService(serviceConnection);
-        }
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(activity, QBService.class);
-        activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     private class QBChatServiceConnection implements ServiceConnection {
 
         @Override
@@ -255,10 +257,5 @@ public class ActivityHelper extends BaseActivityHelper {
         public void onServiceDisconnected(ComponentName name) {
 
         }
-    }
-
-    public interface ServiceConnectionListener {
-
-        public void onConnectedToService(QBService service);
     }
 }

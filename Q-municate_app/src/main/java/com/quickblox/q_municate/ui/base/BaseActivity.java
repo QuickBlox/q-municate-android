@@ -220,7 +220,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
-            showProgress();
             activityHelper.refreshSession();
         }
 

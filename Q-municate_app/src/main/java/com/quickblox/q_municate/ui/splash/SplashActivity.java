@@ -9,7 +9,7 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
-import com.quickblox.q_municate.GCMIntentService;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseActivity;
@@ -52,11 +52,6 @@ public class SplashActivity extends BaseActivity {
 
         boolean isRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
 
-        if (getIntent().hasExtra(GCMIntentService.CLICKED_ON_PUSH)) {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG,
-                    getIntent().getBooleanExtra(GCMIntentService.CLICKED_ON_PUSH, false));
-        }
-
         if (isRememberMe) {
             checkStartExistSession(userEmail, userPassword);
         } else {
@@ -73,6 +68,15 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (isLoggedInToChat()) {
+            startMainActivity();
+            finish();
+        }
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         facebookHelper.onActivityStop();
@@ -82,6 +86,10 @@ public class SplashActivity extends BaseActivity {
     protected void onFailAction(String action) {
         super.onFailAction(action);
         startLanding();
+    }
+
+    private boolean isLoggedInToChat() {
+        return QBChatService.isInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
     private void checkStartExistSession(String userEmail, String userPassword) {
@@ -155,6 +163,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startMainActivity() {
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
         MainActivity.start(SplashActivity.this);
     }
 
@@ -174,7 +183,7 @@ public class SplashActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+
             startMainActivity();
 
             AnalyticsUtils.pushAnalyticsData(SplashActivity.this, user, "User Sign In");

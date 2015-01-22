@@ -20,7 +20,6 @@ import com.quickblox.q_municate.ui.splash.SplashActivity;
 
 public class GCMIntentService extends IntentService {
 
-    public final static String CLICKED_ON_PUSH = "clicked_on_push";
     public final static int NOTIFICATION_ID = 1;
     public final static long VIBRATOR_DURATION = 1500;
 
@@ -68,7 +67,7 @@ public class GCMIntentService extends IntentService {
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
-        saveOpeningDialogData(intent, userId, dialogId);
+        saveOpeningDialogData(userId, dialogId);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -83,14 +82,14 @@ public class GCMIntentService extends IntentService {
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void saveOpeningDialogData(Intent intent, int userId, String dialogId) {
+    private void saveOpeningDialogData(int userId, String dialogId) {
+        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
-            PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
-            intent.putExtra(CLICKED_ON_PUSH, true);
+            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
         } else {
-            intent.putExtra(CLICKED_ON_PUSH, false);
+            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         }
     }
 

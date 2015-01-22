@@ -10,6 +10,7 @@ import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
@@ -126,7 +127,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
-        showActionBarProgress();
         initBroadcastActionList();
         checkGCMRegistration();
         loadFriendsList();
@@ -187,6 +187,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         gsmHelper.checkPlayServices();
+        showActionBarProgress();
         checkVisibilityProgressBars();
     }
 
@@ -202,12 +203,18 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private void checkVisibilityProgressBars() {
         isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
                 PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        if (isNeedToOpenDialog) {
+        if (isJoinedToDialogs()) {
+            hideActionBarProgress();
+        }
+        if (isNeedToOpenDialog && !isJoinedToDialogs()) {
             hideActionBarProgress();
             showProgress();
-        } else {
-            hideProgress();
         }
+    }
+
+    private boolean isJoinedToDialogs() {
+        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
+        return prefsHelper.getPref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, false);
     }
 
     private void startDialog() {

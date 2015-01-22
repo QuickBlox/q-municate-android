@@ -3,9 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -14,6 +12,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -41,13 +40,14 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        Log.d(TAG, "--- perform() ---");
         final QBUser currentUser = AppSession.getSession().getUser();
-        // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
+
         tryLogin(currentUser);
 
+        // clear old dialogs data
+        PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
+
         if (!chatRestHelper.isLoggedIn()) {
-            Log.d(TAG, "--- tryLogin() ---> AUTHENTICATION_FAILED ---");
             throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
         }
         return extras;
@@ -59,10 +59,8 @@ public class QBLoginChatCommand extends ServiceCommand {
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
-                Log.d(TAG, "--- tryLogin() ---");
                 chatRestHelper.login(currentUser);
             } catch (SmackException ignore) {
-                Log.d(TAG, "--- tryLogin() ---> SmackException --- ");
                 ignore.printStackTrace();
             }
         }

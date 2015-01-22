@@ -235,7 +235,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseFragmentActivity.this, getString(R.string.dlg_refresh_session));
-            showProgress();
+//            showProgress();
             activityHelper.refreshSession();
         }
 

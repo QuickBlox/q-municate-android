@@ -8,8 +8,10 @@ import android.widget.Toast;
 public class ErrorUtils {
 
     public static void showError(Context context, Exception e) {
-        String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : ConstsCore.EMPTY_STRING;
-        Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
+        String errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : null;
+        if (errorMsg != null) {
+            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
+        }
         e.printStackTrace();
     }
 

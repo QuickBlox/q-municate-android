@@ -277,6 +277,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
                 opponentFriend.getUserId());
         messageEditText.setEnabled(isFriend);
+        smilePanelImageButton.setEnabled(isFriend);
     }
 
     private void acceptUser(final int userId) {

@@ -22,6 +22,7 @@ public class PrefsHelper {
     public static final String PREF_REG_USER_ID = "registered_push_user";
     public static final String PREF_GCM_SENDER_ID = "265299067289";
     public static final String PREF_USER_AGREEMENT = "user_agreement";
+    public static final String PREF_JOINED_TO_ALL_DIALOGS = "joined_to_all_dialogs";
 
     public static final String PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";
     public static final String PREF_PUSH_MESSAGE_DIALOG_ID = "push_dialog_id";
