@@ -20,6 +20,7 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.FileHelper;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
@@ -50,11 +51,13 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     protected QBDialog dialog;
     private Random random;
     private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
+    private FileHelper fileHelper;
 
     public BaseDialogMessagesAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         random = new Random();
         imageUtils = new ImageUtils((android.app.Activity) context);
+        fileHelper = new FileHelper();
     }
 
     @Override
@@ -220,6 +223,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
             initMaskedImageView(loadedBitmap);
+            fileHelper.checkExsistFile(imageUri, loadedBitmap);
         }
 
         private void initMaskedImageView(Bitmap loadedBitmap) {
