@@ -6,6 +6,8 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
+    <include layout="@layout/view_load_more" />
+
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/messages_listview"
         android:layout_width="match_parent"

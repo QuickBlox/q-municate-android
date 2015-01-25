@@ -176,18 +176,18 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return chatDialogsList;
     }
 
-    public List<QBChatHistoryMessage> getDialogMessages(QBDialog dialog,
-            long lastDateLoad) throws QBResponseException {
-        Bundle bundle = new Bundle();
-        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+    public List<QBChatHistoryMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
+                                                        Bundle returnedBundle, QBDialog dialog,
+                                                        long lastDateLoad) throws QBResponseException {
+
         if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
             customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT, lastDateLoad);
         } else {
             deleteMessagesByDialogId(dialog.getDialogId());
         }
+
         List<QBChatHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
-                customObjectRequestBuilder, bundle);
+                customObjectRequestBuilder, returnedBundle);
 
         if (dialogMessagesList != null) {
             ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());

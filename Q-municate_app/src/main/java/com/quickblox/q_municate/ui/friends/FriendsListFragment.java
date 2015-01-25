@@ -65,8 +65,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private FriendOperationAction friendOperationAction;
     private Resources resources;
     private Timer searchTimer;
-    private int firstVisiblePositionList;
 
+    private int firstVisiblePositionList;
     private View listLoadingView;
     private boolean loadingMore;
     private int page = -1; // first loading
@@ -255,7 +255,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     private void initUI(View view) {
         friendsListView = (ExpandableListView) view.findViewById(R.id.friends_expandablelistview);
-        listLoadingView = baseActivity.getLayoutInflater().inflate(R.layout.view_footer_load_more, null);
+        listLoadingView = baseActivity.getLayoutInflater().inflate(R.layout.view_load_more, null);
         friendsListView.addFooterView(listLoadingView);
         emptyListTextView = (TextView) view.findViewById(R.id.empty_list_textview);
     }

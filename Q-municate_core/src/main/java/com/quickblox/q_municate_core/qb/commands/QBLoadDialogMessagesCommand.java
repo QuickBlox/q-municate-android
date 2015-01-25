@@ -6,11 +6,12 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.List;
 
@@ -24,11 +25,12 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, long lastDateLoad) {
+    public static void start(Context context, QBDialog dialog, long lastDateLoad, int skipMessages) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
+        intent.putExtra(QBServiceConsts.EXTRA_SKIP_ITEMS, skipMessages);
         context.startService(intent);
     }
 
@@ -36,12 +38,22 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
+        int skipMessages = extras.getInt(QBServiceConsts.EXTRA_SKIP_ITEMS);
 
-        List<QBChatHistoryMessage> dialogMessagesList = baseChatHelper.getDialogMessages(dialog, lastDateLoad);
+        Bundle returnedBundle = new Bundle();
+        QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
+        customObjectRequestBuilder.setPagesSkip(skipMessages);
+        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
+        List<QBChatHistoryMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
+                returnedBundle, dialog, lastDateLoad);
+
+        Bundle bundleResult = new Bundle();
+        bundleResult.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
                 (java.io.Serializable) dialogMessagesList);
-        return bundle;
+        bundleResult.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
+                returnedBundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES));
+
+        return bundleResult;
     }
 }

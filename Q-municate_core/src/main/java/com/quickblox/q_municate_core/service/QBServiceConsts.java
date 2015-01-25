@@ -190,6 +190,7 @@ public class QBServiceConsts {
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
+    public static final String EXTRA_SKIP_ITEMS = "skip_items";
 
     public static final String UPDATE_DIALOG = "update_dialog";
     public static final String TYPING_MESSAGE = "typing_message";

@@ -25,6 +25,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -70,7 +71,9 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener,
+        LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
+        EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
     private static final int MESSAGES_LOADER_ID = 0;
@@ -100,12 +103,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private ImageView messageTypingBoxImageView;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
+    private LoadDialogMessagesFailAction loadDialogMessagesFailAction;
     private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
+
+    private int firstVisiblePositionList;
+    private View loadMoreView;
+    private boolean loadingMore;
+    private int skipMessages;
+    private int totalEntries;
+    private int loadedItems;
+    private boolean firstItemInList;
+    private int totalItemCountInList;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -141,6 +154,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
+        loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
 
         initUI();
@@ -278,7 +292,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, loadAttachFileSuccessAction);
         addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, loadDialogMessagesFailAction);
         addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
@@ -396,7 +410,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onFileLoaded(QBFile file);
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad);
+        loadingMore = true;
+        QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
+        skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     }
 
     protected abstract Bundle generateBundleToInitDialog();
@@ -413,6 +429,32 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingView = _findViewById(R.id.message_typing_view);
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
+        loadMoreView = _findViewById(R.id.load_more_linearlayout);
+        messagesListView.setOnScrollListener(this);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        if (scrollState == SCROLL_STATE_IDLE) {
+            if (firstItemInList && !loadingMore) {
+                firstVisiblePositionList = totalItemCountInList - 1;
+//                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+                loadMoreItems();
+//                }
+            }
+        }
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+                         int totalItemCount) {
+        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
+        totalItemCountInList = totalItemCount;
+    }
+
+    private void loadMoreItems() {
+        loadMoreView.setVisibility(View.VISIBLE);
+        startLoadDialogMessages();
     }
 
     protected void initCursorLoaders() {
@@ -652,6 +694,29 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+            loadingMore = false;
+            loadMoreView.setVisibility(View.GONE);
+
+            if (skipMessages != 0) {
+                messagesListView.setSelection(10);
+            }
+
+            hideActionBarProgress();
+        }
+    }
+
+    public class LoadDialogMessagesFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            loadingMore = false;
+            loadMoreView.setVisibility(View.GONE);
+
+            if (skipMessages != 0) {
+                messagesListView.setSelection(10);
+            }
+
             hideActionBarProgress();
         }
     }
