@@ -72,6 +72,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private int page = -1; // first loading
     private int totalEntries;
     private int loadedItems;
+    private int lastItemInScreen;
+    private int totalItemCountInList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -337,6 +339,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void startUsersListLoader() {
+        loadingMore = true;
         QBFindUsersCommand.start(baseActivity, AppSession.getSession().getUser(), constraint, page);
     }
 
@@ -371,36 +374,39 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
+        if (scrollState == SCROLL_STATE_IDLE) {
+            if ((lastItemInScreen == totalItemCountInList) && !loadingMore && state == State.GLOBAL_LIST) {
+                if (TextUtils.isEmpty(constraint)) {
+                    return;
+                }
+
+                firstVisiblePositionList = totalItemCountInList - 1;
+                int currentPage = (page - 1);
+                loadedItems = currentPage * ConstsCore.FL_FRIENDS_PER_PAGE;
+
+                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+                    loadMoreItems();
+                }
+            }
+        }
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
-        int lastInScreen = firstVisibleItem + visibleItemCount;
-        if ((lastInScreen == totalItemCount) && !loadingMore && state == State.GLOBAL_LIST) {
-            if (TextUtils.isEmpty(constraint)) {
-                return;
-            }
-
-            firstVisiblePositionList = totalItemCount - 1;
-            int currentPage = (page - 1);
-            loadedItems = currentPage * ConstsCore.FL_FRIENDS_PER_PAGE;
-
-            loadMoreItems();
-        }
+        lastItemInScreen = firstVisibleItem + visibleItemCount;
+        totalItemCountInList = totalItemCount;
     }
 
     private void loadMoreItems() {
         if (userCollection != null && !userCollection.isEmpty()) {
             if (loadedItems < totalEntries) {
                 friendsListView.addFooterView(listLoadingView);
-                loadingMore = true;
                 startUsersListLoader();
                 page++;
             }
         } else {
             friendsListView.addFooterView(listLoadingView);
-            loadingMore = true;
             startUsersListLoader();
             page++;
         }
