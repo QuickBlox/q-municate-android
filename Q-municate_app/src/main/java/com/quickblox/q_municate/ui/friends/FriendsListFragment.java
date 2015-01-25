@@ -67,13 +67,13 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private Timer searchTimer;
     private int firstVisiblePositionList;
 
-//    private View listLoadingView;
-//    private boolean loadingMore;
-//    private int page = -1; // first loading
-//    private int totalEntries;
-//    private int loadedItems;
-//    private int lastItemInScreen;
-//    private int totalItemCountInList;
+    private View listLoadingView;
+    private boolean loadingMore;
+    private int page = -1; // first loading
+    private int totalEntries;
+    private int loadedItems;
+    private int lastItemInScreen;
+    private int totalItemCountInList;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
