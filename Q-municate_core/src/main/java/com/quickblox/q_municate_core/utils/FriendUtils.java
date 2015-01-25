@@ -108,7 +108,7 @@ public class FriendUtils {
         return userIds;
     }
 
-    public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
+    public static MatrixCursor createSearchResultCursor(Context context, Collection<User> usersList) {
         MatrixCursor usersCursor = new MatrixCursor(
                 new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_PENDING_STATUS});
 

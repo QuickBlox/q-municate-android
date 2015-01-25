@@ -160,6 +160,7 @@ public class QBServiceConsts {
     public static final String EXTRA_EMAIL = "email";
     public static final String EXTRA_FILE_ID = "file_id";
     public static final String EXTRA_CONSTRAINT = "constraint";
+    public static final String EXTRA_TOTAL_ENTRIES = "total_entries";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
     public static final String EXTRA_ROOM_NAME = "room_name";
@@ -188,6 +189,7 @@ public class QBServiceConsts {
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
+    public static final String EXTRA_PAGE = "load_elements";
 
     public static final String UPDATE_DIALOG = "update_dialog";
     public static final String TYPING_MESSAGE = "typing_message";
