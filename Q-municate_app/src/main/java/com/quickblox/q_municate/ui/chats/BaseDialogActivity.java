@@ -430,7 +430,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
         loadMoreView = _findViewById(R.id.load_more_linearlayout);
-        messagesListView.setOnScrollListener(this);
+        loadMoreView.setVisibility(View.GONE);
+//        messagesListView.setOnScrollListener(this);
     }
 
     @Override
@@ -453,7 +454,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void loadMoreItems() {
-        loadMoreView.setVisibility(View.VISIBLE);
+//        loadMoreView.setVisibility(View.VISIBLE);
         startLoadDialogMessages();
     }
 
@@ -696,10 +697,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = false;
-            loadMoreView.setVisibility(View.GONE);
+//            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
-                messagesListView.setSelection(10);
+                messagesListView.setSelection(0);
             }
 
             hideActionBarProgress();
@@ -711,10 +712,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             loadingMore = false;
-            loadMoreView.setVisibility(View.GONE);
+//            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
-                messagesListView.setSelection(10);
+                messagesListView.setSelection(0);
             }
 
             hideActionBarProgress();

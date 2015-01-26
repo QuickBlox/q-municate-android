@@ -93,6 +93,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private ArrayList<Integer> addedFriendIdsList;
 
     private FriendOperationAction friendOperationAction;
+    private boolean loadedDialogInfo;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -109,6 +110,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         groupDialog = new GroupDialog(currentDialog);
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
+        loadedDialogInfo = false;
 
         initUI();
         initUIWithData();
@@ -186,7 +188,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, updateGroupFailAction);
 
         addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new AddFriendFailAction());
 
         updateBroadcastActionList();
     }
@@ -244,12 +246,18 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 navigateToParent();
                 return true;
             case R.id.action_add:
-                startAddFriendsActivity();
+                if (!loadedDialogInfo) {
+                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getResources()
+                            .getString(R.string.gdd_group_info_is_loading));
+                } else {
+                    startAddFriendsActivity();
+                }
                 return true;
             case R.id.action_leave:
                 showLeaveGroupDialog();
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -483,6 +491,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             initTextChangedListeners();
             initListView();
             hideProgress();
+            loadedDialogInfo = true;
         }
     }
 

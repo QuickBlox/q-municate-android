@@ -203,7 +203,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
-                                        int childPosition, long id) {
+                    int childPosition, long id) {
                 Cursor selectedItem = friendsListAdapter.getChild(groupPosition, childPosition);
                 if (selectedItem.getCount() != ConstsCore.ZERO_INT_VALUE && !selectedItem.isBeforeFirst()) {
                     User selectedUser = UsersDatabaseManager.getUserFromCursor(selectedItem);
@@ -225,17 +225,17 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         constraint = newText;
 
         if (TextUtils.isEmpty(newText)) {
+            cancelSearch();
             return true;
         }
+
+        state = State.GLOBAL_LIST;
 
         page = 1; // first page for loading items
 
         clearUserCollection();
-
-        if (State.GLOBAL_LIST.equals(state)) {
-            friendsListView.removeFooterView(listLoadingView);
-            checkUsersListLoader();
-        }
+        friendsListView.removeFooterView(listLoadingView);
+        checkUsersListLoader();
 
         return true;
     }
@@ -273,7 +273,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendsListForSearch() {
-        int countFriends = UsersDatabaseManager.getAllFriendsCountByFullNameWithPending(baseActivity, constraint);
+        int countFriends = UsersDatabaseManager.getAllFriendsCountByFullNameWithPending(baseActivity,
+                constraint);
         createHeadersCursor(countFriends);
 
         friendsListAdapter = new FriendsListCursorAdapter(baseActivity, headersCursor, searchResultCursor,
@@ -392,8 +393,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                         int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         lastItemInScreen = firstVisibleItem + visibleItemCount;
         totalItemCountInList = totalItemCount;
     }
@@ -426,6 +426,14 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
+    private void cancelSearch() {
+        state = State.FRIENDS_LIST;
+        initFriendsList();
+        friendsListAdapter.setSearchCharacters(null);
+        clearUserCollection();
+        checkVisibilityEmptyLabel();
+    }
+
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchTimerTask extends TimerTask {
@@ -446,13 +454,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         @Override
         public boolean onMenuItemActionCollapse(MenuItem item) {
-            state = State.FRIENDS_LIST;
-
-            initFriendsList();
-            friendsListAdapter.setSearchCharacters(null);
-            clearUserCollection();
-            checkVisibilityEmptyLabel();
-
+            cancelSearch();
             return true;
         }
     }
@@ -487,7 +489,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             loadingMore = false;
 
             if (FriendsListFragment.this.constraint.equals(constraint)) {
-                Collection<User> newUsersList = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
+                Collection<User> newUsersList = (Collection<User>) bundle.getSerializable(
+                        QBServiceConsts.EXTRA_USERS);
                 prepareUserList(newUsersList);
                 initAfterSuccess();
             } else {

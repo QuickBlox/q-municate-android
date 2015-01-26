@@ -7,7 +7,7 @@ public class ConstsCore {
     public static final int FL_FRIENDS_PER_PAGE = 20;
 
     public static final int CHATS_DIALOGS_PER_PAGE = 100;
-    public static final int DIALOG_MESSAGES_PER_PAGE = 20;
+    public static final int DIALOG_MESSAGES_PER_PAGE = 100;
 
     public static final int ZERO_INT_VALUE = 0;
     public static final long ZERO_LONG_VALUE = 0L;

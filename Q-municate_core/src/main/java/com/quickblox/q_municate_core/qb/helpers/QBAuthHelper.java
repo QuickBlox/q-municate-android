@@ -112,26 +112,36 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
 
+        String password = inputUser.getPassword();
+
         UserCustomData userCustomDataNew = getUserCustomData(inputUser);
         inputUser.setCustomData(Utils.customDataToString(userCustomDataNew));
 
-        String password = inputUser.getPassword();
+        inputUser.setPassword(null);
+        inputUser.setOldPassword(null);
+
         user = QBUsers.updateUser(inputUser);
 
-        user.setPassword(password);
+        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
+            user.setPassword(password);
+        }
+
         return user;
     }
 
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
+        QBUser newUser = new QBUser();
+
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-        user.setWebsite(qbFile.getPublicUrl());
-        user.setFileId(qbFile.getId());
+        newUser.setId(user.getId());
+        newUser.setWebsite(qbFile.getPublicUrl());
+        newUser.setFileId(qbFile.getId());
 
         UserCustomData userCustomData = getUserCustomData(user);
         userCustomData.setAvatar_url(qbFile.getPublicUrl());
-        user.setCustomData(Utils.customDataToString(userCustomData));
+        newUser.setCustomData(Utils.customDataToString(userCustomData));
 
-        return updateUser(user);
+        return updateUser(newUser);
     }
 
     // TODO: temp method

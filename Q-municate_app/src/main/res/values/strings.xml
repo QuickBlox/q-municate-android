@@ -116,6 +116,7 @@
     <string name="gdd_online_participants">%1$d/%2$d online</string>
     <string name="gdd_name_not_entered">Please fill group name</string>
     <string name="gdd_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
+    <string name="gdd_group_info_is_loading">Group info is loading, please wait…</string>
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>

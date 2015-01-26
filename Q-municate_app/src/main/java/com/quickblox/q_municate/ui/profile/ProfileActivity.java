@@ -272,7 +272,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     @Override
     public void onCachedImageFileReceived(File imageFile) {
-        QBUpdateUserCommand.start(this, user, imageFile);
+        QBUser newUser = createUserForUpdating();
+        QBUpdateUserCommand.start(this, newUser, imageFile);
     }
 
     @Override
@@ -305,20 +306,44 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
         showProgress();
 
-        user.setFullName(fullNameCurrent);
-        user.setPhone(phoneCurrent);
-        userCustomData.setStatus(statusCurrent);
-        user.setCustomData(Utils.customDataToString(userCustomData));
+        QBUser newUser = createUserForUpdating();
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
-            QBUpdateUserCommand.start(this, user, null);
+            QBUpdateUserCommand.start(this, newUser, null);
         }
 
         stopChangingEditText(fullNameEditText);
         stopChangingEditText(phoneEditText);
         stopChangingEditText(statusEditText);
+    }
+
+    private QBUser createUserForUpdating() {
+        QBUser newUser = new QBUser();
+        newUser.setId(user.getId());
+
+        if (isFieldValueChanged(fullNameCurrent, fullNameOld)) {
+            user.setFullName(fullNameCurrent);
+            newUser.setFullName(fullNameCurrent);
+        }
+
+        if (isFieldValueChanged(phoneCurrent, phoneOld)) {
+            user.setPhone(fullNameCurrent);
+            newUser.setPhone(fullNameCurrent);
+        }
+
+        if (isFieldValueChanged(statusCurrent, statusOld)) {
+            userCustomData.setStatus(statusCurrent);
+            user.setCustomData(Utils.customDataToString(userCustomData));
+            newUser.setCustomData(Utils.customDataToString(userCustomData));
+        }
+
+        return newUser;
+    }
+
+    private boolean isFieldValueChanged(String fieldValue, String oldFieldValue) {
+        return !fieldValue.equals(oldFieldValue);
     }
 
     private boolean isUserDataCorrect() {
