@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
-import com.quickblox.chat.model.QBMessage;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -46,7 +45,7 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT = "6";
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE = "7";
 
-    public static QBDialog parseDialogFromQBMessage(Context context, QBMessage chatMessage, QBDialogType dialogType) {
+    public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage chatMessage, QBDialogType dialogType) {
         String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
         String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -85,7 +84,7 @@ public class ChatNotificationUtils {
         return dialog;
     }
 
-    public static QBDialog parseDialogFromQBMessage(Context context, QBMessage chatMessage,
+    public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage chatMessage,
             String lastMessage, QBDialogType dialogType) {
         QBDialog dialog = parseDialogFromQBMessage(context, chatMessage, dialogType);
 
@@ -98,7 +97,7 @@ public class ChatNotificationUtils {
         return dialog;
     }
 
-    public static void updateDialogFromQBMessage(Context context, QBMessage chatMessage, QBDialog dialog) {
+    public static void updateDialogFromQBMessage(Context context, QBChatMessage chatMessage, QBDialog dialog) {
         String lastMessage = getBodyForUpdateChatNotificationMessage(context, chatMessage);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -284,7 +283,7 @@ public class ChatNotificationUtils {
         return chatMessage;
     }
 
-    public static MessagesNotificationType getUpdateChatNotificationMessageType(QBMessage chatMessage) {
+    public static MessagesNotificationType getUpdateChatNotificationMessageType(QBChatMessage chatMessage) {
         String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -316,7 +315,7 @@ public class ChatNotificationUtils {
         return null;
     }
 
-    public static String getBodyForUpdateChatNotificationMessage(Context context, QBMessage chatMessage) {
+    public static String getBodyForUpdateChatNotificationMessage(Context context, QBChatMessage chatMessage) {
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
         String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);

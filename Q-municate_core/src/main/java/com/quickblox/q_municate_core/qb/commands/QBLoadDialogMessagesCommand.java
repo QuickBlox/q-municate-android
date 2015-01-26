@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.chat.model.QBChatHistoryMessage;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -45,7 +45,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         customObjectRequestBuilder.setPagesSkip(skipMessages);
         customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
-        List<QBChatHistoryMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
+        List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
                 returnedBundle, dialog, lastDateLoad);
 
         Bundle bundleResult = new Bundle();

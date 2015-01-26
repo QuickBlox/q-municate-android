@@ -329,8 +329,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         }
 
         if (isFieldValueChanged(phoneCurrent, phoneOld)) {
-            user.setPhone(fullNameCurrent);
-            newUser.setPhone(fullNameCurrent);
+            user.setPhone(phoneCurrent);
+            newUser.setPhone(phoneCurrent);
         }
 
         if (isFieldValueChanged(statusCurrent, statusOld)) {

@@ -1,20 +1,11 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.QBGroupChatManager;
-import com.quickblox.chat.QBPrivateChatManager;
-import com.quickblox.chat.model.QBChatHistoryMessage;
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
-import com.quickblox.core.request.QBRequestGetBuilder;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.ConnectionListener;
@@ -23,7 +14,6 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
-import java.util.List;
 
 public class QBChatRestHelper extends BaseHelper {
 

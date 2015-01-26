@@ -7,9 +7,11 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBGroupChat;
+import com.quickblox.chat.listeners.QBParticipantListener;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBPresence;
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
@@ -23,6 +25,7 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -42,17 +45,20 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     private static final String TAG = QBMultiChatHelper.class.getSimpleName();
 
     private QBNotificationChatListener notificationChatListener;
+    private QBParticipantListener participantListener;
     private List<QBDialog> groupDialogsList;
 
     public QBMultiChatHelper(Context context) {
         super(context);
         notificationChatListener = new GroupChatNotificationListener();
+        participantListener = new ParticipantListener();
         addNotificationChatListener(notificationChatListener);
     }
 
     @Override
     public QBChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
+        roomChat.addParticipantListener(participantListener);
         currentDialog = dialog;
         return roomChat;
     }
@@ -311,6 +317,13 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    protected void notifyUpdatingDialogDetails(int userId, boolean online) {
+        Intent intent = new Intent(QBServiceConsts.UPDATE_DIALOG_DETAILS);
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
+        intent.putExtra(QBServiceConsts.EXTRA_STATUS, online);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     private void createDialogByNotification(QBChatMessage chatMessage,
             MessagesNotificationType messagesNotificationType) {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
@@ -343,6 +356,16 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(
                     notificationType)) {
                 updateDialogByNotification(chatMessage);
+            }
+        }
+    }
+
+    private class ParticipantListener implements QBParticipantListener {
+
+        @Override
+        public void processPresence(QBGroupChat groupChat, QBPresence presence) {
+            if (currentDialog != null && currentDialog.getRoomJid().equals(groupChat.getJid())) {
+                notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }
         }
     }

@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
 
-import com.quickblox.chat.model.QBChatHistoryMessage;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
@@ -289,9 +289,9 @@ public class ChatDatabaseManager {
                     messageCache.getSenderId(), countUnreadMessagesLocal);
     }
 
-    public static void saveChatMessages(Context context, List<QBChatHistoryMessage> messagesList,
+    public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
             String dialogId) {
-        for (QBChatHistoryMessage historyMessage : messagesList) {
+        for (QBChatMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
             int senderId = historyMessage.getSenderId();

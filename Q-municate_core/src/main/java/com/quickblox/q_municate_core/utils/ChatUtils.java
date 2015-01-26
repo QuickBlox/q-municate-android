@@ -38,7 +38,8 @@ public class ChatUtils {
         return resultId;
     }
 
-    public static String getAttachUrlFromMessage(ArrayList<QBAttachment> attachmentsList) {
+    public static String getAttachUrlFromMessage(Collection<QBAttachment> attachmentsCollection) {
+        ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(attachmentsCollection);
         if (!attachmentsList.isEmpty()) {
             return attachmentsList.get(0).getUrl();
         }

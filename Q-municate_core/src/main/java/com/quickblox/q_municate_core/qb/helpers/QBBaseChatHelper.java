@@ -16,7 +16,6 @@ import com.quickblox.chat.listeners.QBIsTypingListener;
 import com.quickblox.chat.listeners.QBMessageListener;
 import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBAttachment;
-import com.quickblox.chat.model.QBChatHistoryMessage;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -176,7 +175,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return chatDialogsList;
     }
 
-    public List<QBChatHistoryMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
+    public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                         Bundle returnedBundle, QBDialog dialog,
                                                         long lastDateLoad) throws QBResponseException {
 
@@ -186,7 +185,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             deleteMessagesByDialogId(dialog.getDialogId());
         }
 
-        List<QBChatHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
+        List<QBChatMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, returnedBundle);
 
         if (dialogMessagesList != null) {

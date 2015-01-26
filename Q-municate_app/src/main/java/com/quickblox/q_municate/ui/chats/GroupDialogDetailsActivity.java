@@ -1,11 +1,15 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -72,28 +76,25 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private String dialogId;
     private GroupDialog groupDialog;
-
     private Object actionMode;
     private boolean closeActionMode;
     private boolean isNeedUpdateAvatar;
     private Uri outputUri;
-
     private Bitmap avatarBitmapCurrent;
     private QBDialog currentDialog;
     private String groupNameCurrent;
-
     private String photoUrlOld;
     private String groupNameOld;
-
     private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
     private QBMultiChatHelper multiChatHelper;
-
     private List<MessagesNotificationType> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
-
     private FriendOperationAction friendOperationAction;
     private boolean loadedDialogInfo;
+    private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
+    private List<User> occupantsList;
+    private int countOnlineFriends;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -111,14 +112,22 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
         loadedDialogInfo = false;
+        currentNotificationTypeList = new ArrayList<MessagesNotificationType>();
 
         initUI();
         initUIWithData();
         addActions();
         startLoadGroupDialog();
 
-        currentNotificationTypeList = new ArrayList<MessagesNotificationType>();
+        initLocalBroadcastManagers();
     }
+
+    private void initLocalBroadcastManagers() {
+        updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogDetailsBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.UPDATE_DIALOG_DETAILS));
+    }
+
 
     @Override
     public void onConnectedToService(QBService service) {
@@ -155,13 +164,21 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void initUIWithData() {
         groupNameEditText.setText(groupDialog.getName());
+
+        countOnlineFriends = groupDialog.getOnlineOccupantsCount();
+        updateCountOnlineFriends();
+
         participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
-        onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
-                groupDialog.getOnlineOccupantsCount(), groupDialog.getOccupantsCount()));
+
         if (!isNeedUpdateAvatar) {
             loadAvatar(groupDialog.getPhotoUrl());
         }
         updateOldGroupData();
+    }
+
+    private void updateCountOnlineFriends() {
+        onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
+                countOnlineFriends, groupDialog.getOccupantsCount()));
     }
 
     private void loadAvatar(String photoUrl) {
@@ -194,7 +211,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     protected GroupDialogOccupantsAdapter getFriendsAdapter() {
-        return new GroupDialogOccupantsAdapter(this, friendOperationAction, groupDialog.getOccupantList());
+        occupantsList = groupDialog.getOccupantList();
+        return new GroupDialogOccupantsAdapter(this, friendOperationAction, occupantsList);
     }
 
     private void showLeaveGroupDialog() {
@@ -247,8 +265,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 return true;
             case R.id.action_add:
                 if (!loadedDialogInfo) {
-                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getResources()
-                            .getString(R.string.gdd_group_info_is_loading));
+                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getResources().getString(
+                            R.string.gdd_group_info_is_loading));
                 } else {
                     startAddFriendsActivity();
                 }
@@ -368,7 +386,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void sendNotificationToGroup() {
         for (MessagesNotificationType messagesNotificationType : currentNotificationTypeList) {
             try {
-                multiChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType, addedFriendIdsList);
+                multiChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType,
+                        addedFriendIdsList);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
                 hideProgress();
@@ -426,6 +445,25 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void addToFriendList(final int userId) {
         showProgress();
         QBAddFriendCommand.start(this, userId);
+    }
+
+    public void updateUserStatus(int userId, boolean status) {
+        User user = findUserById(userId);
+        if (user != null) {
+            user.setOnline(status);
+            groupDialogOccupantsAdapter.notifyDataSetChanged();
+            countOnlineFriends = status ? ++countOnlineFriends : --countOnlineFriends;
+            updateCountOnlineFriends();
+        }
+    }
+
+    public User findUserById(int userId) {
+        for (User user : occupantsList) {
+            if (userId == user.getUserId()) {
+                return user;
+            }
+        }
+        return null;
     }
 
     private class FriendOperationAction implements FriendOperationListener {
@@ -527,6 +565,18 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
             resetGroupData();
             hideProgress();
+        }
+    }
+
+    private class UpdatingDialogDetailsBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG_DETAILS)) {
+                int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, ConstsCore.ZERO_INT_VALUE);
+                boolean online = intent.getBooleanExtra(QBServiceConsts.EXTRA_STATUS, false);
+                updateUserStatus(userId, online);
+            }
         }
     }
 }
