@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.dialogs;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.text.TextUtils;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.BaseSelectableFriendListActivity;
+import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;

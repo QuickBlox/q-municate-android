@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.dialogs;
 
 import android.content.Context;
 import android.database.Cursor;

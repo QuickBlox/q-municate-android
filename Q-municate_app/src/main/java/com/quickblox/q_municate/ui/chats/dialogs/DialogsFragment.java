@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.dialogs;
 
 import android.app.LoaderManager;
 import android.content.Loader;
@@ -22,6 +22,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;

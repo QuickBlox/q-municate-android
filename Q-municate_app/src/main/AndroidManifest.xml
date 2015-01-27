@@ -78,7 +78,7 @@
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.chats.NewDialogActivity"
+            android:name=".ui.chats.dialogs.NewDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/ndl_title"
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"

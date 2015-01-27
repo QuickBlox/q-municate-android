@@ -10,13 +10,12 @@ import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.chats.DialogsFragment;
+import com.quickblox.q_municate.ui.chats.dialogs.DialogsFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
