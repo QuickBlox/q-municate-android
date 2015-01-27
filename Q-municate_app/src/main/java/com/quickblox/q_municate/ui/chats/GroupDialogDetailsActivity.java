@@ -106,20 +106,26 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_dialog_details);
+
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        currentDialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
-        groupDialog = new GroupDialog(currentDialog);
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
         loadedDialogInfo = false;
         currentNotificationTypeList = new ArrayList<MessagesNotificationType>();
 
         initUI();
+
+        initDialogs();
         initUIWithData();
+
         addActions();
-        startLoadGroupDialog();
 
         initLocalBroadcastManagers();
+    }
+
+    private void initDialogs() {
+        currentDialog = ChatDatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this, dialogId);
+        groupDialog = new GroupDialog(currentDialog);
     }
 
     private void initLocalBroadcastManagers() {
@@ -128,6 +134,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG_DETAILS));
     }
 
+    private void unregisterLocalBroadcastManagers() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updatingDialogDetailsBroadcastReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadGroupDialog();
+        showActionBarProgress();
+    }
 
     @Override
     public void onConnectedToService(QBService service) {
@@ -137,104 +153,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     @Override
-    public void onUriScaledBitmapReceived(Uri originalUri) {
-        hideProgress();
-        canPerformLogout.set(false);
-        startCropActivity(originalUri);
-    }
-
-    private void startLoadGroupDialog() {
-        QBLoadGroupDialogCommand.start(this, currentDialog, groupDialog.getRoomJid());
-    }
-
-    public void changeAvatarOnClick(View view) {
-        canPerformLogout.set(false);
-        imageUtils.getImage();
-    }
-
-    private void initUI() {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        avatarImageView = _findViewById(R.id.avatar_imageview);
-        groupNameEditText = _findViewById(R.id.name_textview);
-        participantsTextView = _findViewById(R.id.participants_textview);
-        friendsListView = _findViewById(R.id.chat_friends_listview);
-        onlineParticipantsTextView = _findViewById(R.id.online_participants_textview);
-    }
-
-    private void initUIWithData() {
-        groupNameEditText.setText(groupDialog.getName());
-
-        countOnlineFriends = groupDialog.getOnlineOccupantsCount();
-        updateCountOnlineFriends();
-
-        participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
-
-        if (!isNeedUpdateAvatar) {
-            loadAvatar(groupDialog.getPhotoUrl());
-        }
-        updateOldGroupData();
-    }
-
-    private void updateCountOnlineFriends() {
-        onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants,
-                countOnlineFriends, groupDialog.getOccupantsCount()));
-    }
-
-    private void loadAvatar(String photoUrl) {
-        ImageLoader.getInstance().displayImage(photoUrl, avatarImageView,
-                Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
-    }
-
-    private void initListView() {
-        groupDialogOccupantsAdapter = getFriendsAdapter();
-        friendsListView.setAdapter(groupDialogOccupantsAdapter);
-        friendsListView.setOnItemClickListener(this);
-    }
-
-    private void addActions() {
-        UpdateGroupFailAction updateGroupFailAction = new UpdateGroupFailAction();
-
-        addAction(QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION, new LoadGroupDialogSuccessAction());
-        addAction(QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
-        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
-        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, updateGroupFailAction);
-
-        addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
-        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new AddFriendFailAction());
-
-        updateBroadcastActionList();
-    }
-
-    protected GroupDialogOccupantsAdapter getFriendsAdapter() {
-        occupantsList = groupDialog.getOccupantList();
-        return new GroupDialogOccupantsAdapter(this, friendOperationAction, occupantsList);
-    }
-
-    private void showLeaveGroupDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                leaveGroup();
-            }
-        });
-        dialog.show(getFragmentManager(), null);
-    }
-
-    private void leaveGroup() {
-        showProgress();
-        currentNotificationTypeList.add(MessagesNotificationType.LEAVE_DIALOG);
-        sendNotificationToGroup();
-        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
-    }
-
-    private void initTextChangedListeners() {
-        groupNameEditText.addTextChangedListener(new GroupNameTextWatcherListener());
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterLocalBroadcastManagers();
     }
 
     @Override
@@ -296,6 +217,109 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onUriScaledBitmapReceived(Uri originalUri) {
+        hideProgress();
+        canPerformLogout.set(false);
+        startCropActivity(originalUri);
+    }
+
+    private void loadGroupDialog() {
+        currentDialog = ChatDatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this, dialogId);
+        QBLoadGroupDialogCommand.start(this, currentDialog);
+    }
+
+    public void changeAvatarOnClick(View view) {
+        canPerformLogout.set(false);
+        imageUtils.getImage();
+    }
+
+    private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        avatarImageView = _findViewById(R.id.avatar_imageview);
+        groupNameEditText = _findViewById(R.id.name_textview);
+        participantsTextView = _findViewById(R.id.participants_textview);
+        friendsListView = _findViewById(R.id.chat_friends_listview);
+        onlineParticipantsTextView = _findViewById(R.id.online_participants_textview);
+    }
+
+    private void initUIWithData() {
+        groupNameEditText.setText(groupDialog.getName());
+
+        countOnlineFriends = groupDialog.getOnlineOccupantsCount();
+        updateCountOnlineFriends();
+
+        participantsTextView.setText(getString(R.string.gdd_participants, groupDialog.getOccupantsCount()));
+
+        if (!isNeedUpdateAvatar) {
+            loadAvatar(groupDialog.getPhotoUrl());
+        }
+
+        updateOldGroupData();
+    }
+
+    private void updateCountOnlineFriends() {
+        onlineParticipantsTextView.setText(getString(R.string.gdd_online_participants, countOnlineFriends,
+                groupDialog.getOccupantsCount()));
+    }
+
+    private void loadAvatar(String photoUrl) {
+        ImageLoader.getInstance().displayImage(photoUrl, avatarImageView,
+                Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
+    }
+
+    private void initListView() {
+        groupDialogOccupantsAdapter = getFriendsAdapter();
+        friendsListView.setAdapter(groupDialogOccupantsAdapter);
+        friendsListView.setOnItemClickListener(this);
+    }
+
+    private void addActions() {
+        UpdateGroupFailAction updateGroupFailAction = new UpdateGroupFailAction();
+
+        addAction(QBServiceConsts.LOAD_GROUP_DIALOG_SUCCESS_ACTION, new LoadGroupDialogSuccessAction());
+        addAction(QBServiceConsts.LOAD_GROUP_DIALOG_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_SUCCESS_ACTION, new LeaveGroupDialogSuccessAction());
+        addAction(QBServiceConsts.LEAVE_GROUP_DIALOG_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_SUCCESS_ACTION, new UpdateGroupDialogSuccessAction());
+        addAction(QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION, updateGroupFailAction);
+
+        addAction(QBServiceConsts.ADD_FRIEND_SUCCESS_ACTION, new AddFriendSuccessAction());
+        addAction(QBServiceConsts.ADD_FRIEND_FAIL_ACTION, new AddFriendFailAction());
+
+        updateBroadcastActionList();
+    }
+
+    protected GroupDialogOccupantsAdapter getFriendsAdapter() {
+        occupantsList = groupDialog.getOccupantList();
+        return new GroupDialogOccupantsAdapter(this, friendOperationAction, occupantsList);
+    }
+
+    private void showLeaveGroupDialog() {
+        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
+        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                leaveGroup();
+            }
+        });
+        dialog.show(getFragmentManager(), null);
+    }
+
+    private void leaveGroup() {
+        showProgress();
+        currentNotificationTypeList.add(MessagesNotificationType.LEAVE_DIALOG);
+        sendNotificationToGroup();
+        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
+    }
+
+    private void initTextChangedListeners() {
+        groupNameEditText.addTextChangedListener(new GroupNameTextWatcherListener());
     }
 
     private void handleAddedFriends(Intent data) {
@@ -452,7 +476,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (user != null) {
             user.setOnline(status);
             groupDialogOccupantsAdapter.notifyDataSetChanged();
-            countOnlineFriends = status ? ++countOnlineFriends : --countOnlineFriends;
+
+            if (status) {
+                ++countOnlineFriends;
+            } else {
+                --countOnlineFriends;
+            }
+
             updateCountOnlineFriends();
         }
     }
@@ -524,11 +554,11 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
-            updateOldGroupData();
+
             initUIWithData();
             initTextChangedListeners();
             initListView();
-            hideProgress();
+            hideActionBarProgress();
             loadedDialogInfo = true;
         }
     }
@@ -548,8 +578,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             currentDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            groupDialog = new GroupDialog(ChatDatabaseManager.getDialogByDialogId(
-                    GroupDialogDetailsActivity.this, currentDialog.getDialogId()));
+            groupDialog = new GroupDialog(currentDialog);
+            groupDialog.setOccupantList((ArrayList<User>) occupantsList);
+
             updateOldGroupData();
 
             sendNotificationToGroup();
@@ -574,8 +605,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG_DETAILS)) {
                 int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, ConstsCore.ZERO_INT_VALUE);
-                boolean online = intent.getBooleanExtra(QBServiceConsts.EXTRA_STATUS, false);
-                updateUserStatus(userId, online);
+                if (occupantsList != null && userId != ConstsCore.ZERO_INT_VALUE) {
+                    boolean online = intent.getBooleanExtra(QBServiceConsts.EXTRA_STATUS, false);
+                    updateUserStatus(userId, online);
+                }
             }
         }
     }

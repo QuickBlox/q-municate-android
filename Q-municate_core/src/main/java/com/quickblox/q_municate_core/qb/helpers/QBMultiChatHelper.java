@@ -25,7 +25,6 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -87,17 +86,21 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         messageCache = parseReceivedMessage(chatMessage);
 
+        boolean ownMessage = chatMessage.getSenderId().equals(chatCreator.getId());
+
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
             messageCache.setMessagesNotificationType(
                     ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
             messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                     chatMessage));
-            updateDialogByNotification(chatMessage);
+            if (!ownMessage) {
+                updateDialogByNotification(chatMessage);
+            }
         }
 
         saveMessageToCache(messageCache);
 
-        if (!chatMessage.getSenderId().equals(chatCreator.getId())) {
+        if (!ownMessage) {
             // TODO IS handle logic when friend is not in the friend list
             notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), false);
         }
@@ -262,12 +265,12 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
+    public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
-        updateDialog(dialog, requestBuilder);
+        return updateDialog(dialog, requestBuilder);
     }
 
     public void removeUsersFromDialog(String roomJid, List<Integer> userIdsList) throws QBResponseException {
@@ -364,7 +367,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         @Override
         public void processPresence(QBGroupChat groupChat, QBPresence presence) {
-            if (currentDialog != null && currentDialog.getRoomJid().equals(groupChat.getJid())) {
+            boolean validData = currentDialog != null && presence.getUserId() != null;
+            if (validData && currentDialog.getRoomJid().equals(groupChat.getJid())) {
                 notifyUpdatingDialogDetails(presence.getUserId(), QBPresence.Type.online.equals(presence.getType()));
             }
         }

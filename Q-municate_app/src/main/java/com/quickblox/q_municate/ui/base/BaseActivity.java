@@ -190,6 +190,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
+            hideActionBarProgress();
             onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -35,8 +37,14 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         ArrayList<Integer> friendIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
 
-        multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
+        QBDialog dialog = multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
 
-        return extras;
+        if (dialog != null) {
+            ChatDatabaseManager.saveDialog(context, dialog);
+        }
+
+        Bundle returnedBundle = new Bundle();
+        returnedBundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
+        return returnedBundle;
     }
 }
