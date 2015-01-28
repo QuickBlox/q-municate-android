@@ -307,8 +307,8 @@ public class QBService extends Service {
 
     private void registerLoadUsersCommand() {
         QBFindUsersCommand userSearchCommand = new QBFindUsersCommand(this,
-                QBServiceConsts.LOAD_USERS_SUCCESS_ACTION, QBServiceConsts.LOAD_USERS_FAIL_ACTION);
-        serviceCommandMap.put(QBServiceConsts.LOAD_USERS_ACTION, userSearchCommand);
+                QBServiceConsts.FIND_USERS_SUCCESS_ACTION, QBServiceConsts.FIND_USERS_FAIL_ACTION);
+        serviceCommandMap.put(QBServiceConsts.FIND_USERS_ACTION, userSearchCommand);
     }
 
     private void registerUpdateUserCommand() {

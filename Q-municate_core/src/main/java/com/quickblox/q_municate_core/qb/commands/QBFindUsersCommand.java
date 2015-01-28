@@ -26,7 +26,7 @@ public class QBFindUsersCommand extends ServiceCommand {
     }
 
     public static void start(Context context, QBUser currentUser, String constraint, int page) {
-        Intent intent = new Intent(QBServiceConsts.LOAD_USERS_ACTION, null, context, QBService.class);
+        Intent intent = new Intent(QBServiceConsts.FIND_USERS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, currentUser);
         intent.putExtra(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
         intent.putExtra(QBServiceConsts.EXTRA_PAGE, page);

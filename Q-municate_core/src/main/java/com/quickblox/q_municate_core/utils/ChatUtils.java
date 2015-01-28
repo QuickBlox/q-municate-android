@@ -39,9 +39,11 @@ public class ChatUtils {
     }
 
     public static String getAttachUrlFromMessage(Collection<QBAttachment> attachmentsCollection) {
-        ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(attachmentsCollection);
-        if (!attachmentsList.isEmpty()) {
-            return attachmentsList.get(0).getUrl();
+        if (attachmentsCollection != null) {
+            ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(attachmentsCollection);
+            if (!attachmentsList.isEmpty()) {
+                return attachmentsList.get(0).getUrl();
+            }
         }
         return ConstsCore.EMPTY_STRING;
     }
@@ -91,9 +93,9 @@ public class ChatUtils {
 
     public static String getAttachUrlIfExists(QBChatMessage chatMessage) {
         String attachURL = ConstsCore.EMPTY_STRING;
-        Collection<QBAttachment> attachments = chatMessage.getAttachments();
-        if (attachments != null && attachments.size() > 0) {
-            attachURL = getAttachUrlFromMessage(new ArrayList<QBAttachment>(attachments));
+        Collection<QBAttachment> attachmentCollection = chatMessage.getAttachments();
+        if (attachmentCollection != null && attachmentCollection.size() > 0) {
+            attachURL = getAttachUrlFromMessage(attachmentCollection);
         }
         return attachURL;
     }

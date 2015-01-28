@@ -151,6 +151,23 @@ public class UsersDatabaseManager {
         return relationStatus;
     }
 
+    public static int getRelationStatusIdByUserId(Context context, int userId) {
+        int relationStatusId = ConstsCore.ZERO_INT_VALUE;
+
+        Cursor cursor = context.getContentResolver().query(FriendTable.CONTENT_URI, null,
+                FriendTable.Cols.USER_ID + " = " + userId, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+
+        return relationStatusId;
+    }
+
     public static boolean isUserInBase(Context context, int searchId) {
         String condition = FriendTable.Cols.USER_ID + " = " + searchId;
 

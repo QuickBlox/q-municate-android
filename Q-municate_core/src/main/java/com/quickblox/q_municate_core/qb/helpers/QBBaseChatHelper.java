@@ -100,7 +100,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         addNecessaryPropertyForQBChatMessage(chatMessage, dialogId);
 
         sendPrivateMessage(chatMessage, opponentId);
-        savePrivateMessageToCache(chatMessage, dialogId);
+        savePrivateMessageToCache(chatMessage, dialogId, opponentId);
     }
 
     public void sendPrivateMessage(QBChatMessage chatMessage, int opponentId) throws QBResponseException {
@@ -127,16 +127,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
     }
 
-    private void savePrivateMessageToCache(QBChatMessage chatMessage, String dialogId) {
+    private void savePrivateMessageToCache(QBChatMessage chatMessage, String dialogId, int opponentId) {
         String messageId = chatMessage.getId();
         long time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT)
                 .toString());
-        String attachUrl = ChatUtils.getAttachUrlFromMessage(new ArrayList<QBAttachment>(
-                chatMessage.getAttachments()));
+        String attachUrl = ChatUtils.getAttachUrlFromMessage(chatMessage.getAttachments());
         Integer recipientId;
 
         if (chatMessage.getRecipientId() == null) {
-            recipientId = ConstsCore.ZERO_INT_VALUE;
+            recipientId = opponentId;
         } else {
             recipientId = chatMessage.getRecipientId();
         }
