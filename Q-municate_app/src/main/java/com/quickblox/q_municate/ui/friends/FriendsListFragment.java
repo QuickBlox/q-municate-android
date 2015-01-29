@@ -36,7 +36,6 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,7 +49,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private ExpandableListView friendsListView;
     private TextView emptyListTextView;
     private FriendsListAdapter friendsListAdapter;
-    private SearchOnActionExpandListener searchOnActionExpandListener;
     private SearchView searchView;
     private Toast errorToast;
     private ContentObserver userTableContentObserver;
@@ -108,7 +106,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-        searchOnActionExpandListener = new SearchOnActionExpandListener();
+        SearchOnActionExpandListener searchOnActionExpandListener = new SearchOnActionExpandListener();
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchItem.setOnActionExpandListener(searchOnActionExpandListener);
         searchView = (SearchView) searchItem.getActionView();
@@ -146,6 +144,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (!TextUtils.isEmpty(constraint)) {
             performQueryTextChange();
         }
+
+        checkVisibilityEmptyLabel();
 
         friendsListView.setSelection(firstVisiblePositionList);
     }
@@ -286,10 +286,15 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             page = 1; // first page for loading items
 
             initFriendList();
+
+            if (!TextUtils.isEmpty(constraint)) {
+                performQueryTextChange();
+            } else {
+                baseActivity.hideActionBarProgress();
+            }
+
             checkUsersListLoader();
         }
-
-        baseActivity.hideActionBarProgress();
 
         return true;
     }
@@ -305,9 +310,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_FAIL_ACTION);
-
-        baseActivity.removeAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION);
-        baseActivity.removeAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
     }
 
     private void addActions() {
@@ -369,7 +371,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         } else {
             int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
 
-            if ((countFriends + friendGroupList.size()) > ConstsCore.ZERO_INT_VALUE) {
+            if ((countFriends + friendGroupAllUsers.getUserList().size()) > ConstsCore.ZERO_INT_VALUE) {
                 emptyListTextView.setVisibility(View.GONE);
             } else {
                 emptyListTextView.setVisibility(View.VISIBLE);
@@ -417,6 +419,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void updateFriendList(Collection<User> newUserCollection) {
+        friendGroupAllUsers.removeFriendsFromList(new ArrayList<User>(newUserCollection));
         friendGroupAllUsers.addUserList(new ArrayList<User>(newUserCollection));
         friendGroupAllUsers.removeFriendsFromList(friendGroupAllFriends.getUserList());
 
@@ -502,6 +505,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 onQueryTextChange(FriendsListFragment.this.constraint);
             }
 
+            checkVisibilityEmptyLabel();
+
             friendsListView.removeFooterView(listLoadingView);
             friendsListView.setSelection(firstVisiblePositionList);
             baseActivity.hideActionBarProgress();
@@ -515,19 +520,10 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             String notFoundError = getResources().getString(R.string.frl_not_found_users);
             showErrorToast(notFoundError);
 
+            checkVisibilityEmptyLabel();
+
             friendsListView.removeFooterView(listLoadingView);
             baseActivity.hideActionBarProgress();
-        }
-    }
-
-    private class UserComparator implements Comparator<User> {
-
-        @Override
-        public int compare(User firstUser, User secondUser) {
-            if (firstUser.getFullName() == null || secondUser.getFullName() == null) {
-                return 0;
-            }
-            return String.CASE_INSENSITIVE_ORDER.compare(firstUser.getFullName(), secondUser.getFullName());
         }
     }
 }

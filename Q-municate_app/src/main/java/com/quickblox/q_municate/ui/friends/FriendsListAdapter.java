@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -109,14 +110,17 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isLastChild, View view, ViewGroup parent) {
         FriendGroup friendGroup = (FriendGroup) getGroup(groupPosition);
 
-        if (view == null) {
+        //By default the group is hidden
+        View hiddenView = new FrameLayout(context);
+
+        if (friendGroup.getUserList().isEmpty()) {
+            return hiddenView;
+        } else {
             view = layoutInflater.inflate(R.layout.view_section_title_friends_list, null);
         }
 
         TextView headerName = (TextView) view.findViewById(R.id.list_title_textview);
         headerName.setText(friendGroup.getHeaderName());
-
-        view.setVisibility(friendGroup.getUserList().isEmpty() ? View.GONE : View.VISIBLE);
 
         return view;
     }
@@ -187,6 +191,11 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
         String status = null;
 
         Friend friend = UsersDatabaseManager.getFriendById(context, user.getUserId());
+
+        if (friend == null) {
+            return;
+        }
+
         String relationStatus = friend.getRelationStatus();
 
         boolean isAddedFriend;
