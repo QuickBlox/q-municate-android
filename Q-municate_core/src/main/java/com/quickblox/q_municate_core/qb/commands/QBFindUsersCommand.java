@@ -5,19 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
+import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class QBFindUsersCommand extends ServiceCommand {
 
@@ -42,6 +39,11 @@ public class QBFindUsersCommand extends ServiceCommand {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(page);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
+
+        //        TODO temp
+        //        ArrayList<GenericQueryRule> ruleList = new ArrayList<GenericQueryRule>();
+        //        ruleList.add(new GenericQueryRule("order", "asc+string+full_name"));
+        //        requestBuilder.setRules(ruleList);
 
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);

@@ -188,7 +188,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
-        String status = null;
+        String status;
 
         Friend friend = UsersDatabaseManager.getFriendById(context, user.getUserId());
 
@@ -205,6 +205,8 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
         if (isAddedFriend) {
             viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.frl_pending_request_status);
+        } else {
+            status = user.getOnlineStatus(context);
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);

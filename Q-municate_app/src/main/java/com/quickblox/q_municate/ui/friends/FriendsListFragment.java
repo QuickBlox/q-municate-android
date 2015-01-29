@@ -36,6 +36,8 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -261,6 +263,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initFriendAdapter() {
+        sortLists();
+
         friendsListAdapter = new FriendsListAdapter(baseActivity, friendOperationAction, friendGroupList);
         friendsListAdapter.setSearchCharacters(constraint);
         friendsListView.setAdapter(friendsListAdapter);
@@ -268,6 +272,14 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListView.setOnScrollListener(this);
 
         expandAll();
+    }
+
+    private void sortLists() {
+        UserComparator userComparator = new UserComparator();
+        Collections.sort(friendGroupList.get(FriendGroup.GROUP_POSITION_ALL_USERS).getUserList(),
+                userComparator);
+        Collections.sort(friendGroupList.get(FriendGroup.GROUP_POSITION_MY_CONTACTS).getUserList(),
+                userComparator);
     }
 
     @Override
@@ -524,6 +536,18 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             friendsListView.removeFooterView(listLoadingView);
             baseActivity.hideActionBarProgress();
+        }
+    }
+
+    private class UserComparator implements Comparator<User> {
+
+        @Override
+        public int compare(User firstUser, User secondUser) {
+            if (firstUser.getFullName() == null || secondUser.getFullName() == null) {
+                return 0;
+            }
+
+            return String.CASE_INSENSITIVE_ORDER.compare(firstUser.getFullName(), secondUser.getFullName());
         }
     }
 }

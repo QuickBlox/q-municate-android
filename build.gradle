@@ -13,11 +13,11 @@ allprojects {
     }
 }
 
-ext.compileSdkVersion = 19
-ext.buildToolsVersion = '19.1.0'
+ext.compileSdkVersion = 21
+ext.buildToolsVersion = '21.0.1'
 ext.minSdkVersion = 14
-ext.targetSdkVersion = 14
-ext.versionName = '1.0.96'
+ext.targetSdkVersion = 21
+ext.versionName = '1.0.97'
 ext.versionCode = 25
 
 ext.prodDebug = true
