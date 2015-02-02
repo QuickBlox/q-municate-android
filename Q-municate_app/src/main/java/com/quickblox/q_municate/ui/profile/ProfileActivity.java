@@ -216,7 +216,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
                 new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
             }
         }
-        canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -229,6 +228,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         } else if (resultCode == Crop.RESULT_ERROR) {
             DialogUtils.showLong(this, Crop.getError(result).getMessage());
         }
+        canPerformLogout.set(true);
     }
 
     private void startCropActivity(Uri originalUri) {
@@ -333,11 +333,12 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
             newUser.setPhone(phoneCurrent);
         }
 
-        if (isFieldValueChanged(statusCurrent, statusOld)) {
+        if (isFieldValueChanged(statusCurrent, statusOld) || isNeedUpdateAvatar) {
             userCustomData.setStatus(statusCurrent);
             user.setCustomData(Utils.customDataToString(userCustomData));
-            newUser.setCustomData(Utils.customDataToString(userCustomData));
         }
+
+        newUser.setCustomData(Utils.customDataToString(userCustomData));
 
         return newUser;
     }

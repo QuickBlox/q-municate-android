@@ -114,9 +114,9 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     protected void startMainActivity(Context context, QBUser user, boolean saveRememberMe) {
+        ChatDatabaseManager.clearAllCache(context);
         AppSession.getSession().updateUser(user);
         AppSession.saveRememberMe(saveRememberMe);
-        ChatDatabaseManager.clearAllCache(context);
         MainActivity.start(context);
         finish();
     }
