@@ -8,7 +8,6 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.core.gcm.tasks.QBGCMRegistrationTask;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
@@ -40,17 +39,6 @@ public class GSMHelper {
         new QBGCMRegistrationTask(activity).execute(gcm);
     }
 
-    public boolean isSubscribed() {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        return prefsHelper.getPref(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, false);
-    }
-
-    public String getRegistrationId() {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        String registrationId = prefsHelper.getPref(PrefsHelper.PREF_REG_ID, ConstsCore.EMPTY_STRING);
-        return registrationId;
-    }
-
     public boolean isDeviceRegisteredWithUser(QBUser user) {
         PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         String registrationId = prefsHelper.getPref(PrefsHelper.PREF_REG_ID, ConstsCore.EMPTY_STRING);
@@ -68,10 +56,5 @@ public class GSMHelper {
         int registeredUserId = prefsHelper.getPref(PrefsHelper.PREF_REG_USER_ID,
                 ConstsCore.NOT_INITIALIZED_VALUE);
         return user.getId() == registeredUserId;
-    }
-
-    //TODO VF will be defined throw core qb
-    public void subscribeToPushNotifications() {
-        new QBGCMRegistrationTask(activity).execute(gcm);
     }
 }

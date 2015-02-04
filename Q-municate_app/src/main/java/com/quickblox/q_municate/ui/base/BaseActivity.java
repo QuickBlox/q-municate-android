@@ -15,7 +15,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
+import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;

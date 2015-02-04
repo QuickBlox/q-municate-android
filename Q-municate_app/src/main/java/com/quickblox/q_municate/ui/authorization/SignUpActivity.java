@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization.signup;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +13,6 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.agreements.UserAgreementActivity;
-import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
-import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
@@ -174,6 +172,11 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
                 UserAgreementActivity.start(SignUpActivity.this);
             }
         });
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
     }
 
     private void addActions() {

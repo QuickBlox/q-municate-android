@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization.landing;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,15 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
-import com.quickblox.q_municate.ui.authorization.login.LoginActivity;
-import com.quickblox.q_municate.ui.authorization.signup.SignUpActivity;
 import com.quickblox.q_municate_core.utils.Utils;
 
 public class LandingActivity extends BaseAuthActivity {

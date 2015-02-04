@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.splash;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +11,6 @@ import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
@@ -28,7 +27,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.concurrent.TimeUnit;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseAuthActivity {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
     private FacebookHelper facebookHelper;
@@ -39,13 +38,9 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Crashlytics.start(this);
-
-        addActions();
-
-        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
 
         String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
@@ -62,14 +57,11 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        facebookHelper.onActivityStart();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
+
+        addActions();
+
         if (isLoggedInToChat()) {
             startMainActivity();
             finish();
@@ -110,10 +102,6 @@ public class SplashActivity extends BaseActivity {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, new LoginSuccessAction());
         addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
-    }
-
-    public boolean isLoggedViaFB() {
-        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
     }
 
     @Override
@@ -160,35 +148,5 @@ public class SplashActivity extends BaseActivity {
 
     private LoginType getCurrentLoginType() {
         return AppSession.getSession().getLoginType();
-    }
-
-    private void startMainActivity() {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        MainActivity.start(SplashActivity.this);
-    }
-
-    private class FacebookSessionStatusCallback implements Session.StatusCallback {
-
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            if (session.isOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType())) {
-                QBLoginRestWithSocialCommand.start(SplashActivity.this, QBProvider.FACEBOOK,
-                        session.getAccessToken(), null);
-            }
-        }
-    }
-
-    private class LoginSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-
-            startMainActivity();
-
-            AnalyticsUtils.pushAnalyticsData(SplashActivity.this, user, "User Sign In");
-
-            finish();
-        }
     }
 }

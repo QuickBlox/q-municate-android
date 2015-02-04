@@ -16,7 +16,7 @@ import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
+import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;

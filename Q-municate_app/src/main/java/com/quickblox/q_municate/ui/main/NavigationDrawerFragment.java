@@ -30,7 +30,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
+import com.quickblox.q_municate.ui.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.utils.FacebookHelper;

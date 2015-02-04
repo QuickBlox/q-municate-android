@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization.landing;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.app.Dialog;
 import android.app.DialogFragment;

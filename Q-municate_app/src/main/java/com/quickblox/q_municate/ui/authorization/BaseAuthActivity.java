@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization.base;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,18 +12,20 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.base.BaseActivity;
+import com.quickblox.q_municate.ui.main.MainActivity;
+import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.utils.DialogUtils;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
-import com.quickblox.q_municate.ui.authorization.landing.UserAgreementDialog;
-import com.quickblox.q_municate.ui.base.BaseActivity;
-import com.quickblox.q_municate.ui.main.MainActivity;
-import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.users.model.QBUser;
 
 public class BaseAuthActivity extends BaseActivity {
 
@@ -106,9 +108,10 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     protected void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,
-                                     DialogInterface.OnClickListener negativeClickListener) {
+            DialogInterface.OnClickListener negativeClickListener) {
         if (userAgreementDialog == null) {
-            userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener, negativeClickListener);
+            userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener,
+                    negativeClickListener);
         }
         userAgreementDialog.show(getFragmentManager(), null);
     }
@@ -131,6 +134,15 @@ public class BaseAuthActivity extends BaseActivity {
         return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
     }
 
+    protected boolean isLoggedViaFB() {
+        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
+    }
+
+    protected void startMainActivity() {
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        MainActivity.start(BaseAuthActivity.this);
+    }
+
     protected void parseExceptionMessage(Exception exception) {
         String errorMessage = exception.getMessage();
 
@@ -147,6 +159,17 @@ public class BaseAuthActivity extends BaseActivity {
         }
 
         validationUtils.setError(errorMessage);
+    }
+
+    private class LoginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+            startMainActivity();
+            AnalyticsUtils.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
+            finish();
+        }
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

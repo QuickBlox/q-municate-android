@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization.login;
+package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,16 +9,12 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
-import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 

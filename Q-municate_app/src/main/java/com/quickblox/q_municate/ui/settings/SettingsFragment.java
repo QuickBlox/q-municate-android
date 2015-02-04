@@ -11,13 +11,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.authorization.login.LoginActivity;
+import com.quickblox.q_municate.ui.authorization.LoginActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;

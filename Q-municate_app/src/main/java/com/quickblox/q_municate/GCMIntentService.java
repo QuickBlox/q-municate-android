@@ -16,7 +16,7 @@ import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.models.PushMessage;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
+import com.quickblox.q_municate.ui.authorization.SplashActivity;
 
 public class GCMIntentService extends IntentService {
 
