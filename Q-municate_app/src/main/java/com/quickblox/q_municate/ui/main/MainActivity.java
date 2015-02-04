@@ -163,11 +163,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         if (gsmHelper.checkPlayServices()) {
             if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getSession().getUser())) {
                 gsmHelper.registerInBackground();
-                return;
-            }
-            boolean subscribed = gsmHelper.isSubscribed();
-            if (!subscribed) {
-                gsmHelper.subscribeToPushNotifications();
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
