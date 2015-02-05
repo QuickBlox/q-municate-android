@@ -41,6 +41,8 @@ import java.lang.ref.WeakReference;
 public class ImageUtils {
 
     public static final int GALLERY_INTENT_CALLED = 1;
+    public static final int GALLERY_IMAGE_PREVIEWER_CALLED = 2;
+    public static final int CAPTURE_CALLED = 3;
 
     private static final String TEMP_FILE_NAME = "temp.png";
 
@@ -53,14 +55,9 @@ public class ImageUtils {
     public static ImageLoaderConfiguration getImageLoaderConfiguration(Context context) {
         final int MEMORY_CACHE_LIMIT = 2 * 1024 * 1024;
         final int THREAD_POOL_SIZE = 5;
-        final int COMPRESS_QUALITY = 60;
-        final int MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE = 600;
-        final int MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE = 1200;
 
         ImageLoaderConfiguration imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
-                .memoryCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE)
-                .discCacheExtraOptions(MAX_IMAGE_WIDTH_FOR_MEMORY_CACHE, MAX_IMAGE_HEIGHT_FOR_MEMORY_CACHE,
-                        Bitmap.CompressFormat.JPEG, COMPRESS_QUALITY, null).threadPoolSize(THREAD_POOL_SIZE)
+                .threadPoolSize(THREAD_POOL_SIZE)
                 .threadPriority(Thread.NORM_PRIORITY).denyCacheImageMultipleSizesInMemory().memoryCache(
                         new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT)).writeDebugLogs()
                 .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS).imageDecoder(
@@ -144,6 +141,11 @@ public class ImageUtils {
         }
     }
 
+    public void getCaptureImage() {
+        Intent cameraIntent=new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        activity.startActivityForResult(cameraIntent, CAPTURE_CALLED);
+    }
+
     public void getImage() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             Intent intent = new Intent();
@@ -162,12 +164,12 @@ public class ImageUtils {
         activity.startActivityForResult(intent, GALLERY_INTENT_CALLED);
     }
 
-    public void showFullImage(Context context, String absolutePath) {
+    public void showFullImage(Activity activity, String absolutePath) {
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
         Uri uri = Uri.parse("file://" + absolutePath);
         intent.setDataAndType(uri, "image/*");
-        context.startActivity(intent);
+        activity.startActivityForResult(intent, GALLERY_IMAGE_PREVIEWER_CALLED);
     }
 
     public Bitmap getRoundedBitmap(Bitmap bitmap) {

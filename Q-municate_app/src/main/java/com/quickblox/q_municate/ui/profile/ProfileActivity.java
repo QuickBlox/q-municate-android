@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -126,8 +127,16 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         });
     }
 
+    private void initCustomData() {
+        userCustomData = Utils.customDataToObject(user.getCustomData());
+
+        if (userCustomData == null) {
+            userCustomData = new UserCustomData();
+        }
+    }
+
     private void initUIWithUsersData() {
-        userCustomData = (UserCustomData) user.getCustomDataAsObject();
+        initCustomData();
 
         loadAvatar();
         fullNameOld = user.getFullName();
@@ -143,9 +152,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         phoneOld = user.getPhone();
         phoneEditText.setText(phoneOld);
 
-        if (userCustomData != null) {
-            statusOld = userCustomData.getStatus();
-        }
+        statusOld = userCustomData.getStatus();
 
         statusEditText.setText(statusOld);
     }
@@ -209,7 +216,6 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
                 new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
             }
         }
-        canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -222,6 +228,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         } else if (resultCode == Crop.RESULT_ERROR) {
             DialogUtils.showLong(this, Crop.getError(result).getMessage());
         }
+        canPerformLogout.set(true);
     }
 
     private void startCropActivity(Uri originalUri) {
@@ -265,7 +272,8 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
     @Override
     public void onCachedImageFileReceived(File imageFile) {
-        QBUpdateUserCommand.start(this, user, imageFile);
+        QBUser newUser = createUserForUpdating();
+        QBUpdateUserCommand.start(this, newUser, imageFile);
     }
 
     @Override
@@ -298,20 +306,45 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
 
         showProgress();
 
-        user.setFullName(fullNameCurrent);
-        user.setPhone(phoneCurrent);
-        userCustomData.setStatus(statusCurrent);
-        user.setCustomDataAsObject(userCustomData);
+        QBUser newUser = createUserForUpdating();
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
-            QBUpdateUserCommand.start(this, user, null);
+            QBUpdateUserCommand.start(this, newUser, null);
         }
 
         stopChangingEditText(fullNameEditText);
         stopChangingEditText(phoneEditText);
         stopChangingEditText(statusEditText);
+    }
+
+    private QBUser createUserForUpdating() {
+        QBUser newUser = new QBUser();
+        newUser.setId(user.getId());
+
+        if (isFieldValueChanged(fullNameCurrent, fullNameOld)) {
+            user.setFullName(fullNameCurrent);
+            newUser.setFullName(fullNameCurrent);
+        }
+
+        if (isFieldValueChanged(phoneCurrent, phoneOld)) {
+            user.setPhone(phoneCurrent);
+            newUser.setPhone(phoneCurrent);
+        }
+
+        if (isFieldValueChanged(statusCurrent, statusOld) || isNeedUpdateAvatar) {
+            userCustomData.setStatus(statusCurrent);
+            user.setCustomData(Utils.customDataToString(userCustomData));
+        }
+
+        newUser.setCustomData(Utils.customDataToString(userCustomData));
+
+        return newUser;
+    }
+
+    private boolean isFieldValueChanged(String fieldValue, String oldFieldValue) {
+        return !fieldValue.equals(oldFieldValue);
     }
 
     private boolean isUserDataCorrect() {
@@ -328,7 +361,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void resetUserData() {
         user.setFullName(fullNameOld);
         user.setPhone(phoneOld);
-        ((UserCustomData) user.getCustomDataAsObject()).setStatus(statusOld);
+        initCustomData();
 
         isNeedUpdateAvatar = false;
     }

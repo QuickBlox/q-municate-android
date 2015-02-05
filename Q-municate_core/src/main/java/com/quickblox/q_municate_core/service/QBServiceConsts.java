@@ -26,6 +26,7 @@ public class QBServiceConsts {
     public static final String UPDATE_USER_ACTION = "update_user_action";
     public static final String LOAD_FRIENDS_ACTION = "friends_load_action";
     public static final String LOAD_USERS_ACTION = "users_search_action";
+    public static final String FIND_USERS_ACTION = "find_search_action";
     public static final String LOAD_USER_ACTION = "user_search_action";
     public static final String SEND_MESSAGE_ACTION = "send_message_action";
     public static final String SEND_GROUP_MESSAGE_ACTION = "send_group_message_action";
@@ -44,11 +45,12 @@ public class QBServiceConsts {
     public static final String LOAD_GROUP_DIALOG_ACTION = "load_group_dialog_action";
     public static final String LEAVE_GROUP_DIALOG_ACTION = "leave_group_group_action";
     public static final String ADD_FRIENDS_TO_GROUP_ACTION = "add_friends_to_group_action";
-    public static final String UPDATE_GROUP_NAME_ACTION = "update_group_name_action";
     public static final String UPDATE_STATUS_MESSAGE_ACTION = "update_status_message_action";
     public static final String SEND_PUSH_ACTION = "send_push_action";
     public static final String GET_USER_BY_ID_ACTION = "get_user_by_id_action";
     public static final String RE_LOGIN_IN_CHAT_ACTION = "relogin_in_chat";
+    public static final String DELETE_DIALOG_ACTION = "delete_dialog_action";
+    public static final String UPDATE_GROUP_DIALOG_ACTION = "update_group_dialog_name_action";
 
     //success and fail actions
     public static final String ADD_FRIEND_SUCCESS_ACTION = "add_friend_success_action";
@@ -79,6 +81,8 @@ public class QBServiceConsts {
     public static final String LOAD_FRIENDS_FAIL_ACTION = "friends_load_fail_action";
     public static final String LOAD_USERS_SUCCESS_ACTION = "users_search_success_action";
     public static final String LOAD_USERS_FAIL_ACTION = "users_search_fail_action";
+    public static final String FIND_USERS_SUCCESS_ACTION = "find_users_success_action";
+    public static final String FIND_USERS_FAIL_ACTION = "find_users_fail_action";
     public static final String LOAD_USER_SUCCESS_ACTION = "user_search_success_action";
     public static final String LOAD_USER_FAIL_ACTION = "user_search_fail_action";
     public static final String SEND_MESSAGE_SUCCESS_ACTION = "send_message_success_action";
@@ -127,15 +131,15 @@ public class QBServiceConsts {
     public static final String LEAVE_GROUP_DIALOG_FAIL_ACTION = "leave_group_dialog_fail_action";
     public static final String ADD_FRIENDS_TO_GROUP_SUCCESS_ACTION = "add_friends_to_group_success_action";
     public static final String ADD_FRIENDS_TO_GROUP_FAIL_ACTION = "add_friends_to_group_fail_action";
-    public static final String UPDATE_GROUP_NAME_SUCCESS_ACTION = "update_group_name_success_action";
-    public static final String UPDATE_GROUP_NAME_FAIL_ACTION = "update_group_name_fail_action";
     public static final String LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION = "login_and_join_chats_sucess_action";
     public static final String LOGIN_AND_JOIN_CHATS_FAIL_ACTION = "login_and_join_chats_fail_action";
     public static final String USER_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
-    public static final String UPDATE_GROUP_PHOTO_SUCCESS_ACTION = "update_group_photo_success_action";
-    public static final String UPDATE_GROUP_PHOTO_FAIL_ACTION = "update_group_photo_fail_action";
+    public static final String UPDATE_GROUP_DIALOG_SUCCESS_ACTION = "update_group_dialog_success_action";
+    public static final String UPDATE_GROUP_DIALOG_FAIL_ACTION = "update_group_dialog_fail_action";
+    public static final String DELETE_DIALOG_SUCCESS_ACTION = "delete_dialog_success_action";
+    public static final String DELETE_DIALOG_FAIL_ACTION = "delete_dialog_fail_action";
 
     public static final String EXTRA_ATTACH_FILE = "attach_file";
     public static final String EXTRA_CHAT_MESSAGE = "chat_message";
@@ -159,6 +163,7 @@ public class QBServiceConsts {
     public static final String EXTRA_EMAIL = "email";
     public static final String EXTRA_FILE_ID = "file_id";
     public static final String EXTRA_CONSTRAINT = "constraint";
+    public static final String EXTRA_TOTAL_ENTRIES = "total_entries";
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
     public static final String EXTRA_ROOM_NAME = "room_name";
@@ -168,6 +173,7 @@ public class QBServiceConsts {
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
     public static final String EXTRA_DIALOG_ID = "dialog_id";
+    public static final String EXTRA_DIALOG_TYPE = "dialog_type";
     public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
@@ -186,7 +192,11 @@ public class QBServiceConsts {
     public static final String EXTRA_FRIEND_ALERT_MESSAGE = "alert_message";
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
+    public static final String EXTRA_PAGE = "load_elements";
+    public static final String EXTRA_SKIP_ITEMS = "skip_items";
 
+    public static final String UPDATE_DIALOG = "update_dialog";
+    public static final String UPDATE_DIALOG_DETAILS = "update_dialog_details";
     public static final String TYPING_MESSAGE = "typing_message";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
     public static final String GOT_CONTACT_REQUEST = "got_contact_request";

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -13,6 +12,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -40,9 +40,13 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBUser currentUser = AppSession.getSession().getUser();
-        // TODO IS remove when fix ResourceBindingNotOfferedException occurrence
+        final QBUser currentUser = AppSession.getSession().getUser();
+
         tryLogin(currentUser);
+
+        // clear old dialogs data
+        PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
+
         if (!chatRestHelper.isLoggedIn()) {
             throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
         }
@@ -56,7 +60,9 @@ public class QBLoginChatCommand extends ServiceCommand {
             currentTime = new Date().getTime();
             try {
                 chatRestHelper.login(currentUser);
-            } catch (SmackException ignore) { /* NOP */ }
+            } catch (SmackException ignore) {
+                ignore.printStackTrace();
+            }
         }
     }
 }

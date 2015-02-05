@@ -17,6 +17,7 @@ public class MessageTable {
         public static final String MESSAGE_ID = "message_id";
         public static final String DIALOG_ID = "dialog_id";
         public static final String SENDER_ID = "sender_id";
+        public static final String RECIPIENT_ID = "recipient_id";
         public static final String BODY = "body";
         public static final String TIME = "time";
         public static final String ATTACH_FILE_ID = "attach_file_id";

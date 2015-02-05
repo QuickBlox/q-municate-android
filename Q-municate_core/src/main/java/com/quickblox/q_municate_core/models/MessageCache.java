@@ -7,22 +7,24 @@ public class MessageCache implements Serializable {
     private String id;
     private String dialogId;
     private Integer senderId;
+    private Integer recipientId;
     private String message;
     private String attachUrl;
     private long time;
     private boolean isRead;
     private boolean isDelivered;
     private boolean isSync;
-    private FriendsNotificationType friendsNotificationType;
+    private MessagesNotificationType messagesNotificationType;
 
     public MessageCache() {
     }
 
-    public MessageCache(String id, String dialogId, Integer senderId, String message, String attachUrl,
+    public MessageCache(String id, String dialogId, Integer senderId, Integer recipientId, String message, String attachUrl,
             long time, boolean isRead, boolean isDelivered, boolean isSync) {
         this.id = id;
         this.dialogId = dialogId;
         this.senderId = senderId;
+        this.recipientId = recipientId;
         this.message = message;
         this.attachUrl = attachUrl;
         this.time = time;
@@ -31,12 +33,20 @@ public class MessageCache implements Serializable {
         this.isSync = isSync;
     }
 
-    public FriendsNotificationType getFriendsNotificationType() {
-        return friendsNotificationType;
+    public Integer getRecipientId() {
+        return recipientId;
     }
 
-    public void setFriendsNotificationType(FriendsNotificationType friendsNotificationType) {
-        this.friendsNotificationType = friendsNotificationType;
+    public void setRecipientId(Integer recipientId) {
+        this.recipientId = recipientId;
+    }
+
+    public MessagesNotificationType getMessagesNotificationType() {
+        return messagesNotificationType;
+    }
+
+    public void setMessagesNotificationType(MessagesNotificationType messagesNotificationType) {
+        this.messagesNotificationType = messagesNotificationType;
     }
 
     public boolean isSync() {

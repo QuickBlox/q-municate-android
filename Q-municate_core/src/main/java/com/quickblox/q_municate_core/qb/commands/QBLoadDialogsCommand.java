@@ -2,29 +2,30 @@ package com.quickblox.q_municate_core.qb.commands;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatDialogUtils;
+import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
-    private QBChatRestHelper chatRestHelper;
     private QBMultiChatHelper multiChatHelper;
 
-    public QBLoadDialogsCommand(Context context, QBChatRestHelper chatRestHelper,
-            QBMultiChatHelper multiChatHelper, String successAction, String failAction) {
+    public QBLoadDialogsCommand(Context context, QBMultiChatHelper multiChatHelper, String successAction,
+            String failAction) {
         super(context, successAction, failAction);
-        this.chatRestHelper = chatRestHelper;
         this.multiChatHelper = multiChatHelper;
     }
 
@@ -35,17 +36,30 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogsList = chatRestHelper.getDialogs();
+        List<QBDialog> dialogsList = multiChatHelper.getDialogs();
         ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
+            new FindUnknownFriendsTask().execute(dialogsList);
             parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
             multiChatHelper.tryJoinRoomChats(dialogsList);
+            // save flag for join to dialogs
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
         }
 
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS,  parcelableQBDialog);
+        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
 
         return bundle;
+    }
+
+    private class FindUnknownFriendsTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            List<QBDialog> dialogsList = (List<QBDialog>) params[0];
+            new FinderUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
+            return null;
+        }
     }
 }

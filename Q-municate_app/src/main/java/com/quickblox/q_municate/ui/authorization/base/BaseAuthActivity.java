@@ -11,9 +11,10 @@ import android.widget.EditText;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
@@ -90,13 +91,18 @@ public class BaseAuthActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     saveUserAgreementShowing();
-                    facebookHelper.loginWithFacebook();
+                    loginWithFacebook();
                 }
             };
             showUserAgreement(positiveUserAgreementOnClickListener, negativeUserAgreementOnClickListener);
         } else {
-            facebookHelper.loginWithFacebook();
+            loginWithFacebook();
         }
+    }
+
+    private void loginWithFacebook() {
+        FacebookHelper.logout(); // clearing old data
+        facebookHelper.loginWithFacebook();
     }
 
     protected void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,
@@ -108,9 +114,9 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     protected void startMainActivity(Context context, QBUser user, boolean saveRememberMe) {
+        ChatDatabaseManager.clearAllCache(context);
         AppSession.getSession().updateUser(user);
         AppSession.saveRememberMe(saveRememberMe);
-        DatabaseManager.clearAllCache(context);
         MainActivity.start(context);
         finish();
     }
@@ -123,6 +129,24 @@ public class BaseAuthActivity extends BaseActivity {
     protected boolean isUserAgreementShown() {
         PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
+    }
+
+    protected void parseExceptionMessage(Exception exception) {
+        String errorMessage = exception.getMessage();
+
+        hideProgress();
+
+        // TODO: temp decision
+        if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
+            errorMessage = resources.getString(R.string.error_bad_timestamp_from_app);
+        } else if (exception.getMessage().equals(resources.getString(
+                R.string.error_email_already_taken)) && startedLoginType.equals(LoginType.FACEBOOK)) {
+            errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
+            DialogUtils.showLong(BaseAuthActivity.this, errorMessage);
+            return;
+        }
+
+        validationUtils.setError(errorMessage);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

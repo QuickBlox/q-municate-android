@@ -3,11 +3,18 @@ package com.quickblox.q_municate_core.utils;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.qb.gson.Gson;
+import com.qb.gson.GsonBuilder;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.users.model.QBUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,9 +57,9 @@ public class Utils {
         Log.d(Utils.class.getSimpleName(), "");
         List<String> errors = e.getErrors();
         for (String error : errors) {
-            Log.d(Utils.class.getSimpleName(), "error =" +error);
+            Log.d(Utils.class.getSimpleName(), "error =" + error);
             if (error.contains(msgError)) {
-                Log.d(Utils.class.getSimpleName(), error + " contains "+msgError);
+                Log.d(Utils.class.getSimpleName(), error + " contains " + msgError);
                 return true;
             }
         }
@@ -80,24 +87,63 @@ public class Utils {
         return user;
     }
 
-    public static int[] toIntArray(List<Integer> integerList)  {
+    public static int[] toIntArray(List<Integer> integerList) {
         int[] intArray = new int[integerList.size()];
         int i = 0;
-        for (Integer e : integerList)
+        for (Integer e : integerList) {
             intArray[i++] = e.intValue();
+        }
         return intArray;
     }
 
-    public static ArrayList<Integer> toArrayList(int[] itemArray)  {
+    public static ArrayList<Integer> toArrayList(int[] itemArray) {
         ArrayList<Integer> integerList = new ArrayList<Integer>(itemArray.length);
-        int i = 0;
         for (int item : itemArray) {
             integerList.add(item);
         }
         return integerList;
     }
 
-    public static boolean validateNotNull(Object object){
+    public static boolean validateNotNull(Object object) {
         return object != null;
+    }
+
+    public static String customDataToString(UserCustomData userCustomData) {
+        JSONObject jsonObject = new JSONObject();
+
+        setJsonValue(jsonObject, UserCustomData.TAG_AVATAR_URL, userCustomData.getAvatar_url());
+        setJsonValue(jsonObject, UserCustomData.TAG_STATUS, userCustomData.getStatus());
+        setJsonValue(jsonObject, UserCustomData.TAG_IS_IMPORT, userCustomData.isIs_import());
+
+        return jsonObject.toString();
+    }
+
+    private static void setJsonValue(JSONObject jsonObject, String key, String value) {
+        if (!TextUtils.isEmpty(value)) {
+            try {
+                jsonObject.put(key, value);
+            } catch (JSONException e) {
+                ErrorUtils.logError(e);
+            }
+        }
+    }
+
+    public static UserCustomData customDataToObject(String userCustomDataString) {
+        if (TextUtils.isEmpty(userCustomDataString)) {
+            return new UserCustomData();
+        }
+
+        UserCustomData userCustomData = null;
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        Gson gson = gsonBuilder.create();
+
+        try {
+            userCustomData = gson.fromJson(userCustomDataString, UserCustomData.class);
+        } catch (com.qb.gson.JsonSyntaxException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return userCustomData;
     }
 }

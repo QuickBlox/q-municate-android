@@ -10,16 +10,23 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 
 public class QBAuthHelper extends BaseHelper {
+
+    private static final String TAG_ANDROID = "android";
 
     public QBAuthHelper(Context context) {
         super(context);
@@ -30,7 +37,6 @@ public class QBAuthHelper extends BaseHelper {
         QBAuth.createSession();
         String password = inputUser.getPassword();
         user = QBUsers.signIn(inputUser);
-        user.setCustomDataClass(UserCustomData.class);
 
         // TODO: temp block
         if (!isUpdatedUserCustomData(user)) {
@@ -51,7 +57,6 @@ public class QBAuthHelper extends BaseHelper {
         QBSession session = QBAuth.createSession();
         user = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         user.setPassword(session.getToken());
-        user.setCustomDataClass(UserCustomData.class);
 
         // TODO: temp block
         if (!isUpdatedUserCustomData(user)) {
@@ -73,14 +78,18 @@ public class QBAuthHelper extends BaseHelper {
         QBAuth.createSession();
         String password = inputUser.getPassword();
         inputUser.setOldPassword(password);
-        inputUser.setCustomDataAsObject(userCustomData);
+        inputUser.setCustomData(Utils.customDataToString(userCustomData));
+
+        StringifyArrayList<String> stringifyArrayList = new StringifyArrayList<String>();
+        stringifyArrayList.add(TAG_ANDROID);
+        inputUser.setTags(stringifyArrayList);
 
         user = QBUsers.signUpSignInTask(inputUser);
 
         if (file != null) {
             QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
             userCustomData.setAvatar_url(qbFile.getPublicUrl());
-            inputUser.setCustomDataAsObject(userCustomData);
+            inputUser.setCustomData(Utils.customDataToString(userCustomData));
             user = QBUsers.updateUser(inputUser);
         }
 
@@ -103,37 +112,50 @@ public class QBAuthHelper extends BaseHelper {
     public QBUser updateUser(QBUser inputUser) throws QBResponseException {
         QBUser user;
 
-        UserCustomData userCustomData = getUserCustomData(inputUser);
-
-        inputUser.setCustomDataAsObject(userCustomData);
-
         String password = inputUser.getPassword();
+
+        UserCustomData userCustomDataNew = getUserCustomData(inputUser);
+        inputUser.setCustomData(Utils.customDataToString(userCustomDataNew));
+
+        inputUser.setPassword(null);
+        inputUser.setOldPassword(null);
+
         user = QBUsers.updateUser(inputUser);
-        user.setCustomDataClass(UserCustomData.class);
-        user.setPassword(password);
+
+        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
+            user.setPassword(password);
+        }
+
         return user;
     }
 
     public QBUser updateUser(QBUser user, File file) throws QBResponseException {
+        QBUser newUser = new QBUser();
+
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
-        user.setWebsite(qbFile.getPublicUrl());
+        newUser.setId(user.getId());
+        newUser.setWebsite(qbFile.getPublicUrl());
+        newUser.setFileId(qbFile.getId());
+
         UserCustomData userCustomData = getUserCustomData(user);
         userCustomData.setAvatar_url(qbFile.getPublicUrl());
-        user.setCustomDataAsObject(userCustomData);
+        newUser.setCustomData(Utils.customDataToString(userCustomData));
 
-        return updateUser(user);
+        return updateUser(newUser);
     }
 
     // TODO: temp method
     private UserCustomData getUserCustomData(QBUser user) {
         if (TextUtils.isEmpty(user.getCustomData())) {
-            return new UserCustomData(user.getWebsite(), ConstsCore.EMPTY_STRING, ConstsCore.ZERO_INT_VALUE);
+            UserCustomData userCustomData = new UserCustomData();
+            userCustomData.setAvatar_url(user.getWebsite());
+            return userCustomData;
         }
 
         UserCustomData userCustomDataNew = null;
         UserCustomData userCustomDataOld = null;
 
-        userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+        userCustomDataOld = Utils.customDataToObject(user.getCustomData());
 
         if (userCustomDataOld != null) {
             userCustomDataNew = userCustomDataOld;
@@ -154,7 +176,7 @@ public class QBAuthHelper extends BaseHelper {
             return false;
         }
 
-        UserCustomData userCustomDataOld = (UserCustomData) user.getCustomDataAsObject();
+        UserCustomData userCustomDataOld = Utils.customDataToObject(user.getCustomData());
 
         if (userCustomDataOld != null) {
             return true;

@@ -8,8 +8,8 @@
     android:padding="10dp">
 
     <com.quickblox.q_municate.ui.views.RoundedImageView
-        style="@style/AvatarImageView"
         android:id="@+id/avatar_imageview"
+        style="@style/AvatarImageView"
         android:layout_width="@dimen/image_view_small_avatar_layout_width"
         android:layout_height="@dimen/image_view_small_avatar_layout_height"
         android:layout_alignParentLeft="true"
@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
+        android:layout_toLeftOf="@+id/add_friend_imagebutton"
         android:layout_toRightOf="@id/avatar_imageview"
         android:orientation="vertical">
 
@@ -48,7 +49,7 @@
                 android:src="@drawable/badge_online" />
 
             <TextView
-                android:id="@+id/statusMessageTextView"
+                android:id="@+id/status_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -56,4 +57,15 @@
                 android:textSize="@dimen/text_size_small" />
         </LinearLayout>
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/add_friend_imagebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/button_general_selector"
+        android:padding="10dp"
+        android:src="@drawable/ic_add_friend"
+        android:visibility="gone" />
+
 </RelativeLayout>

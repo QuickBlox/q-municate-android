@@ -20,6 +20,7 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.FileHelper;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
@@ -38,19 +39,25 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
+    protected static int TYPE_REQUEST_MESSAGE = 0;
+    protected static int TYPE_OWN_MESSAGE = 1;
+    protected static int TYPE_OPPONENT_MESSAGE = 2;
+    protected static int COMMON_TYPE_COUNT = 3;
+
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
-    protected ScrollMessagesListener scrollMessagesListener;
+    protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected QBDialog dialog;
     private Random random;
-    private Map<Integer, Integer> colorsMap;
+    private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
+    private FileHelper fileHelper;
 
     public BaseDialogMessagesAdapter(Context context, Cursor cursor) {
         super(context, cursor, true);
         random = new Random();
-        colorsMap = new HashMap<Integer, Integer>();
         imageUtils = new ImageUtils((android.app.Activity) context);
+        fileHelper = new FileHelper();
     }
 
     @Override
@@ -96,10 +103,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         return iconResourceId;
     }
 
-    protected void setMessageStatus(View view, ViewHolder viewHolder, int resourceId,
-            boolean messageDelivered, boolean messageRead) {
-        viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(resourceId);
-        viewHolder.messageDeliveryStatusImageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
+    protected void setMessageStatus(ImageView imageView, boolean messageDelivered, boolean messageRead) {
+        imageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
     }
 
     protected void resetUI(ViewHolder viewHolder) {
@@ -133,11 +138,14 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     @Override
     public void onAbsolutePathExtFileReceived(String absolutePath) {
-        imageUtils.showFullImage(context, absolutePath);
+        chatUIHelperListener.onScreenResetPossibilityPerformLogout(false);
+        imageUtils.showFullImage((android.app.Activity) context, absolutePath);
     }
 
     protected void setViewVisibility(View view, int visibility) {
-        view.setVisibility(visibility);
+        if (view != null) {
+            view.setVisibility(visibility);
+        }
     }
 
     @Override
@@ -215,6 +223,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
             initMaskedImageView(loadedBitmap);
+            fileHelper.checkExsistFile(imageUri, loadedBitmap);
         }
 
         private void initMaskedImageView(Bitmap loadedBitmap) {
@@ -223,8 +232,10 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
             setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
             setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
+
             updateUIAfterLoading();
-            scrollMessagesListener.onScrollToBottom();
+
+            chatUIHelperListener.onScrollMessagesToBottom();
         }
 
         private void updateUIAfterLoading() {
@@ -267,6 +278,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         public TextView nameTextView;
         public View textMessageView;
         public ImageView messageDeliveryStatusImageView;
+        public ImageView attachDeliveryStatusImageView;
         public RelativeLayout progressRelativeLayout;
         public RelativeLayout attachMessageRelativeLayout;
         public TextView messageTextView;

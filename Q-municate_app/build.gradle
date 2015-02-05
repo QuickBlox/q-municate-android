@@ -23,9 +23,9 @@ dependencies {
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
     compile "de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}"
+    compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.crashlytics.android:crashlytics:1.+'
-    compile 'com.nineoldandroids:library:2.4.0'
 }
 
 android {
@@ -37,18 +37,10 @@ android {
         versionCode rootProject.versionCode
         versionName rootProject.versionName
     }
-    signingConfigs {
-        debug {
-            storeFile file('../cert/debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
-    }
     buildTypes {
-        debug {
-            debuggable rootProject.devDebug
-            signingConfig signingConfigs.debug
+        release {
+            debuggable rootProject.prodDebug
+            proguardFile 'proguard.cfg'
         }
     }
     packagingOptions {

@@ -13,17 +13,17 @@ allprojects {
     }
 }
 
-ext.compileSdkVersion = 19
-ext.buildToolsVersion = '19.1.0'
+ext.compileSdkVersion = 21
+ext.buildToolsVersion = '21.0.1'
 ext.minSdkVersion = 14
-ext.targetSdkVersion = 14
-ext.versionName = '1.1.0'
-ext.versionCode = 25
+ext.targetSdkVersion = 21
+ext.versionName = '1.0.10'
+ext.versionCode = 30
 
-ext.prodDebug = false
-ext.devDebug = true
+ext.prodDebug = true
 
 // Dependencies versions
 ext.universalImageLoaderVersion = '1.9.1'
 ext.googlePlayServicesVersion = '5.0.+'
 ext.croutonVersion = '1.8.4'
+ext.nineoldandroidsVersion = '2.4.0'

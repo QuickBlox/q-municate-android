@@ -33,22 +33,20 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = chatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, String roomJid) {
+    public static void start(Context context, QBDialog dialog) {
         Intent intent = new Intent(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
         context.startService(intent);
     }
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        String roomJid = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
 
         GroupDialog groupDialog = new GroupDialog(dialog);
 
         List<Integer> participantIdsList = dialog.getOccupants();
-        List<Integer> onlineParticipantIdsList = multiChatHelper.getRoomOnlineParticipantList(roomJid);
+        List<Integer> onlineParticipantIdsList = multiChatHelper.getRoomOnlineParticipantList(dialog.getRoomJid());
 
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
@@ -58,7 +56,10 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
         Map<Integer, User> friendMap = FriendUtils.createUserMap(userList);
         for (Integer onlineParticipantId : onlineParticipantIdsList) {
-            friendMap.get(onlineParticipantId).setOnline(true);
+            User user = friendMap.get(onlineParticipantId);
+            if (user != null) {
+                user.setOnline(true);
+            }
         }
 
         ArrayList<User> friendList = new ArrayList<User>(friendMap.values());

@@ -52,8 +52,9 @@ public class QBUpdateUserCommand extends ServiceCommand {
             result.putSerializable(QBServiceConsts.EXTRA_USER, user);
             return result;
         }
-        updateUser(user, file);
-        result.putSerializable(QBServiceConsts.EXTRA_USER, user);
+
+        QBUser newUser = updateUser(user, file);
+        result.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
 
         return result;
     }
@@ -62,11 +63,11 @@ public class QBUpdateUserCommand extends ServiceCommand {
        return !TextUtils.isEmpty(user.getFacebookId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
     }
 
-    private void updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {
+    private QBUser updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {
         if (file == null) {
-            authHelper.updateUser(user);
+            return authHelper.updateUser(user);
         } else {
-            authHelper.updateUser(user, file);
+            return authHelper.updateUser(user, file);
         }
         // TODO SF temp
 		// friendListHelper.sendStatus(status);

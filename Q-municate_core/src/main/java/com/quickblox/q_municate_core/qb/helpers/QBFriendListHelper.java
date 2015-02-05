@@ -16,17 +16,18 @@ import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
@@ -74,38 +75,37 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void inviteFriend(int userId) throws Exception {
         if (isNotInvited(userId)) {
-            sendInvitation(userId);
-
-            QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
-            sendNotificationToFriend(chatMessage, userId);
+            invite(userId);
         }
     }
 
     public void addFriend(int userId) throws Exception {
-        createFriend(userId);
+        if (isNewFriend(userId)) {
+            acceptFriend(userId);
+        } else {
+            createFriend(userId, false);
+            invite(userId);
+        }
+    }
+
+    public void invite(int userId) throws Exception {
         sendInvitation(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
     private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = createPrivateDialog(userId);
+        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId,
+                chatMessage.getBody());
         privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
-    }
-
-    private QBDialog createPrivateDialog(int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(context, userId);
-        if (existingPrivateDialog == null) {
-            existingPrivateDialog = privateChatHelper.createPrivateChatOnRest(userId);
-        }
-        return existingPrivateDialog;
     }
 
     public void acceptFriend(int userId) throws Exception {
         roster.confirmSubscription(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForAcceptFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForAcceptFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -114,7 +114,8 @@ public class QBFriendListHelper extends BaseHelper {
         clearRosterEntry(userId);
         deleteFriend(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRejectFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRejectFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -130,7 +131,8 @@ public class QBFriendListHelper extends BaseHelper {
         clearRosterEntry(userId);
         deleteFriend(userId);
 
-        QBChatMessage chatMessage = ChatUtils.createNotificationMessageForRemoveFriendsRequest(context);
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
+                context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -193,23 +195,26 @@ public class QBFriendListHelper extends BaseHelper {
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User user = restHelper.loadUser(userId);
+        User newUser = restHelper.loadUser(userId);
 
-        if (user == null) {
+        if (newUser == null) {
             return;
         }
 
         Friend friend = FriendUtils.createFriend(rosterEntry);
 
-        saveUser(user);
+        newUser.setOnline(isFriendOnline(roster.getPresence(userId)));
+
+        saveUser(newUser);
         saveFriend(friend);
 
-        fillUserOnlineStatus(user);
+        fillUserOnlineStatus(newUser);
     }
 
-    private void createFriend(int userId) throws QBResponseException {
+    private void createFriend(int userId, boolean isNewFriendStatus) throws QBResponseException {
         User user = restHelper.loadUser(userId);
         Friend friend = FriendUtils.createFriend(userId);
+        friend.setNewFriendStatus(isNewFriendStatus);
         fillUserOnlineStatus(user);
 
         saveUser(user);
@@ -238,43 +243,43 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private void fillFriendStatus(User friend) {
-        QBPresence presence = roster.getPresence(friend.getUserId());
-        friend.setStatus(presence.getStatus());
-    }
-
     private void fillUserOnlineStatus(User user, QBPresence presence) {
-        if (QBPresence.Type.online.equals(presence.getType())) {
+        if (isFriendOnline(presence)) {
             user.setOnline(true);
         } else {
             user.setOnline(false);
         }
     }
 
-    public void sendStatus(String status) throws SmackException.NotConnectedException {
-        QBPresence presence = new QBPresence(QBPresence.Type.online, status, STATUS_PRESENCE_PRIORITY,
-                QBPresence.Mode.available);
-        roster.sendPresence(presence);
+    private boolean isFriendOnline(QBPresence presence) {
+        return QBPresence.Type.online.equals(presence.getType());
     }
 
-    private void deleteAllFriends() {
-        DatabaseManager.deleteAllFriends(context);
-    }
+    //    private void fillFriendStatus(User friend) {
+    //        QBPresence presence = roster.getPresence(friend.getUserId());
+    //        friend.setStatus(presence.getStatus());
+    //    }
+
+    //    public void sendStatus(String status) throws SmackException.NotConnectedException {
+    //        QBPresence presence = new QBPresence(QBPresence.Type.online, status, STATUS_PRESENCE_PRIORITY,
+    //                QBPresence.Mode.available);
+    //        roster.sendPresence(presence);
+    //    }
 
     private void saveUser(User user) {
-        DatabaseManager.saveUser(context, user);
+        UsersDatabaseManager.saveUser(context, user);
     }
 
     private void savePeople(List<User> usersList, List<Friend> friendsList) {
-        DatabaseManager.savePeople(context, usersList, friendsList);
+        UsersDatabaseManager.savePeople(context, usersList, friendsList);
     }
 
     private void saveFriend(Friend friend) {
-        DatabaseManager.saveFriend(context, friend);
+        UsersDatabaseManager.saveFriend(context, friend);
     }
 
     private void deleteFriend(int userId) {
-        DatabaseManager.deleteFriendById(context, userId);
+        ChatDatabaseManager.deleteFriendById(context, userId);
     }
 
     private void deleteFriends(Collection<Integer> userIdsList) throws QBResponseException {
@@ -283,15 +288,17 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private void notifyContactRequest() {
-        Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    private boolean isNewFriend(int userId) {
+        return UsersDatabaseManager.isFriendWithStatusNew(context, userId);
     }
 
-    private void addedFriends(Collection<Integer> userIdsList) throws QBResponseException {
-        for (Integer userId : userIdsList) {
-            createFriend(userId);
-        }
+    private void notifyContactRequest(int userId) {
+        Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
+
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(R.string.frl_friends_contact_request));
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private class RosterListener implements QBRosterListener {
@@ -320,12 +327,12 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = DatabaseManager.getUserById(context, presence.getUserId());
+            User user = UsersDatabaseManager.getUserById(context, presence.getUserId());
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
                 fillUserOnlineStatus(user, presence);
-                DatabaseManager.saveUser(context, user);
+                UsersDatabaseManager.saveUser(context, user);
             }
         }
     }
@@ -335,9 +342,11 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                createFriend(userId);
-                notifyContactRequest();
+                createFriend(userId, true);
+                notifyContactRequest(userId);
             } catch (QBResponseException e) {
+                Log.e(TAG, SUBSCRIPTION_ERROR, e);
+            } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
         }

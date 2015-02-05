@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.MatrixCursor;
 
 import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.Friend;
@@ -31,11 +31,11 @@ public class FriendUtils {
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
 
-        UserCustomData userCustomData = null;
-        userCustomData = (UserCustomData) qbUser.getCustomDataAsObject();
+        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
         if (userCustomData != null) {
             user.setAvatarUrl(userCustomData.getAvatar_url());
+            user.setStatus(userCustomData.getStatus());
         }
 
         return user;
@@ -45,10 +45,12 @@ public class FriendUtils {
         Friend friend = new Friend();
         friend.setUserId(rosterEntry.getUserId());
         friend.setRelationStatus(rosterEntry.getType().name());
-        if (RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus())) {
-            friend.setAskStatus(true);
-        }
+        friend.setPendingStatus(isPendingFriend(rosterEntry));
         return friend;
+    }
+
+    public static boolean isPendingFriend(QBRosterEntry rosterEntry) {
+        return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
     }
 
     public static Friend createFriend(int userId) {
@@ -106,11 +108,11 @@ public class FriendUtils {
         return userIds;
     }
 
-    public static MatrixCursor createSearchResultCursor(Context context, List<User> usersList) {
+    public static MatrixCursor createSearchResultCursor(Context context, Collection<User> usersList) {
         MatrixCursor usersCursor = new MatrixCursor(
-                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_STATUS_ASK});
+                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_PENDING_STATUS});
 
-        List<User> friendsList = DatabaseManager.getAllFriendsList(context);
+        List<User> friendsList = UsersDatabaseManager.getAllFriendsList(context);
 
         for (User user : usersList) {
             if (!friendsList.contains(user)) {

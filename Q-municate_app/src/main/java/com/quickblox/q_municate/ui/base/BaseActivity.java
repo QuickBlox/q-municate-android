@@ -5,34 +5,30 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
-public abstract class BaseActivity extends Activity {
+public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
     protected final ProgressDialog progress;
     protected App app;
     protected ActionBar actionBar;
-    protected QBService service;
     protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
@@ -40,8 +36,6 @@ public abstract class BaseActivity extends Activity {
     protected ActivityHelper activityHelper;
 
     private boolean doubleBackToExitPressedOnce;
-    private boolean bounded;
-    private ServiceConnection serviceConnection = new QBChatServiceConnection();
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -95,14 +89,14 @@ public abstract class BaseActivity extends Activity {
         actionBar = getActionBar();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityHelper = new ActivityHelper(this, new GlobalListener());
+        activityHelper = new ActivityHelper(this, new GlobalListener(), this);
         activityHelper.onCreate();
     }
 
     @Override
     protected void onStart() {
+        activityHelper.onStart();
         super.onStart();
-        connectToService();
     }
 
     @Override
@@ -120,8 +114,8 @@ public abstract class BaseActivity extends Activity {
 
     @Override
     protected void onStop() {
+        activityHelper.onStop();
         super.onStop();
-        unbindService();
     }
 
     @Override
@@ -141,7 +135,9 @@ public abstract class BaseActivity extends Activity {
         }, DOUBLE_BACK_DELAY);
     }
 
-    protected void onConnectedToService() {
+    @Override
+    public void onConnectedToService(QBService service) {
+
     }
 
     protected void navigateToParent() {
@@ -167,17 +163,6 @@ public abstract class BaseActivity extends Activity {
         transaction.commit();
     }
 
-    private void unbindService() {
-        if (bounded) {
-            unbindService(serviceConnection);
-        }
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(this, QBService.class);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
     private FragmentTransaction buildTransaction() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -186,6 +171,12 @@ public abstract class BaseActivity extends Activity {
 
     protected void onFailAction(String action) {
 
+    }
+
+    private boolean needShowReceivedNotification() {
+        boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
+        boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
+        return !isSplashActivity && !isCallActivity;
     }
 
     protected void onSuccessAction(String action) {
@@ -199,6 +190,7 @@ public abstract class BaseActivity extends Activity {
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
+            hideActionBarProgress();
             onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }
@@ -216,9 +208,8 @@ public abstract class BaseActivity extends Activity {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {
-            boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
-            if(!isSplashActivity) {
-                activityHelper.onReceiveMessage(extras);
+            if (needShowReceivedNotification()) {
+                activityHelper.onReceivedChatMessageNotification(extras);
             }
         }
 
@@ -230,29 +221,14 @@ public abstract class BaseActivity extends Activity {
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
-            showProgress();
             activityHelper.refreshSession();
         }
 
         @Override
-        public void onReceiveFriendActionAction(Bundle extras) {
-            String alertMessage = extras.getString(QBServiceConsts.EXTRA_FRIEND_ALERT_MESSAGE);
-            activityHelper.showFriendAlert(alertMessage);
-        }
-    }
-
-    private class QBChatServiceConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            bounded = true;
-            service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
+        public void onReceiveContactRequestAction(Bundle extras) {
+            if (needShowReceivedNotification()) {
+                activityHelper.onReceivedContactRequestNotification(extras);
+            }
         }
     }
 }

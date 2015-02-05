@@ -73,30 +73,41 @@
     <string name="frl_pending_status">Waiting…</string>
     <string name="frl_pending_request_status">Pending contact request</string>
     <string name="frl_column_header_name_requests">Requests</string>
-    <string name="frl_column_header_name_contacts">My Contacts</string>
+    <string name="frl_column_header_name_my_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
+    <string name="frd_default_status">I enjoy using Q-municate!</string>
     <string name="frd_video_call">Video Call</string>
     <string name="frd_audio_call">Audio Call</string>
     <string name="frd_chat">Chat</string>
     <string name="frd_mobile">MOBILE</string>
-    <string name="frd_dlg_remove_friend">Do you really want to delete %1$s  from your contact list?</string>
+    <string name="frd_dlg_remove_friend">Do you really want to delete %1$s from your contact list?</string>
 
     // Dialog
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
-    <string name="dlg_no_chats">Oops…\nYou don\'t have any chats, \ntap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dlg_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
     <string name="dlg_reply">Reply</string>
     <string name="dlg_user_is_not_friend">User is not your friend</string>
+    <string name="dlg_confirm_sending_attach">Do you really want to send attachment?</string>
+    <string name="dlg_select_attach_type">Select attachments type</string>
+
+    <string-array name="dlg_attach_types_array">
+        <item>Take Photo</item>
+        <item>From Library</item>
+    </string-array>
 
     // Group Dialog
     <string name="gdl_ctx_menu_reply">Reply</string>
     <string name="gdl_ctx_menu_prv_message">Private Message</string>
     <string name="gdl_ctx_menu_video_call">Video Call</string>
     <string name="gdl_ctx_menu_profile">View Profile</string>
+
+    // Dialogs
+    <string name="dlgs_ctx_menu_remove">Delete dialog</string>
 
     // Group Dialog Details
     <string name="gdd_title">Group Details</string>
@@ -105,6 +116,7 @@
     <string name="gdd_online_participants">%1$d/%2$d online</string>
     <string name="gdd_name_not_entered">Please fill group name</string>
     <string name="gdd_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
+    <string name="gdd_group_info_is_loading">Group info is loading, please wait…</string>
 
     // New Dialog
     <string name="ndl_title">New Group Chat</string>
@@ -198,7 +210,7 @@
     <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
     <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
-    <string name="dlg_friend_removed">Friend is removed</string>
+    <string name="dlg_friend_removed">You have deleted %1$s from your contacts</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
     <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>
@@ -213,6 +225,8 @@
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
     <string name="error_bad_timestamp">base Bad timestamp</string>
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
+    <string name="error_email_already_taken">email has already been taken</string>
+    <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
@@ -229,6 +243,7 @@
     <string name="uploading_file">Uploading… Please wait</string>
     <string name="user_read_message">%1$s read message</string>
     <string name="label_done">Done</string>
+    <string name="go">Go</string>
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>

@@ -132,9 +132,9 @@ public class User implements Serializable {
             return false;
         }
 
-        User friend = (User) object;
+        User user = (User) object;
 
-        return userId.equals(friend.userId);
+        return userId.equals(user.getUserId());
     }
 
     @Override

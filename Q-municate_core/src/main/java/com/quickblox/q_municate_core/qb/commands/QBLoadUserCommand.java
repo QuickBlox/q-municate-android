@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -39,12 +38,11 @@ public class QBLoadUserCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         if (extras.containsKey(QBServiceConsts.EXTRA_USERS)) {
             Collection<Integer> userIdsList = (List<Integer>) extras.getSerializable(QBServiceConsts.EXTRA_USERS);
-            Collection<User> usersList = restHelper.loadUsers(userIdsList);
+            restHelper.loadUsers(userIdsList);
         } else if (extras.containsKey(QBServiceConsts.EXTRA_USER_ID)) {
             int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-            User user = restHelper.loadUser(userId);
+            restHelper.loadUser(userId);
         }
-
         return null;
     }
 }

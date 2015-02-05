@@ -7,6 +7,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,22 +17,25 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.DatabaseManager;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
-import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -45,7 +49,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView phoneTextView;
     private View phoneView;
 
-    private User friend;
+    private QBPrivateChatHelper privateChatHelper;
+    private User user;
     private Cursor friendCursor;
     private ContentObserver statusContentObserver;
 
@@ -61,8 +66,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         setContentView(R.layout.activity_friend_details);
         canPerformLogout.set(true);
         int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-        friendCursor = DatabaseManager.getFriendCursorById(this, friendId);
-        friend = DatabaseManager.getUserById(this, friendId);
+        friendCursor = UsersDatabaseManager.getFriendCursorById(this, friendId);
+        user = UsersDatabaseManager.getUserById(this, friendId);
         initUI();
         registerStatusChangingObserver();
         initUIWithFriendsData();
@@ -83,16 +88,17 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         statusContentObserver = new ContentObserver(new Handler()) {
 
             @Override
-            public void onChange(boolean selfChange) {
-                if (FriendDetailsActivity.this.friend !=null) {
-                    friend = DatabaseManager.getUserById(FriendDetailsActivity.this, FriendDetailsActivity.this.friend.getUserId());
-                    setOnlineStatus(friend);
-                }
+            public boolean deliverSelfNotifications() {
+                return true;
             }
 
             @Override
-            public boolean deliverSelfNotifications() {
-                return true;
+            public void onChange(boolean selfChange) {
+                if (FriendDetailsActivity.this.user != null) {
+                    user = UsersDatabaseManager.getUserById(FriendDetailsActivity.this,
+                            FriendDetailsActivity.this.user.getUserId());
+                    setOnlineStatus(user);
+                }
             }
         };
         friendCursor.registerContentObserver(statusContentObserver);
@@ -107,51 +113,33 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
     }
 
     private void initUIWithFriendsData() {
         loadAvatar();
         setName();
-        setOnlineStatus(friend);
+        setOnlineStatus(user);
+        setStatus();
         setPhone();
+    }
+
+    private void setStatus() {
+        if (!TextUtils.isEmpty(user.getStatus())) {
+            statusTextView.setText(user.getStatus());
+        }
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        if (privateChatHelper == null) {
+            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unregisterStatusChangingObserver();
-    }
-
-    private void setName() {
-        nameTextView.setText(friend.getFullName());
-    }
-
-    private void setPhone() {
-        if (friend.getPhone() != null) {
-            phoneView.setVisibility(View.VISIBLE);
-        } else {
-            phoneView.setVisibility(View.GONE);
-        }
-        phoneTextView.setText(friend.getPhone());
-    }
-
-    private void setOnlineStatus(User user) {
-        if (user != null) {
-            if (user.isOnline()) {
-                onlineImageView.setVisibility(View.VISIBLE);
-            } else {
-                onlineImageView.setVisibility(View.GONE);
-            }
-            statusTextView.setText(user.getStatus());
-            onlineStatusTextView.setText(user.getOnlineStatus(this));
-        }
-    }
-
-    private void loadAvatar() {
-        String url = friend.getAvatarUrl();
-        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     @Override
@@ -175,14 +163,43 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         }
     }
 
+    private void setName() {
+        nameTextView.setText(user.getFullName());
+    }
+
+    private void setPhone() {
+        if (user.getPhone() != null) {
+            phoneView.setVisibility(View.VISIBLE);
+        } else {
+            phoneView.setVisibility(View.GONE);
+        }
+        phoneTextView.setText(user.getPhone());
+    }
+
+    private void setOnlineStatus(User user) {
+        if (user != null) {
+            if (user.isOnline()) {
+                onlineImageView.setVisibility(View.VISIBLE);
+            } else {
+                onlineImageView.setVisibility(View.GONE);
+            }
+            onlineStatusTextView.setText(user.getOnlineStatus(this));
+        }
+    }
+
+    private void loadAvatar() {
+        String url = user.getAvatarUrl();
+        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+    }
+
     private void showRemoveUserDialog() {
         AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
-                R.string.frd_dlg_remove_friend, friend.getFullName()));
+                R.string.frd_dlg_remove_friend, user.getFullName()));
         alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 showProgress();
-                QBRemoveFriendCommand.start(FriendDetailsActivity.this, friend.getUserId());
+                QBRemoveFriendCommand.start(FriendDetailsActivity.this, user.getUserId());
             }
         });
         alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
@@ -194,49 +211,55 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
     }
 
     private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
-            CallActivity.start(FriendDetailsActivity.this, friend, callType);
+            if (checkFriendStatus(friend.getUserId())) {
+                CallActivity.start(FriendDetailsActivity.this, friend, callType);
+            }
         }
     }
 
     public void voiceCallClickListener(View view) {
-        callToUser(friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+    }
+
+    private boolean checkFriendStatus(int userId) {
+        boolean isFriend = UsersDatabaseManager.isFriendInBase(this, userId);
+        if (isFriend) {
+            return true;
+        } else {
+            DialogUtils.showLong(this, getResources().getString(R.string.dlg_user_is_not_friend));
+            return false;
+        }
     }
 
     public void chatClickListener(View view) {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(this, friend.getUserId());
-        if (existingPrivateDialog != null) {
-            PrivateDialogActivity.start(FriendDetailsActivity.this, friend, existingPrivateDialog);
-        } else {
-            showProgress();
-            QBCreatePrivateChatCommand.start(this, friend);
+        if (checkFriendStatus(user.getUserId())) {
+            try {
+                QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(
+                        user.getUserId());
+                PrivateDialogActivity.start(FriendDetailsActivity.this, user, existingPrivateDialog);
+            } catch (QBResponseException e) {
+                ErrorUtils.showError(this, e);
+            }
         }
     }
 
-    private class CreateChatSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            hideProgress();
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            if (dialog != null) {
-                PrivateDialogActivity.start(FriendDetailsActivity.this, friend, dialog);
-                finish();
-            } else {
-                ErrorUtils.showError(FriendDetailsActivity.this, getString(R.string.dlg_fail_create_chat));
-            }
-        }
+    private void deleteDialog() {
+        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, user.getUserId());
+        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
     private class RemoveFriendSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed));
+            deleteDialog();
+            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed,
+                    user.getFullName()));
             finish();
         }
     }

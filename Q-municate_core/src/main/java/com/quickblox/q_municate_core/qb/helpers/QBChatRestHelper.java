@@ -1,15 +1,10 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.model.QBChatHistoryMessage;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.Lo;
-import com.quickblox.core.request.QBCustomObjectRequestBuilder;
-import com.quickblox.q_municate_core.db.DatabaseManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 
@@ -19,19 +14,17 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import java.io.IOException;
-import java.util.List;
 
 public class QBChatRestHelper extends BaseHelper {
 
-    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
     private static final String TAG = QBChatRestHelper.class.getSimpleName();
+    private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
     private QBChatService chatService;
+    private ConnectionListener connectionListener = new ChatConnectionListener();
 
     public QBChatRestHelper(Context context) {
         super(context);
     }
-
-    private ConnectionListener connectionListener = new ChatConnectionListener();
 
     public synchronized void initChatService() throws XMPPException, SmackException {
         if (!QBChatService.isInitialized()) {
@@ -42,8 +35,7 @@ public class QBChatRestHelper extends BaseHelper {
         }
     }
 
-    public synchronized void login(
-            QBUser user) throws XMPPException, IOException, SmackException {
+    public synchronized void login(QBUser user) throws XMPPException, IOException, SmackException {
         if (!chatService.isLoggedIn() && user != null) {
             chatService.login(user);
             chatService.enableCarbons();
@@ -64,39 +56,6 @@ public class QBChatRestHelper extends BaseHelper {
 
     public boolean isLoggedIn() {
         return chatService != null && chatService.isLoggedIn();
-    }
-
-    public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
-        Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
-        List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
-                bundle);
-        return chatDialogsList;
-    }
-
-    public List<QBChatHistoryMessage> getDialogMessages(QBDialog dialog,
-            long lastDateLoad) throws QBResponseException {
-        Bundle bundle = new Bundle();
-        QBCustomObjectRequestBuilder customObjectRequestBuilder = new QBCustomObjectRequestBuilder();
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
-        if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
-            customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT,
-                    lastDateLoad);
-        } else {
-            deleteMessagesByDialogId(dialog.getDialogId());
-        }
-        List<QBChatHistoryMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog, customObjectRequestBuilder, bundle);
-
-        if (dialogMessagesList != null) {
-            DatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
-
-        return dialogMessagesList;
-    }
-
-    private void deleteMessagesByDialogId(String dialogId) {
-        DatabaseManager.deleteMessagesByDialogId(context, dialogId);
     }
 
     private class ChatConnectionListener implements ConnectionListener {

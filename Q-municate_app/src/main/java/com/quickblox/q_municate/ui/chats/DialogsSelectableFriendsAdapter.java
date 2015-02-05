@@ -12,7 +12,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -49,7 +50,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
         viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
         viewHolder.onlineImageView = (ImageView) view.findViewById(R.id.online_imageview);
-        viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.statusMessageTextView);
+        viewHolder.statusMessageTextView = (TextView) view.findViewById(R.id.status_textview);
         viewHolder.selectFriendCheckBox = (CheckBox) view.findViewById(R.id.selected_friend_checkbox);
 
         view.setTag(viewHolder);
@@ -60,10 +61,10 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
     public void bindView(View view, Context context, final Cursor cursor) {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        final User friend = DatabaseManager.getUserFromCursor(cursor);
+        final User friend = UsersDatabaseManager.getUserFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullName());
-        viewHolder.statusMessageTextView.setText(friend.getStatus());
+        viewHolder.statusMessageTextView.setText(friend.getOnlineStatus(context));
         viewHolder.nameTextView.setText(friend.getFullName());
 
         if (friend.isOnline()) {

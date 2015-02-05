@@ -2,25 +2,28 @@ package com.quickblox.q_municate.ui.base;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.HashMap;
@@ -31,8 +34,9 @@ import java.util.Set;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 //This class uses to delegate common functionality from different types of activity(Activity, FragmentActivity)
-public class ActivityHelper extends BaseActivityDelegator {
+public class ActivityHelper extends BaseActivityHelper {
 
+    protected QBService service;
     private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
@@ -41,25 +45,30 @@ public class ActivityHelper extends BaseActivityDelegator {
     private Handler handler;
     private ActivityUIHelper activityUIHelper;
 
-    public ActivityHelper(Context context, GlobalActionsListener actionsListener) {
+    private boolean bounded;
+    private ServiceConnection serviceConnection;
+    private ServiceConnectionListener serviceConnectionListener;
+
+    public ActivityHelper(Context context, GlobalActionsListener actionsListener,
+            ServiceConnectionListener serviceConnectionListener) {
         super(context);
         this.actionsListener = actionsListener;
+        this.serviceConnectionListener = serviceConnectionListener;
         activity = (Activity) context;
         activityUIHelper = new ActivityUIHelper(activity);
+        serviceConnection = new QBChatServiceConnection();
     }
 
-    public void showFriendAlert(String message) {
-        AlertDialog alertDialog = AlertDialog.newInstance(message);
-        alertDialog.show(activity.getFragmentManager(), null);
+    protected void onReceivedChatMessageNotification(Bundle extras) {
+        activityUIHelper.showChatMessageNotification(extras);
     }
 
-    protected void onReceiveMessage(Bundle extras) {
-        activityUIHelper.onReceiveMessage(extras);
+    protected void onReceivedContactRequestNotification(Bundle extras) {
+        activityUIHelper.showContactRequestNotification(extras);
     }
 
     public void forceRelogin() {
-        ErrorUtils.showError(activity, activity.getString(
-                R.string.dlg_force_relogin_on_token_required));
+        ErrorUtils.showError(activity, activity.getString(R.string.dlg_force_relogin_on_token_required));
         SplashActivity.start(activity);
         activity.finish();
     }
@@ -126,12 +135,20 @@ public class ActivityHelper extends BaseActivityDelegator {
         updateBroadcastActionList();
     }
 
+    protected void onStart() {
+        connectToService();
+    }
+
+    public void onStop() {
+        unbindService();
+    }
+
     private void registerGlobalReceiver() {
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
+        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
-        globalActionsIntentFilter.addAction(QBServiceConsts.FRIEND_ALERT_SHOW);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
                 globalActionsIntentFilter);
@@ -149,6 +166,17 @@ public class ActivityHelper extends BaseActivityDelegator {
         return handler;
     }
 
+    private void unbindService() {
+        if (bounded) {
+            activity.unbindService(serviceConnection);
+        }
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(activity, QBService.class);
+        activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
     public interface GlobalActionsListener {
 
         public void onReceiveChatMessageAction(Bundle extras);
@@ -157,7 +185,12 @@ public class ActivityHelper extends BaseActivityDelegator {
 
         public void onReceiveRefreshSessionAction(Bundle extras);
 
-        public void onReceiveFriendActionAction(Bundle extras);
+        public void onReceiveContactRequestAction(Bundle extras);
+    }
+
+    public interface ServiceConnectionListener {
+
+        public void onConnectedToService(QBService service);
     }
 
     private class BaseBroadcastReceiver extends BroadcastReceiver {
@@ -195,25 +228,34 @@ public class ActivityHelper extends BaseActivityDelegator {
                 @Override
                 public void run() {
                     Bundle extras = intent.getExtras();
-                    if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                    if (actionsListener != null) {
+                        if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
                             actionsListener.onReceiveChatMessageAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                        } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
+                            actionsListener.onReceiveContactRequestAction(intent.getExtras());
+                        } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                             actionsListener.onReceiveForceReloginAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
-                        if (actionsListener != null) {
+                        } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
                             actionsListener.onReceiveRefreshSessionAction(intent.getExtras());
-                        }
-                    } else if (QBServiceConsts.FRIEND_ALERT_SHOW.equals(intent.getAction())) {
-                        if (actionsListener != null) {
-                            actionsListener.onReceiveFriendActionAction(intent.getExtras());
                         }
                     }
                 }
             });
+        }
+    }
+
+    private class QBChatServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            bounded = true;
+            service = ((QBService.QBServiceBinder) binder).getService();
+            serviceConnectionListener.onConnectedToService(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
         }
     }
 }

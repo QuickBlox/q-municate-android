@@ -58,8 +58,11 @@ public class QBVideoChatHelper extends BaseHelper {
         videoSignalingListener = new VideoSignalingListener();
     }
 
-    public void closeSignalingChannel(ConnectionConfig connectionConfig, Class<? extends Activity> activityClass) {
+    public void initActivityClass(Class<? extends Activity> activityClass) {
         this.activityClass = activityClass;
+    }
+
+    public void closeSignalingChannel(ConnectionConfig connectionConfig) {
         WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(
                 connectionConfig.getConnectionSession());
         Lo.g("closeSignalingChannel sessionId="+connectionConfig.getConnectionSession());
@@ -75,8 +78,7 @@ public class QBVideoChatHelper extends BaseHelper {
         scheduler.schedule(clearSessionTask, ConstsCore.DEFAULT_CLEAR_SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 
-    public QBVideoChannel makeSignalingChannel(int participantId, Class<? extends Activity> activityClass) {
-        this.activityClass = activityClass;
+    public QBVideoChannel makeSignalingChannel(int participantId) {
         QBWebRTCSignaling signaling = QBChatService.getInstance().getVideoChatWebRTCSignalingManager().createSignaling(
                 participantId, null);
         QBVideoChannel signalingChannel = new QBVideoChannel(signaling);
@@ -113,7 +115,7 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onCall(ConnectionConfig connectionConfig) {
             String sessionId = connectionConfig.getConnectionSession();
             Lo.g("onCall sessionId="+sessionId);
-            if ( isExistSameSession(sessionId) || workingSessionPull.existActive() ) {
+            if ( isExistSameSession(sessionId) || workingSessionPull.existActive() || activityClass == null) {
                 return;
             }
 

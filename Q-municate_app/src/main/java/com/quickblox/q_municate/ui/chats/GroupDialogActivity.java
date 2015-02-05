@@ -16,13 +16,14 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.DatabaseManager;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
@@ -33,8 +34,6 @@ import java.util.ArrayList;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
-
-    private String groupName;
 
     public GroupDialogActivity() {
         super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
@@ -62,11 +61,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        initListView();
+
+        initCursorLoaders();
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 
-        registerForContextMenu(messagesListView);
+//        registerForContextMenu(messagesListView);
     }
 
     @Override
@@ -94,9 +94,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
+    protected void onFileSelected(Bitmap bitmap) {
+        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
+    }
+
+    @Override
     protected void onFileLoaded(QBFile file) {
         try {
-            ((QBMultiChatHelper) chatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            ((QBMultiChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }
@@ -116,21 +121,25 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return null;
     }
 
-    private void startUpdateChatDialog() {
-        QBDialog dialog = getQBDialog();
-        if (dialog != null) {
-            QBUpdateDialogCommand.start(this, dialog);
-        }
+    @Override
+    protected void initListView(Cursor messagesCursor) {
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this,
+                dialog);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        isNeedToScrollMessages = true;
+        scrollListView();
     }
 
-    private QBDialog getQBDialog() {
+    protected QBDialog getQBDialog() {
         Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
 
-        MessageCache messageCache = DatabaseManager.getMessageCacheFromCursor(cursor);
-        if (messageCache.getFriendsNotificationType() == null) {
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+
+        if (messagesNotificationType == null) {
             dialog.setLastMessage(messageCache.getMessage());
-        } else {
-            dialog.setLastMessage(getResources().getString(R.string.frl_friends_contact_request));
+        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
+            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
         }
 
         dialog.setLastMessageDateSent(messageCache.getTime());
@@ -138,22 +147,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return dialog;
     }
 
-    private void updateChatData() {
-        dialog = DatabaseManager.getDialogByDialogId(this, dialogId);
-        if (dialog != null) {
-            groupName = dialog.getName();
-            updateActionBar();
-        }
-    }
-
-    private void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, getAllDialogMessagesByDialogId(), this,
-                dialog);
-        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-    }
-
-    private void updateActionBar() {
-        actionBar.setTitle(groupName);
+    protected void updateActionBar() {
+        actionBar.setTitle(dialog.getName());
         actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
@@ -171,15 +166,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     public void sendMessageOnClick(View view) {
-        try {
-            ((QBMultiChatHelper) chatHelper).sendGroupMessage(dialog.getRoomJid(),
-                    messageEditText.getText().toString());
-        } catch (QBResponseException e) {
-            ErrorUtils.showError(this, e);
-        }
-        messageEditText.setText(ConstsCore.EMPTY_STRING);
-        isNeedToScrollMessages = true;
-        scrollListView();
+        sendMessage(false);
     }
 
     @Override
@@ -215,7 +202,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        updateChatData();
-        scrollListView();
+        updateDialogData();
+
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            scrollListView();
+        }
     }
 }

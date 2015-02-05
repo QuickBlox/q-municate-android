@@ -2,19 +2,12 @@ package com.quickblox.q_municate_core.utils;
 
 public class ConstsCore {
 
-    // Q-municate
-    public static final String QB_APP_ID = "13318";
-    public static final String QB_AUTH_KEY = "WzrAY7vrGmbgFfP";
-    public static final String QB_AUTH_SECRET = "xS2uerEveGHmEun";
-
-    public static final String QB_DOMAIN = "api.stage.quickblox.com";
-
     // Friend list consts
     public static final int FL_FRIENDS_PAGE_NUM = 1;
-    public static final int FL_FRIENDS_PER_PAGE = 500;
+    public static final int FL_FRIENDS_PER_PAGE = 20;
 
-    public static final int CHATS_DIALOGS_PER_PAGE = 500;
-    public static final int DIALOG_MESSAGES_PER_PAGE = 500;
+    public static final int CHATS_DIALOGS_PER_PAGE = 100;
+    public static final int DIALOG_MESSAGES_PER_PAGE = 100;
 
     public static final int ZERO_INT_VALUE = 0;
     public static final long ZERO_LONG_VALUE = 0L;

@@ -292,7 +292,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             signalingChannel.removeSignalingListener(signalingMessageHandler);
         }
         if (videoChatHelper != null) {
-            videoChatHelper.closeSignalingChannel(currentConnectionConfig, CallActivity.class);
+            videoChatHelper.closeSignalingChannel(currentConnectionConfig);
         }
         if (STOP_TYPE.CLOSED.equals(stopType)) {
             onConnectionClosed();
@@ -306,7 +306,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
         } else {
-            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getUserId(), CallActivity.class);
+            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getUserId());
         }
         if (signalingChannel != null && isExistActivity()) {
             tryInitChat();

@@ -11,6 +11,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.concurrency.BaseProgressTask;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging, Void, Bundle> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
-    private Context context;
 
     public QBGCMRegistrationTask(Activity activity) {
         super(activity, ConstsCore.NOT_INITIALIZED_VALUE, false);
@@ -47,18 +47,13 @@ public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging
         String registrationId = getRegistrationId(gcm);
         registration.putString(PrefsHelper.PREF_REG_ID, registrationId);
         boolean subscribed = subscribeToPushNotifications(registrationId);
-        if (subscribed) {
-            registration.putBoolean(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, subscribed);
-        }
+        registration.putBoolean(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, subscribed);
         return registration;
     }
 
     private String getRegistrationId(GoogleCloudMessaging gcm) throws IOException {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        String registrationId = prefsHelper.getPref(PrefsHelper.PREF_GCM_SENDER_ID, ConstsCore.EMPTY_STRING);
-        if (registrationId.isEmpty()) {
-            registrationId = gcm.register(PrefsHelper.PREF_GCM_SENDER_ID);
-        }
+        String registrationId = activityRef.get().getResources().getString(R.string.push_registration_app_id);
+        registrationId = gcm.register(registrationId);
         return registrationId;
     }
 
