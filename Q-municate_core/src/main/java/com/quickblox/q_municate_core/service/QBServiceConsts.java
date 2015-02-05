@@ -4,7 +4,18 @@ public class QBServiceConsts {
 
 
     //main actions
-    public static final String COMMAND_ACTION = "action";
+    public static final String COMMAND_ACTION = "command_action";
+    public static final String COMMAND_DESCRIPTION_ACTION = "command_description_action";
+    public static final String COMMAND_IS_SUCCESS_ACTION = "command_is_success_action";
+
+    public static final String LOGIN_ACTION = "login_action";
+    public static final String LOGIN_SUCCESS_ACTION = "login_success_action";
+    public static final String LOGIN_FAIL_ACTION = "login_fail_action";
+
+    public static final String SOCIAL_LOGIN_ACTION = "social_login_action";
+    public static final String SOCIAL_LOGIN_SUCCESS_ACTION = "social_login_success_action";
+    public static final String SOCIAL_LOGIN_FAIL_ACTION = "social_login_fail_action";
+
     public static final String ADD_FRIEND_ACTION = "add_friend_action";
     public static final String ACCEPT_FRIEND_ACTION = "accept_friend_action";
     public static final String REMOVE_FRIEND_ACTION = "remove_friend_action";
@@ -12,9 +23,8 @@ public class QBServiceConsts {
     public static final String IMPORT_FRIENDS_ACTION = "import_friends_action";
     public static final String CHANGE_PASSWORD_ACTION = "change_password_action";
     public static final String GET_FILE_ACTION = "get_file_action";
-    public static final String LOGIN_ACTION = "login_action";
     public static final String LOGIN_REST_ACTION = "login_rest_command";
-    public static final String LOGIN_REST_SOCIAL_ACTION = "login_rest__social_command";
+    public static final String LOGIN_CHAT_COMPOSITE_ACTION = "login_chat_composite_action";
     public static final String LOGIN_CHAT_ACTION = "login_chat_action";
     public static final String LOGOUT_ACTION = "logout_action";
     public static final String LOGOUT_REST_ACTION = "logout_rest_action";
@@ -22,7 +32,9 @@ public class QBServiceConsts {
     public static final String LOGOUT_AND_DESTROY_CHAT_ACTION = "logout_and_destroy_chat_action";
     public static final String RESET_PASSWORD_ACTION = "reset_password_action";
     public static final String SIGNUP_ACTION = "signup_action";
-    public static final String SOCIAL_LOGIN_ACTION = "social_login_action";
+
+
+
     public static final String UPDATE_USER_ACTION = "update_user_action";
     public static final String LOAD_FRIENDS_ACTION = "friends_load_action";
     public static final String LOAD_USERS_ACTION = "users_search_action";
@@ -67,8 +79,7 @@ public class QBServiceConsts {
     public static final String CHANGE_PASSWORD_FAIL_ACTION = "change_password_fail_action";
     public static final String GET_FILE_SUCCESS_ACTION = "get_file_success_action";
     public static final String GET_FILE_FAIL_ACTION = "get_file_fail_action";
-    public static final String LOGIN_SUCCESS_ACTION = "login_success_action";
-    public static final String LOGIN_FAIL_ACTION = "login_fail_action";
+
     public static final String LOGOUT_SUCCESS_ACTION = "logout_success_action";
     public static final String LOGOUT_FAIL_ACTION = "logout_fail_action";
     public static final String RESET_PASSWORD_SUCCESS_ACTION = "reset_password_success_action";
@@ -95,6 +106,8 @@ public class QBServiceConsts {
     public static final String LOGIN_REST_FAIL_ACTION = "login_rest_fail_action";
     public static final String LOGIN_CHAT_SUCCESS_ACTION = "login_chat_success_action";
     public static final String LOGIN_CHAT_FAIL_ACTION = "login_chat_fail_action";
+    public static final String LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION = "login_chat_composite_success_action";
+    public static final String LOGIN_CHAT_COMPOSITE_FAIL_ACTION = "login_chat_composite_fail_action";
     public static final String LOGOUT_CHAT_SUCCESS_ACTION = "logout_chat_success_action";
     public static final String LOGOUT_CHAT_FAIL_ACTION = "logout_chat_fail_action";
     public static final String INIT_CHATS_SUCCESS_ACTION = "init_chats_success_action";

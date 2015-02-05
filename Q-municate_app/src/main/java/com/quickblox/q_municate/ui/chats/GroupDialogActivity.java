@@ -20,7 +20,7 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -36,7 +36,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     public GroupDialogActivity() {
-        super(R.layout.activity_dialog, QBService.MULTI_CHAT_HELPER);
+        super(R.layout.activity_dialog, QBService.GROUP_CHAT_HELPER);
     }
 
     public static void start(Context context, ArrayList<User> friends) {
@@ -101,7 +101,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onFileLoaded(QBFile file) {
         try {
-            ((QBMultiChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
+            ((QBGroupChatHelper) baseChatHelper).sendGroupMessageWithAttachImage(dialog.getRoomJid(), file);
         } catch (QBResponseException e) {
             ErrorUtils.showError(this, e);
         }

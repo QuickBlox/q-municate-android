@@ -10,14 +10,15 @@ import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.chats.dialogs.DialogsFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.chats.dialogs.DialogsFragment;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
@@ -31,8 +32,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
@@ -51,7 +51,10 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private GSMHelper gsmHelper;
-    private boolean isNeedToOpenDialog;
+
+    private LoginChatCompositeSuccessAction loginChatCompositeSuccessAction;
+    private ImportFriendsSuccessAction importFriendsSuccessAction;
+    private ImportFriendsFailAction importFriendsFailAction;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -115,6 +118,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         useDoubleBackPressed = true;
 
         gsmHelper = new GSMHelper(this);
+        loginChatCompositeSuccessAction = new LoginChatCompositeSuccessAction();
+        importFriendsSuccessAction = new ImportFriendsSuccessAction();
+        importFriendsFailAction = new ImportFriendsFailAction();
 
         initNavigationDrawer();
 
@@ -126,11 +132,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
-        initBroadcastActionList();
         checkGCMRegistration();
-        loadFriendsList();
 
-        initVideoChat();
+        if (!isLoggedInChat()) {
+            loginChat();
+        }
+    }
+
+    private void loginChat() {
+        QBLoginChatCompositeCommand.start(this);
     }
 
     private void initVideoChat() {
@@ -142,14 +152,15 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
     }
 
-    private void initBroadcastActionList() {
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION, new LoadDialogsSuccessAction());
-        addAction(QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, new LoadFriendsSuccessAction());
-        addAction(QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, new ImportFriendsSuccessAction());
-        addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, new ImportFriendsFailAction());
-        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginAndJoinChatsSuccessAction());
+    private void performImportFriendsSuccessAction(Bundle bundle) {
+        importFriendsFinished();
+    }
+
+    private void performLoginChatSuccessAction(Bundle bundle) {
+        initVideoChat();
+
+        hideActionBarProgress();
+        hideProgress();
     }
 
     private void initNavigationDrawer() {
@@ -169,40 +180,52 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         }
     }
 
-    private void loadFriendsList() {
-        QBLoadFriendListCommand.start(this);
-    }
-
-    private void loadChatsDialogs() {
-        QBLoadDialogsCommand.start(MainActivity.this);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
+        addActions();
         gsmHelper.checkPlayServices();
         showActionBarProgress();
         checkVisibilityProgressBars();
     }
 
     @Override
-    protected void onFailAction(String action) {
+    protected void onPause() {
+        super.onPause();
+        removeActions();
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, loginChatCompositeSuccessAction);
+        addAction(QBServiceConsts.IMPORT_FRIENDS_SUCCESS_ACTION, importFriendsSuccessAction);
+        addAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION, importFriendsFailAction);
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.IMPORT_FRIENDS_FAIL_ACTION);
+        updateBroadcastActionList();
+    }
+
+    private void performImportFriendsFailAction(Bundle bundle) {
+        importFriendsFinished();
         hideActionBarProgress();
-        hideProgress();
-        if (QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION.equals(action)) {
-            loadChatsDialogs();
-        }
     }
 
     private void checkVisibilityProgressBars() {
-        isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
+        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
                 PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+
         if (isJoinedToDialogs()) {
             hideActionBarProgress();
         }
-        if (isNeedToOpenDialog && !isJoinedToDialogs()) {
-            hideActionBarProgress();
-            showProgress();
+
+        if (isLoggedInChat()) {
+            initVideoChat();
+        }
+
+        if (isNeedToOpenDialog) {
+            startDialog();
         }
     }
 
@@ -211,17 +234,31 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         return prefsHelper.getPref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, false);
     }
 
+    private boolean isLoggedInChat() {
+        boolean result = false;
+        if (QBChatService.isInitialized()) {
+            result = QBChatService.getInstance().isLoggedIn();
+        }
+        return result;
+    }
+
     private void startDialog() {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
         long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
                 ConstsCore.NOT_INITIALIZED_VALUE);
+
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
+        if (dialog == null) {
+            return;
+        }
+
         if (dialog.getType() == QBDialogType.PRIVATE) {
             startPrivateChatActivity(dialog, userId);
         } else {
             startGroupChatActivity(dialog);
         }
+
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
     }
 
     private void startPrivateChatActivity(QBDialog dialog, long userId) {
@@ -240,45 +277,24 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         GroupDialogActivity.start(this, dialog);
     }
 
-    private class LoadDialogsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideActionBarProgress();
-            hideProgress();
-
-            if (isNeedToOpenDialog) {
-                startDialog();
-            }
-        }
-    }
-
     private class FacebookSessionStatusCallback implements Session.StatusCallback {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 importFriends.startGetFriendsListTask(true);
-            } else if (!(!session.isOpened() && !session.isClosed()) && !isImportInitialized()) {
+            } else if (!session.isClosed() && !isImportInitialized()) {
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
         }
     }
 
-    private class LoginAndJoinChatsSuccessAction implements Command {
+    private class LoginChatCompositeSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            loadChatsDialogs();
-        }
-    }
-
-    private class LoadFriendsSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) throws Exception {
-            loadChatsDialogs();
+            performLoginChatSuccessAction(bundle);
         }
     }
 
@@ -286,7 +302,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            importFriendsFinished();
+            performImportFriendsSuccessAction(bundle);
         }
     }
 
@@ -294,7 +310,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            importFriendsFinished();
+            performImportFriendsFailAction(bundle);
         }
     }
 }

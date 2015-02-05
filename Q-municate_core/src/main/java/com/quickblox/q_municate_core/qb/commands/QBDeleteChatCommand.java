@@ -7,15 +7,14 @@ import android.os.Bundle;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-public class QBDeleteDialogCommand extends ServiceCommand {
+public class QBDeleteChatCommand extends ServiceCommand {
 
     private QBBaseChatHelper baseChatHelper;
 
-    public QBDeleteDialogCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
+    public QBDeleteChatCommand(Context context, QBBaseChatHelper baseChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.baseChatHelper = baseChatHelper;

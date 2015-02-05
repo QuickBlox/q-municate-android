@@ -4,13 +4,18 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.q_municate.ui.authorization.LoginHelper;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
@@ -18,15 +23,16 @@ import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.models.PushMessage;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 
-public class GCMIntentService extends IntentService {
+public class GCMIntentService extends IntentService implements LoginHelper.ExistingSessionListener {
 
     public final static int NOTIFICATION_ID = 1;
     public final static long VIBRATOR_DURATION = 1500;
 
-    private NotificationManager notificationManager;
     private String message;
     private String dialogId;
     private int userId;
+    private CommandBroadcastReceiver commandBroadcastReceiver;
+    private PrefsHelper prefsHelper;
 
     public GCMIntentService() {
         super("GcmIntentService");
@@ -48,6 +54,8 @@ public class GCMIntentService extends IntentService {
     }
 
     private void parseMessage(Bundle extras) {
+        prefsHelper = PrefsHelper.getPrefsHelper();
+
         if (extras.getString(NotificationHelper.MESSAGE) != null) {
             message = extras.getString(NotificationHelper.MESSAGE);
         }
@@ -60,16 +68,36 @@ public class GCMIntentService extends IntentService {
             dialogId = extras.getString(NotificationHelper.DIALOG_ID);
         }
 
-        sendNotification();
+        boolean chatPush = userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId);
+
+        if (chatPush) {
+            saveOpeningDialogData(userId, dialogId, true);
+            commandBroadcastReceiver = new CommandBroadcastReceiver();
+            registerCommandBroadcastReceiver();
+
+            boolean checkedRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME);
+
+            LoginHelper loginHelper = new LoginHelper(this, this, checkedRememberMe);
+
+            loginHelper.checkStartExistSession();
+
+//            if (loginHelper.checkStartExistSession()) {
+//                loginHelper.loginChat();
+//            }
+
+        } else {
+            saveOpeningDialogData(false);
+            sendNotification();
+        }
     }
 
     private void sendNotification() {
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
-        saveOpeningDialogData(userId, dialogId);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(
                 R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
@@ -82,23 +110,51 @@ public class GCMIntentService extends IntentService {
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void saveOpeningDialogData(int userId, String dialogId) {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
-            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
-            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
-            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
-        } else {
-            prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        }
+    private void saveOpeningDialogData(int userId, String dialogId, boolean save) {
+        prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
+        prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
+        prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, save);
     }
 
-    private void sendBroadcast(PushMessage message) {
-        Intent intent = new Intent();
-        intent.setAction(NotificationHelper.ACTION_VIDEO_CALL);
-        QBUser qbUser = new QBUser();
-        qbUser.setId(message.getUserId());
-        intent.putExtra(ConstsCore.USER, qbUser);
-        sendBroadcast(intent);
+    private void saveOpeningDialogData(boolean save) {
+        prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, save);
+    }
+
+    private void unregisterBroadcastReceiver() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(commandBroadcastReceiver);
+    }
+
+    private void registerCommandBroadcastReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+
+        intentFilter.addAction(QBServiceConsts.COMMAND_ACTION);
+        intentFilter.addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION);
+        intentFilter.addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
+        intentFilter.addAction(QBServiceConsts.LOGIN_FAIL_ACTION);
+        intentFilter.addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
+        intentFilter.addAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(commandBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    public void onStartSessionSuccess() {
+        unregisterBroadcastReceiver();
+        sendNotification();
+    }
+
+    @Override
+    public void onStartSessionFail() {
+        unregisterBroadcastReceiver();
+        sendNotification();
+    }
+
+    private class CommandBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            final String action = intent.getAction();
+            return;
+        }
     }
 }

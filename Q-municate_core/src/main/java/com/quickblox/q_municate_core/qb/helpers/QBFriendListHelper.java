@@ -213,6 +213,11 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void createFriend(int userId, boolean isNewFriendStatus) throws QBResponseException {
         User user = restHelper.loadUser(userId);
+
+        if (user == null) {
+            return;
+        }
+
         Friend friend = FriendUtils.createFriend(userId);
         friend.setNewFriendStatus(isNewFriendStatus);
         fillUserOnlineStatus(user);
@@ -344,8 +349,6 @@ public class QBFriendListHelper extends BaseHelper {
             try {
                 createFriend(userId, true);
                 notifyContactRequest(userId);
-            } catch (QBResponseException e) {
-                Log.e(TAG, SUBSCRIPTION_ERROR, e);
             } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }

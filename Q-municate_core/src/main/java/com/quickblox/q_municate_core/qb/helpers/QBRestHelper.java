@@ -7,7 +7,6 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;

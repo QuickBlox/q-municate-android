@@ -4,21 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.users.model.QBUser;
 
 public class QBInitChatsCommand extends ServiceCommand {
 
     private QBPrivateChatHelper privateChatHelper;
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper multiChatHelper;
 
     public QBInitChatsCommand(Context context, QBPrivateChatHelper privateChatHelper,
-            QBMultiChatHelper multiChatHelper, String successAction, String failAction) {
+            QBGroupChatHelper multiChatHelper, String successAction, String failAction) {
         super(context, successAction, failAction);
         this.privateChatHelper = privateChatHelper;
         this.multiChatHelper = multiChatHelper;

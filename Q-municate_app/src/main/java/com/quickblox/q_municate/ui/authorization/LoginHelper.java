@@ -6,7 +6,8 @@ import android.text.TextUtils;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.qb.commands.QBLoginWithSocialCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
@@ -16,30 +17,34 @@ import java.util.concurrent.TimeUnit;
 public class LoginHelper {
 
     private Context context;
+    private ExistingSessionListener existingSessionListener;
+    private boolean checkedRememberMe;
 
-    public LoginHelper(Context context) {
+    public LoginHelper(Context context, ExistingSessionListener existingSessionListener, boolean checkedRememberMe) {
         this.context = context;
+        this.existingSessionListener = existingSessionListener;
+        this.checkedRememberMe = checkedRememberMe;
     }
 
-    public boolean checkStartExistSession() {
+    public void checkStartExistSession() {
         String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
-        boolean isRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
+        checkedRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
 
-        if (isRememberMe) {
-            return checkStartExistSession(userEmail, userPassword);
+        if (checkedRememberMe) {
+            checkStartExistSession(userEmail, userPassword);
+        } else {
+            existingSessionListener.onStartSessionFail();
         }
-
-        return false;
     }
 
-    public boolean checkStartExistSession(String userEmail, String userPassword) {
+    public void checkStartExistSession(String userEmail, String userPassword) {
         boolean isEmailEntered = !TextUtils.isEmpty(userEmail);
         boolean isPasswordEntered = !TextUtils.isEmpty(userPassword);
         if ((isEmailEntered && isPasswordEntered) || (isLoggedViaFB(isPasswordEntered))) {
-            return runExistSession(userEmail, userPassword);
+            runExistSession(userEmail, userPassword);
         } else {
-            return false;
+            existingSessionListener.onStartSessionFail();
         }
     }
 
@@ -51,19 +56,14 @@ public class LoginHelper {
         return AppSession.getSession().getLoginType();
     }
 
-    public boolean runExistSession(String userEmail, String userPassword) {
+    public void runExistSession(String userEmail, String userPassword) {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
-            return true;
+            existingSessionListener.onStartSessionSuccess();
         } else {
             doAutoLogin(userEmail, userPassword);
-            return false;
         }
-    }
-
-    public void loginChat() {
-        QBLoginChatCompositeCommand.start(context);
     }
 
     public void doAutoLogin(String userEmail, String userPassword) {
@@ -77,7 +77,7 @@ public class LoginHelper {
     public void loginFB() {
         String tokenFB = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_SESSION_FB_TOKEN);
         AppSession.getSession().closeAndClear();
-        QBLoginWithSocialCommand.start(context, QBProvider.FACEBOOK, tokenFB, null);
+        QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, tokenFB, null);
     }
 
     public void login(String userEmail, String userPassword) {
@@ -85,5 +85,11 @@ public class LoginHelper {
         QBUser user = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
         QBLoginCompositeCommand.start(context, user);
+    }
+
+    public interface ExistingSessionListener {
+
+        public void onStartSessionSuccess();
+        public void onStartSessionFail();
     }
 }

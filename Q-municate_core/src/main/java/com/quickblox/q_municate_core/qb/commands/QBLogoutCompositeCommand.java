@@ -11,11 +11,11 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
-public class QBLogoutCommand extends CompositeServiceCommand {
+public class QBLogoutCompositeCommand extends CompositeServiceCommand {
 
-    private static final String TAG = QBLogoutCommand.class.getSimpleName();
+    private static final String TAG = QBLogoutCompositeCommand.class.getSimpleName();
 
-    public QBLogoutCommand(Context context, String successAction, String failAction) {
+    public QBLogoutCompositeCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 

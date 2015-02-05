@@ -10,11 +10,11 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-public class QBUpdateDialogCommand extends ServiceCommand {
+public class QBUpdateDialogLocalCommand extends ServiceCommand {
 
     private QBPrivateChatHelper chatHelper;
 
-    public QBUpdateDialogCommand(Context context, QBPrivateChatHelper chatHelper, String successAction,
+    public QBUpdateDialogLocalCommand(Context context, QBPrivateChatHelper chatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatHelper = chatHelper;

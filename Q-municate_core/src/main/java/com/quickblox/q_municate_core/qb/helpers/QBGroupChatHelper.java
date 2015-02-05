@@ -39,15 +39,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QBMultiChatHelper extends QBBaseChatHelper {
+public class QBGroupChatHelper extends QBBaseChatHelper {
 
-    private static final String TAG = QBMultiChatHelper.class.getSimpleName();
+    private static final String TAG = QBGroupChatHelper.class.getSimpleName();
 
     private QBNotificationChatListener notificationChatListener;
     private QBParticipantListener participantListener;
     private List<QBDialog> groupDialogsList;
 
-    public QBMultiChatHelper(Context context) {
+    public QBGroupChatHelper(Context context) {
         super(context);
         notificationChatListener = new GroupChatNotificationListener();
         participantListener = new ParticipantListener();

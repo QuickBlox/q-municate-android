@@ -14,13 +14,10 @@ import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 
@@ -61,13 +58,16 @@ public class QBAuthHelper extends BaseHelper {
         // TODO: temp block
         if (!isUpdatedUserCustomData(user)) {
             user.setOldPassword(session.getToken());
-            updateUser(user);
+            user = updateUser(user);
         }
         // end todo
+
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SESSION_FB_TOKEN, accessToken);
 
         user.setPassword(session.getToken());
         String token = QBAuth.getBaseService().getToken();
         AppSession.startSession(LoginType.FACEBOOK, user, token);
+
         return user;
     }
 
@@ -188,5 +188,14 @@ public class QBAuthHelper extends BaseHelper {
     public void resetPassword(String email) throws QBResponseException {
         QBAuth.createSession();
         QBUsers.resetPassword(email);
+    }
+
+    public QBUser changePasswordUser(QBUser inputUser) throws QBResponseException {
+        QBUser user;
+        String password = inputUser.getPassword();
+        user = QBUsers.updateUser(inputUser);
+        user.setPassword(password);
+
+        return user;
     }
 }

@@ -31,7 +31,7 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -250,7 +250,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private void deleteDialog() {
         String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, user.getUserId());
-        QBDeleteDialogCommand.start(this, dialogId, QBDialogType.PRIVATE);
+        QBDeleteChatCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
 
     private class RemoveFriendSuccessAction implements Command {

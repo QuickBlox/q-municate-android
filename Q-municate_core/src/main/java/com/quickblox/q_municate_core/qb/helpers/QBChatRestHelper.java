@@ -19,6 +19,7 @@ public class QBChatRestHelper extends BaseHelper {
 
     private static final String TAG = QBChatRestHelper.class.getSimpleName();
     private static final int AUTO_PRESENCE_INTERVAL_IN_SECONDS = 30;
+
     private QBChatService chatService;
     private ConnectionListener connectionListener = new ChatConnectionListener();
 

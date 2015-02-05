@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
@@ -14,9 +14,9 @@ import java.io.File;
 
 public class QBUpdateGroupDialogCommand extends ServiceCommand {
 
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper multiChatHelper;
 
-    public QBUpdateGroupDialogCommand(Context context, QBMultiChatHelper multiChatHelper,
+    public QBUpdateGroupDialogCommand(Context context, QBGroupChatHelper multiChatHelper,
             String successAction, String failAction) {
         super(context, successAction, failAction);
         this.multiChatHelper = multiChatHelper;

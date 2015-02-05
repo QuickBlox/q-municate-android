@@ -3,14 +3,14 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.users.model.QBUser;
 
-public class QBLoginCommand extends CompositeServiceCommand {
+public class QBLoginCompositeCommand extends CompositeServiceCommand {
 
-    public QBLoginCommand(Context context, String successAction, String failAction) {
+    public QBLoginCompositeCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 

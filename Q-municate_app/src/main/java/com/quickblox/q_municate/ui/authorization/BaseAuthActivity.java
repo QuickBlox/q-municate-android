@@ -21,7 +21,8 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
@@ -37,11 +38,16 @@ public class BaseAuthActivity extends BaseActivity {
     protected LoginType startedLoginType = LoginType.EMAIL;
     protected ValidationUtils validationUtils;
     protected Resources resources;
+    protected boolean checkedRememberMe;
 
     protected UserAgreementDialog userAgreementDialog;
 
     protected DialogInterface.OnClickListener positiveUserAgreementOnClickListener;
     protected DialogInterface.OnClickListener negativeUserAgreementOnClickListener;
+
+    protected LoginSuccessAction loginSuccessAction;
+    protected SocialLoginSuccessAction socialLoginSuccessAction;
+    protected FailAction failAction;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, BaseAuthActivity.class);
@@ -59,6 +65,10 @@ public class BaseAuthActivity extends BaseActivity {
         }
 
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+
+        loginSuccessAction = new LoginSuccessAction();
+        socialLoginSuccessAction = new SocialLoginSuccessAction();
+        failAction = new FailAction();
     }
 
     @Override
@@ -68,9 +78,26 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        addActions();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        removeActions();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         facebookHelper.onActivityStop();
+    }
+
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
     }
 
     @Override
@@ -121,6 +148,14 @@ public class BaseAuthActivity extends BaseActivity {
         AppSession.getSession().updateUser(user);
         AppSession.saveRememberMe(saveRememberMe);
         MainActivity.start(context);
+
+        finish();
+    }
+
+    protected void startMainActivity() {
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        MainActivity.start(BaseAuthActivity.this);
+
         finish();
     }
 
@@ -134,13 +169,8 @@ public class BaseAuthActivity extends BaseActivity {
         return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
     }
 
-    protected boolean isLoggedViaFB() {
-        return facebookHelper.isSessionOpened() && LoginType.FACEBOOK.equals(getCurrentLoginType());
-    }
-
-    protected void startMainActivity() {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        MainActivity.start(BaseAuthActivity.this);
+    protected LoginType getCurrentLoginType() {
+        return AppSession.getSession().getLoginType();
     }
 
     protected void parseExceptionMessage(Exception exception) {
@@ -161,14 +191,71 @@ public class BaseAuthActivity extends BaseActivity {
         validationUtils.setError(errorMessage);
     }
 
+    protected void parseFailException(Bundle bundle) {
+        Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+        int errorCode = bundle.getInt(QBServiceConsts.EXTRA_ERROR_CODE);
+        parseExceptionMessage(exception);
+    }
+
+    protected void login(String userEmail, String userPassword) {
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        QBUser user = new QBUser(null, userPassword, userEmail);
+        AppSession.getSession().closeAndClear();
+        QBLoginCompositeCommand.start(this, user);
+    }
+
+    protected void performLoginSuccessAction(Bundle bundle) {
+        QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+        startMainActivity(BaseAuthActivity.this, user, checkedRememberMe);
+
+        // send analytics data
+        AnalyticsUtils.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
+    }
+
+    protected boolean isLoggedInToServer() {
+        return AppSession.getSession().isLoggedIn();
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, loginSuccessAction);
+        addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION, socialLoginSuccessAction);
+        addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.LOGIN_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_FAIL_ACTION);
+        removeAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
+        removeAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
+        updateBroadcastActionList();
+    }
+
     private class LoginSuccessAction implements Command {
 
         @Override
-        public void execute(Bundle bundle) {
-            QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-            startMainActivity();
-            AnalyticsUtils.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
-            finish();
+        public void execute(Bundle bundle) throws Exception {
+            performLoginSuccessAction(bundle);
+        }
+    }
+
+    private class SocialLoginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            checkedRememberMe = true;
+            performLoginSuccessAction(bundle);
+        }
+    }
+
+    private class FailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) throws Exception {
+            parseFailException(bundle);
         }
     }
 
@@ -178,7 +265,8 @@ public class BaseAuthActivity extends BaseActivity {
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 showProgress();
-                QBLoginRestWithSocialCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK,
+                AppSession.getSession().closeAndClear();
+                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
             }
         }

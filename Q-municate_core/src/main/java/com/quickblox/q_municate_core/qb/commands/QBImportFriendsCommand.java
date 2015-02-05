@@ -5,13 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate_core.utils.FriendUtils;
-import com.quickblox.users.QBUsers;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.users.QBUsers;
+import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.List;

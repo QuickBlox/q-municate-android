@@ -15,7 +15,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class NewDialogActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper multiChatHelper;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewDialogActivity.class);
@@ -40,7 +40,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     @Override
     public void onConnectedToService(QBService service) {
         if (multiChatHelper == null) {
-            multiChatHelper = (QBMultiChatHelper) service.getHelper(QBService.MULTI_CHAT_HELPER);
+            multiChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
         }
     }
 

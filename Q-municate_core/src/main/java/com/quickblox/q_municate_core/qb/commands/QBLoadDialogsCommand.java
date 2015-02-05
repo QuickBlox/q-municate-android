@@ -9,7 +9,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatDialogUtils;
@@ -21,9 +21,9 @@ import java.util.List;
 
 public class QBLoadDialogsCommand extends ServiceCommand {
 
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper multiChatHelper;
 
-    public QBLoadDialogsCommand(Context context, QBMultiChatHelper multiChatHelper, String successAction,
+    public QBLoadDialogsCommand(Context context, QBGroupChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.multiChatHelper = multiChatHelper;
@@ -47,10 +47,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
+        extras.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
 
-        return bundle;
+        return extras;
     }
 
     private class FindUnknownFriendsTask extends AsyncTask {

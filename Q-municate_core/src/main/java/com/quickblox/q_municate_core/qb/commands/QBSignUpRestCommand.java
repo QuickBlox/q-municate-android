@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.users.model.QBUser;
 
 import java.io.File;
 

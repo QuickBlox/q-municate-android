@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 
@@ -60,7 +60,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
     }
 
     private boolean isLoggedViaFB(QBUser user, int authorizationType){
-       return !TextUtils.isEmpty(user.getFacebookId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
+        return !TextUtils.isEmpty(user.getFacebookId()) && QBServiceConsts.AUTH_TYPE_LOGIN == authorizationType;
     }
 
     private QBUser updateUser(QBUser user, File file) throws QBResponseException, SmackException.NotConnectedException {
@@ -70,6 +70,6 @@ public class QBUpdateUserCommand extends ServiceCommand {
             return authHelper.updateUser(user, file);
         }
         // TODO SF temp
-		// friendListHelper.sendStatus(status);
+        // friendListHelper.sendStatus(status);
     }
 }

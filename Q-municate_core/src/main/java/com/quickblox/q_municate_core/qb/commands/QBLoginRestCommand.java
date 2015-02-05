@@ -3,13 +3,12 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.users.model.QBUser;
 
 public class QBLoginRestCommand extends ServiceCommand {
 
@@ -31,7 +30,6 @@ public class QBLoginRestCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        Log.d(TAG, "--- perform() ---");
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         user = authHelper.login(user);
         extras.putSerializable(QBServiceConsts.EXTRA_USER, user);

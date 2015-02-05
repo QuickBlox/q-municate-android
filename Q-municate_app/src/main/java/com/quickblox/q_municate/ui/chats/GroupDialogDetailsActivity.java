@@ -49,7 +49,7 @@ import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -87,7 +87,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private String groupNameOld;
     private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper groupChatHelper;
     private List<MessagesNotificationType> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
     private FriendOperationAction friendOperationAction;
@@ -147,8 +147,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     @Override
     public void onConnectedToService(QBService service) {
-        if (multiChatHelper == null) {
-            multiChatHelper = (QBMultiChatHelper) service.getHelper(QBService.MULTI_CHAT_HELPER);
+        if (groupChatHelper == null) {
+            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
         }
     }
 
@@ -326,7 +326,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
         if (addedFriendIdsList != null) {
             try {
-                multiChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(currentDialog,
+                groupChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(currentDialog,
                         addedFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
@@ -410,7 +410,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void sendNotificationToGroup() {
         for (MessagesNotificationType messagesNotificationType : currentNotificationTypeList) {
             try {
-                multiChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType,
+                groupChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType,
                         addedFriendIdsList);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

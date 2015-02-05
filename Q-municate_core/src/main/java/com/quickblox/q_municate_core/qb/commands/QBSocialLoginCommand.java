@@ -6,32 +6,32 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.UserCustomData;
+import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-public class QBLoginRestWithSocialCommand extends ServiceCommand {
+public class QBSocialLoginCommand extends ServiceCommand {
 
-    private static final String TAG = QBLoginRestWithSocialCommand.class.getSimpleName();
+    private static final String TAG = QBSocialLoginCommand.class.getSimpleName();
 
     private final QBAuthHelper authHelper;
 
-    public QBLoginRestWithSocialCommand(Context context, QBAuthHelper authHelper, String successAction,
+    public QBSocialLoginCommand(Context context, QBAuthHelper authHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.authHelper = authHelper;
     }
 
-    public static void start(Context context, String socialProvier, String accessToken,
+    public static void start(Context context, String socialProvider, String accessToken,
             String accessTokenSecret) {
         Intent intent = new Intent(QBServiceConsts.SOCIAL_LOGIN_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_SOCIAL_PROVIDER, socialProvier);
+        intent.putExtra(QBServiceConsts.EXTRA_SOCIAL_PROVIDER, socialProvider);
         intent.putExtra(QBServiceConsts.EXTRA_ACCESS_TOKEN, accessToken);
         intent.putExtra(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET, accessTokenSecret);
         context.startService(intent);
@@ -43,7 +43,7 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-        if(TextUtils.isEmpty(user.getWebsite())) {
+        if (TextUtils.isEmpty(user.getWebsite())) {
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));

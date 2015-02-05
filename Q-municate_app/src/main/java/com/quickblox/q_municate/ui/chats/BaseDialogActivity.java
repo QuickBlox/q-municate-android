@@ -54,9 +54,9 @@ import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogLocalCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -71,9 +71,7 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener,
-        LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
-        EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
     private static final int MESSAGES_LOADER_ID = 0;
@@ -431,7 +429,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
         loadMoreView = _findViewById(R.id.load_more_linearlayout);
         loadMoreView.setVisibility(View.GONE);
-//        messagesListView.setOnScrollListener(this);
+        //        messagesListView.setOnScrollListener(this);
     }
 
     @Override
@@ -439,22 +437,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (scrollState == SCROLL_STATE_IDLE) {
             if (firstItemInList && !loadingMore) {
                 firstVisiblePositionList = totalItemCountInList - 1;
-//                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+                //                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
                 loadMoreItems();
-//                }
+                //                }
             }
         }
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                         int totalItemCount) {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
         totalItemCountInList = totalItemCount;
     }
 
     private void loadMoreItems() {
-//        loadMoreView.setVisibility(View.VISIBLE);
+        //        loadMoreView.setVisibility(View.VISIBLE);
         startLoadDialogMessages();
     }
 
@@ -615,7 +612,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
                         messageEditText.getText().toString(), opponentFriend.getUserId());
             } else {
-                ((QBMultiChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
+                ((QBGroupChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
                         messageEditText.getText().toString());
             }
         } catch (QBResponseException e) {
@@ -637,7 +634,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void startUpdateChatDialog() {
         QBDialog dialog = getQBDialog();
         if (dialog != null) {
-            QBUpdateDialogCommand.start(this, dialog);
+            QBUpdateDialogLocalCommand.start(this, dialog);
         }
     }
 
@@ -697,7 +694,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = false;
-//            loadMoreView.setVisibility(View.GONE);
+            //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);
@@ -712,7 +709,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             loadingMore = false;
-//            loadMoreView.setVisibility(View.GONE);
+            //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);

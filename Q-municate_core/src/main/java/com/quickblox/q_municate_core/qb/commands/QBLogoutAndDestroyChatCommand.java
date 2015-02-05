@@ -6,7 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
@@ -14,9 +14,9 @@ import com.quickblox.q_municate_core.utils.PrefsHelper;
 public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
 
     private QBChatRestHelper chatRestHelper;
-    private QBMultiChatHelper multiChatHelper;
+    private QBGroupChatHelper multiChatHelper;
 
-    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, QBMultiChatHelper multiChatHelper, String successAction,
+    public QBLogoutAndDestroyChatCommand(Context context, QBChatRestHelper chatRestHelper, QBGroupChatHelper multiChatHelper, String successAction,
             String failAction) {
         super(context, successAction, failAction);
         this.chatRestHelper = chatRestHelper;

@@ -111,6 +111,10 @@ public class AppSession implements Serializable {
         prefsHelper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
     }
 
+    public boolean isLoggedIn() {
+        return user != null && !TextUtils.isEmpty(sessionToken);
+    }
+
     public boolean isSessionExist() {
         return loginType != null && !TextUtils.isEmpty(sessionToken);
     }

@@ -24,11 +24,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -234,7 +234,7 @@ public class NavigationDrawerFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 baseActivity.showProgress();
                 FacebookHelper.logout();
-                QBLogoutCommand.start(baseActivity);
+                QBLogoutCompositeCommand.start(baseActivity);
             }
         });
         dialog.show(getFragmentManager(), null);

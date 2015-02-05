@@ -21,7 +21,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
+import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -77,7 +77,7 @@ public class ActivityHelper extends BaseActivityHelper {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(activity, AppSession.getSession().getUser());
         } else {
-            QBLoginRestWithSocialCommand.start(activity, QBProvider.FACEBOOK,
+            QBSocialLoginCommand.start(activity, QBProvider.FACEBOOK,
                     Session.getActiveSession().getAccessToken(), null);
         }
     }

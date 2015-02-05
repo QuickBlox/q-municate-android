@@ -41,8 +41,8 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         try {
             baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
         } catch (Exception e) {
-            ErrorUtils.logError(TAG, e + " --- dialogId = " + dialog.getDialogId()
-                    + ", messageId = " + messageCache.getId());
+            ErrorUtils.logError(TAG,
+                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + messageCache.getId());
         }
 
         return null;

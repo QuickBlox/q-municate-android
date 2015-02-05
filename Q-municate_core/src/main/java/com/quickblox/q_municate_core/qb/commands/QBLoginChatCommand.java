@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -27,8 +26,8 @@ public class QBLoginChatCommand extends ServiceCommand {
 
     private QBChatRestHelper chatRestHelper;
 
-    public QBLoginChatCommand(Context context, QBAuthHelper authHelper, QBChatRestHelper chatRestHelper,
-            String successAction, String failAction) {
+    public QBLoginChatCommand(Context context, QBChatRestHelper chatRestHelper, String successAction,
+            String failAction) {
         super(context, successAction, failAction);
         this.chatRestHelper = chatRestHelper;
     }

@@ -4,20 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import com.quickblox.chat.QBSignaling;
-import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
-import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+import com.quickblox.core.helper.Lo;
 import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.call.WorkingSessionPull;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.videochat.webrtc.QBVideoChannel;
+import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
 import com.quickblox.videochat.webrtc.model.CallConfig;
-import com.quickblox.videochat.webrtc.listener.*;
 import com.quickblox.videochat.webrtc.model.ConnectionConfig;
 import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
 
@@ -65,7 +65,7 @@ public class QBVideoChatHelper extends BaseHelper {
     public void closeSignalingChannel(ConnectionConfig connectionConfig) {
         WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(
                 connectionConfig.getConnectionSession());
-        Lo.g("closeSignalingChannel sessionId="+connectionConfig.getConnectionSession());
+        Lo.g("closeSignalingChannel sessionId=" + connectionConfig.getConnectionSession());
         if (session != null  && session.isActive()) {
             session.cancel();
             startClearSessionTask(connectionConfig);
@@ -114,7 +114,7 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void onCall(ConnectionConfig connectionConfig) {
             String sessionId = connectionConfig.getConnectionSession();
-            Lo.g("onCall sessionId="+sessionId);
+            Lo.g("onCall sessionId=" + sessionId);
             if ( isExistSameSession(sessionId) || workingSessionPull.existActive() || activityClass == null) {
                 return;
             }
