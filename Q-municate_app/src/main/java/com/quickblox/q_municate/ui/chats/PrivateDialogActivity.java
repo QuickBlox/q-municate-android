@@ -165,8 +165,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void setOnlineStatus(User friend) {
-        ActionBar actionBar = getActionBar();
-        actionBar.setSubtitle(friend.getOnlineStatus(this));
+        if (friend != null) {
+            ActionBar actionBar = getActionBar();
+            actionBar.setSubtitle(friend.getOnlineStatus(this));
+        }
     }
 
     protected QBDialog getQBDialog() {

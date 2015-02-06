@@ -43,6 +43,7 @@ public class SplashActivity extends BaseAuthActivity implements LoginHelper.Exis
 
     @Override
     public void onStartSessionSuccess() {
+        checkedRememberMe = true;
         startMainActivity();
         finish();
     }

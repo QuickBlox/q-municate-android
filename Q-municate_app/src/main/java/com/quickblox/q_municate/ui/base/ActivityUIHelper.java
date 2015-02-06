@@ -79,6 +79,10 @@ public class ActivityUIHelper {
     }
 
     public void showNewMessageAlert(User senderUser, String message) {
+        if (senderUser == null) {
+            return;
+        }
+
         newMessageTextView.setText(message);
         senderMessageTextView.setText(senderUser.getFullName());
         Crouton.cancelAllCroutons();

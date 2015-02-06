@@ -20,6 +20,7 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
@@ -182,6 +183,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     private void startSignUp(File imageFile) {
+        ChatDatabaseManager.clearAllCache(this);
         AppSession.getSession().closeAndClear();
         QBSignUpCommand.start(SignUpActivity.this, user, imageFile);
     }
@@ -208,7 +210,8 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
     protected void performUpdateUserSuccessAction(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-        startMainActivity(SignUpActivity.this, user, true);
+        AppSession.saveRememberMe(true);
+        startMainActivity(SignUpActivity.this, user);
 
         // send analytics data
         AnalyticsUtils.pushAnalyticsData(SignUpActivity.this, user, "User Sign Up");

@@ -15,13 +15,11 @@ import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.q_municate.ui.authorization.LoginHelper;
+import com.quickblox.q_municate.ui.authorization.SplashActivity;
+import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
-import com.quickblox.q_municate_core.models.PushMessage;
-import com.quickblox.q_municate.ui.authorization.SplashActivity;
 
 public class GCMIntentService extends IntentService implements LoginHelper.ExistingSessionListener {
 
@@ -33,6 +31,7 @@ public class GCMIntentService extends IntentService implements LoginHelper.Exist
     private int userId;
     private CommandBroadcastReceiver commandBroadcastReceiver;
     private PrefsHelper prefsHelper;
+    private LoginHelper loginHelper;
 
     public GCMIntentService() {
         super("GcmIntentService");
@@ -77,14 +76,8 @@ public class GCMIntentService extends IntentService implements LoginHelper.Exist
 
             boolean checkedRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME);
 
-            LoginHelper loginHelper = new LoginHelper(this, this, checkedRememberMe);
-
+            loginHelper = new LoginHelper(this, this, checkedRememberMe);
             loginHelper.checkStartExistSession();
-
-//            if (loginHelper.checkStartExistSession()) {
-//                loginHelper.loginChat();
-//            }
-
         } else {
             saveOpeningDialogData(false);
             sendNotification();
@@ -133,14 +126,15 @@ public class GCMIntentService extends IntentService implements LoginHelper.Exist
         intentFilter.addAction(QBServiceConsts.LOGIN_FAIL_ACTION);
         intentFilter.addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
         intentFilter.addAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
+        intentFilter.addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
+        intentFilter.addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(commandBroadcastReceiver, intentFilter);
     }
 
     @Override
     public void onStartSessionSuccess() {
-        unregisterBroadcastReceiver();
-        sendNotification();
+        loginHelper.loginChat();
     }
 
     @Override
@@ -153,8 +147,12 @@ public class GCMIntentService extends IntentService implements LoginHelper.Exist
 
         @Override
         public void onReceive(Context context, final Intent intent) {
-            final String action = intent.getAction();
-            return;
+            if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION)) {
+                saveOpeningDialogData(true);
+            } else if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION)) {
+                saveOpeningDialogData(false);
+            }
+            sendNotification();
         }
     }
 }

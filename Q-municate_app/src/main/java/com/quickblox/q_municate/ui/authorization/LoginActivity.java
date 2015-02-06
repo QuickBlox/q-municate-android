@@ -11,6 +11,7 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 
 public class LoginActivity extends BaseAuthActivity {
 
@@ -46,10 +47,10 @@ public class LoginActivity extends BaseAuthActivity {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        initCheckedRememberMe();
-
         if (validationUtils.isValidUserDate(userEmail, userPassword)) {
             showProgress();
+            ChatDatabaseManager.clearAllCache(this);
+            initCheckedRememberMe();
             login(userEmail, userPassword);
         }
     }

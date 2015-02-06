@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -96,11 +97,6 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     @Override
-    protected void onFailAction(String action) {
-        super.onFailAction(action);
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(STARTED_LOGIN_TYPE, startedLoginType);
@@ -130,6 +126,9 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     private void loginWithFacebook() {
+        ChatDatabaseManager.clearAllCache(this);
+        AppSession.saveRememberMe(true);
+        showProgress();
         FacebookHelper.logout(); // clearing old data
         facebookHelper.loginWithFacebook();
     }
@@ -143,10 +142,8 @@ public class BaseAuthActivity extends BaseActivity {
         userAgreementDialog.show(getFragmentManager(), null);
     }
 
-    protected void startMainActivity(Context context, QBUser user, boolean saveRememberMe) {
-        ChatDatabaseManager.clearAllCache(context);
+    protected void startMainActivity(Context context, QBUser user) {
         AppSession.getSession().updateUser(user);
-        AppSession.saveRememberMe(saveRememberMe);
         MainActivity.start(context);
 
         finish();
@@ -198,6 +195,7 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     protected void login(String userEmail, String userPassword) {
+        AppSession.saveRememberMe(checkedRememberMe);
         PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
         QBUser user = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
@@ -206,7 +204,7 @@ public class BaseAuthActivity extends BaseActivity {
 
     protected void performLoginSuccessAction(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
-        startMainActivity(BaseAuthActivity.this, user, checkedRememberMe);
+        startMainActivity(BaseAuthActivity.this, user);
 
         // send analytics data
         AnalyticsUtils.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
@@ -264,7 +262,7 @@ public class BaseAuthActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
-                showProgress();
+                checkedRememberMe = true;
                 AppSession.getSession().closeAndClear();
                 QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);

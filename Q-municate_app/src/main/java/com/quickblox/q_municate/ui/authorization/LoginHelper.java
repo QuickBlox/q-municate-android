@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -85,6 +86,10 @@ public class LoginHelper {
         QBUser user = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
         QBLoginCompositeCommand.start(context, user);
+    }
+
+    public void loginChat() {
+        QBLoginChatCompositeCommand.start(context);
     }
 
     public interface ExistingSessionListener {
