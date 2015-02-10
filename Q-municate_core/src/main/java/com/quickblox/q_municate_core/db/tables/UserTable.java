@@ -26,7 +26,6 @@ public class UserTable {
         public static final String LOGIN = "login";
         public static final String PHONE = "phone";
         public static final String WEB_SITE = "web_site";
-        public static final String CUSTOM_DATA = "custom_data";
         public static final String LAST_REQUEST_AT = "last_request_at";
         public static final String EXTERNAL_ID = "external_id";
         public static final String FACEBOOK_ID = "facebook_id";

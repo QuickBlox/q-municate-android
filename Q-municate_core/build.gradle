@@ -28,4 +28,6 @@ dependencies {
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     compile fileTree(dir: 'libs', include: '*.jar')
     compile project(':facebook')
+    compile "com.j256.ormlite:ormlite-android:${rootProject.ormliteAndroidVersion}"
+    compile "com.j256.ormlite:ormlite-core:${rootProject.ormliteCoreVersion}"
 }

@@ -47,7 +47,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 .append(UserTable.Cols.LOGIN).append(" TEXT, ")
                 .append(UserTable.Cols.PHONE).append(" TEXT, ")
                 .append(UserTable.Cols.WEB_SITE).append(" TEXT, ")
-                .append(UserTable.Cols.CUSTOM_DATA).append(" TEXT, ")
                 .append(UserTable.Cols.LAST_REQUEST_AT).append(" TEXT, ")
                 .append(UserTable.Cols.EXTERNAL_ID).append(" TEXT, ")
                 .append(UserTable.Cols.FACEBOOK_ID).append(" INTEGER, ")
