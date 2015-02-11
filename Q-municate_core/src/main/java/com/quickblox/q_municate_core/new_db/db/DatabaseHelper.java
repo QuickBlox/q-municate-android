@@ -15,6 +15,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
@@ -22,12 +23,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
-    private Dao<User, Integer> userDao = null;
-    private Dao<Friend, Integer> friendDao = null;
-    private Dao<FriendsRelationStatus, Integer> friendsRelationStatusDao = null;
+    private ConcurrentHashMap<Class, Dao> concurrentDaoHashMap = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        concurrentDaoHashMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -35,6 +35,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         try {
             TableUtils.createTable(connectionSource, User.class);
             TableUtils.createTable(connectionSource, Friend.class);
+            TableUtils.createTable(connectionSource, FriendsRelationStatus.class);
         } catch (SQLException e) {
             ErrorUtils.logError("Can't create database", e);
             throw new RuntimeException(e);
@@ -61,36 +62,16 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    public Dao<User, Integer> getUserDao() {
-        if (null == userDao) {
-            try {
-                userDao = getDao(User.class);
-            } catch (java.sql.SQLException e) {
-                ErrorUtils.logError(e);
+    public Dao getDaoByClass(Class cls) {
+        try {
+            if (concurrentDaoHashMap.contains(cls)) {
+                return concurrentDaoHashMap.get(cls);
+            } else {
+                concurrentDaoHashMap.put(cls, getDao(cls));
             }
+        } catch (java.sql.SQLException e) {
+            ErrorUtils.logError(e);
         }
-        return userDao;
-    }
-
-    public Dao<Friend, Integer> getFriendDao() {
-        if (null == friendDao) {
-            try {
-                friendDao = getDao(Friend.class);
-            } catch (java.sql.SQLException e) {
-                ErrorUtils.logError(e);
-            }
-        }
-        return friendDao;
-    }
-
-    public Dao<FriendsRelationStatus, Integer> getFriendsRelationStatusDao() {
-        if (null == friendsRelationStatusDao) {
-            try {
-                friendsRelationStatusDao = getDao(FriendsRelationStatus.class);
-            } catch (java.sql.SQLException e) {
-                ErrorUtils.logError(e);
-            }
-        }
-        return friendsRelationStatusDao;
+        return null;
     }
 }
