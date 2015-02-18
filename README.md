@@ -1,5 +1,5 @@
 # Q-municate 
-Q-municate is an open source code of a chat application with a wide range of communication features included (such as messaging, file transfer, push notifications, audio/video calls).
+Q-municate is a code of a chat application with a wide range of communication features included (such as messaging, file transfer, push notifications, audio/video calls).
 http://q-municate.com/
 
 We are happy to offer you a chat application out of the box. You can customize this application to on your needs (with attribution as stated in the license). QuickBlox is used for the backend http://quickblox.com
