@@ -10,10 +10,10 @@ import android.widget.ListView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.Collections;

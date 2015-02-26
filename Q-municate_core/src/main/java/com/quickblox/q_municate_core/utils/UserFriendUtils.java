@@ -1,16 +1,11 @@
 package com.quickblox.q_municate_core.utils;
 
-import android.content.Context;
-import android.database.MatrixCursor;
-
 import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.db.tables.FriendTable;
-import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.Friend;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Role;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.packet.RosterPacket;
@@ -21,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FriendUtils {
+public class UserFriendUtils {
 
     public static User createUser(QBUser qbUser) {
         qbUser.setCustomDataClass(UserCustomData.class);
@@ -34,11 +29,34 @@ public class FriendUtils {
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
 
         if (userCustomData != null) {
-            user.setAvatarUrl(userCustomData.getAvatar_url());
+            user.setAvatar(userCustomData.getAvatar_url());
             user.setStatus(userCustomData.getStatus());
         }
 
         return user;
+    }
+
+    public static com.quickblox.q_municate_db.models.User createLocalUser(QBUser qbUser, Role role) {
+        com.quickblox.q_municate_db.models.User user = new com.quickblox.q_municate_db.models.User();
+        user.setUserId(qbUser.getId());
+        user.setFullName(qbUser.getFullName());
+        user.setEmail(qbUser.getEmail());
+        user.setPhone(qbUser.getPhone());
+        user.setRole(role);
+
+        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
+
+        if (userCustomData != null) {
+            user.setAvatar(userCustomData.getAvatar_url());
+            user.setStatus(userCustomData.getStatus());
+        }
+
+        return user;
+    }
+
+    public static com.quickblox.q_municate_db.models.User createLocalUser(QBUser qbUser) {
+        Role role = DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER);
+        return createLocalUser(qbUser, role);
     }
 
     public static Friend createFriend(QBRosterEntry rosterEntry) {
@@ -100,29 +118,11 @@ public class FriendUtils {
         return friendIdsList;
     }
 
-    public static List<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection) {
+    public static Collection<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection) {
         List<Integer> userIds = new ArrayList<Integer>();
         for (QBRosterEntry entry : rosterEntryCollection) {
             userIds.add(entry.getUserId());
         }
         return userIds;
-    }
-
-    public static MatrixCursor createSearchResultCursor(Context context, Collection<User> usersList) {
-        MatrixCursor usersCursor = new MatrixCursor(
-                new String[]{UserTable.Cols.ID, UserTable.Cols.USER_ID, UserTable.Cols.FULL_NAME, UserTable.Cols.EMAIL, UserTable.Cols.PHONE, UserTable.Cols.AVATAR_URL, UserTable.Cols.STATUS, UserTable.Cols.IS_ONLINE, FriendTable.Cols.RELATION_STATUS_ID, FriendTable.Cols.IS_PENDING_STATUS});
-
-        List<User> friendsList = UsersDatabaseManager.getAllFriendsList(context);
-
-        for (User user : usersList) {
-            if (!friendsList.contains(user)) {
-                usersCursor.addRow(new String[]{user.getUserId() + ConstsCore.EMPTY_STRING, user
-                        .getUserId() + ConstsCore.EMPTY_STRING, user.getFullName(), user.getEmail(), user
-                        .getPhone(), user.getAvatarUrl(), user
-                        .getStatus(), ConstsCore.ZERO_INT_VALUE + ConstsCore.EMPTY_STRING, QBFriendListHelper.VALUE_RELATION_STATUS_ALL_USERS + ConstsCore.EMPTY_STRING, ConstsCore.ZERO_INT_VALUE + ConstsCore.EMPTY_STRING});
-            }
-        }
-
-        return usersCursor;
     }
 }

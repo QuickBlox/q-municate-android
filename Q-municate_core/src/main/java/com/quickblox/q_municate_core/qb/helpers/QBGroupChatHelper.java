@@ -21,13 +21,13 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;

@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.models;
 
+import android.content.Context;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -47,6 +49,8 @@ public class User implements Serializable {
     @DatabaseField(columnName = COLUMN_STATUS)
     private String status;
 
+    private boolean online;
+
     public User() {
     }
 
@@ -59,6 +63,14 @@ public class User implements Serializable {
         this.avatar = avatar;
         this.role = role;
         this.social = social;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 
     public Role getRole() {

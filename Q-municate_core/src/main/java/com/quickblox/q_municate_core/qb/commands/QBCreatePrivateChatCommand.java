@@ -6,10 +6,10 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_db.models.User;
 
 public class QBCreatePrivateChatCommand extends ServiceCommand {
 

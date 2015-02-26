@@ -8,11 +8,11 @@ import android.os.Bundle;
 import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 
@@ -39,14 +39,14 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     protected Cursor getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
-        return UsersDatabaseManager.getFriendsFilteredByIds(this, FriendUtils.getFriendIds(
+        return UsersDatabaseManager.getFriendsFilteredByIds(this, UserFriendUtils.getFriendIds(
                 dialog.getOccupantList()));
     }
 
     @Override
     protected void onFriendsSelected(ArrayList<User> selectedFriends) {
         showProgress();
-        friendIdsList = FriendUtils.getFriendIds(selectedFriends);
+        friendIdsList = UserFriendUtils.getFriendIds(selectedFriends);
         QBAddFriendsToGroupCommand.start(this, dialog.getId(), friendIdsList);
     }
 

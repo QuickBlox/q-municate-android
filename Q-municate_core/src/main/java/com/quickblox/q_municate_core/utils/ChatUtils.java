@@ -10,10 +10,10 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -123,36 +123,34 @@ public class ChatUtils {
         }
     }
 
-    public static String getFullNameById(Context context, int userId) {
-        User user = UsersDatabaseManager.getUserById(context, userId);
-        if (user == null) {
-            try {
-                QBUser qbUser = QBUsers.getUser(userId);
-                user = FriendUtils.createUser(qbUser);
-                UsersDatabaseManager.saveUser(context, user);
-                return qbUser.getFullName();
-            } catch (QBResponseException e) {
-                ErrorUtils.logError(e);
-            }
+    public static String getFullNameById(int userId) {
+        QBUser qbUser = null;
+        try {
+            qbUser = QBUsers.getUser(userId);
+        } catch (QBResponseException e) {
+            ErrorUtils.logError(e);
         }
+        User user = UserFriendUtils.createLocalUser(qbUser);
+        DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
         return user.getFullName();
     }
 
-    public static String getFullNamesFromOpponentIds(Context context, String occupantsIdsString) {
+    public static String getFullNamesFromOpponentIds(String occupantsIdsString) {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
-        return getFullNamesFromOpponentIdsList(context, occupantsIdsList);
+        return getFullNamesFromOpponentIdsList(occupantsIdsList);
     }
 
-    public static String getFullNamesFromOpponentId(Context context, Integer userId, String occupantsIdsString) {
+    public static String getFullNamesFromOpponentId(Integer userId,
+            String occupantsIdsString) {
         List<Integer> occupantsIdsList = getOccupantsIdsListFromString(occupantsIdsString);
         occupantsIdsList.remove(userId);
-        return getFullNamesFromOpponentIdsList(context, occupantsIdsList);
+        return getFullNamesFromOpponentIdsList(occupantsIdsList);
     }
 
-    private static String getFullNamesFromOpponentIdsList(Context context, List<Integer> occupantsIdsList) {
+    private static String getFullNamesFromOpponentIdsList(List<Integer> occupantsIdsList) {
         StringBuilder stringBuilder = new StringBuilder(occupantsIdsList.size());
         for (Integer id : occupantsIdsList) {
-            stringBuilder.append(getFullNameById(context, id)).append(OCCUPANT_IDS_DIVIDER).append(" ");
+            stringBuilder.append(getFullNameById(id)).append(OCCUPANT_IDS_DIVIDER).append(" ");
         }
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }

@@ -16,11 +16,11 @@ import android.widget.ToggleButton;
 
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate.ui.base.BaseFragment;
@@ -41,7 +41,6 @@ import org.webrtc.SessionDescription;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
 

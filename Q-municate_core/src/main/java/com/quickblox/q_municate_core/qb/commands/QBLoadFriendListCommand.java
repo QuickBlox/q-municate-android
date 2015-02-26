@@ -9,7 +9,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-import java.util.List;
+import java.util.Collection;
 
 public class QBLoadFriendListCommand extends ServiceCommand {
 
@@ -28,7 +28,7 @@ public class QBLoadFriendListCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        List<Integer> userIdsList = friendListHelper.updateFriendList();
+        Collection<Integer> userIdsList = friendListHelper.updateFriendList();
         Bundle bundle = new Bundle();
         bundle.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) userIdsList);
         return bundle;

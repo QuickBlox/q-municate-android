@@ -16,10 +16,11 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import java.io.File;
@@ -73,7 +74,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage chatMessage) {
-        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
+        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
 
         if (user == null) {
             user = ChatUtils.getTempUserFromChatMessage(chatMessage);

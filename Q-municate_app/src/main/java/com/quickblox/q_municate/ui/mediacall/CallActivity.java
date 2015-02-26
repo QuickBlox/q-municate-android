@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBVideoChannel;
 import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
@@ -14,7 +15,6 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;

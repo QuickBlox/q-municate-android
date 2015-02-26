@@ -5,8 +5,8 @@ import android.content.Context;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import java.util.Collection;

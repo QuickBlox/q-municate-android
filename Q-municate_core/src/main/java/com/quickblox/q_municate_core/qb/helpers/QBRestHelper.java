@@ -5,9 +5,9 @@ import android.os.Bundle;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -24,7 +24,7 @@ public class QBRestHelper extends BaseHelper {
 
         try {
             QBUser user = QBUsers.getUser(userId);
-            resultUser = FriendUtils.createUser(user);
+            resultUser = UserFriendUtils.createLocalUser(user);
         } catch (QBResponseException e) {
             // user not found
         }
@@ -37,7 +37,7 @@ public class QBRestHelper extends BaseHelper {
         requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
         Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle());
-        Collection<User> usersListResult = FriendUtils.createUsersList(usersList);
+        Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
         return usersListResult;
     }
 }

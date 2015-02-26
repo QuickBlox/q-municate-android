@@ -19,9 +19,9 @@ import com.quickblox.q_municate.utils.TextViewHelper;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.FriendGroup;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private String getAvatarUrlForUser(User user) {
-        return user.getAvatarUrl();
+        return user.getAvatar();
     }
 
     @Override
@@ -188,7 +188,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
-        String status;
+        String status = null;
 
         Friend friend = UsersDatabaseManager.getFriendById(context, user.getUserId());
 
@@ -206,7 +206,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
             viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.frl_pending_request_status);
         } else {
-            status = user.getOnlineStatus(context);
+//            status = user.getOnlineStatus(context);
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);

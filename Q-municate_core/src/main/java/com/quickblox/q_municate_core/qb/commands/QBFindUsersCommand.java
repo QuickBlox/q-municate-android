@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -47,8 +47,8 @@ public class QBFindUsersCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
-        Collection<User> userCollection = FriendUtils.createUsersList(userList);
-        userCollection.remove(FriendUtils.createUser(currentUser));
+        Collection<User> userCollection = UserFriendUtils.createUsersList(userList);
+        userCollection.remove(UserFriendUtils.createLocalUser(currentUser));
 
         Bundle params = new Bundle();
         params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);

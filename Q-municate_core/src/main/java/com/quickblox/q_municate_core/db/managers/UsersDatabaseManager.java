@@ -10,9 +10,9 @@ import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.Friend;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -480,7 +480,8 @@ public class UsersDatabaseManager {
         String status = cursor.getString(cursor.getColumnIndex(UserTable.Cols.STATUS));
         boolean online = cursor.getInt(cursor.getColumnIndex(UserTable.Cols.IS_ONLINE)) > 0;
 
-        User user = new User(id, fullName, email, phone, avatarUid);
+        User user = new User();
+//        User user = new User(id, fullName, email, phone, avatarUid);
         user.setStatus(status);
         user.setOnline(online);
 
@@ -507,7 +508,7 @@ public class UsersDatabaseManager {
         values.put(UserTable.Cols.FULL_NAME, user.getFullName());
         values.put(UserTable.Cols.EMAIL, user.getEmail());
         values.put(UserTable.Cols.PHONE, user.getPhone());
-        values.put(UserTable.Cols.AVATAR_URL, user.getAvatarUrl());
+        values.put(UserTable.Cols.AVATAR_URL, user.getAvatar());
         values.put(UserTable.Cols.STATUS, user.getStatus());
         values.put(UserTable.Cols.IS_ONLINE, user.isOnline());
         return values;

@@ -43,8 +43,8 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         }
         RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
         avatarView.setOval(true);
-        if(!TextUtils.isEmpty(opponent.getAvatarUrl())){
-            ImageLoader.getInstance().displayImage(opponent.getAvatarUrl(),
+        if(!TextUtils.isEmpty(opponent.getAvatar())){
+            ImageLoader.getInstance().displayImage(opponent.getAvatar(),
                     avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }

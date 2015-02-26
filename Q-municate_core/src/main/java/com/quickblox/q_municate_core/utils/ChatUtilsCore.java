@@ -1,6 +1,6 @@
 package com.quickblox.q_municate_core.utils;
 
-import com.quickblox.q_municate_core.models.User;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.List;

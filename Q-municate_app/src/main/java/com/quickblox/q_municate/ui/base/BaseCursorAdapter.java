@@ -11,10 +11,10 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.models.User;
 
 public abstract class BaseCursorAdapter extends CursorAdapter {
 
@@ -55,7 +55,7 @@ public abstract class BaseCursorAdapter extends CursorAdapter {
         return currentUser.getWebsite();
     }
 
-    protected String getAvatarUrlForFriend(User friend) {
-        return friend.getAvatarUrl();
+    protected String getAvatarUrlForFriend(User user) {
+        return user.getAvatar();
     }
 }

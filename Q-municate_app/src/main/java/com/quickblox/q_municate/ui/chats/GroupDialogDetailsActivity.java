@@ -44,7 +44,6 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
@@ -55,7 +54,8 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
@@ -338,7 +338,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void startAddFriendsActivity() {
         int countUnselectedFriendsInChat = UsersDatabaseManager.getFriendsFilteredByIds(this,
-                FriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
+                UserFriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
         } else {

@@ -11,6 +11,7 @@ import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 
 public class App extends Application {
 
@@ -32,6 +33,10 @@ public class App extends Application {
         ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
     }
 
+    private void initDB(Context context) {
+        DatabaseManager.init(this);
+    }
+
     public MediaPlayerManager getMediaPlayer() {
         return soundPlayer;
     }
@@ -40,6 +45,7 @@ public class App extends Application {
         instance = this;
         QBChatService.setDebugEnabled(true);
         initImageLoader(this);
+        initDB(this);
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY,
                 Consts.QB_AUTH_SECRET);
         soundPlayer = new MediaPlayerManager(this);

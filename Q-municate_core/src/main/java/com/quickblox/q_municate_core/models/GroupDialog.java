@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 

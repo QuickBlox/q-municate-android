@@ -30,7 +30,6 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -38,6 +37,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.User;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
 
@@ -183,12 +183,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             } else {
                 onlineImageView.setVisibility(View.GONE);
             }
-            onlineStatusTextView.setText(user.getOnlineStatus(this));
+//            onlineStatusTextView.setText(user.getOnlineStatus(this));
         }
     }
 
     private void loadAvatar() {
-        String url = user.getAvatarUrl();
+        String url = user.getAvatar();
         ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 

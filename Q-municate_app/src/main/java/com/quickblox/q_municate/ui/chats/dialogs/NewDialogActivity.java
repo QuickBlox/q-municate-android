@@ -13,12 +13,12 @@ import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 

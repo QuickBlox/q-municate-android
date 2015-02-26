@@ -29,11 +29,11 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 

@@ -8,12 +8,12 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.GroupDialog;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -54,7 +54,7 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
 
         Bundle requestParams = new Bundle();
         List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
-        Map<Integer, User> friendMap = FriendUtils.createUserMap(userList);
+        Map<Integer, User> friendMap = UserFriendUtils.createUserMap(userList);
         for (Integer onlineParticipantId : onlineParticipantIdsList) {
             User user = friendMap.get(onlineParticipantId);
             if (user != null) {

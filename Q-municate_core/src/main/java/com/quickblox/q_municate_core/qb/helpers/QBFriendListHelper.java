@@ -18,13 +18,14 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.Friend;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Role;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -80,12 +81,12 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void addFriend(int userId) throws Exception {
-        if (isNewFriend(userId)) {
-            acceptFriend(userId);
-        } else {
-            createFriend(userId, false);
-            invite(userId);
-        }
+//        if (isNewFriend(userId)) {
+//            acceptFriend(userId);
+//        } else {
+//            createFriend(userId, false);
+//            invite(userId);
+//        }
     }
 
     public void invite(int userId) throws Exception {
@@ -158,15 +159,13 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    public List<Integer> updateFriendList() throws QBResponseException {
-        Collection<QBRosterEntry> rosterEntryCollection;
-        List<Integer> userIdsList = new ArrayList<Integer>();
+    public Collection<Integer> updateFriendList() throws QBResponseException {
+        Collection<Integer> userIdsList = new ArrayList<>();
 
         if (roster != null) {
-            rosterEntryCollection = roster.getEntries();
-            if (!rosterEntryCollection.isEmpty()) {
-                userIdsList = FriendUtils.getUserIdsFromRoster(rosterEntryCollection);
-                updateFriends(userIdsList, rosterEntryCollection);
+            if (!roster.getEntries().isEmpty()) {
+                userIdsList = UserFriendUtils.getUserIdsFromRoster(roster.getEntries());
+                updateFriends(userIdsList);
             }
         } else {
             ErrorUtils.logError(TAG, ROSTER_INIT_ERROR);
@@ -175,18 +174,15 @@ public class QBFriendListHelper extends BaseHelper {
         return userIdsList;
     }
 
-    private void updateFriends(Collection<Integer> userIdsList,
-            Collection<QBRosterEntry> rosterEntryCollection) throws QBResponseException {
-        List<QBUser> qbUsersList = loadUsers(userIdsList);
-        List<User> usersList = FriendUtils.createUsersList(qbUsersList);
-        List<Friend> friendsList = FriendUtils.createFriendsList(rosterEntryCollection);
+    private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
+        List<QBUser> usersList = loadUsers(friendIdsList);
 
-        fillUsersWithRosterData(usersList);
+        //        fillUsersWithRosterData(usersList);
 
-        savePeople(usersList, friendsList);
+        saveUsersAndFriends(usersList);
     }
 
-    private void updateFriends(Collection<Integer> userIdsList) throws QBResponseException {
+    private void updateFriends1(Collection<Integer> userIdsList) throws QBResponseException {
         for (Integer userId : userIdsList) {
             updateFriend(userId);
         }
@@ -201,12 +197,12 @@ public class QBFriendListHelper extends BaseHelper {
             return;
         }
 
-        Friend friend = FriendUtils.createFriend(rosterEntry);
+        Friend friend = UserFriendUtils.createFriend(rosterEntry);
 
         newUser.setOnline(isFriendOnline(roster.getPresence(userId)));
 
         saveUser(newUser);
-        saveFriend(friend);
+        saveFriend(newUser);
 
         fillUserOnlineStatus(newUser);
     }
@@ -218,12 +214,12 @@ public class QBFriendListHelper extends BaseHelper {
             return;
         }
 
-        Friend friend = FriendUtils.createFriend(userId);
+        Friend friend = UserFriendUtils.createFriend(userId);
         friend.setNewFriendStatus(isNewFriendStatus);
         fillUserOnlineStatus(user);
 
         saveUser(user);
-        saveFriend(friend);
+        saveFriend(user);
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
@@ -260,27 +256,24 @@ public class QBFriendListHelper extends BaseHelper {
         return QBPresence.Type.online.equals(presence.getType());
     }
 
-    //    private void fillFriendStatus(User friend) {
-    //        QBPresence presence = roster.getPresence(friend.getUserId());
-    //        friend.setStatus(presence.getStatus());
-    //    }
-
-    //    public void sendStatus(String status) throws SmackException.NotConnectedException {
-    //        QBPresence presence = new QBPresence(QBPresence.Type.online, status, STATUS_PRESENCE_PRIORITY,
-    //                QBPresence.Mode.available);
-    //        roster.sendPresence(presence);
-    //    }
-
     private void saveUser(User user) {
-        UsersDatabaseManager.saveUser(context, user);
+        DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
+
+//        UsersDatabaseManager.saveUser(context, user);
     }
 
-    private void savePeople(List<User> usersList, List<Friend> friendsList) {
-        UsersDatabaseManager.savePeople(context, usersList, friendsList);
+    private void saveUsersAndFriends(Collection<QBUser> usersCollection) {
+        Role sampleRole = DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.SIMPLE_ROLE);
+        for (QBUser qbUser : usersCollection) {
+            User user = UserFriendUtils.createLocalUser(qbUser, sampleRole);
+            DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
+            DatabaseManager.getInstance().getFriendManager().createIfNotExists(new com.quickblox.q_municate_db.models.Friend(user));
+        }
+//        UsersDatabaseManager.savePeople(context, usersList);
     }
 
-    private void saveFriend(Friend friend) {
-        UsersDatabaseManager.saveFriend(context, friend);
+    private void saveFriend(User user) {
+        DatabaseManager.getInstance().getFriendManager().createIfNotExists(new com.quickblox.q_municate_db.models.Friend(user));
     }
 
     private void deleteFriend(int userId) {
@@ -293,14 +286,15 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private boolean isNewFriend(int userId) {
-        return UsersDatabaseManager.isFriendWithStatusNew(context, userId);
-    }
+//    private boolean isNewFriend(int userId) {
+//        return UsersDatabaseManager.isFriendWithStatusNew(context, userId);
+//    }
 
     private void notifyContactRequest(int userId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
 
-        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(R.string.frl_friends_contact_request));
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, context.getResources().getString(
+                R.string.frl_friends_contact_request));
         intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -324,7 +318,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void entriesUpdated(Collection<Integer> userIdsList) {
             try {
-                updateFriends(userIdsList);
+                updateFriends1(userIdsList);
             } catch (QBResponseException e) {
                 Log.e(TAG, ENTRIES_UPDATING_ERROR, e);
             }
@@ -332,12 +326,16 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = UsersDatabaseManager.getUserById(context, presence.getUserId());
+            User user = DatabaseManager.getInstance().getUserManager().get(presence.getUserId());
+
+//            User user = UsersDatabaseManager.getUserById(context, presence.getUserId());
+
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
                 fillUserOnlineStatus(user, presence);
-                UsersDatabaseManager.saveUser(context, user);
+
+//                UsersDatabaseManager.saveUser(context, user);
             }
         }
     }

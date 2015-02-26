@@ -7,10 +7,10 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.ui.friends.FriendOperationListener;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -61,7 +61,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
         initListeners(viewHolder, user.getUserId());
 
-        displayImage(user.getAvatarUrl(), viewHolder.avatarImageView);
+        displayImage(user.getAvatar(), viewHolder.avatarImageView);
 
         return convertView;
     }
@@ -80,7 +80,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
             user.setOnline(true);
         }
 
-        viewHolder.onlineStatusTextView.setText(user.getOnlineStatus(baseActivity));
+//        viewHolder.onlineStatusTextView.setText(user.getOnlineStatus(baseActivity));
         if (user.isOnline()) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {

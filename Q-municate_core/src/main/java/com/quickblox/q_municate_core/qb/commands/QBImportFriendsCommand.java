@@ -9,7 +9,7 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.FriendUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
@@ -75,11 +75,11 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<Integer> userIdsList = new ArrayList<Integer>();
 
         if (realFriendsFacebookList != null && !realFriendsFacebookList.isEmpty()) {
-            userIdsList.addAll(FriendUtils.getFriendIdsList(realFriendsFacebookList));
+            userIdsList.addAll(UserFriendUtils.getFriendIdsList(realFriendsFacebookList));
         }
 
         if (realFriendsContactsList != null && !realFriendsContactsList.isEmpty()) {
-            userIdsList.addAll(FriendUtils.getFriendIdsList(realFriendsContactsList));
+            userIdsList.addAll(UserFriendUtils.getFriendIdsList(realFriendsContactsList));
         }
 
         return userIdsList;

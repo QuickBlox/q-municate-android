@@ -27,7 +27,6 @@ import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -40,6 +39,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
 
@@ -167,7 +167,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private void setOnlineStatus(User friend) {
         if (friend != null) {
             ActionBar actionBar = getActionBar();
-            actionBar.setSubtitle(friend.getOnlineStatus(this));
+//            actionBar.setSubtitle(friend.getOnlineStatus(this));
         }
     }
 
@@ -204,10 +204,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void initActionBar() {
         actionBar.setTitle(opponentFriend.getFullName());
-        actionBar.setSubtitle(opponentFriend.getOnlineStatus(this));
+//        actionBar.setSubtitle(opponentFriend.getOnlineStatus(this));
         actionBar.setLogo(R.drawable.placeholder_user);
-        if (!TextUtils.isEmpty(opponentFriend.getAvatarUrl())) {
-            loadLogoActionBar(opponentFriend.getAvatarUrl());
+        if (!TextUtils.isEmpty(opponentFriend.getAvatar())) {
+            loadLogoActionBar(opponentFriend.getAvatar());
         }
     }
 

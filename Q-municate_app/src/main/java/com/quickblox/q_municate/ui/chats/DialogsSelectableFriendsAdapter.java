@@ -14,9 +14,9 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
         final User friend = UsersDatabaseManager.getUserFromCursor(cursor);
 
         viewHolder.nameTextView.setText(friend.getFullName());
-        viewHolder.statusMessageTextView.setText(friend.getOnlineStatus(context));
+//        viewHolder.statusMessageTextView.setText(friend.getOnlineStatus(context));
         viewHolder.nameTextView.setText(friend.getFullName());
 
         if (friend.isOnline()) {
@@ -81,7 +81,7 @@ public class DialogsSelectableFriendsAdapter extends BaseCursorAdapter {
             public void onClick(View view) {
                 CheckBox checkBox = (CheckBox) view;
                 sparseArrayCheckBoxes.put(position, checkBox.isChecked());
-                friend.setSelected(checkBox.isChecked());
+//                friend.setSelected(checkBox.isChecked());
                 notifyCounterChanged(checkBox.isChecked());
                 if (checkBox.isChecked()) {
                     selectedFriends.add(friend);

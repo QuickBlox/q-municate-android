@@ -9,8 +9,8 @@ import android.util.Log;
 import com.qb.gson.Gson;
 import com.qb.gson.GsonBuilder;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.models.UserCustomData;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import org.json.JSONException;

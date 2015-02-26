@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
-    private static final String DATABASE_NAME = "app_db.sqlite";
+    private static final String DATABASE_NAME = "q_municate_db.sqlite";
 
     private static final int DATABASE_VERSION = 1;
 
@@ -68,6 +68,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         } catch (java.sql.SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        // TODO TEMP
+        TablesInitHelper.init();
     }
 
     @Override

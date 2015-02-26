@@ -27,12 +27,12 @@ import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.FriendGroup;
-import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
