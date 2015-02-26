@@ -1,10 +1,10 @@
-package com.quickblox.q_municate_core.new_db.dao;
+package com.quickblox.q_municate_db.dao;
 
 import java.util.List;
 
 public interface CommonDao<T> {
 
-    public int create(T item);
+    public T createIfNotExists(T item);
 
     public List<T> getAll();
 

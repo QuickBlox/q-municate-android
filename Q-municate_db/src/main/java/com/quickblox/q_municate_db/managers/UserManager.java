@@ -1,9 +1,9 @@
-package com.quickblox.q_municate_core.new_db.managers;
+package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
-import com.quickblox.q_municate_core.new_db.dao.CommonDao;
-import com.quickblox.q_municate_core.new_db.models.User;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.dao.CommonDao;
+import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,13 +17,13 @@ public class UserManager implements CommonDao<User> {
     }
 
     @Override
-    public int create(User item) {
+    public User createIfNotExists(User item) {
         try {
-            return userDao.create(item);
+            return userDao.createIfNotExists(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-        return 0;
+        return null;
     }
 
     @Override

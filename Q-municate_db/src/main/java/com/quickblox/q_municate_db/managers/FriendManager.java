@@ -1,9 +1,11 @@
-package com.quickblox.q_municate_core.new_db.managers;
+package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
-import com.quickblox.q_municate_core.new_db.dao.CommonDao;
-import com.quickblox.q_municate_core.new_db.models.Friend;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.quickblox.q_municate_db.dao.CommonDao;
+import com.quickblox.q_municate_db.models.Friend;
+import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,24 +19,24 @@ public class FriendManager implements CommonDao<Friend> {
     }
 
     @Override
-    public int create(Friend item) {
+    public Friend createIfNotExists(Friend item) {
         try {
-            return friendDao.create(item);
+            return friendDao.createIfNotExists(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-        return 0;
+        return null;
     }
 
     @Override
     public List<Friend> getAll() {
-        List<Friend> friendListList = null;
+        List<Friend> friendList = null;
         try {
-            friendListList = friendDao.queryForAll();
+            friendList = friendDao.queryForAll();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-        return friendListList;
+        return friendList;
     }
 
     @Override
@@ -61,6 +63,16 @@ public class FriendManager implements CommonDao<Friend> {
     public void delete(Friend item) {
         try {
             friendDao.delete(item);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    public void delete(User item) {
+        try {
+            DeleteBuilder<Friend, Integer> deleteBuilder = friendDao.deleteBuilder();
+            deleteBuilder.where().eq(User.COLUMN_USER_ID, item.getUserId());
+            deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
