@@ -33,7 +33,7 @@ public class App extends Application {
         ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
     }
 
-    private void initDB(Context context) {
+    private void initDB() {
         DatabaseManager.init(this);
     }
 
@@ -45,7 +45,7 @@ public class App extends Application {
         instance = this;
         QBChatService.setDebugEnabled(true);
         initImageLoader(this);
-        initDB(this);
+        initDB();
         QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY,
                 Consts.QB_AUTH_SECRET);
         soundPlayer = new MediaPlayerManager(this);
