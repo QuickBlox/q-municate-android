@@ -12,6 +12,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 
 public class LoginActivity extends BaseAuthActivity {
 
@@ -49,7 +50,12 @@ public class LoginActivity extends BaseAuthActivity {
 
         if (validationUtils.isValidUserDate(userEmail, userPassword)) {
             showProgress();
-            ChatDatabaseManager.clearAllCache(this);
+
+            boolean ownerUser = DatabaseManager.getInstance().getUserManager().isUserOwner(userEmail);
+            if (!ownerUser) {
+                ChatDatabaseManager.clearAllCache(this);
+            }
+
             initCheckedRememberMe();
             login(userEmail, userPassword);
         }

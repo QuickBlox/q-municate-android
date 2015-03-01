@@ -26,15 +26,13 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "q_municate_db.sqlite";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 30;
 
     private ConcurrentHashMap<Class<?>, Dao> concurrentDaoHashMap = null;
 
@@ -62,9 +60,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Attachment.class);
             TableUtils.createTable(connectionSource, State.class);
             TableUtils.createTable(connectionSource, Message.class);
-        } catch (SQLException e) {
-            ErrorUtils.logError("Can't create database", e);
-            throw new RuntimeException(e);
         } catch (java.sql.SQLException e) {
             ErrorUtils.logError(e);
         }
@@ -77,17 +72,40 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion,
             int newVersion) {
         try {
-            List<String> allSql = new ArrayList<>();
-            switch (oldVersion) {
-                case 1:
-                    //allSql.add("alter table AdData add column `new_col` VARCHAR");
-            }
-            for (String sql : allSql) {
-                db.execSQL(sql);
-            }
-        } catch (SQLException e) {
-            ErrorUtils.logError("exception during onUpgrade", e);
-            throw new RuntimeException(e);
+            TableUtils.dropTable(connectionSource, User.class, true);
+            TableUtils.dropTable(connectionSource, Friend.class, true);
+            TableUtils.dropTable(connectionSource, Role.class, true);
+            TableUtils.dropTable(connectionSource, SocialType.class, true);
+            TableUtils.dropTable(connectionSource, Social.class, true);
+            TableUtils.dropTable(connectionSource, Status.class, true);
+            TableUtils.dropTable(connectionSource, UserRequest.class, true);
+            TableUtils.dropTable(connectionSource, DialogType.class, true);
+            TableUtils.dropTable(connectionSource, Dialog.class, true);
+            TableUtils.dropTable(connectionSource, DialogOccupant.class, true);
+            TableUtils.dropTable(connectionSource, DialogNotification.class, true);
+            TableUtils.dropTable(connectionSource, Notification.class, true);
+            TableUtils.dropTable(connectionSource, AttachmentType.class, true);
+            TableUtils.dropTable(connectionSource, Attachment.class, true);
+            TableUtils.dropTable(connectionSource, State.class, true);
+            TableUtils.dropTable(connectionSource, Message.class, true);
+        } catch (java.sql.SQLException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    public void clearTables() {
+        try {
+            TableUtils.clearTable(connectionSource, User.class);
+            TableUtils.clearTable(connectionSource, Friend.class);
+            TableUtils.clearTable(connectionSource, Social.class);
+            TableUtils.clearTable(connectionSource, UserRequest.class);
+            TableUtils.clearTable(connectionSource, Dialog.class);
+            TableUtils.clearTable(connectionSource, DialogOccupant.class);
+            TableUtils.clearTable(connectionSource, DialogNotification.class);
+            TableUtils.clearTable(connectionSource, Attachment.class);
+            TableUtils.clearTable(connectionSource, Message.class);
+        } catch (java.sql.SQLException e) {
+            ErrorUtils.logError(e);
         }
     }
 

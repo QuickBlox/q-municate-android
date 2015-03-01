@@ -51,7 +51,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private QBPrivateChatHelper privateChatHelper;
     private User user;
 
-    //    private Cursor friendCursor;
+//    private Cursor friendCursor;
 //    private ContentObserver statusContentObserver;
 
     public static void start(Context context, int friendId) {

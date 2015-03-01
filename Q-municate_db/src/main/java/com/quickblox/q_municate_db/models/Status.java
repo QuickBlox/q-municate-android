@@ -4,8 +4,10 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable(tableName = Status.TABLE_NAME)
-public class Status {
+public class Status implements Serializable {
 
     public static final String TABLE_NAME = "status";
 
@@ -42,6 +44,6 @@ public class Status {
     }
 
     public enum Type {
-        ACCEPT, REJECT, PENDING
+        INCOMING, OUTGOING
     }
 }

@@ -4,8 +4,10 @@ import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable(tableName = DialogType.TABLE_NAME)
-public class DialogType {
+public class DialogType implements Serializable {
 
     public static final String TABLE_NAME = "dialog_type";
 

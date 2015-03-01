@@ -43,6 +43,10 @@ public class DatabaseManager {
         return databaseHelper;
     }
 
+    public void clearAllTables() {
+        databaseHelper.clearTables();
+    }
+
     public UserManager getUserManager() {
         return new UserManager(getDatabaseHelper().getDaoByClass(User.class));
     }

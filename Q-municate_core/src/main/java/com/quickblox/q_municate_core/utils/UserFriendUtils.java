@@ -1,11 +1,13 @@
 package com.quickblox.q_municate_core.utils;
 
 import com.quickblox.chat.model.QBRosterEntry;
-import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.Role;
+import com.quickblox.q_municate_db.models.Status;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.packet.RosterPacket;
@@ -18,10 +20,20 @@ import java.util.Map;
 
 public class UserFriendUtils {
 
-    public static List<User> getUsersFromFriends(List<com.quickblox.q_municate_db.models.Friend> friendList) {
+    public static List<User> getUsersFromFriends(List<Friend> friendList) {
         List<User> userList = new ArrayList<>(friendList.size());
-        for (com.quickblox.q_municate_db.models.Friend friend : friendList) {
+        for (Friend friend : friendList) {
             userList.add(friend.getUser());
+        }
+        return userList;
+    }
+
+    public static List<User> getUsersFromUserRequest(List<UserRequest> userRequestList) {
+        List<User> userList = new ArrayList<>(userRequestList.size());
+        for (UserRequest userRequest : userRequestList) {
+            if (userRequest.getStatus().getType() == Status.Type.OUTGOING) {
+                userList.add(userRequest.getUser());
+            }
         }
         return userList;
     }
@@ -49,23 +61,12 @@ public class UserFriendUtils {
         return createLocalUser(qbUser, role);
     }
 
-    public static Friend createFriend(QBRosterEntry rosterEntry) {
-        Friend friend = new Friend();
-        friend.setUserId(rosterEntry.getUserId());
-        friend.setRelationStatus(rosterEntry.getType().name());
-        friend.setPendingStatus(isPendingFriend(rosterEntry));
-        return friend;
-    }
-
     public static boolean isPendingFriend(QBRosterEntry rosterEntry) {
         return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
     }
 
-    public static Friend createFriend(int userId) {
-        Friend friend = new Friend();
-        friend.setUserId(userId);
-        friend.setRelationStatus(RosterPacket.ItemType.none.name());
-        return friend;
+    public static boolean isNoneFriend(QBRosterEntry rosterEntry) {
+        return RosterPacket.ItemType.none.equals(rosterEntry.getType());
     }
 
     public static List<User> createUsersList(Collection<QBUser> usersList) {
@@ -74,14 +75,6 @@ public class UserFriendUtils {
             users.add(createLocalUser(user));
         }
         return users;
-    }
-
-    public static List<Friend> createFriendsList(Collection<QBRosterEntry> rosterEntryCollection) {
-        List<Friend> friendsList = new ArrayList<Friend>();
-        for (QBRosterEntry rosterEntry : rosterEntryCollection) {
-            friendsList.add(createFriend(rosterEntry));
-        }
-        return friendsList;
     }
 
     public static Map<Integer, User> createUserMap(List<QBUser> userList) {
@@ -108,11 +101,16 @@ public class UserFriendUtils {
         return friendIdsList;
     }
 
-    public static Collection<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection) {
-        List<Integer> userIds = new ArrayList<Integer>();
-        for (QBRosterEntry entry : rosterEntryCollection) {
-            userIds.add(entry.getUserId());
-        }
-        return userIds;
-    }
+//    public static Collection<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection) {
+//        List<Integer> userIds = new ArrayList<Integer>();
+//        for (QBRosterEntry rosterEntry : rosterEntryCollection) {
+//            if (!isPendingFriend(rosterEntry) && !isNoneFriend(rosterEntry)) {
+//                userIds.add(rosterEntry.getUserId());
+//            }
+//            if (isPendingFriend(rosterEntry)) {
+//
+//            }
+//        }
+//        return userIds;
+//    }
 }

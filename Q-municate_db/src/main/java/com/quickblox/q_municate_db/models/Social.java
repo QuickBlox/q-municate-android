@@ -3,8 +3,10 @@ package com.quickblox.q_municate_db.models;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+import java.io.Serializable;
+
 @DatabaseTable(tableName = Social.TABLE_NAME)
-public class Social {
+public class Social implements Serializable {
 
     public static final String TABLE_NAME = "social";
 

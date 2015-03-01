@@ -39,12 +39,10 @@ public class TablesInitHelper {
     }
 
     private static void saveStatus() {
-        Status acceptStatus = new Status(Status.Type.ACCEPT);
-        Status statusReject = new Status(Status.Type.REJECT);
-        Status statusPending = new Status(Status.Type.PENDING);
-        DatabaseManager.getInstance().getStatusManager().createIfNotExists(acceptStatus);
-        DatabaseManager.getInstance().getStatusManager().createIfNotExists(statusReject);
-        DatabaseManager.getInstance().getStatusManager().createIfNotExists(statusPending);
+        Status incomingStatus = new Status(Status.Type.INCOMING);
+        Status outgoingReject = new Status(Status.Type.OUTGOING);
+        DatabaseManager.getInstance().getStatusManager().createIfNotExists(incomingStatus);
+        DatabaseManager.getInstance().getStatusManager().createIfNotExists(outgoingReject);
     }
 
     private static void saveDialogTypes() {

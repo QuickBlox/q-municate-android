@@ -24,17 +24,6 @@ public class UsersDatabaseManager {
     private static String USER_FRIEND_RELATION_KEY = UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " = " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID;
     private static Map<String, Integer> relationStatusesMap;
 
-    private static ContentValues getContentValuesFriendTable(Friend friend) {
-        ContentValues values = new ContentValues();
-
-        values.put(FriendTable.Cols.USER_ID, friend.getUserId());
-        values.put(FriendTable.Cols.RELATION_STATUS_ID, friend.getRelationStatusId());
-        values.put(FriendTable.Cols.IS_PENDING_STATUS, friend.isPendingStatus());
-        values.put(FriendTable.Cols.IS_NEW_FRIEND_STATUS, friend.isNewFriendStatus());
-
-        return values;
-    }
-
     public static int getRelationStatusIdByName(Context context, String relationStatus) {
         int relationStatusId = ConstsCore.ZERO_INT_VALUE;
 
@@ -374,14 +363,6 @@ public class UsersDatabaseManager {
         return conditionResult;
     }
 
-    public static void deleteAllFriends(Context context) {
-        context.getContentResolver().delete(FriendTable.CONTENT_URI, null, null);
-    }
-
-    public static void deleteAllUsers(Context context) {
-        context.getContentResolver().delete(UserTable.CONTENT_URI, null, null);
-    }
-
     public static User getUserById(Context context, long userId) {
         Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
                 UserTable.Cols.USER_ID + " = " + userId, null, null);
@@ -444,17 +425,5 @@ public class UsersDatabaseManager {
         friend.setNewFriendStatus(isNewFriendStatus);
 
         return friend;
-    }
-
-    private static ContentValues getContentValuesUserTable(User user) {
-        ContentValues values = new ContentValues();
-        values.put(UserTable.Cols.USER_ID, user.getUserId());
-        values.put(UserTable.Cols.FULL_NAME, user.getFullName());
-        values.put(UserTable.Cols.EMAIL, user.getEmail());
-        values.put(UserTable.Cols.PHONE, user.getPhone());
-        values.put(UserTable.Cols.AVATAR_URL, user.getAvatar());
-        values.put(UserTable.Cols.STATUS, user.getStatus());
-        values.put(UserTable.Cols.IS_ONLINE, user.isOnline());
-        return values;
     }
 }

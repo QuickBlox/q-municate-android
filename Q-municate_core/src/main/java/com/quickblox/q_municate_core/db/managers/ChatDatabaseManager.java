@@ -22,6 +22,7 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -534,8 +535,8 @@ public class ChatDatabaseManager {
     }
 
     public static void clearAllCache(Context context) {
-        UsersDatabaseManager.deleteAllUsers(context);
-        UsersDatabaseManager.deleteAllFriends(context);
+        DatabaseManager.getInstance().clearAllTables();
+
         deleteAllMessages(context);
         deleteAllDialogs(context);
         // TODO clear something else
