@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -28,7 +27,6 @@ import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
@@ -37,6 +35,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
@@ -51,8 +50,9 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private QBPrivateChatHelper privateChatHelper;
     private User user;
-    private Cursor friendCursor;
-    private ContentObserver statusContentObserver;
+
+    //    private Cursor friendCursor;
+//    private ContentObserver statusContentObserver;
 
     public static void start(Context context, int friendId) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
@@ -66,10 +66,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         setContentView(R.layout.activity_friend_details);
         canPerformLogout.set(true);
         int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-        friendCursor = UsersDatabaseManager.getFriendCursorById(this, friendId);
-        user = UsersDatabaseManager.getUserById(this, friendId);
+//        friendCursor = UsersDatabaseManager.getFriendCursorById(this, friendId);
+        user = DatabaseManager.getInstance().getUserManager().get(friendId);
         initUI();
-        registerStatusChangingObserver();
+//        registerStatusChangingObserver();
         initUIWithFriendsData();
         initBroadcastActionList();
     }
@@ -84,29 +84,28 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneView = _findViewById(R.id.phone_relativelayout);
     }
 
-    private void registerStatusChangingObserver() {
-        statusContentObserver = new ContentObserver(new Handler()) {
+//    private void registerStatusChangingObserver() {
+//        statusContentObserver = new ContentObserver(new Handler()) {
+//
+//            @Override
+//            public boolean deliverSelfNotifications() {
+//                return true;
+//            }
+//
+//            @Override
+//            public void onChange(boolean selfChange) {
+//                if (FriendDetailsActivity.this.user != null) {
+//                    user = DatabaseManager.getInstance().getUserManager().get(FriendDetailsActivity.this.user.getUserId());
+//                    setOnlineStatus(user);
+//                }
+//            }
+//        };
+//        friendCursor.registerContentObserver(statusContentObserver);
+//    }
 
-            @Override
-            public boolean deliverSelfNotifications() {
-                return true;
-            }
-
-            @Override
-            public void onChange(boolean selfChange) {
-                if (FriendDetailsActivity.this.user != null) {
-                    user = UsersDatabaseManager.getUserById(FriendDetailsActivity.this,
-                            FriendDetailsActivity.this.user.getUserId());
-                    setOnlineStatus(user);
-                }
-            }
-        };
-        friendCursor.registerContentObserver(statusContentObserver);
-    }
-
-    private void unregisterStatusChangingObserver() {
-        friendCursor.unregisterContentObserver(statusContentObserver);
-    }
+//    private void unregisterStatusChangingObserver() {
+//        friendCursor.unregisterContentObserver(statusContentObserver);
+//    }
 
     private void initBroadcastActionList() {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
@@ -139,7 +138,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterStatusChangingObserver();
+//        unregisterStatusChangingObserver();
     }
 
     @Override
@@ -227,7 +226,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private boolean checkFriendStatus(int userId) {
-        boolean isFriend = UsersDatabaseManager.isFriendInBase(this, userId);
+        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(userId) != null;
         if (isFriend) {
             return true;
         } else {

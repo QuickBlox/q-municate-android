@@ -22,7 +22,6 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -32,6 +31,9 @@ import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -212,11 +214,10 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                     int childPosition, long id) {
                 User selectedUser = (User) friendsListAdapter.getChild(groupPosition, childPosition);
-                boolean isFriend = UsersDatabaseManager.isFriendInBaseWithPending(baseActivity,
-                        selectedUser.getUserId());
-                if (isFriend) {
-                    startFriendDetailsActivity(selectedUser.getUserId());
-                }
+//                boolean isFriend = isFriendInBaseWithPending(baseActivity, selectedUser.getUserId());
+//                if (isFriend) {
+                startFriendDetailsActivity(selectedUser.getUserId());
+//                }
                 return false;
             }
         });
@@ -231,14 +232,14 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initAllFriends() {
-        int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
+        List<Friend> friendList = DatabaseManager.getInstance().getFriendManager().getAll();
+        int countFriends = friendList.size();
         friendGroupAllFriends = new FriendGroup(FriendGroup.GROUP_POSITION_MY_CONTACTS, resources.getString(
                 R.string.frl_column_header_name_my_contacts));
         friendGroupAllFriends.setUserList(new ArrayList<User>(countFriends));
 
         if (countFriends > ConstsCore.ZERO_INT_VALUE) {
-            List<User> friendList = UsersDatabaseManager.getAllFriendsList(baseActivity);
-            friendGroupAllFriends.addUserList(friendList);
+            friendGroupAllFriends.addUserList(UserFriendUtils.getUsersFromFriends(friendList));
         }
 
         friendGroupList.add(friendGroupAllFriends);
@@ -253,12 +254,12 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void updateAllFriends() {
-        int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
+        List<Friend> friendList = DatabaseManager.getInstance().getFriendManager().getAll();
+        int countFriends = friendList.size();
         friendGroupAllFriends.getUserList().clear();
 
         if (countFriends > ConstsCore.ZERO_INT_VALUE) {
-            List<User> friendList = UsersDatabaseManager.getAllFriendsList(baseActivity);
-            friendGroupAllFriends.addUserList(friendList);
+            friendGroupAllFriends.addUserList(UserFriendUtils.getUsersFromFriends(friendList));
         }
     }
 
@@ -381,7 +382,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (state == State.GLOBAL_LIST) {
             emptyListTextView.setVisibility(View.GONE);
         } else {
-            int countFriends = UsersDatabaseManager.getAllFriendsCountWithPending(baseActivity);
+            List<Friend> friendList = DatabaseManager.getInstance().getFriendManager().getAll();
+            int countFriends = friendList.size();
 
             if ((countFriends + friendGroupAllUsers.getUserList().size()) > ConstsCore.ZERO_INT_VALUE) {
                 emptyListTextView.setVisibility(View.GONE);
@@ -491,7 +493,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         public void execute(Bundle bundle) {
             int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
 
-            User addedUser = UsersDatabaseManager.getUserById(baseActivity, userId);
+            User addedUser = DatabaseManager.getInstance().getUserManager().get(userId);
             friendGroupAllFriends.getUserList().add(addedUser);
             friendGroupAllUsers.getUserList().remove(addedUser);
             initFriendAdapter();

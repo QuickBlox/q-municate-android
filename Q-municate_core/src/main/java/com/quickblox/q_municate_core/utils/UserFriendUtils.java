@@ -18,26 +18,16 @@ import java.util.Map;
 
 public class UserFriendUtils {
 
-    public static User createUser(QBUser qbUser) {
-        qbUser.setCustomDataClass(UserCustomData.class);
-        User user = new User();
-        user.setUserId(qbUser.getId());
-        user.setFullName(qbUser.getFullName());
-        user.setEmail(qbUser.getEmail());
-        user.setPhone(qbUser.getPhone());
-
-        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
-
-        if (userCustomData != null) {
-            user.setAvatar(userCustomData.getAvatar_url());
-            user.setStatus(userCustomData.getStatus());
+    public static List<User> getUsersFromFriends(List<com.quickblox.q_municate_db.models.Friend> friendList) {
+        List<User> userList = new ArrayList<>(friendList.size());
+        for (com.quickblox.q_municate_db.models.Friend friend : friendList) {
+            userList.add(friend.getUser());
         }
-
-        return user;
+        return userList;
     }
 
-    public static com.quickblox.q_municate_db.models.User createLocalUser(QBUser qbUser, Role role) {
-        com.quickblox.q_municate_db.models.User user = new com.quickblox.q_municate_db.models.User();
+    public static User createLocalUser(QBUser qbUser, Role role) {
+        User user = new User();
         user.setUserId(qbUser.getId());
         user.setFullName(qbUser.getFullName());
         user.setEmail(qbUser.getEmail());
@@ -54,8 +44,8 @@ public class UserFriendUtils {
         return user;
     }
 
-    public static com.quickblox.q_municate_db.models.User createLocalUser(QBUser qbUser) {
-        Role role = DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER);
+    public static User createLocalUser(QBUser qbUser) {
+        Role role = DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.SIMPLE_ROLE);
         return createLocalUser(qbUser, role);
     }
 
@@ -81,7 +71,7 @@ public class UserFriendUtils {
     public static List<User> createUsersList(Collection<QBUser> usersList) {
         List<User> users = new ArrayList<User>();
         for (QBUser user : usersList) {
-            users.add(createUser(user));
+            users.add(createLocalUser(user));
         }
         return users;
     }
@@ -97,7 +87,7 @@ public class UserFriendUtils {
     public static Map<Integer, User> createUserMap(List<QBUser> userList) {
         Map<Integer, User> userHashMap = new HashMap<Integer, User>();
         for (QBUser user : userList) {
-            userHashMap.put(user.getId(), createUser(user));
+            userHashMap.put(user.getId(), createLocalUser(user));
         }
         return userHashMap;
     }

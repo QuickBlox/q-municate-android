@@ -2,6 +2,8 @@ package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.dao.CommonDao;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
@@ -76,5 +78,18 @@ public class FriendManager implements CommonDao<Friend> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    public Friend getByUserId(int userId) {
+        Friend friend = null;
+        try {
+            QueryBuilder<Friend, Integer> queryBuilder = friendDao.queryBuilder();
+            queryBuilder.where().eq(User.COLUMN_USER_ID, userId);
+            PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
+            friend = friendDao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return friend;
     }
 }

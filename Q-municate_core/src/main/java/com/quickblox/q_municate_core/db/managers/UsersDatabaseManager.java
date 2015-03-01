@@ -15,7 +15,6 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,61 +23,6 @@ public class UsersDatabaseManager {
 
     private static String USER_FRIEND_RELATION_KEY = UserTable.TABLE_NAME + "." + UserTable.Cols.USER_ID + " = " + FriendTable.TABLE_NAME + "." + FriendTable.Cols.USER_ID;
     private static Map<String, Integer> relationStatusesMap;
-
-    public static void savePeople(Context context, List<User> usersList, List<Friend> friendsList) {
-        for (User user : usersList) {
-            saveUser(context, user);
-        }
-        for (Friend friend : friendsList) {
-            saveFriend(context, friend);
-        }
-    }
-
-    public static void saveUsers(Context context, Collection<User> usersList) {
-        for (User user : usersList) {
-            saveUser(context, user);
-        }
-    }
-
-    public static void saveUser(Context context, User user) {
-        ContentValues values = getContentValuesUserTable(user);
-
-        String condition = UserTable.Cols.USER_ID + "='" + user.getUserId() + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.CONTENT_URI, null, condition, null, null);
-
-        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            resolver.update(UserTable.CONTENT_URI, values, condition, null);
-        } else {
-            resolver.insert(UserTable.CONTENT_URI, values);
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-    }
-
-    public static void saveFriend(Context context, Friend friend) {
-        int relationStatusId = getRelationStatusIdByName(context, friend.getRelationStatus());
-
-        friend.setRelationStatusId(relationStatusId);
-
-        ContentValues values = getContentValuesFriendTable(friend);
-
-        String condition = FriendTable.Cols.USER_ID + "='" + friend.getUserId() + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(FriendTable.CONTENT_URI, null, condition, null, null);
-
-        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            resolver.update(FriendTable.CONTENT_URI, values, condition, null);
-        } else {
-            resolver.insert(FriendTable.CONTENT_URI, values);
-        }
-
-        if (cursor != null) {
-            cursor.close();
-        }
-    }
 
     private static ContentValues getContentValuesFriendTable(Friend friend) {
         ContentValues values = new ContentValues();

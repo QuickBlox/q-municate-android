@@ -84,8 +84,8 @@ public class QBFriendListHelper extends BaseHelper {
 //        if (isNewFriend(userId)) {
 //            acceptFriend(userId);
 //        } else {
-//            createFriend(userId, false);
-//            invite(userId);
+            createFriend(userId, false);
+            invite(userId);
 //        }
     }
 
@@ -177,7 +177,7 @@ public class QBFriendListHelper extends BaseHelper {
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
         List<QBUser> usersList = loadUsers(friendIdsList);
 
-        //        fillUsersWithRosterData(usersList);
+//        fillUsersWithRosterData(usersList);
 
         saveUsersAndFriends(usersList);
     }
@@ -197,7 +197,7 @@ public class QBFriendListHelper extends BaseHelper {
             return;
         }
 
-        Friend friend = UserFriendUtils.createFriend(rosterEntry);
+//        Friend friend = UserFriendUtils.createFriend(rosterEntry);
 
         newUser.setOnline(isFriendOnline(roster.getPresence(userId)));
 
@@ -231,11 +231,11 @@ public class QBFriendListHelper extends BaseHelper {
         return QBUsers.getUsersByIDs(userIds, requestBuilder, params);
     }
 
-    private void fillUsersWithRosterData(List<User> usersList) {
-        for (User user : usersList) {
-            fillUserOnlineStatus(user);
-        }
-    }
+//    private void fillUsersWithRosterData(Collection<User> usersList) {
+//        for (User user : usersList) {
+//            fillUserOnlineStatus(user);
+//        }
+//    }
 
     private void fillUserOnlineStatus(User user) {
         if (roster != null) {
@@ -287,7 +287,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
 //    private boolean isNewFriend(int userId) {
-//        return UsersDatabaseManager.isFriendWithStatusNew(context, userId);
+//        return DatabaseManager.getInstance().getFriendManager(). (context, userId);
 //    }
 
     private void notifyContactRequest(int userId) {

@@ -6,6 +6,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.UserManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -64,12 +66,12 @@ public class FinderUnknownFriends {
                 int userId = loadIdsSet.iterator().next();
                 User user = restHelper.loadUser(userId);
                 if (user != null) {
-                    UsersDatabaseManager.saveUser(context, user);
+                    DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
                 }
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    UsersDatabaseManager.saveUsers(context, userCollection);
+                    DatabaseManager.getInstance().getUserManager().createIfNotExists(userCollection);
                 }
             }
         } catch (QBResponseException e) {

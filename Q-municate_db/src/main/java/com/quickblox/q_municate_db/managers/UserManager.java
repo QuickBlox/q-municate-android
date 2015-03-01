@@ -6,7 +6,9 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class UserManager implements CommonDao<User> {
 
@@ -62,6 +64,22 @@ public class UserManager implements CommonDao<User> {
         try {
             userDao.delete(item);
         } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+    }
+
+    public void createIfNotExists(final Collection<User> userList) {
+        try {
+            userDao.callBatchTasks(new Callable<User>() {
+                @Override
+                public User call() throws Exception {
+                    for (User user : userList) {
+                        userDao.createOrUpdate(user);
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
             ErrorUtils.logError(e);
         }
     }
