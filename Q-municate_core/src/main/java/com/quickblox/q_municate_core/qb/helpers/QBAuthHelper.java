@@ -39,12 +39,10 @@ public class QBAuthHelper extends BaseHelper {
         String password = inputUser.getPassword();
         qbUser = QBUsers.signIn(inputUser);
 
-        // TODO: temp block
-        if (!isUpdatedUserCustomData(qbUser)) {
+        if (!hasUserCustomData(qbUser)) {
             qbUser.setOldPassword(password);
             updateUser(qbUser);
         }
-        // end todo
 
         String token = QBAuth.getBaseService().getToken();
         qbUser.setPassword(password);
@@ -57,7 +55,8 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     private void saveOwnerUser(QBUser qbUser) {
-        User user = UserFriendUtils.createLocalUser(qbUser, DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER));
+        User user = UserFriendUtils.createLocalUser(qbUser,
+                DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER));
         DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
     }
 
@@ -68,12 +67,10 @@ public class QBAuthHelper extends BaseHelper {
         qbUser = QBUsers.signInUsingSocialProvider(socialProvider, accessToken, accessTokenSecret);
         qbUser.setPassword(session.getToken());
 
-        // TODO: temp block
-        if (!isUpdatedUserCustomData(qbUser)) {
+        if (!hasUserCustomData(qbUser)) {
             qbUser.setOldPassword(session.getToken());
             qbUser = updateUser(qbUser);
         }
-        // end todo
 
         PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SESSION_FB_TOKEN, accessToken);
 
@@ -154,7 +151,6 @@ public class QBAuthHelper extends BaseHelper {
 
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
         newUser.setId(user.getId());
-        newUser.setWebsite(qbFile.getPublicUrl());
         newUser.setFileId(qbFile.getId());
 
         UserCustomData userCustomData = getUserCustomData(user);
@@ -164,41 +160,26 @@ public class QBAuthHelper extends BaseHelper {
         return updateUser(newUser);
     }
 
-    // TODO: temp method
     private UserCustomData getUserCustomData(QBUser user) {
         if (TextUtils.isEmpty(user.getCustomData())) {
-            UserCustomData userCustomData = new UserCustomData();
-            userCustomData.setAvatar_url(user.getWebsite());
+            return new UserCustomData();
+        }
+
+        UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+
+        if (userCustomData != null) {
             return userCustomData;
-        }
-
-        UserCustomData userCustomDataNew = null;
-        UserCustomData userCustomDataOld = null;
-
-        userCustomDataOld = Utils.customDataToObject(user.getCustomData());
-
-        if (userCustomDataOld != null) {
-            userCustomDataNew = userCustomDataOld;
         } else {
-            userCustomDataNew = new UserCustomData();
+            return new UserCustomData();
         }
-
-        if (!TextUtils.isEmpty(user.getWebsite())) {
-            userCustomDataNew.setAvatar_url(user.getWebsite());
-        }
-
-        return userCustomDataNew;
     }
 
-    // TODO: temp method
-    private boolean isUpdatedUserCustomData(QBUser user) {
+    private boolean hasUserCustomData(QBUser user) {
         if (TextUtils.isEmpty(user.getCustomData())) {
             return false;
         }
-
-        UserCustomData userCustomDataOld = Utils.customDataToObject(user.getCustomData());
-
-         return userCustomDataOld != null;
+        UserCustomData userCustomData = Utils.customDataToObject(user.getCustomData());
+        return userCustomData != null;
     }
 
     public void resetPassword(String email) throws QBResponseException {

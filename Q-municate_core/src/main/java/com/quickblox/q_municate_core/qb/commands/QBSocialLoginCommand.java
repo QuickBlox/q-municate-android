@@ -3,7 +3,6 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -43,7 +42,7 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-        if (TextUtils.isEmpty(user.getWebsite())) {
+        if (user.getCustomData() == null) {
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
@@ -61,16 +60,11 @@ public class QBSocialLoginCommand extends ServiceCommand {
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
         newUser.setCustomData(Utils.customDataToString(getUserCustomData(avatarUrl)));
-
-        // TODO temp field
-        newUser.setWebsite(avatarUrl);
-        // end todo
-
         return newUser;
     }
 
     private UserCustomData getUserCustomData(String avatarUrl) {
-        String isImport = "1";
+        String isImport = "1"; // first FB login
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
-}
+}/**/
