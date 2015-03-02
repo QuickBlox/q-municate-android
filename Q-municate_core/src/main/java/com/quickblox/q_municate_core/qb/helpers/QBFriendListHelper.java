@@ -235,11 +235,16 @@ public class QBFriendListHelper extends BaseHelper {
             createUserRequest(userId, incomingStatus);
         } else {
             saveFriend(newUser);
+            deleteUserRequestByUser(newUser);
         }
 
         saveUser(newUser);
 
         fillUserOnlineStatus(newUser);
+    }
+
+    private void deleteUserRequestByUser(User user) {
+        DatabaseManager.getInstance().getUserRequestManager().deleteByUserId(user.getUserId());
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {

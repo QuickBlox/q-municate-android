@@ -16,11 +16,10 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.TextViewHelper;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.models.Friend;
 import com.quickblox.q_municate_core.models.FriendGroup;
-import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -188,25 +187,22 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
-        String status = null;
+        Friend friend = DatabaseManager.getInstance().getFriendManager().getByUserId(user.getUserId());
+        User pendingUser = DatabaseManager.getInstance().getUserRequestManager().getUserById(user.getUserId());
 
-        Friend friend = UsersDatabaseManager.getFriendById(context, user.getUserId());
-
-        if (friend == null) {
+        if (friend == null && pendingUser == null) {
             return;
         }
 
-        String relationStatus = friend.getRelationStatus();
+        String status;
 
-        boolean isAddedFriend;
-
-        isAddedFriend = relationStatus.equals(QBFriendListHelper.RELATION_STATUS_NONE) && friend
-                .isPendingStatus();
-        if (isAddedFriend) {
+        if (pendingUser != null) {
             viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.frl_pending_request_status);
         } else {
-//            status = user.getOnlineStatus(context);
+            // TODO temp
+            //            status = user.getOnlineStatus(context);
+            status = "status";
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);

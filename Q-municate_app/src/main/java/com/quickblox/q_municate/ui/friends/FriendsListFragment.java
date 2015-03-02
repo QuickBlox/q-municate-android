@@ -212,7 +212,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                     int childPosition, long id) {
                 User selectedUser = (User) friendsListAdapter.getChild(groupPosition, childPosition);
                 boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(selectedUser.getUserId()) != null;
-                if (isFriend) {
+                boolean isPendingFriend = DatabaseManager.getInstance().getUserRequestManager().getUserById(selectedUser.getUserId()) != null;
+                if (isFriend || isPendingFriend) {
                     startFriendDetailsActivity(selectedUser.getUserId());
                 }
                 return false;
