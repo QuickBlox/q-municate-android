@@ -10,7 +10,6 @@ import com.quickblox.q_municate_core.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_db.models.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -106,26 +105,6 @@ public class UsersDatabaseManager {
         return isFriendInBase;
     }
 
-    public static Cursor getAllFriends(Context context) {
-        if (relationStatusesMap == null) {
-            relationStatusesMap = getRelationStatusesMap(context);
-        }
-
-        int relationStatusFromId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_FROM);
-        int relationStatusToId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_TO);
-        int relationStatusBothId = relationStatusesMap.get(QBFriendListHelper.RELATION_STATUS_BOTH);
-
-        String condition = FriendTable.TABLE_NAME + "." + FriendTable.Cols.RELATION_STATUS_ID + " IN (" + relationStatusFromId + "," + relationStatusToId + "," + relationStatusBothId + ")";
-
-        String sortOrder = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
-
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(UserTable.USER_FRIEND_CONTENT_URI, null,
-                USER_FRIEND_RELATION_KEY + " AND (" + condition + ")", null, sortOrder);
-
-        return cursor;
-    }
-
     public static Cursor getFriendsFilteredByIds(Context context, List<Integer> friendIdsList) {
         String selection = prepareFriendsFilter(context, friendIdsList);
         String sortOrder = UserTable.TABLE_NAME + "." + UserTable.Cols.ID + " ORDER BY " + UserTable.TABLE_NAME + "." + UserTable.Cols.FULL_NAME + " COLLATE NOCASE ASC";
@@ -157,22 +136,5 @@ public class UsersDatabaseManager {
             cursor.moveToFirst();
         }
         return cursor;
-    }
-
-    public static User getUserFromCursor(Cursor cursor) {
-        int id = cursor.getInt(cursor.getColumnIndex(UserTable.Cols.USER_ID));
-        String fullName = cursor.getString(cursor.getColumnIndex(UserTable.Cols.FULL_NAME));
-        String email = cursor.getString(cursor.getColumnIndex(UserTable.Cols.EMAIL));
-        String phone = cursor.getString(cursor.getColumnIndex(UserTable.Cols.PHONE));
-        String avatarUid = cursor.getString(cursor.getColumnIndex(UserTable.Cols.AVATAR_URL));
-        String status = cursor.getString(cursor.getColumnIndex(UserTable.Cols.STATUS));
-        boolean online = cursor.getInt(cursor.getColumnIndex(UserTable.Cols.IS_ONLINE)) > 0;
-
-        User user = new User();
-        //        User user = new User(id, fullName, email, phone, avatarUid);
-        user.setStatus(status);
-        user.setOnline(online);
-
-        return user;
     }
 }

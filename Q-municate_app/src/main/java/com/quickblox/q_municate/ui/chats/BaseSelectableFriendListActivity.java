@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.chats;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -18,6 +17,7 @@ import com.quickblox.q_municate_db.models.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public abstract class BaseSelectableFriendListActivity extends BaseLogeableActivity implements NewDialogCounterFriendsListener {
 
@@ -45,7 +45,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         friendsListView = _findViewById(R.id.chat_friends_listview);
     }
 
-    protected abstract Cursor getFriends();
+    protected abstract List<User> getFriends();
 
     private void initListView() {
         friendsAdapter = new DialogsSelectableFriendsAdapter(this, getFriends());

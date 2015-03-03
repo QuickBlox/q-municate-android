@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.chats.dialogs;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -11,16 +10,18 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.BaseSelectableFriendListActivity;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NewDialogActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
@@ -51,8 +52,8 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected Cursor getFriends() {
-        return UsersDatabaseManager.getAllFriends(this);
+    protected List<User> getFriends() {
+        return UserFriendUtils.getUsersFromFriends(DatabaseManager.getInstance().getFriendManager().getAll());
     }
 
     @Override
@@ -83,14 +84,14 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
         return userFullname + ", " + friendsFullnames;
     }
 
-//    private void sendNotificationToGroup(QBDialog dialog) {
-//        try {
-//            multiChatHelper.sendNotificationToFriends(dialog, MessagesNotificationType.CREATE_DIALOG,
-//                    ChatUtils.getOccupantIdsWithoutUser(dialog.getOccupants()));
-//        } catch (QBResponseException e) {
-//            ErrorUtils.logError(e);
-//        }
-//    }
+    //    private void sendNotificationToGroup(QBDialog dialog) {
+    //        try {
+    //            multiChatHelper.sendNotificationToFriends(dialog, MessagesNotificationType.CREATE_DIALOG,
+    //                    ChatUtils.getOccupantIdsWithoutUser(dialog.getOccupants()));
+    //        } catch (QBResponseException e) {
+    //            ErrorUtils.logError(e);
+    //        }
+    //    }
 
     private class CreateChatSuccessAction implements Command {
 
@@ -100,7 +101,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog.getRoomJid() != null) {
                 GroupDialogActivity.start(NewDialogActivity.this, dialog);
-//                sendNotificationToGroup(dialog);
+                //                sendNotificationToGroup(dialog);
                 finish();
             } else {
                 ErrorUtils.showError(NewDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));

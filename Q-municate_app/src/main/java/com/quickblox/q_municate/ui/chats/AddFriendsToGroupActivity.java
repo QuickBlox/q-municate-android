@@ -2,19 +2,19 @@ package com.quickblox.q_municate.ui.chats;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 
 import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
@@ -37,10 +37,12 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     }
 
     @Override
-    protected Cursor getFriends() {
+    protected List<User> getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
-        return UsersDatabaseManager.getFriendsFilteredByIds(this, UserFriendUtils.getFriendIds(
-                dialog.getOccupantList()));
+        return UserFriendUtils.getUsersFromFriends(DatabaseManager.getInstance().getFriendManager().getAll());
+        // TODO temp decision
+        //        return UsersDatabaseManager.getFriendsFilteredByIds(this, UserFriendUtils.getFriendIds(
+        //                dialog.getOccupantList()));
     }
 
     @Override

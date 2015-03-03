@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 
