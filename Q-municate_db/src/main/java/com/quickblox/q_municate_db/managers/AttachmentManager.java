@@ -17,9 +17,9 @@ public class AttachmentManager implements CommonDao<Attachment> {
     }
 
     @Override
-    public Attachment createIfNotExists(Attachment item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Attachment item) {
         try {
-            return attachmentDao.createIfNotExists(item);
+            return attachmentDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

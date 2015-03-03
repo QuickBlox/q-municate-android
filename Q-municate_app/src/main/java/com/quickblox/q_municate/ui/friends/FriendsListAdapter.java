@@ -18,6 +18,7 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.TextViewHelper;
 import com.quickblox.q_municate_core.models.FriendGroup;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
@@ -202,7 +203,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
         } else {
             // TODO temp
             //            status = user.getOnlineStatus(context);
-            status = "status";
+            status = resources.getString(OnlineStatusHelper.getOnlineStatus(user.isOnline()));
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);

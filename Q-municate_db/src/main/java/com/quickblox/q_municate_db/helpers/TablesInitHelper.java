@@ -27,29 +27,29 @@ public class TablesInitHelper {
     private static void saveRoles() {
         Role ownerRole = new Role(Role.Type.OWNER);
         Role simpleRole = new Role(Role.Type.SIMPLE_ROLE);
-        DatabaseManager.getInstance().getRoleManager().createIfNotExists(ownerRole);
-        DatabaseManager.getInstance().getRoleManager().createIfNotExists(simpleRole);
+        DatabaseManager.getInstance().getRoleManager().createOrUpdate(ownerRole);
+        DatabaseManager.getInstance().getRoleManager().createOrUpdate(simpleRole);
     }
 
     private static void saveSocialTypes() {
         SocialType facebookSocialType = new SocialType(SocialType.Type.FACEBOOK);
         SocialType twitterSocialType = new SocialType(SocialType.Type.TWITTER);
-        DatabaseManager.getInstance().getSocialTypeManager().createIfNotExists(facebookSocialType);
-        DatabaseManager.getInstance().getSocialTypeManager().createIfNotExists(twitterSocialType);
+        DatabaseManager.getInstance().getSocialTypeManager().createOrUpdate(facebookSocialType);
+        DatabaseManager.getInstance().getSocialTypeManager().createOrUpdate(twitterSocialType);
     }
 
     private static void saveStatus() {
         Status incomingStatus = new Status(Status.Type.INCOMING);
         Status outgoingReject = new Status(Status.Type.OUTGOING);
-        DatabaseManager.getInstance().getStatusManager().createIfNotExists(incomingStatus);
-        DatabaseManager.getInstance().getStatusManager().createIfNotExists(outgoingReject);
+        DatabaseManager.getInstance().getStatusManager().createOrUpdate(incomingStatus);
+        DatabaseManager.getInstance().getStatusManager().createOrUpdate(outgoingReject);
     }
 
     private static void saveDialogTypes() {
         DialogType privateDialogType = new DialogType(DialogType.Type.PRIVATE);
         DialogType groupDialogType = new DialogType(DialogType.Type.GROUP);
-        DatabaseManager.getInstance().getDialogTypeManager().createIfNotExists(privateDialogType);
-        DatabaseManager.getInstance().getDialogTypeManager().createIfNotExists(groupDialogType);
+        DatabaseManager.getInstance().getDialogTypeManager().createOrUpdate(privateDialogType);
+        DatabaseManager.getInstance().getDialogTypeManager().createOrUpdate(groupDialogType);
     }
 
     private static void saveNotifications() {
@@ -59,12 +59,11 @@ public class TablesInitHelper {
         Notification changeOccupantsNotification = new Notification(
                 Notification.Type.CHANGE_OCCUPANTS_GROUP_CHAT);
         Notification changePhotoNotification = new Notification(Notification.Type.CHANGE_PHOTO_GROUP_CHAT);
-        DatabaseManager.getInstance().getNotificationManager().createIfNotExists(
-                createPrivateChatNotification);
-        DatabaseManager.getInstance().getNotificationManager().createIfNotExists(createGroupChatNotification);
-        DatabaseManager.getInstance().getNotificationManager().createIfNotExists(changeNameNotification);
-        DatabaseManager.getInstance().getNotificationManager().createIfNotExists(changeOccupantsNotification);
-        DatabaseManager.getInstance().getNotificationManager().createIfNotExists(changePhotoNotification);
+        DatabaseManager.getInstance().getNotificationManager().createOrUpdate(createPrivateChatNotification);
+        DatabaseManager.getInstance().getNotificationManager().createOrUpdate(createGroupChatNotification);
+        DatabaseManager.getInstance().getNotificationManager().createOrUpdate(changeNameNotification);
+        DatabaseManager.getInstance().getNotificationManager().createOrUpdate(changeOccupantsNotification);
+        DatabaseManager.getInstance().getNotificationManager().createOrUpdate(changePhotoNotification);
     }
 
     private static void saveAttachmentTypes() {
@@ -73,19 +72,19 @@ public class TablesInitHelper {
         AttachmentType pictureAttachmentType = new AttachmentType(AttachmentType.Type.PICTURE);
         AttachmentType docAttachmentType = new AttachmentType(AttachmentType.Type.DOC);
         AttachmentType otherAttachmentType = new AttachmentType(AttachmentType.Type.OTHER);
-        DatabaseManager.getInstance().getAttachmentTypeManager().createIfNotExists(audioAttachmentType);
-        DatabaseManager.getInstance().getAttachmentTypeManager().createIfNotExists(videoAttachmentType);
-        DatabaseManager.getInstance().getAttachmentTypeManager().createIfNotExists(pictureAttachmentType);
-        DatabaseManager.getInstance().getAttachmentTypeManager().createIfNotExists(docAttachmentType);
-        DatabaseManager.getInstance().getAttachmentTypeManager().createIfNotExists(otherAttachmentType);
+        DatabaseManager.getInstance().getAttachmentTypeManager().createOrUpdate(audioAttachmentType);
+        DatabaseManager.getInstance().getAttachmentTypeManager().createOrUpdate(videoAttachmentType);
+        DatabaseManager.getInstance().getAttachmentTypeManager().createOrUpdate(pictureAttachmentType);
+        DatabaseManager.getInstance().getAttachmentTypeManager().createOrUpdate(docAttachmentType);
+        DatabaseManager.getInstance().getAttachmentTypeManager().createOrUpdate(otherAttachmentType);
     }
 
     private static void saveStates() {
         State deliveredState = new State(State.Type.DELIVERED);
         State readState = new State(State.Type.READ);
         State syncState = new State(State.Type.SYNC);
-        DatabaseManager.getInstance().getStateManager().createIfNotExists(deliveredState);
-        DatabaseManager.getInstance().getStateManager().createIfNotExists(readState);
-        DatabaseManager.getInstance().getStateManager().createIfNotExists(syncState);
+        DatabaseManager.getInstance().getStateManager().createOrUpdate(deliveredState);
+        DatabaseManager.getInstance().getStateManager().createOrUpdate(readState);
+        DatabaseManager.getInstance().getStateManager().createOrUpdate(syncState);
     }
 }

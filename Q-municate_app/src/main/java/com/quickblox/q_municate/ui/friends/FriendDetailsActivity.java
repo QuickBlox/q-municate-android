@@ -3,9 +3,7 @@ package com.quickblox.q_municate.ui.friends;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,6 +33,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
@@ -135,11 +134,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
 //        unregisterStatusChangingObserver();
-    }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -182,7 +181,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             } else {
                 onlineImageView.setVisibility(View.GONE);
             }
-//            onlineStatusTextView.setText(user.getOnlineStatus(this));
+            onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(user.isOnline()));
         }
     }
 

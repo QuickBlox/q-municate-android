@@ -16,11 +16,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
@@ -32,13 +35,12 @@ import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
@@ -65,11 +67,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onFileSelected(Bitmap bitmap) {
-        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         friendOperationAction = new FriendOperationAction();
@@ -88,6 +85,23 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onPause() {
         super.onPause();
         Crouton.cancelAllCroutons();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            scrollListView();
+        }
+
+        startLoadDialogMessages();
+        currentOpponent = opponentFriend.getFullName();
+
+        checkMessageSendingPossibility();
+    }
+
+    @Override
+    protected void updateActionBar() {
     }
 
     @Override
@@ -111,6 +125,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
+    protected void onFileSelected(Bitmap bitmap) {
+        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
+    }
+
+    @Override
     protected void onFileLoaded(QBFile file) {
         try {
             ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessageWithAttachImage(file,
@@ -128,12 +147,45 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return bundle;
     }
 
+    @Override
+    protected void initListView(Cursor messagesCursor) {
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesCursor, this,
+                dialog);
+        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        isNeedToScrollMessages = true;
+        scrollListView();
+    }
+
+    protected QBDialog getQBDialog() {
+        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+
+        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+
+        if (messagesNotificationType == null) {
+            dialog.setLastMessage(messageCache.getMessage());
+        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
+            dialog.setLastMessage(resources.getString(R.string.frl_friends_contact_request));
+        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(
+                messagesNotificationType.getCode())) {
+            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
+        }
+
+        dialog.setLastMessageDateSent(messageCache.getTime());
+        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
+        dialog.setLastMessageUserId(messageCache.getSenderId());
+        dialog.setType(QBDialogType.PRIVATE);
+
+        return dialog;
+    }
+
     private void registerContentObservers() {
         statusContentObserver = new ContentObserver(new Handler()) {
 
             @Override
             public void onChange(boolean selfChange) {
-                opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
+                opponentFriend = DatabaseManager.getInstance().getUserManager().get(
                         PrivateDialogActivity.this.opponentFriend.getUserId());
                 setOnlineStatus(opponentFriend);
             }
@@ -147,11 +199,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                 checkMessageSendingPossibility();
             }
         };
-        getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true, friendsTableContentObserver);
-    }
-
-    @Override
-    protected void updateActionBar() {
+        getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
+                friendsTableContentObserver);
     }
 
     private void unregisterStatusChangingObserver() {
@@ -167,44 +216,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private void setOnlineStatus(User friend) {
         if (friend != null) {
             ActionBar actionBar = getActionBar();
-//            actionBar.setSubtitle(friend.getOnlineStatus(this));
+            actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(friend.isOnline()));
         }
-    }
-
-    protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-
-        if (messagesNotificationType == null) {
-            dialog.setLastMessage(messageCache.getMessage());
-        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
-            dialog.setLastMessage(resources.getString(R.string.frl_friends_contact_request));
-        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
-            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
-        }
-
-        dialog.setLastMessageDateSent(messageCache.getTime());
-        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
-        dialog.setLastMessageUserId(messageCache.getSenderId());
-        dialog.setType(QBDialogType.PRIVATE);
-
-        return dialog;
-    }
-
-    @Override
-    protected void initListView(Cursor messagesCursor) {
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesCursor, this, dialog);
-        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        isNeedToScrollMessages = true;
-        scrollListView();
     }
 
     private void initActionBar() {
         actionBar.setTitle(opponentFriend.getFullName());
-//        actionBar.setSubtitle(opponentFriend.getOnlineStatus(this));
+        actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(opponentFriend.isOnline()));
         actionBar.setLogo(R.drawable.placeholder_user);
         if (!TextUtils.isEmpty(opponentFriend.getAvatar())) {
             loadLogoActionBar(opponentFriend.getAvatar());
@@ -236,7 +254,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
                 opponentFriend.getUserId());
         if (!isFriend && item.getItemId() != android.R.id.home) {
-            DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(R.string.dlg_user_is_not_friend));
+            DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(
+                    R.string.dlg_user_is_not_friend));
             return true;
         }
         switch (item.getItemId()) {
@@ -262,22 +281,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
-
-        startLoadDialogMessages();
-        currentOpponent = opponentFriend.getFullName();
-
-        checkMessageSendingPossibility();
-    }
-
     private void checkMessageSendingPossibility() {
-        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
-                opponentFriend.getUserId());
+        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(
+                opponentFriend.getUserId()) != null;
         messageEditText.setEnabled(isFriend);
         smilePanelImageButton.setEnabled(isFriend);
     }
@@ -292,7 +298,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void showRejectUserDialog(final int userId) {
-        User user = UsersDatabaseManager.getUserById(this, userId);
+        User user = DatabaseManager.getInstance().getUserManager().get(userId);
         AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
                 R.string.frl_dlg_reject_friend, user.getFullName()));
         alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {

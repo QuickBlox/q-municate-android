@@ -17,9 +17,9 @@ public class DialogNotificationManager implements CommonDao<DialogNotification> 
     }
 
     @Override
-    public DialogNotification createIfNotExists(DialogNotification item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(DialogNotification item) {
         try {
-            return dialogNotificationDao.createIfNotExists(item);
+            return dialogNotificationDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

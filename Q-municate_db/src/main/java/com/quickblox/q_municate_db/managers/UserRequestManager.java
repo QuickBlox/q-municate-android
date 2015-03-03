@@ -21,9 +21,9 @@ public class UserRequestManager implements CommonDao<UserRequest> {
     }
 
     @Override
-    public UserRequest createIfNotExists(UserRequest item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(UserRequest item) {
         try {
-            return userRequestDao.createIfNotExists(item);
+            return userRequestDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

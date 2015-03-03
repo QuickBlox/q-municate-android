@@ -57,7 +57,7 @@ public class QBAuthHelper extends BaseHelper {
     private void saveOwnerUser(QBUser qbUser) {
         User user = UserFriendUtils.createLocalUser(qbUser,
                 DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER));
-        DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
+        DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
     }
 
     public QBUser login(String socialProvider, String accessToken,

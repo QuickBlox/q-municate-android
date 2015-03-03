@@ -19,9 +19,9 @@ public class RoleManager implements CommonDao<Role> {
     }
 
     @Override
-    public Role createIfNotExists(Role item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Role item) {
         try {
-            return roleDao.createIfNotExists(item);
+            return roleDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

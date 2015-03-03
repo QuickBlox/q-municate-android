@@ -20,6 +20,7 @@ import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
@@ -122,7 +123,8 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             if (ownMessage) {
                 avatarUrl = getAvatarUrlForCurrentUser();
             } else {
-                User senderFriend = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());
+                User senderFriend = DatabaseManager.getInstance().getUserManager().get(
+                        messageCache.getSenderId());
                 if (senderFriend != null) {
                     senderName = senderFriend.getFullName();
                     avatarUrl = getAvatarUrlForFriend(senderFriend);

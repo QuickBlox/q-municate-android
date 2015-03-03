@@ -13,6 +13,7 @@ import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -69,7 +70,7 @@ public class ActivityUIHelper {
 
     protected void showContactRequestNotification(Bundle extras) {
         int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        senderUser = UsersDatabaseManager.getUserById(activity, senderUserId);
+        senderUser = DatabaseManager.getInstance().getUserManager().get(senderUserId);
         String message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
         String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(activity, senderUserId);
         isPrivateMessage = true;

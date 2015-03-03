@@ -8,10 +8,10 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -198,10 +198,10 @@ public class ChatNotificationUtils {
                 User opponentUser;
 
                 if (messageCache.getRecipientId().intValue() == user.getId().intValue()) {
-                    opponentUser = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());
+                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
                     resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_friend, opponentUser.getFullName());
                 } else {
-                    opponentUser = UsersDatabaseManager.getUserById(context, messageCache.getRecipientId());
+                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getRecipientId());
                     resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me, opponentUser.getFullName());
                 }
 

@@ -19,9 +19,9 @@ public class StatusManager implements CommonDao<Status> {
     }
 
     @Override
-    public Status createIfNotExists(Status item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Status item) {
         try {
-            return statusDao.createIfNotExists(item);
+            return statusDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

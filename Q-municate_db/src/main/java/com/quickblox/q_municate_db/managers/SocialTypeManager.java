@@ -19,9 +19,9 @@ public class SocialTypeManager implements CommonDao<SocialType> {
     }
 
     @Override
-    public SocialType createIfNotExists(SocialType item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(SocialType item) {
         try {
-            return socialTypeDao.createIfNotExists(item);
+            return socialTypeDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

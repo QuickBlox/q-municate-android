@@ -19,9 +19,9 @@ public class MessageManager implements CommonDao<Message> {
     }
 
     @Override
-    public Message createIfNotExists(Message item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Message item) {
         try {
-            return messageDao.createIfNotExists(item);
+            return messageDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

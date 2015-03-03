@@ -19,9 +19,9 @@ public class NotificationManager implements CommonDao<Notification> {
     }
 
     @Override
-    public Notification createIfNotExists(Notification item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Notification item) {
         try {
-            return notificationDao.createIfNotExists(item);
+            return notificationDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

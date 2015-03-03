@@ -27,6 +27,7 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -76,7 +77,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             return;
         }
 
-        User user = UsersDatabaseManager.getUserById(context, chatMessage.getSenderId());
+        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
 
         MessageCache messageCache;
 
@@ -345,7 +346,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             new FinderUnknownFriends(context, chatCreator, dialog).find();
         }
 
-        User senderUser = UsersDatabaseManager.getUserById(context, messageCache.getSenderId());
+        User senderUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
         notifyMessageReceived(chatMessage, senderUser, messageCache.getDialogId(), false);
     }
 

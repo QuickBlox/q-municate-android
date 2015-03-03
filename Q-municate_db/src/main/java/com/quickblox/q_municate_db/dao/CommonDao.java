@@ -1,10 +1,12 @@
 package com.quickblox.q_municate_db.dao;
 
+import com.j256.ormlite.dao.Dao;
+
 import java.util.List;
 
 public interface CommonDao<T> {
 
-    public T createIfNotExists(T item);
+    public Dao.CreateOrUpdateStatus createOrUpdate(T item);
 
     public List<T> getAll();
 

@@ -19,9 +19,9 @@ public class StateManager implements CommonDao<State> {
     }
 
     @Override
-    public State createIfNotExists(State item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(State item) {
         try {
-            return stateDao.createIfNotExists(item);
+            return stateDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

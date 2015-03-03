@@ -131,7 +131,7 @@ public class ChatUtils {
             ErrorUtils.logError(e);
         }
         User user = UserFriendUtils.createLocalUser(qbUser);
-        DatabaseManager.getInstance().getUserManager().createIfNotExists(user);
+        DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
         return user.getFullName();
     }
 

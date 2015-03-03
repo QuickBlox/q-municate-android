@@ -15,6 +15,7 @@ import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
 public class DialogsAdapter extends BaseCursorAdapter {
@@ -65,7 +66,7 @@ public class DialogsAdapter extends BaseCursorAdapter {
     }
 
     public User getOccupantById(int occupantId) {
-        User friend = UsersDatabaseManager.getUserById(context, occupantId);
+        User friend = DatabaseManager.getInstance().getUserManager().get(occupantId);
         if (friend == null) {
             friend = new User();
             friend.setUserId(occupantId);

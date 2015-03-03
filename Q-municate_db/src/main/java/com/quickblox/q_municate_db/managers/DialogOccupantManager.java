@@ -17,9 +17,9 @@ public class DialogOccupantManager implements CommonDao<DialogOccupant> {
     }
 
     @Override
-    public DialogOccupant createIfNotExists(DialogOccupant item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(DialogOccupant item) {
         try {
-            return dialogOccupantDao.createIfNotExists(item);
+            return dialogOccupantDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

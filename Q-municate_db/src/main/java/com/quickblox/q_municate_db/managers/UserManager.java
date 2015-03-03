@@ -22,9 +22,9 @@ public class UserManager implements CommonDao<User> {
     }
 
     @Override
-    public User createIfNotExists(User item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(User item) {
         try {
-            return userDao.createIfNotExists(item);
+            return userDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

@@ -21,9 +21,9 @@ public class FriendManager implements CommonDao<Friend> {
     }
 
     @Override
-    public Friend createIfNotExists(Friend item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(Friend item) {
         try {
-            return friendDao.createIfNotExists(item);
+            return friendDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
@@ -70,10 +70,10 @@ public class FriendManager implements CommonDao<Friend> {
         }
     }
 
-    public void delete(User item) {
+    public void delete(int userId) {
         try {
             DeleteBuilder<Friend, Integer> deleteBuilder = friendDao.deleteBuilder();
-            deleteBuilder.where().eq(User.COLUMN_USER_ID, item.getUserId());
+            deleteBuilder.where().eq(User.COLUMN_USER_ID, userId);
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);

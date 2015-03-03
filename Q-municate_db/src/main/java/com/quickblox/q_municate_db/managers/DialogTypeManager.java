@@ -19,9 +19,9 @@ public class DialogTypeManager implements CommonDao<DialogType> {
     }
 
     @Override
-    public DialogType createIfNotExists(DialogType item) {
+    public Dao.CreateOrUpdateStatus createOrUpdate(DialogType item) {
         try {
-            return dialogTypeDao.createIfNotExists(item);
+            return dialogTypeDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
