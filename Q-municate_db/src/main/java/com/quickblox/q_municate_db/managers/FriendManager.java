@@ -92,4 +92,17 @@ public class FriendManager implements CommonDao<Friend> {
         }
         return friend;
     }
+
+    public List<Friend> getFriendsByIds(List<Integer> idsList) {
+        List<Friend> friendsList = null;
+        try {
+            QueryBuilder<Friend, Integer> queryBuilder = friendDao.queryBuilder();
+            queryBuilder.where().in(User.COLUMN_USER_ID, idsList);
+            PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
+            friendsList = friendDao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return friendsList;
+    }
 }

@@ -40,7 +40,6 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -55,6 +54,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -337,8 +337,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void startAddFriendsActivity() {
-        int countUnselectedFriendsInChat = UsersDatabaseManager.getFriendsFilteredByIds(this,
-                UserFriendUtils.getFriendIds(groupDialog.getOccupantList())).getCount();
+        List<Integer> friendsIdsList = UserFriendUtils.getFriendIds(groupDialog.getOccupantList());
+        int countUnselectedFriendsInChat = DatabaseManager.getInstance().getFriendManager().getFriendsByIds(friendsIdsList).size();
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
         } else {

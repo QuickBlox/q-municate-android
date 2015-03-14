@@ -2,11 +2,9 @@ package com.quickblox.q_municate.ui.chats.dialogs;
 
 import android.app.LoaderManager;
 import android.content.Loader;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,12 +24,9 @@ import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
@@ -47,9 +42,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
-    private ContentObserver userTableContentObserver;
     private Cursor dialogsCursor;
-    private int selectedPositionList;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -73,27 +66,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         initCursorLoaders();
 
         registerForContextMenu(dialogsListView);
-        registerContentObservers();
 
         return view;
-    }
-
-    private void registerContentObservers() {
-        userTableContentObserver = new ContentObserver(new Handler()) {
-
-            @Override
-            public void onChange(boolean selfChange) {
-                selectedPositionList = dialogsListView.getFirstVisiblePosition();
-                initCursorLoaders();
-            }
-        };
-
-        baseActivity.getContentResolver().registerContentObserver(UserTable.CONTENT_URI, true,
-                userTableContentObserver);
-    }
-
-    private void unregisterContentObservers() {
-        baseActivity.getContentResolver().unregisterContentObserver(userTableContentObserver);
     }
 
     private void initCursorLoaders() {
@@ -152,12 +126,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        unregisterContentObservers();
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.dialogs_list_menu, menu);
     }
@@ -199,10 +167,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             }
         });
         dialogsListView.setAdapter(dialogsAdapter);
-
-        if (selectedPositionList != ConstsCore.ZERO_INT_VALUE) {
-            dialogsListView.setSelection(selectedPositionList);
-        }
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {

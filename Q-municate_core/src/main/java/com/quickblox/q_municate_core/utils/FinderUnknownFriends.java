@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
@@ -81,7 +80,7 @@ public class FinderUnknownFriends {
     private void findUserInDialog(QBDialog dialog, int currentUserId) {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
-            boolean isUserInBase = UsersDatabaseManager.isUserInBase(context, occupantId);
+            boolean isUserInBase = DatabaseManager.getInstance().getUserManager().get(occupantId) != null;
             if (!isUserInBase && currentUserId != occupantId) {
                 loadIdsSet.add(occupantId);
             }

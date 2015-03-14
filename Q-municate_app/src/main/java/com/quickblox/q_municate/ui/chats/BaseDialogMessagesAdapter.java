@@ -82,13 +82,11 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     protected int getTextColor(Integer senderId) {
-        if (colorsMap.get(senderId) != null) {
-            return colorsMap.get(senderId);
-        } else {
+        if (colorsMap.get(senderId) == null) {
             int colorValue = getRandomColor();
             colorsMap.put(senderId, colorValue);
-            return colorsMap.get(senderId);
         }
+        return colorsMap.get(senderId);
     }
 
     protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {

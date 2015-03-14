@@ -13,9 +13,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
-import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
-import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -52,19 +50,6 @@ public class ChatDatabaseManager {
         return dialog;
     }
 
-    public static String getDialogIdByMessageId(Context context, String messageId) {
-        String dialogId = null;
-        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.MESSAGE_ID + " = '" + messageId + "'", null, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
-            cursor.close();
-        }
-
-        return dialogId;
-    }
-
     public static String getPrivateDialogIdByOpponentId(Context context, int opponentId) {
         String dialogId = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
@@ -96,7 +81,7 @@ public class ChatDatabaseManager {
     }
 
     public static List<QBDialog> getDialogsByOpponent(Context context, int opponent,
-            QBDialogType dialogType) {
+                                                      QBDialogType dialogType) {
         List<QBDialog> dialogsList = new LinkedList<QBDialog>();
 
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
@@ -243,12 +228,6 @@ public class ChatDatabaseManager {
         return count;
     }
 
-    public static Cursor getAllDialogMessagesByDialogId(Context context, String dialogId) {
-        return context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
-                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
-    }
-
     public static void deleteAllMessages(Context context) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI, null, null);
     }
@@ -274,7 +253,7 @@ public class ChatDatabaseManager {
     }
 
     private static void checkUpdatingDialogForFriendsNotificationMessage(Context context, MessageCache messageCache,
-            int countUnreadMessagesLocal) {
+                                                                         int countUnreadMessagesLocal) {
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
         String lastMessage = messageCache.getMessage();
 
@@ -287,11 +266,11 @@ public class ChatDatabaseManager {
         }
 
         updateDialog(context, messageCache.getDialogId(), lastMessage, messageCache.getTime(),
-                    messageCache.getSenderId(), countUnreadMessagesLocal);
+                messageCache.getSenderId(), countUnreadMessagesLocal);
     }
 
     public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
-            String dialogId) {
+                                        String dialogId) {
         for (QBChatMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
@@ -404,18 +383,6 @@ public class ChatDatabaseManager {
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
-    public static boolean deleteFriendById(Context context, int userId) {
-        int deletedRow = context.getContentResolver().delete(FriendTable.CONTENT_URI,
-                FriendTable.Cols.USER_ID + " = " + userId, null);
-        return deletedRow > ConstsCore.ZERO_INT_VALUE;
-    }
-
-    public static boolean deleteUserById(Context context, int userId) {
-        int deletedRow = context.getContentResolver().delete(UserTable.CONTENT_URI,
-                UserTable.Cols.USER_ID + " = " + userId, null);
-        return deletedRow > ConstsCore.ZERO_INT_VALUE;
-    }
-
     private static ContentValues getContentValuesForUpdateDialogTable(Context context, QBDialog dialog) {
         ContentValues values = new ContentValues();
 
@@ -483,7 +450,7 @@ public class ChatDatabaseManager {
     }
 
     public static void updateDialog(Context context, String dialogId, long dateSent,
-            long lastSenderId, int countUnreadMessages) {
+                                    long lastSenderId, int countUnreadMessages) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = getContentValuesForUpdateDialog(dateSent, lastSenderId,
                 countUnreadMessages);
@@ -492,7 +459,7 @@ public class ChatDatabaseManager {
     }
 
     public static void updateDialog(Context context, String dialogId, String lastMessage, long dateSent,
-            long lastSenderId, int countUnreadMessages) {
+                                    long lastSenderId, int countUnreadMessages) {
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = getContentValuesForUpdateDialog(dateSent, lastSenderId,
                 countUnreadMessages);
@@ -508,7 +475,7 @@ public class ChatDatabaseManager {
     }
 
     private static ContentValues getContentValuesForUpdateDialog(long dateSent,
-            long lastSenderId, int countUnreadMessages) {
+                                                                 long lastSenderId, int countUnreadMessages) {
         ContentValues values = new ContentValues();
 
         if (countUnreadMessages >= ConstsCore.ZERO_INT_VALUE) {

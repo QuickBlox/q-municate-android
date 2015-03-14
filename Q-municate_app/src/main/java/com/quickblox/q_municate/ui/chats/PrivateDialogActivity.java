@@ -4,12 +4,10 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,8 +23,6 @@ import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
-import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -50,9 +46,6 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
-    private ContentObserver statusContentObserver;
-    private ContentObserver friendsTableContentObserver;
-    private Cursor friendCursor;
     private FriendOperationAction friendOperationAction;
 
     public PrivateDialogActivity() {
@@ -73,11 +66,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
-        friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
 
         initCursorLoaders();
         initActionBar();
-        registerContentObservers();
         setCurrentDialog(dialog);
     }
 
@@ -115,7 +106,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onDestroy() {
         super.onDestroy();
         currentOpponent = null;
-        unregisterStatusChangingObserver();
     }
 
     @Override
@@ -180,39 +170,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return dialog;
     }
 
-    private void registerContentObservers() {
-        statusContentObserver = new ContentObserver(new Handler()) {
-
-            @Override
-            public void onChange(boolean selfChange) {
-                opponentFriend = DatabaseManager.getInstance().getUserManager().get(
-                        PrivateDialogActivity.this.opponentFriend.getUserId());
-                setOnlineStatus(opponentFriend);
-            }
-        };
-        friendCursor.registerContentObserver(statusContentObserver);
-
-        friendsTableContentObserver = new ContentObserver(new Handler()) {
-
-            @Override
-            public void onChange(boolean selfChange) {
-                checkMessageSendingPossibility();
-            }
-        };
-        getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
-                friendsTableContentObserver);
-    }
-
-    private void unregisterStatusChangingObserver() {
-        if (friendCursor != null && statusContentObserver != null) {
-            friendCursor.unregisterContentObserver(statusContentObserver);
-        }
-
-        if (friendsTableContentObserver != null) {
-            getContentResolver().unregisterContentObserver(friendsTableContentObserver);
-        }
-    }
-
     private void setOnlineStatus(User friend) {
         if (friend != null) {
             ActionBar actionBar = getActionBar();
@@ -251,8 +208,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
-                opponentFriend.getUserId());
+        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(opponentFriend.getUserId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
             DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(
                     R.string.dlg_user_is_not_friend));

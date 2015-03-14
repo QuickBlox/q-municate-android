@@ -6,7 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.ui.friends.FriendOperationListener;
-import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
@@ -93,9 +93,13 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
     }
 
     private boolean isFriend(User user) {
-        boolean isFriend;
-        isFriend = isMe(user) ? true : UsersDatabaseManager.isFriendInBaseWithPending(baseActivity, user.getUserId());
-        return isFriend;
+        if (isMe(user)) {
+            return true;
+        } else {
+            boolean isFriendPending = DatabaseManager.getInstance().getUserRequestManager().getUserById(user.getUserId()) != null;
+            boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(user.getUserId()) != null;
+            return isFriend || isFriendPending;
+        }
     }
 
     private boolean isMe(User inputUser) {
