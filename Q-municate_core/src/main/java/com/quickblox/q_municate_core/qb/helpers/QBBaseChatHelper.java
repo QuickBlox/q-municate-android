@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -33,6 +34,11 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Attachment;
+import com.quickblox.q_municate_db.models.AttachmentType;
+import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -69,8 +75,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
     }
 
-    public void saveMessageToCache(MessageCache messageCache) {
-        ChatDatabaseManager.saveChatMessageGlobal(context, messageCache);
+    public void saveMessageToCache(Message message) {
+        ChatDatabaseManager.saveChatMessageGlobal(context, message);
     }
 
     /*
@@ -139,24 +145,38 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             recipientId = chatMessage.getRecipientId();
         }
 
-        MessageCache messageCache = new MessageCache(messageId, dialogId, chatCreator.getId(), recipientId,
+        Message message = new Message(messageId, dialogId, chatCreator.getId(), recipientId,
                 chatMessage.getBody(), attachUrl, time, false, false, true);
 
         if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
             int friendsMessageTypeCode = ChatNotificationUtils.getNotificationTypeIfExist(chatMessage);
-            messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
+            message.setMessagesNotificationType(MessagesNotificationType.parseByCode(
                     friendsMessageTypeCode));
         }
 
         saveMessageToCache(messageCache);
     }
 
-    protected void saveDialogToCache(QBDialog dialog) {
-        ChatDatabaseManager.saveDialog(context, dialog);
+    protected void saveDialogToCache(QBDialog qbDialog) {
+       DatabaseManager.getInstance().getDialogManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
+
+        saveDialogsOccupants(qbDialog);
     }
 
-    protected void saveDialogsToCache(List<QBDialog> chatDialogsList) {
-        ChatDatabaseManager.saveDialogs(context, chatDialogsList);
+    protected void saveDialogsToCache(List<QBDialog> qbDialogsList) {
+        DatabaseManager.getInstance().getDialogManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
+
+        saveDialogsOccupants(qbDialogsList);
+    }
+
+    private void saveDialogsOccupants(QBDialog qbDialog) {
+        DatabaseManager.getInstance().getDialogOccupantManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
+    }
+
+    private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {
+        for (QBDialog qbDialog : qbDialogsList) {
+            saveDialogsOccupants(qbDialog);
+        }
     }
 
     public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
@@ -319,7 +339,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    protected MessageCache parseReceivedMessage(QBChatMessage chatMessage) {
+    protected Message parseReceivedMessage(QBChatMessage chatMessage) {
         long time;
         String attachUrl;
 
@@ -334,32 +354,51 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             recipientId = chatMessage.getRecipientId();
         }
 
-        MessageCache messageCache = new MessageCache(chatMessage.getId(), dialogId, chatMessage.getSenderId(),
-                recipientId, chatMessage.getBody(), attachUrl, time, false, false, false);
+//        Message message = new Message(chatMessage.getId(), dialogId, chatMessage.getSenderId(),
+//                recipientId, chatMessage.getBody(), attachUrl, time, false, false, false);
 
-        return messageCache;
+        Message message = new Message();
+        message.setMessageId(chatMessage.getId());
+        message.setBody(chatMessage.getBody());
+        State deliveredState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.DELIVERED);
+        message.setState(deliveredState);
+        message.setCreatedDate(time);
+
+        if (!TextUtils.isEmpty(attachUrl)) {
+            Attachment attachment = new Attachment();
+            AttachmentType photoType = DatabaseManager.getInstance().getAttachmentTypeManager().getByAttachmentType(AttachmentType.Type.PICTURE);
+            attachment.setAttachmentType(photoType);
+            attachment.setRemoteUrl(attachUrl);
+
+            DatabaseManager.getInstance().getAttachmentManager().createOrUpdate(attachment);
+
+            message.setAttachment(attachment);
+        }
+
+        return message;
     }
 
-    public void updateStatusMessageRead(String dialogId, MessageCache messageCache,
+    public void updateStatusMessageRead(String dialogId, Message message,
             boolean forPrivate) throws Exception {
-        updateStatusMessageReadServer(dialogId, messageCache, forPrivate);
-        updateStatusMessageLocal(messageCache);
+        updateStatusMessageReadServer(dialogId, message, forPrivate);
+        updateStatusMessageLocal(message);
     }
 
-    public void updateStatusMessageReadServer(String dialogId, MessageCache messageCache,
+    public void updateStatusMessageReadServer(String dialogId, Message message,
             boolean fromPrivate) throws Exception {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
-        messagesIdsList.add(messageCache.getId());
+        messagesIdsList.add(message.getMessageId());
         QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
 
         if (fromPrivate) {
-            QBPrivateChat privateChat = createPrivateChatIfNotExist(messageCache.getSenderId());
-            privateChat.readMessage(messageCache.getId());
+            QBPrivateChat privateChat = createPrivateChatIfNotExist(message.getDialogOccupant().getUser().getUserId());
+            privateChat.readMessage(message.getMessageId());
         }
     }
 
-    public void updateStatusMessageLocal(MessageCache messageCache) throws QBResponseException {
-        ChatDatabaseManager.updateStatusMessage(context, messageCache);
+    public void updateStatusMessageLocal(Message message) throws QBResponseException {
+        // TODO temp
+//        ChatDatabaseManager.updateStatusMessage(context, message);
     }
 
     public void updateMessageStatusDeliveredLocal(String messageId, boolean isDelivered) {
@@ -428,9 +467,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         @Override
         public void processMessageRead(QBPrivateChat privateChat, String messageId) {
             try {
-                MessageCache messageCache = new MessageCache();
-                messageCache.setId(messageId);
-                messageCache.setRead(true);
+                Message messageCache = new Message();
+                messageCache.setMessageId(messageId);
+                State readState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.READ);
+                messageCache.setState(readState);
                 updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

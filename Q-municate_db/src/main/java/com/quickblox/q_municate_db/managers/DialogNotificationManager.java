@@ -10,6 +10,8 @@ import java.util.List;
 
 public class DialogNotificationManager implements CommonDao<DialogNotification> {
 
+    private static final String TAG = DialogNotificationManager.class.getSimpleName();
+
     private Dao<DialogNotification, Integer> dialogNotificationDao;
 
     public DialogNotificationManager(Dao<DialogNotification, Integer> dialogNotificationDao) {
@@ -21,7 +23,7 @@ public class DialogNotificationManager implements CommonDao<DialogNotification> 
         try {
             return dialogNotificationDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

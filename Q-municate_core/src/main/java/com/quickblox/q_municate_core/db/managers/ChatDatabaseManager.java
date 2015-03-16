@@ -28,12 +28,6 @@ import java.util.List;
 
 public class ChatDatabaseManager {
 
-    public static void saveDialogs(Context context, List<QBDialog> dialogsList) {
-        for (QBDialog dialog : dialogsList) {
-            saveDialog(context, dialog);
-        }
-    }
-
     public static QBDialog getDialogByDialogId(Context context, String dialogId) {
         QBDialog dialog = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
@@ -120,11 +114,6 @@ public class ChatDatabaseManager {
 
     public static Cursor getAllDialogs(Context context) {
         return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
-                DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
-    }
-
-    public static CursorLoader getAllDialogsCursorLoader(Context context) {
-        return new CursorLoader(context, DialogTable.CONTENT_URI, null, null, null,
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
     }
 

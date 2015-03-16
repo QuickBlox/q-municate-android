@@ -1,77 +1,85 @@
 package com.quickblox.q_municate.ui.chats.dialogs;
 
-import android.content.Context;
-import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
+import com.quickblox.q_municate.ui.base.BaseActivity;
+import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.DialogType;
+import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 
-public class DialogsAdapter extends BaseCursorAdapter {
+import java.util.List;
 
-    public DialogsAdapter(Context context, Cursor cursor) {
-        super(context, cursor, true);
+public class DialogsAdapter extends BaseListAdapter<Dialog> {
+
+    private DatabaseManager databaseManager;
+
+    public DialogsAdapter(BaseActivity baseActivity, List<Dialog> objectsList) {
+        super(baseActivity, objectsList);
+        databaseManager = DatabaseManager.getInstance();
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View convertView;
-        convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
-        ViewHolder viewHolder = new ViewHolder();
-        viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-        viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-        viewHolder.lastMessageTextView = (TextView) convertView.findViewById(R.id.last_message_textview);
-        viewHolder.unreadMessagesTextView = (TextView) convertView.findViewById(
-                R.id.unread_messages_textview);
-        convertView.setTag(viewHolder);
-        return convertView;
-    }
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
 
-    @Override
-    public void bindView(View view, final Context context, Cursor cursor) {
-        final ViewHolder viewHolder = (ViewHolder) view.getTag();
+        if (convertView == null) {
+            convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
 
-        QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(cursor);
+            viewHolder = new ViewHolder();
 
-        if (dialog.getType().equals(QBDialogType.PRIVATE)) {
-            int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
-            User occupant = getOccupantById(occupantId);
-            viewHolder.nameTextView.setText(occupant.getFullName());
-            displayAvatarImage(getAvatarUrlForFriend(occupant), viewHolder.avatarImageView);
+            viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
+            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
+            viewHolder.lastMessageTextView = (TextView) convertView.findViewById(R.id.last_message_textview);
+            viewHolder.unreadMessagesTextView = (TextView) convertView.findViewById(
+                    R.id.unread_messages_textview);
+
+            convertView.setTag(viewHolder);
         } else {
-            viewHolder.nameTextView.setText(dialog.getName());
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        Dialog dialog = getItem(position);
+        List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+
+        if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
+            User opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentQBUser), dialogOccupantsList);
+            viewHolder.nameTextView.setText(opponentUser.getFullName());
+            displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
+        } else {
+            viewHolder.nameTextView.setText(dialog.getTitle());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);
             displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
         }
 
-        if (dialog.getUnreadMessageCount() > ConstsCore.ZERO_INT_VALUE) {
-            viewHolder.unreadMessagesTextView.setText(dialog.getUnreadMessageCount() + ConstsCore.EMPTY_STRING);
+        State unreadMessageState = databaseManager.getStateManager().getByStateType(State.Type.READ);
+        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        long unreadMessages = databaseManager.getMessageManager().getCountUnreadMessages(dialogOccupantsIdsList, unreadMessageState);
+        if (unreadMessages > ConstsCore.ZERO_INT_VALUE) {
+            viewHolder.unreadMessagesTextView.setText(unreadMessages + ConstsCore.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        viewHolder.lastMessageTextView.setText(dialog.getLastMessage());
-    }
+        Message message = databaseManager.getMessageManager().getLastMessageByDialogId(dialogOccupantsIdsList);
 
-    public User getOccupantById(int occupantId) {
-        User friend = DatabaseManager.getInstance().getUserManager().get(occupantId);
-        if (friend == null) {
-            friend = new User();
-            friend.setUserId(occupantId);
-            friend.setFullName(occupantId + ConstsCore.EMPTY_STRING);
+        if (message != null) {
+            viewHolder.lastMessageTextView.setText(message.getBody());
         }
-        return friend;
+
+        return convertView;
     }
 
     private static class ViewHolder {

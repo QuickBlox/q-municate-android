@@ -12,7 +12,7 @@ import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatDialogUtils;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
@@ -41,7 +41,7 @@ public class QBLoadDialogsCommand extends ServiceCommand {
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
             new FindUnknownFriendsTask().execute(dialogsList);
-            parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
+            parcelableQBDialog = ChatUtils.dialogsToParcelableDialogs(dialogsList);
             multiChatHelper.tryJoinRoomChats(dialogsList);
             // save flag for join to dialogs
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);

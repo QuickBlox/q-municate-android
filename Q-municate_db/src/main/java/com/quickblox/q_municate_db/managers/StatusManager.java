@@ -12,6 +12,8 @@ import java.util.List;
 
 public class StatusManager implements CommonDao<Status> {
 
+    private static final String TAG = StatusManager.class.getSimpleName();
+
     private Dao<Status, Integer> statusDao;
 
     public StatusManager(Dao<Status, Integer> statusDao) {
@@ -23,7 +25,7 @@ public class StatusManager implements CommonDao<Status> {
         try {
             return statusDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

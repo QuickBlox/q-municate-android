@@ -12,6 +12,8 @@ import java.util.List;
 
 public class NotificationManager implements CommonDao<Notification> {
 
+    private static final String TAG = NotificationManager.class.getSimpleName();
+
     private Dao<Notification, Integer> notificationDao;
 
     public NotificationManager(Dao<Notification, Integer> notificationDao) {
@@ -23,7 +25,7 @@ public class NotificationManager implements CommonDao<Notification> {
         try {
             return notificationDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

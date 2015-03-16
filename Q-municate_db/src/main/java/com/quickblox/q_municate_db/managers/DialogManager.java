@@ -8,9 +8,13 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class DialogManager implements CommonDao<Dialog> {
+
+    private static final String TAG = DialogManager.class.getSimpleName();
 
     private Dao<Dialog, Integer> dialogDao;
 
@@ -23,9 +27,25 @@ public class DialogManager implements CommonDao<Dialog> {
         try {
             return dialogDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
+    }
+
+    public void createOrUpdate(final Collection<Dialog> dialogsList) {
+        try {
+            dialogDao.callBatchTasks(new Callable<Dialog>() {
+                @Override
+                public Dialog call() throws Exception {
+                    for (Dialog dialog : dialogsList) {
+                        dialogDao.createOrUpdate(dialog);
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
+        }
     }
 
     @Override

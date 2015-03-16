@@ -15,6 +15,8 @@ import java.util.concurrent.Callable;
 
 public class UserManager implements CommonDao<User> {
 
+    private static final String TAG = UserManager.class.getSimpleName();
+
     private Dao<User, Integer> userDao;
 
     public UserManager(Dao<User, Integer> userDao) {
@@ -26,9 +28,25 @@ public class UserManager implements CommonDao<User> {
         try {
             return userDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
+    }
+
+    public void createOrUpdate(final Collection<User> userList) {
+        try {
+            userDao.callBatchTasks(new Callable<User>() {
+                @Override
+                public User call() throws Exception {
+                    for (User user : userList) {
+                        userDao.createOrUpdate(user);
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
+        }
     }
 
     @Override
@@ -67,22 +85,6 @@ public class UserManager implements CommonDao<User> {
         try {
             userDao.delete(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
-        }
-    }
-
-    public void createIfNotExists(final Collection<User> userList) {
-        try {
-            userDao.callBatchTasks(new Callable<User>() {
-                @Override
-                public User call() throws Exception {
-                    for (User user : userList) {
-                        userDao.createOrUpdate(user);
-                    }
-                    return null;
-                }
-            });
-        } catch (Exception e) {
             ErrorUtils.logError(e);
         }
     }

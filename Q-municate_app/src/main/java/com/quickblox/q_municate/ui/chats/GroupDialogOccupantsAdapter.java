@@ -61,7 +61,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
         initListeners(viewHolder, user.getUserId());
 
-        displayImage(user.getAvatar(), viewHolder.avatarImageView);
+        displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
         return convertView;
     }

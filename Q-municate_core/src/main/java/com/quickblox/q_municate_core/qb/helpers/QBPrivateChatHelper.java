@@ -110,7 +110,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         MessageCache messageCache = parseReceivedMessage(chatMessage);
         messageCache.setMessagesNotificationType(messagesNotificationType);
 
-        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, messageCache.getDialogId());
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(messageCache.getDialogId()));
 
         if (dialog == null) {
             dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,

@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
-import android.app.Dialog;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,6 +39,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
+import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
@@ -49,7 +49,6 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -59,22 +58,28 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.DialogType;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
-    private static final int MESSAGES_LOADER_ID = 0;
 
     protected Resources resources;
     protected EditText chatEditText;
@@ -88,8 +93,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected View emojisFragment;
     protected ImageUtils imageUtils;
     protected int layoutResID;
-    protected BaseCursorAdapter messagesAdapter;
-    protected QBDialog dialog;
+    protected BaseListAdapter messagesAdapter;
+    protected Dialog dialog;
     protected boolean isNeedToScrollMessages;
     protected QBBaseChatHelper baseChatHelper;
     protected User opponentFriend;
@@ -165,6 +170,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         initLocalBroadcastManagers();
         hideSmileLayout();
+
+        initListView();
     }
 
 
@@ -175,7 +182,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         hideSmileLayout();
 
         // TODO: now it is possible only for Private chats
-        if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+        if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
             if (isTypingNow) {
                 isTypingNow = false;
                 sendTypingStatus();
@@ -199,7 +206,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void updateDialogData() {
-        dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
+        dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
         if (dialog != null) {
             updateActionBar();
         }
@@ -221,7 +228,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {
-                baseChatHelper.createChatLocally(dialog, generateBundleToInitDialog());
+                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog), generateBundleToInitDialog());
             } catch (QBResponseException e) {
                 ErrorUtils.showError(this, e.getMessage());
                 finish();
@@ -244,7 +251,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         CharSequence[] itemsArray = resources.getStringArray(R.array.dlg_attach_types_array);
 
-        Dialog dialog = DialogUtils.createSingleChoiceItemsDialog(this, resources.getString(
+        final android.app.Dialog alertDialog = DialogUtils.createSingleChoiceItemsDialog(this, resources.getString(
                 R.string.dlg_select_attach_type), itemsArray, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item) {
@@ -256,11 +263,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                         break;
                 }
 
-                dialog.dismiss();
+//                alertDialog.dismiss();
             }
         });
 
-        dialog.show();
+        alertDialog.show();
     }
 
     @Override
@@ -318,7 +325,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         if (baseChatHelper != null) {
-            baseChatHelper.closeChat(dialog, generateBundleToInitDialog());
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog), generateBundleToInitDialog());
         }
         removeActions();
     }
@@ -455,29 +462,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         startLoadDialogMessages();
     }
 
-    protected void initCursorLoaders() {
-        getLoaderManager().initLoader(MESSAGES_LOADER_ID, null, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return ChatDatabaseManager.getAllDialogMessagesLoaderByDialogId(this, dialogId);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
-        if (messagesAdapter == null) {
-            initListView(messagesCursor);
-        } else {
-            messagesAdapter.swapCursor(messagesCursor);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
-
-    protected abstract void initListView(Cursor messagesCursor);
+    protected abstract void initListView();
 
     private void setSendButtonVisibility(CharSequence charSequence) {
         if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
@@ -494,7 +479,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 hideSmileLayout();
 
                 // TODO: now it is possible only for Private chats
-                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+                if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
                     if (!isTypingNow) {
                         isTypingNow = true;
                         sendTypingStatus();
@@ -513,7 +498,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 setSendButtonVisibility(charSequence);
 
                 // TODO: now it is possible only for Private chats
-                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+                if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
                     if (!isTypingNow) {
                         isTypingNow = true;
                         sendTypingStatus();
@@ -603,7 +588,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    abstract QBDialog getQBDialog();
+//    abstract QBDialog getQBDialog();
 
     protected void sendMessage(boolean privateMessage) {
         boolean error = false;
@@ -632,10 +617,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startUpdateChatDialog() {
-        QBDialog dialog = getQBDialog();
-        if (dialog != null) {
-            QBUpdateDialogLocalCommand.start(this, dialog);
-        }
+//        QBDialog dialog = getQBDialog();
+//        if (dialog != null) {
+//            QBUpdateDialogLocalCommand.start(this, dialog);
+//        }
     }
 
     protected void startLoadDialogMessages() {
@@ -645,12 +630,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-        MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
+        List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        Message lastReadMessage = DatabaseManager.getInstance().getMessageManager().getLastMessageByDialogId(dialogOccupantsIdsList);
         if (lastReadMessage == null) {
-            startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
+            startLoadDialogMessages(ChatUtils.createQBDialogFromLocalDialog(dialog), ConstsCore.ZERO_LONG_VALUE);
         } else {
-            long lastMessageDateSent = lastReadMessage.getTime();
-            startLoadDialogMessages(dialog, lastMessageDateSent);
+            long lastMessageDateSent = lastReadMessage.getCreatedDate();
+            startLoadDialogMessages(ChatUtils.createQBDialogFromLocalDialog(dialog), lastMessageDateSent);
         }
     }
 
@@ -723,9 +710,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            hideProgress();
-            startLoadDialogMessages();
+            // TODO temp
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            hideProgress();
+//            startLoadDialogMessages();
         }
     }
 
@@ -733,9 +721,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            hideProgress();
-            startLoadDialogMessages();
+            // TODO temp
+//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+//            hideProgress();
+//            startLoadDialogMessages();
         }
     }
 
@@ -745,7 +734,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             // TODO: now it is possible only for Private chats
-            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+            if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
                 boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
                 if (isTyping) {
                     startMessageTypingAnimation();

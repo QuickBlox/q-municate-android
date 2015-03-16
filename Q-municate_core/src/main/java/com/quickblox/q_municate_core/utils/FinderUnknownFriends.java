@@ -69,7 +69,7 @@ public class FinderUnknownFriends {
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    DatabaseManager.getInstance().getUserManager().createIfNotExists(userCollection);
+                    DatabaseManager.getInstance().getUserManager().createOrUpdate(userCollection);
                 }
             }
         } catch (QBResponseException e) {

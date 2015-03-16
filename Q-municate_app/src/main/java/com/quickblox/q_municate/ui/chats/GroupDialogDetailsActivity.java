@@ -50,6 +50,7 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -124,7 +125,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initDialogs() {
-        currentDialog = ChatDatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this, dialogId);
+        currentDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
         groupDialog = new GroupDialog(currentDialog);
     }
 
@@ -227,7 +228,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void loadGroupDialog() {
-        currentDialog = ChatDatabaseManager.getDialogByDialogId(GroupDialogDetailsActivity.this, dialogId);
+        currentDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
         QBLoadGroupDialogCommand.start(this, currentDialog);
     }
 

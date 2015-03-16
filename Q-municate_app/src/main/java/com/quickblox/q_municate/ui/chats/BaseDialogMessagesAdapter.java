@@ -19,25 +19,28 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.FileHelper;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
-import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.Message;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
+public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Message> implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
     protected static int TYPE_REQUEST_MESSAGE = 0;
     protected static int TYPE_OWN_MESSAGE = 1;
@@ -48,13 +51,13 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     private final float colorAlpha = 0.8f;
     protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
-    protected QBDialog dialog;
+    protected Dialog dialog;
     private Random random;
     private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
     private FileHelper fileHelper;
 
-    public BaseDialogMessagesAdapter(Context context, Cursor cursor) {
-        super(context, cursor, true);
+    public BaseDialogMessagesAdapter(Context context, List<Message> objectsList) {
+        super(context, objectsList);
         random = new Random();
         imageUtils = new ImageUtils((android.app.Activity) context);
         fileHelper = new FileHelper();
@@ -72,7 +75,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     }
 
     protected boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
+        return senderId == currentQBUser.getId();
     }
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
@@ -149,11 +152,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     @Override
     public View getHeaderView(int position, View convertView, ViewGroup parent) {
         HeaderViewHolder holder;
-        Cursor cursor = null;
 
-        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
-            cursor = (Cursor) getItem(position);
-        }
+        Message message = getItem(position);
 
         if (convertView == null) {
             holder = new HeaderViewHolder();
@@ -164,8 +164,8 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        if (cursor != null) {
-            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
+        if (message != null) {
+            long time = message.getCreatedDate();
             holder.headerTextView.setText(DateUtils.longToMessageListHeaderDate(time));
         }
 
@@ -176,13 +176,9 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     public long getHeaderId(int position) {
         String timeString;
 
-        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
-            Cursor cursor = (Cursor) getItem(position);
-            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-            timeString = DateUtils.longToMessageListHeaderDate(time);
-        } else {
-            return ConstsCore.ZERO_INT_VALUE;
-        }
+        Message message = getItem(position);
+        long time = message.getCreatedDate();
+        timeString = DateUtils.longToMessageListHeaderDate(time);
 
         if (!TextUtils.isEmpty(timeString)) {
             return timeString.subSequence(ConstsCore.ZERO_INT_VALUE, timeString.length() - 1).charAt(

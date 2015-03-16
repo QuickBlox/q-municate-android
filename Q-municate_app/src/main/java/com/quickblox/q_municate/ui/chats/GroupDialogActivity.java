@@ -23,13 +23,18 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
@@ -45,10 +50,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         context.startActivity(intent);
     }
 
-    public static void start(Context context, QBDialog qbDialog) {
+    public static void start(Context context, Dialog dialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, qbDialog.getDialogId());
-        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
+        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, dialog.getDialogId());
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startActivity(intent);
     }
 
@@ -60,11 +65,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             dialogId = getIntent().getStringExtra(QBServiceConsts.EXTRA_ROOM_JID);
         }
 
-        dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
-        initCursorLoaders();
         startLoadDialogMessages();
-        setCurrentDialog(dialog);
+        setCurrentDialog(ChatUtils.createQBDialogFromLocalDialog(dialog));
 
 //        registerForContextMenu(messagesListView);
     }
@@ -122,34 +126,35 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
-    protected void initListView(Cursor messagesCursor) {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this,
+    protected void initListView() {
+        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAll();
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesList, this,
                 dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
         scrollListView();
     }
 
-    protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-
-        if (messagesNotificationType == null) {
-            dialog.setLastMessage(messageCache.getMessage());
-        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
-            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
-        }
-
-        dialog.setLastMessageDateSent(messageCache.getTime());
-        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
-        return dialog;
-    }
+//    protected QBDialog getQBDialog() {
+//        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+//
+//        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+//        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+//
+//        if (messagesNotificationType == null) {
+//            dialog.setLastMessage(messageCache.getMessage());
+//        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
+//            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
+//        }
+//
+//        dialog.setLastMessageDateSent(messageCache.getTime());
+//        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
+//        return dialog;
+//    }
 
     protected void updateActionBar() {
-        actionBar.setTitle(dialog.getName());
-        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
+        actionBar.setTitle(dialog.getTitle());
+//        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
         actionBar.setLogo(R.drawable.placeholder_group);
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
             loadLogoActionBar(dialog.getPhoto());

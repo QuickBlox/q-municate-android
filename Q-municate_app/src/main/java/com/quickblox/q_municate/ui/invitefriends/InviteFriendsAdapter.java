@@ -75,7 +75,7 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
 
         viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(viewHolder.checkBox.isChecked()));
 
-        displayImage(uri, viewHolder.avatarImageView);
+        displayAvatarImage(uri, viewHolder.avatarImageView);
         return convertView;
     }
 

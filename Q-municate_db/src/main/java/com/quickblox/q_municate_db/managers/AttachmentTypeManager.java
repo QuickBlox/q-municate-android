@@ -12,6 +12,8 @@ import java.util.List;
 
 public class AttachmentTypeManager implements CommonDao<AttachmentType> {
 
+    private static final String TAG = AttachmentTypeManager.class.getSimpleName();
+
     private Dao<AttachmentType, Integer> attachmentTypeDao;
 
     public AttachmentTypeManager(Dao<AttachmentType, Integer> attachmentTypeDao) {
@@ -23,7 +25,7 @@ public class AttachmentTypeManager implements CommonDao<AttachmentType> {
         try {
             return attachmentTypeDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

@@ -10,6 +10,8 @@ import java.util.List;
 
 public class AttachmentManager implements CommonDao<Attachment> {
 
+    private static final String TAG = AttachmentManager.class.getSimpleName();
+
     private Dao<Attachment, Integer> attachmentDao;
 
     public AttachmentManager(Dao<Attachment, Integer> attachmentDao) {
@@ -21,7 +23,7 @@ public class AttachmentManager implements CommonDao<Attachment> {
         try {
             return attachmentDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }
@@ -64,5 +66,18 @@ public class AttachmentManager implements CommonDao<Attachment> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    public Attachment getByAttachmentType(AttachmentT.Type type) {
+        Status status = null;
+        try {
+            QueryBuilder<Status, Integer> queryBuilder = statusDao.queryBuilder();
+            queryBuilder.where().eq(Status.COLUMN_STATUS, type);
+            PreparedQuery<Status> preparedQuery = queryBuilder.prepare();
+            status = statusDao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return status;
     }
 }

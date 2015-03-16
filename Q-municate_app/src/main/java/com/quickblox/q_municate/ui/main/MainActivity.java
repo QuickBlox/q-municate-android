@@ -32,6 +32,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
@@ -247,7 +248,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
                 ConstsCore.NOT_INITIALIZED_VALUE);
 
-        QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(this, dialogId);
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
         if (dialog == null) {
             return;
         }
@@ -274,7 +275,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(this, dialog);
+        GroupDialogActivity.start(this, ChatUtils.createLocalDialog(dialog));
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

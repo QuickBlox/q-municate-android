@@ -12,6 +12,8 @@ import java.util.List;
 
 public class StateManager implements CommonDao<State> {
 
+    private static final String TAG = StateManager.class.getSimpleName();
+
     private Dao<State, Integer> stateDao;
 
     public StateManager(Dao<State, Integer> stateDao) {
@@ -23,7 +25,7 @@ public class StateManager implements CommonDao<State> {
         try {
             return stateDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

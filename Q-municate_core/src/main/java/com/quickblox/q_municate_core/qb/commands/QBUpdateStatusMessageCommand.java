@@ -6,11 +6,11 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.Message;
 
 public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
@@ -24,10 +24,10 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, MessageCache messageCache, boolean forPrivate) {
+    public static void start(Context context, QBDialog dialog, Message message, boolean forPrivate) {
         Intent intent = new Intent(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, messageCache);
+        intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, message);
         intent.putExtra(QBServiceConsts.EXTRA_IS_FOR_PRIVATE, forPrivate);
         context.startService(intent);
     }
@@ -35,14 +35,14 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        MessageCache messageCache = (MessageCache) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
+        Message message = (Message) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
         boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
 
         try {
-            baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
+            baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), message, forPrivate);
         } catch (Exception e) {
             ErrorUtils.logError(TAG,
-                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + messageCache.getId());
+                    e + " --- dialogId = " + dialog.getDialogId() + ", messageId = " + message.getMessageId());
         }
 
         return null;

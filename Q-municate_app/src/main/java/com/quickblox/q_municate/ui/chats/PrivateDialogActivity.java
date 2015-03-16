@@ -32,14 +32,18 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
+import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
@@ -64,12 +68,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         super.onCreate(savedInstanceState);
         friendOperationAction = new FriendOperationAction();
         opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
 
-        initCursorLoaders();
         initActionBar();
-        setCurrentDialog(dialog);
+        setCurrentDialog(ChatUtils.createQBDialogFromLocalDialog(dialog));
     }
 
     @Override
@@ -138,8 +141,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void initListView(Cursor messagesCursor) {
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesCursor, this,
+    protected void initListView() {
+        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAll();
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesList, this,
                 dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
@@ -147,28 +151,28 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         scrollListView();
     }
 
-    protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-
-        if (messagesNotificationType == null) {
-            dialog.setLastMessage(messageCache.getMessage());
-        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
-            dialog.setLastMessage(resources.getString(R.string.frl_friends_contact_request));
-        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(
-                messagesNotificationType.getCode())) {
-            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
-        }
-
-        dialog.setLastMessageDateSent(messageCache.getTime());
-        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
-        dialog.setLastMessageUserId(messageCache.getSenderId());
-        dialog.setType(QBDialogType.PRIVATE);
-
-        return dialog;
-    }
+//    protected QBDialog getQBDialog() {
+//        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+//
+//        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+//        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+//
+//        if (messagesNotificationType == null) {
+//            dialog.setLastMessage(messageCache.getMessage());
+//        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
+//            dialog.setLastMessage(resources.getString(R.string.frl_friends_contact_request));
+//        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(
+//                messagesNotificationType.getCode())) {
+//            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
+//        }
+//
+//        dialog.setLastMessageDateSent(messageCache.getTime());
+//        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
+//        dialog.setLastMessageUserId(messageCache.getSenderId());
+//        dialog.setType(QBDialogType.PRIVATE);
+//
+//        return dialog;
+//    }
 
     private void setOnlineStatus(User friend) {
         if (friend != null) {

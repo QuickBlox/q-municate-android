@@ -12,6 +12,8 @@ import java.util.List;
 
 public class DialogTypeManager implements CommonDao<DialogType> {
 
+    private static final String TAG = DialogTypeManager.class.getSimpleName();
+
     private Dao<DialogType, Integer> dialogTypeDao;
 
     public DialogTypeManager(Dao<DialogType, Integer> dialogTypeDao) {
@@ -23,7 +25,7 @@ public class DialogTypeManager implements CommonDao<DialogType> {
         try {
             return dialogTypeDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

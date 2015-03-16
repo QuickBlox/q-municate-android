@@ -15,6 +15,7 @@ import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
@@ -100,7 +101,7 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             hideProgress();
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             if (dialog.getRoomJid() != null) {
-                GroupDialogActivity.start(NewDialogActivity.this, dialog);
+                GroupDialogActivity.start(NewDialogActivity.this, ChatUtils.createLocalDialog(dialog));
                 //                sendNotificationToGroup(dialog);
                 finish();
             } else {

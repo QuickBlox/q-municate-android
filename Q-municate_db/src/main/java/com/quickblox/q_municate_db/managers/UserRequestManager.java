@@ -14,6 +14,8 @@ import java.util.List;
 
 public class UserRequestManager implements CommonDao<UserRequest> {
 
+    private static final String TAG = UserRequestManager.class.getSimpleName();
+
     private Dao<UserRequest, Integer> userRequestDao;
 
     public UserRequestManager(Dao<UserRequest, Integer> userRequestDao) {
@@ -25,7 +27,7 @@ public class UserRequestManager implements CommonDao<UserRequest> {
         try {
             return userRequestDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

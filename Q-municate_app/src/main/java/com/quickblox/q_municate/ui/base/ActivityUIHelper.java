@@ -12,6 +12,7 @@ import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.User;
 
@@ -63,7 +64,7 @@ public class ActivityUIHelper {
     }
 
     private boolean isMessagesDialogCorrect(String dialogId) {
-        messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
+        messagesDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
         return messagesDialog != null;
     }
 
@@ -103,6 +104,6 @@ public class ActivityUIHelper {
     }
 
     private void startGroupChatActivity() {
-        GroupDialogActivity.start(activity, messagesDialog);
+        GroupDialogActivity.start(activity, ChatUtils.createLocalDialog(messagesDialog));
     }
 }

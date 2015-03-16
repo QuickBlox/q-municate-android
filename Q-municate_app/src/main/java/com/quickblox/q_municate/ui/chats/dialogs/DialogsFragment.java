@@ -1,9 +1,6 @@
 package com.quickblox.q_municate.ui.chats.dialogs;
 
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,25 +21,27 @@ import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class DialogsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    private static final int DIALOGS_LOADER_ID = 0;
+public class DialogsFragment extends BaseFragment {
 
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
-    private Cursor dialogsCursor;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -63,31 +62,12 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         Crouton.cancelAllCroutons();
 
         addActions();
-        initCursorLoaders();
 
         registerForContextMenu(dialogsListView);
 
-        return view;
-    }
-
-    private void initCursorLoaders() {
-        getLoaderManager().initLoader(DIALOGS_LOADER_ID, null, this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return ChatDatabaseManager.getAllDialogsCursorLoader(baseActivity);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor dialogsCursor) {
-        this.dialogsCursor = dialogsCursor;
         initChatsDialogs();
-        checkVisibilityEmptyLabel();
-    }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+        return view;
     }
 
     private void initUI(View view) {
@@ -140,45 +120,22 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         return true;
     }
 
-    //    @Override
-    //    public boolean onContextItemSelected(MenuItem item) {
-    //        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-    //        switch (item.getItemId()) {
-    //            case R.id.action_delete:
-    //                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-    //                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-    //                deleteDialog(dialog);
-    //                break;
-    //        }
-    //        return true;
-    //    }
-
-    //    private void deleteDialog(QBDialog dialog) {
-    //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
-    //    }
-
     private void initChatsDialogs() {
-        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
-        dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                checkVisibilityEmptyLabel();
-            }
-        });
+        List<Dialog> dialogsList = DatabaseManager.getInstance().getDialogManager().getAll();
+        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsList);
         dialogsListView.setAdapter(dialogsAdapter);
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {
-        int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
-        User occupant = dialogsAdapter.getOccupantById(occupantId);
+        List<DialogOccupant> occupantsList = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+        User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
         }
     }
 
     private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(baseActivity, dialog);
+        GroupDialogActivity.start(baseActivity, ChatUtils.createLocalDialog(dialog));
     }
 
     private void startNewDialogPage() {
@@ -198,11 +155,34 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         baseActivity.updateBroadcastActionList();
     }
 
+    private void updateDialogsList() {
+        List<Dialog> dialogsList = DatabaseManager.getInstance().getDialogManager().getAll();
+        dialogsAdapter.setNewData(dialogsList);
+        dialogsAdapter.notifyDataSetChanged();
+    }
+
     //    @Override
     //    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
     //        super.onCreateContextMenu(menu, view, menuInfo);
     //        MenuInflater menuInflater = baseActivity.getMenuInflater();
     //        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
+    //    }
+
+    //    @Override
+    //    public boolean onContextItemSelected(MenuItem item) {
+    //        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    //        switch (item.getItemId()) {
+    //            case R.id.action_delete:
+    //                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
+    //                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
+    //                deleteDialog(dialog);
+    //                break;
+    //        }
+    //        return true;
+    //    }
+
+    //    private void deleteDialog(QBDialog dialog) {
+    //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
     //    }
 
     private class LoadChatsDialogsSuccessAction implements Command {
@@ -213,6 +193,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                     QBServiceConsts.EXTRA_CHATS_DIALOGS);
             if (parcelableDialogsList == null) {
                 emptyListTextView.setVisibility(View.VISIBLE);
+            } else {
+                updateDialogsList();
             }
         }
     }

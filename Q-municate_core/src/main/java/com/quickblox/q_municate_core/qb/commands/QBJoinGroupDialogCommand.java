@@ -11,7 +11,7 @@ import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatDialogUtils;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
         List<QBDialog> dialogs = null;
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
             dialogList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST);
-            dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);
+            dialogs = ChatUtils.parcelableDialogsToDialogs(dialogList);
         }
 
         if(dialogs == null) {

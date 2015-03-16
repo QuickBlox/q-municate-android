@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,48 +8,50 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
+import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
+
+import java.util.List;
 
 public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
-    public GroupDialogMessagesAdapter(Context context, Cursor cursor,
-            ChatUIHelperListener chatUIHelperListener, QBDialog dialog) {
-        super(context, cursor);
+    public GroupDialogMessagesAdapter(Context context, List<Message> objectsList,
+                                      ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
+        super(context, objectsList);
         this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
 
-    private int getItemViewType(Cursor cursor) {
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        boolean ownMessage = isOwnMessage(messageCache.getSenderId());
-        boolean friendsRequestMessage = messageCache.getMessagesNotificationType() != null;
+    private int getItemViewType(Message message) {
 
-        if (!friendsRequestMessage) {
-            if (ownMessage) {
+        boolean ownMessage = message.isIncoming(currentQBUser.getId());
+//        boolean friendsRequestMessage = messageCache.getMessagesNotificationType() != null;
+
+//        if (!friendsRequestMessage) {
+        if (ownMessage) {
                 return TYPE_OWN_MESSAGE;
             } else {
                 return TYPE_OPPONENT_MESSAGE;
             }
-        } else {
-            return TYPE_REQUEST_MESSAGE;
-        }
+//        } else {
+//            return TYPE_REQUEST_MESSAGE;
+//        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
-        return getItemViewType(cursor);
+        return getItemViewType(getItem(position));
     }
 
     @Override
@@ -59,15 +60,17 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view;
-        ViewHolder viewHolder = new ViewHolder();
+    public View getView(int position, View view, ViewGroup parent) {
+        ViewHolder viewHolder;
 
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        boolean ownMessage = isOwnMessage(messageCache.getSenderId());
+        Message message = getItem(position);
+        boolean ownMessage = !message.isIncoming(currentQBUser.getId());
 
-        if (messageCache.getMessagesNotificationType() == null) {
+        if (view == null) {
+            viewHolder = new ViewHolder();
 
+            // TODO temp
+            //            if (message.getMessagesNotificationType() == null) {
             if (ownMessage) {
                 view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
             } else {
@@ -88,68 +91,58 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
             viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
             viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
+
+//            } else {
+//            view = layoutInflater.inflate(R.layout.list_item_notification_message, null, true);
+//
+//            viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
+//            viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
+//                    R.id.time_text_message_textview);
+//            }
+
+            view.setTag(viewHolder);
         } else {
-            view = layoutInflater.inflate(R.layout.list_item_notification_message, null, true);
-
-            viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
-            viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
-                    R.id.time_text_message_textview);
+            viewHolder = (ViewHolder) view.getTag();
         }
-
-        view.setTag(viewHolder);
-
-        return view;
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         String avatarUrl = null;
-        String senderName;
+        String senderName = "name";
 
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+        resetUI(viewHolder);
 
-        boolean ownMessage = isOwnMessage(messageCache.getSenderId());
-        boolean notificationMessage = messageCache.getMessagesNotificationType() != null;
-
-        if (notificationMessage) {
-            viewHolder.messageTextView.setText(messageCache.getMessage());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
+        if (ownMessage) {
+//            avatarUrl = currentQBUser.;
         } else {
-            resetUI(viewHolder);
-
-            if (ownMessage) {
-                avatarUrl = getAvatarUrlForCurrentUser();
+            User senderFriend = DatabaseManager.getInstance().getUserManager().get(
+                    message.getDialogOccupant().getUser().getUserId());
+            if (senderFriend != null) {
+                senderName = senderFriend.getFullName();
+//                avatarUrl = getAvatarUrlForFriend(senderFriend);
             } else {
-                User senderFriend = DatabaseManager.getInstance().getUserManager().get(
-                        messageCache.getSenderId());
-                if (senderFriend != null) {
-                    senderName = senderFriend.getFullName();
-                    avatarUrl = getAvatarUrlForFriend(senderFriend);
-                } else {
-                    senderName = messageCache.getSenderId() + ConstsCore.EMPTY_STRING;
-                }
-                viewHolder.nameTextView.setTextColor(getTextColor(messageCache.getSenderId()));
-                viewHolder.nameTextView.setText(senderName);
+//                senderName = messageCache.getSenderId() + ConstsCore.EMPTY_STRING;
             }
-
-            if (!TextUtils.isEmpty(messageCache.getAttachUrl())) {
-                viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-                setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-                displayAttachImage(messageCache.getAttachUrl(), viewHolder);
-            } else {
-                setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-                viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
-                viewHolder.messageTextView.setText(messageCache.getMessage());
-            }
+            viewHolder.nameTextView.setTextColor(getTextColor(message.getDialogOccupant().getUser().getUserId()));
+            viewHolder.nameTextView.setText(senderName);
         }
 
-        if (!messageCache.isRead() && !ownMessage) {
-            messageCache.setRead(true);
-            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
+        if (message.getAttachment() != null) {
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
+            setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
+            displayAttachImage(message.getAttachment().getRemoteUrl(), viewHolder);
+        } else {
+            setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
+            viewHolder.messageTextView.setText(message.getBody());
         }
 
-        displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
+        if (!State.Type.READ.equals(message.getState().getType()) && !ownMessage) {
+            State readState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.READ);
+            message.setState(readState);
+            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog), message, true);
+        }
+
+//        displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
+
+        return view;
     }
 }

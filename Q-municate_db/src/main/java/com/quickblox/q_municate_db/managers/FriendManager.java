@@ -14,6 +14,8 @@ import java.util.List;
 
 public class FriendManager implements CommonDao<Friend> {
 
+    private static final String TAG = FriendManager.class.getSimpleName();
+
     private Dao<Friend, Integer> friendDao;
 
     public FriendManager(Dao<Friend, Integer> friendDao) {
@@ -25,7 +27,7 @@ public class FriendManager implements CommonDao<Friend> {
         try {
             return friendDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

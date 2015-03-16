@@ -12,6 +12,8 @@ import java.util.List;
 
 public class SocialTypeManager implements CommonDao<SocialType> {
 
+    private static final String TAG = SocialTypeManager.class.getSimpleName();
+
     private Dao<SocialType, Integer> socialTypeDao;
 
     public SocialTypeManager(Dao<SocialType, Integer> socialTypeDao) {
@@ -23,7 +25,7 @@ public class SocialTypeManager implements CommonDao<SocialType> {
         try {
             return socialTypeDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

@@ -12,6 +12,8 @@ import java.util.List;
 
 public class RoleManager implements CommonDao<Role> {
 
+    private static final String TAG = RoleManager.class.getSimpleName();
+
     private Dao<Role, Integer> roleDao;
 
     public RoleManager(Dao<Role, Integer> roleDao) {
@@ -23,7 +25,7 @@ public class RoleManager implements CommonDao<Role> {
         try {
             return roleDao.createOrUpdate(item);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
         return null;
     }

@@ -11,8 +11,12 @@ import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.DialogType;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -153,5 +157,91 @@ public class ChatUtils {
             stringBuilder.append(getFullNameById(id)).append(OCCUPANT_IDS_DIVIDER).append(" ");
         }
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
+    }
+
+    public static ArrayList<ParcelableQBDialog> dialogsToParcelableDialogs(List<QBDialog> dialogList){
+        ArrayList<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
+        for (QBDialog dialog : dialogList) {
+            ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
+            parcelableDialogList.add(parcelableQBDialog);
+        }
+        return parcelableDialogList;
+    }
+
+    public static ArrayList<QBDialog> parcelableDialogsToDialogs(List<ParcelableQBDialog> parcelableDialogList){
+        ArrayList<QBDialog> dialogList = new ArrayList<QBDialog>(parcelableDialogList.size());
+        for (ParcelableQBDialog parcelableDialog : parcelableDialogList) {
+            dialogList.add(parcelableDialog.getDialog());
+        }
+        return dialogList;
+    }
+
+    public static User getOpponentFromPrivateDialog(User currentUser, List<DialogOccupant> occupantsList) {
+        for (DialogOccupant dialogOccupant : occupantsList) {
+            if (currentUser.getUserId() != dialogOccupant.getUser().getUserId()) {
+                return dialogOccupant.getUser();
+            }
+        }
+        return new User();
+    }
+
+    public static Dialog createLocalDialog(QBDialog qbDialog) {
+        Dialog dialog = new Dialog();
+        dialog.setDialogId(qbDialog.getDialogId());
+        dialog.setRoomJid(qbDialog.getRoomJid());
+        dialog.setTitle(qbDialog.getName());
+        dialog.setPhoto(qbDialog.getPhoto());
+
+        if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
+            dialog.setDialogType(DatabaseManager.getInstance().getDialogTypeManager().getByDialogType(DialogType.Type.PRIVATE));
+        } else if (QBDialogType.GROUP.equals(qbDialog.getType())){
+            dialog.setDialogType(DatabaseManager.getInstance().getDialogTypeManager().getByDialogType(DialogType.Type.GROUP));
+        }
+
+        return dialog;
+    }
+
+    public static List<Dialog> createLocalDialogsList(List<QBDialog> qbDialogsList) {
+        List<Dialog> dialogsList = new ArrayList<>(qbDialogsList.size());
+
+        for (QBDialog qbDialog : qbDialogsList) {
+            dialogsList.add(createLocalDialog(qbDialog));
+        }
+
+        return dialogsList;
+    }
+
+    public static List<DialogOccupant> createDialogOccupantsList(QBDialog qbDialog) {
+        List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
+
+        for (Integer userId : qbDialog.getOccupants()) {
+            DialogOccupant dialogOccupant = new DialogOccupant();
+            dialogOccupant.setUser(DatabaseManager.getInstance().getUserManager().get(userId));
+            dialogOccupant.setDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(qbDialog.getDialogId()));
+
+            dialogOccupantsList.add(dialogOccupant);
+        }
+
+        return dialogOccupantsList;
+    }
+
+    public static List<Integer> getIdsFromDialogOccupantsList(List<DialogOccupant> dialogOccupantsList) {
+        List<Integer> idsList = new ArrayList<>(dialogOccupantsList.size());
+
+        for (DialogOccupant dialogOccupant : dialogOccupantsList) {
+            idsList.add(dialogOccupant.getDialogOccupantId());
+        }
+
+        return idsList;
+    }
+
+    public static QBDialog createQBDialogFromLocalDialog(Dialog dialog) {
+        QBDialog qbDialog = new QBDialog();
+        qbDialog.setDialogId(dialog.getDialogId());
+        qbDialog.setRoomJid(dialog.getRoomJid());
+        qbDialog.setPhoto(dialog.getPhoto());
+        qbDialog.setName(dialog.getTitle());
+        qbDialog.setType(DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
+        return qbDialog;
     }
 }

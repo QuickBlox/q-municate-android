@@ -95,4 +95,8 @@ public class Message implements Serializable {
     public void setDialogOccupant(DialogOccupant dialogOccupant) {
         this.dialogOccupant = dialogOccupant;
     }
+
+    public boolean isIncoming(int currentUserId) {
+        return currentUserId == dialogOccupant.getUser().getUserId();
+    }
 }

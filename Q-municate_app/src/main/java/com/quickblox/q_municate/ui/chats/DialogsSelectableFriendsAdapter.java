@@ -95,7 +95,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
 
         viewHolder.selectFriendCheckBox.setChecked(checked);
 
-        displayImage(user.getAvatar(), viewHolder.avatarImageView);
+        displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
         viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checked));
 
