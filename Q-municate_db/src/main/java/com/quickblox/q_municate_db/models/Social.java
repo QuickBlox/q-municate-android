@@ -1,30 +1,37 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Social.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.Social.Column.ID;
+import static com.quickblox.q_municate_db.models.Social.Column.TABLE_NAME;
+import static com.quickblox.q_municate_db.models.Social.Column.TYPE;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class Social implements Serializable {
 
-    public static final String TABLE_NAME = "social";
-
-    public static final String COLUMN_SOCIAL_ID = "social_id";
-
-    @DatabaseField(id = true, columnName = COLUMN_SOCIAL_ID)
+    @DatabaseField(id = true, columnName = ID)
     private String socialId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = SocialType.COLUMN_TYPE_ID)
-    private SocialType socialType;
+            columnName = User.Column.ID)
+    private User user;
+
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
+            columnName = TYPE)
+    private Type type;
 
     public Social() {
     }
 
-    public Social(String socialId, SocialType socialType) {
+    public Social(String socialId, User user, Type type) {
         this.socialId = socialId;
-        this.socialType = socialType;
+        this.user = user;
+        this.type = type;
     }
 
     public String getSocialId() {
@@ -35,11 +42,53 @@ public class Social implements Serializable {
         this.socialId = socialId;
     }
 
-    public SocialType getSocialType() {
-        return socialType;
+    public Type getType() {
+        return type;
     }
 
-    public void setSocialType(SocialType socialType) {
-        this.socialType = socialType;
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public enum Type {
+        FACEBOOK(0),
+        TWITTER(1);
+
+        private int code;
+
+        Type(int code) {
+            this.code = code;
+        }
+
+        public static Type parseByCode(int code) {
+            Type[] valuesArray = Type.values();
+            Type result = null;
+            for (Type value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "social";
+        String ID = BaseColumns._ID;
+        String TYPE = "type";
     }
 }

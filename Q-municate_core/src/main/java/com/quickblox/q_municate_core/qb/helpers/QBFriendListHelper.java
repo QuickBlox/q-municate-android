@@ -24,8 +24,6 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.Role;
-import com.quickblox.q_municate_db.models.Status;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.users.QBUsers;
@@ -38,11 +36,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class QBFriendListHelper extends BaseHelper {
-
-    public static final String RELATION_STATUS_NONE = "none";
-    public static final String RELATION_STATUS_TO = "to";
-    public static final String RELATION_STATUS_FROM = "from";
-    public static final String RELATION_STATUS_BOTH = "both";
 
     private static final String TAG = QBFriendListHelper.class.getSimpleName();
     private static final String PRESENCE_CHANGE_ERROR = "Presence change error: could not find friend in DB by id = ";
@@ -79,12 +72,11 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     public void addFriend(int userId) throws Exception {
-        // TODO auto added friend logic
+        // TODO auto adding friend logic
         //        if (isNewFriend(userId)) {
         //            acceptFriend(userId);
         //        } else {
-        Status outgoingStatus = databaseManager.getStatusManager().getByStatusType(Status.Type.OUTGOING);
-        createUserRequest(userId, outgoingStatus);
+        createUserRequest(userId, UserRequest.RequestStatus.OUTGOING);
         invite(userId);
         //        }
     }
@@ -191,9 +183,7 @@ public class QBFriendListHelper extends BaseHelper {
         if (!userList.isEmpty()) {
             List<QBUser> loadedUserList = loadUsers(userList);
             for (QBUser user : loadedUserList) {
-                Status incomingStatus = databaseManager.getStatusManager().getByStatusType(
-                        Status.Type.OUTGOING);
-                createUserRequest(user.getId(), incomingStatus);
+                createUserRequest(user.getId(), UserRequest.RequestStatus.OUTGOING);
             }
         }
 
@@ -225,8 +215,7 @@ public class QBFriendListHelper extends BaseHelper {
         saveUser(newUser);
 
         if (UserFriendUtils.isPendingFriend(rosterEntry)) {
-            Status incomingStatus = databaseManager.getStatusManager().getByStatusType(Status.Type.INCOMING);
-            createUserRequest(userId, incomingStatus);
+            createUserRequest(userId, UserRequest.RequestStatus.INCOMING);
         } else {
             saveFriend(newUser);
             deleteUserRequestByUser(newUser.getUserId());
@@ -278,9 +267,8 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void saveUsersAndFriends(Collection<QBUser> usersCollection) {
-        Role sampleRole = databaseManager.getRoleManager().getByRoleType(Role.Type.SIMPLE_ROLE);
         for (QBUser qbUser : usersCollection) {
-            User user = UserFriendUtils.createLocalUser(qbUser, sampleRole);
+            User user = UserFriendUtils.createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
             databaseManager.getUserManager().createOrUpdate(user);
             databaseManager.getFriendManager().createOrUpdate(new Friend(user));
         }
@@ -311,7 +299,7 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    private void createUserRequest(int userId, Status status) {
+    private void createUserRequest(int userId, UserRequest.RequestStatus requestStatus) {
         User user = restHelper.loadUser(userId);
 
         if (user == null) {
@@ -321,7 +309,7 @@ public class QBFriendListHelper extends BaseHelper {
         }
 
         long currentTime = DateUtilsCore.getCurrentTime();
-        UserRequest userRequest = new UserRequest(currentTime, null, status, user);
+        UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
         databaseManager.getUserRequestManager().createOrUpdate(userRequest);
     }
 
@@ -375,9 +363,7 @@ public class QBFriendListHelper extends BaseHelper {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                Status incomingStatus = databaseManager.getStatusManager().getByStatusType(
-                        Status.Type.INCOMING);
-                createUserRequest(userId, incomingStatus);
+                createUserRequest(userId, UserRequest.RequestStatus.INCOMING);
                 notifyContactRequest(userId);
             } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);

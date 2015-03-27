@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -26,7 +25,6 @@ import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -34,10 +32,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.models.Attachment;
-import com.quickblox.q_municate_db.models.AttachmentType;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -54,6 +49,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     protected QBChatService chatService;
     protected QBUser chatCreator;
     protected QBDialog currentDialog;
+    protected DatabaseManager databaseManager;
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
     protected QBGroupChatManager groupChatManager;
@@ -72,10 +68,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         groupChatMessageListener = new GroupChatMessageListener();
 
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
-    }
 
-    public void saveMessageToCache(Message message) {
-//        ChatDatabaseManager.saveChatMessageGlobal(context, message);
+        databaseManager = DatabaseManager.getInstance();
     }
 
     /*
@@ -359,20 +353,21 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         Message message = new Message();
         message.setMessageId(chatMessage.getId());
         message.setBody(chatMessage.getBody());
-        State deliveredState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.DELIVERED);
-        message.setState(deliveredState);
-        message.setCreatedDate(time);
 
-        if (!TextUtils.isEmpty(attachUrl)) {
-            Attachment attachment = new Attachment();
-            AttachmentType photoType = DatabaseManager.getInstance().getAttachmentTypeManager().getByAttachmentType(AttachmentType.Type.PICTURE);
-            attachment.setAttachmentType(photoType);
-            attachment.setRemoteUrl(attachUrl);
-
-            DatabaseManager.getInstance().getAttachmentManager().createOrUpdate(attachment);
-
-            message.setAttachment(attachment);
-        }
+        //        State deliveredState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.DELIVERED);
+        //        message.setState(deliveredState);
+        //        message.setCreatedDate(time);
+        //
+        //        if (!TextUtils.isEmpty(attachUrl)) {
+        //            Attachment attachment = new Attachment();
+        //            AttachmentType photoType = DatabaseManager.getInstance().getAttachmentTypeManager().getByAttachmentType(AttachmentType.Type.PICTURE);
+        //            attachment.setType(photoType);
+        //            attachment.setRemoteUrl(attachUrl);
+        //
+        //            DatabaseManager.getInstance().getAttachmentManager().createOrUpdate(attachment);
+        //
+        //            message.setAttachment(attachment);
+        //        }
 
         return message;
     }
@@ -468,8 +463,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             try {
                 Message messageCache = new Message();
                 messageCache.setMessageId(messageId);
-                State readState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.READ);
-                messageCache.setState(readState);
+                messageCache.setState(Message.State.READ);
                 updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

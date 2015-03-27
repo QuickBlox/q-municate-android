@@ -77,7 +77,7 @@ public class UserRequestManager implements CommonDao<UserRequest> {
 
         try {
             QueryBuilder<UserRequest, Integer> queryBuilder = userRequestDao.queryBuilder();
-            queryBuilder.where().eq(User.COLUMN_USER_ID, userId);
+            queryBuilder.where().eq(User.Column.ID, userId);
             PreparedQuery<UserRequest> preparedQuery = queryBuilder.prepare();
             userRequest = userRequestDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
@@ -90,7 +90,7 @@ public class UserRequestManager implements CommonDao<UserRequest> {
     public void deleteByUserId(int userId) {
         try {
             DeleteBuilder<UserRequest, Integer> deleteBuilder = userRequestDao.deleteBuilder();
-            deleteBuilder.where().eq(User.COLUMN_USER_ID, userId);
+            deleteBuilder.where().eq(User.Column.ID, userId);
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);

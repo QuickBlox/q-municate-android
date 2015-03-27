@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
@@ -7,22 +9,21 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = DialogOccupant.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.DialogOccupant.Column.ID;
+import static com.quickblox.q_municate_db.models.DialogOccupant.Column.TABLE_NAME;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class DialogOccupant implements Serializable {
 
-    public static final String TABLE_NAME = "dialog_occupant";
-
-    public static final String COLUMN_DIALOG_OCCUPANT_ID = "dialog_occupant_id";
-
-    @DatabaseField(generatedId = true, unique = true, columnName = COLUMN_DIALOG_OCCUPANT_ID)
+    @DatabaseField(generatedId = true, unique = true, columnName = ID)
     private int dialogOccupantId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, uniqueCombo = true,
-            columnName = Dialog.COLUMN_DIALOG_ID)
+            columnName = Dialog.Column.ID)
     private Dialog dialog;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, uniqueCombo = true,
-            columnName = User.COLUMN_USER_ID)
+            columnName = User.Column.ID)
     private User user;
 
     @ForeignCollectionField(eager = true)
@@ -75,5 +76,11 @@ public class DialogOccupant implements Serializable {
 
     public void setDialogOccupantId(int dialogOccupantId) {
         this.dialogOccupantId = dialogOccupantId;
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "dialog_occupant";
+        String ID = BaseColumns._ID;
     }
 }

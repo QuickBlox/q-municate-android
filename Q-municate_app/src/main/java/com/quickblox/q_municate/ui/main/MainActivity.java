@@ -11,8 +11,6 @@ import android.view.Menu;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.chat.QBChatService;
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -27,15 +25,14 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.SettingsFragment;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -248,12 +245,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
                 ConstsCore.NOT_INITIALIZED_VALUE);
 
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
+        Dialog dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
         if (dialog == null) {
             return;
         }
 
-        if (dialog.getType() == QBDialogType.PRIVATE) {
+        if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog, userId);
         } else {
             startGroupChatActivity(dialog);
@@ -262,7 +259,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
     }
 
-    private void startPrivateChatActivity(QBDialog dialog, int userId) {
+    private void startPrivateChatActivity(Dialog dialog, int userId) {
         User occupantUser = DatabaseManager.getInstance().getUserManager().get(userId);
         if (occupantUser != null && userId != ConstsCore.ZERO_INT_VALUE) {
             PrivateDialogActivity.start(this, occupantUser, dialog);
@@ -274,8 +271,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         hideProgress();
     }
 
-    private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(this, ChatUtils.createLocalDialog(dialog));
+    private void startGroupChatActivity(Dialog dialog) {
+        GroupDialogActivity.start(this, dialog);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

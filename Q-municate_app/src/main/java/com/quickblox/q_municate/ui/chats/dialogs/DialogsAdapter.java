@@ -14,9 +14,7 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.DialogType;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
@@ -54,7 +52,7 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
 
         List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
 
-        if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {
+        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             User opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentQBUser), dialogOccupantsList);
             viewHolder.nameTextView.setText(opponentUser.getFullName());
             displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
@@ -64,9 +62,9 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
             displayGroupPhotoImage(dialog.getPhoto(), viewHolder.avatarImageView);
         }
 
-        State unreadMessageState = databaseManager.getStateManager().getByStateType(State.Type.READ);
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        long unreadMessages = databaseManager.getMessageManager().getCountUnreadMessages(dialogOccupantsIdsList, unreadMessageState);
+        long unreadMessages = databaseManager.getMessageManager().getCountUnreadMessages(
+                dialogOccupantsIdsList);
         if (unreadMessages > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(unreadMessages + ConstsCore.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);

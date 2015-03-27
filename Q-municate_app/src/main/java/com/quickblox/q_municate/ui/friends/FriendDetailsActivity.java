@@ -31,6 +31,7 @@ import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
@@ -239,7 +240,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             try {
                 QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(
                         user.getUserId());
-                PrivateDialogActivity.start(FriendDetailsActivity.this, user, existingPrivateDialog);
+                PrivateDialogActivity.start(FriendDetailsActivity.this, user, ChatUtils.createLocalDialog(existingPrivateDialog));
             } catch (QBResponseException e) {
                 ErrorUtils.showError(this, e);
             }

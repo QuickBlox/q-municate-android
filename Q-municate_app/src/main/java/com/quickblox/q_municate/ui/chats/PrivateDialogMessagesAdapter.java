@@ -15,10 +15,8 @@ import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.State;
 
 import java.util.List;
 
@@ -145,7 +143,8 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
 
             if (ownMessage) {
-                setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.Type.DELIVERED.equals(message.getState().getType()), State.Type.READ.equals(message.getState().getType()));
+                setMessageStatus(viewHolder.attachDeliveryStatusImageView, Message.State.DELIVERED.equals(
+                        message.getState()), Message.State.READ.equals(message.getState()));
             }
 
             displayAttachImage(message.getAttachment().getRemoteUrl(), viewHolder);
@@ -157,15 +156,15 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
 
             if (ownMessage) {
-                setMessageStatus(viewHolder.messageDeliveryStatusImageView, State.Type.DELIVERED.equals(message.getState().getType()),
-                        State.Type.READ.equals(message.getState().getType()));
+                setMessageStatus(viewHolder.messageDeliveryStatusImageView, Message.State.DELIVERED.equals(
+                        message.getState()), Message.State.READ.equals(message.getState()));
             }
         }
 
-        if (!State.Type.READ.equals(message.getState().getType()) && !ownMessage) {
-            State readState = DatabaseManager.getInstance().getStateManager().getByStateType(State.Type.READ);
-            message.setState(readState);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog), message, true);
+        if (!Message.State.READ.equals(message.getState()) && !ownMessage) {
+            message.setState(Message.State.READ);
+            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog1(dialog),
+                    message, true);
         }
 
         // TODO temp

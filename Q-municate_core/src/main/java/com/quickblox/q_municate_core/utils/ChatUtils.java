@@ -16,7 +16,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.DialogType;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -193,9 +192,9 @@ public class ChatUtils {
         dialog.setPhoto(qbDialog.getPhoto());
 
         if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
-            dialog.setDialogType(DatabaseManager.getInstance().getDialogTypeManager().getByDialogType(DialogType.Type.PRIVATE));
+            dialog.setType(Dialog.Type.PRIVATE);
         } else if (QBDialogType.GROUP.equals(qbDialog.getType())){
-            dialog.setDialogType(DatabaseManager.getInstance().getDialogTypeManager().getByDialogType(DialogType.Type.GROUP));
+            dialog.setType(Dialog.Type.GROUP);
         }
 
         return dialog;
@@ -235,13 +234,14 @@ public class ChatUtils {
         return idsList;
     }
 
-    public static QBDialog createQBDialogFromLocalDialog(Dialog dialog) {
+    public static QBDialog createQBDialogFromLocalDialog1(Dialog dialog) {
         QBDialog qbDialog = new QBDialog();
         qbDialog.setDialogId(dialog.getDialogId());
         qbDialog.setRoomJid(dialog.getRoomJid());
         qbDialog.setPhoto(dialog.getPhoto());
         qbDialog.setName(dialog.getTitle());
-        qbDialog.setType(DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
+        qbDialog.setType(Dialog.Type.PRIVATE.equals(
+                dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
         return qbDialog;
     }
 }

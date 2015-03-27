@@ -32,22 +32,6 @@ public class DialogManager implements CommonDao<Dialog> {
         return null;
     }
 
-    public void createOrUpdate(final Collection<Dialog> dialogsList) {
-        try {
-            dialogDao.callBatchTasks(new Callable<Dialog>() {
-                @Override
-                public Dialog call() throws Exception {
-                    for (Dialog dialog : dialogsList) {
-                        dialogDao.createOrUpdate(dialog);
-                    }
-                    return null;
-                }
-            });
-        } catch (Exception e) {
-            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
-        }
-    }
-
     @Override
     public List<Dialog> getAll() {
         List<Dialog> dialogList = null;
@@ -88,11 +72,27 @@ public class DialogManager implements CommonDao<Dialog> {
         }
     }
 
+    public void createOrUpdate(final Collection<Dialog> dialogsList) {
+        try {
+            dialogDao.callBatchTasks(new Callable<Dialog>() {
+                @Override
+                public Dialog call() throws Exception {
+                    for (Dialog dialog : dialogsList) {
+                        dialogDao.createOrUpdate(dialog);
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
+        }
+    }
+
     public Dialog getByDialogId(String dialogId) {
         Dialog dialog = null;
         try {
             QueryBuilder<Dialog, Integer> queryBuilder = dialogDao.queryBuilder();
-            queryBuilder.where().eq(Dialog.COLUMN_DIALOG_ID, dialogId);
+            queryBuilder.where().eq(Dialog.Column.ID, dialogId);
             PreparedQuery<Dialog> preparedQuery = queryBuilder.prepare();
             dialog = dialogDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

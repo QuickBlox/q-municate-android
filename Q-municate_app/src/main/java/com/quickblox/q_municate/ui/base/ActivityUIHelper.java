@@ -6,14 +6,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -27,7 +26,7 @@ public class ActivityUIHelper {
     private Button notificationActionButton;
 
     private User senderUser;
-    private QBDialog messagesDialog;
+    private Dialog messagesDialog;
     private boolean isPrivateMessage;
 
     public ActivityUIHelper(Activity activity) {
@@ -64,7 +63,7 @@ public class ActivityUIHelper {
     }
 
     private boolean isMessagesDialogCorrect(String dialogId) {
-        messagesDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
+        messagesDialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
         return messagesDialog != null;
     }
 
@@ -104,6 +103,6 @@ public class ActivityUIHelper {
     }
 
     private void startGroupChatActivity() {
-        GroupDialogActivity.start(activity, ChatUtils.createLocalDialog(messagesDialog));
+        GroupDialogActivity.start(activity, messagesDialog);
     }
 }

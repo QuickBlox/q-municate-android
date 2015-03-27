@@ -1,51 +1,52 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Attachment.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.Attachment.Column.ADDITIONAL_INFO;
+import static com.quickblox.q_municate_db.models.Attachment.Column.BLOB_ID;
+import static com.quickblox.q_municate_db.models.Attachment.Column.ID;
+import static com.quickblox.q_municate_db.models.Attachment.Column.NAME;
+import static com.quickblox.q_municate_db.models.Attachment.Column.REMOTE_URL;
+import static com.quickblox.q_municate_db.models.Attachment.Column.SIZE;
+import static com.quickblox.q_municate_db.models.Attachment.Column.TABLE_NAME;
+import static com.quickblox.q_municate_db.models.Attachment.Column.TYPE;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class Attachment implements Serializable {
 
-    public static final String TABLE_NAME = "attachment";
-
-    public static final String COLUMN_ATTACHMENT_ID = "attachment_id";
-    public static final String COLUMN_BLOB_ID = "blob_id";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_SIZE = "size";
-    public static final String COLUMN_REMOTE_URL = "remote_url";
-    public static final String COLUMN_ADDITIONAL_INFO = "additional_info";
-
-    @DatabaseField(generatedId = true, unique = true, columnName = COLUMN_ATTACHMENT_ID)
+    @DatabaseField(generatedId = true, unique = true, columnName = ID)
     private int attachmentId;
 
-    @DatabaseField(unique = true, columnName = COLUMN_BLOB_ID)
+    @DatabaseField(unique = true, columnName = BLOB_ID)
     private int blobId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = AttachmentType.COLUMN_TYPE_ID)
-    private AttachmentType attachmentType;
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, columnName = TYPE)
+    private Type type;
 
-    @DatabaseField(columnName = COLUMN_NAME)
+    @DatabaseField(columnName = NAME)
     private String name;
 
-    @DatabaseField(columnName = COLUMN_SIZE)
+    @DatabaseField(columnName = SIZE)
     private long size;
 
-    @DatabaseField(columnName = COLUMN_REMOTE_URL)
+    @DatabaseField(columnName = REMOTE_URL)
     private String remoteUrl;
 
-    @DatabaseField(columnName = COLUMN_ADDITIONAL_INFO)
+    @DatabaseField(columnName = ADDITIONAL_INFO)
     private String additionalInfo;
 
     public Attachment() {
     }
 
-    public Attachment(int blobId, AttachmentType attachmentType, String name, long size, String remoteUrl,
+    public Attachment(int blobId, Type type, String name, long size, String remoteUrl,
             String additionalInfo) {
         this.blobId = blobId;
-        this.attachmentType = attachmentType;
+        this.type = type;
         this.name = name;
         this.size = size;
         this.remoteUrl = remoteUrl;
@@ -68,12 +69,12 @@ public class Attachment implements Serializable {
         this.blobId = blobId;
     }
 
-    public AttachmentType getAttachmentType() {
-        return attachmentType;
+    public Type getType() {
+        return type;
     }
 
-    public void setAttachmentType(AttachmentType attachmentType) {
-        this.attachmentType = attachmentType;
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public String getName() {
@@ -106,5 +107,48 @@ public class Attachment implements Serializable {
 
     public void setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
+    }
+
+    public enum Type {
+
+        AUDIO(0),
+        VIDEO(1),
+        PICTURE(2),
+        DOC(3),
+        OTHER(4);
+
+        private int code;
+
+        Type(int code) {
+            this.code = code;
+        }
+
+        public static Type parseByCode(int code) {
+            Type[] valuesArray = Type.values();
+            Type result = null;
+            for (Type value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "attachment";
+        String ID = BaseColumns._ID;
+        String BLOB_ID = "blob_id";
+        String NAME = "name";
+        String SIZE = "size";
+        String REMOTE_URL = "remote_url";
+        String ADDITIONAL_INFO = "additional_info";
+        String TYPE = "type";
     }
 }

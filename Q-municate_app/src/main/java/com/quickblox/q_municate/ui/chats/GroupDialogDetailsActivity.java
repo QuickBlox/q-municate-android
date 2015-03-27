@@ -23,7 +23,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -39,7 +38,6 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -56,6 +54,7 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -82,7 +81,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private boolean isNeedUpdateAvatar;
     private Uri outputUri;
     private Bitmap avatarBitmapCurrent;
-    private QBDialog currentDialog;
+    private Dialog currentDialog;
     private String groupNameCurrent;
     private String photoUrlOld;
     private String groupNameOld;
@@ -96,6 +95,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
     private List<User> occupantsList;
     private int countOnlineFriends;
+    private DatabaseManager databaseManager;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -125,8 +125,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initDialogs() {
-        currentDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
-        groupDialog = new GroupDialog(currentDialog);
+        currentDialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        groupDialog = new GroupDialog(ChatUtils.createQBDialogFromLocalDialog1(currentDialog));
     }
 
     private void initLocalBroadcastManagers() {
@@ -228,8 +228,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void loadGroupDialog() {
-        currentDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
-        QBLoadGroupDialogCommand.start(this, currentDialog);
+        currentDialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        QBLoadGroupDialogCommand.start(this, ChatUtils.createQBDialogFromLocalDialog1(currentDialog));
     }
 
     public void changeAvatarOnClick(View view) {
@@ -327,8 +327,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         addedFriendIdsList = (ArrayList<Integer>) data.getSerializableExtra(QBServiceConsts.EXTRA_FRIENDS);
         if (addedFriendIdsList != null) {
             try {
-                groupChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(currentDialog,
-                        addedFriendIdsList);
+                groupChatHelper.sendNotificationToPrivateChatAboutCreatingGroupChat(
+                        ChatUtils.createQBDialogFromLocalDialog1(currentDialog), addedFriendIdsList);
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
@@ -391,8 +391,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             return;
         }
 
-        if (!currentDialog.getName().equals(groupNameCurrent)) {
-            currentDialog.setName(groupNameCurrent);
+        if (!currentDialog.getTitle().equals(groupNameCurrent)) {
+            currentDialog.setTitle(groupNameCurrent);
 
             currentNotificationTypeList.add(MessagesNotificationType.NAME_DIALOG);
         }
@@ -411,8 +411,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void sendNotificationToGroup() {
         for (MessagesNotificationType messagesNotificationType : currentNotificationTypeList) {
             try {
-                groupChatHelper.sendNotificationToFriends(currentDialog, messagesNotificationType,
-                        addedFriendIdsList);
+                groupChatHelper.sendNotificationToFriends(ChatUtils.createQBDialogFromLocalDialog1(
+                        currentDialog), messagesNotificationType, addedFriendIdsList);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
                 hideProgress();
@@ -454,7 +454,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void updateGroupDialog(File imageFile) {
-        QBUpdateGroupDialogCommand.start(this, currentDialog, imageFile);
+        QBUpdateGroupDialogCommand.start(this, ChatUtils.createQBDialogFromLocalDialog1(currentDialog),
+                imageFile);
     }
 
     @Override
@@ -578,8 +579,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
         @Override
         public void execute(Bundle bundle) {
-            currentDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            groupDialog = new GroupDialog(currentDialog);
+            currentDialog = (Dialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+            groupDialog = new GroupDialog(ChatUtils.createQBDialogFromLocalDialog1(currentDialog));
             groupDialog.setOccupantList((ArrayList<User>) occupantsList);
 
             updateOldGroupData();

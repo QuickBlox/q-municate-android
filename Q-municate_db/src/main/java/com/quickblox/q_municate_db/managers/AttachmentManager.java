@@ -5,7 +5,6 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.dao.CommonDao;
 import com.quickblox.q_municate_db.models.Attachment;
-import com.quickblox.q_municate_db.models.AttachmentType;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -71,11 +70,11 @@ public class AttachmentManager implements CommonDao<Attachment> {
         }
     }
 
-    public Attachment getByAttachmentType(AttachmentType.Type type) {
+    public Attachment getByAttachmentType(Attachment.Type type) {
         Attachment attachment = null;
         try {
             QueryBuilder<Attachment, Integer> queryBuilder = attachmentDao.queryBuilder();
-            queryBuilder.where().eq(Attachment.COLUMN_ATTACHMENT_ID, type);
+            queryBuilder.where().eq(Attachment.Column.ID, type);
             PreparedQuery<Attachment> preparedQuery = queryBuilder.prepare();
             attachment = attachmentDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

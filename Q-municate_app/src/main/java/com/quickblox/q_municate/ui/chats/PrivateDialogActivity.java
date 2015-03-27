@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -26,7 +25,6 @@ import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
@@ -49,7 +47,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
     }
 
-    public static void start(Context context, User opponent, QBDialog dialog) {
+    public static void start(Context context, User opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
@@ -65,7 +63,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialogId = dialog.getDialogId();
 
         initActionBar();
-        setCurrentDialog(ChatUtils.createQBDialogFromLocalDialog(dialog));
+        setCurrentDialog(dialog);
     }
 
     @Override

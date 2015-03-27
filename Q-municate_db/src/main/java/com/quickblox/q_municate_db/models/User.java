@@ -1,52 +1,52 @@
 package com.quickblox.q_municate_db.models;
 
-import android.content.Context;
+import android.provider.BaseColumns;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = User.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.User.Column.AVATAR;
+import static com.quickblox.q_municate_db.models.User.Column.EMAIL;
+import static com.quickblox.q_municate_db.models.User.Column.FULL_NAME;
+import static com.quickblox.q_municate_db.models.User.Column.ID;
+import static com.quickblox.q_municate_db.models.User.Column.LOGIN;
+import static com.quickblox.q_municate_db.models.User.Column.PHONE;
+import static com.quickblox.q_municate_db.models.User.Column.ROLE;
+import static com.quickblox.q_municate_db.models.User.Column.STATUS;
+import static com.quickblox.q_municate_db.models.User.Column.TABLE_NAME;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class User implements Serializable {
 
-    public static final String TABLE_NAME = "user";
-
-    public static final String COLUMN_USER_ID = "user_id";
-    public static final String COLUMN_FULL_NAME = "full_name";
-    public static final String COLUMN_EMAIL = "email";
-    public static final String COLUMN_LOGIN = "login";
-    public static final String COLUMN_PHONE = "phone";
-    public static final String COLUMN_AVATAR = "avatar";
-    public static final String COLUMN_STATUS = "status";
-
-    @DatabaseField(id = true, unique = true, columnName = COLUMN_USER_ID)
+    @DatabaseField(id = true, unique = true, columnName = ID)
     private Integer userId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = Role.COLUMN_ROLE_ID)
+            columnName = ROLE)
     private Role role;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
-            columnName = Social.COLUMN_SOCIAL_ID)
+            columnName = Social.Column.ID)
     private Social social;
 
-    @DatabaseField(columnName = COLUMN_FULL_NAME)
+    @DatabaseField(columnName = FULL_NAME)
     private String fullName;
 
-    @DatabaseField(columnName = COLUMN_EMAIL)
+    @DatabaseField(columnName = EMAIL)
     private String email;
 
-    @DatabaseField(columnName = COLUMN_LOGIN)
+    @DatabaseField(columnName = LOGIN)
     private String login;
 
-    @DatabaseField(columnName = COLUMN_PHONE)
+    @DatabaseField(columnName = PHONE)
     private String phone;
 
-    @DatabaseField(columnName = COLUMN_AVATAR)
+    @DatabaseField(columnName = AVATAR)
     private String avatar;
 
-    @DatabaseField(columnName = COLUMN_STATUS)
+    @DatabaseField(columnName = STATUS)
     private String status;
 
     private boolean online;
@@ -171,5 +171,46 @@ public class User implements Serializable {
 
     public void setSocial(Social social) {
         this.social = social;
+    }
+
+    public enum Role {
+
+        OWNER(0),
+        SIMPLE_ROLE(1);
+
+        private int code;
+
+        Role(int code) {
+            this.code = code;
+        }
+
+        public static Role parseByCode(int code) {
+            Role[] valuesArray = Role.values();
+            Role result = null;
+            for (Role value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "user";
+        String ID = BaseColumns._ID;
+        String FULL_NAME = "full_name";
+        String EMAIL = "email";
+        String LOGIN = "login";
+        String PHONE = "phone";
+        String AVATAR = "avatar";
+        String STATUS = "status";
+        String ROLE = "role";
     }
 }

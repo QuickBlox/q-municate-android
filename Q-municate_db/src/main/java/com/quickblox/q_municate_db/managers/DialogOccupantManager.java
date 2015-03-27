@@ -33,22 +33,6 @@ public class DialogOccupantManager implements CommonDao<DialogOccupant> {
         return null;
     }
 
-    public void createOrUpdate(final Collection<DialogOccupant> dialogOccupantsList) {
-        try {
-            dialogOccupantDao.callBatchTasks(new Callable<DialogOccupant>() {
-                @Override
-                public DialogOccupant call() throws Exception {
-                    for (DialogOccupant dialogOccupant : dialogOccupantsList) {
-                        dialogOccupantDao.createOrUpdate(dialogOccupant);
-                    }
-                    return null;
-                }
-            });
-        } catch (Exception e) {
-            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
-        }
-    }
-
     @Override
     public List<DialogOccupant> getAll() {
         List<DialogOccupant> dialogOccupantList = null;
@@ -89,11 +73,27 @@ public class DialogOccupantManager implements CommonDao<DialogOccupant> {
         }
     }
 
+    public void createOrUpdate(final Collection<DialogOccupant> dialogOccupantsList) {
+        try {
+            dialogOccupantDao.callBatchTasks(new Callable<DialogOccupant>() {
+                @Override
+                public DialogOccupant call() throws Exception {
+                    for (DialogOccupant dialogOccupant : dialogOccupantsList) {
+                        dialogOccupantDao.createOrUpdate(dialogOccupant);
+                    }
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
+        }
+    }
+
     public List<DialogOccupant> getDialogOccupantsListByDialog(String dialogId) {
         List<DialogOccupant> dialogOccupant = null;
         try {
             QueryBuilder<DialogOccupant, Integer> queryBuilder = dialogOccupantDao.queryBuilder();
-            queryBuilder.where().eq(Dialog.COLUMN_DIALOG_ID, dialogId);
+            queryBuilder.where().eq(Dialog.Column.ID, dialogId);
             PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();
             dialogOccupant = dialogOccupantDao.query(preparedQuery);
         } catch (SQLException e) {

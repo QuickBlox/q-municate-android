@@ -23,10 +23,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
@@ -116,7 +113,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         QBGroupChat groupChat = groupChatManager.getGroupChat(roomJId);
         QBDialog existingDialog = null;
         if (groupChat == null) {
-            existingDialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
+            existingDialog = ChatUtils.createQBDialogFromLocalDialog1(
+                    databaseManager.getDialogManager().getByDialogId(dialogId));
             groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
         String error = null;
@@ -265,7 +263,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog1(
+                databaseManager.getDialogManager().getByDialogId(dialogId));
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
@@ -305,7 +304,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     private void updateDialogByNotification(QBChatMessage chatMessage) {
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId));
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog1(
+                databaseManager.getDialogManager().getByDialogId(dialogId));
 
         ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, dialog);
 

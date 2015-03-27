@@ -12,8 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
@@ -93,7 +91,7 @@ public class DialogsFragment extends BaseFragment {
 
     private void startChat(int position) {
         Dialog dialog = dialogsAdapter.getItem(position);
-        if (dialog.getDialogType().getType() == com.quickblox.q_municate_core.models.Dialog.DialogType.PRIVATE) {
+        if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog);
         } else {
             startGroupChatActivity(dialog);
@@ -134,7 +132,7 @@ public class DialogsFragment extends BaseFragment {
         dialogsListView.setAdapter(dialogsAdapter);
     }
 
-    private void startPrivateChatActivity(QBDialog dialog) {
+    private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = databaseManager.getDialogOccupantManager()
                 .getDialogOccupantsListByDialog(dialog.getDialogId());
         User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
@@ -143,8 +141,8 @@ public class DialogsFragment extends BaseFragment {
         }
     }
 
-    private void startGroupChatActivity(QBDialog dialog) {
-        GroupDialogActivity.start(baseActivity, ChatUtils.createLocalDialog(dialog));
+    private void startGroupChatActivity(Dialog dialog) {
+        GroupDialogActivity.start(baseActivity, dialog);
     }
 
     private void startNewDialogPage() {

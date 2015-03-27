@@ -1,39 +1,42 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = DialogNotification.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.CREATED_DATE;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.ID;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.NOTIFICATION_TYPE;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.TABLE_NAME;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class DialogNotification implements Serializable {
 
-    public static final String TABLE_NAME = "dialog_notification";
-
-    public static final String COLUMN_DIALOG_NOTIFICATION_ID = "dialog_notification_id";
-    public static final String COLUMN_CREATED_DATE = "created_date";
-
-    @DatabaseField(id = true, unique = true, columnName = COLUMN_DIALOG_NOTIFICATION_ID)
+    @DatabaseField(id = true, unique = true, columnName = ID)
     private String dialogNotificationId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true,
-            columnName = DialogOccupant.COLUMN_DIALOG_OCCUPANT_ID)
+            columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
-            columnName = Notification.COLUMN_NAME_NOTIFICATION_ID)
-    private Notification notification;
+            columnName = NOTIFICATION_TYPE)
+    private NotificationType notificationType;
 
-    @DatabaseField(columnName = COLUMN_CREATED_DATE)
+    @DatabaseField(columnName = CREATED_DATE)
     private String createdDate;
 
     public DialogNotification() {
     }
 
-    public DialogNotification(String dialogNotificationId, DialogOccupant dialogOccupant, Notification notification, String createdDate) {
+    public DialogNotification(String dialogNotificationId, DialogOccupant dialogOccupant,
+            NotificationType notificationType, String createdDate) {
         this.dialogNotificationId = dialogNotificationId;
         this.dialogOccupant = dialogOccupant;
-        this.notification = notification;
+        this.notificationType = notificationType;
         this.createdDate = createdDate;
     }
 
@@ -53,12 +56,12 @@ public class DialogNotification implements Serializable {
         this.dialogOccupant = dialogOccupant;
     }
 
-    public Notification getNotification() {
-        return notification;
+    public NotificationType getNotificationType() {
+        return notificationType;
     }
 
-    public void setNotification(Notification notification) {
-        this.notification = notification;
+    public void setNotificationType(NotificationType NotificationType) {
+        this.notificationType = NotificationType;
     }
 
     public String getCreatedDate() {
@@ -67,5 +70,44 @@ public class DialogNotification implements Serializable {
 
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public enum NotificationType {
+
+        CREATE_PRIVATE_CHAT(0),
+        CREATE_GROUP_CHAT(1),
+        CHANGE_NAME_GROUP_CHAT(2),
+        CHANGE_PHOTO_GROUP_CHAT(3),
+        CHANGE_OCCUPANTS_GROUP_CHAT(4);
+
+        private int code;
+
+        NotificationType(int code) {
+            this.code = code;
+        }
+
+        public static NotificationType parseByCode(int code) {
+            NotificationType[] valuesArray = NotificationType.values();
+            NotificationType result = null;
+            for (NotificationType value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "dialog_notification";
+        String ID = BaseColumns._ID;
+        String CREATED_DATE = "created_date";
+        String NOTIFICATION_TYPE = "notification_type";
     }
 }

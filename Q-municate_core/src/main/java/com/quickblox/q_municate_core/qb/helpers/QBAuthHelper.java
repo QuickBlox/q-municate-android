@@ -18,7 +18,6 @@ import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.models.Role;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -55,8 +54,7 @@ public class QBAuthHelper extends BaseHelper {
     }
 
     private void saveOwnerUser(QBUser qbUser) {
-        User user = UserFriendUtils.createLocalUser(qbUser,
-                DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.OWNER));
+        User user = UserFriendUtils.createLocalUser(qbUser, User.Role.OWNER);
         DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
     }
 

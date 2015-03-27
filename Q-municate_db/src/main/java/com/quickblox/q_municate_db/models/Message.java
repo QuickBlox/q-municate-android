@@ -1,5 +1,7 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -7,18 +9,18 @@ import java.io.Serializable;
 
 import static com.quickblox.q_municate_db.models.Message.Column.BODY;
 import static com.quickblox.q_municate_db.models.Message.Column.CREATED_DATE;
-import static com.quickblox.q_municate_db.models.Message.Column.MESSAGE_ID;
+import static com.quickblox.q_municate_db.models.Message.Column.ID;
 import static com.quickblox.q_municate_db.models.Message.Column.STATE;
 import static com.quickblox.q_municate_db.models.Message.Column.TABLE_NAME;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class Message implements Serializable {
 
-    @DatabaseField(id = true, unique = true, columnName = MESSAGE_ID)
+    @DatabaseField(id = true, unique = true, columnName = ID)
     private String messageId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = DialogOccupant.COLUMN_DIALOG_OCCUPANT_ID)
+            columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
@@ -26,7 +28,7 @@ public class Message implements Serializable {
     private State state;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
-            columnName = Attachment.COLUMN_ATTACHMENT_ID)
+            columnName = Attachment.Column.ID)
     private Attachment attachment;
 
     @DatabaseField(columnName = BODY)
@@ -101,13 +103,38 @@ public class Message implements Serializable {
     }
 
     public enum State {
-        DELIVERED, READ, SYNC
+
+        DELIVERED(0),
+        READ(1),
+        SYNC(2);
+
+        private int code;
+
+        State(int code) {
+            this.code = code;
+        }
+
+        public static State parseByCode(int code) {
+            State[] valuesArray = State.values();
+            State result = null;
+            for (State value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
     }
 
     public interface Column {
 
         String TABLE_NAME = "message";
-        String MESSAGE_ID = "message_id";
+        String ID = BaseColumns._ID;
         String BODY = "body";
         String CREATED_DATE = "created_date";
         String STATE = "state";

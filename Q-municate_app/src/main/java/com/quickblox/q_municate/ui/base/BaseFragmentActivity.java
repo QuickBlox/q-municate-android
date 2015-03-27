@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
@@ -20,6 +19,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -36,7 +36,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected SuccessAction successAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
     protected ActivityHelper activityHelper;
-    private QBDialog currentDialog;
+    private Dialog currentDialog;
     private boolean doubleBackToExitPressedOnce;
 
     public BaseFragmentActivity() {
@@ -114,7 +114,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         return activityHelper.service;
     }
 
-    protected void setCurrentDialog(QBDialog dialog) {
+    protected void setCurrentDialog(Dialog dialog) {
         currentDialog = dialog;
     }
 
@@ -195,6 +195,12 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         return canPerformLogout.get();
     }
 
+    private boolean isFromCurrentDialog(Bundle extras) {
+        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
+        return isFromCurrentChat;
+    }
+
     public class SuccessAction implements Command {
 
         @Override
@@ -235,7 +241,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceiveRefreshSessionAction(Bundle extras) {
             DialogUtils.show(BaseFragmentActivity.this, getString(R.string.dlg_refresh_session));
-//            showProgress();
             activityHelper.refreshSession();
         }
 
@@ -248,11 +253,5 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
                 activityHelper.onReceivedContactRequestNotification(extras);
             }
         }
-    }
-
-    private boolean isFromCurrentDialog(Bundle extras) {
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
-        boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
-        return isFromCurrentChat;
     }
 }

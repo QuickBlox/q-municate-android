@@ -2,10 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Friend;
-import com.quickblox.q_municate_db.models.Role;
-import com.quickblox.q_municate_db.models.Status;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
 import com.quickblox.users.model.QBUser;
@@ -31,14 +28,14 @@ public class UserFriendUtils {
     public static List<User> getUsersFromUserRequest(List<UserRequest> userRequestList) {
         List<User> userList = new ArrayList<>(userRequestList.size());
         for (UserRequest userRequest : userRequestList) {
-            if (userRequest.getStatus().getType() == Status.Type.OUTGOING) {
+            if (userRequest.getRequestStatus() == UserRequest.RequestStatus.OUTGOING) {
                 userList.add(userRequest.getUser());
             }
         }
         return userList;
     }
 
-    public static User createLocalUser(QBUser qbUser, Role role) {
+    public static User createLocalUser(QBUser qbUser, User.Role role) {
         User user = new User();
         user.setUserId(qbUser.getId());
         user.setFullName(qbUser.getFullName());
@@ -57,8 +54,7 @@ public class UserFriendUtils {
     }
 
     public static User createLocalUser(QBUser qbUser) {
-        Role role = DatabaseManager.getInstance().getRoleManager().getByRoleType(Role.Type.SIMPLE_ROLE);
-        return createLocalUser(qbUser, role);
+        return createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
     }
 
     public static boolean isPendingFriend(QBRosterEntry rosterEntry) {

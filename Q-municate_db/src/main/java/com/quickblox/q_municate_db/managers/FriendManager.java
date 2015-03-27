@@ -75,7 +75,7 @@ public class FriendManager implements CommonDao<Friend> {
     public void delete(int userId) {
         try {
             DeleteBuilder<Friend, Integer> deleteBuilder = friendDao.deleteBuilder();
-            deleteBuilder.where().eq(User.COLUMN_USER_ID, userId);
+            deleteBuilder.where().eq(User.Column.ID, userId);
             deleteBuilder.delete();
         } catch (SQLException e) {
             ErrorUtils.logError(e);
@@ -86,7 +86,7 @@ public class FriendManager implements CommonDao<Friend> {
         Friend friend = null;
         try {
             QueryBuilder<Friend, Integer> queryBuilder = friendDao.queryBuilder();
-            queryBuilder.where().eq(User.COLUMN_USER_ID, userId);
+            queryBuilder.where().eq(User.Column.ID, userId);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
             friend = friendDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
@@ -99,7 +99,7 @@ public class FriendManager implements CommonDao<Friend> {
         List<Friend> friendsList = null;
         try {
             QueryBuilder<Friend, Integer> queryBuilder = friendDao.queryBuilder();
-            queryBuilder.where().in(User.COLUMN_USER_ID, idsList);
+            queryBuilder.where().in(User.Column.ID, idsList);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
             friendsList = friendDao.query(preparedQuery);
         } catch (SQLException e) {

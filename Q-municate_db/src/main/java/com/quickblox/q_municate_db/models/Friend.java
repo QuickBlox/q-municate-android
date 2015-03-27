@@ -1,22 +1,23 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Friend.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.Friend.Column.ID;
+import static com.quickblox.q_municate_db.models.Friend.Column.TABLE_NAME;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class Friend implements Serializable {
 
-    public static final String TABLE_NAME = "friend";
-
-    public static final String COLUMN_FRIEND_ID = "friend_id";
-
-    @DatabaseField(generatedId = true, unique = true, columnName = COLUMN_FRIEND_ID)
+    @DatabaseField(generatedId = true, unique = true, columnName = ID)
     private int friendId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, unique = true, canBeNull = false,
-            columnName = User.COLUMN_USER_ID)
+            columnName = User.Column.ID)
     private User user;
 
     public Friend() {
@@ -40,5 +41,11 @@ public class Friend implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "friend";
+        String ID = BaseColumns._ID;
     }
 }

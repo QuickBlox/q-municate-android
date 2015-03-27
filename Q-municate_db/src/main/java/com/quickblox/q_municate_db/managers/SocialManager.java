@@ -74,7 +74,7 @@ public class SocialManager implements CommonDao<Social> {
         Social social = null;
         try {
             QueryBuilder<Social, Integer> queryBuilder = socialDao.queryBuilder();
-            queryBuilder.where().eq(Social.COLUMN_SOCIAL_ID, socialId);
+            queryBuilder.where().eq(Social.Column.ID, socialId);
             PreparedQuery<Social> preparedQuery = queryBuilder.prepare();
             social = socialDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

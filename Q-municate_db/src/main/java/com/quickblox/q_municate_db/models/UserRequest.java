@@ -1,43 +1,45 @@
 package com.quickblox.q_municate_db.models;
 
+import android.provider.BaseColumns;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = UserRequest.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.UserRequest.Column.ID;
+import static com.quickblox.q_municate_db.models.UserRequest.Column.REQUEST_STATUS;
+import static com.quickblox.q_municate_db.models.UserRequest.Column.TABLE_NAME;
+import static com.quickblox.q_municate_db.models.UserRequest.Column.TEXT_STATUS;
+import static com.quickblox.q_municate_db.models.UserRequest.Column.UPDATED_DATE;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class UserRequest implements Serializable {
 
-    public static final String TABLE_NAME = "user_request";
-
-    public static final String COLUMN_REQUEST_ID = "request_id";
-    public static final String COLUMN_TEXT_STATUS = "text_status";
-    public static final String COLUMN_UPDATED_DATE = "updated_date";
-
-    @DatabaseField(generatedId = true, unique = true, columnName = COLUMN_REQUEST_ID)
+    @DatabaseField(generatedId = true, unique = true, columnName = ID)
     private int requestId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, unique = true,
-            canBeNull = false, columnName = User.COLUMN_USER_ID)
+            canBeNull = false, columnName = User.Column.ID)
     private User user;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = Status.COLUMN_STATUS_ID)
-    private Status status;
+            columnName = REQUEST_STATUS)
+    private RequestStatus requestStatus;
 
-    @DatabaseField(columnName = COLUMN_TEXT_STATUS)
+    @DatabaseField(columnName = TEXT_STATUS)
     private String textStatus;
 
-    @DatabaseField(columnName = COLUMN_UPDATED_DATE)
+    @DatabaseField(columnName = UPDATED_DATE)
     private long updatedDate;
 
     public UserRequest() {
     }
 
-    public UserRequest(long updatedDate, String textStatus, Status status, User user) {
+    public UserRequest(long updatedDate, String textStatus, RequestStatus requestStatus, User user) {
         this.updatedDate = updatedDate;
         this.textStatus = textStatus;
-        this.status = status;
+        this.requestStatus = requestStatus;
         this.user = user;
     }
 
@@ -73,15 +75,52 @@ public class UserRequest implements Serializable {
         this.textStatus = textStatus;
     }
 
-    public Status getStatus() {
-        return status;
+    public RequestStatus getRequestStatus() {
+        return requestStatus;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setRequestStatus(RequestStatus requestStatus) {
+        this.requestStatus = requestStatus;
     }
 
     public boolean isIncoming() {
-        return user.getRole().getType() != Role.Type.OWNER;
+        return user.getRole() != User.Role.OWNER;
+    }
+
+    public enum RequestStatus {
+
+        INCOMING(0),
+        OUTGOING(1);
+
+        private int code;
+
+        RequestStatus(int code) {
+            this.code = code;
+        }
+
+        public static RequestStatus parseByCode(int code) {
+            RequestStatus[] valuesArray = RequestStatus.values();
+            RequestStatus result = null;
+            for (RequestStatus value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "user_request";
+        String ID = BaseColumns._ID;
+        String TEXT_STATUS = "text_status";
+        String UPDATED_DATE = "updated_date";
+        String REQUEST_STATUS = "request_status";
     }
 }

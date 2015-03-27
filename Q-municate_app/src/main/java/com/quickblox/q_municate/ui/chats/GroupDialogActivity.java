@@ -18,7 +18,6 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -61,7 +60,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
         startLoadDialogMessages();
-        setCurrentDialog(ChatUtils.createQBDialogFromLocalDialog(dialog));
+        setCurrentDialog(dialog);
 
         //        registerForContextMenu(messagesListView);
     }
