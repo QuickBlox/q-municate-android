@@ -1,8 +1,11 @@
 package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.dao.CommonDao;
 import com.quickblox.q_municate_db.models.Attachment;
+import com.quickblox.q_municate_db.models.AttachmentType;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -68,16 +71,16 @@ public class AttachmentManager implements CommonDao<Attachment> {
         }
     }
 
-    public Attachment getByAttachmentType(AttachmentT.Type type) {
-        Status status = null;
+    public Attachment getByAttachmentType(AttachmentType.Type type) {
+        Attachment attachment = null;
         try {
-            QueryBuilder<Status, Integer> queryBuilder = statusDao.queryBuilder();
-            queryBuilder.where().eq(Status.COLUMN_STATUS, type);
-            PreparedQuery<Status> preparedQuery = queryBuilder.prepare();
-            status = statusDao.queryForFirst(preparedQuery);
+            QueryBuilder<Attachment, Integer> queryBuilder = attachmentDao.queryBuilder();
+            queryBuilder.where().eq(Attachment.COLUMN_ATTACHMENT_ID, type);
+            PreparedQuery<Attachment> preparedQuery = queryBuilder.prepare();
+            attachment = attachmentDao.queryForFirst(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
-        return status;
+        return attachment;
     }
 }

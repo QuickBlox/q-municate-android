@@ -9,9 +9,9 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -168,46 +168,47 @@ public class ChatNotificationUtils {
     }
 
     public static String getBodyForFriendsNotificationMessage(Context context,
-                                                              MessagesNotificationType messagesNotificationType, MessageCache messageCache) {
+                                                              MessagesNotificationType messagesNotificationType, Message messageCache) {
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.frl_friends_contact_request);
         QBUser user = AppSession.getSession().getUser();
-        boolean ownMessage = user.getId().equals(messageCache.getSenderId());
 
-        switch (messagesNotificationType) {
-            case FRIENDS_REQUEST: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_message_for_friend, ChatUtils.getFullNameById(
-                                messageCache.getSenderId()));
-                break;
-            }
-            case FRIENDS_ACCEPT: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_accept_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_accept_message_for_friend);
-                break;
-            }
-            case FRIENDS_REJECT: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_reject_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_reject_message_for_friend);
-                break;
-            }
-            case FRIENDS_REMOVE: {
-                User opponentUser;
-
-                if (messageCache.getRecipientId().intValue() == user.getId().intValue()) {
-                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
-                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_friend, opponentUser.getFullName());
-                } else {
-                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getRecipientId());
-                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me, opponentUser.getFullName());
-                }
-
-                break;
-            }
-        }
+//        boolean ownMessage = user.getId().equals(messageCache.getSenderId());
+//
+//        switch (messagesNotificationType) {
+//            case FRIENDS_REQUEST: {
+//                resultMessage = ownMessage ? resources.getString(
+//                        R.string.frl_friends_request_message_for_me) : resources.getString(
+//                        R.string.frl_friends_request_message_for_friend, ChatUtils.getFullNameById(
+//                                messageCache.getSenderId()));
+//                break;
+//            }
+//            case FRIENDS_ACCEPT: {
+//                resultMessage = ownMessage ? resources.getString(
+//                        R.string.frl_friends_request_accept_message_for_me) : resources.getString(
+//                        R.string.frl_friends_request_accept_message_for_friend);
+//                break;
+//            }
+//            case FRIENDS_REJECT: {
+//                resultMessage = ownMessage ? resources.getString(
+//                        R.string.frl_friends_request_reject_message_for_me) : resources.getString(
+//                        R.string.frl_friends_request_reject_message_for_friend);
+//                break;
+//            }
+//            case FRIENDS_REMOVE: {
+//                User opponentUser;
+//
+//                if (messageCache.getRecipientId().intValue() == user.getId().intValue()) {
+//                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
+//                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_friend, opponentUser.getFullName());
+//                } else {
+//                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getRecipientId());
+//                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me, opponentUser.getFullName());
+//                }
+//
+//                break;
+//            }
+//        }
 
         return resultMessage;
     }

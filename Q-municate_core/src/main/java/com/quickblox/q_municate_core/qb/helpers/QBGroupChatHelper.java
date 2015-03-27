@@ -18,7 +18,6 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestUpdateBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -76,34 +75,34 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             return;
         }
 
-        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
-
-        MessageCache messageCache;
-
-        if (user == null) {
-            user = ChatUtils.getTempUserFromChatMessage(chatMessage);
-        }
-
-        messageCache = parseReceivedMessage(chatMessage);
-
-        boolean ownMessage = chatMessage.getSenderId().equals(chatCreator.getId());
-
-        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
-            messageCache.setMessagesNotificationType(
-                    ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
-            messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
-                    chatMessage));
-            if (!ownMessage) {
-                updateDialogByNotification(chatMessage);
-            }
-        }
-
-        saveMessageToCache(messageCache);
-
-        if (!ownMessage) {
-            // TODO IS handle logic when friend is not in the friend list
-            notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), false);
-        }
+//        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
+//
+//        MessageCache messageCache;
+//
+//        if (user == null) {
+//            user = ChatUtils.getTempUserFromChatMessage(chatMessage);
+//        }
+//
+//        messageCache = parseReceivedMessage(chatMessage);
+//
+//        boolean ownMessage = chatMessage.getSenderId().equals(chatCreator.getId());
+//
+//        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+//            messageCache.setMessagesNotificationType(
+//                    ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
+//            messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
+//                    chatMessage));
+//            if (!ownMessage) {
+//                updateDialogByNotification(chatMessage);
+//            }
+//        }
+//
+//        saveMessageToCache(messageCache);
+//
+//        if (!ownMessage) {
+//            // TODO IS handle logic when friend is not in the friend list
+//            notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), false);
+//        }
     }
 
     public void sendGroupMessage(String roomJidId,
@@ -329,24 +328,24 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     private void createDialogByNotification(QBChatMessage chatMessage,
             MessagesNotificationType messagesNotificationType) {
-        MessageCache messageCache = parseReceivedMessage(chatMessage);
-        messageCache.setMessagesNotificationType(messagesNotificationType);
-
-        String roomJidId;
-
-        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                messageCache.getMessage(), QBDialogType.GROUP);
-        dialog.setUnreadMessageCount(1);
-        saveDialogToCache(dialog);
-
-        roomJidId = dialog.getRoomJid();
-        if (roomJidId != null) {
-            tryJoinRoomChat(dialog);
-            new FinderUnknownFriends(context, chatCreator, dialog).find();
-        }
-
-        User senderUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
-        notifyMessageReceived(chatMessage, senderUser, messageCache.getDialogId(), false);
+//        MessageCache messageCache = parseReceivedMessage(chatMessage);
+//        messageCache.setMessagesNotificationType(messagesNotificationType);
+//
+//        String roomJidId;
+//
+//        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+//                messageCache.getMessage(), QBDialogType.GROUP);
+//        dialog.setUnreadMessageCount(1);
+//        saveDialogToCache(dialog);
+//
+//        roomJidId = dialog.getRoomJid();
+//        if (roomJidId != null) {
+//            tryJoinRoomChat(dialog);
+//            new FinderUnknownFriends(context, chatCreator, dialog).find();
+//        }
+//
+//        User senderUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
+//        notifyMessageReceived(chatMessage, senderUser, messageCache.getDialogId(), false);
     }
 
     private class GroupChatNotificationListener implements QBNotificationChatListener {

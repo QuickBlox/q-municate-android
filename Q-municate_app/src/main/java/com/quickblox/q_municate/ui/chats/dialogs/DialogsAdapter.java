@@ -34,6 +34,8 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
+        Dialog dialog = getItem(position);
+
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
 
@@ -50,7 +52,6 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        Dialog dialog = getItem(position);
         List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
 
         if (DialogType.Type.PRIVATE.equals(dialog.getDialogType().getType())) {

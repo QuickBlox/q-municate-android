@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.chats;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,21 +11,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
+import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.Message;
@@ -70,7 +63,26 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         startLoadDialogMessages();
         setCurrentDialog(ChatUtils.createQBDialogFromLocalDialog(dialog));
 
-//        registerForContextMenu(messagesListView);
+        //        registerForContextMenu(messagesListView);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDialogData();
+
+        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            scrollListView();
+        }
+    }
+
+    protected void updateActionBar() {
+        actionBar.setTitle(dialog.getTitle());
+        //        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
+        actionBar.setLogo(R.drawable.placeholder_group);
+        if (!TextUtils.isEmpty(dialog.getPhoto())) {
+            loadLogoActionBar(dialog.getPhoto());
+        }
     }
 
     @Override
@@ -78,6 +90,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
             startUpdateChatDialog();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode && GroupDialogDetailsActivity.RESULT_LEAVE_GROUP == resultCode) {
+            finish();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -111,14 +131,22 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode &&
-                GroupDialogDetailsActivity.RESULT_LEAVE_GROUP == resultCode) {
-            finish();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+    //    protected QBDialog getQBDialog() {
+    //        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+    //
+    //        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+    //        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
+    //
+    //        if (messagesNotificationType == null) {
+    //            dialog.setLastMessage(messageCache.getMessage());
+    //        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
+    //            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
+    //        }
+    //
+    //        dialog.setLastMessageDateSent(messageCache.getTime());
+    //        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
+    //        return dialog;
+    //    }
 
     @Override
     protected Bundle generateBundleToInitDialog() {
@@ -128,37 +156,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void initListView() {
         List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAll();
-        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesList, this,
-                dialog);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesList, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
         scrollListView();
-    }
-
-//    protected QBDialog getQBDialog() {
-//        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-//
-//        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-//        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-//
-//        if (messagesNotificationType == null) {
-//            dialog.setLastMessage(messageCache.getMessage());
-//        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
-//            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
-//        }
-//
-//        dialog.setLastMessageDateSent(messageCache.getTime());
-//        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
-//        return dialog;
-//    }
-
-    protected void updateActionBar() {
-        actionBar.setTitle(dialog.getTitle());
-//        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
-        actionBar.setLogo(R.drawable.placeholder_group);
-        if (!TextUtils.isEmpty(dialog.getPhoto())) {
-            loadLogoActionBar(dialog.getPhoto());
-        }
     }
 
     @Override
@@ -181,6 +182,13 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         return true;
     }
 
+    //    @Override
+    //    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+    //        super.onCreateContextMenu(menu, view, menuInfo);
+    //        MenuInflater m = getMenuInflater();
+    //        m.inflate(R.menu.group_dialog_ctx_menu, menu);
+    //    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -195,22 +203,5 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-//    @Override
-//    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, view, menuInfo);
-//        MenuInflater m = getMenuInflater();
-//        m.inflate(R.menu.group_dialog_ctx_menu, menu);
-//    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateDialogData();
-
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
     }
 }

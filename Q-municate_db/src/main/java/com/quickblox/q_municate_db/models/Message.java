@@ -5,16 +5,16 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
-@DatabaseTable(tableName = Message.TABLE_NAME)
+import static com.quickblox.q_municate_db.models.Message.Column.BODY;
+import static com.quickblox.q_municate_db.models.Message.Column.CREATED_DATE;
+import static com.quickblox.q_municate_db.models.Message.Column.MESSAGE_ID;
+import static com.quickblox.q_municate_db.models.Message.Column.STATE;
+import static com.quickblox.q_municate_db.models.Message.Column.TABLE_NAME;
+
+@DatabaseTable(tableName = TABLE_NAME)
 public class Message implements Serializable {
 
-    public static final String TABLE_NAME = "message";
-
-    public static final String COLUMN_MESSAGE_ID = "message_id";
-    public static final String COLUMN_BODY = "body";
-    public static final String COLUMN_CREATED_DATE = "created_date";
-
-    @DatabaseField(id = true, unique = true, columnName = COLUMN_MESSAGE_ID)
+    @DatabaseField(id = true, unique = true, columnName = MESSAGE_ID)
     private String messageId;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
@@ -22,17 +22,17 @@ public class Message implements Serializable {
     private DialogOccupant dialogOccupant;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = State.COLUMN_STATE_ID)
+            columnName = STATE)
     private State state;
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
             columnName = Attachment.COLUMN_ATTACHMENT_ID)
     private Attachment attachment;
 
-    @DatabaseField(columnName = COLUMN_BODY)
+    @DatabaseField(columnName = BODY)
     private String body;
 
-    @DatabaseField(columnName = COLUMN_CREATED_DATE)
+    @DatabaseField(columnName = CREATED_DATE)
     private long createdDate;
 
     public Message() {
@@ -98,5 +98,18 @@ public class Message implements Serializable {
 
     public boolean isIncoming(int currentUserId) {
         return currentUserId == dialogOccupant.getUser().getUserId();
+    }
+
+    public enum State {
+        DELIVERED, READ, SYNC
+    }
+
+    public interface Column {
+
+        String TABLE_NAME = "message";
+        String MESSAGE_ID = "message_id";
+        String BODY = "body";
+        String CREATED_DATE = "created_date";
+        String STATE = "state";
     }
 }

@@ -1,15 +1,12 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.app.ActionBar;
-import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.Loader;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -33,11 +30,9 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.base.BaseCursorAdapter;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
@@ -49,10 +44,8 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogLocalCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -228,7 +221,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {
-                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog), generateBundleToInitDialog());
+                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                        generateBundleToInitDialog());
             } catch (QBResponseException e) {
                 ErrorUtils.showError(this, e.getMessage());
                 finish();
@@ -251,21 +245,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         CharSequence[] itemsArray = resources.getStringArray(R.array.dlg_attach_types_array);
 
-        final android.app.Dialog alertDialog = DialogUtils.createSingleChoiceItemsDialog(this, resources.getString(
-                R.string.dlg_select_attach_type), itemsArray, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                switch (item) {
-                    case 0:
-                        imageUtils.getCaptureImage();
-                        break;
-                    case 1:
-                        imageUtils.getImage();
-                        break;
-                }
+        final android.app.Dialog alertDialog = DialogUtils.createSingleChoiceItemsDialog(this,
+                resources.getString(R.string.dlg_select_attach_type), itemsArray,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        switch (item) {
+                            case 0:
+                                imageUtils.getCaptureImage();
+                                break;
+                            case 1:
+                                imageUtils.getImage();
+                                break;
+                        }
 
-//                alertDialog.dismiss();
-            }
-        });
+                        //                alertDialog.dismiss();
+                    }
+                });
 
         alertDialog.show();
     }
@@ -325,7 +320,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         if (baseChatHelper != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog), generateBundleToInitDialog());
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                    generateBundleToInitDialog());
         }
         removeActions();
     }
@@ -588,7 +584,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-//    abstract QBDialog getQBDialog();
+    //    abstract QBDialog getQBDialog();
 
     protected void sendMessage(boolean privateMessage) {
         boolean error = false;
@@ -617,10 +613,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startUpdateChatDialog() {
-//        QBDialog dialog = getQBDialog();
-//        if (dialog != null) {
-//            QBUpdateDialogLocalCommand.start(this, dialog);
-//        }
+        //        QBDialog dialog = getQBDialog();
+        //        if (dialog != null) {
+        //            QBUpdateDialogLocalCommand.start(this, dialog);
+        //        }
     }
 
     protected void startLoadDialogMessages() {
@@ -630,11 +626,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-        List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+        List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager()
+                .getDialogOccupantsListByDialog(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        Message lastReadMessage = DatabaseManager.getInstance().getMessageManager().getLastMessageByDialogId(dialogOccupantsIdsList);
+        Message lastReadMessage = DatabaseManager.getInstance().getMessageManager().getLastMessageByDialogId(
+                dialogOccupantsIdsList);
         if (lastReadMessage == null) {
-            startLoadDialogMessages(ChatUtils.createQBDialogFromLocalDialog(dialog), ConstsCore.ZERO_LONG_VALUE);
+            startLoadDialogMessages(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                    ConstsCore.ZERO_LONG_VALUE);
         } else {
             long lastMessageDateSent = lastReadMessage.getCreatedDate();
             startLoadDialogMessages(ChatUtils.createQBDialogFromLocalDialog(dialog), lastMessageDateSent);
@@ -711,9 +710,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             // TODO temp
-//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-//            hideProgress();
-//            startLoadDialogMessages();
+            //            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            //            hideProgress();
+            //            startLoadDialogMessages();
         }
     }
 
@@ -722,9 +721,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             // TODO temp
-//            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-//            hideProgress();
-//            startLoadDialogMessages();
+            //            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            //            hideProgress();
+            //            startLoadDialogMessages();
         }
     }
 

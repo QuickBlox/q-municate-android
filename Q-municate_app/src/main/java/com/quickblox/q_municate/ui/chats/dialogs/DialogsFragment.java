@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.chats.dialogs;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -42,6 +40,7 @@ public class DialogsFragment extends BaseFragment {
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
+    private DatabaseManager databaseManager;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -57,17 +56,23 @@ public class DialogsFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
+        initFields();
         initUI(view);
         initListeners();
+
         Crouton.cancelAllCroutons();
 
         addActions();
 
-        registerForContextMenu(dialogsListView);
-
         initChatsDialogs();
 
+        //        registerForContextMenu(dialogsListView);
+
         return view;
+    }
+
+    private void initFields() {
+        databaseManager = DatabaseManager.getInstance();
     }
 
     private void initUI(View view) {
@@ -81,15 +86,18 @@ public class DialogsFragment extends BaseFragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
-                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-                if (dialog.getType() == QBDialogType.PRIVATE) {
-                    startPrivateChatActivity(dialog);
-                } else {
-                    startGroupChatActivity(dialog);
-                }
+                startChat(position);
             }
         });
+    }
+
+    private void startChat(int position) {
+        Dialog dialog = dialogsAdapter.getItem(position);
+        if (dialog.getDialogType().getType() == com.quickblox.q_municate_core.models.Dialog.DialogType.PRIVATE) {
+            startPrivateChatActivity(dialog);
+        } else {
+            startGroupChatActivity(dialog);
+        }
     }
 
     private void checkVisibilityEmptyLabel() {
@@ -106,8 +114,8 @@ public class DialogsFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.dialogs_list_menu, menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
+        menuInflater.inflate(R.menu.dialogs_list_menu, menu);
     }
 
     @Override
@@ -121,13 +129,14 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void initChatsDialogs() {
-        List<Dialog> dialogsList = DatabaseManager.getInstance().getDialogManager().getAll();
+        List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsList);
         dialogsListView.setAdapter(dialogsAdapter);
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {
-        List<DialogOccupant> occupantsList = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+        List<DialogOccupant> occupantsList = databaseManager.getDialogOccupantManager()
+                .getDialogOccupantsListByDialog(dialog.getDialogId());
         User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
@@ -139,12 +148,11 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startNewDialogPage() {
-        boolean isFriends = !DatabaseManager.getInstance().getFriendManager().getAll().isEmpty();
+        boolean isFriends = !databaseManager.getFriendManager().getAll().isEmpty();
         if (isFriends) {
             NewDialogActivity.start(baseActivity);
         } else {
-            DialogUtils.showLong(baseActivity, getResources().getString(
-                    R.string.ndl_no_friends_for_new_chat));
+            DialogUtils.showLong(baseActivity, getString(R.string.ndl_no_friends_for_new_chat));
         }
     }
 
@@ -156,7 +164,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void updateDialogsList() {
-        List<Dialog> dialogsList = DatabaseManager.getInstance().getDialogManager().getAll();
+        List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
         dialogsAdapter.setNewData(dialogsList);
         dialogsAdapter.notifyDataSetChanged();
     }

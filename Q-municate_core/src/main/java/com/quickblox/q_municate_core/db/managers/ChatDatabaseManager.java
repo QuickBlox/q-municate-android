@@ -15,7 +15,6 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -137,30 +136,6 @@ public class ChatDatabaseManager {
         return dialogs;
     }
 
-    public static MessageCache getMessageCacheFromCursor(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.MESSAGE_ID));
-        String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
-        Integer senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
-        Integer recipientId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.RECIPIENT_ID));
-        String body = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
-        long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-        String attachUrl = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.ATTACH_FILE_ID));
-        boolean isRead = cursor.getInt(cursor.getColumnIndex(
-                MessageTable.Cols.IS_READ)) > ConstsCore.ZERO_INT_VALUE;
-        boolean isDelivered = cursor.getInt(cursor.getColumnIndex(
-                MessageTable.Cols.IS_DELIVERED)) > ConstsCore.ZERO_INT_VALUE;
-        boolean isSync = cursor.getInt(cursor.getColumnIndex(
-                MessageTable.Cols.IS_SYNC)) > ConstsCore.ZERO_INT_VALUE;
-        MessagesNotificationType messagesNotificationType = MessagesNotificationType.parseByCode(
-                cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)));
-
-        MessageCache messageCache = new MessageCache(id, dialogId, senderId, recipientId, body, attachUrl, time,
-                isRead, isDelivered, isSync);
-
-        messageCache.setMessagesNotificationType(messagesNotificationType);
-
-        return messageCache;
-    }
 
     public static QBDialog getDialogFromCursor(Cursor cursor) {
         String dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
@@ -191,21 +166,6 @@ public class ChatDatabaseManager {
         return dialog;
     }
 
-    public static MessageCache getLastSyncMessage(Context context, QBDialog dialog) {
-        MessageCache messageCache = null;
-
-        Cursor cursor = context.getContentResolver().query(MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.DIALOG_ID + " = '" + dialog.getDialogId() + "' AND " + MessageTable.Cols.IS_SYNC + " > 0", null,
-                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
-
-        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            cursor.moveToLast();
-            messageCache = getMessageCacheFromCursor(cursor);
-        }
-
-        return messageCache;
-    }
-
     public static int getCountUnreadDialogs(Context context) {
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
                 DialogTable.Cols.COUNT_UNREAD_MESSAGES + " > 0", null, null);
@@ -223,136 +183,6 @@ public class ChatDatabaseManager {
 
     public static void deleteAllDialogs(Context context) {
         context.getContentResolver().delete(DialogTable.CONTENT_URI, null, null);
-    }
-
-    public static void saveChatMessageGlobal(Context context, MessageCache messageCache) {
-        int countUnreadMessagesLocal;
-        boolean ownMessage = AppSession.getSession().getUser().getId() == messageCache.getSenderId();
-
-        saveChatMessage(context, messageCache);
-
-        if (!messageCache.isSync() && !ownMessage) {
-            countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
-            countUnreadMessagesLocal = ++countUnreadMessagesLocal;
-        } else {
-            countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
-        }
-
-        checkUpdatingDialogForFriendsNotificationMessage(context, messageCache, countUnreadMessagesLocal);
-    }
-
-    private static void checkUpdatingDialogForFriendsNotificationMessage(Context context, MessageCache messageCache,
-                                                                         int countUnreadMessagesLocal) {
-        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-        String lastMessage = messageCache.getMessage();
-
-        if (messagesNotificationType == null) {
-            lastMessage = messageCache.getMessage();
-        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
-            lastMessage = context.getResources().getString(R.string.frl_friends_contact_request);
-        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(messagesNotificationType.getCode())) {
-            lastMessage = context.getResources().getString(R.string.cht_notification_message);
-        }
-
-        updateDialog(context, messageCache.getDialogId(), lastMessage, messageCache.getTime(),
-                messageCache.getSenderId(), countUnreadMessagesLocal);
-    }
-
-    public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
-                                        String dialogId) {
-        for (QBChatMessage historyMessage : messagesList) {
-            String messageId = historyMessage.getId();
-            String message = historyMessage.getBody();
-            int senderId = historyMessage.getSenderId();
-            int recipientId;
-            long time = historyMessage.getDateSent();
-
-            if (historyMessage.getRecipientId() == null) {
-                recipientId = ConstsCore.ZERO_INT_VALUE;
-            } else {
-                recipientId = historyMessage.getRecipientId();
-            }
-
-            String attachURL;
-            int friendsMessageTypeCode;
-
-            attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
-
-            MessageCache messageCache = new MessageCache(messageId, dialogId, senderId, recipientId, message, attachURL, time,
-                    historyMessage.isRead(), true, true);
-
-            if (historyMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
-                friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
-                        ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString());
-                if (ChatNotificationUtils.isFriendsNotificationMessage(friendsMessageTypeCode)) {
-                    messageCache.setMessagesNotificationType(MessagesNotificationType.parseByCode(
-                            friendsMessageTypeCode));
-                } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)
-                        || ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
-                    messageCache.setMessage(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
-                            historyMessage));
-                    messageCache.setMessagesNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(historyMessage));
-                }
-            }
-
-            saveChatMessage(context, messageCache);
-        }
-
-        // all messages will be marked as read.
-        updateDialog(context, dialogId, ConstsCore.ZERO_INT_VALUE);
-    }
-
-    private static void saveChatMessage(Context context, MessageCache messageCache) {
-        ContentValues values = new ContentValues();
-        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-
-        messageCache.setMessage(parseMessageBody(context, messageCache));
-
-        values.put(MessageTable.Cols.BODY, messageCache.getMessage());
-        values.put(MessageTable.Cols.TIME, messageCache.getTime());
-        values.put(MessageTable.Cols.ATTACH_FILE_ID, messageCache.getAttachUrl());
-        values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
-        values.put(MessageTable.Cols.IS_DELIVERED, messageCache.isDelivered());
-        values.put(MessageTable.Cols.IS_SYNC, messageCache.isSync());
-        values.put(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE, messagesNotificationType == null ? ConstsCore.ZERO_INT_VALUE
-                : messagesNotificationType.getCode());
-
-        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageCache.getId() + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
-
-        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            resolver.update(MessageTable.CONTENT_URI, values, condition, null);
-        } else {
-            values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
-            values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
-            values.put(MessageTable.Cols.SENDER_ID, messageCache.getSenderId());
-
-            if (messageCache.getRecipientId() == null) {
-                values.put(MessageTable.Cols.RECIPIENT_ID, ConstsCore.ZERO_INT_VALUE);
-            } else {
-                values.put(MessageTable.Cols.RECIPIENT_ID, messageCache.getRecipientId());
-            }
-
-            resolver.insert(MessageTable.CONTENT_URI, values);
-        }
-    }
-
-    private static String parseMessageBody(Context context, MessageCache messageCache) {
-        String resultMessage = messageCache.getMessage();
-
-        if (messageCache.getMessagesNotificationType() != null
-                && !ChatNotificationUtils.isUpdateChatNotificationMessage(
-                messageCache.getMessagesNotificationType().getCode())) {
-            resultMessage = ChatNotificationUtils.getBodyForFriendsNotificationMessage(context,
-                    messageCache.getMessagesNotificationType(), messageCache);
-        } else {
-            if (!TextUtils.isEmpty(messageCache.getMessage())) {
-                resultMessage = Html.fromHtml(messageCache.getMessage()).toString();
-            }
-        }
-
-        return resultMessage;
     }
 
     public static boolean isExistDialogById(Context context, String dialogId) {
@@ -496,35 +326,6 @@ public class ChatDatabaseManager {
         deleteAllMessages(context);
         deleteAllDialogs(context);
         // TODO clear something else
-    }
-
-    public static void updateStatusMessage(Context context, MessageCache messageCache) {
-        ContentValues values = new ContentValues();
-        String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageCache.getId() + "'";
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
-            String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
-            long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
-            int lastSenderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
-            int recipientId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.RECIPIENT_ID));
-
-            messageCache.setDialogId(dialogId);
-            messageCache.setMessage(message);
-            messageCache.setSenderId(lastSenderId);
-            messageCache.setRecipientId(recipientId);
-            messageCache.setTime(time);
-
-            values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
-            resolver.update(MessageTable.CONTENT_URI, values, condition, null);
-            cursor.close();
-
-            int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
-            countUnreadMessagesLocal = --countUnreadMessagesLocal;
-
-            checkUpdatingDialogForFriendsNotificationMessage(context, messageCache, countUnreadMessagesLocal);
-        }
     }
 
     public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {

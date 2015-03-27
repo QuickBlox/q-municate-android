@@ -9,14 +9,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
@@ -233,19 +229,19 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean friendsRequestMessage;
         boolean isFriend;
 
-        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-        if (messageCache.getMessagesNotificationType() != null) {
-            ownMessage = isOwnMessage(messageCache.getSenderId());
-            friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
-                    messageCache.getMessagesNotificationType());
-
-            if (friendsRequestMessage && !ownMessage) {
-                isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(messageCache.getSenderId()) != null;
-                if (!isFriend) {
-                    lastRequestPosition = cursor.getPosition();
-                }
-            }
-        }
+//        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
+//        if (messageCache.getMessagesNotificationType() != null) {
+//            ownMessage = isOwnMessage(messageCache.getSenderId());
+//            friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
+//                    messageCache.getMessagesNotificationType());
+//
+//            if (friendsRequestMessage && !ownMessage) {
+//                isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(messageCache.getSenderId()) != null;
+//                if (!isFriend) {
+//                    lastRequestPosition = cursor.getPosition();
+//                }
+//            }
+//        }
     }
 
     private class FindLastFriendsRequestThread extends Thread {

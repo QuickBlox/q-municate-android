@@ -26,7 +26,6 @@ import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -76,7 +75,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void saveMessageToCache(Message message) {
-        ChatDatabaseManager.saveChatMessageGlobal(context, message);
+//        ChatDatabaseManager.saveChatMessageGlobal(context, message);
     }
 
     /*
@@ -133,28 +132,28 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void savePrivateMessageToCache(QBChatMessage chatMessage, String dialogId, int opponentId) {
-        String messageId = chatMessage.getId();
-        long time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT)
-                .toString());
-        String attachUrl = ChatUtils.getAttachUrlFromMessage(chatMessage.getAttachments());
-        Integer recipientId;
-
-        if (chatMessage.getRecipientId() == null) {
-            recipientId = opponentId;
-        } else {
-            recipientId = chatMessage.getRecipientId();
-        }
-
-        Message message = new Message(messageId, dialogId, chatCreator.getId(), recipientId,
-                chatMessage.getBody(), attachUrl, time, false, false, true);
-
-        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
-            int friendsMessageTypeCode = ChatNotificationUtils.getNotificationTypeIfExist(chatMessage);
-            message.setMessagesNotificationType(MessagesNotificationType.parseByCode(
-                    friendsMessageTypeCode));
-        }
-
-        saveMessageToCache(messageCache);
+//        String messageId = chatMessage.getId();
+//        long time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT)
+//                .toString());
+//        String attachUrl = ChatUtils.getAttachUrlFromMessage(chatMessage.getAttachments());
+//        Integer recipientId;
+//
+//        if (chatMessage.getRecipientId() == null) {
+//            recipientId = opponentId;
+//        } else {
+//            recipientId = chatMessage.getRecipientId();
+//        }
+//
+//        Message message = new Message(messageId, dialogId, chatCreator.getId(), recipientId,
+//                chatMessage.getBody(), attachUrl, time, false, false, true);
+//
+//        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+//            int friendsMessageTypeCode = ChatNotificationUtils.getNotificationTypeIfExist(chatMessage);
+//            message.setMessagesNotificationType(MessagesNotificationType.parseByCode(
+//                    friendsMessageTypeCode));
+//        }
+//
+//        saveMessageToCache(messageCache);
     }
 
     protected void saveDialogToCache(QBDialog qbDialog) {
@@ -206,9 +205,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         List<QBChatMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, returnedBundle);
 
-        if (dialogMessagesList != null) {
-            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
+//        if (dialogMessagesList != null) {
+//            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
+//        }
 
         return dialogMessagesList;
     }

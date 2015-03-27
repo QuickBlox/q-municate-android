@@ -13,7 +13,6 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -79,11 +78,11 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
             user = ChatUtils.getTempUserFromChatMessage(chatMessage);
         }
 
-        MessageCache messageCache = parseReceivedMessage(chatMessage);
-
-        saveMessageToCache(messageCache);
-
-        notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), true);
+//        MessageCache messageCache = parseReceivedMessage(chatMessage);
+//
+//        saveMessageToCache(messageCache);
+//
+//        notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), true);
     }
 
     public void updateDialog(QBDialog dialog) {
@@ -107,21 +106,21 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     private void friendRequestMessageReceived(QBChatMessage chatMessage,
             MessagesNotificationType messagesNotificationType) {
-        MessageCache messageCache = parseReceivedMessage(chatMessage);
-        messageCache.setMessagesNotificationType(messagesNotificationType);
-
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(messageCache.getDialogId()));
-
-        if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                    QBDialogType.PRIVATE);
-            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
-                    chatCreator.getId(), chatMessage.getSenderId());
-            dialog.setOccupantsIds(occupantsIdsList);
-            saveDialogToCache(dialog);
-        }
-
-        saveMessageToCache(messageCache);
+//        MessageCache messageCache = parseReceivedMessage(chatMessage);
+//        messageCache.setMessagesNotificationType(messagesNotificationType);
+//
+//        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(messageCache.getDialogId()));
+//
+//        if (dialog == null) {
+//            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+//                    QBDialogType.PRIVATE);
+//            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
+//                    chatCreator.getId(), chatMessage.getSenderId());
+//            dialog.setOccupantsIds(occupantsIdsList);
+//            saveDialogToCache(dialog);
+//        }
+//
+//        saveMessageToCache(messageCache);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
