@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FinderUnknownFriends {
+public class FinderUnknownUsers {
 
     private Context context;
     private QBDialog dialog;
@@ -22,13 +22,14 @@ public class FinderUnknownFriends {
     private Set<Integer> loadIdsSet;
     private QBUser currentUser;
     private QBRestHelper restHelper;
+    private DatabaseManager databaseManager;
 
-    public FinderUnknownFriends(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
+    public FinderUnknownUsers(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
         init(context, currentUser);
         this.dialogsList = dialogsList;
     }
 
-    public FinderUnknownFriends(Context context, QBUser currentUser, QBDialog dialog) {
+    public FinderUnknownUsers(Context context, QBUser currentUser, QBDialog dialog) {
         init(context, currentUser);
         this.dialog = dialog;
     }
@@ -38,6 +39,7 @@ public class FinderUnknownFriends {
         this.currentUser = currentUser;
         loadIdsSet = new HashSet<Integer>();
         restHelper = new QBRestHelper(context);
+        databaseManager = DatabaseManager.getInstance();
     }
 
     public void find() {
@@ -64,12 +66,12 @@ public class FinderUnknownFriends {
                 int userId = loadIdsSet.iterator().next();
                 User user = restHelper.loadUser(userId);
                 if (user != null) {
-                    DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
+                    databaseManager.getUserManager().createOrUpdate(user);
                 }
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    DatabaseManager.getInstance().getUserManager().createOrUpdate(userCollection);
+                    databaseManager.getUserManager().createOrUpdate(userCollection);
                 }
             }
         } catch (QBResponseException e) {

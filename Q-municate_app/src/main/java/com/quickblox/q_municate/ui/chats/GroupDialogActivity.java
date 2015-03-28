@@ -62,6 +62,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 
+        initListView();
+
         //        registerForContextMenu(messagesListView);
     }
 
@@ -154,7 +156,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void initListView() {
-        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAll();
+        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAllByDialogId(dialogId);
         messagesAdapter = new GroupDialogMessagesAdapter(this, messagesList, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;

@@ -161,8 +161,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         initLocalBroadcastManagers();
         hideSmileLayout();
-
-        initListView();
     }
 
 
@@ -219,7 +217,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {
-                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog1(dialog),
+                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
                         generateBundleToInitDialog());
             } catch (QBResponseException e) {
                 ErrorUtils.showError(this, e.getMessage());
@@ -318,7 +316,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void onDestroy() {
         super.onDestroy();
         if (baseChatHelper != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog1(dialog),
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
                     generateBundleToInitDialog());
         }
         removeActions();
@@ -410,7 +408,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
         loadingMore = true;
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog1(dialog),
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog),
                 lastDateLoad, skipMessages);
         skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     }
@@ -626,7 +624,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         showActionBarProgress();
 
         List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager()
-                .getDialogOccupantsListByDialog(dialog.getDialogId());
+                .getDialogOccupantsListByDialogId(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
         Message lastReadMessage = DatabaseManager.getInstance().getMessageManager().getLastMessageByDialogId(
                 dialogOccupantsIdsList);
@@ -678,7 +676,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = false;
-            //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);
@@ -693,7 +690,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             loadingMore = false;
-            //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);

@@ -50,7 +50,8 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialog(dialog.getDialogId());
+        List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialogId(
+                dialog.getDialogId());
 
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
             User opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentQBUser), dialogOccupantsList);

@@ -16,20 +16,19 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
-import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DialogManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
@@ -39,6 +38,8 @@ public class DialogsFragment extends BaseFragment {
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
     private DatabaseManager databaseManager;
+
+    private Observer dialogObserver;
 
     public static DialogsFragment newInstance() {
         return new DialogsFragment();
@@ -60,8 +61,6 @@ public class DialogsFragment extends BaseFragment {
 
         Crouton.cancelAllCroutons();
 
-        addActions();
-
         initChatsDialogs();
 
         //        registerForContextMenu(dialogsListView);
@@ -71,6 +70,7 @@ public class DialogsFragment extends BaseFragment {
 
     private void initFields() {
         databaseManager = DatabaseManager.getInstance();
+        dialogObserver = new DialogObserver();
     }
 
     private void initUI(View view) {
@@ -104,11 +104,18 @@ public class DialogsFragment extends BaseFragment {
 
     @Override
     public void onResume() {
+        super.onResume();
+        addObservers();
         Crouton.cancelAllCroutons();
         if (dialogsAdapter != null) {
             checkVisibilityEmptyLabel();
         }
-        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        deleteObservers();
     }
 
     @Override
@@ -126,6 +133,14 @@ public class DialogsFragment extends BaseFragment {
         return true;
     }
 
+    private void addObservers() {
+        databaseManager.getDialogManager().addObserver(dialogObserver);
+    }
+
+    private void deleteObservers() {
+        databaseManager.getDialogManager().deleteObserver(dialogObserver);
+    }
+
     private void initChatsDialogs() {
         List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsList);
@@ -134,7 +149,7 @@ public class DialogsFragment extends BaseFragment {
 
     private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = databaseManager.getDialogOccupantManager()
-                .getDialogOccupantsListByDialog(dialog.getDialogId());
+                .getDialogOccupantsListByDialogId(dialog.getDialogId());
         User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
@@ -154,17 +169,11 @@ public class DialogsFragment extends BaseFragment {
         }
     }
 
-    private void addActions() {
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
-                new LoadChatsDialogsSuccessAction());
-        baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
-        baseActivity.updateBroadcastActionList();
-    }
-
     private void updateDialogsList() {
         List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
         dialogsAdapter.setNewData(dialogsList);
         dialogsAdapter.notifyDataSetChanged();
+        checkEmptyList(dialogsList.size());
     }
 
     //    @Override
@@ -191,15 +200,19 @@ public class DialogsFragment extends BaseFragment {
     //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
     //    }
 
-    private class LoadChatsDialogsSuccessAction implements Command {
+    private void checkEmptyList(int listSize) {
+        if (listSize > 0) {
+            emptyListTextView.setVisibility(View.GONE);
+        } else {
+            emptyListTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class DialogObserver implements Observer {
 
         @Override
-        public void execute(Bundle bundle) {
-            ArrayList<ParcelableQBDialog> parcelableDialogsList = bundle.getParcelableArrayList(
-                    QBServiceConsts.EXTRA_CHATS_DIALOGS);
-            if (parcelableDialogsList == null) {
-                emptyListTextView.setVisibility(View.VISIBLE);
-            } else {
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(DialogManager.OBSERVE_DIALOG)) {
                 updateDialogsList();
             }
         }

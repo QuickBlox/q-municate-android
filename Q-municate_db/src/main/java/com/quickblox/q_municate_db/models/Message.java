@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.models;
 
-import android.provider.BaseColumns;
-
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -23,13 +21,12 @@ public class Message implements Serializable {
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = STATE)
-    private State state;
-
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
             columnName = Attachment.Column.ID)
     private Attachment attachment;
+
+    @DatabaseField(columnName = STATE)
+    private State state;
 
     @DatabaseField(columnName = BODY)
     private String body;
@@ -40,12 +37,12 @@ public class Message implements Serializable {
     public Message() {
     }
 
-    public Message(String messageId, DialogOccupant dialogOccupant, State state, Attachment attachment,
+    public Message(String messageId, DialogOccupant dialogOccupant, Attachment attachment, State state,
             String body, long createdDate) {
         this.messageId = messageId;
         this.dialogOccupant = dialogOccupant;
-        this.state = state;
         this.attachment = attachment;
+        this.state = state;
         this.body = body;
         this.createdDate = createdDate;
     }
@@ -134,7 +131,7 @@ public class Message implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "message";
-        String ID = BaseColumns._ID;
+        String ID = "message_id";
         String BODY = "body";
         String CREATED_DATE = "created_date";
         String STATE = "state";

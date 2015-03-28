@@ -40,11 +40,6 @@ public class QBFindUsersCommand extends ServiceCommand {
         requestBuilder.setPage(page);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
 
-        //        TODO temp
-        //        ArrayList<GenericQueryRule> ruleList = new ArrayList<GenericQueryRule>();
-        //        ruleList.add(new GenericQueryRule("order", "asc+string+full_name"));
-        //        requestBuilder.setRules(ruleList);
-
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collection<User> userCollection = UserFriendUtils.createUsersList(userList);

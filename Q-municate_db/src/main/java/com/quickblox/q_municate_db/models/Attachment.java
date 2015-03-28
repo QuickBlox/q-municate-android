@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.models;
 
-import android.provider.BaseColumns;
-
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -25,14 +23,14 @@ public class Attachment implements Serializable {
     @DatabaseField(unique = true, columnName = BLOB_ID)
     private int blobId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, columnName = TYPE)
+    @DatabaseField(columnName = TYPE)
     private Type type;
 
     @DatabaseField(columnName = NAME)
     private String name;
 
     @DatabaseField(columnName = SIZE)
-    private long size;
+    private double size;
 
     @DatabaseField(columnName = REMOTE_URL)
     private String remoteUrl;
@@ -85,11 +83,11 @@ public class Attachment implements Serializable {
         this.name = name;
     }
 
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(double size) {
         this.size = size;
     }
 
@@ -143,7 +141,7 @@ public class Attachment implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "attachment";
-        String ID = BaseColumns._ID;
+        String ID = "attachment_id";
         String BLOB_ID = "blob_id";
         String NAME = "name";
         String SIZE = "size";

@@ -37,8 +37,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onCreate(SQLiteDatabase database, ConnectionSource connectionSource) {
         try {
             TableUtils.createTable(connectionSource, User.class);
-            TableUtils.createTable(connectionSource, Friend.class);
             TableUtils.createTable(connectionSource, Social.class);
+            TableUtils.createTable(connectionSource, Friend.class);
             TableUtils.createTable(connectionSource, UserRequest.class);
             TableUtils.createTable(connectionSource, Dialog.class);
             TableUtils.createTable(connectionSource, DialogOccupant.class);
@@ -55,8 +55,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             int newVersion) {
         try {
             TableUtils.dropTable(connectionSource, User.class, true);
-            TableUtils.dropTable(connectionSource, Friend.class, true);
             TableUtils.dropTable(connectionSource, Social.class, true);
+            TableUtils.dropTable(connectionSource, Friend.class, true);
             TableUtils.dropTable(connectionSource, UserRequest.class, true);
             TableUtils.dropTable(connectionSource, Dialog.class, true);
             TableUtils.dropTable(connectionSource, DialogOccupant.class, true);

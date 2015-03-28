@@ -14,8 +14,10 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -234,7 +236,7 @@ public class ChatUtils {
         return idsList;
     }
 
-    public static QBDialog createQBDialogFromLocalDialog1(Dialog dialog) {
+    public static QBDialog createQBDialogFromLocalDialog(Dialog dialog) {
         QBDialog qbDialog = new QBDialog();
         qbDialog.setDialogId(dialog.getDialogId());
         qbDialog.setRoomJid(dialog.getRoomJid());
@@ -243,5 +245,23 @@ public class ChatUtils {
         qbDialog.setType(Dialog.Type.PRIVATE.equals(
                 dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
         return qbDialog;
+    }
+
+    public static Message createLocalMessage(QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, Message.State state) {
+        Message message = new Message();
+        message.setMessageId(qbChatMessage.getId());
+        message.setDialogOccupant(dialogOccupant);
+        message.setCreatedDate(qbChatMessage.getDateSent());
+        message.setState(state);
+        message.setBody(qbChatMessage.getBody());
+        return message;
+    }
+
+    public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
+        Attachment attachment = new Attachment();
+        attachment.setRemoteUrl(qbAttachment.getUrl());
+        attachment.setName(qbAttachment.getName());
+        attachment.setSize(qbAttachment.getSize());
+        return attachment;
     }
 }

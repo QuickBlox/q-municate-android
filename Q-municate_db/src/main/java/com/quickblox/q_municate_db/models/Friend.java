@@ -46,6 +46,6 @@ public class Friend implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "friend";
-        String ID = BaseColumns._ID;
+        String ID = "friend_id";
     }
 }

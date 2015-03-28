@@ -27,22 +27,6 @@ import java.util.List;
 
 public class ChatDatabaseManager {
 
-    public static QBDialog getDialogByDialogId(Context context, String dialogId) {
-        QBDialog dialog = null;
-        Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
-                DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
-
-        if (cursor != null && cursor.moveToFirst()) {
-            String resultDialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
-            if (!TextUtils.isEmpty(resultDialogId)) {
-                dialog = getDialogFromCursor(cursor);
-            }
-            cursor.close();
-        }
-
-        return dialog;
-    }
-
     public static String getPrivateDialogIdByOpponentId(Context context, int opponentId) {
         String dialogId = null;
         Cursor cursor = context.getContentResolver().query(DialogTable.CONTENT_URI, null,
@@ -114,12 +98,6 @@ public class ChatDatabaseManager {
     public static Cursor getAllDialogs(Context context) {
         return context.getContentResolver().query(DialogTable.CONTENT_URI, null, null, null,
                 DialogTable.Cols.ID + " ORDER BY " + DialogTable.Cols.LAST_DATE_SENT + " DESC");
-    }
-
-    public static CursorLoader getAllDialogMessagesLoaderByDialogId(Context context, String dialogId) {
-        return new CursorLoader(context, MessageTable.CONTENT_URI, null,
-                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
-                MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
     public static List<QBDialog> getDialogs(Context context) {
@@ -260,23 +238,6 @@ public class ChatDatabaseManager {
         return values;
     }
 
-    public static void updateDialog(Context context, String dialogId, int countUnreadMessages) {
-        ContentResolver resolver = context.getContentResolver();
-        ContentValues values = new ContentValues();
-        values.put(DialogTable.Cols.COUNT_UNREAD_MESSAGES, countUnreadMessages);
-        String condition = DialogTable.Cols.DIALOG_ID + "='" + dialogId + "'";
-        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-    }
-
-    public static void updateDialog(Context context, String dialogId, long dateSent,
-                                    long lastSenderId, int countUnreadMessages) {
-        ContentResolver resolver = context.getContentResolver();
-        ContentValues values = getContentValuesForUpdateDialog(dateSent, lastSenderId,
-                countUnreadMessages);
-        String condition = DialogTable.Cols.DIALOG_ID + "='" + dialogId + "'";
-        resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-    }
-
     public static void updateDialog(Context context, String dialogId, String lastMessage, long dateSent,
                                     long lastSenderId, int countUnreadMessages) {
         ContentResolver resolver = context.getContentResolver();
@@ -338,11 +299,6 @@ public class ChatDatabaseManager {
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
             cursor.close();
         }
-    }
-
-    public static void deleteDialogByDialogId(Context context, String dialogId) {
-        context.getContentResolver().delete(DialogTable.CONTENT_URI,
-                DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
     public static void deleteDialogByRoomJid(Context context, String roomJid) {

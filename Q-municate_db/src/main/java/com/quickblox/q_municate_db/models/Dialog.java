@@ -20,8 +20,7 @@ public class Dialog implements Serializable {
     @DatabaseField(id = true, unique = true, columnName = ID)
     private String dialogId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = TYPE)
+    @DatabaseField(columnName = TYPE)
     private Type type;
 
     @DatabaseField(columnName = ROOM_JID)
@@ -107,7 +106,7 @@ public class Dialog implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "dialog";
-        String ID = BaseColumns._ID;
+        String ID = "dialog_id";
         String ROOM_JID = "room_jid";
         String TITLE = "title";
         String PHOTO = "photo";

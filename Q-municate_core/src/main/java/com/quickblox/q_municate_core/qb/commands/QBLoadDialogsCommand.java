@@ -2,18 +2,15 @@ package com.quickblox.q_municate_core.qb.commands;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
@@ -37,10 +34,9 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         List<QBDialog> dialogsList = multiChatHelper.getDialogs();
-        ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
+        ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
-            new FindUnknownFriendsTask().execute(dialogsList);
             parcelableQBDialog = ChatUtils.dialogsToParcelableDialogs(dialogsList);
             multiChatHelper.tryJoinRoomChats(dialogsList);
             // save flag for join to dialogs
@@ -50,15 +46,5 @@ public class QBLoadDialogsCommand extends ServiceCommand {
         extras.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
 
         return extras;
-    }
-
-    private class FindUnknownFriendsTask extends AsyncTask {
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            List<QBDialog> dialogsList = (List<QBDialog>) params[0];
-            new FinderUnknownFriends(context, AppSession.getSession().getUser(), dialogsList).find();
-            return null;
-        }
     }
 }

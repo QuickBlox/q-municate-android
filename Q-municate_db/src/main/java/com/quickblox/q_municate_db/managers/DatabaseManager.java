@@ -18,6 +18,16 @@ public class DatabaseManager {
     private static DatabaseManager instance;
     private DatabaseHelper databaseHelper;
 
+    private UserManager userManager;
+    private FriendManager friendManager;
+    private SocialManager socialManager;
+    private UserRequestManager userRequestManager;
+    private DialogManager dialogManager;
+    private DialogOccupantManager dialogOccupantManager;
+    private DialogNotificationManager dialogNotificationManager;
+    private AttachmentManager attachmentManager;
+    private MessageManager messageManager;
+
     private DatabaseManager(Context context) {
         databaseHelper = new DatabaseHelper(context);
     }
@@ -41,38 +51,69 @@ public class DatabaseManager {
     }
 
     public UserManager getUserManager() {
-        return new UserManager(getDatabaseHelper().getDaoByClass(User.class));
+        if (userManager == null) {
+            userManager = new UserManager(getDatabaseHelper().getDaoByClass(User.class));
+        }
+        return userManager;
     }
 
     public FriendManager getFriendManager() {
-        return new FriendManager(getDatabaseHelper().getDaoByClass(Friend.class));
+        if (friendManager == null) {
+            friendManager = new FriendManager(getDatabaseHelper().getDaoByClass(Friend.class));
+        }
+        return friendManager;
     }
 
     public SocialManager getSocialManager() {
-        return new SocialManager(getDatabaseHelper().getDaoByClass(Social.class));
+        if (socialManager == null) {
+            socialManager = new SocialManager(getDatabaseHelper().getDaoByClass(Social.class));
+        }
+        return socialManager;
     }
 
     public UserRequestManager getUserRequestManager() {
-        return new UserRequestManager(getDatabaseHelper().getDaoByClass(UserRequest.class));
+        if (userRequestManager == null) {
+            userRequestManager = new UserRequestManager(getDatabaseHelper().getDaoByClass(UserRequest.class));
+        }
+        return userRequestManager;
     }
 
     public DialogManager getDialogManager() {
-        return new DialogManager(getDatabaseHelper().getDaoByClass(Dialog.class));
+        if (dialogManager == null) {
+            dialogManager = new DialogManager(getDatabaseHelper().getDaoByClass(Dialog.class));
+        }
+        return dialogManager;
     }
 
     public DialogOccupantManager getDialogOccupantManager() {
-        return new DialogOccupantManager(getDatabaseHelper().getDaoByClass(DialogOccupant.class));
+        if (dialogOccupantManager == null) {
+            dialogOccupantManager = new DialogOccupantManager(getDatabaseHelper().getDaoByClass(
+                    DialogOccupant.class), getDatabaseHelper().getDaoByClass(Dialog.class));
+        }
+        return dialogOccupantManager;
     }
 
     public DialogNotificationManager getDialogNotificationManager() {
-        return new DialogNotificationManager(getDatabaseHelper().getDaoByClass(DialogNotification.class));
+        if (dialogNotificationManager == null) {
+            dialogNotificationManager = new DialogNotificationManager(getDatabaseHelper().getDaoByClass(
+                    DialogNotification.class));
+        }
+        return dialogNotificationManager;
     }
 
     public AttachmentManager getAttachmentManager() {
-        return new AttachmentManager(getDatabaseHelper().getDaoByClass(Attachment.class));
+        if (attachmentManager == null) {
+            attachmentManager = new AttachmentManager(getDatabaseHelper().getDaoByClass(Attachment.class));
+        }
+        return attachmentManager;
     }
 
     public MessageManager getMessageManager() {
-        return new MessageManager(getDatabaseHelper().getDaoByClass(Message.class));
+        if (messageManager == null) {
+            messageManager = new MessageManager(getDatabaseHelper().getDaoByClass(Message.class),
+                    getDatabaseHelper().getDaoByClass(Dialog.class), getDatabaseHelper().getDaoByClass(
+                    DialogOccupant.class));
+        }
+        return messageManager;
     }
 }

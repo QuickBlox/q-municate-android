@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.friends;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,6 +28,8 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.FriendManager;
+import com.quickblox.q_municate_db.managers.UserRequestManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
@@ -38,6 +39,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,116 +48,34 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
     private static final int SEARCH_DELAY = 1000;
 
-    private State state;
-    private String constraint;
+    private View listLoadingView;
     private ExpandableListView friendsListView;
     private TextView emptyListTextView;
+
+    private State state;
+    private String constraint;
     private FriendsListAdapter friendsListAdapter;
     private SearchView searchView;
     private Toast errorToast;
-//    private ContentObserver userTableContentObserver;
-//    private ContentObserver friendTableContentObserver;
     private FriendOperationAction friendOperationAction;
-    private Resources resources;
     private Timer searchTimer;
-
     private int firstVisiblePositionList;
-    private View listLoadingView;
     private boolean loadingMore;
     private int page = -1; // first loading
     private int totalEntries;
     private int loadedItems;
     private int lastItemInScreen;
     private int totalItemCountInList;
-
+    private DatabaseManager databaseManager;
     private List<FriendGroup> friendGroupList;
     private FriendGroup friendGroupAllFriends;
     private FriendGroup friendGroupAllUsers;
+    private Observer friendObserver;
+    private Observer userRequestObserver;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
     }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        checkVisibilityEmptyLabel();
-
-        if (page == -1) {
-            friendsListView.removeFooterView(listLoadingView);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        removeActions();
-    }
-
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        unregisterContentObservers();
-//    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.friend_list_menu, menu);
-        SearchOnActionExpandListener searchOnActionExpandListener = new SearchOnActionExpandListener();
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(searchOnActionExpandListener);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-    }
-
-//    private void registerContentObservers() {
-//        userTableContentObserver = new ContentObserver(new Handler()) {
-//
-//            @Override
-//            public void onChange(boolean selfChange) {
-//                updateAllFriendsData();
-//            }
-//        };
-//
-//        friendTableContentObserver = new ContentObserver(new Handler()) {
-//
-//            @Override
-//            public void onChange(boolean selfChange) {
-//                updateAllFriendsData();
-//            }
-//        };
-//
-//        baseActivity.getContentResolver().registerContentObserver(UserTable.CONTENT_URI, true,
-//                userTableContentObserver);
-//        baseActivity.getContentResolver().registerContentObserver(FriendTable.CONTENT_URI, true,
-//                friendTableContentObserver);
-//    }
-
-//    private void updateAllFriendsData() {
-//        firstVisiblePositionList = friendsListView.getFirstVisiblePosition();
-//        updateAllFriends();
-//        initFriendAdapter();
-//
-//        if (!TextUtils.isEmpty(constraint)) {
-//            performQueryTextChange();
-//        }
-//
-//        checkVisibilityEmptyLabel();
-//
-//        friendsListView.setSelection(firstVisiblePositionList);
-//    }
-
-//    private void unregisterContentObservers() {
-//        baseActivity.getContentResolver().unregisterContentObserver(userTableContentObserver);
-//        baseActivity.getContentResolver().unregisterContentObserver(friendTableContentObserver);
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -167,19 +88,24 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
-        resources = getResources();
+        initFields();
+        initUI(rootView);
+        initListeners();
+        initFriendList();
+
+        addActions();
+        addObservers();
+
+        return rootView;
+    }
+
+    private void initFields() {
+        databaseManager = DatabaseManager.getInstance();
         friendOperationAction = new FriendOperationAction();
         searchTimer = new Timer();
         friendGroupList = new ArrayList<FriendGroup>();
-
-        initUI(rootView);
-        initListeners();
-//        registerContentObservers();
-        addActions();
-
-        initFriendList();
-
-        return rootView;
+        friendObserver = new FriendObserver();
+        userRequestObserver = new UserRequestObserver();
     }
 
     private void initUI(View view) {
@@ -221,6 +147,50 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         });
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        checkVisibilityEmptyLabel();
+
+        if (page == -1) {
+            friendsListView.removeFooterView(listLoadingView);
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        removeActions();
+        deleteObservers();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.friend_list_menu, menu);
+        SearchOnActionExpandListener searchOnActionExpandListener = new SearchOnActionExpandListener();
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem.setOnActionExpandListener(searchOnActionExpandListener);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+    }
+
+    private void addObservers() {
+        databaseManager.getUserRequestManager().addObserver(userRequestObserver);
+        databaseManager.getFriendManager().addObserver(friendObserver);
+    }
+
+    private void deleteObservers() {
+        databaseManager.getUserRequestManager().deleteObserver(userRequestObserver);
+        databaseManager.getFriendManager().deleteObserver(friendObserver);
+    }
+
     private void initFriendList() {
         friendGroupList.clear();
 
@@ -235,7 +205,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         List<UserRequest> userRequestList = DatabaseManager.getInstance().getUserRequestManager().getAll();
         int countUserRequests = userRequestList.size();
 
-        friendGroupAllFriends = new FriendGroup(FriendGroup.GROUP_POSITION_MY_CONTACTS, resources.getString(
+        friendGroupAllFriends = new FriendGroup(FriendGroup.GROUP_POSITION_MY_CONTACTS, getString(
                 R.string.frl_column_header_name_my_contacts));
         friendGroupAllFriends.setUserList(new ArrayList<User>(countFriends + countUserRequests));
 
@@ -254,22 +224,12 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     private void initAllUsers() {
-        friendGroupAllUsers = new FriendGroup(FriendGroup.GROUP_POSITION_ALL_USERS, resources.getString(
+        friendGroupAllUsers = new FriendGroup(FriendGroup.GROUP_POSITION_ALL_USERS, getString(
                 R.string.frl_column_header_name_all_users));
         friendGroupAllUsers.setUserList(new ArrayList<User>());
 
         friendGroupList.add(friendGroupAllUsers);
     }
-
-//    private void updateAllFriends() {
-//        List<Friend> friendList = DatabaseManager.getInstance().getFriendManager().getAll();
-//        int countFriends = friendList.size();
-//        friendGroupAllFriends.getUserList().clear();
-//
-//        if (countFriends > ConstsCore.ZERO_INT_VALUE) {
-//            friendGroupAllFriends.addUserList(UserFriendUtils.getUsersFromFriends(friendList));
-//        }
-//    }
 
     private void initFriendAdapter() {
         sortLists();
@@ -331,6 +291,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_SUCCESS_ACTION);
         baseActivity.removeAction(QBServiceConsts.FIND_USERS_FAIL_ACTION);
+
+        baseActivity.updateBroadcastActionList();
     }
 
     private void addActions() {
@@ -486,6 +448,26 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
                 cancelSearch();
             }
             return true;
+        }
+    }
+
+    private class FriendObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(FriendManager.OBSERVE_FRIEND)) {
+                initFriendList();
+            }
+        }
+    }
+
+    private class UserRequestObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(UserRequestManager.OBSERVE_USER_REQUEST)) {
+                initFriendList();
+            }
         }
     }
 

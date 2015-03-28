@@ -29,7 +29,6 @@ import com.quickblox.q_municate_core.qb.commands.QBInitChatServiceCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitFriendListCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
-import com.quickblox.q_municate_core.qb.commands.QBJoinGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -139,7 +138,6 @@ public class QBService extends Service {
         registerCreatePrivateChatCommand();
         registerCreateGroupChatCommand();
         registerUpdateGroupDialogCommand();
-        registerJoinGroupChat();
         registerDeleteChatCommand();
         registerUpdateStatusMessageCommand();
         registerLogoutAndDestroyChatCommand();
@@ -247,15 +245,6 @@ public class QBService extends Service {
                 QBServiceConsts.UPDATE_GROUP_DIALOG_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.UPDATE_GROUP_DIALOG_ACTION, updateGroupNameCommand);
-    }
-
-    private void registerJoinGroupChat() {
-        QBGroupChatHelper groupChatHelper = (QBGroupChatHelper) getHelper(GROUP_CHAT_HELPER);
-
-        QBJoinGroupDialogCommand joinGroupChatCommand = new QBJoinGroupDialogCommand(this, groupChatHelper,
-                QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION, QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatCommand);
     }
 
     private void registerDeleteChatCommand() {

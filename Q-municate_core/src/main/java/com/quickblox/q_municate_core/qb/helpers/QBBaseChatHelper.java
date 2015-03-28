@@ -31,7 +31,10 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.Attachment;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -39,6 +42,7 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -151,13 +155,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogToCache(QBDialog qbDialog) {
-       DatabaseManager.getInstance().getDialogManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
+        databaseManager.getDialogManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
 
         saveDialogsOccupants(qbDialog);
     }
 
     protected void saveDialogsToCache(List<QBDialog> qbDialogsList) {
-        DatabaseManager.getInstance().getDialogManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
+        databaseManager.getDialogManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
 
         saveDialogsOccupants(qbDialogsList);
     }
@@ -179,9 +183,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         List<QBDialog> chatDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
                 bundle);
 
-        if (chatDialogsList != null && !chatDialogsList.isEmpty()) {
-            saveDialogsToCache(chatDialogsList);
-        }
+        new FinderUnknownUsers(context, chatCreator, chatDialogsList).find();
+
+        saveDialogsToCache(chatDialogsList);
 
         return chatDialogsList;
     }
@@ -196,14 +200,36 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             deleteMessagesByDialogId(dialog.getDialogId());
         }
 
-        List<QBChatMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
+        List<QBChatMessage> qbMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, returnedBundle);
 
-//        if (dialogMessagesList != null) {
-//            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-//        }
+        if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
+            saveMessagesToCache(qbMessagesList, dialog.getDialogId(), Message.State.DELIVERED);
+        }
 
-        return dialogMessagesList;
+        return qbMessagesList;
+    }
+
+    private void saveMessagesToCache(List<QBChatMessage> qbMessagesList, String dialogId, Message.State state) {
+        for (QBChatMessage qbChatMessage : qbMessagesList) {
+            saveMessageToCache(dialogId, qbChatMessage, state);
+        }
+    }
+
+    private void saveMessageToCache(String dialogId, QBChatMessage qbChatMessage, Message.State state) {
+        DialogOccupant dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupant(
+                dialogId, qbChatMessage.getSenderId());
+        Message message = ChatUtils.createLocalMessage(qbChatMessage, dialogOccupant, state);
+
+        if (!qbChatMessage.getAttachments().isEmpty()) {
+            ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(
+                    qbChatMessage.getAttachments());
+            Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
+            message.setAttachment(attachment);
+            databaseManager.getAttachmentManager().createOrUpdate(attachment);
+        }
+
+        databaseManager.getMessageManager().createOrUpdate(message);
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
@@ -211,7 +237,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void deleteDialogLocal(String dialogId) {
-        ChatDatabaseManager.deleteDialogByDialogId(context, dialogId);
+        databaseManager.getDialogManager().delete(dialogId);
     }
 
     public void deleteDialog(String dialogId, QBDialogType dialogType) {

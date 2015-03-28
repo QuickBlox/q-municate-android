@@ -1,6 +1,10 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.dao.CommonDao;
@@ -10,26 +14,46 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.Callable;
 
-public class DialogManager implements CommonDao<Dialog> {
+public class DialogManager extends Observable implements CommonDao<Dialog> {
 
     private static final String TAG = DialogManager.class.getSimpleName();
+    public static final String OBSERVE_DIALOG = "observe_dialog";
 
+    private Handler handler;
     private Dao<Dialog, Integer> dialogDao;
 
     public DialogManager(Dao<Dialog, Integer> dialogDao) {
+        handler = new Handler(Looper.getMainLooper());
         this.dialogDao = dialogDao;
     }
 
     @Override
+    public void notifyObservers(final Object data) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                DialogManager.super.notifyObservers(data);
+            }
+        });
+    }
+
+    @Override
     public Dao.CreateOrUpdateStatus createOrUpdate(Dialog item) {
+        Dao.CreateOrUpdateStatus createOrUpdateStatus = null;
+
         try {
-            return dialogDao.createOrUpdate(item);
+            createOrUpdateStatus = dialogDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
-        return null;
+
+        notifyObservers(OBSERVE_DIALOG);
+
+        return createOrUpdateStatus;
     }
 
     @Override
@@ -61,6 +85,8 @@ public class DialogManager implements CommonDao<Dialog> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_DIALOG);
     }
 
     @Override
@@ -70,6 +96,20 @@ public class DialogManager implements CommonDao<Dialog> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_DIALOG);
+    }
+
+    public void delete(String dialogId) {
+        try {
+            DeleteBuilder<Dialog, Integer> deleteBuilder = dialogDao.deleteBuilder();
+            deleteBuilder.where().eq(Dialog.Column.ID, dialogId);
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        notifyObservers(OBSERVE_DIALOG);
     }
 
     public void createOrUpdate(final Collection<Dialog> dialogsList) {
@@ -80,6 +120,9 @@ public class DialogManager implements CommonDao<Dialog> {
                     for (Dialog dialog : dialogsList) {
                         dialogDao.createOrUpdate(dialog);
                     }
+
+                    notifyObservers(OBSERVE_DIALOG);
+
                     return null;
                 }
             });

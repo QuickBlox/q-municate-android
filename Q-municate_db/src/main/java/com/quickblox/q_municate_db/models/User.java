@@ -23,13 +23,12 @@ public class User implements Serializable {
     @DatabaseField(id = true, unique = true, columnName = ID)
     private Integer userId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = ROLE)
-    private Role role;
-
     @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
             columnName = Social.Column.ID)
     private Social social;
+
+    @DatabaseField(columnName = ROLE)
+    private Role role;
 
     @DatabaseField(columnName = FULL_NAME)
     private String fullName;
@@ -54,15 +53,15 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(Integer userId, Role role, Social social, String fullName, String email, String phone,
+    public User(Integer userId, Social social, Role role, String fullName, String email, String phone,
             String avatar) {
         this.userId = userId;
+        this.social = social;
+        this.role = role;
         this.fullName = fullName;
         this.email = email;
         this.phone = phone;
         this.avatar = avatar;
-        this.role = role;
-        this.social = social;
     }
 
     public boolean isOnline() {
@@ -204,7 +203,7 @@ public class User implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "user";
-        String ID = BaseColumns._ID;
+        String ID = "user_id";
         String FULL_NAME = "full_name";
         String EMAIL = "email";
         String LOGIN = "login";

@@ -21,8 +21,7 @@ public class Social implements Serializable {
             columnName = User.Column.ID)
     private User user;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = TYPE)
+    @DatabaseField(columnName = TYPE)
     private Type type;
 
     public Social() {
@@ -88,7 +87,7 @@ public class Social implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "social";
-        String ID = BaseColumns._ID;
+        String ID = "social_id";
         String TYPE = "type";
     }
 }

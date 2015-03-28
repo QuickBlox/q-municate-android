@@ -113,7 +113,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         QBGroupChat groupChat = groupChatManager.getGroupChat(roomJId);
         QBDialog existingDialog = null;
         if (groupChat == null) {
-            existingDialog = ChatUtils.createQBDialogFromLocalDialog1(
+            existingDialog = ChatUtils.createQBDialogFromLocalDialog(
                     databaseManager.getDialogManager().getByDialogId(dialogId));
             groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
@@ -263,7 +263,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog1(
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
                 databaseManager.getDialogManager().getByDialogId(dialogId));
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
@@ -304,7 +304,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     private void updateDialogByNotification(QBChatMessage chatMessage) {
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog1(
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
                 databaseManager.getDialogManager().getByDialogId(dialogId));
 
         ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, dialog);

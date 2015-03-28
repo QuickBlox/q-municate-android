@@ -36,7 +36,12 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.UserManager;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
+
+import java.util.Observable;
+import java.util.Observer;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
 
@@ -49,10 +54,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private View phoneView;
 
     private QBPrivateChatHelper privateChatHelper;
+    private DatabaseManager databaseManager;
+    private int userId;
     private User user;
-
-//    private Cursor friendCursor;
-//    private ContentObserver statusContentObserver;
+    private Observer userObserver;
 
     public static void start(Context context, int friendId) {
         Intent intent = new Intent(context, FriendDetailsActivity.class);
@@ -64,14 +69,19 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
-        canPerformLogout.set(true);
-        int friendId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-//        friendCursor = UsersDatabaseManager.getFriendCursorById(this, friendId);
-        user = DatabaseManager.getInstance().getUserManager().get(friendId);
+
+        initFields();
         initUI();
-//        registerStatusChangingObserver();
-        initUIWithFriendsData();
-        initBroadcastActionList();
+        initUIWithUsersData();
+        addActions();
+    }
+
+    private void initFields() {
+        databaseManager = DatabaseManager.getInstance();
+        canPerformLogout.set(true);
+        userId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
+        user = databaseManager.getUserManager().get(userId);
+        userObserver = new UserObserver();
     }
 
     private void initUI() {
@@ -84,37 +94,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneView = _findViewById(R.id.phone_relativelayout);
     }
 
-//    private void registerStatusChangingObserver() {
-//        statusContentObserver = new ContentObserver(new Handler()) {
-//
-//            @Override
-//            public boolean deliverSelfNotifications() {
-//                return true;
-//            }
-//
-//            @Override
-//            public void onChange(boolean selfChange) {
-//                if (FriendDetailsActivity.this.user != null) {
-//                    user = DatabaseManager.getInstance().getUserManager().get(FriendDetailsActivity.this.user.getUserId());
-//                    setOnlineStatus(user);
-//                }
-//            }
-//        };
-//        friendCursor.registerContentObserver(statusContentObserver);
-//    }
-
-//    private void unregisterStatusChangingObserver() {
-//        friendCursor.unregisterContentObserver(statusContentObserver);
-//    }
-
-    private void initBroadcastActionList() {
+    private void addActions() {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.GET_FILE_FAIL_ACTION, failAction);
     }
 
-    private void initUIWithFriendsData() {
+    private void initUIWithUsersData() {
         loadAvatar();
         setName();
         setOnlineStatus(user);
@@ -129,17 +114,29 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        addObservers();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        deleteObservers();
+    }
+
+    @Override
     public void onConnectedToService(QBService service) {
         if (privateChatHelper == null) {
             privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
         }
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        unregisterStatusChangingObserver();
-//    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,6 +157,19 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION);
+    }
+
+    private void addObservers() {
+        databaseManager.getUserManager().addObserver(userObserver);
+    }
+
+    private void deleteObservers() {
+        databaseManager.getUserManager().deleteObserver(userObserver);
     }
 
     private void setName() {
@@ -248,8 +258,20 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void deleteDialog() {
-        String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(this, user.getUserId());
+        DialogOccupant dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupantForPrivateChat(user.getUserId());
+        String dialogId = dialogOccupant.getDialog().getDialogId();
         QBDeleteChatCommand.start(this, dialogId, QBDialogType.PRIVATE);
+    }
+
+    private class UserObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(UserManager.OBSERVE_USER)) {
+                user = DatabaseManager.getInstance().getUserManager().get(userId);
+                initUIWithUsersData();
+            }
+        }
     }
 
     private class RemoveFriendSuccessAction implements Command {

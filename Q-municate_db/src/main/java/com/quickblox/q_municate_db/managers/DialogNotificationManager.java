@@ -1,5 +1,8 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.j256.ormlite.dao.Dao;
 import com.quickblox.q_municate_db.dao.CommonDao;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -7,15 +10,30 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Observable;
 
-public class DialogNotificationManager implements CommonDao<DialogNotification> {
+public class DialogNotificationManager extends Observable implements CommonDao<DialogNotification> {
 
     private static final String TAG = DialogNotificationManager.class.getSimpleName();
+    public static final String OBSERVE_DIALOG_NOTIFICATION = "observe_dialog_notification";
 
+    private Handler handler;
     private Dao<DialogNotification, Integer> dialogNotificationDao;
 
     public DialogNotificationManager(Dao<DialogNotification, Integer> dialogNotificationDao) {
+        handler = new Handler(Looper.getMainLooper());
         this.dialogNotificationDao = dialogNotificationDao;
+    }
+
+    @Override
+    public void notifyObservers(final Object data) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                DialogNotificationManager.super.notifyObservers(data);
+            }
+        });
     }
 
     @Override

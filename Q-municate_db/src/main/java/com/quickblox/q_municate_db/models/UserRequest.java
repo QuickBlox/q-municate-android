@@ -23,8 +23,7 @@ public class UserRequest implements Serializable {
             canBeNull = false, columnName = User.Column.ID)
     private User user;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
-            columnName = REQUEST_STATUS)
+    @DatabaseField(columnName = REQUEST_STATUS)
     private RequestStatus requestStatus;
 
     @DatabaseField(columnName = TEXT_STATUS)
@@ -118,7 +117,7 @@ public class UserRequest implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "user_request";
-        String ID = BaseColumns._ID;
+        String ID = "user_request_id";
         String TEXT_STATUS = "text_status";
         String UPDATED_DATE = "updated_date";
         String REQUEST_STATUS = "request_status";

@@ -1,5 +1,8 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -10,26 +13,46 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Observable;
 import java.util.concurrent.Callable;
 
-public class UserManager implements CommonDao<User> {
+public class UserManager extends Observable implements CommonDao<User> {
 
     private static final String TAG = UserManager.class.getSimpleName();
+    public static final String OBSERVE_USER = "observe_user";
 
+    private Handler handler;
     private Dao<User, Integer> userDao;
 
     public UserManager(Dao<User, Integer> userDao) {
+        handler = new Handler(Looper.getMainLooper());
         this.userDao = userDao;
     }
 
     @Override
+    public void notifyObservers(final Object data) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                UserManager.super.notifyObservers(data);
+            }
+        });
+    }
+
+    @Override
     public Dao.CreateOrUpdateStatus createOrUpdate(User item) {
+        Dao.CreateOrUpdateStatus createOrUpdateStatus = null;
+
         try {
-            return userDao.createOrUpdate(item);
+            createOrUpdateStatus = userDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
-        return null;
+
+        notifyObservers(OBSERVE_USER);
+
+        return createOrUpdateStatus;
     }
 
     public void createOrUpdate(final Collection<User> userList) {
@@ -40,6 +63,9 @@ public class UserManager implements CommonDao<User> {
                     for (User user : userList) {
                         userDao.createOrUpdate(user);
                     }
+
+                    notifyObservers(OBSERVE_USER);
+
                     return null;
                 }
             });
@@ -77,6 +103,8 @@ public class UserManager implements CommonDao<User> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_USER);
     }
 
     @Override
@@ -86,6 +114,8 @@ public class UserManager implements CommonDao<User> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_USER);
     }
 
     public boolean isUserOwner(String email) {

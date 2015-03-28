@@ -30,6 +30,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
@@ -64,6 +65,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         initActionBar();
         setCurrentDialog(dialog);
+
+        initListView();
     }
 
     @Override
@@ -133,11 +136,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void initListView() {
-        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAll();
+        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAllByDialogId(dialogId);
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesList, this,
                 dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+//        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         isNeedToScrollMessages = true;
         scrollListView();
     }

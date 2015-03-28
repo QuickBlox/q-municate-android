@@ -22,8 +22,7 @@ public class DialogNotification implements Serializable {
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
-            columnName = NOTIFICATION_TYPE)
+    @DatabaseField(columnName = NOTIFICATION_TYPE)
     private NotificationType notificationType;
 
     @DatabaseField(columnName = CREATED_DATE)
@@ -106,7 +105,7 @@ public class DialogNotification implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "dialog_notification";
-        String ID = BaseColumns._ID;
+        String ID = "dialog_notification_id";
         String CREATED_DATE = "created_date";
         String NOTIFICATION_TYPE = "notification_type";
     }

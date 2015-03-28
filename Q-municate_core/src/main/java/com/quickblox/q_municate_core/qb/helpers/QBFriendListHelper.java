@@ -278,8 +278,8 @@ public class QBFriendListHelper extends BaseHelper {
         databaseManager.getFriendManager().createOrUpdate(new Friend(user));
     }
 
-    private void deleteFriend(int friendId) {
-        databaseManager.getFriendManager().delete(friendId);
+    private void deleteFriend(int userId) {
+        databaseManager.getFriendManager().delete(userId);
     }
 
     private void deleteFriendOrUserRequest(int id) {

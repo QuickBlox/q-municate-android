@@ -163,7 +163,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!Message.State.READ.equals(message.getState()) && !ownMessage) {
             message.setState(Message.State.READ);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog1(dialog),
+            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog),
                     message, true);
         }
 

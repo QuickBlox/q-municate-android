@@ -1,5 +1,10 @@
 package com.quickblox.q_municate_db.managers;
 
+import android.os.Handler;
+import android.os.Looper;
+
+import java.util.Observable;
+
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -12,24 +17,43 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UserRequestManager implements CommonDao<UserRequest> {
+public class UserRequestManager extends Observable implements CommonDao<UserRequest> {
 
     private static final String TAG = UserRequestManager.class.getSimpleName();
+    public static final String OBSERVE_USER_REQUEST = "observe_user_request";
 
+    private Handler handler;
     private Dao<UserRequest, Integer> userRequestDao;
 
     public UserRequestManager(Dao<UserRequest, Integer> userRequestDao) {
+        handler = new Handler(Looper.getMainLooper());
         this.userRequestDao = userRequestDao;
     }
 
     @Override
+    public void notifyObservers(final Object data) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setChanged();
+                UserRequestManager.super.notifyObservers(data);
+            }
+        });
+    }
+
+    @Override
     public Dao.CreateOrUpdateStatus createOrUpdate(UserRequest item) {
+        Dao.CreateOrUpdateStatus createOrUpdateStatus = null;
+
         try {
-            return userRequestDao.createOrUpdate(item);
+            createOrUpdateStatus = userRequestDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
-        return null;
+
+        notifyObservers(OBSERVE_USER_REQUEST);
+
+        return createOrUpdateStatus;
     }
 
     @Override
@@ -61,6 +85,8 @@ public class UserRequestManager implements CommonDao<UserRequest> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_USER_REQUEST);
     }
 
     @Override
@@ -70,6 +96,8 @@ public class UserRequestManager implements CommonDao<UserRequest> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_USER_REQUEST);
     }
 
     public User getUserById(int userId) {
@@ -95,5 +123,7 @@ public class UserRequestManager implements CommonDao<UserRequest> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_USER_REQUEST);
     }
 }

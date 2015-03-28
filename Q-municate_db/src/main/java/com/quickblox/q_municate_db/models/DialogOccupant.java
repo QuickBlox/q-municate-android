@@ -81,6 +81,6 @@ public class DialogOccupant implements Serializable {
     public interface Column {
 
         String TABLE_NAME = "dialog_occupant";
-        String ID = BaseColumns._ID;
+        String ID = "dialog_occupant_id";
     }
 }
