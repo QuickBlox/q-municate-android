@@ -23,18 +23,17 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.users.model.QBUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -82,13 +81,6 @@ public class NavigationDrawerFragment extends BaseFragment {
         initLocalBroadcastManagers();
     }
 
-    private void initLocalBroadcastManagers() {
-        countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
-
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
@@ -100,6 +92,13 @@ public class NavigationDrawerFragment extends BaseFragment {
         drawerListView.setItemChecked(currentSelectedPosition, true);
 
         return rootView;
+    }
+
+    private void initLocalBroadcastManagers() {
+        countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
+
+        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
     }
 
     @Override
@@ -251,7 +250,9 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     private int getCountUnreadDialogs() {
-        return ChatDatabaseManager.getCountUnreadDialogs(baseActivity);
+        // TODO temp
+        //        return ChatDatabaseManager.getCountUnreadDialogs(baseActivity);
+        return 0;
     }
 
     public interface NavigationDrawerCallbacks {

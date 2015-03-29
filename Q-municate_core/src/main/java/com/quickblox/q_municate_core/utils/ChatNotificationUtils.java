@@ -9,9 +9,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -147,7 +146,7 @@ public class ChatNotificationUtils {
         if (chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null) {
             String inputCode = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
             if (PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
-                friendsMessageTypeCode = MessagesNotificationType.CREATE_DIALOG.getCode();
+                friendsMessageTypeCode = DialogNotification.NotificationType.CREATE_DIALOG.getCode();
             } else {
                 friendsMessageTypeCode = Integer.parseInt(inputCode);
             }
@@ -168,47 +167,51 @@ public class ChatNotificationUtils {
     }
 
     public static String getBodyForFriendsNotificationMessage(Context context,
-                                                              MessagesNotificationType messagesNotificationType, Message messageCache) {
+            DialogNotification.NotificationType notificationType, QBChatMessage qbChatMessage) {
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.frl_friends_contact_request);
         QBUser user = AppSession.getSession().getUser();
+        boolean ownMessage = user.getId().equals(qbChatMessage.getSenderId());
 
-//        boolean ownMessage = user.getId().equals(messageCache.getSenderId());
-//
-//        switch (messagesNotificationType) {
-//            case FRIENDS_REQUEST: {
-//                resultMessage = ownMessage ? resources.getString(
-//                        R.string.frl_friends_request_message_for_me) : resources.getString(
-//                        R.string.frl_friends_request_message_for_friend, ChatUtils.getFullNameById(
-//                                messageCache.getSenderId()));
-//                break;
-//            }
-//            case FRIENDS_ACCEPT: {
-//                resultMessage = ownMessage ? resources.getString(
-//                        R.string.frl_friends_request_accept_message_for_me) : resources.getString(
-//                        R.string.frl_friends_request_accept_message_for_friend);
-//                break;
-//            }
-//            case FRIENDS_REJECT: {
-//                resultMessage = ownMessage ? resources.getString(
-//                        R.string.frl_friends_request_reject_message_for_me) : resources.getString(
-//                        R.string.frl_friends_request_reject_message_for_friend);
-//                break;
-//            }
-//            case FRIENDS_REMOVE: {
-//                User opponentUser;
-//
-//                if (messageCache.getRecipientId().intValue() == user.getId().intValue()) {
-//                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getSenderId());
-//                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_friend, opponentUser.getFullName());
-//                } else {
-//                    opponentUser = DatabaseManager.getInstance().getUserManager().get(messageCache.getRecipientId());
-//                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me, opponentUser.getFullName());
-//                }
-//
-//                break;
-//            }
-//        }
+        switch (notificationType) {
+            case FRIENDS_REQUEST: {
+                resultMessage = ownMessage ? resources.getString(
+                        R.string.frl_friends_request_message_for_me) : resources.getString(
+                        R.string.frl_friends_request_message_for_friend, ChatUtils.getFullNameById(
+                                qbChatMessage.getSenderId()));
+                break;
+            }
+            case FRIENDS_ACCEPT: {
+                resultMessage = ownMessage ? resources.getString(
+                        R.string.frl_friends_request_accept_message_for_me) : resources.getString(
+                        R.string.frl_friends_request_accept_message_for_friend);
+                break;
+            }
+            case FRIENDS_REJECT: {
+                resultMessage = ownMessage ? resources.getString(
+                        R.string.frl_friends_request_reject_message_for_me) : resources.getString(
+                        R.string.frl_friends_request_reject_message_for_friend);
+                break;
+            }
+            case FRIENDS_REMOVE: {
+                User opponentUser;
+
+                if (qbChatMessage.getRecipientId().intValue() == user.getId().intValue()) {
+                    opponentUser = DatabaseManager.getInstance().getUserManager().get(
+                            qbChatMessage.getSenderId());
+                    resultMessage = resources.getString(
+                            R.string.frl_friends_request_remove_message_for_friend,
+                            opponentUser.getFullName());
+                } else {
+                    opponentUser = DatabaseManager.getInstance().getUserManager().get(
+                            qbChatMessage.getRecipientId());
+                    resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me,
+                            opponentUser.getFullName());
+                }
+
+                break;
+            }
+        }
 
         return resultMessage;
     }
@@ -249,14 +252,14 @@ public class ChatNotificationUtils {
     }
 
     public static QBChatMessage createNotificationMessageForUpdateChat(Context context, QBDialog dialog,
-                                                                       MessagesNotificationType messagesNotificationType, Collection<Integer> addedFriendIdsList) {
+            DialogNotification.NotificationType notificationType, Collection<Integer> addedFriendIdsList) {
         QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE);
         chatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
 
-        switch (messagesNotificationType) {
+        switch (notificationType) {
             case ADDED_DIALOG: {
                 chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                         addedFriendIdsList));
@@ -284,7 +287,8 @@ public class ChatNotificationUtils {
         return chatMessage;
     }
 
-    public static MessagesNotificationType getUpdateChatNotificationMessageType(QBChatMessage chatMessage) {
+    public static DialogNotification.NotificationType getUpdateChatNotificationMessageType(
+            QBChatMessage chatMessage) {
         String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
         String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
@@ -293,40 +297,41 @@ public class ChatNotificationUtils {
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
                 PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE)) {
-            return MessagesNotificationType.ADDED_DIALOG;
+            return DialogNotification.NotificationType.ADDED_DIALOG;
         }
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
                 PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
-            return MessagesNotificationType.CREATE_DIALOG;
+            return DialogNotification.NotificationType.CREATE_DIALOG;
         }
 
         if (!TextUtils.isEmpty(dialogName)) {
-            return MessagesNotificationType.NAME_DIALOG;
+            return DialogNotification.NotificationType.NAME_DIALOG;
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {
-            return MessagesNotificationType.PHOTO_DIALOG;
+            return DialogNotification.NotificationType.PHOTO_DIALOG;
         }
 
         if (!TextUtils.isEmpty(leave)) {
-            return MessagesNotificationType.LEAVE_DIALOG;
+            return DialogNotification.NotificationType.LEAVE_DIALOG;
         }
 
         return null;
     }
 
-    public static String getBodyForUpdateChatNotificationMessage(Context context, QBChatMessage chatMessage) {
-        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        String leave = chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
-        String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
+    public static String getBodyForUpdateChatNotificationMessage(Context context,
+            QBChatMessage qbChatMessage) {
+        String occupantsIds = qbChatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = qbChatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        String leave = qbChatMessage.getProperty(PROPERTY_ROOM_LEAVE);
+        String notificationType = qbChatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
 
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.cht_notification_message);
         QBUser user = AppSession.getSession().getUser();
-        boolean ownMessage = user.getId().equals(chatMessage.getSenderId());
+        boolean ownMessage = user.getId().equals(qbChatMessage.getSenderId());
 
         if (notificationType.equals(PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
             String fullNames;
@@ -335,9 +340,9 @@ public class ChatNotificationUtils {
                 fullNames = ChatUtils.getFullNamesFromOpponentId(user.getId(), occupantsIds);
                 resultMessage = resources.getString(R.string.cht_update_group_added_message, user.getFullName(), fullNames);
             } else {
-                fullNames = ChatUtils.getFullNamesFromOpponentId(chatMessage.getSenderId(), occupantsIds);
+                fullNames = ChatUtils.getFullNamesFromOpponentId(qbChatMessage.getSenderId(), occupantsIds);
                 resultMessage = resources.getString(R.string.cht_update_group_added_message, ChatUtils.getFullNameById(
-                                chatMessage.getSenderId()), fullNames);
+                        qbChatMessage.getSenderId()), fullNames);
             }
 
             return resultMessage;
@@ -348,26 +353,26 @@ public class ChatNotificationUtils {
             resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_added_message,
                     user.getFullName(), fullNames) : resources.getString(
                     R.string.cht_update_group_added_message, ChatUtils.getFullNameById(
-                            chatMessage.getSenderId()), fullNames);
+                            qbChatMessage.getSenderId()), fullNames);
         }
 
         if (!TextUtils.isEmpty(dialogName)) {
             resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_name_message,
                     user.getFullName(), dialogName) : resources.getString(
                     R.string.cht_update_group_name_message, ChatUtils.getFullNameById(
-                            chatMessage.getSenderId()), dialogName);
+                            qbChatMessage.getSenderId()), dialogName);
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {
             resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_photo_message,
                     user.getFullName()) : resources.getString(R.string.cht_update_group_photo_message,
-                    ChatUtils.getFullNameById(chatMessage.getSenderId()));
+                    ChatUtils.getFullNameById(qbChatMessage.getSenderId()));
         }
 
         if (!TextUtils.isEmpty(leave)) {
             resultMessage = ownMessage ? resources.getString(R.string.cht_update_group_leave_message,
                     user.getFullName()) : resources.getString(R.string.cht_update_group_leave_message,
-                    ChatUtils.getFullNameById(chatMessage.getSenderId()));
+                    ChatUtils.getFullNameById(qbChatMessage.getSenderId()));
         }
 
         return resultMessage;

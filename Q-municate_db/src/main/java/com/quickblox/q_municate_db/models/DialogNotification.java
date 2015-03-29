@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.models;
 
-import android.provider.BaseColumns;
-
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -10,7 +8,9 @@ import java.io.Serializable;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.CREATED_DATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.ID;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.NOTIFICATION_TYPE;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.STATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.TABLE_NAME;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.BODY;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class DialogNotification implements Serializable {
@@ -22,19 +22,26 @@ public class DialogNotification implements Serializable {
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
+    @DatabaseField(columnName = STATE)
+    private State state;
+
     @DatabaseField(columnName = NOTIFICATION_TYPE)
     private NotificationType notificationType;
 
+    @DatabaseField(columnName = BODY)
+    private String body;
+
     @DatabaseField(columnName = CREATED_DATE)
-    private String createdDate;
+    private long createdDate;
 
     public DialogNotification() {
     }
 
-    public DialogNotification(String dialogNotificationId, DialogOccupant dialogOccupant,
-            NotificationType notificationType, String createdDate) {
+    public DialogNotification(String dialogNotificationId, DialogOccupant dialogOccupant, State state,
+            NotificationType notificationType, long createdDate) {
         this.dialogNotificationId = dialogNotificationId;
         this.dialogOccupant = dialogOccupant;
+        this.state = state;
         this.notificationType = notificationType;
         this.createdDate = createdDate;
     }
@@ -63,21 +70,34 @@ public class DialogNotification implements Serializable {
         this.notificationType = NotificationType;
     }
 
-    public String getCreatedDate() {
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(String createdDate) {
+    public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     public enum NotificationType {
 
-        CREATE_PRIVATE_CHAT(0),
-        CREATE_GROUP_CHAT(1),
-        CHANGE_NAME_GROUP_CHAT(2),
-        CHANGE_PHOTO_GROUP_CHAT(3),
-        CHANGE_OCCUPANTS_GROUP_CHAT(4);
+        FRIENDS_REQUEST(4), FRIENDS_ACCEPT(5), FRIENDS_REJECT(6), FRIENDS_REMOVE(7),
+        CREATE_DIALOG(25), ADDED_DIALOG(21), NAME_DIALOG(22), PHOTO_DIALOG(23), LEAVE_DIALOG(24);
 
         private int code;
 
@@ -106,6 +126,8 @@ public class DialogNotification implements Serializable {
 
         String TABLE_NAME = "dialog_notification";
         String ID = "dialog_notification_id";
+        String STATE = "state";
+        String BODY = "body";
         String CREATED_DATE = "created_date";
         String NOTIFICATION_TYPE = "notification_type";
     }

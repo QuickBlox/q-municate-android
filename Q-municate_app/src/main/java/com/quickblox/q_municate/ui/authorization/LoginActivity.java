@@ -11,7 +11,6 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.ValidationUtils;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 
 public class LoginActivity extends BaseAuthActivity {
@@ -53,7 +52,7 @@ public class LoginActivity extends BaseAuthActivity {
 
             boolean ownerUser = DatabaseManager.getInstance().getUserManager().isUserOwner(userEmail);
             if (!ownerUser) {
-                ChatDatabaseManager.clearAllCache(this);
+                DatabaseManager.getInstance().clearAllTables();
             }
 
             initCheckedRememberMe();

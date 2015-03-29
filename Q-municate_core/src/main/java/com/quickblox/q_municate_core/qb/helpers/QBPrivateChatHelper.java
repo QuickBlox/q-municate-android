@@ -12,12 +12,13 @@ import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -71,25 +72,13 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         super.init(user);
     }
 
-    public void onPrivateMessageReceived(QBChat chat, QBChatMessage chatMessage) {
-        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
-
-        if (user == null) {
-            user = ChatUtils.getTempUserFromChatMessage(chatMessage);
-        }
-
-//        MessageCache messageCache = parseReceivedMessage(chatMessage);
-//
-//        saveMessageToCache(messageCache);
-//
-//        notifyMessageReceived(chatMessage, user, messageCache.getDialogId(), true);
+    public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
+        User user = DatabaseManager.getInstance().getUserManager().get(qbChatMessage.getSenderId());
+        saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
+        notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), true);
     }
 
     public void updateDialog(QBDialog dialog) {
-        int countUnreadDialog = ChatDatabaseManager.getCountUnreadMessagesByDialogIdLocal(context,
-                dialog.getDialogId());
-        ChatDatabaseManager.updateDialog(context, dialog.getDialogId(), dialog.getLastMessage(),
-                dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 
     public QBFile loadAttachFile(File inputFile) throws Exception {
@@ -104,23 +93,25 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         return file;
     }
 
-    private void friendRequestMessageReceived(QBChatMessage chatMessage,
-            MessagesNotificationType messagesNotificationType) {
-//        MessageCache messageCache = parseReceivedMessage(chatMessage);
-//        messageCache.setMessagesNotificationType(messagesNotificationType);
-//
-//        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(messageCache.getDialogId()));
-//
-//        if (dialog == null) {
-//            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-//                    QBDialogType.PRIVATE);
-//            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
-//                    chatCreator.getId(), chatMessage.getSenderId());
-//            dialog.setOccupantsIds(occupantsIdsList);
-//            saveDialogToCache(dialog);
-//        }
-//
-//        saveMessageToCache(messageCache);
+    private void friendRequestMessageReceived(QBChatMessage qbChatMessage,
+            DialogNotification.NotificationType notificationType) {
+        Message message = parseReceivedMessage(qbChatMessage);
+        DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
+        dialogNotification.setNotificationType(notificationType);
+
+        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
+                DatabaseManager.getInstance().getDialogManager().getByDialogId(qbChatMessage.getDialogId()));
+
+        if (dialog == null) {
+            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage,
+                    QBDialogType.PRIVATE);
+            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
+                    chatCreator.getId(), qbChatMessage.getSenderId());
+            dialog.setOccupantsIds(occupantsIdsList);
+            saveDialogToCache(dialog);
+        }
+
+        saveDialogNotificationToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
@@ -129,16 +120,17 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REQUEST);
+                friendRequestMessageReceived(chatMessage,
+                        DialogNotification.NotificationType.FRIENDS_REQUEST);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_ACCEPT);
+                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_ACCEPT);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REJECT);
+                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_REJECT);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, MessagesNotificationType.FRIENDS_REMOVE);
+                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_REMOVE);
             }
         }
     }

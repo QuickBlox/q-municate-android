@@ -20,6 +20,7 @@ import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -30,8 +31,6 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.DialogOccupant;
-import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
@@ -65,7 +64,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         initActionBar();
         setCurrentDialog(dialog);
-
         initListView();
     }
 
@@ -136,37 +134,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void initListView() {
-        List<Message> messagesList = DatabaseManager.getInstance().getMessageManager().getAllByDialogId(dialogId);
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, messagesList, this,
-                dialog);
+        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
+                combinationMessagesList, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-//        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         isNeedToScrollMessages = true;
         scrollListView();
     }
 
-    //    protected QBDialog getQBDialog() {
-    //        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
-    //
-    //        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-    //        MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
-    //
-    //        if (messagesNotificationType == null) {
-    //            dialog.setLastMessage(messageCache.getMessage());
-    //        } else if (ChatNotificationUtils.isFriendsNotificationMessage(messagesNotificationType.getCode())) {
-    //            dialog.setLastMessage(resources.getString(R.string.frl_friends_contact_request));
-    //        } else if (ChatNotificationUtils.isUpdateChatNotificationMessage(
-    //                messagesNotificationType.getCode())) {
-    //            dialog.setLastMessage(resources.getString(R.string.cht_notification_message));
-    //        }
-    //
-    //        dialog.setLastMessageDateSent(messageCache.getTime());
-    //        dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
-    //        dialog.setLastMessageUserId(messageCache.getSenderId());
-    //        dialog.setType(QBDialogType.PRIVATE);
-    //
-    //        return dialog;
-    //    }
+    @Override
+    protected void updateMessagesList() {
+        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
+        messagesAdapter.setNewData(combinationMessagesList);
+        messagesAdapter.notifyDataSetChanged();
+    }
 
     private void setOnlineStatus(User friend) {
         if (friend != null) {

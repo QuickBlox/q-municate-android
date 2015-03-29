@@ -40,7 +40,6 @@ import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.GroupDialog;
-import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
@@ -55,6 +54,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -88,7 +88,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
     private QBGroupChatHelper groupChatHelper;
-    private List<MessagesNotificationType> currentNotificationTypeList;
+    private List<DialogNotification.NotificationType> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
     private FriendOperationAction friendOperationAction;
     private boolean loadedDialogInfo;
@@ -112,7 +112,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
         loadedDialogInfo = false;
-        currentNotificationTypeList = new ArrayList<MessagesNotificationType>();
+        currentNotificationTypeList = new ArrayList<DialogNotification.NotificationType>();
 
         initUI();
 
@@ -314,9 +314,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void leaveGroup() {
         showProgress();
-        currentNotificationTypeList.add(MessagesNotificationType.LEAVE_DIALOG);
+        currentNotificationTypeList.add(DialogNotification.NotificationType.LEAVE_DIALOG);
         sendNotificationToGroup();
-        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, groupDialog.getRoomJid());
+        Dialog dialog = databaseManager.getDialogManager().getByRoomJid(groupDialog.getRoomJid());
+        QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, dialog);
     }
 
     private void initTextChangedListeners() {
@@ -332,7 +333,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
-            currentNotificationTypeList.add(MessagesNotificationType.ADDED_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.NotificationType.ADDED_DIALOG);
             sendNotificationToGroup();
         }
     }
@@ -394,13 +395,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (!currentDialog.getTitle().equals(groupNameCurrent)) {
             currentDialog.setTitle(groupNameCurrent);
 
-            currentNotificationTypeList.add(MessagesNotificationType.NAME_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.NotificationType.NAME_DIALOG);
         }
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
 
-            currentNotificationTypeList.add(MessagesNotificationType.PHOTO_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.NotificationType.PHOTO_DIALOG);
         } else {
             updateGroupDialog(null);
         }
@@ -409,7 +410,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void sendNotificationToGroup() {
-        for (MessagesNotificationType messagesNotificationType : currentNotificationTypeList) {
+        for (DialogNotification.NotificationType messagesNotificationType : currentNotificationTypeList) {
             try {
                 groupChatHelper.sendNotificationToFriends(ChatUtils.createQBDialogFromLocalDialog(
                         currentDialog), messagesNotificationType, addedFriendIdsList);

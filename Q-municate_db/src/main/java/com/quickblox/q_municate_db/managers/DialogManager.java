@@ -143,4 +143,17 @@ public class DialogManager extends Observable implements CommonDao<Dialog> {
         }
         return dialog;
     }
+
+    public Dialog getByRoomJid(String roomJid) {
+        Dialog dialog = null;
+        try {
+            QueryBuilder<Dialog, Integer> queryBuilder = dialogDao.queryBuilder();
+            queryBuilder.where().eq(Dialog.Column.ROOM_JID, roomJid);
+            PreparedQuery<Dialog> preparedQuery = queryBuilder.prepare();
+            dialog = dialogDao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return dialog;
+    }
 }

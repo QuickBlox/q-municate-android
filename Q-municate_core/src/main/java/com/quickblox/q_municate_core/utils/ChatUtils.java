@@ -9,15 +9,17 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -118,11 +120,12 @@ public class ChatUtils {
         return bundle;
     }
 
-    public static QBDialog getExistPrivateDialog(Context context, int opponentId) {
-        List<QBDialog> dialogList = ChatDatabaseManager.getDialogsByOpponent(context, opponentId,
-                QBDialogType.PRIVATE);
-        if (!dialogList.isEmpty()) {
-            return dialogList.get(0);
+    public static QBDialog getExistPrivateDialog(int opponentId) {
+        DialogOccupant dialogOccupant = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantForPrivateChat(opponentId);
+
+        if (dialogOccupant != null) {
+            Dialog dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogOccupant.getDialog().getDialogId());
+            return createQBDialogFromLocalDialog(dialog);
         } else {
             return null;
         }
@@ -247,7 +250,7 @@ public class ChatUtils {
         return qbDialog;
     }
 
-    public static Message createLocalMessage(QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, Message.State state) {
+    public static Message createLocalMessage(QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, State state) {
         Message message = new Message();
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
@@ -263,5 +266,60 @@ public class ChatUtils {
         attachment.setName(qbAttachment.getName());
         attachment.setSize(qbAttachment.getSize());
         return attachment;
+    }
+
+    public static DialogNotification createLocalDialogNotification(Context context, QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, State state) {
+        DialogNotification dialogNotification = new DialogNotification();
+        dialogNotification.setDialogNotificationId(qbChatMessage.getId());
+        dialogNotification.setDialogOccupant(dialogOccupant);
+
+        int friendsMessageTypeCode = Integer.parseInt(qbChatMessage.getProperty(
+                ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString());
+        if (ChatNotificationUtils.isFriendsNotificationMessage(friendsMessageTypeCode)) {
+            dialogNotification.setNotificationType(DialogNotification.NotificationType.parseByCode(
+                    friendsMessageTypeCode));
+            dialogNotification.setBody(ChatNotificationUtils.getBodyForFriendsNotificationMessage(context,
+                    DialogNotification.NotificationType.parseByCode(friendsMessageTypeCode),
+                    qbChatMessage));
+        } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)
+                || ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
+            dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
+                    qbChatMessage));
+            dialogNotification.setNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
+        }
+
+        dialogNotification.setCreatedDate(qbChatMessage.getDateSent());
+        dialogNotification.setState(state);
+        return dialogNotification;
+    }
+
+    public static List<CombinationMessage> getCombinationMessagesListFromMessagesList(List<Message> messagesList) {
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>(messagesList.size());
+
+        for (Message message : messagesList) {
+            combinationMessagesList.add(new CombinationMessage(message));
+        }
+
+        return combinationMessagesList;
+    }
+
+    public static List<CombinationMessage> getCombinationMessagesListFromDialogNotificationsList(List<DialogNotification> dialogNotificationsList) {
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>(dialogNotificationsList.size());
+
+        for (DialogNotification dialogNotification : dialogNotificationsList) {
+            combinationMessagesList.add(new CombinationMessage(dialogNotification));
+        }
+
+        return combinationMessagesList;
+    }
+
+    public static DialogNotification convertMessageToDialogNotification(Message message) {
+        DialogNotification dialogNotification = new DialogNotification();
+        dialogNotification.setDialogNotificationId(message.getMessageId());
+        dialogNotification.setDialogOccupant(message.getDialogOccupant());
+        dialogNotification.setBody(message.getBody());
+        dialogNotification.setCreatedDate(message.getCreatedDate());
+        dialogNotification.setState(message.getState());
+        return dialogNotification;
     }
 }

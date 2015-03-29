@@ -96,7 +96,8 @@ public class DatabaseManager {
     public DialogNotificationManager getDialogNotificationManager() {
         if (dialogNotificationManager == null) {
             dialogNotificationManager = new DialogNotificationManager(getDatabaseHelper().getDaoByClass(
-                    DialogNotification.class));
+                    DialogNotification.class), getDatabaseHelper().getDaoByClass(Dialog.class),
+                    getDatabaseHelper().getDaoByClass(DialogOccupant.class));
         }
         return dialogNotificationManager;
     }

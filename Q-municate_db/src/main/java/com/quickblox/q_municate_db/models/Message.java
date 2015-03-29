@@ -96,36 +96,7 @@ public class Message implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return currentUserId == dialogOccupant.getUser().getUserId();
-    }
-
-    public enum State {
-
-        DELIVERED(0),
-        READ(1),
-        SYNC(2);
-
-        private int code;
-
-        State(int code) {
-            this.code = code;
-        }
-
-        public static State parseByCode(int code) {
-            State[] valuesArray = State.values();
-            State result = null;
-            for (State value : valuesArray) {
-                if (value.getCode() == code) {
-                    result = value;
-                    break;
-                }
-            }
-            return result;
-        }
-
-        public int getCode() {
-            return code;
-        }
+        return currentUserId != dialogOccupant.getUser().getUserId();
     }
 
     public interface Column {

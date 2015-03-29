@@ -8,6 +8,7 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_db.models.Dialog;
 
 public class QBLeaveGroupDialogCommand extends ServiceCommand {
 
@@ -19,16 +20,16 @@ public class QBLeaveGroupDialogCommand extends ServiceCommand {
         this.multiChatHelper = multiChatHelper;
     }
 
-    public static void start(Context context, String roomJid) {
+    public static void start(Context context, Dialog dialog) {
         Intent intent = new Intent(QBServiceConsts.LEAVE_GROUP_DIALOG_ACTION, null, context, QBService.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, roomJid);
+        intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startService(intent);
     }
 
     @Override
     protected Bundle perform(Bundle extras) throws Exception {
-        String roomJid = extras.getString(QBServiceConsts.EXTRA_ROOM_JID);
-        multiChatHelper.leaveRoomChat(roomJid);
+        Dialog dialog = (Dialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        multiChatHelper.leaveRoomChat(dialog);
 
         return extras;
     }

@@ -156,10 +156,6 @@
             android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />
 
-        <provider
-            android:name="com.quickblox.q_municate_core.db.DatabaseProvider"
-            android:authorities="com.qmun.quickblox"
-            android:exported="false" />
         <meta-data android:name="com.crashlytics.ApiKey" android:value="7aea78439bec41a9005c7488bb6751c5e33fe270"/>
 
     </application>

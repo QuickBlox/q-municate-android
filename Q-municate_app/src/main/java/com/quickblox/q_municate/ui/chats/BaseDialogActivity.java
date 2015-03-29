@@ -43,6 +43,7 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
@@ -56,13 +57,19 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.MessageManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -73,6 +80,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private static final int TYPING_DELAY = 1000;
 
     protected Resources resources;
+    protected DatabaseManager databaseManager;
     protected EditText chatEditText;
     protected StickyListHeadersListView messagesListView;
     protected EditText messageEditText;
@@ -104,15 +112,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean isTypingNow;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
-
     private int firstVisiblePositionList;
     private View loadMoreView;
     private boolean loadingMore;
     private int skipMessages;
-    private int totalEntries;
-    private int loadedItems;
     private boolean firstItemInList;
     private int totalItemCountInList;
+    private Observer messageObserver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -145,11 +151,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(rootView);
 
         resources = getResources();
+        databaseManager = DatabaseManager.getInstance();
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
+        messageObserver = new MessageObserver();
 
         initUI();
         initListeners();
@@ -160,6 +168,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         isNeedToScrollMessages = true;
 
         initLocalBroadcastManagers();
+        addObservers();
         hideSmileLayout();
     }
 
@@ -192,6 +201,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onConnectedToService(QBService service) {
         createChatLocally();
+    }
+
+    private void addObservers() {
+        databaseManager.getMessageManager().addObserver(messageObserver);
+    }
+
+    private void deleteObservers() {
+        databaseManager.getMessageManager().deleteObserver(messageObserver);
     }
 
     protected void updateDialogData() {
@@ -320,6 +337,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                     generateBundleToInitDialog());
         }
         removeActions();
+        deleteObservers();
     }
 
     private boolean isGalleryCalled(int requestCode) {
@@ -429,7 +447,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
         loadMoreView = _findViewById(R.id.load_more_linearlayout);
         loadMoreView.setVisibility(View.GONE);
-        //        messagesListView.setOnScrollListener(this);
     }
 
     @Override
@@ -437,9 +454,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (scrollState == SCROLL_STATE_IDLE) {
             if (firstItemInList && !loadingMore) {
                 firstVisiblePositionList = totalItemCountInList - 1;
-                //                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
                 loadMoreItems();
-                //                }
             }
         }
     }
@@ -451,7 +466,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void loadMoreItems() {
-        //        loadMoreView.setVisibility(View.VISIBLE);
         startLoadDialogMessages();
     }
 
@@ -609,6 +623,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
+    protected List<CombinationMessage> createCombinationMessagesList() {
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>();
+        List<Message> messagesList = databaseManager.getMessageManager().getMessagesByDialogId(dialogId);
+        List<DialogNotification> dialogNotificationsList = databaseManager.getDialogNotificationManager()
+                .getDialogNotificationsByDialogId(dialogId);
+        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromMessagesList(messagesList));
+        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromDialogNotificationsList(
+                dialogNotificationsList));
+        Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
+        return combinationMessagesList;
+    }
+
     protected void startUpdateChatDialog() {
         //        QBDialog dialog = getQBDialog();
         //        if (dialog != null) {
@@ -633,6 +659,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         } else {
             long lastMessageDateSent = lastReadMessage.getCreatedDate();
             startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
+
+    protected abstract void updateMessagesList();
+
+    private class MessageObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(MessageManager.OBSERVE_MESSAGE)) {
+                updateMessagesList();
+            }
         }
     }
 
@@ -674,7 +712,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+            //            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = false;
 
             if (skipMessages != 0) {
@@ -703,10 +741,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            // TODO temp
-            //            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            //            hideProgress();
-            //            startLoadDialogMessages();
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            hideProgress();
+            startLoadDialogMessages();
         }
     }
 
@@ -714,10 +751,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            // TODO temp
-            //            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            //            hideProgress();
-            //            startLoadDialogMessages();
+            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            hideProgress();
+            startLoadDialogMessages();
         }
     }
 

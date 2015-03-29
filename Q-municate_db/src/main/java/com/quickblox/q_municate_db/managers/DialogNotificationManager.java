@@ -4,25 +4,35 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.dao.CommonDao;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 public class DialogNotificationManager extends Observable implements CommonDao<DialogNotification> {
 
-    private static final String TAG = DialogNotificationManager.class.getSimpleName();
     public static final String OBSERVE_DIALOG_NOTIFICATION = "observe_dialog_notification";
+    private static final String TAG = DialogNotificationManager.class.getSimpleName();
 
     private Handler handler;
     private Dao<DialogNotification, Integer> dialogNotificationDao;
+    private Dao<Dialog, Integer> dialogDao;
+    private Dao<DialogOccupant, Integer> dialogOccupantDao;
 
-    public DialogNotificationManager(Dao<DialogNotification, Integer> dialogNotificationDao) {
+    public DialogNotificationManager(Dao<DialogNotification, Integer> dialogNotificationDao,
+            Dao<Dialog, Integer> dialogDao, Dao<DialogOccupant, Integer> dialogOccupantDao) {
         handler = new Handler(Looper.getMainLooper());
         this.dialogNotificationDao = dialogNotificationDao;
+        this.dialogDao = dialogDao;
+        this.dialogOccupantDao = dialogOccupantDao;
     }
 
     @Override
@@ -84,5 +94,28 @@ public class DialogNotificationManager extends Observable implements CommonDao<D
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+    }
+
+    public List<DialogNotification> getDialogNotificationsByDialogId(String dialogId) {
+        List<DialogNotification> dialogNotificationsList = new ArrayList<>();
+        try {
+            QueryBuilder<DialogNotification, Integer> messageQueryBuilder = dialogNotificationDao
+                    .queryBuilder();
+
+            QueryBuilder<DialogOccupant, Integer> dialogOccupantQueryBuilder = dialogOccupantDao
+                    .queryBuilder();
+
+            QueryBuilder<Dialog, Integer> dialogQueryBuilder = dialogDao.queryBuilder();
+            dialogQueryBuilder.where().eq(Dialog.Column.ID, dialogId);
+
+            dialogOccupantQueryBuilder.join(dialogQueryBuilder);
+            messageQueryBuilder.join(dialogOccupantQueryBuilder);
+
+            PreparedQuery<DialogNotification> preparedQuery = messageQueryBuilder.prepare();
+            dialogNotificationsList = dialogNotificationDao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+        return dialogNotificationsList;
     }
 }

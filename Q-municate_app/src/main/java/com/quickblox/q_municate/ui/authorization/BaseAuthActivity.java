@@ -18,7 +18,6 @@ import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
@@ -26,6 +25,7 @@ import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.users.model.QBUser;
 
 public class BaseAuthActivity extends BaseActivity {
@@ -125,7 +125,7 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     private void loginWithFacebook() {
-        ChatDatabaseManager.clearAllCache(this);
+        DatabaseManager.getInstance().clearAllTables();
         AppSession.saveRememberMe(true);
         showProgress();
         FacebookHelper.logout(); // clearing old data

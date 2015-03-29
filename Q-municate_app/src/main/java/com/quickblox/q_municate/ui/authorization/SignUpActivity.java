@@ -20,13 +20,13 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
@@ -183,7 +183,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     private void startSignUp(File imageFile) {
-        ChatDatabaseManager.clearAllCache(this);
+        DatabaseManager.getInstance().clearAllTables();
         AppSession.getSession().closeAndClear();
         QBSignUpCommand.start(SignUpActivity.this, user, imageFile);
     }

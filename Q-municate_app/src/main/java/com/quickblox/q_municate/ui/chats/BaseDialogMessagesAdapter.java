@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.TextUtils;
@@ -17,20 +16,18 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
-import com.quickblox.q_municate.utils.Consts;
-import com.quickblox.q_municate.utils.FileHelper;
-import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate.utils.FileHelper;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_core.models.CombinationMessage;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.Message;
 
 import java.io.File;
 import java.util.HashMap;
@@ -40,38 +37,26 @@ import java.util.Random;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Message> implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
+public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<CombinationMessage> implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
     protected static int TYPE_REQUEST_MESSAGE = 0;
     protected static int TYPE_OWN_MESSAGE = 1;
     protected static int TYPE_OPPONENT_MESSAGE = 2;
     protected static int COMMON_TYPE_COUNT = 3;
-
+    private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;
     protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected Dialog dialog;
     private Random random;
-    private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
     private FileHelper fileHelper;
 
-    public BaseDialogMessagesAdapter(Context context, List<Message> objectsList) {
+    public BaseDialogMessagesAdapter(Context context, List<CombinationMessage> objectsList) {
         super(context, objectsList);
         random = new Random();
         imageUtils = new ImageUtils((android.app.Activity) context);
         fileHelper = new FileHelper();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
-        return getItemViewType(cursor);
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return ConstsCore.MESSAGES_TYPE_COUNT;
     }
 
     protected boolean isOwnMessage(int senderId) {
@@ -124,15 +109,6 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Message>
         return color;
     }
 
-    private int getItemViewType(Cursor cursor) {
-        int senderId = cursor.getInt(cursor.getColumnIndex(MessageTable.Cols.SENDER_ID));
-        if (isOwnMessage(senderId)) {
-            return ConstsCore.OWN_DIALOG_MESSAGE_TYPE;
-        } else {
-            return ConstsCore.OPPONENT_DIALOG_MESSAGE_TYPE;
-        }
-    }
-
     @Override
     public void onCachedImageFileReceived(File imageFile) {
     }
@@ -153,7 +129,7 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Message>
     public View getHeaderView(int position, View convertView, ViewGroup parent) {
         HeaderViewHolder holder;
 
-        Message message = getItem(position);
+        CombinationMessage message = getItem(position);
 
         if (convertView == null) {
             holder = new HeaderViewHolder();
@@ -176,7 +152,7 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Message>
     public long getHeaderId(int position) {
         String timeString;
 
-        Message message = getItem(position);
+        CombinationMessage message = getItem(position);
         long time = message.getCreatedDate();
         timeString = DateUtils.longToMessageListHeaderDate(time);
 

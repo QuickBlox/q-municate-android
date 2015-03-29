@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.ui.chats;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,10 +12,13 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.State;
 
 import java.util.List;
 
@@ -29,28 +31,25 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private PrivateDialogActivity.FriendOperationListener friendOperationListener;
 
     public PrivateDialogMessagesAdapter(Context context,
-                                        PrivateDialogActivity.FriendOperationListener friendOperationListener, List<Message> objectsList,
-                                        ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
+            PrivateDialogActivity.FriendOperationListener friendOperationListener,
+            List<CombinationMessage> objectsList, ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
         super(context, objectsList);
         this.friendOperationListener = friendOperationListener;
         this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
 
-    private int getItemViewType(Message message) {
-        boolean ownMessage = !message.isIncoming(currentQBUser.getId());
-        // TODO temp
-        //        boolean friendsRequestMessage = message.getMessagesNotificationType() != null;
-
-//        if (!friendsRequestMessage) {
+    private int getItemViewType(CombinationMessage combinationMessage) {
+        boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
+        if (combinationMessage.getNotificationType() == null) {
             if (ownMessage) {
                 return TYPE_OWN_MESSAGE;
             } else {
                 return TYPE_OPPONENT_MESSAGE;
             }
-//        } else {
-//            return TYPE_REQUEST_MESSAGE;
-//        }
+        } else {
+            return TYPE_REQUEST_MESSAGE;
+        }
     }
 
     @Override
@@ -67,18 +66,17 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     public View getView(int position, View view, ViewGroup parent) {
         ViewHolder viewHolder;
 
-        Message message = getItem(position);
-        boolean ownMessage = !message.isIncoming(currentQBUser.getId());
+        CombinationMessage combinationMessage = getItem(position);
+        boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
 
         if (view == null) {
             viewHolder = new ViewHolder();
 
-            // TODO temp
-            //            if (message.getMessagesNotificationType() == null) {
-            if (ownMessage) {
-                view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
-            } else {
-                view = layoutInflater.inflate(R.layout.list_item_private_message_opponent, null, true);
+            if (combinationMessage.getNotificationType() == null) {
+                if (ownMessage) {
+                    view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
+                } else {
+                    view = layoutInflater.inflate(R.layout.list_item_private_message_opponent, null, true);
             }
 
             viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(
@@ -98,89 +96,89 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     R.drawable.vertical_progressbar));
             viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
             viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
+            } else {
+                view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
 
-//            } else {
-//                view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
-//
-//                viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
-//                viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
-//                        R.id.time_text_message_textview);
-//                viewHolder.acceptFriendImageView = (ImageView) view.findViewById(R.id.accept_friend_imagebutton);
-//                viewHolder.dividerView = view.findViewById(R.id.divider_view);
-//                viewHolder.rejectFriendImageView = (ImageView) view.findViewById(R.id.reject_friend_imagebutton);
-//            }
+                viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
+                viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
+                        R.id.time_text_message_textview);
+                viewHolder.acceptFriendImageView = (ImageView) view.findViewById(
+                        R.id.accept_friend_imagebutton);
+                viewHolder.dividerView = view.findViewById(R.id.divider_view);
+                viewHolder.rejectFriendImageView = (ImageView) view.findViewById(
+                        R.id.reject_friend_imagebutton);
+            }
 
             view.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        // TODO temp
-        /*
-        boolean friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
-                message.getMessagesNotificationType());
-        boolean friendsInfoRequestMessage = message
-                .getMessagesNotificationType() != null && !friendsRequestMessage;
+        boolean friendsRequestMessage = DialogNotification.NotificationType.FRIENDS_REQUEST.equals(
+                combinationMessage.getNotificationType());
+        boolean friendsInfoRequestMessage = combinationMessage
+                .getNotificationType() != null && !friendsRequestMessage;
 
         if (friendsRequestMessage) {
-            viewHolder.messageTextView.setText(message.getMessage());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(message.getTime()));
+            viewHolder.messageTextView.setText(combinationMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+                    combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
-            viewHolder.messageTextView.setText(message.getMessage());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(message.getTime()));
+            viewHolder.messageTextView.setText(combinationMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+                    combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
 
-            lastInfoRequestPosition = cursor.getPosition();
-        } else
-        */
-        if (message.getAttachment() != null) {
+            lastInfoRequestPosition = position;
+        } else if (combinationMessage.getAttachment() != null) {
             resetUI(viewHolder);
 
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(
+                    combinationMessage.getCreatedDate()));
 
             if (ownMessage) {
-                setMessageStatus(viewHolder.attachDeliveryStatusImageView, Message.State.DELIVERED.equals(
-                        message.getState()), Message.State.READ.equals(message.getState()));
+                setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
+                        combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
 
-            displayAttachImage(message.getAttachment().getRemoteUrl(), viewHolder);
+            displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
         } else {
             resetUI(viewHolder);
 
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-            viewHolder.messageTextView.setText(message.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(message.getCreatedDate()));
+            viewHolder.messageTextView.setText(combinationMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+                    combinationMessage.getCreatedDate()));
 
             if (ownMessage) {
-                setMessageStatus(viewHolder.messageDeliveryStatusImageView, Message.State.DELIVERED.equals(
-                        message.getState()), Message.State.READ.equals(message.getState()));
+                setMessageStatus(viewHolder.messageDeliveryStatusImageView, State.DELIVERED.equals(
+                        combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
         }
 
-        if (!Message.State.READ.equals(message.getState()) && !ownMessage) {
-            message.setState(Message.State.READ);
+        if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
+            combinationMessage.setState(State.READ);
             QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    message, true);
+                    combinationMessage.toMessage(), true);
         }
 
-        // TODO temp
-        // check if last message is request message
-//        boolean lastRequestMessage = cursor.getPosition() == cursor.getCount() - 1 && friendsRequestMessage;
-//        if (lastRequestMessage) {
-//            findLastFriendsRequestForCursor(cursor);
-//        }
-//
+        // check if last messageCombination is request messageCombination
+        boolean lastRequestMessage = (position == objectsList.size() - 1 && friendsRequestMessage);
+        if (lastRequestMessage) {
+            findLastFriendsRequest();
+        }
+
         // check if friend was rejected/deleted.
-//        if (lastRequestPosition != EMPTY_POSITION && lastRequestPosition < lastInfoRequestPosition) {
-//            lastRequestPosition = EMPTY_POSITION;
-//        } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == cursor.getPosition())) { // set visible friends actions
-//            setVisibilityFriendsActions(viewHolder, View.VISIBLE);
-//            initListeners(viewHolder, message.getDialogOccupant().getUser().getUserId());
-//        }
+        if (lastRequestPosition != EMPTY_POSITION && lastRequestPosition < lastInfoRequestPosition) {
+            lastRequestPosition = EMPTY_POSITION;
+        } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
+            setVisibilityFriendsActions(viewHolder, View.VISIBLE);
+            initListeners(viewHolder, combinationMessage.getDialogOccupant().getUser().getUserId());
+        }
 
         return view;
     }
@@ -216,31 +214,29 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     private void findLastFriendsRequest() {
-//        Cursor cursor = getCursor();
-//        for (int i = 0; i < getCursor().getCount(); i++) {
-//            cursor.moveToPosition(i);
-//            findLastFriendsRequestForCursor(cursor);
-//        }
+        for (int i = 0; i < objectsList.size(); i++) {
+            findLastFriendsRequest(i, objectsList.get(i));
+        }
     }
 
-    private void findLastFriendsRequestForCursor(Cursor cursor) {
+    private void findLastFriendsRequest(int position, CombinationMessage combinationMessage) {
         boolean ownMessage;
         boolean friendsRequestMessage;
         boolean isFriend;
 
-//        MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
-//        if (messageCache.getMessagesNotificationType() != null) {
-//            ownMessage = isOwnMessage(messageCache.getSenderId());
-//            friendsRequestMessage = MessagesNotificationType.FRIENDS_REQUEST.equals(
-//                    messageCache.getMessagesNotificationType());
-//
-//            if (friendsRequestMessage && !ownMessage) {
-//                isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(messageCache.getSenderId()) != null;
-//                if (!isFriend) {
-//                    lastRequestPosition = cursor.getPosition();
-//                }
-//            }
-//        }
+        if (combinationMessage.getNotificationType() != null) {
+            ownMessage = isOwnMessage(combinationMessage.getDialogOccupant().getUser().getUserId());
+            friendsRequestMessage = DialogNotification.NotificationType.FRIENDS_REQUEST.equals(
+                    combinationMessage.getNotificationType());
+
+            if (friendsRequestMessage && !ownMessage) {
+                isFriend = DatabaseManager.getInstance().getFriendManager().
+                        getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
+                if (!isFriend) {
+                    lastRequestPosition = position;
+                }
+            }
+        }
     }
 
     private class FindLastFriendsRequestThread extends Thread {

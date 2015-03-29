@@ -10,6 +10,7 @@ import com.quickblox.q_municate_db.dao.CommonDao;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -48,12 +49,17 @@ public class MessageManager extends Observable implements CommonDao<Message> {
 
     @Override
     public Dao.CreateOrUpdateStatus createOrUpdate(Message item) {
+        Dao.CreateOrUpdateStatus createOrUpdateStatus = null;
+
         try {
-            return messageDao.createOrUpdate(item);
+            createOrUpdateStatus = messageDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
-        return null;
+
+        notifyObservers(OBSERVE_MESSAGE);
+
+        return createOrUpdateStatus;
     }
 
     @Override
@@ -94,6 +100,8 @@ public class MessageManager extends Observable implements CommonDao<Message> {
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_MESSAGE);
     }
 
     public void createOrUpdate(final Collection<Message> messagesList) {
@@ -147,8 +155,8 @@ public class MessageManager extends Observable implements CommonDao<Message> {
         try {
             QueryBuilder<Message, Integer> queryBuilder = messageDao.queryBuilder();
             queryBuilder.setCountOf(true);
-            queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList)
-                    .and().eq(Message.Column.STATE, Message.State.DELIVERED);
+            queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList).and().eq(
+                    Message.Column.STATE, State.DELIVERED);
             PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
             count = messageDao.countOf(preparedQuery);
         } catch (SQLException e) {
@@ -171,7 +179,7 @@ public class MessageManager extends Observable implements CommonDao<Message> {
         return messagesList;
     }
 
-    public List<Message> getAllByDialogId(String dialogId) {
+    public List<Message> getMessagesByDialogId(String dialogId) {
         List<Message> messagesList = new ArrayList<>();
         try {
             QueryBuilder<Message, Integer> messageQueryBuilder = messageDao.queryBuilder();
