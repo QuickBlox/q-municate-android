@@ -14,8 +14,10 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
+import java.util.concurrent.Callable;
 
 public class DialogNotificationManager extends Observable implements CommonDao<DialogNotification> {
 
@@ -48,12 +50,17 @@ public class DialogNotificationManager extends Observable implements CommonDao<D
 
     @Override
     public Dao.CreateOrUpdateStatus createOrUpdate(DialogNotification item) {
+        Dao.CreateOrUpdateStatus createOrUpdateStatus = null;
+
         try {
-            return dialogNotificationDao.createOrUpdate(item);
+            createOrUpdateStatus = dialogNotificationDao.createOrUpdate(item);
         } catch (SQLException e) {
             ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
-        return null;
+
+        notifyObservers(OBSERVE_DIALOG_NOTIFICATION);
+
+        return createOrUpdateStatus;
     }
 
     @Override
@@ -85,6 +92,8 @@ public class DialogNotificationManager extends Observable implements CommonDao<D
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
+
+        notifyObservers(OBSERVE_DIALOG_NOTIFICATION);
     }
 
     @Override
@@ -93,6 +102,27 @@ public class DialogNotificationManager extends Observable implements CommonDao<D
             dialogNotificationDao.delete(item);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
+        }
+
+        notifyObservers(OBSERVE_DIALOG_NOTIFICATION);
+    }
+
+    public void createOrUpdate(final Collection<DialogNotification> dialogNotificationsList) {
+        try {
+            dialogNotificationDao.callBatchTasks(new Callable<DialogNotification>() {
+                @Override
+                public DialogNotification call() throws Exception {
+                    for (DialogNotification message : dialogNotificationsList) {
+                        dialogNotificationDao.createOrUpdate(message);
+                    }
+
+                    notifyObservers(OBSERVE_DIALOG_NOTIFICATION);
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
         }
     }
 

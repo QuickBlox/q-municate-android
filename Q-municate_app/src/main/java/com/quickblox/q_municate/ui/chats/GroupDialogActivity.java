@@ -19,11 +19,8 @@ import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.DialogNotification;
-import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
@@ -72,7 +69,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        updateDialogData();
+        updateData();
 
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
             scrollListView();

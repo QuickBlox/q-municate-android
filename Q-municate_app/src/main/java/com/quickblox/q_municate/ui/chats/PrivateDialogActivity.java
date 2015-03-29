@@ -145,9 +145,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void updateMessagesList() {
-        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
-        messagesAdapter.setNewData(combinationMessagesList);
-        messagesAdapter.notifyDataSetChanged();
+        initListView();
     }
 
     private void setOnlineStatus(User friend) {

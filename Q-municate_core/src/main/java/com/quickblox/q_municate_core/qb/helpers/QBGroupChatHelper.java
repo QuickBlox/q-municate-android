@@ -72,30 +72,30 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         super.init(user);
     }
 
-    public void onGroupMessageReceived(QBChat chat, QBChatMessage chatMessage) {
-        if (chatMessage.getDialogId() == null) {
+    public void onGroupMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
+        if (qbChatMessage.getDialogId() == null) {
             return;
         }
 
-        User user = DatabaseManager.getInstance().getUserManager().get(chatMessage.getSenderId());
-        Message message = parseReceivedMessage(chatMessage);
+        User user = DatabaseManager.getInstance().getUserManager().get(qbChatMessage.getSenderId());
+        Message message = parseReceivedMessage(qbChatMessage);
 
         boolean ownMessage = message.isIncoming(chatCreator.getId());
 
-        if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
+        if (ChatNotificationUtils.isNotificationMessage(qbChatMessage)) {
             DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
-            dialogNotification.setNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(chatMessage));
-            dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context, chatMessage));
+            dialogNotification.setNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
+            dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context, qbChatMessage));
 
             if (!ownMessage) {
-                updateDialogByNotification(chatMessage);
+                updateDialogByNotification(qbChatMessage);
             }
         }
 
-        saveMessageToCache(chatMessage.getDialogId(), chatMessage, State.DELIVERED);
+        saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
 
         if (!ownMessage) {
-            notifyMessageReceived(chatMessage, user, chatMessage.getDialogId(), false);
+            notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), false);
         }
     }
 

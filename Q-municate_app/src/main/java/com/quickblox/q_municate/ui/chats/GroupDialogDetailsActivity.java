@@ -109,6 +109,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         setContentView(R.layout.activity_group_dialog_details);
 
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+        databaseManager = DatabaseManager.getInstance();
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
         loadedDialogInfo = false;

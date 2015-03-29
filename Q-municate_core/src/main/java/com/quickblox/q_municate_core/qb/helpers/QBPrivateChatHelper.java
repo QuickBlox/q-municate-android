@@ -17,6 +17,7 @@ import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
@@ -111,7 +112,9 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
             saveDialogToCache(dialog);
         }
 
-        saveDialogNotificationToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
+        DialogOccupant dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupant(qbChatMessage.getDialogId(),
+                qbChatMessage.getSenderId());
+        saveDialogNotificationToCache(qbChatMessage.getDialogId(), dialogOccupant, qbChatMessage);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {

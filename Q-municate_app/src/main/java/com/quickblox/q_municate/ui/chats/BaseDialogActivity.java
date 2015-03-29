@@ -57,11 +57,13 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DialogNotificationManager;
 import com.quickblox.q_municate_db.managers.MessageManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
@@ -110,8 +112,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
-    private BroadcastReceiver typingMessageBroadcastReceiver;
-    private BroadcastReceiver updatingDialogBroadcastReceiver;
     private int firstVisiblePositionList;
     private View loadMoreView;
     private boolean loadingMore;
@@ -119,6 +119,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean firstItemInList;
     private int totalItemCountInList;
     private Observer messageObserver;
+    private Observer dialogNotificationObserver;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -158,6 +159,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
         messageObserver = new MessageObserver();
+        dialogNotificationObserver = new DialogNotificationObserver();
 
         initUI();
         initListeners();
@@ -205,27 +207,30 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void addObservers() {
         databaseManager.getMessageManager().addObserver(messageObserver);
+        databaseManager.getDialogNotificationManager().addObserver(dialogNotificationObserver);
     }
 
     private void deleteObservers() {
         databaseManager.getMessageManager().deleteObserver(messageObserver);
+        databaseManager.getDialogNotificationManager().deleteObserver(dialogNotificationObserver);
     }
 
-    protected void updateDialogData() {
-        dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
+    protected void updateData() {
+        dialog = databaseManager.getDialogManager().getByDialogId(dialogId);
         if (dialog != null) {
             updateActionBar();
         }
+        updateMessagesList();
     }
 
     protected abstract void updateActionBar();
 
     private void initLocalBroadcastManagers() {
-        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        BroadcastReceiver typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
 
-        updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+        BroadcastReceiver updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogBroadcastReceiver,
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
@@ -338,6 +343,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
         removeActions();
         deleteObservers();
+        readAllMessages();
     }
 
     private boolean isGalleryCalled(int requestCode) {
@@ -595,8 +601,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    //    abstract QBDialog getQBDialog();
-
     protected void sendMessage(boolean privateMessage) {
         boolean error = false;
         try {
@@ -635,6 +639,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         return combinationMessagesList;
     }
 
+    //    abstract QBDialog getQBDialog();
+
+
     protected void startUpdateChatDialog() {
         //        QBDialog dialog = getQBDialog();
         //        if (dialog != null) {
@@ -669,6 +676,39 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(MessageManager.OBSERVE_MESSAGE)) {
+                updateMessagesList();
+            }
+        }
+    }
+    
+    private void readAllMessages() {
+        List<Message> messagesList = databaseManager.getMessageManager().getMessagesByDialogId(dialogId);
+        List<Message> updateMessagesList = new ArrayList<>();
+        for (Message message : messagesList) {
+            if (message.getState().equals(State.DELIVERED)) {
+                message.setState(State.READ);
+                updateMessagesList.add(message);
+            }
+        }
+        databaseManager.getMessageManager().createOrUpdate(updateMessagesList);
+
+        List<DialogNotification> dialogNotificationsList = databaseManager.getDialogNotificationManager()
+                .getDialogNotificationsByDialogId(dialogId);
+        List<DialogNotification> updateDialogNotificationsList = new ArrayList<>();
+        for (DialogNotification dialogNotification : dialogNotificationsList) {
+            if (dialogNotification.getState().equals(State.DELIVERED)) {
+                dialogNotification.setState(State.READ);
+                updateDialogNotificationsList.add(dialogNotification);
+            }
+        }
+        databaseManager.getDialogNotificationManager().createOrUpdate(updateDialogNotificationsList);
+    }
+
+    private class DialogNotificationObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(DialogNotificationManager.OBSERVE_DIALOG_NOTIFICATION)) {
                 updateMessagesList();
             }
         }
@@ -779,7 +819,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
-                updateDialogData();
+                updateData();
             }
         }
     }

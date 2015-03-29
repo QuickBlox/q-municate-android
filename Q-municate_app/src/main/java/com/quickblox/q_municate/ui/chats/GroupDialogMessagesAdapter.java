@@ -58,11 +58,12 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         CombinationMessage combinationMessage = getItem(position);
         boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
+        boolean notificationMessage = combinationMessage.getNotificationType() != null;
 
         if (view == null) {
             viewHolder = new ViewHolder();
 
-            if (combinationMessage.getNotificationType() == null) {
+            if (!notificationMessage) {
                 if (ownMessage) {
                     view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
                 } else {
@@ -101,31 +102,37 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        String avatarUrl;
+        String avatarUrl = null;
         String senderName;
 
-        resetUI(viewHolder);
-
-        if (ownMessage) {
-            avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
-        } else {
-            senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
-            avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
-            viewHolder.nameTextView.setTextColor(getTextColor(
-                    combinationMessage.getDialogOccupant().getUser().getUserId()));
-            viewHolder.nameTextView.setText(senderName);
-        }
-
-        if (combinationMessage.getAttachment() != null) {
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(
-                    combinationMessage.getCreatedDate()));
-            setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
-        } else {
-            setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
-                    combinationMessage.getCreatedDate()));
+        if (notificationMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
+            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
+        } else {
+
+            resetUI(viewHolder);
+
+            if (ownMessage) {
+                avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
+            } else {
+                senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
+                avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
+                viewHolder.nameTextView.setTextColor(getTextColor(
+                        combinationMessage.getDialogOccupant().getUser().getUserId()));
+                viewHolder.nameTextView.setText(senderName);
+            }
+
+            if (combinationMessage.getAttachment() != null) {
+                viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(
+                        combinationMessage.getCreatedDate()));
+                setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
+                displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
+            } else {
+                setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
+                viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+                        combinationMessage.getCreatedDate()));
+                viewHolder.messageTextView.setText(combinationMessage.getBody());
+            }
         }
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {

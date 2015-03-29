@@ -124,9 +124,10 @@ public class QBFriendListHelper extends BaseHelper {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
+        QBChatMessage qbChatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
                 context);
-        sendNotificationToFriend(chatMessage, userId);
+        qbChatMessage.setRecipientId(userId);
+        sendNotificationToFriend(qbChatMessage, userId);
     }
 
     private boolean isNotInvited(int userId) {
