@@ -96,6 +96,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     R.drawable.vertical_progressbar));
             viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
             viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
+
             } else {
                 view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
 
@@ -110,6 +111,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
 
             view.setTag(viewHolder);
+
         } else {
             viewHolder = (ViewHolder) view.getTag();
         }

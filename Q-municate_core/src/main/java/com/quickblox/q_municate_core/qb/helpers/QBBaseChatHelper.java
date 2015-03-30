@@ -205,7 +205,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         boolean isDialogNotification = qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null;
         if (isDialogNotification) {
-            saveDialogNotificationToCache(dialogId, dialogOccupant, qbChatMessage);
+            saveDialogNotificationToCache(dialogOccupant, qbChatMessage);
         } else {
             Message message = ChatUtils.createLocalMessage(qbChatMessage, dialogOccupant, state);
             if (qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty()) {
@@ -219,7 +219,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
     }
 
-    protected void saveDialogNotificationToCache(String dialogId, DialogOccupant dialogOccupant,
+    protected void saveDialogNotificationToCache(DialogOccupant dialogOccupant,
             QBChatMessage qbChatMessage) {
         DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage,
                 dialogOccupant);
@@ -370,7 +370,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         message.setDialogOccupant(dialogOccupant);
 
-        if (qbChatMessage.getAttachments().size() != 0) {
+        if (qbChatMessage.getAttachments()!= null && !qbChatMessage.getAttachments().isEmpty()) {
             Attachment attachment = new Attachment();
             attachment.setType(Attachment.Type.PICTURE);
             attachment.setRemoteUrl(attachUrl);
