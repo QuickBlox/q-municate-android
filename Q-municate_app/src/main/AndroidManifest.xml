@@ -73,11 +73,6 @@
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.mediacall.CallActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ui.chats.dialogs.NewDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/ndl_title"
@@ -129,6 +124,13 @@
             android:label="@string/uag_user_agreement_title"
             android:parentActivityName="com.quickblox.q_municate.ui.authorization.signup.SignUpActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.quickblox.q_municate.ui.mediacall.CallActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+
+        <!--android:label="@string/uag_user_agreement_title"-->
+        <!--android:parentActivityName="com.quickblox.q_municate.ui.authorization.signup.SignUpActivity"-->
 
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 

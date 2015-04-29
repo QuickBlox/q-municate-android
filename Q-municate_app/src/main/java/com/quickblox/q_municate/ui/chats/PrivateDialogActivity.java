@@ -21,6 +21,8 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
@@ -34,12 +36,12 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.io.File;
 
@@ -245,16 +247,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                 attachButtonOnClick();
                 return true;
             case R.id.action_audio_call:
-                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+                callToUser(opponentFriend, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
                 return true;
             case R.id.action_video_call:
-                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+                callToUser(opponentFriend, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
+    private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             CallActivity.start(PrivateDialogActivity.this, friend, callType);
         }

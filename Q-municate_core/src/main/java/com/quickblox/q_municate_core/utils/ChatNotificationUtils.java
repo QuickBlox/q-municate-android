@@ -46,12 +46,12 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE = "7";
 
     public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage chatMessage, QBDialogType dialogType) {
-        String dialogId = chatMessage.getProperty(PROPERTY_DIALOG_ID);
-        String roomJid = chatMessage.getProperty(PROPERTY_ROOM_JID);
-        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        long lastMessageDateSent = Long.parseLong(chatMessage.getProperty(PROPERTY_DATE_SENT));
+        String dialogId = (String) chatMessage.getProperty(PROPERTY_DIALOG_ID);
+        String roomJid = (String) chatMessage.getProperty(PROPERTY_ROOM_JID);
+        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        long lastMessageDateSent = Long.parseLong((String) chatMessage.getProperty(PROPERTY_DATE_SENT));
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
@@ -99,9 +99,9 @@ public class ChatNotificationUtils {
 
     public static void updateDialogFromQBMessage(Context context, QBChatMessage chatMessage, QBDialog dialog) {
         String lastMessage = getBodyForUpdateChatNotificationMessage(context, chatMessage);
-        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
 
         dialog.setLastMessage(lastMessage);
 
@@ -145,7 +145,7 @@ public class ChatNotificationUtils {
     public static int getNotificationTypeIfExist(QBChatMessage chatMessage) {
         int friendsMessageTypeCode = ConstsCore.ZERO_INT_VALUE;
         if (chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null) {
-            String inputCode = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
+            String inputCode = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
             if (PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
                 friendsMessageTypeCode = MessagesNotificationType.CREATE_DIALOG.getCode();
             } else {
@@ -284,11 +284,11 @@ public class ChatNotificationUtils {
     }
 
     public static MessagesNotificationType getUpdateChatNotificationMessageType(QBChatMessage chatMessage) {
-        String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
-        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        String leave = chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
+        String notificationType = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
+        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        String leave = (String) chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
                 PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE)) {
@@ -316,11 +316,11 @@ public class ChatNotificationUtils {
     }
 
     public static String getBodyForUpdateChatNotificationMessage(Context context, QBChatMessage chatMessage) {
-        String occupantsIds = chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        String leave = chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
-        String notificationType = chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
+        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        String leave = (String) chatMessage.getProperty(PROPERTY_ROOM_LEAVE);
+        String notificationType = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
 
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.cht_notification_message);

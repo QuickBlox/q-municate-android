@@ -38,6 +38,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
 
@@ -211,10 +212,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
     }
 
-    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
+    private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             if (checkFriendStatus(friend.getUserId())) {
                 CallActivity.start(FriendDetailsActivity.this, friend, callType);
@@ -223,7 +224,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void voiceCallClickListener(View view) {
-        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
     }
 
     private boolean checkFriendStatus(int userId) {

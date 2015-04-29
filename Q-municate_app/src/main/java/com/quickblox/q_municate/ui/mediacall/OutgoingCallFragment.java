@@ -1,96 +1,168 @@
 package com.quickblox.q_municate.ui.mediacall;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.quickblox.chat.exception.QBChatException;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
-import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.MediaUtils;
-import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.videochat.webrtc.QBVideoChannel;
-import com.quickblox.videochat.webrtc.QBVideoChat;
-import com.quickblox.videochat.webrtc.exception.QBVideoException;
-import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
-import com.quickblox.videochat.webrtc.model.CallConfig;
-import com.quickblox.videochat.webrtc.model.ConnectionConfig;
-import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
-import com.quickblox.videochat.webrtc.view.QBVideoStreamView;
+import com.quickblox.users.model.QBUser;
+import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCSession;
+import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
+import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 
-import org.webrtc.SessionDescription;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
+public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
-public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
-
-    public static final String TAG = OutgoingCallFragment.class.getSimpleName();
-    protected QBVideoChat videoChat;
+    public static final String TAG = "LCYCLE" + OutgoingCallFragment.class.getSimpleName();
+    private static String SESSION_ID_EXTENSION = "sessionId";
     protected User opponent;
     private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
-    private SessionDescription remoteSessionDescription;
     private boolean bounded;
     private QBService service;
-    private com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM call_type;
     private Timer callTimer;
-    private ServiceConnection serviceConnection = new ChetServiceConnection();
-    private OutgoingCallListener outgoingCallListener;
     private String sessionId;
-    private QBVideoChatWebRTCSignalingListenerImpl signalingMessageHandler;
-    private QBSignalingChannel.PLATFORM remotePlatform;
-    private QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation;
-    private QBVideoChannel signalingChannel;
-    private QBVideoChatHelper videoChatHelper;
-    private ConnectionConfig currentConnectionConfig;
 
-    public interface OutgoingCallListener {
+    protected OutgoingCallFragmentInterface outgoingCallFragmentInterface;
 
-        public void onConnectionAccepted();
 
-        public void onConnectionRejected();
+    private ArrayList<Integer> opponents;
+    private int startReason;
+    private QBRTCSessionDescription sessionDescription;
 
-        public void onConnectionClosed();
+    private Map<String, String> userInfo;
+//    private boolean isVideoEnabled = true;
+    private boolean isAudioEnabled = true;
+    private List<QBUser> allUsers = new ArrayList<>();
+    private boolean isMessageProcessed;
+    private QBRTCTypes.QBConferenceType call_type;
+    private ToggleButton muteDynamicButton;
+    private ImageButton stopСallButton;
+    private ToggleButton muteMicrophoneButton;
+    private TextView timerTextView;
+    private Handler handler;
+    private TimeUpdater updater;
+    protected QBVideoChatHelper videoChatHelper;
+
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        session = CallActivity.session;
+//        if (!isMessageProcessed) {
+//            if (startReason == StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
+//                session.acceptCall(session.getUserInfo());
+//            } else {
+//                session.startCall(session.getUserInfo());
+//
+//            }
+//            isMessageProcessed = true;
+//        }
+//    }
+
+    protected void initUI(View rootView) {
+        Log.d("CALL_INTEGRATION","OutgoingCallFragment initUI ");
+        timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
+        if (updater != null) {
+            updater.setTextView(timerTextView);
+        }
+
+//        videoView = (GLSurfaceView) rootView.findViewById(R.id.ownVideoScreenImageView);
+//
+//        imgMyCameraOff = (ImageView) rootView.findViewById(R.id.imgMyCameraOff);
+//
+//        cameraOffButton = (ToggleButton) rootView.findViewById(R.id.cameraOffButton);
+//        cameraOffButton.setOnClickListener(this);
+
+        muteDynamicButton = (ToggleButton) rootView.findViewById(R.id.muteDynamicButton);
+        muteDynamicButton.setOnClickListener(this);
+
+        stopСallButton = (ImageButton) rootView.findViewById(R.id.stopСallButton);
+        stopСallButton.setOnClickListener(this);
+
+        muteMicrophoneButton = (ToggleButton) rootView.findViewById(R.id.muteMicrophoneButton);
+        muteMicrophoneButton.setOnClickListener(this);
+
+//        switchCameraButton = (ImageButton) rootView.findViewById(R.id.switchCameraButton);
+//        switchCameraButton.setOnClickListener(this);
     }
 
-    private enum STOP_TYPE {
-        REJECTED, CLOSED
+    // ----------------------------- ConnectionState callbacks -------------------------- //
+
+    @Override
+    public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
+
     }
+
+    @Override
+    public void onConnectedToUser(QBRTCSession qbrtcSession, Integer integer) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                startTimer(timerTextView);
+            }
+        });
+        ((CallActivity)getActivity()).cancelPlayer();                   // надо пересмотреть
+    }
+
+    @Override
+    public void onConnectionClosedForUser(QBRTCSession qbrtcSession, Integer integer) {
+        getActivity().finish();
+    }
+
+    @Override
+    public void onDisconnectedFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), "Disconnected", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onDisconnectedTimeoutFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        getActivity().finish();
+    }
+
+    @Override
+    public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
+        getActivity().finish();
+    }
+
+
+    /* ==========================   Q-municate original code   ==========================*/
+
 
     protected abstract int getContentView();
 
-    public static Bundle generateArguments(SessionDescriptionWrapper sessionDescriptionWrapper, User friend,
-            ConstsCore.CALL_DIRECTION_TYPE type, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType, String sessionId,
-            QBSignalingChannel.PLATFORM platform,
-            QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION deviceOrientation) {
+    public static Bundle generateArguments(User friend,
+            ConstsCore.CALL_DIRECTION_TYPE type, QBRTCTypes.QBConferenceType callType, String sessionId) {
+
         Bundle args = new Bundle();
         args.putSerializable(ConstsCore.EXTRA_FRIEND, friend);
         args.putSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(ConstsCore.CALL_TYPE_EXTRA, callType);
-        args.putSerializable(com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION, deviceOrientation);
-        args.putSerializable(com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION, platform);
-        args.putParcelable(ConstsCore.REMOTE_DESCRIPTION, sessionDescriptionWrapper);
-        args.putString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, sessionId);
+        args.putString(SESSION_ID_EXTENSION, sessionId);
         return args;
     }
 
@@ -98,7 +170,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            outgoingCallListener = (OutgoingCallListener) activity;
+            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onAttach");
+            outgoingCallFragmentInterface = (OutgoingCallFragmentInterface)activity;
+            videoChatHelper = outgoingCallFragmentInterface.needVideoChatHelper();
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
@@ -107,342 +181,184 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onDetach() {
         super.onDetach();
-        outgoingCallListener = null;
+        outgoingCallFragmentInterface = null;
     }
 
     @Override
     public void onStart() {
+        Log.d(TAG, "onStart()");
         super.onStart();
-        connectToService();
+
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+
+
+        if (getArguments() != null){
+            ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
+            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
+                Log.d("CALL_INTEGRATION", "OutgoingCallFragment. Start call");
+                ((CallActivity)getActivity()).startCall();
+            }
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        unbindService();
+        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (videoChat != null) {
-            videoChat.onActivityPause();
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        Log.d(TAG, "onCreateView()");
+        Log.d("CALL_INTEGRATION","OutgoingCallFragment. onCreateView ");
         View rootView = inflater.inflate(getContentView(), container, false);
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
-        ToggleButton muteMicrophoneToggleBtn = (ToggleButton) rootView.findViewById(R.id.muteMicrophoneButton);
-        boolean microphoneMuted = MediaUtils.isMicrophoneMuted(getActivity());
-        muteMicrophoneToggleBtn.setChecked(microphoneMuted);
-        if (microphoneMuted){
-            ErrorUtils.showError(getActivity(), getActivity().getString(R.string.dlg_microphone_muted));
-        }
-        muteMicrophoneToggleBtn.setOnCheckedChangeListener(new MuteMicrophoneCheckedChangeListener());
+
         initChatData();
-        reInitChatIfExist(rootView);
-        postInit(rootView);
+        initUI(rootView);
+
+        Log.d("CALL_INTEGRATION","init video calls client");
+        if (!QBRTCClient.isInitiated()) {
+            QBRTCClient.init();
+        }
+
+        Log.d("CALL_INTEGRATION"," call prepare to prosess smack calls on video chat client");
+        QBRTCClient.getInstance().prepareToProcessCalls(getActivity());
+
         return rootView;
     }
 
-    private void reInitChatIfExist(View rootView) {
-        QBVideoStreamView videoView = (QBVideoStreamView) rootView.findViewById(R.id.ownVideoScreenImageView);
-        if (videoChat != null && videoView != null) {
-            videoChat.setVideoView(videoView);
-        }
-    }
-
     private void initChatData() {
+
+        Log.d("CALL_INTEGRATION","OutgoingCallFragment. initChatData()");
+
         if (call_direction_type != null) {
             return;
-        }
-        SessionDescriptionWrapper sessionDescriptionWrapper = getArguments().getParcelable(
-                ConstsCore.REMOTE_DESCRIPTION);
-        if (sessionDescriptionWrapper != null) {
-            remoteSessionDescription = sessionDescriptionWrapper.getSessionDescription();
         }
         call_direction_type = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (User) getArguments().getSerializable(ConstsCore.EXTRA_FRIEND);
-        call_type = (com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM) getArguments().getSerializable(
+        call_type = (QBRTCTypes.QBConferenceType) getArguments().getSerializable(
                 ConstsCore.CALL_TYPE_EXTRA);
-        remotePlatform = (QBSignalingChannel.PLATFORM) getArguments().getSerializable(
-                com.quickblox.videochat.webrtc.Consts.PLATFORM_EXTENSION);
-        deviceOrientation = (QBSignalingChannel.PLATFORM_DEVICE_ORIENTATION) getArguments().getSerializable(
-                com.quickblox.videochat.webrtc.Consts.ORIENTATION_EXTENSION);
-        sessionId = getArguments().getString(com.quickblox.videochat.webrtc.Consts.SESSION_ID_EXTENSION, "");
+        sessionId = getArguments().getString(SESSION_ID_EXTENSION, "");
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.muteDynamicButton:
+                switchAudioOutput();
+                break;
             case R.id.stopСallButton:
-                stopCall(true, STOP_TYPE.CLOSED);
+                stopCall();
+                Log.d("Track", "Call is stopped");
+                break;
+            case R.id.muteMicrophoneButton:
+                toggleMicrophone();
                 break;
             default:
                 break;
         }
     }
 
+//    private void toggleCamera() {
+//        if (outcomingCallFragmentInterface != null){
+//            DisplayMetrics displaymetrics = new DisplayMetrics();
+//            displaymetrics.setToDefaults();
+//            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+//
+//            int height = displaymetrics.heightPixels;
+//            int width = displaymetrics.widthPixels;
+//
+//            ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
+//
+//            layoutParams.height = ((height / 100) * 31);
+//            layoutParams.width = ((width / 100) * 30);
+//
+//            imgMyCameraOff.setLayoutParams(layoutParams);
+//
+//            Log.d(TAG, "Width is: " + imgMyCameraOff.getLayoutParams().width + " height is:" + imgMyCameraOff.getLayoutParams().height);
+//
+//            if (isVideoEnabled){
+//                outcomingCallFragmentInterface.offCam();
+//                isVideoEnabled = false;
+//                switchCameraButton.setVisibility(View.VISIBLE);
+//                imgMyCameraOff.setVisibility(View.INVISIBLE);
+//                Log.d(TAG, "Camera disabled");
+//            } else {
+//                outcomingCallFragmentInterface.onCam();
+//                isVideoEnabled = true;
+//                switchCameraButton.setVisibility(View.INVISIBLE);
+//                imgMyCameraOff.setVisibility(View.VISIBLE);
+//                Log.d(TAG, "Camera enabled");
+//            }
+//        }
+//    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (videoChat != null) {
-            videoChat.onActivityResume();
+    private void switchAudioOutput(){
+        if (outgoingCallFragmentInterface != null) {
+            outgoingCallFragmentInterface.switchSpeaker();
+            Log.d(TAG, "Speaker switched!");
         }
     }
 
-    public void initChat(QBSignalingChannel signalingChannel) throws QBVideoException {
-        if (videoChat != null) {
-            return;
-        }
-        QBVideoStreamView videoView = (QBVideoStreamView) getView().findViewById(R.id.ownVideoScreenImageView);
-        videoChat = new QBVideoChat(getActivity(), signalingChannel, videoView);
-        videoChat.setMediaCaptureCallback(new MediaCapturerHandler());
-        signalingMessageHandler = new VideoChatMessageHandler();
-        signalingChannel.addSignalingListener(signalingMessageHandler);
-        if (remoteSessionDescription != null) {
-            videoChat.setRemoteSessionDescription(remoteSessionDescription);
-        }
-        if (ConstsCore.CALL_DIRECTION_TYPE.OUTGOING.equals(call_direction_type) && opponent != null) {
-            startCall();
-        } else {
-            QBUser userOpponent = Utils.friendToUser(opponent);
-            CallConfig callConfig = new CallConfig(userOpponent, sessionId, deviceOrientation);
-            callConfig.setCallStreamType(call_type);
-            callConfig.setSessionDescription(remoteSessionDescription);
-            callConfig.setDevicePlatform(remotePlatform);
-            currentConnectionConfig = callConfig;
-            videoChat.accept(callConfig);
-            onConnectionEstablished();
-        }
-    }
-
-    protected void onConnectionEstablished() {
-        if (outgoingCallListener != null) {
-            outgoingCallListener.onConnectionAccepted();
-        }
-    }
-
-    protected void postInit(View rootView) {
-    }
-
-    protected void onConnectionClosed() {
-        if (outgoingCallListener != null) {
-            outgoingCallListener.onConnectionClosed();
-        }
-    }
-
-    protected void onConnectionRejected() {
-        if (outgoingCallListener != null) {
-            outgoingCallListener.onConnectionRejected();
-        }
-    }
-
-    private void muteMicrophone() {
-        if (videoChat != null) {
-            videoChat.muteMicrophone(!videoChat.isMicrophoneMute());
-        }
-    }
-
-    private void startCall() {
-        QBUser sender = AppSession.getSession().getUser();
-        if (sender != null) {
-            QBUser userOpponent = Utils.friendToUser(opponent);
-            currentConnectionConfig = videoChat.call(userOpponent, call_type,
-                    ConstsCore.DEFAULT_CALL_PACKET_REPLY_TIMEOUT);
-            callTimer = new Timer();
-            callTimer.schedule(new CancelCallTimerTask(), ConstsCore.DEFAULT_DIALING_TIME);
-        }
-    }
-
-    private void connectToService() {
-        Intent intent = new Intent(getActivity(), QBService.class);
-        if (isExistActivity()) {
-            getBaseActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        }
-    }
-
-    private void cancelCallTimer() {
-        if (callTimer != null) {
-            callTimer.cancel();
-            callTimer = null;
-        }
-    }
-
-    private void unbindService() {
-        if (isExistActivity() && bounded) {
-            getBaseActivity().unbindService(serviceConnection);
-        }
-    }
-
-    private void stopCall(boolean sendStop, STOP_TYPE stopType) {
-        cancelCallTimer();
-        if (videoChat != null) {
-            if (sendStop) {
-                videoChat.stopCall();
+    private void toggleMicrophone(){
+        if (outgoingCallFragmentInterface != null) {
+            if (isAudioEnabled) {
+                outgoingCallFragmentInterface.offMic();
+                isAudioEnabled = false;
+                Log.d(TAG, "Mic is off!");
             } else {
-                videoChat.disposeConnection();
-            }
-        }
-        if (signalingChannel != null) {
-            signalingChannel.removeSignalingListener(signalingMessageHandler);
-        }
-        if (videoChatHelper != null) {
-            videoChatHelper.closeSignalingChannel(currentConnectionConfig);
-        }
-        if (STOP_TYPE.CLOSED.equals(stopType)) {
-            onConnectionClosed();
-        } else {
-            onConnectionRejected();
-        }
-    }
-
-    private void onConnectedToService() {
-        videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
-        if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-            signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
-        } else {
-            signalingChannel = videoChatHelper.makeSignalingChannel(opponent.getUserId());
-        }
-        if (signalingChannel != null && isExistActivity()) {
-            tryInitChat();
-        } else if (isExistActivity()) {
-            ErrorUtils.showError(getActivity(), "Cannot establish connection. Check internet settings");
-        }
-    }
-
-    private void tryInitChat() {
-        try {
-            initChat(signalingChannel);
-        } catch (QBVideoException e) {
-            ErrorUtils.showError(getActivity(), getString(R.string.videochat_init_fail));
-            stopCall(true, STOP_TYPE.CLOSED);
-        }
-    }
-
-    private class MuteMicrophoneCheckedChangeListener implements CompoundButton.OnCheckedChangeListener {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            muteMicrophone();
-        }
-    }
-
-    private class MediaCapturerHandler implements QBVideoChat.MediaCaptureCallback {
-
-        @Override
-        public void onCaptureFail(com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM media_stream, String s) {
-            if (isExistActivity()) {
-                ErrorUtils.showError(getActivity(), s);
-            }
-        }
-
-        @Override
-        public void onCaptureSuccess(com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM media_stream) {
-
-        }
-    }
-
-    private class VideoChatMessageHandler extends QBVideoChatWebRTCSignalingListenerImpl {
-
-        @Override
-        public void onAccepted(ConnectionConfig connectionConfig) {
-            cancelCallTimer();
-            if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DialogUtils.show(getActivity(), "accepted");
-                        onConnectionEstablished();
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onStop(ConnectionConfig connectionConfig) {
-            stopCall(false, STOP_TYPE.CLOSED);
-        }
-
-        @Override
-        public void onRejected(ConnectionConfig connectionConfig) {
-            cancelCallTimer();
-            if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DialogUtils.show(getActivity(), "Rejected");
-                        stopCall(false, STOP_TYPE.REJECTED);
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onClosed(final String error) {
-            if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ErrorUtils.showError(getActivity(), error);
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onError(final QBSignalingChannel.PacketType state, final QBChatException e) {
-            if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
-                        switch (state) {
-                            case qbvideochat_call:
-                            case qbvideochat_acceptCall: {
-                                stopCall(true, STOP_TYPE.CLOSED);
-                                break;
-                            }
-                            default:
-                                break;
-                        }
-                    }
-                });
+                outgoingCallFragmentInterface.onMic();
+                isAudioEnabled = true;
+                Log.d(TAG, "Mic is on!");
             }
         }
     }
 
-    private class ChetServiceConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            Log.i(TAG, "onServiceConnected");
-            bounded = true;
-            service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService();
+    public void stopCall(){
+        if (outgoingCallFragmentInterface != null) {
+            outgoingCallFragmentInterface.hungUpClick();
         }
+        stopTimer();
+    }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
+    private void startTimer(TextView textView) {
 
+        handler = new Handler();
+        updater = new TimeUpdater(textView, handler);
+        handler.postDelayed(updater, ConstsCore.SECOND);
+    }
+
+    private void stopTimer() {
+        if (handler != null && updater != null) {
+            handler.removeCallbacks(updater);
         }
     }
 
-    class CancelCallTimerTask extends TimerTask {
+//    private void cancelCallTimer() {
+//        if (callTimer != null) {
+//            callTimer.cancel();
+//            callTimer = null;
+//        }
+//    }
 
-        @Override
-        public void run() {
-            if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        stopCall(true, STOP_TYPE.CLOSED);
-                    }
-                });
-            }
-        }
-    }
+//    class CancelCallTimerTask extends TimerTask {
+//
+//        @Override
+//        public void run() {
+//            if (isExistActivity()) {
+//                getBaseActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        stopCall(true, STOP_TYPE.CLOSED);
+//                    }
+//                });
+//            }
+//        }
+//    }
 }

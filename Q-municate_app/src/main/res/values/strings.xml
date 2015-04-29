@@ -234,6 +234,13 @@
     //Calls
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
+    <string name="user_not_answer">User not answer</string>
+    <string name="user_reject_call">User reject call</string>
+    <string name="user_hang_up_call">User hang up call</string>
+    <string name="session_closed">Session was closed</string>
+    <string name="session_start_close">Session start close</string>
+    <string name="local_video_track_received">Local video track received</string>
+    <string name="remote_video_track_received">Remote video track received</string>
 
     // Other
     <string name="comming_soon">Will be implemented soon</string>
@@ -247,5 +254,7 @@
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
+
+
 
 </resources>

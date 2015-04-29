@@ -39,7 +39,6 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -324,9 +323,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         long time;
         String attachUrl;
 
-        time = Long.parseLong(chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
+        time = Long.parseLong((String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
         attachUrl = ChatUtils.getAttachUrlIfExists(chatMessage);
-        String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        String dialogId = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         Integer recipientId;
 
         if (chatMessage.getRecipientId() == null) {
@@ -407,7 +406,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
             if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
                 for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
-                    notificationChatListener.onReceivedNotification(chatMessage.getProperty(
+                    notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
                             ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
                 }
             } else {

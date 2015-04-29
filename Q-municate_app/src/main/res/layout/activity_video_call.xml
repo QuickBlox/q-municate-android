@@ -8,15 +8,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.quickblox.videochat.webrtc.view.QBVideoStreamView
+        <android.opengl.GLSurfaceView
             android:id="@+id/ownVideoScreenImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/controlPanelRelativeLayout"
             android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="@dimen/act_call_margin_top" />
+            android:layout_gravity="center"/>
+
+        <ImageButton
+            android:id="@+id/switchCameraButton"
+            android:layout_width="@dimen/button_height"
+            android:layout_height="@dimen/button_height"
+            android:layout_gravity="center|left"
+            android:background="@drawable/button_general_selector"
+            android:padding="5dp"
+            android:src="@drawable/ic_call_switch"
+            android:layout_marginRight="50dp"
+            android:layout_alignTop="@+id/ownVideoScreenImageView"
+            android:layout_alignParentRight="true" />
+
+        <ImageView
+            android:id="@+id/imgMyCameraOff"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center_vertical"
+            android:scaleType="centerCrop"
+            android:visibility="invisible"
+            android:src="@drawable/ic_user_camera_off"
+            android:layout_alignTop="@+id/ownVideoScreenImageView"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/timerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="00:00"
+            android:padding="10dp"
+            android:textColor="@color/screen_call_timer_text_color"
+            android:textSize="@dimen/act_call_name_size"
+            android:layout_alignTop="@+id/ownVideoScreenImageView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <LinearLayout
             android:id="@+id/controlPanelRelativeLayout"
@@ -28,32 +63,38 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:layout_width="@dimen/act_call_end_button_height"
-                android:layout_height="@dimen/act_call_end_button_height"
-                android:layout_alignParentLeft="true"
-                android:layout_centerInParent="true"
+            <ToggleButton
+                style="@style/baseToggleBtn"
+                android:id="@+id/cameraOffButton"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
+                android:layout_gravity="center|right"
+                android:background="@drawable/button_camera_toggle"
+                android:padding="5dp" />
+
+            <ToggleButton
+                style="@style/baseToggleBtn"
+                android:id="@+id/muteDynamicButton"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
                 android:layout_gravity="center|left"
-                android:background="@drawable/button_general_selector"
                 android:padding="5dp"
-                android:enabled="false"
-                android:visibility="invisible"
-                android:src="@drawable/ic_call_switch" />
+                android:background="@drawable/button_dynamic_selector" />
 
             <ImageButton
                 android:id="@+id/stopСallButton"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_centerInParent="true"
-                android:layout_weight="1"
+                android:padding="20dp"
                 android:background="@drawable/button_general_selector"
                 android:src="@drawable/ic_call_mute" />
 
             <ToggleButton
                 style="@style/baseToggleBtn"
                 android:id="@+id/muteMicrophoneButton"
-                android:layout_width="@dimen/act_call_end_button_height"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_width="@dimen/button_height"
+                android:layout_height="@dimen/button_height"
                 android:layout_gravity="center|right"
                 android:background="@drawable/button_microphone_selector"
                 android:padding="5dp" />

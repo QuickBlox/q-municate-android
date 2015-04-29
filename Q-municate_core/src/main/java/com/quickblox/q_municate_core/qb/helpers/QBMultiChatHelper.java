@@ -305,7 +305,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     private void updateDialogByNotification(QBChatMessage chatMessage) {
-        String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        String dialogId = (String) chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
 
         ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, dialog);
