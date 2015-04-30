@@ -16,7 +16,6 @@ import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
@@ -83,16 +82,17 @@ public class QBVideoChatHelper extends BaseHelper {
         videoTracksCallbacksListener = new VideoTracksCallbacksListener();
         smackMessageProcessorCallbacksListener = new SmackSignallinProcessorgCallbackListener();
 
-        initCallClient();
-    }
-
-    private void initCallClient() {
-//        QBRTCConfig.setDialingTimeInterval(2);
-
         Log.d("CALL_INTEGRATION"," Init call client");
         if(!QBRTCClient.isInitiated()) {
             QBRTCClient.init();
         }
+
+        setUpCallClient();
+    }
+
+    private void setUpCallClient() {
+
+        QBRTCClient.initTaskExecutor();
 
         Log.d("CALL_INTEGRATION","Add callbacks listeners");
         QBRTCClient.getInstance().addSmackMessagesProcessorCallbacksListener(getSmackSignallingProcessorCallback());
@@ -192,17 +192,25 @@ public class QBVideoChatHelper extends BaseHelper {
      * Start call logic
      */
     public void startCall(Map<String, String> userInfo, List<Integer> opponents, QBRTCTypes.QBConferenceType qbConferenceType) {
+        if(QBRTCClient.isClosed()) {
+            setUpCallClient();
+        }
+
         Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Start call logic starts");
         QBRTCSession newSessionWithOpponents = QBRTCClient.getInstance().createNewSessionWithOpponents(opponents, qbConferenceType);
         sessionManager.addSession(newSessionWithOpponents);
         setCurrentSession(newSessionWithOpponents);
-        sessionManager.getSession(currentSession).startCall(userInfo);
+        QBRTCSession session = sessionManager.getSession(currentSession);
+        session.startCall(userInfo);
     }
 
     /**
      * Reject call logic
      */
     public void acceptCall(Map<String, String> userInfo) {
+        if(QBRTCClient.isClosed()) {
+            setUpCallClient();
+        }
         if (sessionManager.getSession(currentSession) != null){
             Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Accept call logic starts");
             sessionManager.getSession(currentSession).acceptCall(userInfo);
@@ -325,6 +333,9 @@ public class QBVideoChatHelper extends BaseHelper {
             if (activityClass != null) {
                 Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveCallFromUser");
                 if (currentSessionDescription == null) {
+                    if(QBRTCClient.isClosed()) {
+                        setUpCallClient();
+                    }
                     currentSessionDescription = qbrtcSessionDescription;
                     startCallActivity(qbrtcSessionDescription);
                 } else {
