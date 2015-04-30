@@ -87,7 +87,7 @@ public class QBVideoChatHelper extends BaseHelper {
     }
 
     private void initCallClient() {
-        QBRTCConfig.setDialingTimeInterval(2);
+//        QBRTCConfig.setDialingTimeInterval(2);
 
         Log.d("CALL_INTEGRATION"," Init call client");
         if(!QBRTCClient.isInitiated()) {
@@ -107,6 +107,11 @@ public class QBVideoChatHelper extends BaseHelper {
 
 
     // ---------------------- PUBLIC METHODS ----------------------------- //
+
+    public  void  disposeAllResources(){
+        currentSessionDescription = null;
+        currentSession = null;
+    }
 
     /**
      * @param listener
@@ -199,7 +204,7 @@ public class QBVideoChatHelper extends BaseHelper {
      */
     public void acceptCall(Map<String, String> userInfo) {
         if (sessionManager.getSession(currentSession) != null){
-            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Reject call logic starts");
+            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Accept call logic starts");
             sessionManager.getSession(currentSession).acceptCall(userInfo);
         }
     }
@@ -209,10 +214,10 @@ public class QBVideoChatHelper extends BaseHelper {
      * Reject call logic
      */
     public void rejectCall(Map<String, String> userInfo) {
-        if (sessionManager.getSession(currentSession) != null) {
-            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Reject call logic starts");
-            sessionManager.getSession(currentSession).rejectCall(userInfo);
-        }
+//        if (sessionManager.getSession(currentSession) != null) {
+//            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Reject call logic starts");
+//            sessionManager.getSession(currentSession).rejectCall(userInfo);
+//        }
     }
 
     /**
@@ -265,32 +270,41 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onLocalVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack) {
             Log.d("CALL_INTEGRATION", "QBVideoChatHelper. onLocalVideoTrackReceive");
 
-            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getLocalRendererCallback()));
-
-            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
-
-            if (pull == null) {
-                pull = new SessionVideoTracksPull(session);
-                sessionVideoTracksList.add(pull);
+            for (VideoChatHelperListener listener : videoChatListenersList){
+                listener.onLocalVideoTrackReceive(session, videoTrack);
             }
 
-            pull.setLocalVideoTrack(videoTrack);
+//            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getLocalRendererCallback()));
+//
+//            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
+//
+//            if (pull == null) {
+//                pull = new SessionVideoTracksPull(session);
+//                sessionVideoTracksList.add(pull);
+//            }
+//
+//            pull.setLocalVideoTrack(videoTrack);
         }
 
         @Override
         public void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID) {
             Log.d("CALL_INTEGRATION", "QBVideoChatHelper. onRemoteVideoTrackReceive");
 
-            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getRemoteRendererCallback()));
 
-            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
-
-            if (pull == null) {
-                pull = new SessionVideoTracksPull(session);
-                sessionVideoTracksList.add(pull);
+            for (VideoChatHelperListener listener : videoChatListenersList){
+                listener.onRemoteVideoTrackReceive(session, videoTrack, userID);
             }
 
-            pull.addRemoteVideoTrack(userID, videoTrack);
+//            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getRemoteRendererCallback()));
+//
+//            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
+//
+//            if (pull == null) {
+//                pull = new SessionVideoTracksPull(session);
+//                sessionVideoTracksList.add(pull);
+//            }
+//
+//            pull.addRemoteVideoTrack(userID, videoTrack);
         }
     }
 
@@ -313,6 +327,8 @@ public class QBVideoChatHelper extends BaseHelper {
                 if (currentSessionDescription == null) {
                     currentSessionDescription = qbrtcSessionDescription;
                     startCallActivity(qbrtcSessionDescription);
+                } else {
+                    Log.d("CALL_INTEGRATION", "currentSessionDescription isn't null");
                 }
             }else {
                 Log.d("CALL_INTEGRATION", "Activity class wasn't sett till now");

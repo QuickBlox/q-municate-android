@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.content.QBContent;
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -25,7 +26,7 @@ public class QBGetFileCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         Integer fileId = extras.getInt(QBServiceConsts.EXTRA_FILE_ID);
 
         QBFile qbFile = new QBFile(fileId);

@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -222,6 +223,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void createChatLocally() {
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
+            Log.d("Bug fixing", "Init baseChatHelper, now  it is: " + baseChatHelper);
             try {
                 baseChatHelper.createChatLocally(dialog, generateBundleToInitDialog());
             } catch (QBResponseException e) {
@@ -563,6 +565,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void sendTypingStatus() {
+        Log.d("Bug fixing", "baseChatHelper is: " + baseChatHelper + " opponentFriend is: " + opponentFriend);
         baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
     }
 

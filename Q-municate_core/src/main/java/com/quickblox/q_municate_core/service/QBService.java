@@ -551,12 +551,12 @@ public class QBService extends Service {
                     if (Utils.isExactError(e, ConstsCore.SESSION_DOES_NOT_EXIST)){
                         refreshSession();
                     }
-                    else if (Utils.isTokenDestroyedError(e)) {
-                        forceRelogin();
-                    }
-                } catch (Exception e) {
+//                    else if (Utils.isTokenDestroyedError(e)) {
+//                        forceRelogin();
+//                    }
+                } /*catch (Exception e) {
                     ErrorUtils.logError(e);
-                }
+                }*/
             }
         });
     }

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.errors.QBChatErrorsConstants;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
@@ -39,16 +40,19 @@ public class QBLoginChatCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         final QBUser currentUser = AppSession.getSession().getUser();
+        try {
+            tryLogin(currentUser);
 
-        tryLogin(currentUser);
+            // clear old dialogs data
+            PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
 
-        // clear old dialogs data
-        PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
-
-        if (!chatRestHelper.isLoggedIn()) {
-            throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
+            if (!chatRestHelper.isLoggedIn()) {
+                throw new QBResponseException(QBChatErrorsConstants.AUTHENTICATION_FAILED);
+            }
+        } catch (XMPPException | SmackException | IOException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;
     }

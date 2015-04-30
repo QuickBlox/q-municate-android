@@ -165,7 +165,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public QBDialog createGroupChat(String name, List<Integer> friendIdsList) throws Exception {
+    public QBDialog createGroupChat(String name, List<Integer> friendIdsList) throws QBResponseException, XMPPException, SmackException {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
 
         QBDialog dialogToCreate = new QBDialog();
@@ -189,7 +189,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     public void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
-            List<Integer> friendIdsList) throws Exception {
+            List<Integer> friendIdsList) throws  QBResponseException{
         for (Integer friendId : friendIdsList) {
             try {
                 sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendId);
@@ -200,7 +200,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
     }
 
     private void sendNotificationToPrivateChatAboutCreatingGroupChat(QBDialog dialog,
-            Integer friendId) throws Exception {
+            Integer friendId) throws QBResponseException {
         QBChatMessage chatMessageForSending = ChatNotificationUtils
                 .createMessageToPrivateChatAboutCreatingGroupChat(dialog, context.getResources().getString(
                         R.string.cht_notification_message));
@@ -265,7 +265,7 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
+    public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws QBResponseException {
         QBDialog dialog = ChatDatabaseManager.getDialogByDialogId(context, dialogId);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();

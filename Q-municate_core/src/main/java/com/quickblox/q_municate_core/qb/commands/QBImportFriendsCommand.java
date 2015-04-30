@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
@@ -12,6 +13,9 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +39,7 @@ public class QBImportFriendsCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         ArrayList<String> friendsFacebookList = extras.getStringArrayList(
                 QBServiceConsts.EXTRA_FRIENDS_FACEBOOK);
         ArrayList<String> friendsContactsList = extras.getStringArrayList(
@@ -60,8 +64,12 @@ public class QBImportFriendsCommand extends ServiceCommand {
         List<Integer> realFriendsList = getSelectedUsersList(realFriendsFacebookList,
                 realFriendsContactsList);
 
-        for (int userId : realFriendsList) {
-            friendListHelper.inviteFriend(userId);
+        try {
+            for (int userId : realFriendsList) {
+                friendListHelper.inviteFriend(userId);
+            }
+        } catch (XMPPException | SmackException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
         }
 
         Bundle result = new Bundle();

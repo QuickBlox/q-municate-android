@@ -259,12 +259,20 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         if(QBRTCClient.isInitiated()){
            QBRTCClient.getInstance().close();
         }
+
+        videoChatHelper.disposeAllResources();
     }
 
     public void setVideoView() {
-        VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
-        LOCAL_RENDERER = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
-        REMOTE_RENDERER = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
+                REMOTE_RENDERER = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
+                LOCAL_RENDERER = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
+            }
+        });
     }
 
     protected void cancelPlayer() {
@@ -581,5 +589,4 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         };
         return task;
     }
-
 }

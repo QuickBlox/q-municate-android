@@ -10,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.ToggleButton;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 
+import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 
 public class VideoCallFragment extends OutgoingCallFragment {
@@ -46,14 +48,24 @@ public class VideoCallFragment extends OutgoingCallFragment {
         switchCameraButton.setOnClickListener(this);
 
         Log.d("CALL_INTEGRATION", "init chat video view");
-        VideoRendererGui.setView(videoView, new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                // SET VIEW FROM UI
+                VideoRendererGui.setView(videoView, new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                });
+
+                // CREATE RENDERERS ON UI
+                ((CallActivity) getActivity()).setVideoView();
             }
         });
-
-        Log.d("CALL_INTEGRATION","addView to videoChatHelper");
-        videoChatHelper.addVideoView(videoView);
+//        Log.d("CALL_INTEGRATION","addView to videoChatHelper");
+//        videoChatHelper.addVideoView(videoView);
 
     }
 

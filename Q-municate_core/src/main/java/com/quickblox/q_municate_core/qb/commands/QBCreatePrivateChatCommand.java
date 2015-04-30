@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -29,7 +30,7 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         Integer friendId = (Integer) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
         QBDialog privateDialog = chatHelper.createPrivateChatOnRest(friendId);

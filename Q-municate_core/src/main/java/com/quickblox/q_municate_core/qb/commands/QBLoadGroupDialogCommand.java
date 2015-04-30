@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.models.GroupDialog;
@@ -17,9 +18,13 @@ import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,31 +45,37 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
         GroupDialog groupDialog = new GroupDialog(dialog);
 
         List<Integer> participantIdsList = dialog.getOccupants();
-        List<Integer> onlineParticipantIdsList = multiChatHelper.getRoomOnlineParticipantList(dialog.getRoomJid());
+        try {
+            List<Integer> onlineParticipantIdsList = multiChatHelper.getRoomOnlineParticipantList(dialog.getRoomJid());
 
-        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
-        requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
+            QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+            requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
+            requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
 
-        Bundle requestParams = new Bundle();
-        List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
-        Map<Integer, User> friendMap = FriendUtils.createUserMap(userList);
-        for (Integer onlineParticipantId : onlineParticipantIdsList) {
-            User user = friendMap.get(onlineParticipantId);
-            if (user != null) {
-                user.setOnline(true);
+            Bundle requestParams = new Bundle();
+            List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);
+            Map<Integer, User> friendMap = FriendUtils.createUserMap(userList);
+            for (Integer onlineParticipantId : onlineParticipantIdsList) {
+                User user = friendMap.get(onlineParticipantId);
+                if (user != null) {
+                    user.setOnline(true);
+                }
             }
+
+            ArrayList<User> friendList = new ArrayList<User>(friendMap.values());
+            Collections.sort(friendList, new UserComparator());
+            groupDialog.setOccupantList(friendList);
+
+        } catch (XMPPException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
         }
 
-        ArrayList<User> friendList = new ArrayList<User>(friendMap.values());
-        Collections.sort(friendList, new UserComparator());
-        groupDialog.setOccupantList(friendList);
 
         Bundle params = new Bundle();
         params.putSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG, groupDialog);

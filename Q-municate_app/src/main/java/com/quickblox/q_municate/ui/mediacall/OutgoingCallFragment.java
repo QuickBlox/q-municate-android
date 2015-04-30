@@ -64,21 +64,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected QBVideoChatHelper videoChatHelper;
 
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        session = CallActivity.session;
-//        if (!isMessageProcessed) {
-//            if (startReason == StartConversetionReason.INCOME_CALL_FOR_ACCEPTION.ordinal()) {
-//                session.acceptCall(session.getUserInfo());
-//            } else {
-//                session.startCall(session.getUserInfo());
-//
-//            }
-//            isMessageProcessed = true;
-//        }
-//    }
-
     protected void initUI(View rootView) {
         Log.d("CALL_INTEGRATION","OutgoingCallFragment initUI ");
         timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
@@ -86,12 +71,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             updater.setTextView(timerTextView);
         }
 
-//        videoView = (GLSurfaceView) rootView.findViewById(R.id.ownVideoScreenImageView);
-//
-//        imgMyCameraOff = (ImageView) rootView.findViewById(R.id.imgMyCameraOff);
-//
-//        cameraOffButton = (ToggleButton) rootView.findViewById(R.id.cameraOffButton);
-//        cameraOffButton.setOnClickListener(this);
 
         muteDynamicButton = (ToggleButton) rootView.findViewById(R.id.muteDynamicButton);
         muteDynamicButton.setOnClickListener(this);
@@ -102,8 +81,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         muteMicrophoneButton = (ToggleButton) rootView.findViewById(R.id.muteMicrophoneButton);
         muteMicrophoneButton.setOnClickListener(this);
 
-//        switchCameraButton = (ImageButton) rootView.findViewById(R.id.switchCameraButton);
-//        switchCameraButton.setOnClickListener(this);
     }
 
     // ----------------------------- ConnectionState callbacks -------------------------- //

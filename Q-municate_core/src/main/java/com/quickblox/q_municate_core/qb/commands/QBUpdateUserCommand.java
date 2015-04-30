@@ -40,7 +40,7 @@ public class QBUpdateUserCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
@@ -53,8 +53,12 @@ public class QBUpdateUserCommand extends ServiceCommand {
             return result;
         }
 
-        QBUser newUser = updateUser(user, file);
-        result.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
+        try {
+            QBUser newUser = updateUser(user, file);
+            result.putSerializable(QBServiceConsts.EXTRA_USER, newUser);
+        } catch (SmackException e){
+            throw new QBResponseException(e.getLocalizedMessage());
+        }
 
         return result;
     }

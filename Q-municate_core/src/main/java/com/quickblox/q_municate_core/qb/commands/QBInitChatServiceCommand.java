@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 public class QBInitChatServiceCommand extends ServiceCommand {
 
@@ -25,10 +29,12 @@ public class QBInitChatServiceCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
-
-        chatRestHelper.initChatService();
-
+    public Bundle perform(Bundle extras) throws QBResponseException {
+        try {
+            chatRestHelper.initChatService();
+        } catch (XMPPException | SmackException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
+        }
         return extras;
     }
 }

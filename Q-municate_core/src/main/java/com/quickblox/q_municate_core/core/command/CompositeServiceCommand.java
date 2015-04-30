@@ -3,6 +3,8 @@ package com.quickblox.q_municate_core.core.command;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +25,7 @@ public class CompositeServiceCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         Bundle params = extras;
         for (ServiceCommand command : commandList) {
             params = command.perform(params);
