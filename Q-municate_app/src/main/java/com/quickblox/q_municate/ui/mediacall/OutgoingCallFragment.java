@@ -242,40 +242,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-//    private void toggleCamera() {
-//        if (outcomingCallFragmentInterface != null){
-//            DisplayMetrics displaymetrics = new DisplayMetrics();
-//            displaymetrics.setToDefaults();
-//            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-//
-//            int height = displaymetrics.heightPixels;
-//            int width = displaymetrics.widthPixels;
-//
-//            ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
-//
-//            layoutParams.height = ((height / 100) * 31);
-//            layoutParams.width = ((width / 100) * 30);
-//
-//            imgMyCameraOff.setLayoutParams(layoutParams);
-//
-//            Log.d(TAG, "Width is: " + imgMyCameraOff.getLayoutParams().width + " height is:" + imgMyCameraOff.getLayoutParams().height);
-//
-//            if (isVideoEnabled){
-//                outcomingCallFragmentInterface.offCam();
-//                isVideoEnabled = false;
-//                switchCameraButton.setVisibility(View.VISIBLE);
-//                imgMyCameraOff.setVisibility(View.INVISIBLE);
-//                Log.d(TAG, "Camera disabled");
-//            } else {
-//                outcomingCallFragmentInterface.onCam();
-//                isVideoEnabled = true;
-//                switchCameraButton.setVisibility(View.INVISIBLE);
-//                imgMyCameraOff.setVisibility(View.VISIBLE);
-//                Log.d(TAG, "Camera enabled");
-//            }
-//        }
-//    }
-
     private void switchAudioOutput(){
         if (outgoingCallFragmentInterface != null) {
             outgoingCallFragmentInterface.switchSpeaker();

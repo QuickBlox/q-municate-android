@@ -206,17 +206,21 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         callTasksMap = new HashMap<>();
 
+        // Main tasks
         callTasksMap.put(START_CALL_TASK, initStartCallTask());
         callTasksMap.put(ACCEPT_CALL_TASK, initAcceptCallTask());
         callTasksMap.put(REJECT_CALL_TASK, initRejectCallTask());
         callTasksMap.put(HANG_UP_CALL_TASK, initHangUpCallTask());
 
+        // Mic tasks
         callTasksMap.put(ON_MIC_TASK, initMicOnTask());
         callTasksMap.put(OFF_MIC_TASK, initMicOffTask());
 
+        // Cam tasks
         callTasksMap.put(ON_CAM_TASK, initCamOnTask());
         callTasksMap.put(OFF_CAM_TASK, initCamOffTask());
 
+        // Switch cam input and  speaker output
         callTasksMap.put(SWITCH_CAM_TASK, initSwitchCamTask());
         callTasksMap.put(SWITCH_SPEACKER_TASK, initSwitchSpeakerTask());
 
@@ -267,7 +271,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
                 REMOTE_RENDERER = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
                 LOCAL_RENDERER = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
