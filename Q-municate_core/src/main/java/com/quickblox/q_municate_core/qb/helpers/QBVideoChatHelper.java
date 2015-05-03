@@ -222,10 +222,10 @@ public class QBVideoChatHelper extends BaseHelper {
      * Reject call logic
      */
     public void rejectCall(Map<String, String> userInfo) {
-//        if (sessionManager.getSession(currentSession) != null) {
-//            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Reject call logic starts");
-//            sessionManager.getSession(currentSession).rejectCall(userInfo);
-//        }
+        if (sessionManager.getSession(currentSession) != null) {
+            Log.d("CALL_INTEGRATION", "QBVideoChatHelper. Reject call logic starts");
+            sessionManager.getSession(currentSession).rejectCall(userInfo);
+        }
     }
 
     /**
@@ -358,9 +358,9 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void onReceiveRejectFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
             Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveRejectFromUser");
-            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
-                currentSessionDescription = null;
-            }
+//            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
+//                currentSessionDescription = null;
+//            }
         }
 
         @Override
@@ -371,9 +371,9 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void onReceiveUserHungUpCall(Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
             Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveUserHungUpCall");
-            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
-                currentSessionDescription = null;
-            }
+//            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
+//                currentSessionDescription = null;
+//            }
         }
 
         @Override
@@ -394,7 +394,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
             Log.d("CALL_INTEGRATION", "START_CALL_ACTIVITY");
 
-            if (currentSession == null) {
+            if (currentSession == null ) {
                 Log.d(TAG, "onReceiveNewSession");
 
                 setCurrentSession(session);
