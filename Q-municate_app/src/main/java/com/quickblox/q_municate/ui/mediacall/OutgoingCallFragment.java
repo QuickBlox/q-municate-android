@@ -87,6 +87,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
+        ((CallActivity)getActivity()).cancelPlayer();                   // надо пересмотреть
 
     }
 
@@ -98,7 +99,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 startTimer(timerTextView);
             }
         });
-        ((CallActivity)getActivity()).cancelPlayer();                   // надо пересмотреть
     }
 
     @Override

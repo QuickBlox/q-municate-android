@@ -84,6 +84,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void acceptCallClick() {
+        cancelPlayer();
         if (isCleintReadyAccept) {
             Log.d("CALL_INTEGRATION", "CallActivity. acceptCall() executed");
             Runnable acceptTask = callTasksMap.get(ACCEPT_CALL_TASK);
@@ -95,6 +96,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void rejectCallClick() {
+        cancelPlayer();
         Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
         Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
         executeCallTask(rejectTask);
@@ -512,7 +514,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             @Override
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. initRejectCallTask lunched");
-                cancelPlayer();
+//                cancelPlayer();
                 videoChatHelper.rejectCall(userInfo);
                 finish();
             }
