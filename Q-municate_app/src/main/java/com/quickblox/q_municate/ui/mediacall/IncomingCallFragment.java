@@ -14,6 +14,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -97,18 +98,20 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     }
 
     private void initUI(View rootView) {
+        User friendFromDB = UsersDatabaseManager.getUserById(getActivity().getBaseContext(), friend.getUserId());
+
         isVideoCall = QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(callType);
         ((ImageButton) rootView.findViewById(R.id.acceptCallButton)).setImageResource(
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
-//        ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*friend*/friendFromDB.getFullName());
+        ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*friend*/friendFromDB.getFullName());
         RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
         avatarView.setOval(true);
-//        if(!TextUtils.isEmpty(/*friend*/friendFromDB.getAvatarUrl())){
-//            ImageLoader.getInstance().displayImage(/*friend*/friendFromDB.getAvatarUrl(),
-//                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
-//        }
+        if(!TextUtils.isEmpty(/*friend*/friendFromDB.getAvatarUrl())){
+            ImageLoader.getInstance().displayImage(/*friend*/friendFromDB.getAvatarUrl(),
+                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        }
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);
     }

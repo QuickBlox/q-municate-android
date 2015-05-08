@@ -304,7 +304,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     private void showOutgoingFragment() {
         Log.d("CALL_INTEGRATION", "CallActivity. showOutgoingFragment");
-        playOutgoingRingtone();
+
+        if (call_direction_type.equals(ConstsCore.CALL_DIRECTION_TYPE.OUTGOING)) {
+            playOutgoingRingtone();
+        }
+
+//        playOutgoingRingtone();
         OutgoingCallFragment outgoingCallFragment = (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(
                 call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
         Bundle bundle = new Bundle();
@@ -313,12 +318,14 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         bundle.putSerializable(ConstsCore.CALL_TYPE_EXTRA, call_type);
         outgoingCallFragment.setArguments(bundle);
 
+        setCurrentFragment(outgoingCallFragment);
 
-        if (outgoingCallFragment instanceof VideoCallFragment) {
-            setCurrentFragment(outgoingCallFragment);
-        } else {
-            setCurrentFragment(outgoingCallFragment);
-        }
+
+//        if (outgoingCallFragment instanceof VideoCallFragment) {
+//            setCurrentFragment(outgoingCallFragment);
+//        } else {
+//            setCurrentFragment(outgoingCallFragment);
+//        }
     }
 
 
@@ -353,7 +360,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             mediaPlayer.playDefaultRingTone();
         }
     }
-
 
 
     private void showIncomingFragment() {

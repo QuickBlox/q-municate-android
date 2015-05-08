@@ -9,18 +9,23 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
+import com.quickblox.q_municate_core.models.User;
 
 public class VoiceCallFragment extends OutgoingCallFragment {
 
     @Override
     protected void initUI(View rootView) {
         super.initUI(rootView);
-        if (opponent != null) {
-            ((TextView) rootView.findViewById(R.id.name_textview)).setText(opponent.getFullName());
+
+        User friendFromDB = UsersDatabaseManager.getUserById(getActivity().getBaseContext(), opponent.getUserId());
+
+        if (/*opponent*/ friendFromDB != null) {
+            ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*opponent*/ friendFromDB.getFullName());
             RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
             avatarView.setOval(true);
-            if (!TextUtils.isEmpty(opponent.getAvatarUrl())) {
-                ImageLoader.getInstance().displayImage(opponent.getAvatarUrl(),
+            if (!TextUtils.isEmpty(/*opponent*/ friendFromDB.getAvatarUrl())) {
+                ImageLoader.getInstance().displayImage(/*opponent*/ friendFromDB.getAvatarUrl(),
                         avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
             }
         }
