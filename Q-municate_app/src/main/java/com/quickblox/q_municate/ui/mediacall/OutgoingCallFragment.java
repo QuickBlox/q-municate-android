@@ -69,7 +69,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected QBVideoChatHelper videoChatHelper;
     private IntentFilter intentFilter;
     private AudioStreamReceiver audioStreamReceiver;
-    private boolean callIsStarted;
+    protected boolean callIsStarted;
 
 
     protected void initUI(View rootView) {
@@ -182,9 +182,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onStart() {
         Log.d(TAG, "onStart()");
         super.onStart();
-
-//        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
-//        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+//        if (!callIsStarted) {
+//            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+//            QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+//        }
 
 
         if (getArguments() != null){
@@ -216,7 +217,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView()");
-        Log.d("CALL_INTEGRATION","OutgoingCallFragment. onCreateView ");
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onCreateView ");
         View rootView = inflater.inflate(getContentView(), container, false);
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
 

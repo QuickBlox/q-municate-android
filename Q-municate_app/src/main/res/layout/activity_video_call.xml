@@ -21,11 +21,10 @@
             android:layout_width="@dimen/button_height"
             android:layout_height="@dimen/button_height"
             android:background="@drawable/button_general_selector"
-            android:padding="0dp"
+            android:padding="5dp"
             android:src="@drawable/ic_call_switch"
-            android:layout_marginLeft="0dp"
-            android:layout_alignTop="@+id/imgMyCameraOff"
-            android:layout_alignLeft="@id/imgMyCameraOff" />
+            android:layout_marginRight="60dp"
+            android:layout_alignRight="@+id/ownVideoScreenImageView" />
 
         <ImageView
             android:id="@+id/imgMyCameraOff"
