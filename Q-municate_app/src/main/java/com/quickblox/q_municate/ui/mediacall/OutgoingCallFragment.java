@@ -1,6 +1,11 @@
 package com.quickblox.q_municate.ui.mediacall;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -62,6 +67,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private Handler handler;
     private TimeUpdater updater;
     protected QBVideoChatHelper videoChatHelper;
+    private IntentFilter intentFilter;
+    private AudioStreamReceiver audioStreamReceiver;
+    private boolean callIsStarted;
 
 
     protected void initUI(View rootView) {
@@ -153,12 +161,21 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+        intentFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+
+        audioStreamReceiver = new AudioStreamReceiver();
+        getActivity().registerReceiver(audioStreamReceiver, intentFilter);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         outgoingCallFragmentInterface = null;
+
+        getActivity().unregisterReceiver(audioStreamReceiver);
     }
 
     @Override
@@ -166,15 +183,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         Log.d(TAG, "onStart()");
         super.onStart();
 
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
-        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+//        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+//        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
 
 
         if (getArguments() != null){
             ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
-            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
+            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted){
                 Log.d("CALL_INTEGRATION", "OutgoingCallFragment. Start call");
                 ((CallActivity)getActivity()).startCall();
+                callIsStarted = true;
             }
         }
     }
@@ -182,9 +200,17 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onStop() {
         super.onStop();
-        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
+//        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -202,7 +228,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             QBRTCClient.init();
         }
 
-        Log.d("CALL_INTEGRATION"," call prepare to prosess smack calls on video chat client");
+        Log.d("CALL_INTEGRATION", " call prepare to prosess smack calls on video chat client");
         QBRTCClient.getInstance().prepareToProcessCalls(getActivity());
 
         return rootView;
@@ -210,7 +236,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void initChatData() {
 
-        Log.d("CALL_INTEGRATION","OutgoingCallFragment. initChatData()");
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. initChatData()");
 
         if (call_direction_type != null) {
             return;
@@ -271,10 +297,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     private void startTimer(TextView textView) {
-
-        handler = new Handler();
-        updater = new TimeUpdater(textView, handler);
-        handler.postDelayed(updater, ConstsCore.SECOND);
+        if (handler == null) {
+            handler = new Handler();
+            updater = new TimeUpdater(textView, handler);
+            handler.postDelayed(updater, ConstsCore.SECOND);
+        }
     }
 
     private void stopTimer() {
@@ -283,7 +310,64 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-//    private void cancelCallTimer() {
+    private void setDynamicButtonState (){
+        AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+        if (audioManager.isBluetoothA2dpOn()) {
+            // через Bluetooth
+            muteDynamicButton.setChecked(true);
+        } else if (audioManager.isSpeakerphoneOn()) {
+            // через динамик телефона
+            muteDynamicButton.setChecked(false);
+        } else if (audioManager.isWiredHeadsetOn()) {
+            // через проводные наушники
+            muteDynamicButton.setChecked(true);
+        } else {
+            muteDynamicButton.setChecked(false);
+        }
+    }
+
+    private class AudioStreamReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG)){
+                Log.d(TAG, "ACTION_HEADSET_PLUG " + intent.getIntExtra("state", -1));
+            } else if (intent.getAction().equals(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)){
+                Log.d(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED " + intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -2));
+            }
+
+            if (intent.getIntExtra("state", -1) == 0 /*|| intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -1) == 0*/){
+                muteDynamicButton.setChecked(false);
+            } else if (intent.getIntExtra("state", -1) == 1) {
+                muteDynamicButton.setChecked(true);
+            } else {
+//                Toast.makeText(context, "Output audio stream is incorrect", Toast.LENGTH_LONG).show();
+            }
+            muteDynamicButton.invalidate();
+
+
+//            Toast.makeText(context, "Audio stream changed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+//        unregisterBroadcastReceiver();
+    }
+
+//    public void registerBroadcastReceiver() {
+//        getActivity().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
+//    }
+//
+//    public void unregisterBroadcastReceiver() {
+//        getActivity().unregisterReceiver(myNoisyAudioStreamReceiver);
+//    }
+
+    //    private void cancelCallTimer() {
 //        if (callTimer != null) {
 //            callTimer.cancel();
 //            callTimer = null;
@@ -304,4 +388,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 //            }
 //        }
 //    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
+
+    }
 }

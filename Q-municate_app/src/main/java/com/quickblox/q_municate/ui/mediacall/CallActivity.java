@@ -70,6 +70,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private VideoRenderer.Callbacks LOCAL_RENDERER;
     private VideoRenderer.Callbacks REMOTE_RENDERER;
     private boolean isCleintReadyAccept;
+    private static boolean callInProcess;
 
 
     public void startCall() {
@@ -252,9 +253,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     protected void onStop() {
         super.onStop();
-        if (videoChatHelper != null) {
-            videoChatHelper.removeVideoChatHelperListener(this);
-        }
+//        if (videoChatHelper != null) {
+//            videoChatHelper.removeVideoChatHelperListener(this);
+//        }
     }
 
     @Override
@@ -262,11 +263,17 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         cancelPlayer();
         super.onDestroy();
 
+        if (videoChatHelper != null) {
+            videoChatHelper.removeVideoChatHelperListener(this);
+        }
+
         if(QBRTCClient.isInitiated()){
            QBRTCClient.getInstance().close();
         }
 
         videoChatHelper.disposeAllResources();
+//        videoChatHelper = null;
+
     }
 
     public void setVideoView() {
@@ -453,23 +460,25 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void onConnectedToService(QBService service) {
         super.onConnectedToService(service);
 
-        Log.d("CALL_INTEGRATION", "CallActivity. onConnectedToService");
-        videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
-        videoChatHelper.addVideoChatHelperListener(CallActivity.this);
-        Log.d("CALL_INTEGRATION", "CallActivity. videoChatHelper was created");
+        if (videoChatHelper == null) {
 
-        if (call_direction_type != null) {
-            if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
-                showIncomingFragment();
-            } else {
-                notifyFriendOnCall(opponent);
-                showOutgoingFragment();
+            Log.d("CALL_INTEGRATION", "CallActivity. onConnectedToService");
+            videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+            videoChatHelper.addVideoChatHelperListener(CallActivity.this);
+            Log.d("CALL_INTEGRATION", "CallActivity. videoChatHelper was created");
+
+            if (call_direction_type != null) {
+                if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
+                    showIncomingFragment();
+                } else {
+                    notifyFriendOnCall(opponent);
+                    showOutgoingFragment();
+                }
             }
+
+            executeScheduledTasks();
+//        }
         }
-
-
-
-        executeScheduledTasks();
     }
 
     private void executeScheduledTasks() {
@@ -599,5 +608,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             }
         };
         return task;
+    }
+
+    @Override
+    public boolean isCanPerformLogoutInOnStop() {
+        return false;
     }
 }

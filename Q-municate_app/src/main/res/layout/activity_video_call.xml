@@ -20,13 +20,12 @@
             android:id="@+id/switchCameraButton"
             android:layout_width="@dimen/button_height"
             android:layout_height="@dimen/button_height"
-            android:layout_gravity="center|left"
             android:background="@drawable/button_general_selector"
-            android:padding="5dp"
+            android:padding="0dp"
             android:src="@drawable/ic_call_switch"
-            android:layout_marginRight="50dp"
-            android:layout_alignTop="@+id/ownVideoScreenImageView"
-            android:layout_alignParentRight="true" />
+            android:layout_marginLeft="0dp"
+            android:layout_alignTop="@+id/imgMyCameraOff"
+            android:layout_alignLeft="@id/imgMyCameraOff" />
 
         <ImageView
             android:id="@+id/imgMyCameraOff"

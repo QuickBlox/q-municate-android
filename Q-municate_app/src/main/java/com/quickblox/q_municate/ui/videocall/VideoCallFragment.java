@@ -24,11 +24,29 @@ public class VideoCallFragment extends OutgoingCallFragment {
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
     private boolean isVideoEnabled = true;
+//    private boolean isCameraEnabled = true;
 
     @Override
     protected int getContentView() {
         return R.layout.activity_video_call;
     }
+
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        if (isVideoEnabled) {
+////            isVideoEnabled = true;
+//            toggleCamera();
+//        }
+//    }
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        if (isCameraEnabled){
+//            toggleCamera();
+//        }
+//    }
 
     @Override
     protected void initUI(View rootView) {
@@ -40,11 +58,28 @@ public class VideoCallFragment extends OutgoingCallFragment {
         videoView = (GLSurfaceView) rootView.findViewById(R.id.ownVideoScreenImageView);
 
         imgMyCameraOff = (ImageView) rootView.findViewById(R.id.imgMyCameraOff);
+//        ViewGroup.LayoutParams _layoutParams = imgMyCameraOff.getLayoutParams();
+//
+////            ViewGroup.LayoutParams videoViewLayoutParams = videoView.getLayoutParams();
+//        int videoViewHeight = videoView.getHeight();
+//        int videoViewWidth = videoView.getWidth();
+//
+////        Log.d(TAG, "height - videoViewHeight " + (height - videoViewHeight) + " width-videoViewWidth " + (width - videoViewWidth) + "");
+//
+//
+//
+//        _layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 33));
+//        _layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
 
         cameraOffButton = (ToggleButton) rootView.findViewById(R.id.cameraOffButton);
         cameraOffButton.setOnClickListener(this);
 
         switchCameraButton = (ImageButton) rootView.findViewById(R.id.switchCameraButton);
+//        ViewGroup.LayoutParams layoutParams = switchCameraButton.getLayoutParams();
+//        layoutParams.width = imgMyCameraOff.getWidth()/3;
+//        layoutParams.height = imgMyCameraOff.getWidth()/3;
+//        switchCameraButton.setLayoutParams(layoutParams);
+//        switchCameraButton.setVisibility(View.VISIBLE);
         switchCameraButton.setOnClickListener(this);
 
         Log.d("CALL_INTEGRATION", "init chat video view");
@@ -90,37 +125,18 @@ public class VideoCallFragment extends OutgoingCallFragment {
             displaymetrics.setToDefaults();
             getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 
-            int height = displaymetrics.heightPixels;
-            int width = displaymetrics.widthPixels;
-
-            ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
-
-//            ViewGroup.LayoutParams videoViewLayoutParams = videoView.getLayoutParams();
-            int videoViewHeight = videoView.getHeight();
-            int videoViewWidth = videoView.getWidth();
-
-            Log.d(TAG, "height - videoViewHeight " + (height - videoViewHeight) + " width-videoViewWidth " + (width-videoViewWidth) + "");
-
-
-
-            layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 32));
-            layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
-
-
-            imgMyCameraOff.setLayoutParams(layoutParams);
-
-            Log.d(TAG, "Width is: " + imgMyCameraOff.getLayoutParams().width + " height is:" + imgMyCameraOff.getLayoutParams().height);
-
             if (isVideoEnabled){
                 outgoingCallFragmentInterface.offCam();
                 isVideoEnabled = false;
                 switchCameraButton.setVisibility(View.INVISIBLE);
+                cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
             } else {
                 outgoingCallFragmentInterface.onCam();
                 isVideoEnabled = true;
                 switchCameraButton.setVisibility(View.VISIBLE);
+                cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);
                 Log.d(TAG, "Camera enabled");
             }
