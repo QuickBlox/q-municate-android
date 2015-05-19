@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,15 +28,19 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
+import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
@@ -70,6 +76,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private IntentFilter intentFilter;
     private AudioStreamReceiver audioStreamReceiver;
     protected boolean callIsStarted;
+    private Handler showIncomingCallWindowTaskHandler;
+    private Runnable showIncomingCallWindowTask;
 
 
     protected void initUI(View rootView) {
@@ -89,14 +97,27 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         muteMicrophoneButton = (ToggleButton) rootView.findViewById(R.id.muteMicrophoneButton);
         muteMicrophoneButton.setOnClickListener(this);
 
+        setActionButtonsEnability(false);
     }
+
+    public void setActionButtonsEnability(boolean enability) {
+
+        muteDynamicButton.setEnabled(enability);
+        stopСallButton.setEnabled(enability);
+        muteMicrophoneButton.setEnabled(enability);
+
+        // inactivate toggle buttons
+        muteDynamicButton.setActivated(enability);
+        stopСallButton.setActivated(enability);
+        muteMicrophoneButton.setActivated(enability);
+    }
+
 
     // ----------------------------- ConnectionState callbacks -------------------------- //
 
     @Override
     public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
         ((CallActivity)getActivity()).cancelPlayer();                   // надо пересмотреть
-
     }
 
     @Override
@@ -104,13 +125,17 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                ((CallActivity) getActivity()).stopIncomeCallTimer();
                 startTimer(timerTextView);
+                setActionButtonsEnability(true);
             }
         });
+
     }
 
     @Override
     public void onConnectionClosedForUser(QBRTCSession qbrtcSession, Integer integer) {
+        ((CallActivity)getActivity()).stopIncomeCallTimer();
         getActivity().finish();
     }
 
@@ -131,9 +156,15 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
+        setActionButtonsEnability(false);
         getActivity().finish();
     }
 
+    @Override
+    public void onError(QBRTCSession session, QBRTCException exeption) {
+        setActionButtonsEnability(false);
+        getActivity().finish();
+    }
 
     /* ==========================   Q-municate original code   ==========================*/
 
@@ -157,7 +188,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         try {
             Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onAttach");
             outgoingCallFragmentInterface = (OutgoingCallFragmentInterface)activity;
-            videoChatHelper = outgoingCallFragmentInterface.needVideoChatHelper();
+            videoChatHelper = ((CallActivity)getActivity()).getVideoChatHelper();
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
@@ -192,6 +223,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
             if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted){
                 Log.d("CALL_INTEGRATION", "OutgoingCallFragment. Start call");
+
+                //TODO why we call this metho here
                 ((CallActivity)getActivity()).startCall();
                 callIsStarted = true;
             }
@@ -223,15 +256,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
         initChatData();
         initUI(rootView);
-
-        Log.d("CALL_INTEGRATION","init video calls client");
-        if (!QBRTCClient.isInitiated()) {
-            QBRTCClient.init();
-        }
-
-        Log.d("CALL_INTEGRATION", " call prepare to prosess smack calls on video chat client");
-        QBRTCClient.getInstance().prepareToProcessCalls(getActivity());
-
         return rootView;
     }
 
@@ -258,6 +282,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 switchAudioOutput();
                 break;
             case R.id.stopСallButton:
+                setActionButtonsEnability(false);
                 stopCall();
                 Log.d("Track", "Call is stopped");
                 break;
@@ -268,6 +293,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 break;
         }
     }
+
 
     private void switchAudioOutput(){
         if (outgoingCallFragmentInterface != null) {
@@ -328,6 +354,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
+    public QBVideoChatHelper getVideoChatHelper() {
+        return videoChatHelper;
+    }
+
     private class AudioStreamReceiver extends BroadcastReceiver {
 
         @Override
@@ -356,8 +386,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onPause() {
         super.onPause();
-
-//        unregisterBroadcastReceiver();
     }
 
 //    public void registerBroadcastReceiver() {

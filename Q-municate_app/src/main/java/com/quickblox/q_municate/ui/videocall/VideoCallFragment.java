@@ -1,29 +1,23 @@
 package com.quickblox.q_municate.ui.videocall;
 
-import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.opengl.GLSurfaceView;
-import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.ToggleButton;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
-
-import org.webrtc.VideoRenderer;
-import org.webrtc.VideoRendererGui;
+import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
 public class VideoCallFragment extends OutgoingCallFragment {
 
     public static final String TAG = VideoCallFragment.class.getSimpleName();
-    private GLSurfaceView videoView;
+    private QBGLVideoView videoView;
     private ImageView imgMyCameraOff;
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
@@ -37,10 +31,10 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
     @Override
     public void onPause() {
-        if (isVideoEnabled) {
-            isVideoEnabled = true;
-            toggleCamera();
-        }
+//        if (isVideoEnabled) {
+//            isVideoEnabled = true;
+//            toggleCamera();
+//        }
         super.onPause();
     }
 
@@ -57,9 +51,10 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
         Log.d(TAG, "initUI()");
 
-        super.initUI(rootView);
 
-        videoView = (GLSurfaceView) rootView.findViewById(R.id.ownVideoScreenImageView);
+        videoView = (QBGLVideoView) rootView.findViewById(R.id.videoScreenImageView);
+//
+        ((CallActivity)getActivity()).setVideoView(videoView);
 
         imgMyCameraOff = (ImageView) rootView.findViewById(R.id.imgMyCameraOff);
 
@@ -69,28 +64,19 @@ public class VideoCallFragment extends OutgoingCallFragment {
         switchCameraButton = (ImageButton) rootView.findViewById(R.id.switchCameraButton);
         switchCameraButton.setOnClickListener(this);
 
-//        Log.d(TAG, "layoutParams = " + layoutParams.width/6 + " " + videoView.getWidth() /*+ " marginLayoutParams.width = " + marginLayoutParams.width + " marginLayoutParams.width = " + marginLayoutParams.width*/);
+        super.initUI(rootView);
+    }
 
-        Log.d("CALL_INTEGRATION", "init chat video view");
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+    @Override
+    public void setActionButtonsEnability(boolean enability) {
+        super.setActionButtonsEnability(enability);
 
-                // SET VIEW FROM UI
-                VideoRendererGui.setView(videoView, new Runnable() {
-                    @Override
-                    public void run() {
+        cameraOffButton.setEnabled(enability);
+        switchCameraButton.setEnabled(enability);
 
-                    }
-                });
-
-                // CREATE RENDERERS ON UI
-                ((CallActivity) getActivity()).setVideoView();
-            }
-        });
-//        Log.d("CALL_INTEGRATION","addView to videoChatHelper");
-//        videoChatHelper.addVideoView(videoView);
-
+        // inactivate toggle buttons
+        cameraOffButton.setActivated(enability);
+        switchCameraButton.setActivated(enability);
     }
 
     @Override

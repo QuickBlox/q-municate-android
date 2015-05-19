@@ -8,8 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.opengl.GLSurfaceView
-            android:id="@+id/ownVideoScreenImageView"
+        <com.quickblox.videochat.webrtc.view.QBGLVideoView
+            android:id="@+id/videoScreenImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/controlPanelRelativeLayout"
@@ -24,7 +24,7 @@
             android:padding="5dp"
             android:src="@drawable/ic_call_switch"
             android:layout_marginRight="60dp"
-            android:layout_alignRight="@+id/ownVideoScreenImageView" />
+            android:layout_alignRight="@+id/videoScreenImageView" />
 
         <ImageView
             android:id="@+id/imgMyCameraOff"
@@ -34,7 +34,7 @@
             android:scaleType="centerCrop"
             android:visibility="invisible"
             android:src="@drawable/ic_user_camera_off"
-            android:layout_alignTop="@+id/ownVideoScreenImageView"
+            android:layout_alignTop="@+id/videoScreenImageView"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
@@ -47,7 +47,7 @@
             android:padding="10dp"
             android:textColor="@color/screen_call_timer_text_color"
             android:textSize="@dimen/act_call_name_size"
-            android:layout_alignTop="@+id/ownVideoScreenImageView"
+            android:layout_alignTop="@+id/videoScreenImageView"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

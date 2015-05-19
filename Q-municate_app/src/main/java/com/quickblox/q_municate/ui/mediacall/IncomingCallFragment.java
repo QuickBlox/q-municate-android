@@ -2,7 +2,11 @@ package com.quickblox.q_municate.ui.mediacall;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +22,13 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
@@ -32,6 +39,8 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     private boolean isVideoCall;
     private QBRTCTypes.QBConferenceType callType;
     private QBRTCSessionDescription sessionDescription;
+    private Handler showIncomingCallWindowTaskHandler;
+    private Runnable showIncomingCallWindowTask;
 //    private User friendFromDB;
 
 
@@ -58,11 +67,13 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onStart() {
         super.onStart();
+        ((CallActivity)getActivity()).startIncomeCallTimer();
     }
 
 
     @Override
     public void onClick(View v) {
+        ((CallActivity)getActivity()).stopIncomeCallTimer();
         switch (v.getId()) {
             case R.id.acceptCallButton:
                 accept();

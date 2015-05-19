@@ -1,9 +1,13 @@
 package com.quickblox.q_municate.ui.mediacall;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,9 +27,12 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
+import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
@@ -35,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class CallActivity extends BaseLogeableActivity implements IncomingCallFragmentInterface, OutgoingCallFragmentInterface, VideoChatHelperListener {
@@ -71,6 +79,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private VideoRenderer.Callbacks REMOTE_RENDERER;
     private boolean isCleintReadyAccept;
     private static boolean callInProcess;
+    private QBGLVideoView videoView;
+    private Handler showIncomingCallWindowTaskHandler;
+    private Runnable showIncomingCallWindowTask;
 
 
     public void startCall() {
@@ -154,17 +165,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         executeCallTask(hungUpTask);
     }
 
-    @Override
-    public QBVideoChatHelper needVideoChatHelper() {
-        Log.d("CALL_INTEGRATION", "CallActivity. QBVideoChatHelper called by fragment");
-        if (videoChatHelper != null) {
-            return videoChatHelper;
-        } else {
-            return null;
-        }
-    }
-
-
     public static void start(Context context, User friend, QBRTCTypes.QBConferenceType callType) {
         Log.d("CALL_INTEGRATION", "CallActivity. START STATIC CALL ACTIVITY");
         Log.i(TAG, "Friend.isOnline() = " + friend.isOnline());
@@ -189,13 +189,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         callTasksHandler = new Handler();
         callTasksQueue = new LinkedList<>();
-
-
-//        if (!QBRTCClient.isInitiated()) {
-//            QBRTCClient.init();
-//        }
-//        QBRTCClient.getInstance().prepareToProcessCalls(CallActivity.this);
-
 
         parseIntentExtras(getIntent().getExtras());
 
@@ -241,17 +234,21 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onResume() {
+
+        Log.d("CALL_INTEGRATION", "Resume call activity");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
+        Log.d("CALL_INTEGRATION", "Pause call activity");
         super.onPause();
     }
 
 
     @Override
     protected void onStop() {
+        Log.d("CALL_INTEGRATION", "Stop call activity");
         super.onStop();
 //        if (videoChatHelper != null) {
 //            videoChatHelper.removeVideoChatHelperListener(this);
@@ -260,6 +257,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onDestroy() {
+        Log.d("CALL_INTEGRATION", "Destroy call activity");
         cancelPlayer();
         super.onDestroy();
 
@@ -272,19 +270,37 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         }
 
         videoChatHelper.disposeAllResources();
-//        videoChatHelper = null;
 
     }
 
-    public void setVideoView() {
-        runOnUiThread(new Runnable() {
+    public void initIncommingCallTask() {
+        showIncomingCallWindowTaskHandler = new Handler(Looper.myLooper());
+        showIncomingCallWindowTask = new Runnable() {
             @Override
             public void run() {
-                VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
-                REMOTE_RENDERER = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
-                LOCAL_RENDERER = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
+                if (currentFragment instanceof IncomingCallFragment) {
+                    getVideoChatHelper().rejectCall(new HashMap<String, String>());
+                } else {
+                    getVideoChatHelper().hangUpCall(new HashMap<String, String>());
+                }
             }
-        });
+        };
+    }
+
+    public void startIncomeCallTimer() {
+        Log.d("CALL_INTEGRATION", "Start stop Income call timer");
+        if (showIncomingCallWindowTaskHandler == null){
+            initIncommingCallTask();
+        }
+        showIncomingCallWindowTaskHandler.postAtTime(showIncomingCallWindowTask, SystemClock.uptimeMillis() + TimeUnit.SECONDS.toMillis(QBRTCConfig.getAnswerTimeInterval()));
+    }
+
+    public void stopIncomeCallTimer() {
+        Log.d("CALL_INTEGRATION", "Start stop Income call timer");
+        if(showIncomingCallWindowTaskHandler != null) {
+            showIncomingCallWindowTaskHandler.removeCallbacks(showIncomingCallWindowTask);
+            showIncomingCallWindowTaskHandler = null;
+        }
     }
 
     protected void cancelPlayer() {
@@ -388,10 +404,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         });
     }
 
+
     @Override
     public void onReceiveNewSession(QBRTCSession qbrtcSession) {
         Log.d("CALL_INTEGRATION", "CallActivity. onReceiveNewSession");
-//        showIncomingFragment();
     }
 
     @Override
@@ -432,7 +448,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. onLocalVideoTrackReceive");
                 showToastMessage(getString(R.string.local_video_track_received));
-                videoTrack.addRenderer(new VideoRenderer(LOCAL_RENDERER));
+//                videoTrack.addRenderer(new VideoRenderer(LOCAL_RENDERER));
+//                Log.d("CALL_INTEGRATION", "Video view is " + videoView);
+                videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getVideoView(), QBGLVideoView.Endpoint.LOCAL)));
+                getVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.LOCAL);
+
             }
         });
     }
@@ -444,7 +464,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. onRemoteVideoTrackReceive");
                 showToastMessage(getString(R.string.remote_video_track_received));
-                videoTrack.addRenderer(new VideoRenderer(REMOTE_RENDERER));
+//                videoTrack.addRenderer(new VideoRenderer(REMOTE_RENDERER));
+//                Log.d("CALL_INTEGRATION", "Video view is " + videoView);
+                videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getVideoView(), QBGLVideoView.Endpoint.REMOTE)));
+                getVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
             }
         });
     }
@@ -465,7 +488,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             Log.d("CALL_INTEGRATION", "CallActivity. onConnectedToService");
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
             videoChatHelper.addVideoChatHelperListener(CallActivity.this);
-            Log.d("CALL_INTEGRATION", "CallActivity. videoChatHelper was created");
+
 
             if (call_direction_type != null) {
                 if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
@@ -477,7 +500,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             }
 
             executeScheduledTasks();
-//        }
+
+            Log.d("CALL_INTEGRATION", "CallActivity. QBRTCClient start listening calls");
+            QBRTCClient.getInstance().prepareToProcessCalls(this);
+//            if(call_direction_type == ConstsCore.CALL_DIRECTION_TYPE.INCOMING){
+//                QBRTCClient.
+//            }
         }
     }
 
@@ -613,5 +641,17 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return false;
+    }
+
+    public QBGLVideoView getVideoView() {
+        return  (QBGLVideoView) findViewById(R.id.videoScreenImageView);
+    }
+
+    public void setVideoView(QBGLVideoView videoView) {
+        this.videoView = videoView;
+    }
+
+    public QBVideoChatHelper getVideoChatHelper() {
+        return videoChatHelper;
     }
 }

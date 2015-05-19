@@ -10,21 +10,27 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.call.SessionManager;
+import com.quickblox.q_municate_core.qb.helpers.call.SmackSignallingProcessorCallbackImpl;
 import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+
 import com.quickblox.users.model.QBUser;
+
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
-import com.quickblox.videochat.webrtc.SmackSignallingProcessorCallback;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
+import com.quickblox.videochat.webrtc.callbacks.SmackSignallingProcessorCallback;
+import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
+import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 
-import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
@@ -38,7 +44,6 @@ import java.util.concurrent.ScheduledExecutorService;
 
 public class QBVideoChatHelper extends BaseHelper {
 
-    private final static int ACTIVE_SESSIONS_DEFAULT_SIZE = 5;
     private static final String TAG = QBVideoChatHelper.class.getSimpleName();
 
     private QBChatService chatService;
@@ -54,7 +59,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
 
     // VideoChat
-    private GLSurfaceView renderingView;
+    private QBGLVideoView renderingView;
     private String currentSession;
 
 
@@ -83,10 +88,6 @@ public class QBVideoChatHelper extends BaseHelper {
         smackMessageProcessorCallbacksListener = new SmackSignallinProcessorgCallbackListener();
 
         Log.d("CALL_INTEGRATION"," Init call client");
-        if(!QBRTCClient.isInitiated()) {
-            QBRTCClient.init();
-        }
-
         setUpCallClient();
     }
 
@@ -94,8 +95,11 @@ public class QBVideoChatHelper extends BaseHelper {
 
         QBRTCClient.initTaskExecutor();
 
+        QBRTCConfig.setAnswerTimeInterval(60);
+        QBRTCConfig.setDialingTimeInterval(2);
+
         Log.d("CALL_INTEGRATION","Add callbacks listeners");
-        QBRTCClient.getInstance().addSmackMessagesProcessorCallbacksListener(getSmackSignallingProcessorCallback());
+        QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
     }
@@ -104,6 +108,7 @@ public class QBVideoChatHelper extends BaseHelper {
         Log.d("CALL_INTEGRATION", "init QBVideoChatHelper with activity");
         this.activityClass = activityClass;
     }
+
 
 
     // ---------------------- PUBLIC METHODS ----------------------------- //
@@ -130,22 +135,20 @@ public class QBVideoChatHelper extends BaseHelper {
      *
      * @param videoView
      */
-    public void addVideoView(GLSurfaceView videoView) {
-
-        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. addVideoView");
-
+    public void setVideoView(QBGLVideoView videoView) {
+        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. setVideoView");
         renderingView = videoView;
-        VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
+//        VideoRendererGui.ScalingType scaleType = VideoRendererGui.ScalingType.SCALE_ASPECT_FILL;
 
-        defaultRenderers = new VideoCallRendererCallbacks();
-
-        VideoRenderer.Callbacks remoteCallback = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
-//        VideoRenderer remoteRenderer = new VideoRenderer(remoteCallbacks);
-        defaultRenderers.setRemoteRendererCallback(remoteCallback);
-
-        VideoRenderer.Callbacks localCallback = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
-//        VideoRenderer localRenderer = new VideoRenderer(localCallbacks);
-        defaultRenderers.setLocalRendererCallback(localCallback);
+//        defaultRenderers = new VideoCallRendererCallbacks();
+//
+//        VideoRenderer.Callbacks remoteCallback = VideoRendererGui.create(0, 0, 100, 100, scaleType, true);
+////        VideoRenderer remoteRenderer = new VideoRenderer(remoteCallbacks);
+//        defaultRenderers.setRemoteRendererCallback(remoteCallback);
+//
+//        VideoRenderer.Callbacks localCallback = VideoRendererGui.create(70, 0, 30, 30, scaleType, true);
+////        VideoRenderer localRenderer = new VideoRenderer(localCallbacks);
+//        defaultRenderers.setLocalRendererCallback(localCallback);
     }
 
     /**
@@ -282,6 +285,8 @@ public class QBVideoChatHelper extends BaseHelper {
                 listener.onLocalVideoTrackReceive(session, videoTrack);
             }
 
+//            VideoCallBacks callbacks = new VideoCallBacks(renderingView, QBGLVideoView.Endpoint.LOCAL);
+//            videoTrack.addRenderer(new VideoRenderer(callbacks));
 //            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getLocalRendererCallback()));
 //
 //            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
@@ -303,6 +308,8 @@ public class QBVideoChatHelper extends BaseHelper {
                 listener.onRemoteVideoTrackReceive(session, videoTrack, userID);
             }
 
+//            VideoCallBacks callbacks = new VideoCallBacks(renderingView, QBGLVideoView.Endpoint.REMOTE);
+//            videoTrack.addRenderer(new VideoRenderer(callbacks));
 //            videoTrack.addRenderer(new VideoRenderer(defaultRenderers.getRemoteRendererCallback()));
 //
 //            SessionVideoTracksPull pull = getSessionVideoTracksPullBySession(session);
@@ -326,7 +333,7 @@ public class QBVideoChatHelper extends BaseHelper {
         return result;
     }
 
-    private class SmackSignallinProcessorgCallbackListener implements SmackSignallingProcessorCallback {
+    private class SmackSignallinProcessorgCallbackListener extends SmackSignallingProcessorCallbackImpl {
 
         @Override
         public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
@@ -345,49 +352,10 @@ public class QBVideoChatHelper extends BaseHelper {
                 Log.d("CALL_INTEGRATION", "Activity class wasn't sett till now");
             }
         }
-
-
-
-        @Override
-        public void onReceiveAcceptFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
-            Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveAcceptFromUser");
-
-
-        }
-
-        @Override
-        public void onReceiveRejectFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
-            Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveRejectFromUser");
-//            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
-//                currentSessionDescription = null;
-//            }
-        }
-
-        @Override
-        public void onReceiveIceCandidatesFromUser(List<IceCandidate> iceCandidates, Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
-            Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveIceCandidatesFromUser");
-        }
-
-        @Override
-        public void onReceiveUserHungUpCall(Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
-            Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onReceiveUserHungUpCall");
-//            if (currentSessionDescription != null && currentSessionDescription.equals(qbrtcSessionDescription)) {
-//                currentSessionDescription = null;
-//            }
-        }
-
-        @Override
-        public void onAddUserNeed(Integer integer, QBRTCSessionDescription qbrtcSessionDescription) {
-            Log.d("CALL_INTEGRATION", "SMACK SIGNALLING onAddUserNeed");
-        }
     }
 
 
     private class SessionCallbacksListener implements QBRTCClientSessionCallbacks {
-
-
-        //  ERROR
-        //  Lo.g("error while establishing connection" + e.getLocalizedMessage());
 
         @Override
         public void onReceiveNewSession(QBRTCSession session) {
@@ -403,11 +371,6 @@ public class QBVideoChatHelper extends BaseHelper {
                 for (VideoChatHelperListener listener : videoChatListenersList){
                     listener.onClientReady();
                 }
-
-//                startCallActivity(session.getSessionDescription());
-
-//            } else if (sessionManager.getSession(currentSession).equals(session.getSessionID())) {
-//                Log.d("CALL_INTEGRATION", "Session " + session.getSessionID()+ "wasn't accepted till now");
             }else{
                 sessionManager.addSession(session);
                 session.rejectCall(null);
