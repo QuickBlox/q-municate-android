@@ -34,6 +34,7 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
+import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,12 +104,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void setActionButtonsEnability(boolean enability) {
 
         muteDynamicButton.setEnabled(enability);
-        stopСallButton.setEnabled(enability);
         muteMicrophoneButton.setEnabled(enability);
 
         // inactivate toggle buttons
         muteDynamicButton.setActivated(enability);
-        stopСallButton.setActivated(enability);
         muteMicrophoneButton.setActivated(enability);
     }
 
@@ -128,6 +127,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 ((CallActivity) getActivity()).stopIncomeCallTimer();
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
+
+                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+                if (videoView != null){
+                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                    videoView.setRemoteOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                }
             }
         });
 
@@ -162,6 +167,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onError(QBRTCSession session, QBRTCException exeption) {
+        Toast.makeText(getActivity(), "ERROR:" + exeption.getMessage(), Toast.LENGTH_LONG).show();
         setActionButtonsEnability(false);
         getActivity().finish();
     }
@@ -213,12 +219,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onStart() {
         Log.d(TAG, "onStart()");
         super.onStart();
-//        if (!callIsStarted) {
-//            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
-//            QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-//        }
+        if (!callIsStarted) {
+            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+            QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+        }
 
-
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. getArguments " + getArguments());
         if (getArguments() != null){
             ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
             if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted){
@@ -283,6 +289,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 break;
             case R.id.stopСallButton:
                 setActionButtonsEnability(false);
+                stopСallButton.setEnabled(false);
+                stopСallButton.setActivated(false);
                 stopCall();
                 Log.d("Track", "Call is stopped");
                 break;

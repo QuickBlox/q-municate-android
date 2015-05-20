@@ -12,21 +12,21 @@ import java.util.Map;
 
 public interface VideoChatHelperListener {
 
-    void onReceiveNewSession(QBRTCSession qbrtcSession);
+    void onReceiveNewSession();
 
-    void onUserNotAnswer(QBRTCSession qbrtcSession, Integer integer);
+    void onUserNotAnswer(Integer integer);
 
-    void onCallRejectByUser(QBRTCSession qbrtcSession, Integer integer, Map<String, String> map);
+    void onCallRejectByUser(Integer integer, Map<String, String> map);
 
-    void onReceiveHangUpFromUser(QBRTCSession qbrtcSession, Integer integer);
+    void onReceiveHangUpFromUser(Integer integer);
 
-    void onSessionClosed(QBRTCSession qbrtcSession);
+    void onSessionClosed();
 
-    void onSessionStartClose(QBRTCSession qbrtcSession);
+    void onSessionStartClose();
 
-    void onLocalVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack);
+    void onLocalVideoTrackReceive(QBRTCVideoTrack videoTrack);
 
-    void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID);
+    void onRemoteVideoTrackReceive(QBRTCVideoTrack videoTrack, Integer userID);
 
     void onClientReady();
 }
