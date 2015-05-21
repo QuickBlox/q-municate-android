@@ -254,7 +254,7 @@
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
-
+    <string name="user_was_not_found_in_db">User wasn\'t found in base</string>
 
 
 </resources>

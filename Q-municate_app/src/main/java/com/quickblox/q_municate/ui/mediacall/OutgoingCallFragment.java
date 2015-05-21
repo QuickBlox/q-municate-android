@@ -62,7 +62,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private QBRTCSessionDescription sessionDescription;
 
     private Map<String, String> userInfo;
-//    private boolean isVideoEnabled = true;
+    //    private boolean isVideoEnabled = true;
     private boolean isAudioEnabled = true;
     private List<QBUser> allUsers = new ArrayList<>();
     private boolean isMessageProcessed;
@@ -82,7 +82,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
 
     protected void initUI(View rootView) {
-        Log.d("CALL_INTEGRATION","OutgoingCallFragment initUI ");
+        Log.d("CALL_INTEGRATION", "OutgoingCallFragment initUI ");
         timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
         if (updater != null) {
             updater.setTextView(timerTextView);
@@ -116,7 +116,16 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
-        ((CallActivity)getActivity()).cancelPlayer();                   // надо пересмотреть
+        ((CallActivity) getActivity()).cancelPlayer();                   // надо пересмотреть
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+                if (videoView != null) {
+                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                }
+            }
+        });
     }
 
     @Override
@@ -129,7 +138,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 setActionButtonsEnability(true);
 
                 QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
-                if (videoView != null){
+                if (videoView != null) {
                     videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                     videoView.setRemoteOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
@@ -140,8 +149,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onConnectionClosedForUser(QBRTCSession qbrtcSession, Integer integer) {
-        ((CallActivity)getActivity()).stopIncomeCallTimer();
-        getActivity().finish();
+        ((CallActivity) getActivity()).stopIncomeCallTimer();
     }
 
     @Override
@@ -156,20 +164,17 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onDisconnectedTimeoutFromUser(QBRTCSession qbrtcSession, Integer integer) {
-        getActivity().finish();
     }
 
     @Override
     public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
         setActionButtonsEnability(false);
-        getActivity().finish();
     }
 
     @Override
     public void onError(QBRTCSession session, QBRTCException exeption) {
         Toast.makeText(getActivity(), "ERROR:" + exeption.getMessage(), Toast.LENGTH_LONG).show();
         setActionButtonsEnability(false);
-        getActivity().finish();
     }
 
     /* ==========================   Q-municate original code   ==========================*/
@@ -178,7 +183,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected abstract int getContentView();
 
     public static Bundle generateArguments(User friend,
-            ConstsCore.CALL_DIRECTION_TYPE type, QBRTCTypes.QBConferenceType callType, String sessionId) {
+                                           ConstsCore.CALL_DIRECTION_TYPE type, QBRTCTypes.QBConferenceType callType, String sessionId) {
 
         Bundle args = new Bundle();
         args.putSerializable(ConstsCore.EXTRA_FRIEND, friend);
@@ -193,8 +198,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         super.onAttach(activity);
         try {
             Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onAttach");
-            outgoingCallFragmentInterface = (OutgoingCallFragmentInterface)activity;
-            videoChatHelper = ((CallActivity)getActivity()).getVideoChatHelper();
+            outgoingCallFragmentInterface = (OutgoingCallFragmentInterface) activity;
+            videoChatHelper = ((CallActivity) getActivity()).getVideoChatHelper();
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
@@ -225,13 +230,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
 
         Log.d("CALL_INTEGRATION", "OutgoingCallFragment. getArguments " + getArguments());
-        if (getArguments() != null){
+        if (getArguments() != null) {
             ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
-            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted){
+            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted) {
                 Log.d("CALL_INTEGRATION", "OutgoingCallFragment. Start call");
 
                 //TODO why we call this metho here
-                ((CallActivity)getActivity()).startCall();
+                ((CallActivity) getActivity()).startCall();
                 callIsStarted = true;
             }
         }
@@ -303,14 +308,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
 
-    private void switchAudioOutput(){
+    private void switchAudioOutput() {
         if (outgoingCallFragmentInterface != null) {
             outgoingCallFragmentInterface.switchSpeaker();
             Log.d(TAG, "Speaker switched!");
         }
     }
 
-    private void toggleMicrophone(){
+    private void toggleMicrophone() {
         if (outgoingCallFragmentInterface != null) {
             if (isAudioEnabled) {
                 outgoingCallFragmentInterface.offMic();
@@ -324,7 +329,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    public void stopCall(){
+    public void stopCall() {
         if (outgoingCallFragmentInterface != null) {
             outgoingCallFragmentInterface.hungUpClick();
         }
@@ -345,7 +350,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         }
     }
 
-    private void setDynamicButtonState (){
+    private void setDynamicButtonState() {
         AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
         if (audioManager.isBluetoothA2dpOn()) {
@@ -371,13 +376,13 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG)){
+            if (intent.getAction().equals(AudioManager.ACTION_HEADSET_PLUG)) {
                 Log.d(TAG, "ACTION_HEADSET_PLUG " + intent.getIntExtra("state", -1));
-            } else if (intent.getAction().equals(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)){
+            } else if (intent.getAction().equals(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED)) {
                 Log.d(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED " + intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -2));
             }
 
-            if (intent.getIntExtra("state", -1) == 0 /*|| intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -1) == 0*/){
+            if (intent.getIntExtra("state", -1) == 0 /*|| intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -1) == 0*/) {
                 muteDynamicButton.setChecked(false);
             } else if (intent.getIntExtra("state", -1) == 1) {
                 muteDynamicButton.setChecked(true);

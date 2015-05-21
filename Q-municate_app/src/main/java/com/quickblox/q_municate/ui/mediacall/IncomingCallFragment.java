@@ -118,12 +118,15 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
-        ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*friend*/friendFromDB.getFullName());
-        RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
-        avatarView.setOval(true);
-        if(!TextUtils.isEmpty(/*friend*/friendFromDB.getAvatarUrl())){
-            ImageLoader.getInstance().displayImage(/*friend*/friendFromDB.getAvatarUrl(),
-                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        if(friendFromDB !=null) {
+            ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*friend*/friendFromDB.getFullName());
+            RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
+            avatarView.setOval(true);
+            if (!TextUtils.isEmpty(/*friend*/friendFromDB.getAvatarUrl())) {
+                ImageLoader.getInstance().displayImage(/*friend*/friendFromDB.getAvatarUrl(),
+                        avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+            }
+            ((TextView) rootView.findViewById(R.id.name_textview)).setText(getString(R.string.user_was_not_found_in_db));
         }
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);

@@ -87,7 +87,7 @@ public class QBVideoChatHelper extends BaseHelper {
         videoTracksCallbacksListener = new VideoTracksCallbacksListener();
         smackMessageProcessorCallbacksListener = new SmackSignallinProcessorgCallbackListener();
 
-        Log.d("CALL_INTEGRATION"," Init call client");
+        Log.d("CALL_INTEGRATION", " Init call client");
         setUpCallClient();
     }
 
@@ -95,7 +95,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         QBRTCClient.initTaskExecutor();
 
-        QBRTCConfig.setAnswerTimeInterval(40);
+        QBRTCConfig.setAnswerTimeInterval(60);
 
         Log.d("CALL_INTEGRATION","Add callbacks listeners");
         QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
@@ -248,7 +248,9 @@ public class QBVideoChatHelper extends BaseHelper {
      * @param micState
      */
     public void setMicState(boolean micState) {
-        sessionManager.getSession(currentSession).setAudioEnabled(micState);
+        if (sessionManager.getSession(currentSession) != null) {
+            sessionManager.getSession(currentSession).setAudioEnabled(micState);
+        }
     }
 
     /**
@@ -257,21 +259,28 @@ public class QBVideoChatHelper extends BaseHelper {
      * @param camState
      */
     public void setCamState(boolean camState) {
-        sessionManager.getSession(currentSession).setVideoEnabled(camState);
+        if (sessionManager.getSession(currentSession) != null) {
+            sessionManager.getSession(currentSession).setVideoEnabled(camState);
+        }
     }
 
     /**
      * Switch betveen phone speaker and loudspeaker
      */
     public void switchMic() {
-        sessionManager.getSession(currentSession).switchAudioOutput();
+
+        if (sessionManager.getSession(currentSession) != null) {
+            sessionManager.getSession(currentSession).switchAudioOutput();
+        }
     }
 
     /**
      * If state is true than mic will be enabled
      */
     public void switchCam() {
-        sessionManager.getSession(currentSession).switchCapturePosition();
+        if (sessionManager.getSession(currentSession) != null) {
+            sessionManager.getSession(currentSession).switchCapturePosition();
+        }
     }
 
 
