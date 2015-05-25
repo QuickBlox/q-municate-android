@@ -120,9 +120,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+//                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+                QBGLVideoView videoView = ((CallActivity) getActivity()).getLocalVideoView();
                 if (videoView != null) {
-                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                    videoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
             }
         });
@@ -137,10 +139,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
 
-                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+//                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
+                QBGLVideoView videoView = ((CallActivity) getActivity()).getRemoteVideoView();
                 if (videoView != null) {
-                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                    videoView.setRemoteOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                    videoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
             }
         });

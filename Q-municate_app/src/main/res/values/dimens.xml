@@ -62,5 +62,7 @@
     <dimen name="action_bar_height">48dp</dimen>
 
     <dimen name="friends_request_message_height">50dp</dimen>
+    <dimen name="localVideoViewWidth">112dp</dimen>
+    <dimen name="localVideoViewHeight">150dp</dimen>
 
 </resources>

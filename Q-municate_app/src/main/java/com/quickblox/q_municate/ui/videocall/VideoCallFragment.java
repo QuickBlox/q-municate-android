@@ -17,12 +17,14 @@ import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 public class VideoCallFragment extends OutgoingCallFragment {
 
     public static final String TAG = VideoCallFragment.class.getSimpleName();
-    private QBGLVideoView videoView;
+//    private QBGLVideoView videoView;
     private ImageView imgMyCameraOff;
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
     private boolean isVideoEnabled = true;
     private boolean isCameraEnabled = true;
+    private QBGLVideoView localVideoView;
+    private QBGLVideoView remoteVideoView;
 
     @Override
     protected int getContentView() {
@@ -52,9 +54,13 @@ public class VideoCallFragment extends OutgoingCallFragment {
         Log.d(TAG, "initUI()");
 
 
-        videoView = (QBGLVideoView) rootView.findViewById(R.id.videoScreenImageView);
+//        videoView = (QBGLVideoView) rootView.findViewById(R.id.videoScreenImageView);
+        localVideoView = (QBGLVideoView) rootView.findViewById(R.id.localVideoView);
+        remoteVideoView = (QBGLVideoView) rootView.findViewById(R.id.remoteVideoView);
 //
-        ((CallActivity)getActivity()).setVideoView(videoView);
+//        ((CallActivity)getActivity()).setVideoView(videoView);
+        ((CallActivity)getActivity()).setLocalVideoView(localVideoView);
+        ((CallActivity)getActivity()).setRemoteVideoView(remoteVideoView);
 
         imgMyCameraOff = (ImageView) rootView.findViewById(R.id.imgMyCameraOff);
 
@@ -107,8 +113,11 @@ public class VideoCallFragment extends OutgoingCallFragment {
             ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
 
 //            ViewGroup.LayoutParams videoViewLayoutParams = videoView.getLayoutParams();
-            int videoViewHeight = videoView.getHeight();
-            int videoViewWidth = videoView.getWidth();
+//            int videoViewHeight = videoView.getHeight();
+//            int videoViewWidth = videoView.getWidth();
+
+            int videoViewHeight = localVideoView.getHeight();
+            int videoViewWidth = localVideoView.getWidth();
 
 //        Log.d(TAG, "height - videoViewHeight " + (height - videoViewHeight) + " width-videoViewWidth " + (width - videoViewWidth) + "");
 
