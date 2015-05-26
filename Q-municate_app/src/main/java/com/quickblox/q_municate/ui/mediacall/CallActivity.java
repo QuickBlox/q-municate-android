@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.quickblox.q_municate.App;
@@ -254,7 +255,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         super.onStart();
         if (videoChatHelper != null) {
             videoChatHelper.setCamState(true);
-            videoChatHelper.setMicState(true);
         }
     }
 
@@ -280,7 +280,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         if (videoChatHelper != null) {
             videoChatHelper.removeVideoChatHelperListener(this);
             videoChatHelper.setCamState(false);
-            videoChatHelper.setMicState(false);
         }
     }
 
@@ -330,9 +329,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     public void stopIncomeCallTimer() {
         Log.d("CALL_INTEGRATION", "Stop Income call timer");
-        if(singleTheadScheduledExecutor != null && singleTheadScheduledExecutor.isShutdown()) {
+        if(singleTheadScheduledExecutor != null) {
             closeIncomeCallFutureTask.cancel(true);
             singleTheadScheduledExecutor.shutdown();
+            singleTheadScheduledExecutor = null;
         }
     }
 
@@ -627,11 +627,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             @Override
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. initSwitchCamTask lunched");
-                videoChatHelper.switchCam();
-
-                localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-//                videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-//                videoView.setRemoteOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                videoChatHelper.switchCam(new Runnable() {
+                    @Override
+                    public void run() {
+                        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait_upside_down.getDegreeRotation());
+                    }
+                });
             }
         };
     }
@@ -669,10 +670,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return false;
     }
 
-//    public QBGLVideoView getVideoView() {
-//        return  (QBGLVideoView) findViewById(R.id.videoScreenImageView);
-//    }
-
     public QBGLVideoView getLocalVideoView() {
         return (QBGLVideoView) findViewById(R.id.localVideoView);
     }
@@ -702,7 +699,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void initLocalVideoTrack(QBRTCVideoTrack videoTrack) {
         Log.d("CALL_INTEGRATION", "CallActivity. onLocalVideoTrackReceive");
 
-        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
 
         showToastMessage(getString(R.string.local_video_track_received));
         Log.d("CALL_INTEGRATION", "Video view is " + localVideoView);
@@ -713,11 +710,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void initRemoteVideoTrack(QBRTCVideoTrack videoTrack) {
         Log.d("CALL_INTEGRATION", "CallActivity. onRemoteVideoTrackReceive");
 
-        remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//        remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
 
         showToastMessage(getString(R.string.remote_video_track_received));
         Log.d("CALL_INTEGRATION", "Video view is " + remoteVideoView);
         videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getRemoteVideoView(), QBGLVideoView.Endpoint.REMOTE)));
         getRemoteVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
     }
+
 }

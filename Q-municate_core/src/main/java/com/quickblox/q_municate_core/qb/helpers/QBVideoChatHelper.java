@@ -277,9 +277,10 @@ public class QBVideoChatHelper extends BaseHelper {
     /**
      * If state is true than mic will be enabled
      */
-    public void switchCam() {
+    public void switchCam(Runnable runnable) {
         if (sessionManager.getSession(currentSession) != null) {
-            sessionManager.getSession(currentSession).switchCapturePosition();
+
+            sessionManager.getSession(currentSession).switchCapturePosition(runnable);
         }
     }
 
@@ -446,8 +447,8 @@ public class QBVideoChatHelper extends BaseHelper {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         Log.d("CALL_INTEGRATION", "Start call activity. CALL_DIRECTION_TYPE_EXTRA " + ConstsCore.CALL_DIRECTION_TYPE.INCOMING +
-        " CALL_TYPE_EXTRA " + sessionDescription.getConferenceType() + " EXTRA_FRIEND " + friend +
-        " USER_INFO " + sessionDescription.getUserInfo() + "SESSION_ID" +  sessionDescription.getSessionId());
+                " CALL_TYPE_EXTRA " + sessionDescription.getConferenceType() + " EXTRA_FRIEND " + friend +
+                " USER_INFO " + sessionDescription.getUserInfo() + "SESSION_ID" + sessionDescription.getSessionId());
 
         context.getApplicationContext().startActivity(intent);
     }
