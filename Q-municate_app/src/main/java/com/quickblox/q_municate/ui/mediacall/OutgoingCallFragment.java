@@ -117,17 +117,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
         ((CallActivity) getActivity()).cancelPlayer();                   // надо пересмотреть
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-//                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
-                QBGLVideoView videoView = ((CallActivity) getActivity()).getLocalVideoView();
-                if (videoView != null) {
-//                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                    videoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                }
-            }
-        });
     }
 
     @Override
@@ -139,15 +128,17 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
 
-//                QBGLVideoView videoView = ((CallActivity) getActivity()).getVideoView();
-                QBGLVideoView videoView = ((CallActivity) getActivity()).getRemoteVideoView();
-                if (videoView != null) {
-//                    videoView.setLocalOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                    videoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+               QBGLVideoView localVideoView = ((CallActivity) getActivity()).getLocalVideoView();
+                if (localVideoView != null) {
+                    localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+                }
+
+                QBGLVideoView remoteView = ((CallActivity) getActivity()).getRemoteVideoView();
+                if (remoteView != null) {
+                    remoteView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
             }
         });
-
     }
 
     @Override
