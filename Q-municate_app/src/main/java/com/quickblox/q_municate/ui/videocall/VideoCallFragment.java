@@ -123,8 +123,11 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
 
 
-            layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 33));
-            layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
+//            layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 33));
+//            layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
+
+            layoutParams.height = videoViewHeight;
+            layoutParams.width = videoViewWidth;
             imgMyCameraOff.setLayoutParams(layoutParams);
 
             if (isVideoEnabled){
