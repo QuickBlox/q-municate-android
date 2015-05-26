@@ -126,8 +126,10 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
                 ImageLoader.getInstance().displayImage(/*friend*/friendFromDB.getAvatarUrl(),
                         avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
             }
+        } else {
             ((TextView) rootView.findViewById(R.id.name_textview)).setText(getString(R.string.user_was_not_found_in_db));
         }
+
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);
     }
