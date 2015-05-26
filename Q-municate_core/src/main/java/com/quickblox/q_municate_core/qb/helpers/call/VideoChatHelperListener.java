@@ -29,4 +29,6 @@ public interface VideoChatHelperListener {
     void onRemoteVideoTrackReceive(QBRTCVideoTrack videoTrack, Integer userID);
 
     void onClientReady();
+
+    void onError(String s);
 }

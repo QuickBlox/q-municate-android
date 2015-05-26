@@ -130,12 +130,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
                QBGLVideoView localVideoView = ((CallActivity) getActivity()).getLocalVideoView();
                 if (localVideoView != null) {
-                    localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//                    localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
 
                 QBGLVideoView remoteView = ((CallActivity) getActivity()).getRemoteVideoView();
                 if (remoteView != null) {
-                    remoteView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
+//                    remoteView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
             }
         });

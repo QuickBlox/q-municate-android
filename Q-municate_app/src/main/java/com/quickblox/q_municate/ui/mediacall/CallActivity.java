@@ -426,7 +426,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(CallActivity.this, message, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(CallActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -497,6 +497,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             executeCallTask(waitingTasksMap.get(key));
         }
         waitingTasksMap.clear();
+    }
+
+    @Override
+    public void onError(String s) {
+        Toast.makeText(this,s,Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -616,7 +621,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             @Override
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. initSwitchSpeakerTask lunched");
-                videoChatHelper.switchMic();
+                boolean result = videoChatHelper.switchMic();
+//                Toast.makeText(CallActivity.this, "Cann't switch output audio", Toast.LENGTH_LONG).show();
             }
         };
     }
@@ -630,7 +636,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 videoChatHelper.switchCam(new Runnable() {
                     @Override
                     public void run() {
-                        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait_upside_down.getDegreeRotation());
+//                        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait_upside_down.getDegreeRotation());
                     }
                 });
             }

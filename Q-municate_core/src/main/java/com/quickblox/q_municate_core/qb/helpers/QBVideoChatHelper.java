@@ -32,6 +32,7 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 
 import org.webrtc.SessionDescription;
+import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 
@@ -96,6 +97,17 @@ public class QBVideoChatHelper extends BaseHelper {
         QBRTCClient.initTaskExecutor();
 
         QBRTCConfig.setAnswerTimeInterval(60);
+
+        QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
+            @Override
+            public void onCameraError(String s) {
+                Log.e("CALL_INTEGRATION", "Error on cams");
+
+                for(VideoChatHelperListener listener : videoChatListenersList){
+                    listener.onError(s);
+                }
+            }
+        });
 
         Log.d("CALL_INTEGRATION","Add callbacks listeners");
         QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
@@ -267,11 +279,12 @@ public class QBVideoChatHelper extends BaseHelper {
     /**
      * Switch betveen phone speaker and loudspeaker
      */
-    public void switchMic() {
+    public boolean switchMic() {
 
         if (sessionManager.getSession(currentSession) != null) {
-            sessionManager.getSession(currentSession).switchAudioOutput();
+            return sessionManager.getSession(currentSession).switchAudioOutput();
         }
+        return false;
     }
 
     /**
