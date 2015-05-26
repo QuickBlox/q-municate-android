@@ -234,9 +234,9 @@
     //Calls
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
-    <string name="user_not_answer">User not answer</string>
-    <string name="user_reject_call">User reject call</string>
-    <string name="user_hang_up_call">User hang up call</string>
+    <string name="user_not_answer">User hasn’t answered</string>
+    <string name="user_reject_call">User is busy</string>
+    <string name="user_hang_up_call">User has hung up a call</string>
     <string name="session_closed">Session was closed</string>
     <string name="session_start_close">Session start close</string>
     <string name="local_video_track_received">Local video track received</string>

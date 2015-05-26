@@ -458,7 +458,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onSessionClosed() {
         Log.d("CALL_INTEGRATION", "CallActivity. onSessionClosed");
-        showToastMessage(getString(R.string.session_closed));
+//        showToastMessage(getString(R.string.session_closed));
         cancelPlayer();
         finish();
     }
@@ -466,7 +466,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onSessionStartClose() {
         Log.d("CALL_INTEGRATION", "CallActivity. onSessionStartClose");
-        showToastMessage(getString(R.string.session_start_close));
+//        showToastMessage(getString(R.string.session_start_close));
     }
 
     @Override
@@ -649,6 +649,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. initHangUpCallTask lunched");
                 videoChatHelper.hangUpCall(userInfo);
+                finish();
             }
         };
     }
@@ -707,7 +708,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
 //        localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
 
-        showToastMessage(getString(R.string.local_video_track_received));
+//        showToastMessage(getString(R.string.local_video_track_received));
         Log.d("CALL_INTEGRATION", "Video view is " + localVideoView);
         videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getLocalVideoView(), QBGLVideoView.Endpoint.LOCAL)));
         getLocalVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.LOCAL);
@@ -718,7 +719,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
 //        remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
 
-        showToastMessage(getString(R.string.remote_video_track_received));
+//        showToastMessage(getString(R.string.remote_video_track_received));
         Log.d("CALL_INTEGRATION", "Video view is " + remoteVideoView);
         videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getRemoteVideoView(), QBGLVideoView.Endpoint.REMOTE)));
         getRemoteVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
