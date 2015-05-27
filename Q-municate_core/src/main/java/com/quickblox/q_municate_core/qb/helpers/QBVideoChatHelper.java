@@ -111,6 +111,8 @@ public class QBVideoChatHelper extends BaseHelper {
         QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
+
+        QBRTCClient.getInstance().prepareToProcessCalls(context);
     }
 
     public void initActivityClass(Class<? extends Activity> activityClass) {
