@@ -426,7 +426,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                Toast.makeText(CallActivity.this, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(CallActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
