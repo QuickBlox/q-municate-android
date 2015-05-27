@@ -94,8 +94,6 @@ public class QBVideoChatHelper extends BaseHelper {
 
     private void setUpCallClient() {
 
-        QBRTCClient.initTaskExecutor();
-
         QBRTCConfig.setAnswerTimeInterval(60);
 
         QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
@@ -103,13 +101,13 @@ public class QBVideoChatHelper extends BaseHelper {
             public void onCameraError(String s) {
                 Log.e("CALL_INTEGRATION", "Error on cams");
 
-                for(VideoChatHelperListener listener : videoChatListenersList){
+                for (VideoChatHelperListener listener : videoChatListenersList) {
                     listener.onError(s);
                 }
             }
         });
 
-        Log.d("CALL_INTEGRATION","Add callbacks listeners");
+        Log.d("CALL_INTEGRATION", "Add callbacks listeners");
         QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
