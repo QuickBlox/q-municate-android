@@ -54,17 +54,9 @@ public class VideoCallFragment extends OutgoingCallFragment {
         Log.d(TAG, "initUI()");
 
 
-//        videoView = (QBGLVideoView) rootView.findViewById(R.id.videoScreenImageView);
         localVideoView = (QBGLVideoView) rootView.findViewById(R.id.localVideoView);
         remoteVideoView = (QBGLVideoView) rootView.findViewById(R.id.remoteVideoView);
 
-        // Buttons
-        rootView.findViewById(R.id.portrait).setOnClickListener(this);
-        rootView.findViewById(R.id.portraitUPD).setOnClickListener(this);
-        rootView.findViewById(R.id.landscape).setOnClickListener(this);
-        rootView.findViewById(R.id.landscapeUPD).setOnClickListener(this);
-//
-//        ((CallActivity)getActivity()).setVideoView(videoView);
         ((CallActivity)getActivity()).setLocalVideoView(localVideoView);
         ((CallActivity)getActivity()).setRemoteVideoView(remoteVideoView);
 
@@ -105,22 +97,6 @@ public class VideoCallFragment extends OutgoingCallFragment {
                 break;
             case R.id.switchCameraButton:
                 switchCamera();
-                break;
-            case R.id.portrait:
-                localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                break;
-            case R.id.portraitUPD:
-                localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait_upside_down.getDegreeRotation());
-                remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait_upside_down.getDegreeRotation());
-                break;
-            case R.id.landscape:
-                localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.landscape_left.getDegreeRotation());
-                remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.landscape_left.getDegreeRotation());
-                break;
-            case R.id.landscapeUPD:
-                localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.landscape_right.getDegreeRotation());
-                remoteVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.landscape_right.getDegreeRotation());
                 break;
             default:
                 break;

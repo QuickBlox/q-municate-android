@@ -17,6 +17,7 @@ import java.util.TimerTask;
 public class SessionManager {
 
     private List<QBRTCSession> sessionList;
+    private String currentSessionId;
 
 
     public SessionManager() {
@@ -47,16 +48,14 @@ public class SessionManager {
         return result;
     }
 
-//    private void startClearSessionTask(ConnectionConfig connectionConfig) {
-//        ClearSessionTask clearSessionTask = new ClearSessionTask(connectionConfig.getConnectionSession(),
-//                connectionConfig.getToUser().getId());
-//        scheduler.schedule(clearSessionTask, ConstsCore.DEFAULT_CLEAR_SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-//    }
-//
-//    private boolean isExistSameSession(String sessionId){
-//        WorkingSessionPull.WorkingSession session = workingSessionPull.getSession(sessionId);
-//        return (session != null );
-//    }
+    public QBRTCSession getCurrentSession() {
+        return getSession(currentSessionId);
+    }
+
+    public void setCurrentSession(QBRTCSession currentSession) {
+            this.currentSessionId = currentSession.getSessionID();
+    }
+
 
 
     private class ClearSessionTask extends TimerTask {

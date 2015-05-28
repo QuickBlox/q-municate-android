@@ -15,7 +15,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -258,7 +260,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
-            CallActivity.start(PrivateDialogActivity.this, friend, callType);
+            if(QBChatService.getInstance().isLoggedIn()) {
+                CallActivity.start(PrivateDialogActivity.this, friend, callType);
+            } else {
+                Toast.makeText(this, getString(R.string.dlg_fail_connection),Toast.LENGTH_LONG).show();
+            }
         }
     }
 

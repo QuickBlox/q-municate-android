@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
@@ -218,7 +220,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             if (checkFriendStatus(friend.getUserId())) {
-                CallActivity.start(FriendDetailsActivity.this, friend, callType);
+                if(QBChatService.getInstance().isLoggedIn()) {
+                    CallActivity.start(FriendDetailsActivity.this, friend, callType);
+                }else {
+                    Toast.makeText(this, getString(R.string.dlg_fail_connection), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

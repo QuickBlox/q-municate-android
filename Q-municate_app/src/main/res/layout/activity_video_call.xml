@@ -8,14 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--<com.quickblox.videochat.webrtc.view.QBGLVideoView-->
-            <!--android:id="@+id/videoScreenImageView"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_above="@+id/controlPanelRelativeLayout"-->
-            <!--android:layout_centerInParent="true"-->
-            <!--android:layout_gravity="center"/>-->
-
         <com.quickblox.videochat.webrtc.view.QBGLVideoView
             android:id="@+id/localVideoView"
             android:layout_width="@dimen/localVideoViewWidth"
@@ -32,39 +24,6 @@
             android:layout_centerInParent="true"
             android:layout_gravity="center"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_alignBottom="@id/remoteVideoView"
-            android:layout_alignRight="@id/remoteVideoView">
-
-            <Button
-                android:id="@+id/portrait"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Port"/>
-
-            <Button
-                android:id="@+id/portraitUPD"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PortUPD"/>
-
-            <Button
-                android:id="@+id/landscape"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Landsc"/>
-
-            <Button
-                android:id="@+id/landscapeUPD"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LandscUPD"/>
-
-
-        </LinearLayout>
 
         <ImageButton
             android:id="@+id/switchCameraButton"

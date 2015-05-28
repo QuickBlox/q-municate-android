@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import com.quickblox.q_municate.App;
@@ -196,8 +195,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        Log.d("CALL_INTEGRATION", "CallActivity. QBRTCClient start listening calls");
-//        QBRTCClient.getInstance().prepareToProcessCalls(this);
+        Log.d("CALL_INTEGRATION", "CallActivity. QBRTCClient start listening calls");
+        QBRTCClient.getInstance().prepareToProcessCalls(this);
 
         canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
@@ -289,14 +288,16 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         cancelPlayer();
         super.onDestroy();
 
-        if (videoChatHelper != null) {
-            videoChatHelper.removeVideoChatHelperListener(this);
-        }
 
         if(QBRTCClient.isInitiated()){
-           QBRTCClient.getInstance().close();
+            QBRTCClient.getInstance().close(true);
         }
-        videoChatHelper.disposeAllResources();
+
+        if (videoChatHelper != null) {
+            videoChatHelper.removeVideoChatHelperListener(this);
+            videoChatHelper.disposeAllResources();
+            videoChatHelper.setClientClosed();
+        }
     }
 
     public void initIncommingCallTask() {
@@ -649,7 +650,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             public void run() {
                 Log.d("CALL_INTEGRATION", "CallActivity. initHangUpCallTask lunched");
                 videoChatHelper.hangUpCall(userInfo);
-                finish();
+//                finish();
             }
         };
     }
