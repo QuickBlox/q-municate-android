@@ -71,7 +71,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private HashMap<String, Runnable> callTasksMap;
     private boolean isCleintReadyAccept;
     private static boolean callInProcess;
-//    private QBGLVideoView videoView;
+    //    private QBGLVideoView videoView;
     private Runnable closeIncomeCallTimerTask;
     private List<Runnable> onVideoViewWaitTaskList;
     private Map<String, Runnable> waitingTasksMap;
@@ -82,7 +82,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
 
     public void startCall() {
-        if(!waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
+        if (!waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
             Log.d("CALL_INTEGRATION", "CallActivity. startCall() executed");
             Runnable callTask = callTasksMap.get(START_CALL_TASK);
             executeCallTask(callTask);
@@ -103,19 +103,19 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             Runnable acceptTask = callTasksMap.get(ACCEPT_CALL_TASK);
             executeCallTask(acceptTask);
         } else {
-            waitingTasksMap.put(ACCEPT_CALL_TASK,callTasksMap.get(ACCEPT_CALL_TASK));
+            waitingTasksMap.put(ACCEPT_CALL_TASK, callTasksMap.get(ACCEPT_CALL_TASK));
         }
     }
 
     @Override
     public void rejectCallClick() {
         if (isCleintReadyAccept) {
-        cancelPlayer();
-        Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
-        Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
-        executeCallTask(rejectTask);
+            cancelPlayer();
+            Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
+            Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
+            executeCallTask(rejectTask);
         } else {
-            waitingTasksMap.put(REJECT_CALL_TASK,callTasksMap.get(REJECT_CALL_TASK));
+            waitingTasksMap.put(REJECT_CALL_TASK, callTasksMap.get(REJECT_CALL_TASK));
         }
     }
 
@@ -172,7 +172,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onVideoViewCreated() {
-        for(Runnable runnable : onVideoViewWaitTaskList){
+        for (Runnable runnable : onVideoViewWaitTaskList) {
             executeCallTask(runnable);
         }
     }
@@ -254,6 +254,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         super.onStart();
         if (videoChatHelper != null) {
             videoChatHelper.setCamState(true);
+            videoChatHelper.removeVideoChatHelperListener(this);
         }
     }
 
@@ -289,7 +290,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         super.onDestroy();
 
 
-        if(QBRTCClient.isInitiated()){
+        if (QBRTCClient.isInitiated()) {
             QBRTCClient.getInstance().close(true);
         }
 
@@ -320,7 +321,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void startIncomeCallTimer() {
         Log.d("CALL_INTEGRATION", "Start Income call timer");
 
-        if (singleTheadScheduledExecutor == null){
+        if (singleTheadScheduledExecutor == null) {
             initIncommingCallTask();
         }
 
@@ -330,7 +331,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     public void stopIncomeCallTimer() {
         Log.d("CALL_INTEGRATION", "Stop Income call timer");
-        if(singleTheadScheduledExecutor != null) {
+        if (singleTheadScheduledExecutor != null) {
             closeIncomeCallFutureTask.cancel(true);
             singleTheadScheduledExecutor.shutdown();
             singleTheadScheduledExecutor = null;
@@ -472,7 +473,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onLocalVideoTrackReceive(final QBRTCVideoTrack videoTrack) {
-        if(getLocalVideoView() == null){
+        if (getLocalVideoView() == null) {
             onVideoViewWaitTaskList.add(initLocalVideoTrackTask(videoTrack));
         } else {
             initLocalVideoTrack(videoTrack);
@@ -481,7 +482,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onRemoteVideoTrackReceive(final QBRTCVideoTrack videoTrack, Integer userID) {
-        if(getRemoteVideoView() == null) {
+        if (getRemoteVideoView() == null) {
             onVideoViewWaitTaskList.add(initRemoteVideoTrackTask(videoTrack));
         } else {
             initRemoteVideoTrack(videoTrack);
@@ -494,7 +495,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         isCleintReadyAccept = true;
 
         //Execute if call was accepted
-       for(String key : waitingTasksMap.keySet()){
+        for (String key : waitingTasksMap.keySet()) {
             executeCallTask(waitingTasksMap.get(key));
         }
         waitingTasksMap.clear();
@@ -502,7 +503,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onError(String s) {
-        Toast.makeText(this,s,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -689,7 +690,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 //    public void setVideoView(QBGLVideoView videoView) {
 //        this.videoView = videoView;
 //    }
-    
+
     public void setLocalVideoView(QBGLVideoView videoView) {
         this.localVideoView = videoView;
         onVideoViewCreated();

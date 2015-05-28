@@ -350,6 +350,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
+            Log.d(CALL_INTEGRATION, "RTCClient. onReceiveCallFromUser");
             if (activityClass != null) {
                 if (getVideoChatHelperState() == VideoHelperStates.WAIT_FOR_CALL) {
                     Log.d(CALL_INTEGRATION, "Receive call from user");
@@ -369,7 +370,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onReceiveNewSession(QBRTCSession session) {
-
+            Log.d(CALL_INTEGRATION, "onReceiveNewSession");
             if (getVideoChatHelperState() != VideoHelperStates.RTC_CLIENT_PROCESS_CALLS) {
                 setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
                 Log.d(CALL_INTEGRATION, "On client receive new session");
@@ -420,10 +421,8 @@ public class QBVideoChatHelper extends BaseHelper {
                     listener.onSessionClosed();
                 }
 
-                if (session.getSessionID().equals(getCurrentSession())) {
-                    Log.d(CALL_INTEGRATION, "Stop session");
-                    setVideoChatHelperState(VideoHelperStates.WAIT_FOR_CALL);
-                }
+                Log.d(CALL_INTEGRATION, "Stop session");
+                setVideoChatHelperState(VideoHelperStates.WAIT_FOR_CALL);
             }
         }
 
