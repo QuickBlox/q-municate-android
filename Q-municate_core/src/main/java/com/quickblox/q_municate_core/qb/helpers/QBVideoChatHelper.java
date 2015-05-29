@@ -340,7 +340,7 @@ public class QBVideoChatHelper extends BaseHelper {
                 }
             } else {
                 sessionManager.addSession(session);
-                rejectCall(getCurrentSession().getUserInfo());
+                session.rejectCall(getCurrentSession().getUserInfo());
             }
         }
 
