@@ -14,5 +14,6 @@ public interface OutgoingCallFragmentInterface {
     void switchCam();
     void switchSpeaker();
     void hungUpClick();
-    void onVideoViewCreated();
+    void onLocalVideoViewCreated();
+    void onRemoteVideoViewCreated();
 }

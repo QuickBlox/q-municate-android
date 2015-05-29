@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
     public static final String TAG = "LCYCLE" + OutgoingCallFragment.class.getSimpleName();
-    private static String SESSION_ID_EXTENSION = "sessionId";
+    private static final String CALL_INTEGRATION = "CALL_INTEGRATION";
     protected User opponent;
     private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
     private boolean bounded;
@@ -82,7 +82,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
 
     protected void initUI(View rootView) {
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment initUI ");
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment initUI ");
         timerTextView = (TextView) rootView.findViewById(R.id.timerTextView);
         if (updater != null) {
             updater.setTextView(timerTextView);
@@ -124,6 +124,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(CALL_INTEGRATION, "OutgoingCallFragment onConnectedToUser ");
                 ((CallActivity) getActivity()).stopIncomeCallTimer();
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
@@ -143,6 +144,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onConnectionClosedForUser(QBRTCSession qbrtcSession, Integer integer) {
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment onConnectionClosedForUser ");
         ((CallActivity) getActivity()).stopIncomeCallTimer();
     }
 
@@ -151,6 +153,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(CALL_INTEGRATION, "OutgoingCallFragment onDisconnectedFromUser ");
                 Toast.makeText(getActivity(), "Disconnected", Toast.LENGTH_SHORT).show();
             }
         });
@@ -158,15 +161,18 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     @Override
     public void onDisconnectedTimeoutFromUser(QBRTCSession qbrtcSession, Integer integer) {
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment onDisconnectedTimeoutFromUser");
     }
 
     @Override
     public void onConnectionFailedWithUser(QBRTCSession qbrtcSession, Integer integer) {
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment onConnectionFailedWithUser");
         setActionButtonsEnability(false);
     }
 
     @Override
     public void onError(QBRTCSession session, QBRTCException exeption) {
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment onError");
         Toast.makeText(getActivity(), "ERROR:" + exeption.getMessage(), Toast.LENGTH_LONG).show();
         setActionButtonsEnability(false);
     }
@@ -183,7 +189,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         args.putSerializable(ConstsCore.EXTRA_FRIEND, friend);
         args.putSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, type);
         args.putSerializable(ConstsCore.CALL_TYPE_EXTRA, callType);
-        args.putString(SESSION_ID_EXTENSION, sessionId);
+        args.putString(ConstsCore.SESSION_ID, sessionId);
         return args;
     }
 
@@ -191,7 +197,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onAttach");
+            Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onAttach");
             outgoingCallFragmentInterface = (OutgoingCallFragmentInterface) activity;
             videoChatHelper = ((CallActivity) getActivity()).getVideoChatHelper();
         } catch (ClassCastException e) {
@@ -219,15 +225,15 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         Log.d(TAG, "onStart()");
         super.onStart();
         if (!callIsStarted) {
-            Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+            Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onStart");
             QBRTCClient.getInstance().addConnectionCallbacksListener(this);
         }
 
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. getArguments " + getArguments());
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. getArguments " + getArguments());
         if (getArguments() != null) {
             ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
             if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted) {
-                Log.d("CALL_INTEGRATION", "OutgoingCallFragment. Start call");
+                Log.d(CALL_INTEGRATION, "OutgoingCallFragment. Start call");
 
                 //TODO why we call this metho here
                 ((CallActivity) getActivity()).startCall();
@@ -247,7 +253,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onStart");
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onCreate");
         QBRTCClient.getInstance().addConnectionCallbacksListener(this);
     }
 
@@ -255,7 +261,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Log.d(TAG, "onCreateView()");
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. onCreateView ");
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onCreateView ");
         View rootView = inflater.inflate(getContentView(), container, false);
         rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
 
@@ -266,7 +272,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void initChatData() {
 
-        Log.d("CALL_INTEGRATION", "OutgoingCallFragment. initChatData()");
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. initChatData()");
 
         if (call_direction_type != null) {
             return;
@@ -276,7 +282,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         opponent = (User) getArguments().getSerializable(ConstsCore.EXTRA_FRIEND);
         call_type = (QBRTCTypes.QBConferenceType) getArguments().getSerializable(
                 ConstsCore.CALL_TYPE_EXTRA);
-        sessionId = getArguments().getString(SESSION_ID_EXTENSION, "");
+        sessionId = getArguments().getString(ConstsCore.SESSION_ID, "");
 
     }
 

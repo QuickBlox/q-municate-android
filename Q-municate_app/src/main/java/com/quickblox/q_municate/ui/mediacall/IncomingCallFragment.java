@@ -70,10 +70,8 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         ((CallActivity)getActivity()).startIncomeCallTimer();
     }
 
-
     @Override
     public void onClick(View v) {
-        ((CallActivity)getActivity()).stopIncomeCallTimer();
         switch (v.getId()) {
             case R.id.acceptCallButton:
                 Log.d(TAG, "Accept call was clicked");
@@ -81,6 +79,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
                 break;
             case R.id.denyCallButton:
                 Log.d(TAG, "Deny call was clicked");
+                ((CallActivity)getActivity()).stopIncomeCallTimer();
                 reject();
                 break;
             default:
