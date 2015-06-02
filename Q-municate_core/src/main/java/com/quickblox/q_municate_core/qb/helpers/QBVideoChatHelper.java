@@ -308,7 +308,7 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. SmackSignallingProcessorCallbackListener. onReceiveCallFromUser");
             if (activityClass != null) {
-                if (getVideoChatHelperState() == VideoHelperStates.WAIT_FOR_CALL) {
+                if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECIVE_INCOME_CALL_MESSAGE.ordinal()) {
                     Log.d(CALL_INTEGRATION, "Receive call from user");
                     setVideoChatHelperState(VideoHelperStates.RECIVE_INCOME_CALL_MESSAGE);
                     startCallActivity(qbrtcSessionDescription);
