@@ -126,7 +126,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="com.quickblox.q_municate.ui.mediacall.CallActivity"
-            android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
 
