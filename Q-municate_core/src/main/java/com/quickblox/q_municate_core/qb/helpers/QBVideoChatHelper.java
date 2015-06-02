@@ -171,7 +171,7 @@ public class QBVideoChatHelper extends BaseHelper {
      */
     public void startCall(Map<String, String> userInfo, List<Integer> opponents, QBRTCTypes.QBConferenceType qbConferenceType) {
         if (getVideoChatHelperState() == VideoHelperStates.WAIT_FOR_CALL) {
-            setVideoChatHelperState(VideoHelperStates.RECIVE_INCOME_CALL_MESSAGE);
+            setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
 
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. Start call logic starts");
             if (isClientClosed) {
@@ -323,13 +323,14 @@ public class QBVideoChatHelper extends BaseHelper {
 
     /**
      * Class for Signalling creation listening
+     * Receive callbacks from RTCClient which manages sessions
      */
     private class SessionCallbacksListener implements QBRTCClientSessionCallbacks {
 
         @Override
         public void onReceiveNewSession(QBRTCSession session) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. RTCClient. onReceiveNewSession");
-            if (getVideoChatHelperState() != VideoHelperStates.RTC_CLIENT_PROCESS_CALLS) {
+            if (getVideoChatHelperState().ordinal() < VideoHelperStates.RTC_CLIENT_PROCESS_CALLS.ordinal()) {
                 setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
                 Log.d(CALL_INTEGRATION, "On client receive new session");
 
