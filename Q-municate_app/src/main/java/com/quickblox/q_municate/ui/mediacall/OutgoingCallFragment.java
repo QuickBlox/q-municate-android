@@ -224,27 +224,28 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onStart() {
         Log.d(TAG, "onStart()");
         super.onStart();
-        if (!callIsStarted) {
+//        if (!callIsStarted) {
             Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onStart");
             QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-        }
-
-        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. getArguments " + getArguments());
-        if (getArguments() != null) {
-            ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
-            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted) {
-                Log.d(CALL_INTEGRATION, "OutgoingCallFragment. Start call");
-
-                //TODO why we call this metho here
-                ((CallActivity) getActivity()).startCall();
-                callIsStarted = true;
-            }
-        }
+//        }
+//
+//        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. getArguments " + getArguments());
+//        if (getArguments() != null) {
+//            ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
+//            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted) {
+//                Log.d(CALL_INTEGRATION, "OutgoingCallFragment. Start call");
+//
+//                //TODO why we call this metho here
+//                ((CallActivity) getActivity()).startCall();
+//                callIsStarted = true;
+//            }
+//        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
 //        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
     }
 

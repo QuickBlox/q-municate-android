@@ -87,7 +87,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private Map<VideoTracks, Set<Runnable>> videoTracksSetEnumMap;
 
     public void startCall() {
-        if (!waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
+        if (waitingTasksMap != null && !waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
             Log.d("CALL_INTEGRATION", "CallActivity. startCall() executed");
             Runnable callTask = callTasksMap.get(START_CALL_TASK);
             executeCallTask(callTask);
@@ -211,6 +211,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         Log.d("CALL_INTEGRATION", "CallActivity. QBRTCClient start listening calls");
         QBRTCClient.getInstance().prepareToProcessCalls(this);
 
+        if(getIntent().getExtras() != null) {
+            parseIntentExtras(getIntent().getExtras());
+        }
+
         canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
         actionBar.hide();
@@ -231,7 +235,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         // Init map of allowed call's tasks
         initCallTasksMap();
 
-        parseIntentExtras(getIntent().getExtras());
+
+        if(call_direction_type == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
+            startCall();
+        }
 
         addAction(QBServiceConsts.SEND_PUSH_MESSAGES_FAIL_ACTION, failAction);
     }
@@ -284,12 +291,30 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         Log.d("CALL_INTEGRATION", "Resume call activity");
         super.onResume();
+
+        // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
+        if (getLocalVideoView() != null){
+            getLocalVideoView().onResume();
+        }
+
+        if (getLocalVideoView() != null){
+            getRemoteVideoView().onResume();
+        }
     }
 
     @Override
     protected void onPause() {
         Log.d("CALL_INTEGRATION", "Pause call activity");
         super.onPause();
+
+        // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
+        if (getLocalVideoView() != null){
+            getLocalVideoView().onPause();
+        }
+
+        if (getLocalVideoView() != null){
+            getRemoteVideoView().onPause();
+        }
     }
 
 
@@ -530,6 +555,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
             Log.d("CALL_INTEGRATION", "CallActivity. onConnectedToService");
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+
+//            if(call_direction_type == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
+//                videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
+//            }
+
             videoChatHelper.addVideoChatHelperListener(CallActivity.this);
 
 
