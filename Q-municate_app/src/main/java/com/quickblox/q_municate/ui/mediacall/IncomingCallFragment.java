@@ -41,6 +41,8 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     private QBRTCSessionDescription sessionDescription;
     private Handler showIncomingCallWindowTaskHandler;
     private Runnable showIncomingCallWindowTask;
+    private ImageButton acceptCallButton;
+    private ImageButton denyCallButton;
 //    private User friendFromDB;
 
 
@@ -76,15 +78,22 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
             case R.id.acceptCallButton:
                 Log.d(TAG, "Accept call was clicked");
                 accept();
+                setEnabledAllButtons(false);
                 break;
             case R.id.denyCallButton:
                 Log.d(TAG, "Deny call was clicked");
                 ((CallActivity)getActivity()).stopIncomeCallTimer();
                 reject();
+                setEnabledAllButtons(false);
                 break;
             default:
                 break;
         }
+    }
+
+    private void setEnabledAllButtons(boolean enabled) {
+        acceptCallButton.setEnabled(enabled);
+        denyCallButton.setEnabled(enabled);
     }
 
     private void reject() {
@@ -129,8 +138,10 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
             ((TextView) rootView.findViewById(R.id.name_textview)).setText(getString(R.string.user_was_not_found_in_db));
         }
 
-        rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
-        rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);
+        acceptCallButton = (ImageButton)rootView.findViewById(R.id.acceptCallButton);
+        acceptCallButton.setOnClickListener(this);
+        denyCallButton = (ImageButton)rootView.findViewById(R.id.denyCallButton);
+        denyCallButton.setOnClickListener(this);
     }
 
     @Override
