@@ -64,6 +64,8 @@ public class QBVideoChatHelper extends BaseHelper {
     private String currentSessionId;
     private VideoHelperStates vieoChatHelperState;
 
+
+
     public QBVideoChatHelper(Context context) {
         super(context);
         Log.d(CALL_INTEGRATION, "construct  QBVideoChatHelper");
@@ -308,10 +310,15 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. SmackSignallingProcessorCallbackListener. onReceiveCallFromUser");
             if (activityClass != null) {
-                if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECIVE_INCOME_CALL_MESSAGE.ordinal()) {
-                    Log.d(CALL_INTEGRATION, "Receive call from user");
-                    setVideoChatHelperState(VideoHelperStates.RECIVE_INCOME_CALL_MESSAGE);
-                    startCallActivity(qbrtcSessionDescription);
+                if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE.ordinal()) {
+                    // Check is new income call was early
+                    if(!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())){
+                        Log.d(CALL_INTEGRATION, "Receive call from user");
+                        setVideoChatHelperState(VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE);
+                        startCallActivity(qbrtcSessionDescription);
+                    }else {
+                        Log.d(CALL_INTEGRATION, "Call with same ID received");
+                    }
                 } else {
                     Log.d(CALL_INTEGRATION, "Video chat helper already process some call");
                 }
@@ -331,13 +338,18 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onReceiveNewSession(QBRTCSession session) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. RTCClient. onReceiveNewSession");
             if (getVideoChatHelperState().ordinal() < VideoHelperStates.RTC_CLIENT_PROCESS_CALLS.ordinal()) {
-                setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
-                Log.d(CALL_INTEGRATION, "On client receive new session");
+                // Check is new income session was early
+                if (!session.getSessionID().equals(sessionManager.getLastSessionId())) {
+                    setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
+                    Log.d(CALL_INTEGRATION, "On client receive new session");
 
-                setCurrentSession(session);
+                    setCurrentSession(session);
 
-                for (VideoChatHelperListener listener : videoChatListenersList) {
-                    listener.onClientReady();
+                    for (VideoChatHelperListener listener : videoChatListenersList) {
+                        listener.onClientReady();
+                    }
+                } else {
+                    Log.d(CALL_INTEGRATION, "Call with same ID received");
                 }
             } else {
                 sessionManager.addSession(session);
@@ -356,16 +368,20 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void onCallRejectByUser(QBRTCSession session, Integer integer, Map<String, String> map) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onCallRejectByUser");
-            for (VideoChatHelperListener listener : videoChatListenersList) {
-                listener.onCallRejectByUser(integer, map);
+            if (session.equals(getCurrentSession())) {
+                for (VideoChatHelperListener listener : videoChatListenersList) {
+                    listener.onCallRejectByUser(integer, map);
+                }
             }
         }
 
         @Override
         public void onReceiveHangUpFromUser(QBRTCSession session, Integer integer) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onReceiveHangUpFromUser");
-            for (VideoChatHelperListener listener : videoChatListenersList) {
-                listener.onReceiveHangUpFromUser(integer);
+            if (session.equals(getCurrentSession())) {
+                for (VideoChatHelperListener listener : videoChatListenersList) {
+                    listener.onReceiveHangUpFromUser(integer);
+                }
             }
         }
 
@@ -382,6 +398,8 @@ public class QBVideoChatHelper extends BaseHelper {
 
                 Log.d(CALL_INTEGRATION, "QBVideoChatHelper. Stop session");
                 setVideoChatHelperState(VideoHelperStates.WAIT_FOR_CALL);
+
+                sessionManager.removeCurrentSession();
             }
         }
 
@@ -485,7 +503,7 @@ public class QBVideoChatHelper extends BaseHelper {
 
     public enum VideoHelperStates {
         WAIT_FOR_CALL,
-        RECIVE_INCOME_CALL_MESSAGE,
+        RECEIVE_INCOME_CALL_MESSAGE,
         RTC_CLIENT_PROCESS_CALLS,
     }
 }
