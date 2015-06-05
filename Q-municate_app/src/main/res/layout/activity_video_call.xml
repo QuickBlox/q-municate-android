@@ -9,7 +9,8 @@
         android:layout_height="@dimen/localVideoViewHeight"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        />
 
     <com.quickblox.videochat.webrtc.view.QBGLVideoView
         android:id="@+id/remoteVideoView"

@@ -101,10 +101,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void acceptCallClick() {
+        Log.d("CALL_INTEGRATION", "CallActivity. acceptCall() executed");
         cancelPlayer();
         showOutgoingFragment();
         if (isCleintReadyAccept) {
-            Log.d("CALL_INTEGRATION", "CallActivity. acceptCall() executed");
             Runnable acceptTask = callTasksMap.get(ACCEPT_CALL_TASK);
             executeCallTask(acceptTask);
         } else {
@@ -114,9 +114,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void rejectCallClick() {
+        Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
+        cancelPlayer();
         if (isCleintReadyAccept) {
-            cancelPlayer();
-            Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
             Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
             executeCallTask(rejectTask);
         } else {
