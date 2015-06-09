@@ -77,14 +77,14 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         switch (v.getId()) {
             case R.id.acceptCallButton:
                 Log.d(TAG, "Accept call was clicked");
-                accept();
                 setEnabledAllButtons(false);
+                accept();
                 break;
             case R.id.denyCallButton:
                 Log.d(TAG, "Deny call was clicked");
                 ((CallActivity)getActivity()).stopIncomeCallTimer();
-                reject();
                 setEnabledAllButtons(false);
+                reject();
                 break;
             default:
                 break;

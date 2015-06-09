@@ -255,7 +255,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         setRetainInstance(true);
 
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onCreate");
-        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
     }
 
     @Override
@@ -264,7 +263,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         Log.d(TAG, "onCreateView()");
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onCreateView ");
         View rootView = inflater.inflate(getContentView(), container, false);
-        rootView.findViewById(R.id.stopСallButton).setOnClickListener(this);
 
         initChatData();
         initUI(rootView);
@@ -431,11 +429,4 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 //            }
 //        }
 //    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
-
-    }
 }

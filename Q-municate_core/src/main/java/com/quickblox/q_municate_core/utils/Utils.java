@@ -58,7 +58,7 @@ public class Utils {
         List<String> errors = e.getErrors();
         for (String error : errors) {
             Log.d(Utils.class.getSimpleName(), "error =" + error);
-            if (error.contains(msgError)) {
+            if (error != null && error.contains(msgError)) {
                 Log.d(Utils.class.getSimpleName(), error + " contains " + msgError);
                 return true;
             }

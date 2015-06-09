@@ -22,7 +22,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
     private boolean isVideoEnabled = true;
-    private boolean isCameraEnabled = true;
+//    private boolean isCameraEnabled = true;
     private QBGLVideoView localVideoView;
     private QBGLVideoView remoteVideoView;
 
@@ -32,20 +32,20 @@ public class VideoCallFragment extends OutgoingCallFragment {
     }
 
     @Override
-    public void onPause() {
-//        if (isVideoEnabled) {
-//            isVideoEnabled = true;
-//            toggleCamera();
-//        }
-        super.onPause();
+    public void onResume() {
+        super.onResume();
+        if (!isVideoEnabled){
+            toggleCamera(isVideoEnabled);
+        }
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (isCameraEnabled && !isVideoEnabled){
-            toggleCamera();
+    public void onPause() {
+        if (isVideoEnabled) {
+            isVideoEnabled = false;
+            toggleCamera(isVideoEnabled);
         }
+        super.onPause();
     }
 
     @Override
@@ -88,12 +88,15 @@ public class VideoCallFragment extends OutgoingCallFragment {
         super.onClick(v);
         switch (v.getId()) {
             case R.id.cameraOffButton:
-                toggleCamera();
-                if (isCameraEnabled){
-                    isCameraEnabled = false;
+
+                if (isVideoEnabled){
+                    isVideoEnabled = false;
                 } else {
-                    isCameraEnabled = true;
+                    isVideoEnabled = true;
                 }
+
+                toggleCamera(isVideoEnabled);
+
                 break;
             case R.id.switchCameraButton:
                 switchCamera();
@@ -103,7 +106,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
         }
     }
 
-    private void toggleCamera() {
+    private void toggleCamera(boolean isCameraEnabled) {
         if (outgoingCallFragmentInterface != null){
             DisplayMetrics displaymetrics = new DisplayMetrics();
             displaymetrics.setToDefaults();
@@ -128,16 +131,16 @@ public class VideoCallFragment extends OutgoingCallFragment {
             layoutParams.width = videoViewWidth;
             imgMyCameraOff.setLayoutParams(layoutParams);
 
-            if (isVideoEnabled){
+            if (isCameraEnabled){
                 outgoingCallFragmentInterface.offCam();
-                isVideoEnabled = false;
+//                isVideoEnabled = false;
                 switchCameraButton.setVisibility(View.INVISIBLE);
                 cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
             } else {
                 outgoingCallFragmentInterface.onCam();
-                isVideoEnabled = true;
+//                isVideoEnabled = true;
                 switchCameraButton.setVisibility(View.VISIBLE);
                 cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);

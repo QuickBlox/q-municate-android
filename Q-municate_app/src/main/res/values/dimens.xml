@@ -65,4 +65,7 @@
     <dimen name="localVideoViewWidth">112dp</dimen>
     <dimen name="localVideoViewHeight">150dp</dimen>
 
+    <dimen name="remoteVideoViewWidth">270dp</dimen>
+    <dimen name="remoteVideoViewHeight">360dp</dimen>
+
 </resources>
