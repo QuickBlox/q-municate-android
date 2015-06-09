@@ -3,17 +3,16 @@ package com.quickblox.q_municate.ui.mediacall;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.base.ActivityHelper;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.ui.videocall.VideoCallFragment;
 import com.quickblox.q_municate.ui.voicecall.VoiceCallFragment;
+import com.quickblox.q_municate_core.core.exceptions.QBRTCSessionIsAbsentException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
@@ -30,14 +29,11 @@ import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 import com.quickblox.videochat.webrtc.view.VideoCallBacks;
 
 import org.webrtc.VideoRenderer;
-import org.webrtc.VideoTrack;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +57,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private static final String OFF_CAM_TASK = "off_cam_task";
     private static final String SWITCH_CAM_TASK = "switch_cam_task";
     private static final String SWITCH_SPEACKER_TASK = "switch_speaker_task";
+    private static final String CALL_INTEGRATION = "CALL_INTEGRATION";
 
 
     private User opponent;
@@ -85,10 +82,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
 
     private Map<VideoTracks, Set<Runnable>> videoTracksSetEnumMap;
+    private String VIDEOCHAT_HAS_NOT_REDY = "Videochat has not redy";
+    private String TASK_WILL_BE_EXECUTED_IN_NEAREST_TIME = "Task will be executed in nearest time";
 
     public void startCall() {
         if (waitingTasksMap != null && !waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
-            Log.d("CALL_INTEGRATION", "CallActivity. startCall() executed");
+            Log.d(CALL_INTEGRATION, "CallActivity. startCall() executed");
             Runnable callTask = callTasksMap.get(START_CALL_TASK);
             executeCallTask(callTask);
         }
@@ -101,7 +100,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void acceptCallClick() {
-        Log.d("CALL_INTEGRATION", "CallActivity. acceptCall() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. acceptCall() executed");
         cancelPlayer();
         showOutgoingFragment();
         if (isCleintReadyAccept) {
@@ -114,7 +113,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void rejectCallClick() {
-        Log.d("CALL_INTEGRATION", "CallActivity. rejectCall() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. rejectCall() executed");
         cancelPlayer();
         if (isCleintReadyAccept) {
             Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
@@ -128,49 +127,49 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onMic() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onMic() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. onMic() executed");
         Runnable onMicTask = callTasksMap.get(ON_MIC_TASK);
         executeCallTask(onMicTask);
     }
 
     @Override
     public void offMic() {
-        Log.d("CALL_INTEGRATION", "CallActivity. offMic() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. offMic() executed");
         Runnable offMicTask = callTasksMap.get(OFF_MIC_TASK);
         executeCallTask(offMicTask);
     }
 
     @Override
     public void onCam() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onCam() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. onCam() executed");
         Runnable onCamTask = callTasksMap.get(ON_CAM_TASK);
         executeCallTask(onCamTask);
     }
 
     @Override
     public void offCam() {
-        Log.d("CALL_INTEGRATION", "CallActivity. offCam() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. offCam() executed");
         Runnable offCamTask = callTasksMap.get(OFF_CAM_TASK);
         executeCallTask(offCamTask);
     }
 
     @Override
     public void switchCam() {
-        Log.d("CALL_INTEGRATION", "CallActivity. switchCam() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. switchCam() executed");
         Runnable switchCamTask = callTasksMap.get(SWITCH_CAM_TASK);
         executeCallTask(switchCamTask);
     }
 
     @Override
     public void switchSpeaker() {
-        Log.d("CALL_INTEGRATION", "CallActivity. switchSpeaker() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. switchSpeaker() executed");
         Runnable switchSpeakerTask = callTasksMap.get(SWITCH_SPEACKER_TASK);
         executeCallTask(switchSpeakerTask);
     }
 
     @Override
     public void hungUpClick() {
-        Log.d("CALL_INTEGRATION", "CallActivity. hungUp() executed");
+        Log.d(CALL_INTEGRATION, "CallActivity. hungUp() executed");
         Runnable hungUpTask = callTasksMap.get(HANG_UP_CALL_TASK);
         executeCallTask(hungUpTask);
     }
@@ -190,7 +189,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     public static void start(Context context, User friend, QBRTCTypes.QBConferenceType callType) {
-        Log.d("CALL_INTEGRATION", "CallActivity. START STATIC CALL ACTIVITY");
+        Log.d(CALL_INTEGRATION, "CallActivity. START STATIC CALL ACTIVITY");
         Log.i(TAG, "Friend.isOnline() = " + friend.isOnline());
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(ConstsCore.EXTRA_FRIEND, friend);
@@ -208,7 +207,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("CALL_INTEGRATION", "CallActivity. QBRTCClient start listening calls");
+        Log.d(CALL_INTEGRATION, "CallActivity. QBRTCClient start listening calls");
         QBRTCClient.getInstance().prepareToProcessCalls(this);
 
         if(getIntent().getExtras() != null) {
@@ -244,7 +243,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void initCallTasksMap() {
-        Log.d("CALL_INTEGRATION", "CallActivity. Set up tasks map");
+        Log.d(CALL_INTEGRATION, "CallActivity. Set up tasks map");
 
         callTasksMap = new HashMap<>();
 
@@ -266,7 +265,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         callTasksMap.put(SWITCH_CAM_TASK, initSwitchCamTask());
         callTasksMap.put(SWITCH_SPEACKER_TASK, initSwitchSpeakerTask());
 
-        Log.d("CALL_INTEGRATION", "CallActivity. Set up tasks map finished");
+        Log.d(CALL_INTEGRATION, "CallActivity. Set up tasks map finished");
     }
 
     private void executeCallTask(Runnable runnable) {
@@ -274,6 +273,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             runOnUiThread(runnable);
         } else {
             callTasksQueue.add(runnable);
+//            Toast.makeText(this, VIDEOCHAT_HAS_NOT_REDY + "." +  TASK_WILL_BE_EXECUTED_IN_NEAREST_TIME, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -281,15 +281,19 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     protected void onStart() {
         super.onStart();
         if (videoChatHelper != null) {
-            videoChatHelper.setCamState(true);
-            videoChatHelper.addVideoChatHelperListener(this);
+            try {
+                videoChatHelper.setCamState(true);
+            } catch (QBRTCSessionIsAbsentException e) {
+                Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to true");
+            }
+//            videoChatHelper.addVideoChatHelperListener(this);
         }
     }
 
     @Override
     protected void onResume() {
 
-        Log.d("CALL_INTEGRATION", "Resume call activity");
+        Log.d(CALL_INTEGRATION, "Resume call activity");
         super.onResume();
 
         // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
@@ -304,7 +308,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onPause() {
-        Log.d("CALL_INTEGRATION", "Pause call activity");
+        Log.d(CALL_INTEGRATION, "Pause call activity");
         super.onPause();
 
         // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
@@ -320,18 +324,22 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onStop() {
-        Log.d("CALL_INTEGRATION", "Stop call activity");
+        Log.d(CALL_INTEGRATION, "Stop call activity");
         super.onStop();
 
         if (videoChatHelper != null) {
-            videoChatHelper.removeVideoChatHelperListener(this);
-            videoChatHelper.setCamState(false);
+//            videoChatHelper.removeVideoChatHelperListener(this);
+            try {
+                videoChatHelper.setCamState(false);
+            } catch (QBRTCSessionIsAbsentException e) {
+                Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to false");
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("CALL_INTEGRATION", "Destroy call activity");
+        Log.d(CALL_INTEGRATION, "Destroy call activity");
         cancelPlayer();
         super.onDestroy();
 
@@ -342,6 +350,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         if (videoChatHelper != null) {
             videoChatHelper.setClientClosed();
+            videoChatHelper.removeVideoChatHelperListener(this);
         }
     }
 
@@ -350,12 +359,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         closeIncomeCallTimerTask = new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "Execute Income call timer close");
+                Log.d(CALL_INTEGRATION, "Execute Income call timer close");
                 if (currentFragment instanceof IncomingCallFragment) {
-                    Log.d("CALL_INTEGRATION", "IncomingCallFragment close with rejectCall");
+                    Log.d(CALL_INTEGRATION, "IncomingCallFragment close with rejectCall");
                     executeCallTask(callTasksMap.get(REJECT_CALL_TASK));
                 } else {
-                    Log.d("CALL_INTEGRATION", "OutgoingCallFragment close with hangUpCall");
+                    Log.d(CALL_INTEGRATION, "OutgoingCallFragment close with hangUpCall");
                     executeCallTask(callTasksMap.get(HANG_UP_CALL_TASK));
                 }
             }
@@ -363,7 +372,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     public void startIncomeCallTimer() {
-        Log.d("CALL_INTEGRATION", "Start Income call timer");
+        Log.d(CALL_INTEGRATION, "Start Income call timer");
 
         if (singleTheadScheduledExecutor == null) {
             initIncomingCallTask();
@@ -374,7 +383,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     public void stopIncomeCallTimer() {
-        Log.d("CALL_INTEGRATION", "Stop Income call timer");
+        Log.d(CALL_INTEGRATION, "Stop Income call timer");
         if (singleTheadScheduledExecutor != null) {
             closeIncomeCallFutureTask.cancel(true);
             singleTheadScheduledExecutor.shutdown();
@@ -407,7 +416,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void showOutgoingFragment() {
-        Log.d("CALL_INTEGRATION", "CallActivity. showOutgoingFragment");
+        Log.d(CALL_INTEGRATION, "CallActivity. showOutgoingFragment");
 
         if (call_direction_type.equals(ConstsCore.CALL_DIRECTION_TYPE.OUTGOING)) {
             playOutgoingRingtone();
@@ -430,7 +439,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void showOutgoingFragment(User opponentId,
                                       QBRTCTypes.QBConferenceType callType, String sessionId) {
 
-        Log.d("CALL_INTEGRATION", "sCallActivity. showOutgoingFragment");
+        Log.d(CALL_INTEGRATION, "sCallActivity. showOutgoingFragment");
 // TODO WHY JUST FOR VIDEO FRAGMENT BUNDLE ARE USING
         Bundle bundle = VideoCallFragment.generateArguments(opponentId,
                 call_direction_type, callType, sessionId);
@@ -460,7 +469,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
 
     private void showIncomingFragment() {
-        Log.d("CALL_INTEGRATION", "CallActivity. showIncomingFragment");
+        Log.d(CALL_INTEGRATION, "CallActivity. showIncomingFragment");
         playIncomingRingtone();
         IncomingCallFragment incomingCallFragment = IncomingCallFragment.newInstance(call_type,
                 opponent);
@@ -479,37 +488,38 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onReceiveNewSession() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onReceiveNewSession");
+        Log.d(CALL_INTEGRATION, "CallActivity. onReceiveNewSession");
     }
 
     @Override
     public void onUserNotAnswer(Integer integer) {
-        Log.d("CALL_INTEGRATION", "CallActivity. onUserNotAnswer");
+        Log.d(CALL_INTEGRATION, "CallActivity. onUserNotAnswer");
         showToastMessage(getString(R.string.user_not_answer));
     }
 
     @Override
     public void onCallRejectByUser(Integer integer, Map<String, String> stringStringMap) {
-        Log.d("CALL_INTEGRATION", "CallActivity. onCallRejectByUser");
+        Log.d(CALL_INTEGRATION, "CallActivity. onCallRejectByUser");
         showToastMessage(getString(R.string.user_reject_call));
     }
 
     @Override
     public void onReceiveHangUpFromUser(Integer integer) {
-        Log.d("CALL_INTEGRATION", "CallActivity. onReceiveHangUpFromUser");
+        Log.d(CALL_INTEGRATION, "CallActivity. onReceiveHangUpFromUser");
         showToastMessage(getString(R.string.user_hang_up_call));
     }
 
     @Override
     public void onSessionClosed() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onSessionClosed");
+        Log.d(CALL_INTEGRATION, "CallActivity. onSessionClosed");
         cancelPlayer();
+
         finish();
     }
 
     @Override
     public void onSessionStartClose() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onSessionStartClose");
+        Log.d(CALL_INTEGRATION, "CallActivity. onSessionStartClose");
     }
 
     @Override
@@ -532,7 +542,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onClientReady() {
-        Log.d("CALL_INTEGRATION", "CallActivity. onClientReady");
+        Log.d(CALL_INTEGRATION, "CallActivity. onClientReady");
         isCleintReadyAccept = true;
 
         //Execute if call was accepted
@@ -553,15 +563,14 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         if (videoChatHelper == null) {
 
-            Log.d("CALL_INTEGRATION", "CallActivity. onConnectedToService");
+            Log.d(CALL_INTEGRATION, "CallActivity. onConnectedToService");
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
+
+            videoChatHelper.addVideoChatHelperListener(this);
 
 //            if(call_direction_type == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
 //                videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
 //            }
-
-            videoChatHelper.addVideoChatHelperListener(CallActivity.this);
-
 
             if (call_direction_type != null) {
                 if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
@@ -576,7 +585,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void executeScheduledTasks() {
-        Log.d("CALL_INTEGRATION", "CallActivity. executeScheduledTasks");
+        Log.d(CALL_INTEGRATION, "CallActivity. executeScheduledTasks");
         for (Runnable task : callTasksQueue) {
 //            callTasksHandler.post(task);
             runOnUiThread(task);
@@ -592,7 +601,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             public void run() {
                 final List<Integer> opponents = new ArrayList<>();
                 opponents.add(opponent.getUserId());
-                Log.d("CALL_INTEGRATION", "CallActivity. initStartCallTask lunched");
+                Log.d(CALL_INTEGRATION, "CallActivity. initStartCallTask lunched");
                 videoChatHelper.startCall(userInfo, opponents, call_type);
             }
         };
@@ -602,8 +611,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initAcceptCallTask lunched");
-                videoChatHelper.acceptCall(userInfo);
+                Log.d(CALL_INTEGRATION, "CallActivity. initAcceptCallTask lunched");
+                try {
+                    videoChatHelper.acceptCall(userInfo);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " acceptCall");
+                }
             }
         };
     }
@@ -612,9 +625,13 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initRejectCallTask lunched");
+                Log.d(CALL_INTEGRATION, "CallActivity. initRejectCallTask lunched");
                 cancelPlayer();
-                videoChatHelper.rejectCall(userInfo);
+                try {
+                    videoChatHelper.rejectCall(userInfo);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " rejectCall");
+                }
             }
         };
     }
@@ -623,8 +640,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initMicOffTask lunched");
-                videoChatHelper.setMicState(false);
+                Log.d(CALL_INTEGRATION, "CallActivity. initMicOffTask lunched");
+                try {
+                    videoChatHelper.setMicState(false);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to false");
+                }
             }
         };
     }
@@ -633,8 +654,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initMicOnTask lunched");
-                videoChatHelper.setMicState(true);
+                Log.d(CALL_INTEGRATION, "CallActivity. initMicOnTask lunched");
+                try {
+                    videoChatHelper.setMicState(true);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to true");
+                }
             }
         };
     }
@@ -643,8 +668,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initCamOnTask lunched");
-                videoChatHelper.setCamState(true);
+                Log.d(CALL_INTEGRATION, "CallActivity. initCamOnTask lunched");
+                try {
+                    videoChatHelper.setCamState(true);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " setCamState to true");
+                }
             }
         };
     }
@@ -653,8 +682,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initCamOffTask lunched");
-                videoChatHelper.setCamState(false);
+                Log.d(CALL_INTEGRATION, "CallActivity. initCamOffTask lunched");
+                try {
+                    videoChatHelper.setCamState(false);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " setCamState to false");
+                }
             }
         };
     }
@@ -663,8 +696,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initSwitchSpeakerTask lunched");
-                videoChatHelper.switchMic();
+                Log.d(CALL_INTEGRATION, "CallActivity. initSwitchSpeakerTask lunched");
+                try {
+                    videoChatHelper.switchMic();
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " switchMic");
+                }
             }
         };
     }
@@ -674,12 +711,12 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initSwitchCamTask lunched");
-                videoChatHelper.switchCam(new Runnable() {
-                    @Override
-                    public void run() {
-                    }
-                });
+                Log.d(CALL_INTEGRATION, "CallActivity. initSwitchCamTask lunched");
+                try {
+                    videoChatHelper.switchCam(null);
+                } catch (QBRTCSessionIsAbsentException e) {
+                    Log.d(CALL_INTEGRATION,e.getMessage() + " switchCam");
+                }
             }
         };
     }
@@ -688,8 +725,13 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         return new Runnable() {
             @Override
             public void run() {
-                Log.d("CALL_INTEGRATION", "CallActivity. initHangUpCallTask lunched");
-                videoChatHelper.hangUpCall(userInfo);
+                Log.d(CALL_INTEGRATION, "CallActivity. initHangUpCallTask lunched");
+                try {
+                    videoChatHelper.hangUpCall(userInfo);
+                } catch (QBRTCSessionIsAbsentException e) {
+//                    finish();
+                    Log.d(CALL_INTEGRATION, e.getMessage() + " hangUpCall");
+                }
             }
         };
     }
@@ -740,17 +782,17 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void initLocalVideoTrack(QBRTCVideoTrack videoTrack) {
-        Log.d("CALL_INTEGRATION", "CallActivity. onLocalVideoTrackReceive");
+        Log.d(CALL_INTEGRATION, "CallActivity. onLocalVideoTrackReceive");
 
-        Log.d("CALL_INTEGRATION", "Video view is " + localVideoView);
+        Log.d(CALL_INTEGRATION, "Video view is " + localVideoView);
         videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getLocalVideoView(), QBGLVideoView.Endpoint.LOCAL)));
         getLocalVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.LOCAL);
     }
 
     private void initRemoteVideoTrack(QBRTCVideoTrack videoTrack) {
-        Log.d("CALL_INTEGRATION", "CallActivity. onRemoteVideoTrackReceive");
+        Log.d(CALL_INTEGRATION, "CallActivity. onRemoteVideoTrackReceive");
 
-        Log.d("CALL_INTEGRATION", "Video view is " + remoteVideoView);
+        Log.d(CALL_INTEGRATION, "Video view is " + remoteVideoView);
         videoTrack.addRenderer(new VideoRenderer(new VideoCallBacks(getRemoteVideoView(), QBGLVideoView.Endpoint.REMOTE)));
         getRemoteVideoView().setVideoTrack(videoTrack, QBGLVideoView.Endpoint.REMOTE);
     }

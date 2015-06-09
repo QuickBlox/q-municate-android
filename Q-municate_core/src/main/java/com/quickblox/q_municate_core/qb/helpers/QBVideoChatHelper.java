@@ -9,6 +9,7 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBSignaling;
 import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
+import com.quickblox.q_municate_core.core.exceptions.QBRTCSessionIsAbsentException;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.call.SessionManager;
 import com.quickblox.q_municate_core.qb.helpers.call.SmackSignallingProcessorCallbackImpl;
@@ -16,7 +17,6 @@ import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
@@ -65,7 +65,6 @@ public class QBVideoChatHelper extends BaseHelper {
     private VideoHelperStates vieoChatHelperState;
 
 
-
     public QBVideoChatHelper(Context context) {
         super(context);
         Log.d(CALL_INTEGRATION, "construct  QBVideoChatHelper");
@@ -93,7 +92,7 @@ public class QBVideoChatHelper extends BaseHelper {
         Log.d(CALL_INTEGRATION, "QBVideoChatHelper. setUpCallClient");
         isClientClosed = false;
 
-        QBRTCConfig.setAnswerTimeInterval(60);
+//        QBRTCConfig.setAnswerTimeInterval(60);
 
         QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
             @Override
@@ -191,7 +190,7 @@ public class QBVideoChatHelper extends BaseHelper {
     /**
      * Accept call logic
      */
-    public void acceptCall(Map<String, String> userInfo) {
+    public void acceptCall(Map<String, String> userInfo) throws QBRTCSessionIsAbsentException {
         Log.d(CALL_INTEGRATION, "QBVideoChatHelper. Accept call logic starts");
         if (isClientClosed) {
             Log.d(CALL_INTEGRATION, "Reinit RTCClient");
@@ -200,36 +199,45 @@ public class QBVideoChatHelper extends BaseHelper {
 
         if (getCurrentSession() != null) {
             getCurrentSession().acceptCall(userInfo);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
     /**
      * Reject call logic
      */
-    public void rejectCall(Map<String, String> userInfo) {
+    public void rejectCall(Map<String, String> userInfo) throws QBRTCSessionIsAbsentException {
         if (getCurrentSession() != null) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. Reject call logic starts");
             getCurrentSession().rejectCall(userInfo);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
     /**
      * HangUp call logic
      */
-    public void hangUpCall(Map<String, String> userInfo) {
+    public void hangUpCall(Map<String, String> userInfo) throws QBRTCSessionIsAbsentException {
         if (getCurrentSession() != null) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. HangUp call logic starts");
             getCurrentSession().hangUp(userInfo);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
     /**
      * If state is true than mic will be enabled
+     *
      * @param micState
      */
-    public void setMicState(boolean micState) {
+    public void setMicState(boolean micState) throws QBRTCSessionIsAbsentException {
         if (getCurrentSession() != null) {
             getCurrentSession().setAudioEnabled(micState);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
@@ -238,29 +246,41 @@ public class QBVideoChatHelper extends BaseHelper {
      *
      * @param camState
      */
-    public void setCamState(boolean camState) {
+    public void setCamState(boolean camState) throws QBRTCSessionIsAbsentException {
         if (getCurrentSession() != null) {
             getCurrentSession().setVideoEnabled(camState);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
     /**
      * Switch between phone speaker and loudspeaker
      */
-    public boolean switchMic() {
+    public boolean switchMic() throws QBRTCSessionIsAbsentException {
 
         if (getCurrentSession() != null) {
             return getCurrentSession().switchAudioOutput();
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
-        return false;
     }
 
     /**
      * If state is true than mic will be enabled
      */
-    public void switchCam(Runnable runnable) {
+    public void switchCam(Runnable runnable) throws QBRTCSessionIsAbsentException {
         if (getCurrentSession() != null) {
+            if (runnable == null) {
+                new Runnable() {
+                    @Override
+                    public void run() {
+                    }
+                };
+            }
             getCurrentSession().switchCapturePosition(runnable);
+        } else {
+            throw new QBRTCSessionIsAbsentException();
         }
     }
 
@@ -312,11 +332,11 @@ public class QBVideoChatHelper extends BaseHelper {
             if (activityClass != null) {
                 if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE.ordinal()) {
                     // Check is new income call was early
-                    if(!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())){
+                    if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())) {
                         Log.d(CALL_INTEGRATION, "Receive call from user");
                         setVideoChatHelperState(VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE);
                         startCallActivity(qbrtcSessionDescription);
-                    }else {
+                    } else {
                         Log.d(CALL_INTEGRATION, "Call with same ID received");
                     }
                 } else {
@@ -337,9 +357,11 @@ public class QBVideoChatHelper extends BaseHelper {
         @Override
         public void onReceiveNewSession(QBRTCSession session) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. RTCClient. onReceiveNewSession");
+            boolean isEqualsLastSessionId = session.getSessionID().equals(sessionManager.getLastSessionId());
+
             if (getVideoChatHelperState().ordinal() < VideoHelperStates.RTC_CLIENT_PROCESS_CALLS.ordinal()) {
                 // Check is new income session was early
-                if (!session.getSessionID().equals(sessionManager.getLastSessionId())) {
+                if (!isEqualsLastSessionId) {
                     setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
                     Log.d(CALL_INTEGRATION, "On client receive new session");
 
@@ -352,8 +374,10 @@ public class QBVideoChatHelper extends BaseHelper {
                     Log.d(CALL_INTEGRATION, "Call with same ID received");
                 }
             } else {
-                sessionManager.addSession(session);
-                session.rejectCall(getCurrentSession().getUserInfo());
+                if (!isEqualsLastSessionId) {
+                    sessionManager.addSession(session);
+                    session.rejectCall(getCurrentSession().getUserInfo());
+                }
             }
         }
 
