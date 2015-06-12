@@ -44,6 +44,8 @@ public class ConstsCore {
     public static final String USER_NAME = "user_name";
     public static final String CALL_DIRECTION_TYPE_EXTRA = "call_type_direction";
     public static final String CALL_TYPE_EXTRA = "call_type";
+    public static final String USER_INFO = "user_info";
+    public static final String SESSION_ID = "session_id";
     public static final String REMOTE_DESCRIPTION = "session_description";
 
     public static final int CHAT_ATTACH_WIDTH = 200;

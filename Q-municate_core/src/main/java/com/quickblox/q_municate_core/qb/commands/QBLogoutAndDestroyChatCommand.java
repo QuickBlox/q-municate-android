@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
 
@@ -38,18 +42,22 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         boolean destroy = true;
         if (extras != null) {
             destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
         }
-        if(chatRestHelper != null && chatRestHelper.isLoggedIn()) {
-            multiChatHelper.leaveDialogs();
-            chatRestHelper.logout();
-            if (destroy) {
-                chatRestHelper.destroy();
+        try {
+            if (chatRestHelper != null && chatRestHelper.isLoggedIn()) {
+                multiChatHelper.leaveDialogs();
+                chatRestHelper.logout();
+                if (destroy) {
+                    chatRestHelper.destroy();
+                }
+                clearDialogsDataFromPreferences();
             }
-            clearDialogsDataFromPreferences();
+        } catch (XMPPException | SmackException e){
+            throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;
     }

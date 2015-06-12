@@ -14,8 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.core.exception.QBResponseException;
@@ -38,6 +40,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 public class FriendDetailsActivity extends BaseLogeableActivity {
 
@@ -211,19 +214,23 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
     }
 
-    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
+    private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             if (checkFriendStatus(friend.getUserId())) {
-                CallActivity.start(FriendDetailsActivity.this, friend, callType);
+                if(QBChatService.getInstance().isLoggedIn()) {
+                    CallActivity.start(FriendDetailsActivity.this, friend, callType);
+                }else {
+                    Toast.makeText(this, getString(R.string.dlg_fail_connection), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
 
     public void voiceCallClickListener(View view) {
-        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
     }
 
     private boolean checkFriendStatus(int userId) {

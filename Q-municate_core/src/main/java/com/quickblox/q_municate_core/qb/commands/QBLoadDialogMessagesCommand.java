@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
@@ -35,7 +36,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
         int skipMessages = extras.getInt(QBServiceConsts.EXTRA_SKIP_ITEMS);

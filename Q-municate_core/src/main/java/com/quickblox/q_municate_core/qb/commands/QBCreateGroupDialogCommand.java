@@ -5,12 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtilsCore;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
 
@@ -32,12 +36,17 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         ArrayList<User> friendList = (ArrayList<User>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        QBDialog dialog = multiChatHelper.createGroupChat(roomName, ChatUtilsCore.getFriendIdsList(friendList));
+        QBDialog dialog = null;
+        try {
+            dialog = multiChatHelper.createGroupChat(roomName, ChatUtilsCore.getFriendIdsList(friendList));
+        } catch (XMPPException | SmackException e) {
+            throw  new QBResponseException(e.getLocalizedMessage());
+        }
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
     }

@@ -41,7 +41,7 @@ public class QBSendPushCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         ArrayList<Integer> usersIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
         String message = extras.getString(ConstsCore.PUSH_MESSAGE);

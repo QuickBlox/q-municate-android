@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
@@ -15,6 +16,9 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatDialogUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownFriends;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,16 +39,20 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
-        List<QBDialog> dialogsList = multiChatHelper.getDialogs();
+    public Bundle perform(Bundle extras) throws QBResponseException {
+        List<QBDialog> dialogsList;
         ArrayList<ParcelableQBDialog> parcelableQBDialog = null;
-
-        if (dialogsList != null && !dialogsList.isEmpty()) {
-            new FindUnknownFriendsTask().execute(dialogsList);
-            parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
-            multiChatHelper.tryJoinRoomChats(dialogsList);
-            // save flag for join to dialogs
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
+        try {
+            dialogsList = multiChatHelper.getDialogs();
+            if (dialogsList != null && !dialogsList.isEmpty()) {
+                new FindUnknownFriendsTask().execute(dialogsList);
+                parcelableQBDialog = ChatDialogUtils.dialogsToParcelableDialogs(dialogsList);
+                multiChatHelper.tryJoinRoomChats(dialogsList);
+                // save flag for join to dialogs
+                PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
+            }
+        } catch (XMPPException | SmackException e) {
+            throw new QBResponseException(e.getLocalizedMessage());
         }
 
         Bundle bundle = new Bundle();

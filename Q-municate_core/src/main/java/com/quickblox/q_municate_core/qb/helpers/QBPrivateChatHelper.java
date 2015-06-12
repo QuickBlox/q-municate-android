@@ -93,16 +93,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
                 dialog.getLastMessageDateSent(), dialog.getLastMessageUserId(), countUnreadDialog);
     }
 
-    public QBFile loadAttachFile(File inputFile) throws Exception {
-        QBFile file = null;
-
-        try {
-            file = QBContent.uploadFileTask(inputFile, true, (String) null);
-        } catch (QBResponseException exc) {
-            throw new Exception(context.getString(R.string.dlg_fail_upload_attach));
-        }
-
-        return file;
+    public QBFile loadAttachFile(File inputFile) throws QBResponseException {
+        return QBContent.uploadFileTask(inputFile, true, (String) null);
     }
 
     private void friendRequestMessageReceived(QBChatMessage chatMessage,

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -15,6 +17,9 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 public class QBLoginRestWithSocialCommand extends ServiceCommand {
 
@@ -38,19 +43,25 @@ public class QBLoginRestWithSocialCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         String socialProvider = (String) extras.getSerializable(QBServiceConsts.EXTRA_SOCIAL_PROVIDER);
         String accessToken = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN);
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
-        QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
-        if(TextUtils.isEmpty(user.getWebsite())) {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-            extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
-            extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
-        } else {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-            extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_LOGIN);
-            extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+
+        try {
+
+            QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
+            if (TextUtils.isEmpty(user.getWebsite())) {
+                PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+                extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
+                extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
+            } else {
+                PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+                extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_LOGIN);
+                extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+            }
+        } catch (BaseServiceException e){
+            throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;
     }

@@ -96,7 +96,9 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     }
 
     private void initCursorLoaders() {
-        getLoaderManager().initLoader(DIALOGS_LOADER_ID, null, this);
+        if (isAdded()) {
+            getLoaderManager().initLoader(DIALOGS_LOADER_ID, null, this);
+        }
     }
 
     @Override

@@ -5,10 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.content.model.QBFile;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
 import java.io.File;
 
@@ -31,7 +35,7 @@ public class QBLoadAttachFileCommand extends ServiceCommand {
     }
 
     @Override
-    protected Bundle perform(Bundle extras) throws Exception {
+    protected Bundle perform(Bundle extras) throws QBResponseException {
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
         QBFile qbFile = privateChatHelper.loadAttachFile(file);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -28,7 +29,7 @@ public class QBInitFriendListCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         friendListHelper.init(privateChatHelper);
         return extras;
     }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.QBChatService;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -28,7 +29,7 @@ public class QBInitVideoChatCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         if (extras == null || extras.getSerializable(QBServiceConsts.EXTRA_CALL_ACTIVITY) == null) { // global init
             videoChatHelper.init(QBChatService.getInstance());
         } else {

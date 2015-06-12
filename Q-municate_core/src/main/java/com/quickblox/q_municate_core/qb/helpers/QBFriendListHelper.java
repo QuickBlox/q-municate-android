@@ -28,6 +28,8 @@ import com.quickblox.q_municate_core.utils.FriendUtils;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
@@ -73,13 +75,13 @@ public class QBFriendListHelper extends BaseHelper {
         roster.addRosterListener(new RosterListener());
     }
 
-    public void inviteFriend(int userId) throws Exception {
+    public void inviteFriend(int userId) throws QBResponseException,XMPPException,SmackException {
         if (isNotInvited(userId)) {
             invite(userId);
         }
     }
 
-    public void addFriend(int userId) throws Exception {
+    public void addFriend(int userId) throws QBResponseException, XMPPException, SmackException {
         if (isNewFriend(userId)) {
             acceptFriend(userId);
         } else {
@@ -88,7 +90,7 @@ public class QBFriendListHelper extends BaseHelper {
         }
     }
 
-    public void invite(int userId) throws Exception {
+    public void invite(int userId) throws QBResponseException, XMPPException, SmackException {
         sendInvitation(userId);
 
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
@@ -101,7 +103,7 @@ public class QBFriendListHelper extends BaseHelper {
         privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
     }
 
-    public void acceptFriend(int userId) throws Exception {
+    public void acceptFriend(int userId) throws XMPPException, SmackException, QBResponseException {
         roster.confirmSubscription(userId);
 
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForAcceptFriendsRequest(
@@ -109,7 +111,7 @@ public class QBFriendListHelper extends BaseHelper {
         sendNotificationToFriend(chatMessage, userId);
     }
 
-    public void rejectFriend(int userId) throws Exception {
+    public void rejectFriend(int userId) throws QBResponseException, SmackException, XMPPException {
         roster.reject(userId);
         clearRosterEntry(userId);
         deleteFriend(userId);
@@ -119,14 +121,14 @@ public class QBFriendListHelper extends BaseHelper {
         sendNotificationToFriend(chatMessage, userId);
     }
 
-    private void clearRosterEntry(int userId) throws Exception {
+    private void clearRosterEntry(int userId) throws XMPPException, SmackException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
         if (rosterEntry != null && roster.contains(userId)) {
             roster.removeEntry(rosterEntry);
         }
     }
 
-    public void removeFriend(int userId) throws Exception {
+    public void removeFriend(int userId) throws QBResponseException, SmackException,XMPPException {
         roster.unsubscribe(userId);
         clearRosterEntry(userId);
         deleteFriend(userId);
@@ -150,7 +152,7 @@ public class QBFriendListHelper extends BaseHelper {
         return isSubscribedToUser || isBothSubscribed;
     }
 
-    private void sendInvitation(int userId) throws Exception {
+    private void sendInvitation(int userId) throws XMPPException, SmackException {
         if (roster.contains(userId)) {
             roster.subscribe(userId);
         } else {

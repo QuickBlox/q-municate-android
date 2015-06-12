@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.BaseServiceException;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
@@ -32,10 +34,15 @@ public class QBSignUpRestCommand extends CompositeServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
-        user = authHelper.signup(user, file);
+
+        try{
+            user = authHelper.signup(user, file);
+        } catch (BaseServiceException e){
+            throw new QBResponseException(e.getLocalizedMessage());
+        }
         extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
         return extras;
     }

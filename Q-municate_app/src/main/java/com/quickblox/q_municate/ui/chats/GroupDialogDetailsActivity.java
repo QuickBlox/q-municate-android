@@ -555,6 +555,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         public void execute(Bundle bundle) {
             groupDialog = (GroupDialog) bundle.getSerializable(QBServiceConsts.EXTRA_GROUP_DIALOG);
 
+//            ChatDatabaseManager.saveDialog(GroupDialogDetailsActivity.this, currentDialog);
+
             initUIWithData();
             initTextChangedListeners();
             initListView();
@@ -580,6 +582,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             currentDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             groupDialog = new GroupDialog(currentDialog);
             groupDialog.setOccupantList((ArrayList<User>) occupantsList);
+
+            ChatDatabaseManager.saveDialog(GroupDialogDetailsActivity.this, currentDialog);
 
             updateOldGroupData();
 

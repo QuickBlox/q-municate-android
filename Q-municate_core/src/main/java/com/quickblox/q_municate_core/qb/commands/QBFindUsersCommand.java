@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.User;
@@ -31,7 +32,7 @@ public class QBFindUsersCommand extends ServiceCommand {
     }
 
     @Override
-    public Bundle perform(Bundle extras) throws Exception {
+    public Bundle perform(Bundle extras) throws QBResponseException {
         String constraint = (String) extras.getSerializable(QBServiceConsts.EXTRA_CONSTRAINT);
         QBUser currentUser = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         int page = extras.getInt(QBServiceConsts.EXTRA_PAGE);
