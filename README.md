@@ -525,7 +525,7 @@ public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QB
 
 
 ### Step 11. Group chat page
-<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-02-37.png" height="400" />&nbsp;
+<img src="http://files.quickblox.com/qm_step13%282%29.png" height="400" />&nbsp;
 
 Group Chat Page is used for messaging with friends.
 
