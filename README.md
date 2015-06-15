@@ -380,7 +380,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
 
 
 ### Step 8. Chats page
-<img src="http://qblx.co/1sxjpoY" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/QB_Android_Chats_activity_2015-06-15-09-56-41.png" height="400" />&nbsp;
 
 Chats Page shows scrollable chats list (private and group).
 
@@ -443,7 +443,7 @@ public QBDialog createRoomChat(String roomName,
 ```
 
 ### Step 10. Private chat page
-<img src="http://qblx.co/1mfZiuV" height="400" />&nbsp;
+<img src="http://files.quickblox.com/QB_Android_Private_chat_2015-06-15-10-11-18.png" height="400" />&nbsp;
 
 Private Chat Page is used for messaging with a friend.
 
@@ -629,7 +629,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ```
 
 ### Video call
-<img src="http://image.quickblox.com/3d05b76fe821f9b3e7a5a2e95de8.injoit.png" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/QB_Android_Video_Chat_2015-06-15-10-12-26.png" height="400" />&nbsp;
 
 ### Video Chat Page features:
 * This page is shown once user initiates a video call
@@ -676,7 +676,7 @@ Email –editable field
 
 
 ### Step 14. Profile Page
-<img src="http://qblx.co/1mg0Y7M" height="400" />&nbsp;
+<img src="http://files.quickblox.com/QB_Android_Profile_2015-06-15-10-13-53.png" height="400" />&nbsp;
 
 Profile page allows user to edit his/her profile info.
 
