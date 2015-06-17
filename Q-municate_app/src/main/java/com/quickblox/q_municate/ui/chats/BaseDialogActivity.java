@@ -703,7 +703,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
-                messagesListView.setSelection(0);
+//                messagesListView.setSelection(0);
+                scrollListView();
+//                messagesListView.setSelection(messagesListView.getCount() - 1);
+//                messagesListView.
             }
 
             hideActionBarProgress();
