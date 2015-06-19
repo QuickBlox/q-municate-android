@@ -11,8 +11,8 @@ import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.q_municate_core.core.exceptions.QBRTCSessionIsAbsentException;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.helpers.call.RTCSignallingMessageProcessorCallbackImpl;
 import com.quickblox.q_municate_core.qb.helpers.call.SessionManager;
+import com.quickblox.q_municate_core.qb.helpers.call.SmackSignallingProcessorCallbackImpl;
 import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
@@ -22,7 +22,7 @@ import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
-import com.quickblox.videochat.webrtc.callbacks.RTCSignallingMessageProcessorCallback;
+import com.quickblox.videochat.webrtc.callbacks.SmackSignallingProcessorCallback;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
@@ -51,7 +51,7 @@ public class QBVideoChatHelper extends BaseHelper {
     // Videochat listeners
     private SessionCallbacksListener sessionCallbacksListener;
     private VideoTracksCallbacksListener videoTracksCallbacksListener;
-    private RTCSignallingMessageProcessorCallback smackMessageProcessorCallbacksListener;
+    private SmackSignallingProcessorCallback smackMessageProcessorCallbacksListener;
 
     // VideoChat
     private QBGLVideoView renderingView;
@@ -80,7 +80,7 @@ public class QBVideoChatHelper extends BaseHelper {
         this.chatService.getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new SignallingManagerListenerImpl());
         sessionCallbacksListener = new SessionCallbacksListener();
         videoTracksCallbacksListener = new VideoTracksCallbacksListener();
-        smackMessageProcessorCallbacksListener = new RTCSignallingMessageProcessorCallbackListener();
+        smackMessageProcessorCallbacksListener = new SmackSignallingProcessorCallbackListener();
 
         vieoChatHelperState = VideoHelperStates.WAIT_FOR_CALL;
 
@@ -106,7 +106,7 @@ public class QBVideoChatHelper extends BaseHelper {
         });
 
         Log.d(CALL_INTEGRATION, "Add callbacks listeners");
-        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getSmackSignallingProcessorCallback());
+        QBRTCClient.getInstance().addSmackSignallingCallbackListener(getSmackSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
     }
@@ -163,7 +163,7 @@ public class QBVideoChatHelper extends BaseHelper {
         return videoTracksCallbacksListener;
     }
 
-    public RTCSignallingMessageProcessorCallback getSmackSignallingProcessorCallback() {
+    public SmackSignallingProcessorCallback getSmackSignallingProcessorCallback() {
         return smackMessageProcessorCallbacksListener;
     }
 
@@ -324,7 +324,7 @@ public class QBVideoChatHelper extends BaseHelper {
     /**
      * Class for SmackSignalling processing
      */
-    private class RTCSignallingMessageProcessorCallbackListener extends RTCSignallingMessageProcessorCallbackImpl {
+    private class SmackSignallingProcessorCallbackListener extends SmackSignallingProcessorCallbackImpl {
 
         @Override
         public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {

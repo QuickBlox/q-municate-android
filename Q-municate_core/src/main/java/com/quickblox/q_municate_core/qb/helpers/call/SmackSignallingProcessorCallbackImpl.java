@@ -2,8 +2,9 @@ package com.quickblox.q_municate_core.qb.helpers.call;
 
 import android.util.Log;
 
+import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
-import com.quickblox.videochat.webrtc.callbacks.RTCSignallingMessageProcessorCallback;
+import com.quickblox.videochat.webrtc.callbacks.SmackSignallingProcessorCallback;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
@@ -13,9 +14,9 @@ import java.util.List;
 /**
  * Created by PC on 19.05.2015.
  */
-public class RTCSignallingMessageProcessorCallbackImpl implements RTCSignallingMessageProcessorCallback {
+public class SmackSignallingProcessorCallbackImpl implements SmackSignallingProcessorCallback{
 
-    private static final String TAG = RTCSignallingMessageProcessorCallbackImpl.class.getSimpleName();
+    private static final String TAG = SmackSignallingProcessorCallbackImpl.class.getSimpleName();
 
     @Override
     public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
