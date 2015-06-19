@@ -23,6 +23,8 @@ import com.quickblox.q_municate.utils.DateUtils;
 
 public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
+    private static final String TAG = PrivateDialogMessagesAdapter.class.getSimpleName();
+
     private static int EMPTY_POSITION = -1;
 
     private int lastRequestPosition = EMPTY_POSITION;
@@ -124,6 +126,13 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                 messageCache.getMessagesNotificationType());
         boolean friendsInfoRequestMessage = messageCache
                 .getMessagesNotificationType() != null && !friendsRequestMessage;
+
+        // search  last read message and remember its position
+        if (!ownMessage && !messageCache.isRead()) {
+            if (positionLastReadMessage == -1) {
+                positionLastReadMessage = cursor.getPosition();
+            }
+        }
 
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());

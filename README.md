@@ -54,7 +54,7 @@ Please note all these features are available in open source code, so you can cus
 
 ## Step by step guide
 ### Step 1. PreLogin page
-<img src="http://qblx.co/1sxhSiD" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-18.png" height="400" />&nbsp;
 
 #### Available features:
 #### Buttons:
@@ -68,7 +68,7 @@ Please note all these features are available in open source code, so you can cus
 
 
 ### Step 2. Sign up page
-<img src="http://qblx.co/1mfYp5E" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-30.png" height="400" />&nbsp;
 
 Sign Up Page allows to create new QM user.
 
@@ -119,7 +119,7 @@ public QBUser signup(QBUser inputUser, File file) throws QBResponseException, Ba
 
 
 ### Step 3. Login page
-<img src="http://qblx.co/1sximp8" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-22-42.png" height="400" />&nbsp;
 
 User can login in the app via Facebook or login as a QM user.
 
@@ -226,7 +226,7 @@ public void inviteFriend(int userId) throws Exception {
 
 
 ### Step 5. Friends page
-<img src="http://qblx.co/1sxiHrZ" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-30.png" height="400" />&nbsp;
 
 User goes to Friends page, if correct credentials are entered
 Friends Page is used for list of user’s friends.
@@ -261,7 +261,7 @@ public void inviteFriend(int userId) throws Exception {
 ```
 
 #### Step 5.1. Side bar
-<img src="http://qblx.co/1mfYIgM" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-33.png" height="400" />&nbsp;
 
 * Friends page (Main page): 
 - A list of friends, listed in alphabetical order.
@@ -277,7 +277,7 @@ public void inviteFriend(int userId) throws Exception {
 - A page with app settings and preferences.
 
 #### Step 5.2. Search Bar
-<img src="http://qblx.co/1mfZ2Mw" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-11-18-26.png" height="400" />&nbsp;
 
 Search icon on Friends page opens/hides search bar.
 
@@ -295,7 +295,7 @@ List<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, r
 
 
 ### Step 6. Details Page
-<img src="http://qblx.co/1sxj3yz" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-48-51.png" height="400" />&nbsp;
 
 Details Page is used for friends profile information.
 
@@ -325,7 +325,7 @@ Friends profile page shows user’s information:
  
 
 ### Step 7. Invite Friends
-<img src="http://qblx.co/1sxjMjh" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-06.png" height="400" />&nbsp;
 
 User can access Invite Friends page from the Side bar, to invite his/her friends in the app.
 
@@ -380,7 +380,7 @@ public void postInviteToWall(Request.Callback requestCallback, String[] selected
 
 
 ### Step 8. Chats page
-<img src="http://qblx.co/1sxjpoY" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/QB_Android_Chats_activity_2015-06-15-09-56-41.png" height="400" />&nbsp;
 
 Chats Page shows scrollable chats list (private and group).
 
@@ -412,7 +412,7 @@ public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, Sm
 
 
 ### Step 9. New chat page
-<img src="http://qblx.co/1tq4p0i" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-37-55.png" height="400" />&nbsp;
 
 New Chat Page allows to create new chat.
 
@@ -443,7 +443,7 @@ public QBDialog createRoomChat(String roomName,
 ```
 
 ### Step 10. Private chat page
-<img src="http://qblx.co/1mfZiuV" height="400" />&nbsp;
+<img src="http://files.quickblox.com/QB_Android_Private_chat_2015-06-15-10-11-18.png" height="400" />&nbsp;
 
 Private Chat Page is used for messaging with a friend.
 
@@ -525,7 +525,7 @@ public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QB
 
 
 ### Step 11. Group chat page
-<img src="http://qblx.co/1mfZzhn" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/qm_step13%282%29.png" height="400" />&nbsp;
 
 Group Chat Page is used for messaging with friends.
 
@@ -629,7 +629,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 ```
 
 ### Video call
-<img src="http://image.quickblox.com/3d05b76fe821f9b3e7a5a2e95de8.injoit.png" height="400" />&nbsp; 
+<img src="http://files.quickblox.com/QB_Android_Video_Chat_2015-06-15-10-12-26.png" height="400" />&nbsp;
 
 ### Video Chat Page features:
 * This page is shown once user initiates a video call
@@ -655,7 +655,7 @@ private void callToUser(Friend friend, WebRTC.MEDIA_STREAM callType) {
 
 
 ### Step 13. Settings Page
-<img src="http://qblx.co/1mfZQAW" height="400" />&nbsp;
+<img src="http://files.quickblox.com/Screenshot_2014-07-03-10-46-47.png" height="400" />&nbsp;
 
 Settings Page allows user to change his/her profile and change other in-app controls.
 
@@ -676,7 +676,7 @@ Email –editable field
 
 
 ### Step 14. Profile Page
-<img src="http://qblx.co/1mg0Y7M" height="400" />&nbsp;
+<img src="http://files.quickblox.com/QB_Android_Profile_2015-06-15-10-13-53.png" height="400" />&nbsp;
 
 Profile page allows user to edit his/her profile info.
 
