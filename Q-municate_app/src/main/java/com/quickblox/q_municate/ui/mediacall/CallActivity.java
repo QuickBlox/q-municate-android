@@ -506,7 +506,16 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onReceiveHangUpFromUser(Integer integer) {
         Log.d(CALL_INTEGRATION, "CallActivity. onReceiveHangUpFromUser");
-        showToastMessage(getString(R.string.user_hang_up_call));
+
+        if(!isCleintReadyAccept){
+            waitingTasksMap.clear();
+            finish();
+        }
+
+        if (currentFragment instanceof IncomingCallFragment
+                || currentFragment instanceof OutgoingCallFragment){
+            showToastMessage(getString(R.string.user_hang_up_call));
+        }
     }
 
     @Override
@@ -729,7 +738,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 try {
                     videoChatHelper.hangUpCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
-//                    finish();
                     Log.d(CALL_INTEGRATION, e.getMessage() + " hangUpCall");
                 }
             }
