@@ -48,8 +48,8 @@ public class QBGCMUnregistrationTask extends BaseProgressTask<GoogleCloudMessagi
         Bundle registration = new Bundle();
         gcm.unregister();
         registration.putString(PrefsHelper.PREF_REG_ID, ConstsCore.EMPTY_STRING);
-        boolean subscribed = unSubscribeToPushNotifications(registrationId);
-        registration.putBoolean(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, subscribed);
+//        boolean subscribed = unSubscribeToPushNotifications(registrationId);
+//        registration.putBoolean(PrefsHelper.PREF_IS_SUBSCRIBED_ON_SERVER, subscribed);
         return registration;
     }
 
@@ -67,7 +67,7 @@ public class QBGCMUnregistrationTask extends BaseProgressTask<GoogleCloudMessagi
 
             for (QBSubscription subscription : subscriptions) {
                 if (subscription.getDevice().getId().equals(deviceId)) {
-                    QBMessages.deleteSubscription(subscription.getId();
+                    QBMessages.deleteSubscription(subscription.getId());
                     break;
                 }
             }
