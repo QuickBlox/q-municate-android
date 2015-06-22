@@ -333,6 +333,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
             outgoingCallFragmentInterface.hungUpClick();
         }
         stopTimer();
+
+        Log.d(CALL_INTEGRATION, "Fragment in activity " + getActivity());
     }
 
     private void startTimer(TextView textView) {
