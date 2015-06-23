@@ -54,6 +54,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private boolean isNeedToOpenDialog;
 
     public static void start(Context context) {
+
+        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS_ON_LOGOUT, false);
+
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }

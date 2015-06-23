@@ -269,6 +269,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void executeCallTask(Runnable runnable) {
+
+
+
         if (videoChatHelper != null) {
             runOnUiThread(runnable);
         } else {
@@ -293,7 +296,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     protected void onResume() {
 
-        Log.d(CALL_INTEGRATION, "Resume call activity");
+        Log.d(CALL_INTEGRATION, "Resume call activity " + this);
         super.onResume();
 
         // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
@@ -308,7 +311,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onPause() {
-        Log.d(CALL_INTEGRATION, "Pause call activity");
+        Log.d(CALL_INTEGRATION, "Pause call activity " + this);
         super.onPause();
 
         // Call activity's lifecycle methods on GLSurfaceViews to allow system mange GL rendering
@@ -324,7 +327,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onStop() {
-        Log.d(CALL_INTEGRATION, "Stop call activity");
+        Log.d(CALL_INTEGRATION, "Stop call activity " + this);
         super.onStop();
 
         if (videoChatHelper != null) {
@@ -339,10 +342,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     protected void onDestroy() {
-        Log.d(CALL_INTEGRATION, "Destroy call activity");
-        cancelPlayer();
-        super.onDestroy();
+        Log.d(CALL_INTEGRATION, "Destroy call activity" + this);
 
+        stopIncomeCallTimer();
+        cancelPlayer();
 
         if (QBRTCClient.isInitiated()) {
             QBRTCClient.getInstance().close(true);
@@ -352,13 +355,17 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             videoChatHelper.setClientClosed();
             videoChatHelper.removeVideoChatHelperListener(this);
         }
+
+        super.onDestroy();
     }
 
     public void initIncomingCallTask() {
+
         singleTheadScheduledExecutor = new ScheduledThreadPoolExecutor(1);
         closeIncomeCallTimerTask = new Runnable() {
             @Override
             public void run() {
+
                 Log.d(CALL_INTEGRATION, "Execute Income call timer close");
                 if (currentFragment instanceof IncomingCallFragment) {
                     Log.d(CALL_INTEGRATION, "IncomingCallFragment close with rejectCall");
@@ -383,6 +390,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     public void stopIncomeCallTimer() {
+
         Log.d(CALL_INTEGRATION, "Stop Income call timer");
         if (singleTheadScheduledExecutor != null) {
             closeIncomeCallFutureTask.cancel(true);
@@ -506,14 +514,22 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     public void onReceiveHangUpFromUser(Integer integer) {
         Log.d(CALL_INTEGRATION, "CallActivity. onReceiveHangUpFromUser");
-        showToastMessage(getString(R.string.user_hang_up_call));
+
+        if(!isCleintReadyAccept){
+            waitingTasksMap.clear();
+            finish();
+        }
+
+        if (currentFragment instanceof IncomingCallFragment
+                || currentFragment instanceof OutgoingCallFragment){
+            showToastMessage(getString(R.string.user_hang_up_call));
+        }
     }
 
     @Override
     public void onSessionClosed() {
         Log.d(CALL_INTEGRATION, "CallActivity. onSessionClosed");
         cancelPlayer();
-
         finish();
     }
 
@@ -567,10 +583,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
 
             videoChatHelper.addVideoChatHelperListener(this);
-
-//            if(call_direction_type == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING){
-//                videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
-//            }
 
             if (call_direction_type != null) {
                 if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
@@ -729,7 +741,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 try {
                     videoChatHelper.hangUpCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
-//                    finish();
+                    CallActivity.this.finish();
                     Log.d(CALL_INTEGRATION, e.getMessage() + " hangUpCall");
                 }
             }

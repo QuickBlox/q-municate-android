@@ -346,6 +346,19 @@ public class QBVideoChatHelper extends BaseHelper {
                 Log.d(CALL_INTEGRATION, "Activity class wasn't sett till now");
             }
         }
+
+
+        @Override
+        public void onReceiveUserHungUpCall(Integer opponentID, QBRTCSessionDescription qbrtcSessionDescription) {
+            super.onReceiveUserHungUpCall(opponentID, qbrtcSessionDescription);
+            if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())) {
+                for (VideoChatHelperListener listener : videoChatListenersList) {
+                    listener.onReceiveHangUpFromUser(opponentID);
+                }
+
+                setVideoChatHelperState(VideoHelperStates.WAIT_FOR_CALL);
+            }
+        }
     }
 
     /**

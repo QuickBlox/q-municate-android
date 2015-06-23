@@ -13,6 +13,7 @@ public class PrefsHelper {
     public static final String PREF_IS_LOGINED = "is_logined";
     public static final String PREF_USER_PASSWORD = "password";
     public static final String PREF_PUSH_NOTIFICATIONS = "push_notifications";
+    public static final String PREF_PUSH_NOTIFICATIONS_ON_LOGOUT = "push_notifications_on_logout";
     public static final String PREF_IMPORT_INITIALIZED = "import_initialized";
     public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
     public static final String PREF_SIGN_UP_INITIALIZED = "sign_up_initialized";
