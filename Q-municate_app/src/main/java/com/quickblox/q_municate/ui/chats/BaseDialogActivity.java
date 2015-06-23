@@ -51,6 +51,7 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -172,6 +173,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (TextUtils.isEmpty(messageEditText.getText().toString().trim())) {
+            String messageBody = ChatDatabaseManager.getNotSendMessageBodyByDialogId(getApplicationContext(), dialogId);
+            if (messageBody != null){
+                messageEditText.setText(messageBody);
+            }
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         onUpdateChatDialog();
@@ -194,6 +207,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (isNeedToOpenDialog) {
             finish();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        if (!TextUtils.isEmpty(messageEditText.getText().toString().trim())){
+           ChatDatabaseManager.saveNotSendMessage(getApplicationContext(), messageEditText.getText().toString(), dialogId, null);
+        } else {
+            ChatDatabaseManager.deleteNotSentMessagesByDialogId(getApplicationContext(), dialogId);
+        }
+
+        super.onStop();
     }
 
     @Override
@@ -566,7 +590,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void sendTypingStatus() {
         Log.d("Bug fixing", "baseChatHelper is: " + baseChatHelper + " opponentFriend is: " + opponentFriend);
-        baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
+        if (baseChatHelper != null) {
+            baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
+        }
     }
 
     private void initKeyboardHeight() {

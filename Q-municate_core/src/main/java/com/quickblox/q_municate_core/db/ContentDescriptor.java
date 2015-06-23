@@ -7,6 +7,7 @@ import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 
 public class ContentDescriptor {
@@ -24,6 +25,9 @@ public class ContentDescriptor {
         matcher.addURI(AUTHORITY, FriendsRelationTable.PATH, FriendsRelationTable.PATH_TOKEN);
         matcher.addURI(AUTHORITY, DialogTable.PATH, DialogTable.PATH_TOKEN);
         matcher.addURI(AUTHORITY, MessageTable.PATH, MessageTable.PATH_TOKEN);
+
+        // Added to store not sent messages
+        matcher.addURI(AUTHORITY, NotSendMessageTable.PATH, NotSendMessageTable.PATH_TOKEN);
         // TODO Sergey Fedunets other tables can be added
 
         return matcher;

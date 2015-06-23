@@ -7,6 +7,7 @@ import android.content.CursorLoader;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -15,6 +16,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
@@ -248,8 +250,36 @@ public class ChatDatabaseManager {
                 MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
+    public static Cursor getAllNotSendMessagesByDialogId(Context context) {
+        return context.getContentResolver().query(NotSendMessageTable.CONTENT_URI, null,
+                null, null,null);
+    }
+
+
+    public static String getNotSendMessageBodyByDialogId(Context context, String dialogId) {
+        Cursor cursor = context.getContentResolver().query(NotSendMessageTable.CONTENT_URI, null,
+                NotSendMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
+                null);
+
+        String messageBody = null;
+
+        if(cursor.moveToFirst()){
+            if(cursor.getCount() <= 1) {
+                messageBody = cursor.getString(cursor.getColumnIndex(NotSendMessageTable.Cols.BODY));
+            }  else {
+                Log.d("ChatDatabaseManager","Wrong count of not sent message was found for dialog " + dialogId);
+            }
+        }
+
+        return messageBody;
+    }
+
     public static void deleteAllMessages(Context context) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI, null, null);
+    }
+
+    public static void deleteAllNotSendMessages(Context context) {
+        context.getContentResolver().delete(NotSendMessageTable.CONTENT_URI, null, null);
     }
 
     public static void deleteAllDialogs(Context context) {
@@ -286,7 +316,7 @@ public class ChatDatabaseManager {
         }
 
         updateDialog(context, messageCache.getDialogId(), lastMessage, messageCache.getTime(),
-                    messageCache.getSenderId(), countUnreadMessagesLocal);
+                messageCache.getSenderId(), countUnreadMessagesLocal);
     }
 
     public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
@@ -369,6 +399,35 @@ public class ChatDatabaseManager {
         }
     }
 
+    public static void saveNotSendMessage(Context context, String message, String dialogID, String attachURL){
+        if(TextUtils.isEmpty(dialogID.trim())){
+            Log.d("ChatDatabaseManager", "Can't save not send message for dialog with NULL value");
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        ContentResolver resolver = context.getContentResolver();
+
+        values.put(NotSendMessageTable.Cols.BODY, message);
+
+//        if (TextUtils.isEmpty(attachURL.trim())) {
+//            values.put(NotSendMessageTable.Cols.ATTACH_FILE_ID, attachURL);
+//        } else {
+            values.putNull(NotSendMessageTable.Cols.ATTACH_FILE_ID);
+//        }
+
+        String condition = NotSendMessageTable.Cols.DIALOG_ID + "='" + dialogID + "'";
+        Cursor cursor = resolver.query(NotSendMessageTable.CONTENT_URI, null, condition, null, null);
+        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
+            Log.d("NOT_SEND_MESSAGE", "Update dialog " + dialogID);
+            resolver.update(NotSendMessageTable.CONTENT_URI, values, condition, null);
+        } else {
+            Log.d("NOT_SEND_MESSAGE", "Insert dialog " + dialogID);
+            values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
+            resolver.insert(NotSendMessageTable.CONTENT_URI, values);
+        }
+    }
+
     private static String parseMessageBody(Context context, MessageCache messageCache) {
         String resultMessage = messageCache.getMessage();
 
@@ -400,6 +459,11 @@ public class ChatDatabaseManager {
 
     public static void deleteMessagesByDialogId(Context context, String dialogId) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
+    }
+
+    public static void deleteNotSentMessagesByDialogId(Context context, String dialogId) {
+        context.getContentResolver().delete(NotSendMessageTable.CONTENT_URI,
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 

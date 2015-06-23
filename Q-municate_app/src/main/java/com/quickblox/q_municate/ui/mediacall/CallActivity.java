@@ -207,6 +207,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(CALL_INTEGRATION, "onCreate call activity" + this);
+
         Log.d(CALL_INTEGRATION, "CallActivity. QBRTCClient start listening calls");
         QBRTCClient.getInstance().prepareToProcessCalls(this);
 

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -25,6 +26,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -236,6 +238,9 @@ public class NavigationDrawerFragment extends BaseFragment {
 
                 // Stop porcess push notifications after logout
                 PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS_ON_LOGOUT, true);
+
+                // Start clear messages that was not sent
+                ChatDatabaseManager.deleteAllNotSendMessages(getActivity().getApplicationContext());
 
                 baseActivity.showProgress();
                 FacebookHelper.logout();
