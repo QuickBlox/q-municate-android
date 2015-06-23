@@ -115,12 +115,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private int firstVisiblePositionList;
     private View loadMoreView;
-    private boolean loadingMore;
+    private boolean loadingMore = true;
     private int skipMessages;
     private int totalEntries;
     private int loadedItems;
     private boolean firstItemInList;
     private int totalItemCountInList;
+    private int firstVisiblePosition;
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -436,9 +437,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onFileLoaded(QBFile file);
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
-        loadingMore = true;
-        QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
-        skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+        if (loadingMore) {
+//        loadingMore = true;
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
+            skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+            loadingMore = false;
+        }
     }
 
     protected abstract Bundle generateBundleToInitDialog();
@@ -457,17 +461,20 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
         loadMoreView = _findViewById(R.id.load_more_linearlayout);
         loadMoreView.setVisibility(View.GONE);
-//        messagesListView.setOnScrollListener(this);
+        messagesListView.setOnScrollListener(this);
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE) {
-            if (firstItemInList && !loadingMore) {
-                firstVisiblePositionList = totalItemCountInList - 1;
-//                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+//            if (firstItemInList && !loadingMore) {
+//                firstVisiblePositionList = totalItemCountInList - 1;
+////                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+//                loadMoreItems();
+////                }
+//            }
+            if (firstVisiblePosition == 0){
                 loadMoreItems();
-//                }
             }
         }
     }
@@ -475,8 +482,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
-        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
-        totalItemCountInList = totalItemCount;
+        firstVisiblePosition = firstVisibleItem;
+//        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
+//        totalItemCountInList = totalItemCount;
     }
 
     private void loadMoreItems() {
@@ -725,12 +733,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            loadingMore = false;
+            loadingMore = true;
 //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {
 //                messagesListView.setSelection(0);
-                scrollListView();
+//                scrollListView();
+//                messagesListView.invalidate();
+//                messagesListView.smoothScrollToPosition(skipMessages);
+                messagesListView.setSelection(ConstsCore.DIALOG_MESSAGES_PER_PAGE - 1);
 //                messagesListView.setSelection(messagesListView.getCount() - 1);
 //                messagesListView.
             }
@@ -743,7 +754,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            loadingMore = false;
+            loadingMore = true;
 //            loadMoreView.setVisibility(View.GONE);
 
             if (skipMessages != 0) {

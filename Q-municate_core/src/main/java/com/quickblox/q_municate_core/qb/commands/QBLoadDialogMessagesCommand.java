@@ -45,6 +45,7 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesSkip(skipMessages);
         customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+        customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
 
         List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
                 returnedBundle, dialog, lastDateLoad);
