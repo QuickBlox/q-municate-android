@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -87,8 +88,12 @@ public class GCMIntentService extends IntentService {
         if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
+
+            Log.d("Bug fixing", "Set PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG true");
+
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
         } else {
+            Log.d("Bug fixing", "Set PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG false");
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         }
     }

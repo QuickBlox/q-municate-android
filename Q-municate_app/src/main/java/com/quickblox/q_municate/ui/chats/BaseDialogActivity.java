@@ -206,7 +206,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
                 PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         if (isNeedToOpenDialog) {
-            finish();
+//            finish();
         }
     }
 
