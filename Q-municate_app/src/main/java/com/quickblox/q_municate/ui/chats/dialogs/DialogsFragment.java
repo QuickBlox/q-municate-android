@@ -28,6 +28,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.UserTable;
+import com.quickblox.q_municate_core.models.Dialog;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -57,12 +58,17 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         title = getString(R.string.nvd_title_chats);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
+
+        if(savedInstanceState != null){
+            selectedPositionList = savedInstanceState.getInt(ConstsCore.LAST_CLICKED_DIALOG);
+        }
 
         initUI(view);
         initListeners();
@@ -82,7 +88,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
             @Override
             public void onChange(boolean selfChange) {
-                selectedPositionList = dialogsListView.getFirstVisiblePosition();
                 initCursorLoaders();
             }
         };
@@ -111,6 +116,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         this.dialogsCursor = dialogsCursor;
         initChatsDialogs();
         checkVisibilityEmptyLabel();
+
+
     }
 
     @Override
@@ -135,6 +142,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 } else {
                     startGroupChatActivity(dialog);
                 }
+                selectedPositionList = position;
             }
         });
     }
@@ -206,6 +214,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         }
     }
 
+
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
         User occupant = dialogsAdapter.getOccupantById(occupantId);
@@ -253,5 +262,11 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ConstsCore.LAST_CLICKED_DIALOG, selectedPositionList);
     }
 }

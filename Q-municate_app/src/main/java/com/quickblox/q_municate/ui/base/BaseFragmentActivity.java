@@ -18,6 +18,7 @@ import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -154,6 +155,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             NavUtils.navigateUpTo(this, intent);
         }
     }
+
 
     @SuppressWarnings("unchecked")
     protected <T> T _findViewById(int viewId) {
