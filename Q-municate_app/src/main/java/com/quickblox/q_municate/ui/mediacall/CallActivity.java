@@ -154,7 +154,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         intent.putExtra(ConstsCore.EXTRA_FRIEND, friend);
         intent.putExtra(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, ConstsCore.CALL_DIRECTION_TYPE.OUTGOING);
         intent.putExtra(ConstsCore.CALL_TYPE_EXTRA, callType);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);                                             // надо еще потестить
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         context.startActivity(intent);
     }
 
