@@ -295,6 +295,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
 
+    //TODO
+    //it's weird to listen packets in videoChatHelper,
+    // then prepare QBRTCClient here to listen following packets again in videoChatHelper
     // ------------------------- Call activity lifecycle methods ------------------ //
     @Override
     protected void onCreate(Bundle savedInstanceState) {

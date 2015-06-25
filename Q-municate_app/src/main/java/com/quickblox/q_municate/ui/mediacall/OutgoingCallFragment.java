@@ -38,6 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+//TODO
+//A lot of methods to implement in QBRTCClientConnectionCallbacks
+//You can exclude main methods in one interface
+//And others in another which isn't necessary
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
     public static final String TAG = "LCYCLE" + OutgoingCallFragment.class.getSimpleName();
