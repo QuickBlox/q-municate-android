@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 /**
  * Created on 4/9/15.
+ * Calls for storing all sessions.
  *
  * @author Bogatov Evgeniy bogatovevgeniy@gmail.com
  */

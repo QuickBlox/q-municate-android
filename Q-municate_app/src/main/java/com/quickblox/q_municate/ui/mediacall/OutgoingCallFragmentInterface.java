@@ -13,7 +13,7 @@ public interface OutgoingCallFragmentInterface {
     void offCam();
     void switchCam();
     void switchSpeaker();
-    void hungUpClick();
+    void hangUpClick();
     void onLocalVideoViewCreated();
     void onRemoteVideoViewCreated();
 }
