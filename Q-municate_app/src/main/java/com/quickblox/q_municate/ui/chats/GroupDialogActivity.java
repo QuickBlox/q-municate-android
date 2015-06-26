@@ -61,9 +61,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
 
         initCursorLoaders();
-        startLoadDialogMessages();
+        updateActionBar();
+//        startLoadDialogMessages();
         setCurrentDialog(dialog);
 
 //        registerForContextMenu(messagesListView);
@@ -123,8 +125,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void initListView(Cursor messagesCursor) {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this,
-                dialog);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
         scrollListView();
@@ -202,10 +203,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        updateDialogData();
 
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
+//        updateDialogData();
+//
+//        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+//            scrollListView();
+//        }
     }
 }

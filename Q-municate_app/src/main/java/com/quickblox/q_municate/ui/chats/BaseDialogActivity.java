@@ -77,6 +77,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener {
 
+    private static final String TAG = BaseDialogActivity.class.getSimpleName();
+
     private static final int TYPING_DELAY = 1000;
     private static final int MESSAGES_LOADER_ID = 0;
 
@@ -116,12 +118,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private int firstVisiblePositionList;
     private View loadMoreView;
     private boolean loadingMore = true;
-    private int skipMessages;
+    protected int skipMessages;
     private int totalEntries;
     private int loadedItems;
     private boolean firstItemInList;
     private int totalItemCountInList;
     private int firstVisiblePosition;
+    private int lastVisiblePosition;
+    private int visibleItemCount;
+    private boolean isFirstUpdateListView = true;
+
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -160,14 +166,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
 
+        isNeedToScrollMessages = true;
         initUI();
         initListeners();
         initActionBar();
-
         addActions();
-
-        isNeedToScrollMessages = true;
-
         initLocalBroadcastManagers();
         hideSmileLayout();
     }
@@ -208,6 +211,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (isNeedToOpenDialog) {
             finish();
         }
+
+
+
+        if (skipMessages == ConstsCore.ZERO_INT_VALUE){
+            startLoadDialogMessages();
+//            scrollListView();
+        } else {
+//            messagesListView.
+//            isNeedToScrollMessages = true;
+//            scrollListView();
+        }
+
     }
 
     @Override
@@ -459,8 +474,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingView = _findViewById(R.id.message_typing_view);
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
-        loadMoreView = _findViewById(R.id.load_more_linearlayout);
-        loadMoreView.setVisibility(View.GONE);
+//        loadMoreView = _findViewById(R.id.load_more_linearlayout);
+//        loadMoreView.setVisibility(View.GONE);
         messagesListView.setOnScrollListener(this);
     }
 
@@ -483,6 +498,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
         firstVisiblePosition = firstVisibleItem;
+        lastVisiblePosition = firstVisibleItem + visibleItemCount;
+        this.visibleItemCount = visibleItemCount;
 //        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
 //        totalItemCountInList = totalItemCount;
     }
@@ -507,7 +524,31 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             initListView(messagesCursor);
         } else {
             messagesAdapter.swapCursor(messagesCursor);
+//            messagesAdapter.changeCursor(messagesCursor);
+
+//            if (isFirstUpdateListView){
+//                messagesListView.setSelection(messagesAdapter.getCount() - 1);
+//                isFirstUpdateListView = false;
+//            } else if (totalEntries > 0) {
+                messagesListView.setSelection(totalEntries - 1);
+//            }
         }
+
+//        if (isFirstUpdateListView){
+//            messagesListView.setSelection(messagesAdapter.getCount() - 1);
+//            isFirstUpdateListView = false;
+//        } else if (totalEntries > 0) {
+//            messagesListView.setSelection(totalEntries - 1);
+//        }
+
+//        isFirstUpdateListView = false;
+
+
+//        else {
+////            isNeedToScrollMessages = true;
+//            scrollListView();
+//        }
+//        hideActionBarProgress();
     }
 
     @Override
@@ -736,16 +777,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             loadingMore = true;
 //            loadMoreView.setVisibility(View.GONE);
 
-            if (skipMessages != 0) {
-//                messagesListView.setSelection(0);
-//                scrollListView();
-//                messagesListView.invalidate();
-//                messagesListView.smoothScrollToPosition(skipMessages);
-                messagesListView.setSelection(ConstsCore.DIALOG_MESSAGES_PER_PAGE - 1);
-//                messagesListView.setSelection(messagesListView.getCount() - 1);
-//                messagesListView.
-            }
-
             hideActionBarProgress();
         }
     }
@@ -756,10 +787,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             loadingMore = true;
 //            loadMoreView.setVisibility(View.GONE);
-
-            if (skipMessages != 0) {
-                messagesListView.setSelection(0);
-            }
 
             hideActionBarProgress();
         }
