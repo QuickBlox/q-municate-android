@@ -81,6 +81,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
         friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
+        skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
 
         initCursorLoaders();
         initActionBar();
@@ -271,11 +272,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onResume() {
         super.onResume();
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
 
-        startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
 
         checkMessageSendingPossibility();

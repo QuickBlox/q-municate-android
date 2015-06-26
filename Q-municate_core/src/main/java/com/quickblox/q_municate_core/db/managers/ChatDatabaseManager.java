@@ -230,6 +230,8 @@ public class ChatDatabaseManager {
             messageCache = getMessageCacheFromCursor(cursor);
         }
 
+        cursor.close();
+
         return messageCache;
     }
 
@@ -426,6 +428,7 @@ public class ChatDatabaseManager {
             values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
             resolver.insert(NotSendMessageTable.CONTENT_URI, values);
         }
+        cursor.close();
     }
 
     private static String parseMessageBody(Context context, MessageCache messageCache) {
