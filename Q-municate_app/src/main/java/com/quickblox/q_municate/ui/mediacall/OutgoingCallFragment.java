@@ -8,8 +8,6 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +26,6 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
-import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
@@ -37,12 +34,14 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 
+//TODO
+//A lot of methods to implement in QBRTCClientConnectionCallbacks
+//You can exclude main methods in one interface
+//And others in another which isn't necessary
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
     public static final String TAG = "LCYCLE" + OutgoingCallFragment.class.getSimpleName();
@@ -330,7 +329,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     public void stopCall() {
         if (outgoingCallFragmentInterface != null) {
-            outgoingCallFragmentInterface.hungUpClick();
+            outgoingCallFragmentInterface.hangUpClick();
         }
         stopTimer();
 

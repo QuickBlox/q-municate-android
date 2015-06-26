@@ -11,8 +11,13 @@ import org.webrtc.SessionDescription;
 import java.util.List;
 
 /**
+ * Implementation of {@link com.quickblox.videochat.webrtc.callbacks.RTCSignallingMessageProcessorCallback}
+ * to reduce unnecessary code
+ *
  * Created by PC on 19.05.2015.
  */
+
+
 public class RTCSignallingMessageProcessorCallbackImpl implements RTCSignallingMessageProcessorCallback {
 
     private static final String TAG = RTCSignallingMessageProcessorCallbackImpl.class.getSimpleName();

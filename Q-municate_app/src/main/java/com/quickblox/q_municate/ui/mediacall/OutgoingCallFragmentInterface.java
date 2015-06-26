@@ -1,10 +1,13 @@
 package com.quickblox.q_municate.ui.mediacall;
 
-import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
-
 /**
  * Created by tereha on 07.04.15.
  */
+//TODO
+//onMic() , offMic(); have the same responsibility for one action
+
+//TODO
+//Again interface is responsible for many actions
 public interface OutgoingCallFragmentInterface {
 
     void onMic();
@@ -13,7 +16,7 @@ public interface OutgoingCallFragmentInterface {
     void offCam();
     void switchCam();
     void switchSpeaker();
-    void hungUpClick();
+    void hangUpClick();
     void onLocalVideoViewCreated();
     void onRemoteVideoViewCreated();
 }

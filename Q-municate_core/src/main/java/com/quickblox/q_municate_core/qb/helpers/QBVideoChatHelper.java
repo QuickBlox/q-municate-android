@@ -1,5 +1,63 @@
 package com.quickblox.q_municate_core.qb.helpers;
 
+
+/**
+ * The main class of video and audio calls.
+ * All non UI logic and interaction with Quickblox SDK execute here.
+ *
+ *
+ *
+ * There are 4 inner classes:
+ *
+ * Two of them response for {@link com.quickblox.videochat.webrtc.QBRTCClient} callbacks processing, it is:
+ * SessionCallbacksListener - session callbacks (receive new call, call accepted, call rejected, call hanged up)
+ * VideoTracksCallbacksListener - new local {@link org.webrtc.VideoTrack} or remote ones was created and requires to set them up {@link com.quickblox.videochat.webrtc.view.VideoCallBacks}
+ *
+ * {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListenerImpl} - listen creation of new {@link com.quickblox.chat.QBWebRTCSignaling}
+ * and once it was created set it up to QBRTCClient via {@link com.quickblox.videochat.webrtc.QBRTCClient.getInstance().addSignaling()}
+ *
+ * {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.RTCSignallingMessageProcessorCallbackListener} added to process calls in background until {@link android.content.Context}
+ * instance was created.
+ *
+ *
+ *
+ *                          <h1> ----- PROCESSING CALLS IN BACKGROUND ----- </h1>
+ *
+ * For background calls processing you should wake next steps.
+ *
+ * <ul>
+ *     <li> Init {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListener} listener</li>
+ *     <li> Set up {@link com.quickblox.videochat.webrtc.QBRTCClient} and add listeners to it;</li>
+ *     <li> Start UI components when income call was received and subscribe on callbacks from {@link com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener};</li>
+ *     <li> Throw call to UI components via {@link com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener};</li>
+ *</ul>
+ *
+ *                          <h2> --- ADDITIONAL DESCRIPTION for list about --- </h2>
+ *
+ * I. Process of initiation {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListenerImpl}
+ * listener is shown in {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListenerImpl} inner class
+ *
+ *
+ * II. Process of sating up {@link com.quickblox.videochat.webrtc.QBRTCClient} are represented below:
+ *  -- ex: Setting up QBRTCClient --
+ * <code>
+ *  QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getRTCSignallingProcessorCallback());
+ *  QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
+ *  QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
+ * </code>
+ * NOTE!!! If you don't set up QBRTClient callbacks wont be notified about current call's state
+ *
+ *
+ * III. Start UI components when income call was received and subscribe on callbacks from the VideoChatHelper mean:
+ * <ul>
+ *     <li>Start your call activity</li>
+ *     <li>Call {@link com.quickblox.videochat.webrtc.QBRTCClient.getInstance().prepareToProcessCalls(this);}</li>
+ *     <li>Subscribe call activity on listening callbacks from VideoChatHelper</li>
+ * </ul>
+ *
+ *
+ */
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,18 +75,17 @@ import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
+import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.RTCSignallingMessageProcessorCallback;
-import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
 import org.webrtc.SessionDescription;
 import org.webrtc.VideoCapturerAndroid;
-import org.webrtc.VideoRenderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,13 +110,8 @@ public class QBVideoChatHelper extends BaseHelper {
     private VideoTracksCallbacksListener videoTracksCallbacksListener;
     private RTCSignallingMessageProcessorCallback smackMessageProcessorCallbacksListener;
 
-    // VideoChat
-    private QBGLVideoView renderingView;
-    private QBRTCSession currentSession;
-
     // inner classes instances
     private SessionManager sessionManager;
-    private List<SessionVideoTracksPull> sessionVideoTracksList;
     private boolean isClientClosed;
     private String currentSessionId;
     private VideoHelperStates vieoChatHelperState;
@@ -69,7 +121,6 @@ public class QBVideoChatHelper extends BaseHelper {
         super(context);
         Log.d(CALL_INTEGRATION, "construct  QBVideoChatHelper");
         videoChatListenersList = new ArrayList<>();
-        sessionVideoTracksList = new ArrayList<>();
         // init inner classes
         sessionManager = new SessionManager();
     }
@@ -92,7 +143,7 @@ public class QBVideoChatHelper extends BaseHelper {
         Log.d(CALL_INTEGRATION, "QBVideoChatHelper. setUpCallClient");
         isClientClosed = false;
 
-//        QBRTCConfig.setAnswerTimeInterval(60);
+        QBRTCConfig.setAnswerTimeInterval(45);
 
         QBRTCClient.getInstance().setCameraErrorHendler(new VideoCapturerAndroid.CameraErrorHandler() {
             @Override
@@ -106,7 +157,7 @@ public class QBVideoChatHelper extends BaseHelper {
         });
 
         Log.d(CALL_INTEGRATION, "Add callbacks listeners");
-        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getSmackSignallingProcessorCallback());
+        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getRTCSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
     }
@@ -163,7 +214,7 @@ public class QBVideoChatHelper extends BaseHelper {
         return videoTracksCallbacksListener;
     }
 
-    public RTCSignallingMessageProcessorCallback getSmackSignallingProcessorCallback() {
+    public RTCSignallingMessageProcessorCallback getRTCSignallingProcessorCallback() {
         return smackMessageProcessorCallbacksListener;
     }
 
@@ -309,17 +360,6 @@ public class QBVideoChatHelper extends BaseHelper {
             }
         }
     }
-
-    private SessionVideoTracksPull getSessionVideoTracksPullBySession(QBRTCSession session) {
-        SessionVideoTracksPull result = null;
-        for (SessionVideoTracksPull pull : sessionVideoTracksList) {
-            if (pull.getSession().equals(session)) {
-                result = pull;
-            }
-        }
-        return result;
-    }
-
 
     /**
      * Class for SmackSignalling processing
@@ -483,64 +523,21 @@ public class QBVideoChatHelper extends BaseHelper {
         }
     }
 
-    private class SessionVideoTracksPull {
-
-        private QBRTCSession session;
-        private QBRTCVideoTrack locacalVideoTrack;
-        private Map<Integer, QBRTCVideoTrack> remoteVideoTrackMap;
-
-        public SessionVideoTracksPull(QBRTCSession session) {
-            this.session = session;
-            remoteVideoTrackMap = new HashMap<>();
-        }
-
-        public QBRTCVideoTrack getLocacalVideoTrack() {
-            return locacalVideoTrack;
-        }
-
-        public void setLocalVideoTrack(QBRTCVideoTrack locacalVideoTrack) {
-            this.locacalVideoTrack = locacalVideoTrack;
-        }
-
-        public QBRTCVideoTrack getRemoteVideoTrack(Integer userId) {
-            return remoteVideoTrackMap.get(userId);
-        }
-
-        public void addRemoteVideoTrack(Integer userID, QBRTCVideoTrack remoteVideoTrack) {
-            remoteVideoTrackMap.put(userID, remoteVideoTrack);
-        }
-
-        public QBRTCSession getSession() {
-            return session;
-        }
-    }
-
-
-    private class VideoCallRendererCallbacks {
-
-        private VideoRenderer.Callbacks localRenderer;
-        private VideoRenderer.Callbacks remoteRenderer;
-
-        public void setLocalRendererCallback(VideoRenderer.Callbacks renderer) {
-            this.localRenderer = renderer;
-        }
-
-        public void setRemoteRendererCallback(VideoRenderer.Callbacks renderer) {
-            this.remoteRenderer = renderer;
-        }
-
-        public VideoRenderer.Callbacks getLocalRendererCallback() {
-            return localRenderer;
-        }
-
-        public VideoRenderer.Callbacks getRemoteRendererCallback() {
-            return remoteRenderer;
-        }
-    }
-
     public enum VideoHelperStates {
+
+        /**
+         * There is no call signalling was receives. Instance wait for incoming signal.
+         */
         WAIT_FOR_CALL,
+
+        /**
+         * Signalling was received. But {@link QBRTCClient} instance doesn't process signalling till now.
+         */
         RECEIVE_INCOME_CALL_MESSAGE,
+
+        /**
+         * Signalling are processing by {@link QBRTCClient}
+         */
         RTC_CLIENT_PROCESS_CALLS,
     }
 }
