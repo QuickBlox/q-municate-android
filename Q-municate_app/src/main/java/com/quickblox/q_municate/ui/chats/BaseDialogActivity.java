@@ -523,15 +523,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (messagesAdapter == null) {
             initListView(messagesCursor);
         } else {
-            messagesAdapter.swapCursor(messagesCursor);
-//            messagesAdapter.changeCursor(messagesCursor);
+//            messagesAdapter.swapCursor(messagesCursor);
+            messagesAdapter.changeCursor(messagesCursor);
+//            messagesAdapter.notifyDataSetChanged();
 
 //            if (isFirstUpdateListView){
 //                messagesListView.setSelection(messagesAdapter.getCount() - 1);
 //                isFirstUpdateListView = false;
-//            } else if (totalEntries > 0) {
-                messagesListView.setSelection(totalEntries - 1);
-//            }
+            if (totalEntries > 0) {
+                messagesListView.setSelection(totalEntries);
+            }
         }
 
 //        if (isFirstUpdateListView){
@@ -678,10 +679,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-        if (isNeedToScrollMessages) {
+//        if (isNeedToScrollMessages) {
             isNeedToScrollMessages = false;
             messagesListView.setSelection(messagesAdapter.getCount() - 1);
-        }
+//        }
     }
 
     abstract QBDialog getQBDialog();
@@ -834,7 +835,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
-                updateDialogData();
+//                updateDialogData();
+//                scrollListView();
             }
         }
     }
