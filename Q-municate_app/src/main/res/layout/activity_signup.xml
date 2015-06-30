@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/sup_fullname_hint"
         android:inputType="textPersonName"
-        android:maxLength="128" />
+        android:maxLength="50"
+        />
 
     <EditText
         android:id="@+id/email_textview"
@@ -30,7 +31,7 @@
         android:layout_marginTop="10dp"
         android:hint="@string/lgn_password_hint"
         android:inputType="textPassword"
-        android:maxLength="256" />
+        android:maxLength="40" />
 
     <LinearLayout
         android:layout_width="match_parent"

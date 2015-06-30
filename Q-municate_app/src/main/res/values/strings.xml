@@ -227,6 +227,11 @@
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
     <string name="error_email_already_taken">email has already been taken</string>
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
+    <string name="error_is_too_long_maximum_is_50_characters">full_name is too long (maximum is 50 characters)</string>
+    <string name="error_is_too_long_maximum_is_50_characters_from_app">Name mustn\'t be more than 50 characters</string>
+    <string name="error_name_must_be_more_than_2_characters_fron_app">Name must be more than 2 characters</string>
+    <string name="error_name_must_do_not_contain_special_characters">Name mustn\’t contain \'&lt;\', \'&gt;\' and \';\' characters</string>
+
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
