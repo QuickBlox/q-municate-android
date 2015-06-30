@@ -347,7 +347,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 //        sessionId = extras.getString(ConstsCore.SESSION_ID, "");
         opponent = (User) extras.getSerializable(ConstsCore.EXTRA_FRIEND);
 
-        Log.i(TAG, "opponentId=" + opponent);
+        Log.i(TAG, "opponentId = " + opponent);
     }
 
     private void initCallTasksMap() {
@@ -377,27 +377,10 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     private void executeCallTask(Runnable runnable) {
-
-
-
         if (videoChatHelper != null) {
             runOnUiThread(runnable);
         } else {
             callTasksQueue.add(runnable);
-//            Toast.makeText(this, VIDEOCHAT_HAS_NOT_REDY + "." +  TASK_WILL_BE_EXECUTED_IN_NEAREST_TIME, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (videoChatHelper != null) {
-            try {
-                videoChatHelper.setCamState(true);
-            } catch (QBRTCSessionIsAbsentException e) {
-                Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to true");
-            }
-//            videoChatHelper.addVideoChatHelperListener(this);
         }
     }
 
@@ -412,7 +395,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             getLocalVideoView().onResume();
         }
 
-        if (getLocalVideoView() != null){
+        if (getRemoteVideoView() != null){
             getRemoteVideoView().onResume();
         }
     }
@@ -427,26 +410,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             getLocalVideoView().onPause();
         }
 
-        if (getLocalVideoView() != null){
+        if (getRemoteVideoView() != null){
             getRemoteVideoView().onPause();
         }
     }
 
-
-    @Override
-    protected void onStop() {
-        Log.d(CALL_INTEGRATION, "Stop call activity " + this);
-        super.onStop();
-
-        if (videoChatHelper != null) {
-//            videoChatHelper.removeVideoChatHelperListener(this);
-            try {
-                videoChatHelper.setCamState(false);
-            } catch (QBRTCSessionIsAbsentException e) {
-                Log.d(CALL_INTEGRATION, e.getMessage() + " setMicState to false");
-            }
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -717,9 +685,11 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
      */
     private void executeScheduledTasks() {
         Log.d(CALL_INTEGRATION, "CallActivity. executeScheduledTasks");
-        for (Runnable task : callTasksQueue) {
+        if(videoChatHelper != null) {
+            for (Runnable task : callTasksQueue) {
 //            callTasksHandler.post(task);
-            runOnUiThread(task);
+                runOnUiThread(task);
+            }
         }
     }
 
@@ -761,6 +731,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 try {
                     videoChatHelper.rejectCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
+
                     Log.d(CALL_INTEGRATION, e.getMessage() + " rejectCall");
                 }
             }
@@ -860,6 +831,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 try {
                     videoChatHelper.hangUpCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
+                    videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.WAIT_FOR_CALL);
                     CallActivity.this.finish();
                     Log.d(CALL_INTEGRATION, e.getMessage() + " hangUpCall");
                 }

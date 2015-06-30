@@ -89,8 +89,10 @@ import org.webrtc.VideoCapturerAndroid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -115,6 +117,7 @@ public class QBVideoChatHelper extends BaseHelper {
     private boolean isClientClosed;
     private String currentSessionId;
     private VideoHelperStates vieoChatHelperState;
+    private Set<String> incomingSessionsSet;
 
 
     public QBVideoChatHelper(Context context) {
@@ -129,6 +132,7 @@ public class QBVideoChatHelper extends BaseHelper {
         Log.d(CALL_INTEGRATION, "init QBVideoChatHelper");
         this.chatService = chatService;
         this.chatService.getVideoChatWebRTCSignalingManager().addSignalingManagerListener(new SignallingManagerListenerImpl());
+        incomingSessionsSet = new HashSet<>();
         sessionCallbacksListener = new SessionCallbacksListener();
         videoTracksCallbacksListener = new VideoTracksCallbacksListener();
         smackMessageProcessorCallbacksListener = new RTCSignallingMessageProcessorCallbackListener();
@@ -234,6 +238,10 @@ public class QBVideoChatHelper extends BaseHelper {
             QBRTCSession newSessionWithOpponents = QBRTCClient.getInstance().createNewSessionWithOpponents(opponents, qbConferenceType);
 
             setCurrentSession(newSessionWithOpponents);
+
+            if(getCurrentSession() != null)
+                Log.d(CALL_INTEGRATION, "QBVideoChatHelper. startCall cur session is " + getCurrentSession().getSessionID());
+
             newSessionWithOpponents.startCall(userInfo);
         }
     }
@@ -372,7 +380,8 @@ public class QBVideoChatHelper extends BaseHelper {
             if (activityClass != null) {
                 if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE.ordinal()) {
                     // Check is new income call was early
-                    if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())) {
+                    if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())
+                            && !incomingSessionsSet.contains(qbrtcSessionDescription.getSessionId())) {
                         Log.d(CALL_INTEGRATION, "Receive call from user");
                         setVideoChatHelperState(VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE);
                         startCallActivity(qbrtcSessionDescription);
@@ -380,6 +389,7 @@ public class QBVideoChatHelper extends BaseHelper {
                         Log.d(CALL_INTEGRATION, "Call with same ID received");
                     }
                 } else {
+                    incomingSessionsSet.add(qbrtcSessionDescription.getSessionId());
                     Log.d(CALL_INTEGRATION, "Video chat helper already process some call");
                 }
             } else {
@@ -409,7 +419,10 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onReceiveNewSession(QBRTCSession session) {
-            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. RTCClient. onReceiveNewSession");
+            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. RTCClient. onReceiveNewSession for session id " + session.getSessionID());
+            if(getCurrentSession() != null)
+                Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onSeonReceiveNewSessionssionClosed cur session is " + getCurrentSession());
+
             boolean isEqualsLastSessionId = session.getSessionID().equals(sessionManager.getLastSessionId());
 
             if (getVideoChatHelperState().ordinal() < VideoHelperStates.RTC_CLIENT_PROCESS_CALLS.ordinal()) {
@@ -444,7 +457,9 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onCallRejectByUser(QBRTCSession session, Integer integer, Map<String, String> map) {
-            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onCallRejectByUser");
+            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onCallRejectByUser for session id " + session.getSessionID());
+            if(getCurrentSession() != null)
+                Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onCallRejectByUser cur session is " + getCurrentSession().getSessionID());
             if (session.equals(getCurrentSession())) {
                 for (VideoChatHelperListener listener : videoChatListenersList) {
                     listener.onCallRejectByUser(integer, map);
@@ -454,7 +469,10 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onReceiveHangUpFromUser(QBRTCSession session, Integer integer) {
-            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onReceiveHangUpFromUser");
+            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onReceiveHangUpFromUser for session id " + session.getSessionID());
+            if(getCurrentSession() != null)
+                Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onReceiveHangUpFromUser cur session is " + getCurrentSession().getSessionID());
+
             if (session.equals(getCurrentSession())) {
                 for (VideoChatHelperListener listener : videoChatListenersList) {
                     listener.onReceiveHangUpFromUser(integer);
@@ -464,7 +482,11 @@ public class QBVideoChatHelper extends BaseHelper {
 
         @Override
         public void onSessionClosed(QBRTCSession session) {
-            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onSessionClosed");
+            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onSessionClosed for session id " + session.getSessionID());
+            if(getCurrentSession() != null)
+            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onSessionClosed cur session is " + getCurrentSession().getSessionID());
+
+
             if (session.equals(getCurrentSession())) {
                 Log.d(CALL_INTEGRATION, "Notify listebers in count of " +
                         videoChatListenersList.size() + " about onSessionClosed call");

@@ -44,10 +44,13 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
     @Override
     public void onPause() {
-        toggleCamera(false);
-        if (cameraState == null) {
-            cameraState = CameraState.NONE;
+        if (isCallStopped()) {
+            toggleCamera(false);
+            if (cameraState == null) {
+                cameraState = CameraState.NONE;
+            }
         }
+
         super.onPause();
     }
 
@@ -108,38 +111,22 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
     private void toggleCamera(boolean isCameraEnabled) {
         if (outgoingCallFragmentInterface != null){
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            displaymetrics.setToDefaults();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
             ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
-
-//            ViewGroup.LayoutParams videoViewLayoutParams = videoView.getLayoutParams();
-//            int videoViewHeight = videoView.getHeight();
-//            int videoViewWidth = videoView.getWidth();
 
             int videoViewHeight = localVideoView.getHeight();
             int videoViewWidth = localVideoView.getWidth();
-
-//        Log.d(TAG, "height - videoViewHeight " + (height - videoViewHeight) + " width-videoViewWidth " + (width - videoViewWidth) + "");
-
-
-
-//            layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 33));
-//            layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
 
             layoutParams.height = videoViewHeight;
             layoutParams.width = videoViewWidth;
             imgMyCameraOff.setLayoutParams(layoutParams);
 
             if (!isCameraEnabled){
-//                isVideoEnabled = false;
                 switchCameraButton.setVisibility(View.INVISIBLE);
                 cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
                 outgoingCallFragmentInterface.offCam();
             } else {
-//                isVideoEnabled = true;
                 switchCameraButton.setVisibility(View.VISIBLE);
                 cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);

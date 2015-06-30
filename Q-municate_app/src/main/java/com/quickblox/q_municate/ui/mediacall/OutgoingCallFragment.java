@@ -75,9 +75,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     protected QBVideoChatHelper videoChatHelper;
     private IntentFilter intentFilter;
     private AudioStreamReceiver audioStreamReceiver;
-    protected boolean callIsStarted;
-    private Handler showIncomingCallWindowTaskHandler;
-    private Runnable showIncomingCallWindowTask;
+    private boolean callStateStopped;
 
 
     protected void initUI(View rootView) {
@@ -128,7 +126,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
 
-               QBGLVideoView localVideoView = ((CallActivity) getActivity()).getLocalVideoView();
+                QBGLVideoView localVideoView = ((CallActivity) getActivity()).getLocalVideoView();
                 if (localVideoView != null) {
 //                    localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
                 }
@@ -291,6 +289,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 switchAudioOutput();
                 break;
             case R.id.stopСallButton:
+                setCallState(true);
                 setActionButtonsEnability(false);
                 stopСallButton.setEnabled(false);
                 stopСallButton.setActivated(false);
@@ -369,6 +368,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     public QBVideoChatHelper getVideoChatHelper() {
         return videoChatHelper;
+    }
+
+    public void setCallState(boolean callStateStopped) {
+        this.callStateStopped = callStateStopped;
+    }
+
+    public boolean isCallStopped() {
+        return callStateStopped;
     }
 
     private class AudioStreamReceiver extends BroadcastReceiver {
