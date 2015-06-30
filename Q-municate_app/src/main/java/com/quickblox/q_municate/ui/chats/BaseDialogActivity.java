@@ -531,7 +531,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 //                messagesListView.setSelection(messagesAdapter.getCount() - 1);
 //                isFirstUpdateListView = false;
             if (totalEntries > 0) {
-                messagesListView.setSelection(totalEntries);
+                messagesListView.setSelection(totalEntries - 1);
             }
         }
 
