@@ -448,7 +448,7 @@ public class ChatDatabaseManager {
 
                 StringBuilder result = new StringBuilder();
 
-                // Store on \n positions in message
+                // Store \n positions in message
                 Set<Integer> newLinePositons = new HashSet<>();
                 Pattern p = Pattern.compile("\n");
                 Matcher m = p.matcher(messageCache.getMessage());

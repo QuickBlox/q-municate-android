@@ -44,7 +44,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
     @Override
     public void onPause() {
-        if (isCallStopped()) {
+        if (!isCallStopped()) {
             toggleCamera(false);
             if (cameraState == null) {
                 cameraState = CameraState.NONE;
