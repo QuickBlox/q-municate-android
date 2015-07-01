@@ -42,11 +42,4 @@ public interface VideoChatHelperListener {
 
     void onRemoteVideoTrackReceive(QBRTCVideoTrack videoTrack, Integer userID);
 
-    /**
-     * Additional callback for notifying UI components that QBRTCClient starts process calls and current session exists.
-     * It's necessary when we take decision store call tasks in queue of waiting tasks or start execute it directly on
-     * QBVideoChatHelper instance
-     */
-
-    void onClientReady();
 }

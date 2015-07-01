@@ -44,7 +44,6 @@ public class SessionManager {
         for (QBRTCSession session : sessionList) {
             if (session.getSessionID().equals(sessionID)) {
                 result = session;
-                Log.d("CALL_INTEGRATION", "SessionManager. Get session successful");
                 break;
             }
         }
