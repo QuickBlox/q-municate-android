@@ -48,24 +48,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private static final String CALL_INTEGRATION = "CALL_INTEGRATION";
     protected User opponent;
     private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
-    private boolean bounded;
-    private QBService service;
-    private Timer callTimer;
-    private String sessionId;
-
     protected OutgoingCallFragmentInterface outgoingCallFragmentInterface;
 
-
-    private ArrayList<Integer> opponents;
-    private int startReason;
-    private QBRTCSessionDescription sessionDescription;
-
-    private Map<String, String> userInfo;
-    //    private boolean isVideoEnabled = true;
     private boolean isAudioEnabled = true;
-    private List<QBUser> allUsers = new ArrayList<>();
-    private boolean isMessageProcessed;
-    private QBRTCTypes.QBConferenceType call_type;
     private ToggleButton muteDynamicButton;
     private ImageButton stopСallButton;
     private ToggleButton muteMicrophoneButton;
@@ -125,16 +110,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 ((CallActivity) getActivity()).stopIncomeCallTimer();
                 startTimer(timerTextView);
                 setActionButtonsEnability(true);
-
-                QBGLVideoView localVideoView = ((CallActivity) getActivity()).getLocalVideoView();
-                if (localVideoView != null) {
-//                    localVideoView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                }
-
-                QBGLVideoView remoteView = ((CallActivity) getActivity()).getRemoteVideoView();
-                if (remoteView != null) {
-//                    remoteView.setVideoViewOrientation(QBGLVideoView.ORIENTATION_MODE.portrait.getDegreeRotation());
-                }
             }
         });
     }
@@ -221,29 +196,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     public void onStart() {
         Log.d(TAG, "onStart()");
         super.onStart();
-//        if (!callIsStarted) {
             Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onStart");
             QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-//        }
-//
-//        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. getArguments " + getArguments());
-//        if (getArguments() != null) {
-//            ConstsCore.CALL_DIRECTION_TYPE directionType = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
-//            if (directionType == ConstsCore.CALL_DIRECTION_TYPE.OUTGOING && !callIsStarted) {
-//                Log.d(CALL_INTEGRATION, "OutgoingCallFragment. Start call");
-//
-//                //TODO why we call this metho here
-//                ((CallActivity) getActivity()).startCall();
-//                callIsStarted = true;
-//            }
-//        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
-//        QBRTCClient.getInstance().removeConnectionCallbacksListener(OutgoingCallFragment.this);
     }
 
     @Override
@@ -273,13 +233,10 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (call_direction_type != null) {
             return;
         }
+
         call_direction_type = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (User) getArguments().getSerializable(ConstsCore.EXTRA_FRIEND);
-        call_type = (QBRTCTypes.QBConferenceType) getArguments().getSerializable(
-                ConstsCore.CALL_TYPE_EXTRA);
-        sessionId = getArguments().getString(ConstsCore.SESSION_ID, "");
-
     }
 
     @Override

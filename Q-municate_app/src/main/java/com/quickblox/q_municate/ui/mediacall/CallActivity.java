@@ -54,10 +54,8 @@ import java.util.concurrent.TimeUnit;
  * There are few {@link Map} which store tasks:
  * <ul>
  *      <li>{@link #callTasksMap} - it's just </li>
- *      <li>{@link #waitingTasksMap}} - it's map of waiting client readiness tasks</li>
  * </ul>
  *
- * When {@link CallActivity#onClientReady()} method called all {@link #waitingTasksMap}} will be executed.
  *
  *
  */
@@ -110,11 +108,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
      */
     private Queue<Runnable> callTasksQueue;
 
-    /**
-     * Map of waiting tasks
-     */
-    private Map<String, Runnable> waitingTasksMap;
-
 
     // Thre fields for closing activity if user didn't response in a set period.
     private Runnable closeIncomeCallTimerTask;
@@ -138,7 +131,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     private MediaPlayerManager mediaPlayer;
     private Map<String, String> userInfo = new HashMap<String, String>();
-    private boolean isCleintReadyAccept;
 
 
     /**
@@ -163,11 +155,9 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
      * Start call task
      */
     public void startCall() {
-        if (waitingTasksMap != null && !waitingTasksMap.containsKey(REJECT_CALL_TASK)) {
             Log.d(CALL_INTEGRATION, "CallActivity. startCall() executed");
             Runnable callTask = callTasksMap.get(START_CALL_TASK);
             executeCallTask(callTask);
-        }
     }
 
 
@@ -179,12 +169,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         Log.d(CALL_INTEGRATION, "CallActivity. acceptCall() executed");
         cancelPlayer();
         showOutgoingFragment();
-        if (isCleintReadyAccept) {
             Runnable acceptTask = callTasksMap.get(ACCEPT_CALL_TASK);
             executeCallTask(acceptTask);
-        } else {
-            waitingTasksMap.put(ACCEPT_CALL_TASK, callTasksMap.get(ACCEPT_CALL_TASK));
-        }
     }
 
     /**
@@ -194,12 +180,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void rejectCallClick() {
         Log.d(CALL_INTEGRATION, "CallActivity. rejectCall() executed");
         cancelPlayer();
-        if (isCleintReadyAccept) {
             Runnable rejectTask = callTasksMap.get(REJECT_CALL_TASK);
             executeCallTask(rejectTask);
-        } else {
-            waitingTasksMap.put(REJECT_CALL_TASK, callTasksMap.get(REJECT_CALL_TASK));
-        }
     }
 
     /**
@@ -305,8 +287,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         Log.d(CALL_INTEGRATION, "onCreate call activity" + this);
 
-        Log.d(CALL_INTEGRATION, "CallActivity. QBRTCClient start listening calls");
-        QBRTCClient.getInstance().prepareToProcessCalls(this);
+
 
         if(getIntent().getExtras() != null) {
             parseIntentExtras(getIntent().getExtras());
@@ -326,9 +307,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             videoTracksSetEnumMap.put(videoTracks, new HashSet<Runnable>());
         }
 
-        // Map of task which called before RTCClient was redy to processing calls
-        waitingTasksMap = new TreeMap<>();
-
         // Init map of allowed call's tasks
         initCallTasksMap();
 
@@ -344,7 +322,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         call_direction_type = (ConstsCore.CALL_DIRECTION_TYPE) extras.getSerializable(
                 ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
         call_type = (QBRTCTypes.QBConferenceType) extras.getSerializable(ConstsCore.CALL_TYPE_EXTRA);
-//        sessionId = extras.getString(ConstsCore.SESSION_ID, "");
         opponent = (User) extras.getSerializable(ConstsCore.EXTRA_FRIEND);
 
         Log.i(TAG, "opponentId = " + opponent);
@@ -415,11 +392,20 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        stopCall();
+    }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         Log.d(CALL_INTEGRATION, "Destroy call activity" + this);
+        stopCall();
+    }
 
+    private void stopCall() {
         stopIncomeCallTimer();
         cancelPlayer();
 
@@ -431,8 +417,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             videoChatHelper.setClientClosed();
             videoChatHelper.removeVideoChatHelperListener(this);
         }
-
-        super.onDestroy();
     }
 
     // --- Init scheduler on closing activity if user did not responseon coll or didn't receive once --- //
@@ -527,28 +511,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         });
     }
 
-
-   /* // TODO REVIEW REQUIREMENT OF THIS METHOD
-    private void showOutgoingFragment(User opponentId,
-                                      QBRTCTypes.QBConferenceType callType, String sessionId) {
-
-        Log.d(CALL_INTEGRATION, "sCallActivity. showOutgoingFragment");
-// TODO WHY JUST FOR VIDEO FRAGMENT BUNDLE ARE USING
-        Bundle bundle = VideoCallFragment.generateArguments(opponentId,
-                call_direction_type, callType, sessionId);
-
-        OutgoingCallFragment outgoingCallFragment = (QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO.equals(
-                call_type)) ? new VideoCallFragment() : new VoiceCallFragment();
-        outgoingCallFragment.setArguments(bundle);
-
-        if (outgoingCallFragment instanceof VideoCallFragment) {
-            setCurrentFragment(outgoingCallFragment);
-        } else {
-            setCurrentFragment(outgoingCallFragment);
-        }
-    }*/
-
-
     // --------------- Manage call ringtones ------------ //
     private void playOutgoingRingtone() {
         if (mediaPlayer != null) {
@@ -594,11 +556,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void onReceiveHangUpFromUser(Integer integer) {
         Log.d(CALL_INTEGRATION, "CallActivity. onReceiveHangUpFromUser");
 
-        if(!isCleintReadyAccept){
-            waitingTasksMap.clear();
-            finish();
-        }
-
         if (currentFragment instanceof IncomingCallFragment
                 || currentFragment instanceof OutgoingCallFragment){
             showToastMessage(getString(R.string.user_hang_up_call));
@@ -609,6 +566,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void onSessionClosed() {
         Log.d(CALL_INTEGRATION, "CallActivity. onSessionClosed");
         cancelPlayer();
+        stopIncomeCallTimer();
         finish();
     }
 
@@ -633,18 +591,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         } else {
             initRemoteVideoTrack(videoTrack);
         }
-    }
-
-    @Override
-    public void onClientReady() {
-        Log.d(CALL_INTEGRATION, "CallActivity. onClientReady");
-        isCleintReadyAccept = true;
-
-        //Execute if call was accepted
-        for (String key : waitingTasksMap.keySet()) {
-            executeCallTask(waitingTasksMap.get(key));
-        }
-        waitingTasksMap.clear();
     }
 
     @Override

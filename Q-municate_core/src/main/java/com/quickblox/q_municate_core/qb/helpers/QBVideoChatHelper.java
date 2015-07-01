@@ -69,7 +69,6 @@ import com.quickblox.chat.QBWebRTCSignaling;
 import com.quickblox.chat.listeners.QBVideoChatSignalingManagerListener;
 import com.quickblox.q_municate_core.core.exceptions.QBRTCSessionIsAbsentException;
 import com.quickblox.q_municate_core.models.User;
-import com.quickblox.q_municate_core.qb.helpers.call.RTCSignallingMessageProcessorCallbackImpl;
 import com.quickblox.q_municate_core.qb.helpers.call.SessionManager;
 import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -81,10 +80,8 @@ import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientSessionCallbacks;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientVideoTracksCallbacks;
-import com.quickblox.videochat.webrtc.callbacks.RTCSignallingMessageProcessorCallback;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
-import org.webrtc.SessionDescription;
 import org.webrtc.VideoCapturerAndroid;
 
 import java.util.ArrayList;
@@ -110,12 +107,10 @@ public class QBVideoChatHelper extends BaseHelper {
     // Videochat listeners
     private SessionCallbacksListener sessionCallbacksListener;
     private VideoTracksCallbacksListener videoTracksCallbacksListener;
-    private RTCSignallingMessageProcessorCallback smackMessageProcessorCallbacksListener;
 
     // inner classes instances
     private SessionManager sessionManager;
     private boolean isClientClosed;
-    private String currentSessionId;
     private VideoHelperStates vieoChatHelperState;
     private Set<String> incomingSessionsSet;
 
@@ -124,6 +119,7 @@ public class QBVideoChatHelper extends BaseHelper {
         super(context);
         Log.d(CALL_INTEGRATION, "construct  QBVideoChatHelper");
         videoChatListenersList = new ArrayList<>();
+
         // init inner classes
         sessionManager = new SessionManager();
     }
@@ -135,7 +131,6 @@ public class QBVideoChatHelper extends BaseHelper {
         incomingSessionsSet = new HashSet<>();
         sessionCallbacksListener = new SessionCallbacksListener();
         videoTracksCallbacksListener = new VideoTracksCallbacksListener();
-        smackMessageProcessorCallbacksListener = new RTCSignallingMessageProcessorCallbackListener();
 
         vieoChatHelperState = VideoHelperStates.WAIT_FOR_CALL;
 
@@ -161,9 +156,12 @@ public class QBVideoChatHelper extends BaseHelper {
         });
 
         Log.d(CALL_INTEGRATION, "Add callbacks listeners");
-        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getRTCSignallingProcessorCallback());
+//        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getRTCSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
+
+        Log.d(CALL_INTEGRATION, "CallActivity. QBRTCClient start listening calls");
+        QBRTCClient.getInstance().prepareToProcessCalls(context);
     }
 
     public void initActivityClass(Class<? extends Activity> activityClass) {
@@ -218,9 +216,6 @@ public class QBVideoChatHelper extends BaseHelper {
         return videoTracksCallbacksListener;
     }
 
-    public RTCSignallingMessageProcessorCallback getRTCSignallingProcessorCallback() {
-        return smackMessageProcessorCallbacksListener;
-    }
 
     /**
      * Start call logic
@@ -362,51 +357,8 @@ public class QBVideoChatHelper extends BaseHelper {
         public void onRemoteVideoTrackReceive(QBRTCSession session, QBRTCVideoTrack videoTrack, Integer userID) {
             Log.d(CALL_INTEGRATION, "QBVideoChatHelper. onRemoteVideoTrackReceive");
 
-
             for (VideoChatHelperListener listener : videoChatListenersList) {
                 listener.onRemoteVideoTrackReceive(videoTrack, userID);
-            }
-        }
-    }
-
-    /**
-     * Class for SmackSignalling processing
-     */
-    private class RTCSignallingMessageProcessorCallbackListener extends RTCSignallingMessageProcessorCallbackImpl {
-
-        @Override
-        public void onReceiveCallFromUser(Integer integer, QBRTCSessionDescription qbrtcSessionDescription, SessionDescription sessionDescription) {
-            Log.d(CALL_INTEGRATION, "QBVideoChatHelper. SmackSignallingProcessorCallbackListener. onReceiveCallFromUser");
-            if (activityClass != null) {
-                if (getVideoChatHelperState().ordinal() < VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE.ordinal()) {
-                    // Check is new income call was early
-                    if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())
-                            && !incomingSessionsSet.contains(qbrtcSessionDescription.getSessionId())) {
-                        Log.d(CALL_INTEGRATION, "Receive call from user");
-                        setVideoChatHelperState(VideoHelperStates.RECEIVE_INCOME_CALL_MESSAGE);
-                        startCallActivity(qbrtcSessionDescription);
-                    } else {
-                        Log.d(CALL_INTEGRATION, "Call with same ID received");
-                    }
-                } else {
-                    incomingSessionsSet.add(qbrtcSessionDescription.getSessionId());
-                    Log.d(CALL_INTEGRATION, "Video chat helper already process some call");
-                }
-            } else {
-                Log.d(CALL_INTEGRATION, "Activity class wasn't sett till now");
-            }
-        }
-
-
-        @Override
-        public void onReceiveUserHungUpCall(Integer opponentID, QBRTCSessionDescription qbrtcSessionDescription) {
-            super.onReceiveUserHungUpCall(opponentID, qbrtcSessionDescription);
-            if (!qbrtcSessionDescription.getSessionId().equals(sessionManager.getLastSessionId())) {
-                for (VideoChatHelperListener listener : videoChatListenersList) {
-                    listener.onReceiveHangUpFromUser(opponentID);
-                }
-
-                setVideoChatHelperState(VideoHelperStates.WAIT_FOR_CALL);
             }
         }
     }
@@ -430,19 +382,16 @@ public class QBVideoChatHelper extends BaseHelper {
                 if (!isEqualsLastSessionId) {
                     setVideoChatHelperState(VideoHelperStates.RTC_CLIENT_PROCESS_CALLS);
                     Log.d(CALL_INTEGRATION, "On client receive new session");
-
+                    startCallActivity(session.getSessionDescription());
                     setCurrentSession(session);
 
-                    for (VideoChatHelperListener listener : videoChatListenersList) {
-                        listener.onClientReady();
-                    }
                 } else {
                     Log.d(CALL_INTEGRATION, "Call with same ID received");
                 }
             } else {
                 if (!isEqualsLastSessionId) {
                     sessionManager.addSession(session);
-                    session.rejectCall(getCurrentSession().getUserInfo());
+                    session.rejectCall(session.getUserInfo());
                 }
             }
         }
@@ -540,7 +489,6 @@ public class QBVideoChatHelper extends BaseHelper {
                 }
 
                 QBRTCClient.getInstance().addSignaling((QBWebRTCSignaling) qbSignaling);
-
             }
         }
     }
@@ -552,14 +500,10 @@ public class QBVideoChatHelper extends BaseHelper {
          */
         WAIT_FOR_CALL,
 
-        /**
-         * Signalling was received. But {@link QBRTCClient} instance doesn't process signalling till now.
-         */
-        RECEIVE_INCOME_CALL_MESSAGE,
 
         /**
          * Signalling are processing by {@link QBRTCClient}
          */
-        RTC_CLIENT_PROCESS_CALLS,
+        RTC_CLIENT_PROCESS_CALLS;
     }
 }
