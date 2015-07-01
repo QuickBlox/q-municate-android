@@ -9,6 +9,9 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class ValidationUtils extends SimpleTextWatcher {
 
     private final int UNAUTHORIZED_ERROR_CODE = 401;
@@ -40,20 +43,32 @@ public class ValidationUtils extends SimpleTextWatcher {
         setError(null);
     }
 
+//    public boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
+//        boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
+//        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+//        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
+//
+//        if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
+//            return true;
+//        } else if (!isFullNameEntered && !isEmailEntered && !isPasswordEntered) {
+//            setError(context.getString(R.string.dlg_not_all_fields_entered));
+//        } else {
+//            setErrors(new boolean[]{isFullNameEntered, isEmailEntered, isPasswordEntered});
+//        }
+//
+//        return false;
+//    }
+
     public boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
-        boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
-        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
+        boolean isFullNameEntered = isValidName(fieldsArray[0], fullNameText);
+        boolean isEmailEntered = isValidEmail(fieldsArray[1], emailText);
+        boolean isPasswordEntered = isValidPassword(fieldsArray[2], passwordText);
 
         if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
             return true;
-        } else if (!isFullNameEntered && !isEmailEntered && !isPasswordEntered) {
-            setError(context.getString(R.string.dlg_not_all_fields_entered));
         } else {
-            setErrors(new boolean[]{isFullNameEntered, isEmailEntered, isPasswordEntered});
+            return false;
         }
-
-        return false;
     }
 
     public boolean isValidUserDate(String emailText, String passwordText) {
@@ -69,6 +84,69 @@ public class ValidationUtils extends SimpleTextWatcher {
         }
 
         return false;
+    }
+
+    public boolean isValidName(EditText fullNameEditText, String fullNameText) {
+
+        int counterSymbols = 0;
+        char[] fullNameTextToCharArray = fullNameText.toCharArray();
+        char[] symbols = {'<', '>', ';'};
+
+        for (int i = 0; i < fullNameTextToCharArray.length; i++) {
+            for (int j = 0; j < symbols.length; j++) {
+                if (fullNameTextToCharArray[i] == symbols[j]) {
+                    counterSymbols++;
+                    break;
+                }
+            }
+        }
+
+        if (!fullNameText.isEmpty()) {
+            if (fullNameText.length() < 3) {
+                fullNameEditText.setError(context.getString(R.string.error_name_must_be_more_than_2_characters_fron_app));
+                return false;
+            } else if (counterSymbols != 0) {
+                fullNameEditText.setError(context.getString(R.string.error_name_must_do_not_contain_special_characters_from_app));
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            fullNameEditText.setError(context.getString(R.string.dlg_not_fullname_field_entered));
+            return false;
+        }
+    }
+
+    public boolean isValidEmail(EditText emailEditText, String emailText){
+        boolean isValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailText).matches();
+
+        if (!isValid){
+            emailEditText.setError(context.getString(R.string.error_please_enter_a_valid_email_from_app));
+        }
+
+        return isValid;
+    }
+
+    public boolean isValidPassword(EditText passwordEditText, String passwordText) {
+        boolean onlyCorrectSymbols;
+        Pattern p = Pattern.compile("^([a-zA-Z0-9_.-@])+");
+        Matcher m = p.matcher(passwordText);
+        onlyCorrectSymbols = m.matches();
+
+        if (!passwordText.isEmpty()) {
+            if (passwordEditText.length() < 8) {
+                passwordEditText.setError(context.getString(R.string.error_password_must_be_more_than_8_characters_from_app));
+                return false;
+            } else if (!onlyCorrectSymbols) {
+                passwordEditText.setError(context.getString(R.string.error_password_must_do_not_contain_non_Latin_characters_and_spaces_from_app));
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            passwordEditText.setError(context.getString(R.string.dlg_not_password_field_entered));
+            return false;
+        }
     }
 
     public boolean isValidChangePasswordData(String oldPasswordText, String newPasswordText) {

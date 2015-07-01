@@ -144,6 +144,8 @@ public class BaseAuthActivity extends BaseActivity {
             errorMessage = resources.getString(R.string.error_email_already_taken_from_app);
             DialogUtils.showLong(BaseAuthActivity.this, errorMessage);
             return;
+        } else if (exception.getMessage().equals(resources.getString(R.string.error_email_already_taken))){
+            errorMessage = resources.getString(R.string.error_email_already_taken_from_app_without_facebook);
         }
 
         validationUtils.setError(errorMessage);
