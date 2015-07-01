@@ -391,7 +391,7 @@ public class QBVideoChatHelper extends BaseHelper {
             } else {
                 if (!isEqualsLastSessionId) {
                     sessionManager.addSession(session);
-                    session.rejectCall(getCurrentSession().getUserInfo());
+                    session.rejectCall(session.getUserInfo());
                 }
             }
         }

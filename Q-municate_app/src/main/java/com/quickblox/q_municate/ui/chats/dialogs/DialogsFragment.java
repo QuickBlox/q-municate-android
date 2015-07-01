@@ -142,7 +142,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 } else {
                     startGroupChatActivity(dialog);
                 }
-                selectedPositionList = position;
+                selectedPositionList = dialogsListView.getFirstVisiblePosition();
             }
         });
     }

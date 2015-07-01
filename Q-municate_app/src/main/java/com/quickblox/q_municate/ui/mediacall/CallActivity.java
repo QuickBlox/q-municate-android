@@ -392,11 +392,20 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        stopCall();
+    }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         Log.d(CALL_INTEGRATION, "Destroy call activity" + this);
+        stopCall();
+    }
 
+    private void stopCall() {
         stopIncomeCallTimer();
         cancelPlayer();
 
@@ -408,8 +417,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             videoChatHelper.setClientClosed();
             videoChatHelper.removeVideoChatHelperListener(this);
         }
-
-        super.onDestroy();
     }
 
     // --- Init scheduler on closing activity if user did not responseon coll or didn't receive once --- //
@@ -559,6 +566,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     public void onSessionClosed() {
         Log.d(CALL_INTEGRATION, "CallActivity. onSessionClosed");
         cancelPlayer();
+        stopIncomeCallTimer();
         finish();
     }
 
