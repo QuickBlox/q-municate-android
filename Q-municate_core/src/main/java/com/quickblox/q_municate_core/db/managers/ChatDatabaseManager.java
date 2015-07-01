@@ -26,8 +26,12 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChatDatabaseManager {
 
@@ -441,7 +445,29 @@ public class ChatDatabaseManager {
                     messageCache.getMessagesNotificationType(), messageCache);
         } else {
             if (!TextUtils.isEmpty(messageCache.getMessage())) {
-                resultMessage = Html.fromHtml(messageCache.getMessage()).toString();
+
+                StringBuilder result = new StringBuilder();
+
+                // Store on \n positions in message
+                Set<Integer> newLinePositons = new HashSet<>();
+                Pattern p = Pattern.compile("\n");
+                Matcher m = p.matcher(messageCache.getMessage());
+
+                while(m.find()){
+                    newLinePositons.add(m.start());
+                }
+
+                // Replace all '<' and '>' symbols to string representation but removes '\n' symbols
+                result.append(Html.fromHtml(messageCache.getMessage()).toString());
+
+                // Restore removed new line symbols
+                for(Integer position : newLinePositons) {
+                    // Remove replaced instead of '\n' space
+                    result.deleteCharAt(position);
+                    result.insert(position, "\n");
+                }
+
+                resultMessage = result.toString();
             }
         }
 
