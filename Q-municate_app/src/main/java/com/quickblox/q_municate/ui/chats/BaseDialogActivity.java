@@ -835,8 +835,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
-//                updateDialogData();
-//                scrollListView();
+                updateDialogData();
             }
         }
     }

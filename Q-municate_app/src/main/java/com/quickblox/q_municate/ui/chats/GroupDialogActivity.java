@@ -204,7 +204,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
 
-//        updateDialogData();
+        updateDialogData();
 //
 //        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
 //            scrollListView();
