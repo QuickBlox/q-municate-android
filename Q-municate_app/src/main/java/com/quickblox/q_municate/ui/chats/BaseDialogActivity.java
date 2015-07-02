@@ -51,7 +51,6 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -127,6 +126,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private int lastVisiblePosition;
     private int visibleItemCount;
     private boolean isFirstUpdateListView = true;
+    private UpdateMessagesReason updateMessagesReason;
 
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
@@ -214,14 +214,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
 
 
-        if (skipMessages == ConstsCore.ZERO_INT_VALUE){
-            startLoadDialogMessages();
+//        if (skipMessages == ConstsCore.ZERO_INT_VALUE){
+        updateMessagesReason = UpdateMessagesReason.DEFAULT;
+        startLoadDialogMessages();
 //            scrollListView();
-        } else {
+//        } else {
 //            messagesListView.
 //            isNeedToScrollMessages = true;
 //            scrollListView();
-        }
+//        }
 
     }
 
@@ -453,12 +454,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
-//        loadingMore = true;
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
             skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
             loadingMore = false;
         }
     }
+
+    protected void startLoadDialogMessagesByDefaultReason(QBDialog dialog) {
+        if (loadingMore) {
+            QBLoadDialogMessagesCommand.start(this, dialog, System.currentTimeMillis(), 0);
+
+            skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE + totalEntries;
+            loadingMore = false;
+        }
+    }
+
+
 
     protected abstract Bundle generateBundleToInitDialog();
 
@@ -489,6 +500,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 ////                }
 //            }
             if (firstVisiblePosition == 0){
+                updateMessagesReason = UpdateMessagesReason.ON_USER_REQUEST;
                 loadMoreItems();
             }
         }
@@ -530,8 +542,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 //            if (isFirstUpdateListView){
 //                messagesListView.setSelection(messagesAdapter.getCount() - 1);
 //                isFirstUpdateListView = false;
-            if (totalEntries > 0) {
+            if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST) {
                 messagesListView.setSelection(totalEntries - 1);
+            } else {
+                scrollListView();
             }
         }
 
@@ -727,10 +741,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
+
+
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
-        } else {
+        } else if (updateMessagesReason == UpdateMessagesReason.DEFAULT) {
+            startLoadDialogMessagesByDefaultReason(dialog);
+        } else if (updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST){
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
         }
@@ -838,5 +856,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 updateDialogData();
             }
         }
+    }
+
+    /**
+     * Enumeration are using for marking reason on loading messages
+     */
+    private enum UpdateMessagesReason {
+        /**
+         * Messages are loading after activity recreating
+         */
+        DEFAULT,
+
+        /**
+         * User scrolled list till oldest uploaded message
+         */
+        ON_USER_REQUEST;
+
     }
 }
