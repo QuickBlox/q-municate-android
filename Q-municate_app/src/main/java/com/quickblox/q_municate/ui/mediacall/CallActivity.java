@@ -420,7 +420,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     }
 
     // --- Init scheduler on closing activity if user did not responseon coll or didn't receive once --- //
-
     public void initIncomingCallTask() {
 
         singleTheadScheduledExecutor = new ScheduledThreadPoolExecutor(1);
