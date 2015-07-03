@@ -43,22 +43,6 @@ public class ValidationUtils extends SimpleTextWatcher {
         setError(null);
     }
 
-//    public boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
-//        boolean isFullNameEntered = !TextUtils.isEmpty(fullNameText);
-//        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-//        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
-//
-//        if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
-//            return true;
-//        } else if (!isFullNameEntered && !isEmailEntered && !isPasswordEntered) {
-//            setError(context.getString(R.string.dlg_not_all_fields_entered));
-//        } else {
-//            setErrors(new boolean[]{isFullNameEntered, isEmailEntered, isPasswordEntered});
-//        }
-//
-//        return false;
-//    }
-
     public boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
         boolean isFullNameValid = isValidName(fieldsArray[0], fullNameText);
         boolean isEmailValid = isValidEmail(fieldsArray[1], emailText);
@@ -70,21 +54,6 @@ public class ValidationUtils extends SimpleTextWatcher {
             return false;
         }
     }
-
-//    public boolean isValidUserDate(String emailText, String passwordText) {
-//        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-//        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
-//
-//        if (isEmailEntered && isPasswordEntered) {
-//            return true;
-//        } else if (!isEmailEntered && !isPasswordEntered) {
-//            setError(context.getString(R.string.dlg_not_all_fields_entered));
-//        } else {
-//            setErrors(new boolean[]{isEmailEntered, isPasswordEntered});
-//        }
-//
-//        return false;
-//    }
 
     public boolean isValidUserDate(String emailText, String passwordText) {
         boolean isEmailValid = isValidEmail(fieldsArray[0], emailText);
