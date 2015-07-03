@@ -60,30 +60,41 @@ public class ValidationUtils extends SimpleTextWatcher {
 //    }
 
     public boolean isValidUserDate(String fullNameText, String emailText, String passwordText) {
-        boolean isFullNameEntered = isValidName(fieldsArray[0], fullNameText);
-        boolean isEmailEntered = isValidEmail(fieldsArray[1], emailText);
-        boolean isPasswordEntered = isValidPassword(fieldsArray[2], passwordText);
+        boolean isFullNameValid = isValidName(fieldsArray[0], fullNameText);
+        boolean isEmailValid = isValidEmail(fieldsArray[1], emailText);
+        boolean isPasswordValid = isValidPassword(fieldsArray[2], passwordText);
 
-        if (isFullNameEntered && isEmailEntered && isPasswordEntered) {
+        if (isFullNameValid && isEmailValid && isPasswordValid) {
             return true;
         } else {
             return false;
         }
     }
 
+//    public boolean isValidUserDate(String emailText, String passwordText) {
+//        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+//        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
+//
+//        if (isEmailEntered && isPasswordEntered) {
+//            return true;
+//        } else if (!isEmailEntered && !isPasswordEntered) {
+//            setError(context.getString(R.string.dlg_not_all_fields_entered));
+//        } else {
+//            setErrors(new boolean[]{isEmailEntered, isPasswordEntered});
+//        }
+//
+//        return false;
+//    }
+
     public boolean isValidUserDate(String emailText, String passwordText) {
-        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
-        boolean isPasswordEntered = !TextUtils.isEmpty(passwordText);
+        boolean isEmailValid = isValidEmail(fieldsArray[0], emailText);
+        boolean isPasswordValid = isValidPassword(fieldsArray[1], passwordText);
 
-        if (isEmailEntered && isPasswordEntered) {
+        if (isEmailValid && isPasswordValid) {
             return true;
-        } else if (!isEmailEntered && !isPasswordEntered) {
-            setError(context.getString(R.string.dlg_not_all_fields_entered));
         } else {
-            setErrors(new boolean[]{isEmailEntered, isPasswordEntered});
+            return false;
         }
-
-        return false;
     }
 
     public boolean isValidName(EditText fullNameEditText, String fullNameText) {
@@ -118,13 +129,13 @@ public class ValidationUtils extends SimpleTextWatcher {
     }
 
     public boolean isValidEmail(EditText emailEditText, String emailText){
-        boolean isValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailText).matches();
+        boolean isMailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailText).matches();
 
-        if (!isValid){
+        if (!isMailValid){
             emailEditText.setError(context.getString(R.string.error_please_enter_a_valid_email_from_app));
         }
 
-        return isValid;
+        return isMailValid;
     }
 
     public boolean isValidPassword(EditText passwordEditText, String passwordText) {
@@ -135,7 +146,7 @@ public class ValidationUtils extends SimpleTextWatcher {
 
         if (!passwordText.isEmpty()) {
             if (passwordEditText.length() < 8) {
-                passwordEditText.setError(context.getString(R.string.error_password_must_be_more_than_8_characters_from_app));
+                passwordEditText.setError(context.getString(R.string.error_password_must_be_more_than_7_characters_from_app));
                 return false;
             } else if (!onlyCorrectSymbols) {
                 passwordEditText.setError(context.getString(R.string.error_password_must_do_not_contain_non_Latin_characters_and_spaces_from_app));
@@ -153,33 +164,31 @@ public class ValidationUtils extends SimpleTextWatcher {
         QBUser user = AppSession.getSession().getUser();
 
         boolean isOldPasswordEntered = !TextUtils.isEmpty(oldPasswordText);
-        boolean isNewPasswordEntered = !TextUtils.isEmpty(newPasswordText);
+        boolean isNewPasswordValid = isValidPassword(fieldsArray[1], newPasswordText);
 
-        if (isOldPasswordEntered && isNewPasswordEntered) {
+        if (isOldPasswordEntered && isNewPasswordValid) {
             if (!user.getPassword().equals(oldPasswordText)) {
                 setError(0, context.getString(R.string.dlg_old_password_wrong));
+                return false;
             } else {
                 return true;
             }
-        } else if (!isOldPasswordEntered && !isNewPasswordEntered) {
-            setError(context.getString(R.string.dlg_not_all_fields_entered));
+        } else if (!isOldPasswordEntered) {
+            setError(0, context.getString(R.string.dlg_not_password_field_entered));
+            return false;
         } else {
-            setErrors(new boolean[]{isOldPasswordEntered, isNewPasswordEntered});
+            return false;
         }
-
-        return false;
     }
 
     public boolean isValidForgotPasswordData(String emailText) {
-        boolean isEmailEntered = !TextUtils.isEmpty(emailText);
+        boolean isEmailValid = isValidEmail(fieldsArray[0], emailText);
 
-        if (isEmailEntered) {
+        if (isEmailValid) {
             return true;
         } else {
-            setErrors(new boolean[]{isEmailEntered});
+            return false;
         }
-
-        return false;
     }
 
     public void setError(String error) {

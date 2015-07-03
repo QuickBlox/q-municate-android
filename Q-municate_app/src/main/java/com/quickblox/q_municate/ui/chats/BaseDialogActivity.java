@@ -544,7 +544,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 //                isFirstUpdateListView = false;
             if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST) {
                 messagesListView.setSelection(totalEntries - 1);
-            } else {
+            } else if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.DEFAULT){
                 scrollListView();
             }
         }

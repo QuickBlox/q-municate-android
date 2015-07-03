@@ -235,7 +235,7 @@
     <string name="error_name_must_be_more_than_2_characters_fron_app">Name must be more than 2 characters</string>
     <string name="error_name_must_do_not_contain_special_characters_from_app">Name mustn\'t contain \"&lt;\", \"&gt;\" and \";\" characters</string>
     <string name="error_please_enter_a_valid_email_from_app">Please enter a valid email</string>
-    <string name="error_password_must_be_more_than_8_characters_from_app">Password must be more than 8 characters</string>
+    <string name="error_password_must_be_more_than_7_characters_from_app">Password must be more than 7 characters</string>
     <string name="error_password_must_do_not_be_more_than_40_characters_from_app">Password mustn\'t be more than 40 characters</string>
     <string name="error_password_must_do_not_contain_non_Latin_characters_and_spaces_from_app">Password mustn\'t contain non-Latin characters and spaces</string>
 
