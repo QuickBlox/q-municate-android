@@ -15,6 +15,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.ui.settings.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
@@ -176,7 +177,8 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     private boolean needShowReceivedNotification() {
         boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
         boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
-        return !isSplashActivity && !isCallActivity;
+        boolean isChangePasswordActivity = activityHelper.getContext() instanceof ChangePasswordActivity;
+        return !isSplashActivity && !isCallActivity && isChangePasswordActivity;
     }
 
     protected void onSuccessAction(String action) {

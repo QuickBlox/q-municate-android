@@ -143,7 +143,7 @@ public class ValidationUtils extends SimpleTextWatcher {
                 return true;
             }
         } else if (!isOldPasswordEntered) {
-            setError(0, context.getString(R.string.dlg_not_password_field_entered));
+            setError(0, fieldsErrorArray[0]);
             return false;
         } else {
             return false;

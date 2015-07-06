@@ -43,7 +43,6 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
     protected static int TYPE_OWN_MESSAGE = 1;
     protected static int TYPE_OPPONENT_MESSAGE = 2;
     protected static int COMMON_TYPE_COUNT = 3;
-    public static int positionLastReadMessage = -1;
 
     private final int colorMaxValue = 255;
     private final float colorAlpha = 0.8f;

@@ -127,13 +127,6 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean friendsInfoRequestMessage = messageCache
                 .getMessagesNotificationType() != null && !friendsRequestMessage;
 
-        // search  last read message and remember its position
-        if (!ownMessage && !messageCache.isRead()) {
-            if (positionLastReadMessage == -1) {
-                positionLastReadMessage = cursor.getPosition();
-            }
-        }
-
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(messageCache.getMessage());
             viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(messageCache.getTime()));
