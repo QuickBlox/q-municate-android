@@ -532,10 +532,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
+        Log.d("POSITION", "Loading finish");
+        Log.d("POSITION", "messagesAdapter is " + messagesAdapter);
         if (messagesAdapter == null) {
             initListView(messagesCursor);
         } else {
-//            messagesAdapter.swapCursor(messagesCursor);
+            Log.d("POSITION", "UpdateMessagesReason is " + updateMessagesReason);
             messagesAdapter.changeCursor(messagesCursor);
 //            messagesAdapter.notifyDataSetChanged();
 
@@ -548,22 +550,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 scrollListView();
             }
         }
-
-//        if (isFirstUpdateListView){
-//            messagesListView.setSelection(messagesAdapter.getCount() - 1);
-//            isFirstUpdateListView = false;
-//        } else if (totalEntries > 0) {
-//            messagesListView.setSelection(totalEntries - 1);
-//        }
-
-//        isFirstUpdateListView = false;
-
-
-//        else {
-////            isNeedToScrollMessages = true;
-//            scrollListView();
-//        }
-//        hideActionBarProgress();
     }
 
     @Override
@@ -871,6 +857,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
          * User scrolled list till oldest uploaded message
          */
         ON_USER_REQUEST;
+
 
     }
 }
