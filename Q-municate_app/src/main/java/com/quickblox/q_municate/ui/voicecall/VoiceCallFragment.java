@@ -12,6 +12,10 @@ import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 
+/**
+ *
+ */
+
 public class VoiceCallFragment extends OutgoingCallFragment {
 
     @Override
@@ -20,12 +24,13 @@ public class VoiceCallFragment extends OutgoingCallFragment {
 
         User friendFromDB = UsersDatabaseManager.getUserById(getActivity().getBaseContext(), opponent.getUserId());
 
-        if (/*opponent*/ friendFromDB != null) {
-            ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*opponent*/ friendFromDB.getFullName());
+        if (friendFromDB != null) {
+            ((TextView) rootView.findViewById(R.id.name_textview)).setText(friendFromDB.getFullName());
             RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
             avatarView.setOval(true);
-            if (!TextUtils.isEmpty(/*opponent*/ friendFromDB.getAvatarUrl())) {
-                ImageLoader.getInstance().displayImage(/*opponent*/ friendFromDB.getAvatarUrl(),
+
+            if (!TextUtils.isEmpty(friendFromDB.getAvatarUrl())) {
+                ImageLoader.getInstance().displayImage(friendFromDB.getAvatarUrl(),
                         avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
             }
         }

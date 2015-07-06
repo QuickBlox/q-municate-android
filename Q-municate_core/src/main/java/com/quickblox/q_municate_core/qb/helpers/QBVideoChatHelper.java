@@ -156,7 +156,6 @@ public class QBVideoChatHelper extends BaseHelper {
         });
 
         Log.d(CALL_INTEGRATION, "Add callbacks listeners");
-//        QBRTCClient.getInstance().addRTCSignallingMessageProcessorCallbackListener(getRTCSignallingProcessorCallback());
         QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
         QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
 
@@ -168,7 +167,6 @@ public class QBVideoChatHelper extends BaseHelper {
         Log.d(CALL_INTEGRATION, "QBVideoChatHelper. init QBVideoChatHelper with activity");
         this.activityClass = activityClass;
     }
-
 
     // ---------------------- PUBLIC METHODS ----------------------------- //
 

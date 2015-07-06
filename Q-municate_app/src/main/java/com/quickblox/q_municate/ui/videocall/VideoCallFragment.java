@@ -1,7 +1,5 @@
 package com.quickblox.q_municate.ui.videocall;
 
-import android.opengl.GLSurfaceView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +12,16 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
+/**
+ *
+ */
+
 public class VideoCallFragment extends OutgoingCallFragment {
 
     public static final String TAG = VideoCallFragment.class.getSimpleName();
-//    private QBGLVideoView videoView;
     private ImageView imgMyCameraOff;
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
-//    private boolean isVideoEnabled = true;
-//    private boolean isCameraEnabled = true;
     private QBGLVideoView localVideoView;
     private QBGLVideoView remoteVideoView;
     private VideoCallFragment.CameraState cameraState = null;
@@ -125,13 +124,13 @@ public class VideoCallFragment extends OutgoingCallFragment {
                 cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
-                outgoingCallFragmentInterface.offCam();
+                outgoingCallFragmentInterface.onCam(false);
             } else {
                 switchCameraButton.setVisibility(View.VISIBLE);
                 cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);
                 Log.d(TAG, "Camera enabled");
-                outgoingCallFragmentInterface.onCam();
+                outgoingCallFragmentInterface.onCam(true);
             }
         }
     }

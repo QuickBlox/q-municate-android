@@ -34,7 +34,7 @@
             android:id="@+id/time_attach_message_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|top"
+            android:layout_gravity="right|top"
             android:textColor="@color/black" />
 
         <ImageView

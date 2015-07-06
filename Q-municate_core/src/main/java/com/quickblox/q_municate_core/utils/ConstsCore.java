@@ -64,9 +64,9 @@ public class ConstsCore {
     public static final int FULL_QUALITY = 100;
 
     public static final int TOKEN_VALID_TIME_IN_MINUTES = 1;
-    public static enum CALL_DIRECTION_TYPE {
-        INCOMING, OUTGOING
 
+    public enum CALL_DIRECTION_TYPE {
+        INCOMING, OUTGOING
     }
 
     //Sound
