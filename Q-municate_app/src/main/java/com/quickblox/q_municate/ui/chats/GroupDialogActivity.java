@@ -128,7 +128,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
-        scrollListView();
     }
 
     protected QBDialog getQBDialog() {

@@ -202,7 +202,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         isNeedToScrollMessages = true;
-        scrollListView();
     }
 
     private void initActionBar() {
