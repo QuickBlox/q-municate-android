@@ -21,47 +21,63 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBRTCClient;
 import com.quickblox.videochat.webrtc.QBRTCException;
 import com.quickblox.videochat.webrtc.QBRTCSession;
-import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
-import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-
-//TODO
-//A lot of methods to implement in QBRTCClientConnectionCallbacks
-//You can exclude main methods in one interface
-//And others in another which isn't necessary
+/**
+ * Base fragment for all call fragments.
+ * Each call fragment extends UI of this one.
+ * <p/>
+ * Fragment receives callbacks about current session peer connection states.
+ * Also it throws callbacks to activity about interaction with UI elements related with call.
+ * <p/>
+ * Each call fragment should receive in bundle next call info:
+ * <ul>
+ * <li>EXTRA_FRIEND - call opponent</li>
+ * <li>CALL_DIRECTION_TYPE_EXTRA - INCOMING|OUTGOING</li>
+ * </ul>
+ */
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {
 
-    public static final String TAG = "LCYCLE" + OutgoingCallFragment.class.getSimpleName();
+    // Log tags
+    public static final String TAG = OutgoingCallFragment.class.getSimpleName();
     private static final String CALL_INTEGRATION = "CALL_INTEGRATION";
-    protected User opponent;
-    private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
-    protected OutgoingCallFragmentInterface outgoingCallFragmentInterface;
 
+    // Necessary fot call info
+    protected User opponent;
+    protected OutgoingCallFragmentInterface outgoingCallFragmentInterface;
+    protected QBVideoChatHelper videoChatHelper;
+    private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
+    // Internal fields
+    private Handler handler;
+    private TimeUpdater updater;
+    private boolean callStateStopped;
+    // Listenning of plagining/unplagining HEADSET/SCO devices
+    private AudioStreamReceiver audioStreamReceiver;
+
+    // UI elements
     private boolean isAudioEnabled = true;
+    private IntentFilter intentFilter;
     private ToggleButton muteDynamicButton;
     private ImageButton stopСallButton;
     private ToggleButton muteMicrophoneButton;
     private TextView timerTextView;
-    private Handler handler;
-    private TimeUpdater updater;
-    protected QBVideoChatHelper videoChatHelper;
-    private IntentFilter intentFilter;
-    private AudioStreamReceiver audioStreamReceiver;
-    private boolean callStateStopped;
 
+    public static Bundle generateArguments(User friend,
+                                           ConstsCore.CALL_DIRECTION_TYPE type, QBRTCTypes.QBConferenceType callType, String sessionId) {
+
+        Bundle args = new Bundle();
+        args.putSerializable(ConstsCore.EXTRA_FRIEND, friend);
+        args.putSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, type);
+        args.putSerializable(ConstsCore.CALL_TYPE_EXTRA, callType);
+        args.putString(ConstsCore.SESSION_ID, sessionId);
+        return args;
+    }
 
     protected void initUI(View rootView) {
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment initUI ");
@@ -83,6 +99,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         setActionButtonsEnability(false);
     }
 
+
+    // ----------------------------- ConnectionState callbacks -------------------------- //
+
     public void setActionButtonsEnability(boolean enability) {
 
         muteDynamicButton.setEnabled(enability);
@@ -92,9 +111,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         muteDynamicButton.setActivated(enability);
         muteMicrophoneButton.setActivated(enability);
     }
-
-
-    // ----------------------------- ConnectionState callbacks -------------------------- //
 
     @Override
     public void onStartConnectToUser(QBRTCSession qbrtcSession, Integer integer) {
@@ -142,6 +158,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         setActionButtonsEnability(false);
     }
 
+    // -----------------------------  Q-municate original code  ----------------------------- /
+
     @Override
     public void onError(QBRTCSession session, QBRTCException exeption) {
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment onError");
@@ -149,25 +167,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         setActionButtonsEnability(false);
     }
 
-    /* ==========================   Q-municate original code   ==========================*/
-
-
     protected abstract int getContentView();
-
-    public static Bundle generateArguments(User friend,
-                                           ConstsCore.CALL_DIRECTION_TYPE type, QBRTCTypes.QBConferenceType callType, String sessionId) {
-
-        Bundle args = new Bundle();
-        args.putSerializable(ConstsCore.EXTRA_FRIEND, friend);
-        args.putSerializable(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, type);
-        args.putSerializable(ConstsCore.CALL_TYPE_EXTRA, callType);
-        args.putString(ConstsCore.SESSION_ID, sessionId);
-        return args;
-    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        // Check is activity implements fragment interface
         try {
             Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onAttach");
             outgoingCallFragmentInterface = (OutgoingCallFragmentInterface) activity;
@@ -175,36 +180,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
-
-        intentFilter = new IntentFilter();
-        intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
-        intentFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
-
-        audioStreamReceiver = new AudioStreamReceiver();
-        getActivity().registerReceiver(audioStreamReceiver, intentFilter);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        outgoingCallFragmentInterface = null;
-
-        getActivity().unregisterReceiver(audioStreamReceiver);
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart()");
-        super.onStart();
-            Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onStart");
-            QBRTCClient.getInstance().addConnectionCallbacksListener(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -213,6 +190,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onCreate");
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -226,8 +204,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         return rootView;
     }
 
-    private void initChatData() {
 
+    private void initChatData() {
         Log.d(CALL_INTEGRATION, "OutgoingCallFragment. initChatData()");
 
         if (call_direction_type != null) {
@@ -237,6 +215,40 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         call_direction_type = (ConstsCore.CALL_DIRECTION_TYPE) getArguments().getSerializable(
                 ConstsCore.CALL_DIRECTION_TYPE_EXTRA);
         opponent = (User) getArguments().getSerializable(ConstsCore.EXTRA_FRIEND);
+    }
+
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+        Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onStart");
+        QBRTCClient.getInstance().addConnectionCallbacksListener(this);
+
+        registerAudioReceiver();
+    }
+
+
+    private void registerAudioReceiver() {
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
+        intentFilter.addAction(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+
+        audioStreamReceiver = new AudioStreamReceiver();
+        getActivity().registerReceiver(audioStreamReceiver, intentFilter);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        QBRTCClient.getInstance().removeConnectionCallbacksListener(this);
+        getActivity().unregisterReceiver(audioStreamReceiver);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        outgoingCallFragmentInterface = null;
     }
 
     @Override
@@ -262,6 +274,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
 
+    // --------------------- Call actions redirection to activity ------------------------ //
+
     private void switchAudioOutput() {
         if (outgoingCallFragmentInterface != null) {
             outgoingCallFragmentInterface.switchSpeaker();
@@ -272,11 +286,11 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private void toggleMicrophone() {
         if (outgoingCallFragmentInterface != null) {
             if (isAudioEnabled) {
-                outgoingCallFragmentInterface.offMic();
+                outgoingCallFragmentInterface.onMic(false);
                 isAudioEnabled = false;
                 Log.d(TAG, "Mic is off!");
             } else {
-                outgoingCallFragmentInterface.onMic();
+                outgoingCallFragmentInterface.onMic(true);
                 isAudioEnabled = true;
                 Log.d(TAG, "Mic is on!");
             }
@@ -292,6 +306,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         Log.d(CALL_INTEGRATION, "Fragment in activity " + getActivity());
     }
 
+
+    // ----------------------- Internal methods  ------------------- //
+
     private void startTimer(TextView textView) {
         if (handler == null) {
             handler = new Handler();
@@ -304,27 +321,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         if (handler != null && updater != null) {
             handler.removeCallbacks(updater);
         }
-    }
-
-    private void setDynamicButtonState() {
-        AudioManager audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-
-        if (audioManager.isBluetoothA2dpOn()) {
-            // через Bluetooth
-            muteDynamicButton.setChecked(true);
-        } else if (audioManager.isSpeakerphoneOn()) {
-            // через динамик телефона
-            muteDynamicButton.setChecked(false);
-        } else if (audioManager.isWiredHeadsetOn()) {
-            // через проводные наушники
-            muteDynamicButton.setChecked(true);
-        } else {
-            muteDynamicButton.setChecked(false);
-        }
-    }
-
-    public QBVideoChatHelper getVideoChatHelper() {
-        return videoChatHelper;
     }
 
     public void setCallState(boolean callStateStopped) {
@@ -346,52 +342,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 Log.d(TAG, "ACTION_SCO_AUDIO_STATE_UPDATED " + intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -2));
             }
 
-            if (intent.getIntExtra("state", -1) == 0 /*|| intent.getIntExtra("EXTRA_SCO_AUDIO_STATE", -1) == 0*/) {
+            if (intent.getIntExtra("state", -1) == 0) {
                 muteDynamicButton.setChecked(false);
             } else if (intent.getIntExtra("state", -1) == 1) {
                 muteDynamicButton.setChecked(true);
-            } else {
-//                Toast.makeText(context, "Output audio stream is incorrect", Toast.LENGTH_LONG).show();
             }
             muteDynamicButton.invalidate();
-
-
-//            Toast.makeText(context, "Audio stream changed", Toast.LENGTH_LONG).show();
         }
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-//    public void registerBroadcastReceiver() {
-//        getActivity().registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
-//    }
-//
-//    public void unregisterBroadcastReceiver() {
-//        getActivity().unregisterReceiver(myNoisyAudioStreamReceiver);
-//    }
-
-    //    private void cancelCallTimer() {
-//        if (callTimer != null) {
-//            callTimer.cancel();
-//            callTimer = null;
-//        }
-//    }
-
-//    class CancelCallTimerTask extends TimerTask {
-//
-//        @Override
-//        public void run() {
-//            if (isExistActivity()) {
-//                getBaseActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        stopCall(true, STOP_TYPE.CLOSED);
-//                    }
-//                });
-//            }
-//        }
-//    }
 }

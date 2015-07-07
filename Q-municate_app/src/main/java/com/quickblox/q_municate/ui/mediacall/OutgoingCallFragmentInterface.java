@@ -3,20 +3,45 @@ package com.quickblox.q_municate.ui.mediacall;
 /**
  * Created by tereha on 07.04.15.
  */
-//TODO
-//onMic() , offMic(); have the same responsibility for one action
 
-//TODO
-//Again interface is responsible for many actions
 public interface OutgoingCallFragmentInterface {
 
-    void onMic();
-    void offMic();
-    void onCam();
-    void offCam();
+    /**
+     * On/off device microphone depends on argument
+     *
+     * @param turnOn - if true - turn microphone on or turn it off
+     */
+    void onMic(boolean turnOn);
+
+    /**
+     * On/off device camera depends on argument
+     *
+     * @param turnOn - if true - turn camera on or turn it off
+     */
+    void onCam(boolean turnOn);
+
+    /**
+     * Switching between front and back cameras
+     */
     void switchCam();
+
+    /**
+     * Switching between headphone speaker and device one
+     */
     void switchSpeaker();
+
+    /**
+     * Stop conversation
+     */
     void hangUpClick();
+
+    /**
+     * On local video view start creating
+     */
     void onLocalVideoViewCreated();
+
+    /**
+     * On remote video view start creating
+     */
     void onRemoteVideoViewCreated();
 }
