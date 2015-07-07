@@ -178,7 +178,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
         boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
         boolean isChangePasswordActivity = activityHelper.getContext() instanceof ChangePasswordActivity;
-        return !isSplashActivity && !isCallActivity && isChangePasswordActivity;
+        return !isSplashActivity && !isCallActivity && !isChangePasswordActivity;
     }
 
     protected void onSuccessAction(String action) {
