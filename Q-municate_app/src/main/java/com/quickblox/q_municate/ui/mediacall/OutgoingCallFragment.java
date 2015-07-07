@@ -36,10 +36,11 @@ import com.quickblox.videochat.webrtc.callbacks.QBRTCClientConnectionCallbacks;
  * Fragment receives callbacks about current session peer connection states.
  * Also it throws callbacks to activity about interaction with UI elements related with call.
  * <p/>
+ *
  * Each call fragment should receive in bundle next call info:
  * <ul>
- * <li>EXTRA_FRIEND - call opponent</li>
- * <li>CALL_DIRECTION_TYPE_EXTRA - INCOMING|OUTGOING</li>
+ *      <li>EXTRA_FRIEND - call opponent</li>
+ *      <li>CALL_DIRECTION_TYPE_EXTRA - INCOMING|OUTGOING</li>
  * </ul>
  */
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener, QBRTCClientConnectionCallbacks {

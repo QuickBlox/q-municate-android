@@ -10,9 +10,9 @@ import java.util.TimerTask;
 
 /**
  * Created on 4/9/15.
- * Calls for storing all sessions.
- *
  * @author Bogatov Evgeniy bogatovevgeniy@gmail.com
+ *
+ * Calls for storing and manage call sessions.
  */
 
 public class SessionManager {
@@ -38,7 +38,6 @@ public class SessionManager {
      * @param sessionID
      * @return
      */
-
     public QBRTCSession getSession(String sessionID) {
         QBRTCSession result = null;
         for (QBRTCSession session : sessionList) {
@@ -66,22 +65,6 @@ public class SessionManager {
 
     public void removeCurrentSession(){
         this.currentSessionId = null;
-    }
-
-    private class ClearSessionTask extends TimerTask {
-
-        private String sessionId;
-        private int opponentId;
-
-        ClearSessionTask(String sessionId, int opponentId) {
-            this.sessionId = sessionId;
-            this.opponentId = opponentId;
-        }
-
-        @Override
-        public void run() {
-//            WorkingSessionPull.WorkingSession workingSession = workingSessionPull.removeSession(sessionId);
-        }
     }
 
 }

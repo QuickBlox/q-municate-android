@@ -14,7 +14,7 @@ package com.quickblox.q_municate_core.qb.helpers;
  * VideoTracksCallbacksListener - new local {@link org.webrtc.VideoTrack} or remote ones was created and requires to set them up {@link com.quickblox.videochat.webrtc.view.VideoCallBacks}
  *
  * {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListenerImpl} - listen creation of new {@link com.quickblox.chat.QBWebRTCSignaling}
- * and once it was created set it up to QBRTCClient via {@link com.quickblox.videochat.webrtc.QBRTCClient.getInstance().addSignaling()}
+ * and once it was created set it up to QBRTCClient via {@link com.quickblox.videochat.webrtc.QBRTCClient#addSignaling(com.quickblox.chat.QBWebRTCSignaling)}
  *
  * {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.RTCSignallingMessageProcessorCallbackListener} added to process calls in background until {@link android.content.Context}
  * instance was created.
@@ -26,8 +26,9 @@ package com.quickblox.q_municate_core.qb.helpers;
  * For background calls processing you should wake next steps.
  *
  * <ul>
- *     <li> Init {@link com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper.SignallingManagerListener} listener</li>
+ *     <li> Init {@link com.quickblox.chat.listeners.QBVideoChatSignalingListener} listener</li>
  *     <li> Set up {@link com.quickblox.videochat.webrtc.QBRTCClient} and add listeners to it;</li>
+ *     <li> Call {@link com.quickblox.videochat.webrtc.QBRTCClient.getInstance().prepareToProcessCalls(this);}</li>
  *     <li> Start UI components when income call was received and subscribe on callbacks from {@link com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener};</li>
  *     <li> Throw call to UI components via {@link com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener};</li>
  *</ul>
@@ -45,13 +46,15 @@ package com.quickblox.q_municate_core.qb.helpers;
  *  QBRTCClient.getInstance().addSessionCallbacksListener(getSessionCallbacksListener());
  *  QBRTCClient.getInstance().addVideoTrackCallbacksListener(getVideoTracksCallbacksListener());
  * </code>
- * NOTE!!! If you don't set up QBRTClient callbacks wont be notified about current call's state
+ * NOTE!!! If you don't set up QBRTClient callbacks wont be notified about current calls' state
  *
+ * III. Call {@link com.quickblox.videochat.webrtc.QBRTCClient#prepareToProcessCalls(android.content.Context)} uses
+ * to notify {@link com.quickblox.videochat.webrtc.QBRTCClient} that you are ready listening calls.
+ * PAY ATTENTION: When you recreate you context instance you should renew link on it in {@link com.quickblox.videochat.webrtc.QBRTCClient}.
  *
- * III. Start UI components when income call was received and subscribe on callbacks from the VideoChatHelper mean:
+ * IV. Start UI components when income call was received and subscribe on callbacks from the VideoChatHelper mean:
  * <ul>
  *     <li>Start your call activity</li>
- *     <li>Call {@link com.quickblox.videochat.webrtc.QBRTCClient.getInstance().prepareToProcessCalls(this);}</li>
  *     <li>Subscribe call activity on listening callbacks from VideoChatHelper</li>
  * </ul>
  *

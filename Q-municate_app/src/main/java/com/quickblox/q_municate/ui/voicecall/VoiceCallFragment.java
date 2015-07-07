@@ -13,7 +13,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 
 /**
- *
+ * Implementation of {@link OutgoingCallFragment} for AUDIO calls representation
  */
 
 public class VoiceCallFragment extends OutgoingCallFragment {

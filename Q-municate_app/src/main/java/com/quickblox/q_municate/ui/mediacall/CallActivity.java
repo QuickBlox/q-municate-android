@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  * in case of OUTGOING call was initiated by us.
  * <p/>
  * Activity implements interfaces {@link IncomingCallFragmentInterface} for processing user accepting or rejecting of call and
- * {@link OutgoingCallFragmentInterface} for processing interaction with call commands UI (onMic(), offMic(), onCam(), offCam(),
+ * {@link OutgoingCallFragmentInterface} for processing interaction with call of UI commands (onMic(), offMic(), onCam(), offCam(),
  * switchCam(), switchSpeaker(), hangUpClick(), onLocalVideoViewCreated(), onRemoteVideoViewCreated())
  */
 

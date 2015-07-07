@@ -13,7 +13,7 @@ import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
 /**
- *
+ * Implementation of {@link OutgoingCallFragment} for VIDEO calls representation
  */
 
 public class VideoCallFragment extends OutgoingCallFragment {
