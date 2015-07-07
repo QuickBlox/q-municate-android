@@ -171,7 +171,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     }
 
     protected void onFailAction(String action) {
-
     }
 
     private boolean needShowReceivedNotification() {
