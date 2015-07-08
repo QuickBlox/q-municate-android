@@ -1,5 +1,4 @@
 package com.quickblox.q_municate_core.qb.helpers.call;
-import com.quickblox.videochat.webrtc.QBRTCSession;
 import com.quickblox.videochat.webrtc.view.QBRTCVideoTrack;
 
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
  *
  * @author Bogatov Evgeniy bogatovevgeniy@gmail.com
  */
-
+//TODO интерфейс отвечает за все
 public interface VideoChatHelperListener {
 
     /**
@@ -21,9 +20,9 @@ public interface VideoChatHelperListener {
 
     void onReceiveNewSession();
 
-    void onUserNotAnswer(Integer integer);
+    void onUserNotAnswer(Integer integer);//TODO что такое integer
 
-    void onCallRejectByUser(Integer integer, Map<String, String> map);
+    void onCallRejectByUser(Integer integer, Map<String, String> map);//TODO что такое integer ? что такое map
 
     void onReceiveHangUpFromUser(Integer integer);
 

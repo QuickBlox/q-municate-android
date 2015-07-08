@@ -6,7 +6,6 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimerTask;
 
 /**
  * Created on 4/9/15.
@@ -14,7 +13,7 @@ import java.util.TimerTask;
  *
  * Calls for storing and manage call sessions.
  */
-
+//TODO синхронизация ?
 public class SessionManager {
 
     private List<QBRTCSession> sessionList;

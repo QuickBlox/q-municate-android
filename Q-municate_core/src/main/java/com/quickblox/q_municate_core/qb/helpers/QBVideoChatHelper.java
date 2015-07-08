@@ -104,7 +104,7 @@ public class QBVideoChatHelper extends BaseHelper {
     private QBChatService chatService;
     private Class<? extends Activity> activityClass;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3);
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(3); //TODO ненужное поле ?
     private List<VideoChatHelperListener> videoChatListenersList;
 
     // Videochat listeners
@@ -115,7 +115,7 @@ public class QBVideoChatHelper extends BaseHelper {
     private SessionManager sessionManager;
     private boolean isClientClosed;
     private VideoHelperStates vieoChatHelperState;
-    private Set<String> incomingSessionsSet;
+    private Set<String> incomingSessionsSet; //TODO ненужное поле ?
 
 
     public QBVideoChatHelper(Context context) {
