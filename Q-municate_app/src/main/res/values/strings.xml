@@ -191,7 +191,7 @@
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
-    <string name="dlg_not_fullname_field_entered">Please enter fullName</string>
+    <string name="dlg_not_fullname_field_entered">Please enter Full Name</string>
     <string name="dlg_not_email_field_entered">Please enter email</string>
     <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>

@@ -109,7 +109,7 @@ public class ValidationUtils extends SimpleTextWatcher {
 
     public boolean isValidPassword(EditText passwordEditText, String passwordText) {
         boolean onlyCorrectSymbols;
-        Pattern p = Pattern.compile("^([a-zA-Z0-9_.-@])+");
+        Pattern p = Pattern.compile("^[-A-Za-z0-9\\]\\[\\!\\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\.\\/\\:\\;\\<\\=\\>\\?\\@\\\\\\^\\_\\`\\{\\|\\}\\~]+");
         Matcher m = p.matcher(passwordText);
         onlyCorrectSymbols = m.matches();
 
