@@ -527,6 +527,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.d("POSITION", "onCreateLoader");
         return ChatDatabaseManager.getAllDialogMessagesLoaderByDialogId(this, dialogId);
     }
 
@@ -534,18 +535,19 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
         Log.d("POSITION", "Loading finish");
         Log.d("POSITION", "messagesAdapter is " + messagesAdapter);
+
         if (messagesAdapter == null) {
             initListView(messagesCursor);
         } else {
+
             Log.d("POSITION", "UpdateMessagesReason is " + updateMessagesReason);
             messagesAdapter.changeCursor(messagesCursor);
-//            messagesAdapter.notifyDataSetChanged();
+//            BaseDialogMessagesAdapter updatedMessageAdapter = new BaseDialogMessagesAdapter(this, messagesCursor);
+//            messagesListView.setAdapter(updatedMessageAdapter);
 
-//            if (isFirstUpdateListView){
-//                messagesListView.setSelection(messagesAdapter.getCount() - 1);
-//                isFirstUpdateListView = false;
             if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST) {
                 messagesListView.setSelection(totalEntries - 1);
+
             } else if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.DEFAULT){
                 scrollListView();
             }
@@ -554,6 +556,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d("POSITION", "onLoaderReset");
     }
 
     protected abstract void initListView(Cursor messagesCursor);

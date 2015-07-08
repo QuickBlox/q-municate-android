@@ -17,6 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
@@ -111,7 +115,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(originalUri.toString(), Consts.UIL_DEFAULT_DISPLAY_OPTIONS);
         new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
@@ -202,6 +206,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
         isNeedToScrollMessages = true;
+        scrollListView();
     }
 
     private void initActionBar() {

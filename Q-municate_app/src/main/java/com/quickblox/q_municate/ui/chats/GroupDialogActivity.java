@@ -12,10 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
@@ -91,7 +93,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(originalUri.toString(), Consts.UIL_DEFAULT_DISPLAY_OPTIONS);
         new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
@@ -128,6 +130,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
+        scrollListView();
     }
 
     protected QBDialog getQBDialog() {
