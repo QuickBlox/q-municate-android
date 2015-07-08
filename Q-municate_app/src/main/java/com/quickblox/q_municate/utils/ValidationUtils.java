@@ -83,7 +83,10 @@ public class ValidationUtils extends SimpleTextWatcher {
 
         if (!fullNameText.isEmpty()) {
             if (fullNameText.length() < 3) {
-                fullNameEditText.setError(context.getString(R.string.error_name_must_be_more_than_2_characters_fron_app));
+                fullNameEditText.setError(context.getString(R.string.error_name_must_be_more_than_2_characters_from_app));
+                return false;
+            } else if (fullNameText.length() > 50){
+                fullNameEditText.setError(context.getString(R.string.error_is_too_long_maximum_is_50_characters_from_app));
                 return false;
             } else if (counterSymbols != 0) {
                 fullNameEditText.setError(context.getString(R.string.error_name_must_do_not_contain_special_characters_from_app));
@@ -117,6 +120,9 @@ public class ValidationUtils extends SimpleTextWatcher {
             if (passwordEditText.length() < 8) {
                 passwordEditText.setError(context.getString(R.string.error_password_must_be_more_than_7_characters_from_app));
                 return false;
+            } else if (passwordEditText.length() > 40){
+                    passwordEditText.setError(context.getString(R.string.error_password_must_do_not_be_more_than_40_characters_from_app));
+                    return false;
             } else if (!onlyCorrectSymbols) {
                 passwordEditText.setError(context.getString(R.string.error_password_must_do_not_contain_non_Latin_characters_and_spaces_from_app));
                 return false;

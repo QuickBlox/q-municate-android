@@ -539,11 +539,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (messagesAdapter == null) {
             initListView(messagesCursor);
         } else {
-
             Log.d("POSITION", "UpdateMessagesReason is " + updateMessagesReason);
             messagesAdapter.changeCursor(messagesCursor);
-//            BaseDialogMessagesAdapter updatedMessageAdapter = new BaseDialogMessagesAdapter(this, messagesCursor);
-//            messagesListView.setAdapter(updatedMessageAdapter);
 
             if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST) {
                 messagesListView.setSelection(totalEntries - 1);
