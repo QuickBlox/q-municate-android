@@ -17,7 +17,8 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
-import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperListener;
+import com.quickblox.q_municate_core.qb.helpers.call.VideoChatHelperSessionListener;
+import com.quickblox.q_municate_core.qb.helpers.call.VideoChatVideoTracksListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -48,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * Receives callbacks from {@link QBVideoChatHelper}
  * <p/>
  * Methods not related with UI call on {@link QBVideoChatHelper} instance.
- * Callbacks received in {@link QBVideoChatHelper} are redirects to CallActivity through {@link VideoChatHelperListener}
+ * Callbacks received in {@link QBVideoChatHelper} are redirects to CallActivity through {@link VideoChatHelperSessionListener}
  * Interaction with call commands was put in fragments: {@link VideoCallFragment} and {@link VoiceCallFragment}
  * <p/>
  * Instance of this activity could be created via QBService from {@link QBVideoChatHelper} if INCOMING call was received or
@@ -56,11 +57,15 @@ import java.util.concurrent.TimeUnit;
  * in case of OUTGOING call was initiated by us.
  * <p/>
  * Activity implements interfaces {@link IncomingCallFragmentInterface} for processing user accepting or rejecting of call and
- * {@link OutgoingCallFragmentInterface} for processing interaction with call of UI commands (onMic(), offMic(), onCam(), offCam(),
+ * {@link LocalVideoViewCreationListener} for processing interaction with call of UI commands (onMic(), offMic(), onCam(), offCam(),
  * switchCam(), switchSpeaker(), hangUpClick(), onLocalVideoViewCreated(), onRemoteVideoViewCreated())
  */
 
-public class CallActivity extends BaseLogeableActivity implements IncomingCallFragmentInterface, OutgoingCallFragmentInterface, VideoChatHelperListener {
+public class CallActivity extends BaseLogeableActivity implements IncomingCallFragmentInterface,
+        // Video chat helper listeners
+        VideoChatHelperSessionListener, VideoChatVideoTracksListener,
+        // Outgoing fragments listeners
+        CallStoppedListener, CallAudioActionsListener,CallVideoActionsListener {
 
 
     private static final String TAG = CallActivity.class.getSimpleName();
@@ -250,7 +255,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     /**
      * Start local straming task
      */
-    @Override
     public void onLocalVideoViewCreated() {
         for (Runnable runnable : videoTracksSetEnumMap.get(VideoTracks.LOCAL_VIDEO_TRACK)) {
             executeCallTask(runnable);
@@ -260,7 +264,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     /**
      * Start remote streaming task
      */
-    @Override
     public void onRemoteVideoViewCreated() {
         for (Runnable runnable : videoTracksSetEnumMap.get(VideoTracks.REMOTE_VIDEO_TRACK)) {
             executeCallTask(runnable);
@@ -404,7 +407,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
         if (videoChatHelper != null) {
             videoChatHelper.setClientClosed();
-            videoChatHelper.removeVideoChatHelperListener(this);
+            videoChatHelper.removeVideoChatHelperSessionListener(this);
+            videoChatHelper.removeVideoChatVideoTracksListener(this);
         }
     }
 
@@ -599,7 +603,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
             Log.d(CALL_INTEGRATION, "CallActivity. onConnectedToService");
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
 
-            videoChatHelper.addVideoChatHelperListener(this);
+            videoChatHelper.addVideoChatHelperSessionListener(this);
+            videoChatHelper.addVideoChatVideoTracksListener(this);
 
             if (call_direction_type != null) {
                 if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
