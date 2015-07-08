@@ -109,7 +109,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
     }
 
     private void toggleCamera(boolean isCameraEnabled) {
-        if (outgoingCallFragmentInterface != null){
+        if (localVideoViewCreationListener != null){
             ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
 
             int videoViewHeight = localVideoView.getHeight();
@@ -124,20 +124,20 @@ public class VideoCallFragment extends OutgoingCallFragment {
                 cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
-                outgoingCallFragmentInterface.onCam(false);
+                callVideoActionsListener.onCam(false);
             } else {
                 switchCameraButton.setVisibility(View.VISIBLE);
                 cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);
                 Log.d(TAG, "Camera enabled");
-                outgoingCallFragmentInterface.onCam(true);
+                callVideoActionsListener.onCam(true);
             }
         }
     }
 
     private void switchCamera(){
-        if (outgoingCallFragmentInterface != null) {
-            outgoingCallFragmentInterface.switchCam();
+        if (localVideoViewCreationListener != null) {
+            callVideoActionsListener.switchCam();
             Log.d(TAG, "Camera switched!");
         }
     }

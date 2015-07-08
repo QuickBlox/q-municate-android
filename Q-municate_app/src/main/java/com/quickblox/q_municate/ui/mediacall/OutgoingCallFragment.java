@@ -51,16 +51,21 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     // Necessary fot call info
     protected User opponent;
-    protected OutgoingCallFragmentInterface outgoingCallFragmentInterface;
+    protected LocalVideoViewCreationListener localVideoViewCreationListener;
+    protected RemoteVideoViewCreationListener remoteVideoViewCreationListener;
+    protected CallStoppedListener callStoppedListener;
+    protected CallAudioActionsListener callAudioActionsListener;
+    protected CallVideoActionsListener callVideoActionsListener;
+
     protected QBVideoChatHelper videoChatHelper;
     private ConstsCore.CALL_DIRECTION_TYPE call_direction_type;
     // Internal fields
     private Handler handler;
     private TimeUpdater updater;
     private boolean callStateStopped;
+
     // Listenning of plagining/unplagining HEADSET/SCO devices
     private AudioStreamReceiver audioStreamReceiver;
-
     // UI elements
     private boolean isAudioEnabled = true;
     private IntentFilter intentFilter;
@@ -176,7 +181,12 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         // Check is activity implements fragment interface
         try {
             Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onAttach");
-            outgoingCallFragmentInterface = (OutgoingCallFragmentInterface) activity;
+            localVideoViewCreationListener = (LocalVideoViewCreationListener) activity;
+            remoteVideoViewCreationListener = (RemoteVideoViewCreationListener) activity;
+            callStoppedListener = (CallStoppedListener) activity;
+            callAudioActionsListener = (CallAudioActionsListener) activity;
+            callVideoActionsListener = (CallVideoActionsListener) activity;
+
             videoChatHelper = ((CallActivity) getActivity()).getVideoChatHelper();
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
@@ -249,7 +259,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onDetach() {
         super.onDetach();
-        outgoingCallFragmentInterface = null;
+        localVideoViewCreationListener = null;
     }
 
     @Override
@@ -278,20 +288,20 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     // --------------------- Call actions redirection to activity ------------------------ //
 
     private void switchAudioOutput() {
-        if (outgoingCallFragmentInterface != null) {
-            outgoingCallFragmentInterface.switchSpeaker();
+        if (localVideoViewCreationListener != null) {
+            callAudioActionsListener.switchSpeaker();
             Log.d(TAG, "Speaker switched!");
         }
     }
 
     private void toggleMicrophone() {
-        if (outgoingCallFragmentInterface != null) {
+        if (localVideoViewCreationListener != null) {
             if (isAudioEnabled) {
-                outgoingCallFragmentInterface.onMic(false);
+                callAudioActionsListener.onMic(false);
                 isAudioEnabled = false;
                 Log.d(TAG, "Mic is off!");
             } else {
-                outgoingCallFragmentInterface.onMic(true);
+                callAudioActionsListener.onMic(true);
                 isAudioEnabled = true;
                 Log.d(TAG, "Mic is on!");
             }
@@ -299,8 +309,8 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     public void stopCall() {
-        if (outgoingCallFragmentInterface != null) {
-            outgoingCallFragmentInterface.hangUpClick();
+        if (localVideoViewCreationListener != null) {
+            callStoppedListener.hangUpClick();
         }
         stopTimer();
 

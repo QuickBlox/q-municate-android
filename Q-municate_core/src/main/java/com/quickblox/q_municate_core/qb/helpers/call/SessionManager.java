@@ -13,7 +13,7 @@ import java.util.List;
  *
  * Calls for storing and manage call sessions.
  */
-//TODO синхронизация ?
+
 public class SessionManager {
 
     private List<QBRTCSession> sessionList;
@@ -25,7 +25,7 @@ public class SessionManager {
         this.sessionList = new LinkedList<QBRTCSession>();
     }
 
-    public void addSession(QBRTCSession qbrtcSession) {
+    public synchronized void addSession(QBRTCSession qbrtcSession) {
         Log.d("CALL_INTEGRATION", "SessionManager. addSession");
         sessionList.add(qbrtcSession);
     }
@@ -37,7 +37,7 @@ public class SessionManager {
      * @param sessionID
      * @return
      */
-    public QBRTCSession getSession(String sessionID) {
+    public synchronized QBRTCSession getSession(String sessionID) {
         QBRTCSession result = null;
         for (QBRTCSession session : sessionList) {
             if (session.getSessionID().equals(sessionID)) {
@@ -48,22 +48,21 @@ public class SessionManager {
         return result;
     }
 
-    public QBRTCSession getCurrentSession() {
+    public synchronized QBRTCSession getCurrentSession() {
         return getSession(currentSessionId);
     }
 
-    public String getLastSessionId() {
+    public synchronized String getLastSessionId() {
         return lastSessionId;
     }
 
-    public void setCurrentSession(QBRTCSession currentSession) {
+    public synchronized void setCurrentSession(QBRTCSession currentSession) {
         String sessionID = currentSession.getSessionID();
         this.currentSessionId = sessionID;
         this.lastSessionId = sessionID;
     }
 
-    public void removeCurrentSession(){
+    public synchronized void removeCurrentSession(){
         this.currentSessionId = null;
     }
-
 }
