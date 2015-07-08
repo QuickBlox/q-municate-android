@@ -3,7 +3,7 @@ package com.quickblox.q_municate.ui.mediacall;
 /**
  * Created by tereha on 07.04.15.
  */
-
+//TODO интерфейс снова отвечает за все
 public interface OutgoingCallFragmentInterface {
 
     /**
@@ -25,6 +25,7 @@ public interface OutgoingCallFragmentInterface {
      */
     void switchCam();
 
+    //TODO нужно либо передавать на какой вариант переключать, либо другой способ, чтобы знать какой вариант в данный момент включен
     /**
      * Switching between headphone speaker and device one
      */
