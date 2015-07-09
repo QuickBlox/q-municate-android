@@ -56,12 +56,12 @@ import java.util.concurrent.TimeUnit;
  * from {@link com.quickblox.q_municate.ui.chats.PrivateDialogActivity} and {@link com.quickblox.q_municate.ui.friends.FriendDetailsActivity}
  * in case of OUTGOING call was initiated by us.
  * <p/>
- * Activity implements interfaces {@link IncomingCallFragmentInterface} for processing user accepting or rejecting of call and
+ * Activity implements interfaces {@link IncomingCallActionsListener} for processing user accepting or rejecting of call and
  * {@link LocalVideoViewCreationListener} for processing interaction with call of UI commands (onMic(), offMic(), onCam(), offCam(),
  * switchCam(), switchSpeaker(), hangUpClick(), onLocalVideoViewCreated(), onRemoteVideoViewCreated())
  */
 
-public class CallActivity extends BaseLogeableActivity implements IncomingCallFragmentInterface,
+public class CallActivity extends BaseLogeableActivity implements IncomingCallActionsListener,
         // Video chat helper listeners
         VideoChatHelperSessionListener, VideoChatVideoTracksListener,
         // Outgoing fragments listeners
@@ -135,7 +135,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private Map<VideoTracks, Set<Runnable>> videoTracksSetEnumMap;
 
     private MediaPlayerManager mediaPlayer;
-    private Map<String, String> userInfo = new HashMap<String, String>();
+    private Map<String, String> userInfo = new HashMap<>();
 
 
     /**
@@ -393,7 +393,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d(CALL_INTEGRATION, "Destroy call activity" + this);
+        Log.d(CALL_INTEGRATION, "Destroy call activity " + this);
         stopCall();
     }
 
@@ -408,7 +408,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         if (videoChatHelper != null) {
             videoChatHelper.setClientClosed();
             videoChatHelper.removeVideoChatHelperSessionListener(this);
-            videoChatHelper.removeVideoChatVideoTracksListener(this);
+            videoChatHelper.removeVideoChatHelperVideoTracksListener(this);
         }
     }
 

@@ -187,16 +187,16 @@ public class QBVideoChatHelper extends BaseHelper {
     }
 
     public void removeVideoChatHelperSessionListener(VideoChatHelperSessionListener listener) {
-        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. removeVideoChatHelperListener");
+        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. removeVideoChatHelperSessionListener");
         videoChatHelperSessionListeners.remove(listener);
     }
 
     public void addVideoChatVideoTracksListener(VideoChatVideoTracksListener listener) {
-        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. addVideoChatHelperListener");
+        Log.d("CALL_INTEGRATION", "QBVideoChatHelper. addVideoChatVideoTracksListener");
         videoChatVideoTracksListeners.add(listener);
     }
 
-    public void removeVideoChatVideoTracksListener(VideoChatVideoTracksListener listener) {
+    public void removeVideoChatHelperVideoTracksListener(VideoChatVideoTracksListener listener) {
         Log.d("CALL_INTEGRATION", "QBVideoChatHelper. removeVideoChatHelperListener");
         videoChatVideoTracksListeners.remove(listener);
     }

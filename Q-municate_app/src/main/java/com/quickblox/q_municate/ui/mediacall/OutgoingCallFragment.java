@@ -181,8 +181,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         // Check is activity implements fragment interface
         try {
             Log.d(CALL_INTEGRATION, "OutgoingCallFragment. onAttach");
-            localVideoViewCreationListener = (LocalVideoViewCreationListener) activity;
-            remoteVideoViewCreationListener = (RemoteVideoViewCreationListener) activity;
             callStoppedListener = (CallStoppedListener) activity;
             callAudioActionsListener = (CallAudioActionsListener) activity;
             callVideoActionsListener = (CallVideoActionsListener) activity;
@@ -259,7 +257,9 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     @Override
     public void onDetach() {
         super.onDetach();
-        localVideoViewCreationListener = null;
+        callStoppedListener = null;
+        callAudioActionsListener = null;
+        callVideoActionsListener = null;
     }
 
     @Override
@@ -288,14 +288,14 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     // --------------------- Call actions redirection to activity ------------------------ //
 
     private void switchAudioOutput() {
-        if (localVideoViewCreationListener != null) {
+        if (callAudioActionsListener != null) {
             callAudioActionsListener.switchSpeaker();
             Log.d(TAG, "Speaker switched!");
         }
     }
 
     private void toggleMicrophone() {
-        if (localVideoViewCreationListener != null) {
+        if (callAudioActionsListener != null) {
             if (isAudioEnabled) {
                 callAudioActionsListener.onMic(false);
                 isAudioEnabled = false;
@@ -309,7 +309,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     }
 
     public void stopCall() {
-        if (localVideoViewCreationListener != null) {
+        if (callStoppedListener != null) {
             callStoppedListener.hangUpClick();
         }
         stopTimer();

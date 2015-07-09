@@ -109,7 +109,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
     }
 
     private void toggleCamera(boolean isCameraEnabled) {
-        if (localVideoViewCreationListener != null){
+        if (callVideoActionsListener != null){
             ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
 
             int videoViewHeight = localVideoView.getHeight();
@@ -136,7 +136,7 @@ public class VideoCallFragment extends OutgoingCallFragment {
     }
 
     private void switchCamera(){
-        if (localVideoViewCreationListener != null) {
+        if (callVideoActionsListener != null) {
             callVideoActionsListener.switchCam();
             Log.d(TAG, "Camera switched!");
         }

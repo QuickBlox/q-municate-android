@@ -79,19 +79,19 @@ public class ActivityUIHelper {
     }
 
     public void showNewMessageAlert(User senderUser, String message) {
+        Crouton.cancelAllCroutons();
         newMessageTextView.setText(message);
         senderMessageTextView.setText(senderUser.getFullName());
-        Crouton.cancelAllCroutons();
         Crouton.show(activity, newMessageView);
     }
 
     protected void showDialog() {
+        Crouton.cancelAllCroutons();
         if (isPrivateMessage) {
             startPrivateChatActivity();
         } else {
             startGroupChatActivity();
         }
-        Crouton.cancelAllCroutons();
     }
 
     private void startPrivateChatActivity() {

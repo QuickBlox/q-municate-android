@@ -31,7 +31,7 @@ import com.quickblox.videochat.webrtc.QBRTCTypes;
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = IncomingCallFragment.class.getSimpleName();
-    private IncomingCallFragmentInterface incomingCallClickListener;
+    private IncomingCallActionsListener incomingCallClickListener;
     private User friend;
     private boolean isVideoCall;
     private QBRTCTypes.QBConferenceType callType;
@@ -54,7 +54,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            incomingCallClickListener = (IncomingCallFragmentInterface) activity;
+            incomingCallClickListener = (IncomingCallActionsListener) activity;
         } catch (ClassCastException e) {
             ErrorUtils.logError(TAG, e);
         }
