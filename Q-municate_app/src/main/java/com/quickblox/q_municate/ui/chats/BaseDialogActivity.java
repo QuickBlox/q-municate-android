@@ -165,6 +165,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
+        updateMessagesReason = UpdateMessagesReason.NONE;
 
         isNeedToScrollMessages = true;
         initUI();
@@ -206,24 +207,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
-                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        if (isNeedToOpenDialog) {
-//            finish();
-        }
-
-
-
-//        if (skipMessages == ConstsCore.ZERO_INT_VALUE){
-        updateMessagesReason = UpdateMessagesReason.DEFAULT;
         startLoadDialogMessages();
-//            scrollListView();
-//        } else {
-//            messagesListView.
-//            isNeedToScrollMessages = true;
-//            scrollListView();
-//        }
-
     }
 
     @Override
@@ -485,24 +469,20 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingView = _findViewById(R.id.message_typing_view);
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
-//        loadMoreView = _findViewById(R.id.load_more_linearlayout);
-//        loadMoreView.setVisibility(View.GONE);
         messagesListView.setOnScrollListener(this);
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         if (scrollState == SCROLL_STATE_IDLE) {
-//            if (firstItemInList && !loadingMore) {
-//                firstVisiblePositionList = totalItemCountInList - 1;
-////                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
-//                loadMoreItems();
-////                }
-//            }
             if (firstVisiblePosition == 0){
                 updateMessagesReason = UpdateMessagesReason.ON_USER_REQUEST;
                 loadMoreItems();
             }
+        }
+
+        if (scrollState > 0){
+            updateMessagesReason = UpdateMessagesReason.NONE;
         }
     }
 
@@ -512,12 +492,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         firstVisiblePosition = firstVisibleItem;
         lastVisiblePosition = firstVisibleItem + visibleItemCount;
         this.visibleItemCount = visibleItemCount;
-//        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
-//        totalItemCountInList = totalItemCount;
     }
 
     private void loadMoreItems() {
-//        loadMoreView.setVisibility(View.VISIBLE);
         startLoadDialogMessages();
     }
 
@@ -540,14 +517,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             initListView(messagesCursor);
         } else {
             Log.d("POSITION", "UpdateMessagesReason is " + updateMessagesReason);
-            messagesAdapter.changeCursor(messagesCursor);
+            messagesAdapter.swapCursor(messagesCursor);
 
-            if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST) {
+            // Set position depends on first load
+            if (totalEntries > 0 && UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason ) {
                 messagesListView.setSelection(totalEntries - 1);
-
-            } else if (totalEntries > 0 && updateMessagesReason == UpdateMessagesReason.DEFAULT){
+            } else if (totalEntries > 0 && UpdateMessagesReason.DEFAULT == updateMessagesReason){
                 scrollListView();
             }
+
+            // Set state to none to prevent scrolling to the bottom of the list on each data update
+            // Update list position only for first load
+            updateMessagesReason = UpdateMessagesReason.NONE;
         }
     }
 
@@ -727,16 +708,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-
-
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
-        } else if (updateMessagesReason == UpdateMessagesReason.DEFAULT) {
+        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
             startLoadDialogMessagesByDefaultReason(dialog);
-        } else if (updateMessagesReason == UpdateMessagesReason.ON_USER_REQUEST){
+        } else {
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
+
         }
     }
 
@@ -780,8 +760,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = true;
-//            loadMoreView.setVisibility(View.GONE);
-
             hideActionBarProgress();
         }
     }
@@ -791,8 +769,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             loadingMore = true;
-//            loadMoreView.setVisibility(View.GONE);
-
             hideActionBarProgress();
         }
     }
@@ -848,6 +824,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
      * Enumeration are using for marking reason on loading messages
      */
     private enum UpdateMessagesReason {
+
+        /**
+         * Loader updates data
+         */
+        NONE,
+
         /**
          * Messages are loading after activity recreating
          */
@@ -857,7 +839,5 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
          * User scrolled list till oldest uploaded message
          */
         ON_USER_REQUEST;
-
-
     }
 }

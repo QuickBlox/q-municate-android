@@ -177,9 +177,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                                                         Bundle returnedBundle, QBDialog dialog,
                                                         long lastDateLoad) throws QBResponseException {
 
-        if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
-//            customObjectRequestBuilder.lte(com.quickblox.chat.Consts.MESSAGE_DATE_SENT, lastDateLoad);
-        } else {
+        if (lastDateLoad == ConstsCore.ZERO_LONG_VALUE) {
             deleteMessagesByDialogId(dialog.getDialogId());
         }
 
