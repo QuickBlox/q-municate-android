@@ -9,13 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,7 +24,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
-import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -181,6 +178,10 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initPrefValues() {
         PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+
+        // Set base value of droverLayout as opposite to userLearnerDrawer
+        // Made it for next behaviour: if drawer will be opened then we shouldn't show croutons
+        prefsHelper.savePref(PrefsHelper.PREF_CROUTONS_DISABLED, !userLearnedDrawer);
     }
 
     private void selectItem(int position) {
@@ -244,6 +245,10 @@ public class NavigationDrawerFragment extends BaseFragment {
 
                 baseActivity.showProgress();
                 FacebookHelper.logout();
+
+                // Clear crouton queue
+                Crouton.cancelAllCroutons();
+
                 QBLogoutCommand.start(baseActivity);
             }
         });
@@ -297,7 +302,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
 
-            Crouton.cancelAllCroutons();
+            // Clear croutons
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_CROUTONS_DISABLED, true);
+            Crouton.clearCroutonsForActivity(getActivity());
 
             baseActivity.invalidateOptionsMenu();
 
@@ -313,6 +320,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onDrawerClosed(View drawerView) {
             super.onDrawerClosed(drawerView);
             baseActivity.invalidateOptionsMenu();
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_CROUTONS_DISABLED, false);
         }
     }
 

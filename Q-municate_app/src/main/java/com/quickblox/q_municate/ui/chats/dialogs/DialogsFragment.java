@@ -8,12 +8,14 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,13 +30,13 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.UserTable;
-import com.quickblox.q_municate_core.models.Dialog;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
 
@@ -114,10 +116,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor dialogsCursor) {
         this.dialogsCursor = dialogsCursor;
-        initChatsDialogs();
+        initChatsDialogs(dialogsCursor);
         checkVisibilityEmptyLabel();
-
-
     }
 
     @Override
@@ -135,6 +135,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
+                Crouton.clearCroutonsForActivity(getActivity());
+
                 Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
                 QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
@@ -142,7 +144,17 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 } else {
                     startGroupChatActivity(dialog);
                 }
+            }
+        });
+
+        dialogsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
                 selectedPositionList = dialogsListView.getFirstVisiblePosition();
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
             }
         });
     }
@@ -153,10 +165,13 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
     @Override
     public void onResume() {
-        Crouton.cancelAllCroutons();
         if (dialogsAdapter != null) {
             checkVisibilityEmptyLabel();
         }
+
+        Log.d("DialogScroilling", selectedPositionList + " is current position");
+        dialogsListView.setSelection(selectedPositionList);
+
         super.onResume();
     }
 
@@ -198,7 +213,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
     //    }
 
-    private void initChatsDialogs() {
+    private void initChatsDialogs(Cursor newCursor) {
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
         dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -207,11 +222,9 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 checkVisibilityEmptyLabel();
             }
         });
-        dialogsListView.setAdapter(dialogsAdapter);
 
-        if (selectedPositionList != ConstsCore.ZERO_INT_VALUE) {
-            dialogsListView.setSelection(selectedPositionList);
-        }
+        dialogsListView.setAdapter(dialogsAdapter);
+//        dialogsAdapter.swapCursor(newCursor);
     }
 
 

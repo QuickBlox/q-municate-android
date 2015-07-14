@@ -81,16 +81,16 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     @Override
-    protected void onPause() {
-        activityHelper.onPause();
-        super.onPause();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+    }
+
+    @Override
+    protected void onPause() {
+        activityHelper.onPause();
+        super.onPause();
     }
 
     @Override

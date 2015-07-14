@@ -25,6 +25,7 @@ import com.quickblox.q_municate_core.qb.commands.QBLoginRestWithSocialCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -125,14 +126,14 @@ public class ActivityHelper extends BaseActivityHelper {
         LocalBroadcastManager.getInstance(activity).registerReceiver(broadcastReceiver, intentFilter);
     }
 
-    public void onPause() {
-        unregisterBroadcastReceiver();
-        Crouton.cancelAllCroutons();
-    }
-
     public void onResume() {
         registerGlobalReceiver();
         updateBroadcastActionList();
+    }
+
+    public void onPause() {
+        Crouton.clearCroutonsForActivity(activity);
+        unregisterBroadcastReceiver();
     }
 
     protected void onStart() {
@@ -229,9 +230,9 @@ public class ActivityHelper extends BaseActivityHelper {
                 public void run() {
                     Bundle extras = intent.getExtras();
                     if (actionsListener != null) {
-                        if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+                        if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction()) && isCroutonDisabled()) {
                             actionsListener.onReceiveChatMessageAction(intent.getExtras());
-                        } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
+                        } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction()) && isCroutonDisabled()) {
                             actionsListener.onReceiveContactRequestAction(intent.getExtras());
                         } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
                             actionsListener.onReceiveForceReloginAction(intent.getExtras());
@@ -241,6 +242,14 @@ public class ActivityHelper extends BaseActivityHelper {
                     }
                 }
             });
+        }
+
+
+        /**
+         * Returns true if drawer navigator are closed
+         */
+        private boolean isCroutonDisabled() {
+            return !PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_CROUTONS_DISABLED, false);
         }
     }
 

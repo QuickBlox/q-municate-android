@@ -35,6 +35,11 @@ public class PrefsHelper {
     public static final String PREF_USER_FULL_NAME = "full_name";
     public static final String PREF_SESSION_TOKEN = "session_token";
 
+
+    public static final String PREF_CROUTONS_DISABLED = "pref_croutons_disabled";
+
+
+
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
 
