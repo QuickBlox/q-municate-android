@@ -472,7 +472,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
         }
 
-        if (scrollState > 0){
+        if (scrollState > 3){
             updateMessagesReason = UpdateMessagesReason.NONE;
         }
     }
