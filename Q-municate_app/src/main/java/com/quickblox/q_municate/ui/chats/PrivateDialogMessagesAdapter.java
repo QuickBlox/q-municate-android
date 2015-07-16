@@ -221,15 +221,11 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     private void findLastFriendsRequest() {
         Cursor cursor = getCursor();
-        try{
             if(cursor.moveToFirst()){
                 do{
                     findLastFriendsRequestForCursor(cursor);
                 }while (cursor.moveToNext());
             }
-        }finally {
-         cursor.close();
-        }
     }
 
     private void findLastFriendsRequestForCursor(Cursor cursor) {

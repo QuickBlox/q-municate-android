@@ -51,6 +51,9 @@ public class ChatDatabaseManager {
             if (!TextUtils.isEmpty(resultDialogId)) {
                 dialog = getDialogFromCursor(cursor);
             }
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -64,6 +67,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -78,6 +84,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -94,6 +103,9 @@ public class ChatDatabaseManager {
             if (!TextUtils.isEmpty(resultDialogId)) {
                 dialog = getDialogFromCursor(cursor);
             }
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -109,8 +121,10 @@ public class ChatDatabaseManager {
                 new String[]{String.valueOf(dialogType.getCode()), "%" + opponent + "%"}, null);
 
         if (cursor != null) {
-            while (cursor.moveToNext()) {
-                dialogsList.add(getDialogFromCursor(cursor));
+            if (cursor.moveToFirst()) {
+                do {
+                    dialogsList.add(getDialogFromCursor(cursor));
+                } while (cursor.moveToNext());
             }
             cursor.close();
         }
@@ -127,10 +141,13 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             values = getContentValuesForUpdateDialogTable(context, dialog);
             resolver.update(DialogTable.CONTENT_URI, values, condition, null);
-            cursor.close();
         } else {
             values = getContentValuesForCreateDialogTable(dialog);
             resolver.insert(DialogTable.CONTENT_URI, values);
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
     }
 
@@ -155,9 +172,9 @@ public class ChatDatabaseManager {
         List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());
         if (allDialogsCursor != null) {
             if (allDialogsCursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-                while (allDialogsCursor.moveToNext()) {
+                do {
                     dialogs.add(getDialogFromCursor(allDialogsCursor));
-                }
+                } while (allDialogsCursor.moveToNext());
             }
             allDialogsCursor.close();
         }
@@ -228,9 +245,11 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             cursor.moveToLast();
             messageCache = getMessageCacheFromCursor(cursor);
-            cursor.close();
         }
 
+        if (cursor != null){
+            cursor.close();
+        }
 
         return messageCache;
     }
@@ -279,6 +298,9 @@ public class ChatDatabaseManager {
             }  else {
                 Log.d("ChatDatabaseManager","Wrong count of not sent message was found for dialog " + dialogId);
             }
+        }
+
+        if (cursor != null){
             cursor.close();
         }
 
@@ -395,7 +417,6 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
-            cursor.close();
         } else {
             values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
             values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
@@ -408,6 +429,10 @@ public class ChatDatabaseManager {
             }
 
             resolver.insert(MessageTable.CONTENT_URI, values);
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
     }
 
@@ -433,11 +458,14 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             Log.d("NOT_SEND_MESSAGE", "Update dialog " + dialogID);
             resolver.update(NotSendMessageTable.CONTENT_URI, values, condition, null);
-            cursor.close();
         } else {
             Log.d("NOT_SEND_MESSAGE", "Insert dialog " + dialogID);
             values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
             resolver.insert(NotSendMessageTable.CONTENT_URI, values);
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
     }
 
@@ -485,8 +513,11 @@ public class ChatDatabaseManager {
                 DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            cursor.close();
             return true;
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
 
         return false;
@@ -626,6 +657,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             countMessages = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.COUNT_UNREAD_MESSAGES));
+        }
+
+        if (cursor != null){
             cursor.close();
         }
 
@@ -660,12 +694,16 @@ public class ChatDatabaseManager {
 
             values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
-            cursor.close();
+
 
             int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
             countUnreadMessagesLocal = --countUnreadMessagesLocal;
 
             checkUpdatingDialogForFriendsNotificationMessage(context, messageCache, countUnreadMessagesLocal);
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
     }
 
@@ -673,10 +711,15 @@ public class ChatDatabaseManager {
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
+
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
+
         if (cursor != null && cursor.moveToFirst()) {
             values.put(MessageTable.Cols.IS_DELIVERED, isDelivered);
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+        }
+
+        if (cursor != null){
             cursor.close();
         }
     }
