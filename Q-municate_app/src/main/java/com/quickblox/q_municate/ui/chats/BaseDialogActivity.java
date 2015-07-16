@@ -53,6 +53,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -65,7 +66,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.io.File;
 import java.util.Timer;
@@ -128,6 +128,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private int visibleItemCount;
     private boolean isFirstUpdateListView = true;
     private UpdateMessagesReason updateMessagesReason;
+    private boolean isListInBottomNow;
+    private boolean isTypingAnimationShown;
 
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
@@ -465,7 +467,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        if (scrollState == SCROLL_STATE_IDLE) {
+        if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
             if (firstVisiblePosition == 0){
                 updateMessagesReason = UpdateMessagesReason.ON_USER_REQUEST;
                 loadMoreItems();
@@ -475,6 +477,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (scrollState > 3){
             updateMessagesReason = UpdateMessagesReason.NONE;
         }
+
+
+        if(isTypingAnimationShown) {
+            isTypingAnimationShown = false;
+            stopMessageTypingAnimation();
+        }
+
     }
 
     @Override
@@ -483,6 +492,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         firstVisiblePosition = firstVisibleItem;
         lastVisiblePosition = firstVisibleItem + visibleItemCount;
         this.visibleItemCount = visibleItemCount;
+        this.isListInBottomNow = (visibleItemCount + firstVisibleItem) == totalItemCount;
     }
 
     private void loadMoreItems() {
@@ -712,26 +722,34 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     public boolean isFirstDialogLaunch() {
         Cursor messagesCursor = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId());
+        boolean result = true;
         if(messagesCursor.moveToFirst()){
             try {
                 do {
-                    if(!isMessageContactRequest(messagesCursor.getString(messagesCursor.getColumnIndex(MessageTable.Cols.BODY)))){
-                        return false;
+                    if (!isMessageTypeContactRequest(messagesCursor.getString(messagesCursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)))) {
+                        result =  false;
+                        break;
                     }
-                    break;
                 } while (messagesCursor.moveToNext());
             } finally {
                 messagesCursor.close();
             }
         }
-        return true;
+        return result;
     }
 
-    private boolean isMessageContactRequest(String messageBody) {
-        String CONTACT_REQUEST = getString(R.string.frl_friends_contact_request);
-        if(CONTACT_REQUEST.equals(messageBody)){
-            return true;
-        } else {
+    private boolean isMessageTypeContactRequest(String messageNotificationType) {
+        try{
+            Integer messageType = Integer.valueOf(messageNotificationType);
+
+            if(MessagesNotificationType.FRIENDS_REQUEST.getCode() == messageType
+                    || MessagesNotificationType.FRIENDS_ACCEPT.getCode() == messageType
+                    || MessagesNotificationType.FRIENDS_REJECT.getCode() == messageType){
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NumberFormatException e){
             return false;
         }
     }
@@ -817,9 +835,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             // TODO: now it is possible only for Private chats
             if (QBDialogType.PRIVATE.equals(dialog.getType())) {
                 boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                if (isTyping) {
+                if (isTyping && isListInBottomNow) {
+                    isTypingAnimationShown = true;
+                    scrollListView();
                     startMessageTypingAnimation();
                 } else {
+                    isTypingAnimationShown = false;
                     stopMessageTypingAnimation();
                 }
             }

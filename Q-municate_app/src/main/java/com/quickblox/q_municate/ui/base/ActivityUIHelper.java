@@ -47,11 +47,6 @@ public class ActivityUIHelper implements View.OnClickListener {
 
     private boolean isMessagesDialogCorrect(String dialogId) {
         messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
-
-        if (messagesDialog == null){
-            Toast.makeText(activity, "DIALOG IS INCORRECT !!!!!", Toast.LENGTH_LONG).show();
-        }
-
         return messagesDialog != null;
     }
 

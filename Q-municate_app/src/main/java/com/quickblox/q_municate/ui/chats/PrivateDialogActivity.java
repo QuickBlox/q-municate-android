@@ -88,7 +88,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         // Check count of messages have been stored in base, if stored messages aren't only contact request then we
         // skip count of messages in base on next dialog's messages request to server this count of messages
-        if (isFirstDialogLaunch()) {
+        if (!isFirstDialogLaunch()) {
             skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
         }
 
