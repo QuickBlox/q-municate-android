@@ -19,6 +19,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
@@ -63,13 +64,17 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         }
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
+
+        // Check count of messages have been stored in base, if stored messages aren't only contact request then we
+        // skip count of messages in base on next dialog's messages request to server this count of messages
+        if (isFirstDialogLaunch()) {
+            skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
+        }
 
         initCursorLoaders();
         updateActionBar();
 //        startLoadDialogMessages();
         setCurrentDialog(dialog);
-
 //        registerForContextMenu(messagesListView);
     }
 
@@ -134,7 +139,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        Cursor cursor = null;
+
+        if (messagesAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        }
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();

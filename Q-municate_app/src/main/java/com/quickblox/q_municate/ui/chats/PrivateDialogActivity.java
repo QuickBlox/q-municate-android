@@ -85,7 +85,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
         friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
-        skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
+
+        // Check count of messages have been stored in base, if stored messages aren't only contact request then we
+        // skip count of messages in base on next dialog's messages request to server this count of messages
+        if (isFirstDialogLaunch()) {
+            skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
+        }
 
         initCursorLoaders();
         initActionBar();
@@ -179,7 +184,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        Cursor cursor = null;
+
+        if (messagesAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        }
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();

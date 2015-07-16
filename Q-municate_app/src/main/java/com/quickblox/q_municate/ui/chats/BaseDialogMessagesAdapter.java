@@ -62,7 +62,12 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) getItem(position);
+        }
+
         return getItemViewType(cursor);
     }
 
@@ -185,6 +190,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
         } else {
             return ConstsCore.ZERO_INT_VALUE;
         }
+
 
         if (!TextUtils.isEmpty(timeString)) {
             return timeString.subSequence(ConstsCore.ZERO_INT_VALUE, timeString.length() - 1).charAt(

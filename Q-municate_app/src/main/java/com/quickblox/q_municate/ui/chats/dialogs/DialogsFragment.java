@@ -137,7 +137,12 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
                 Crouton.clearCroutonsForActivity(getActivity());
 
-                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
+                // Check cursor
+                Cursor selectedChatCursor = null;
+                if (dialogsAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+                    selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
+                }
+
                 QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);

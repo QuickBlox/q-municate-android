@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
@@ -244,6 +246,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceiveContactRequestAction(Bundle extras) {
             if (currentDialog == null) {
+                Toast.makeText(getApplicationContext(),"Dialog is absent", Toast.LENGTH_LONG).show();
                 return;
             }
             if (!isFromCurrentDialog(extras)) {

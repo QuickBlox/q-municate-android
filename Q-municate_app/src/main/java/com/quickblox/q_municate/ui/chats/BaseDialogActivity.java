@@ -51,6 +51,7 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -168,6 +169,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         updateMessagesReason = UpdateMessagesReason.NONE;
 
         isNeedToScrollMessages = true;
+
         initUI();
         initListeners();
         initActionBar();
@@ -439,21 +441,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
-            skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+            skipMessages += totalEntries;
             loadingMore = false;
         }
     }
-
-    protected void startLoadDialogMessagesByDefaultReason(QBDialog dialog) {
-        if (loadingMore) {
-            QBLoadDialogMessagesCommand.start(this, dialog, System.currentTimeMillis(), 0);
-
-            skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE + totalEntries;
-            loadingMore = false;
-        }
-    }
-
-
 
     protected abstract Bundle generateBundleToInitDialog();
 
@@ -712,11 +703,36 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
         } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
-            startLoadDialogMessagesByDefaultReason(dialog);
+            startLoadDialogMessages(dialog, System.currentTimeMillis());
         } else {
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
+        }
+    }
 
+    public boolean isFirstDialogLaunch() {
+        Cursor messagesCursor = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId());
+        if(messagesCursor.moveToFirst()){
+            try {
+                do {
+                    if(!isMessageContactRequest(messagesCursor.getString(messagesCursor.getColumnIndex(MessageTable.Cols.BODY)))){
+                        return false;
+                    }
+                    break;
+                } while (messagesCursor.moveToNext());
+            } finally {
+                messagesCursor.close();
+            }
+        }
+        return true;
+    }
+
+    private boolean isMessageContactRequest(String messageBody) {
+        String CONTACT_REQUEST = getString(R.string.frl_friends_contact_request);
+        if(CONTACT_REQUEST.equals(messageBody)){
+            return true;
+        } else {
+            return false;
         }
     }
 

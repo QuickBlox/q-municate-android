@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
@@ -46,6 +47,11 @@ public class ActivityUIHelper implements View.OnClickListener {
 
     private boolean isMessagesDialogCorrect(String dialogId) {
         messagesDialog = ChatDatabaseManager.getDialogByDialogId(activity, dialogId);
+
+        if (messagesDialog == null){
+            Toast.makeText(activity, "DIALOG IS INCORRECT !!!!!", Toast.LENGTH_LONG).show();
+        }
+
         return messagesDialog != null;
     }
 

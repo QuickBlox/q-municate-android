@@ -253,7 +253,6 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(tableName);
         Cursor result = builder.query(db, projection, selection, selectionArgs, sortOrder, null, null);
-
         result.setNotificationUri(getContext().getContentResolver(), uri);
 
         return result;

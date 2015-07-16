@@ -49,7 +49,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+             cursor = (Cursor) getItem(position);
+        }
         return getItemViewType(cursor);
     }
 

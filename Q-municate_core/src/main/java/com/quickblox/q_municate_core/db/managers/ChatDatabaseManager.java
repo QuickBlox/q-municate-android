@@ -112,7 +112,6 @@ public class ChatDatabaseManager {
             while (cursor.moveToNext()) {
                 dialogsList.add(getDialogFromCursor(cursor));
             }
-
             cursor.close();
         }
 
@@ -128,13 +127,10 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             values = getContentValuesForUpdateDialogTable(context, dialog);
             resolver.update(DialogTable.CONTENT_URI, values, condition, null);
+            cursor.close();
         } else {
             values = getContentValuesForCreateDialogTable(dialog);
             resolver.insert(DialogTable.CONTENT_URI, values);
-        }
-
-        if (cursor != null) {
-            cursor.close();
         }
     }
 
@@ -232,9 +228,9 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             cursor.moveToLast();
             messageCache = getMessageCacheFromCursor(cursor);
+            cursor.close();
         }
 
-        cursor.close();
 
         return messageCache;
     }
@@ -262,19 +258,28 @@ public class ChatDatabaseManager {
     }
 
 
+    /**
+     * Check is exists some not sent message for this dialog.
+     * Only one message which wasn't sent can be exists in the database table for one dialog.
+     *
+     * @param context - context to call content resolver
+     * @param dialogId - id for which we will search message
+     * @return
+     */
     public static String getNotSendMessageBodyByDialogId(Context context, String dialogId) {
         Cursor cursor = context.getContentResolver().query(NotSendMessageTable.CONTENT_URI, null,
                 NotSendMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
                 null);
 
-        String messageBody = null;
+        String messageBody = "";
 
-        if(cursor.moveToFirst()){
+        if(cursor != null && cursor.moveToFirst()){
             if(cursor.getCount() <= 1) {
                 messageBody = cursor.getString(cursor.getColumnIndex(NotSendMessageTable.Cols.BODY));
             }  else {
                 Log.d("ChatDatabaseManager","Wrong count of not sent message was found for dialog " + dialogId);
             }
+            cursor.close();
         }
 
         return messageBody;
@@ -390,6 +395,7 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+            cursor.close();
         } else {
             values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
             values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
@@ -427,12 +433,12 @@ public class ChatDatabaseManager {
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             Log.d("NOT_SEND_MESSAGE", "Update dialog " + dialogID);
             resolver.update(NotSendMessageTable.CONTENT_URI, values, condition, null);
+            cursor.close();
         } else {
             Log.d("NOT_SEND_MESSAGE", "Insert dialog " + dialogID);
             values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
             resolver.insert(NotSendMessageTable.CONTENT_URI, values);
         }
-        cursor.close();
     }
 
     private static String parseMessageBody(Context context, MessageCache messageCache) {

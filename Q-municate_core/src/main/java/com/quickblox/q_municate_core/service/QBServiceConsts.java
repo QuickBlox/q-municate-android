@@ -208,4 +208,15 @@ public class QBServiceConsts {
     public static final String AUTH_ACTION_TYPE = "authorize_type";
     public static final int AUTH_TYPE_REGISTRATION = 1;
     public static final int AUTH_TYPE_LOGIN = 2;
+
+    /**
+     * Loading strategy means what algorithm are we use.
+     * By default we are loading in {@link com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand}
+     * all messages which are less then some date, but in some case we can need to load greater then values so we can
+     * by setting this param true value
+     *
+     * LTE strategy - true
+     * GTE strategy - false
+     */
+    public static final String EXTRA_LOAD_STRATEGY = "extra_load_strategy";
 }
