@@ -49,9 +49,12 @@ public class UsersDatabaseManager {
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             resolver.update(UserTable.CONTENT_URI, values, condition, null);
-            cursor.close();
         } else {
             resolver.insert(UserTable.CONTENT_URI, values);
+        }
+
+        if(cursor != null){
+            cursor.close();
         }
     }
 
@@ -68,9 +71,12 @@ public class UsersDatabaseManager {
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             resolver.update(FriendTable.CONTENT_URI, values, condition, null);
-            cursor.close();
         } else {
             resolver.insert(FriendTable.CONTENT_URI, values);
+        }
+
+        if(cursor != null){
+            cursor.close();
         }
     }
 
@@ -94,6 +100,9 @@ public class UsersDatabaseManager {
         if (cursor != null && cursor.moveToFirst()) {
             relationStatusId = cursor.getInt(cursor.getColumnIndex(
                     FriendsRelationTable.Cols.RELATION_STATUS_ID));
+        }
+
+        if(cursor != null){
             cursor.close();
         }
 
@@ -128,6 +137,9 @@ public class UsersDatabaseManager {
         if (cursor != null && cursor.moveToFirst()) {
             relationStatus = cursor.getString(cursor.getColumnIndex(
                     FriendsRelationTable.Cols.RELATION_STATUS));
+        }
+
+        if(cursor != null){
             cursor.close();
         }
 
@@ -142,6 +154,9 @@ public class UsersDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
+        }
+
+        if(cursor != null){
             cursor.close();
         }
 
@@ -379,9 +394,11 @@ public class UsersDatabaseManager {
 
         while (cursor != null && cursor.moveToNext()) {
             friendList.add(getUserFromCursor(cursor));
-            cursor.close();
         }
 
+        if(cursor != null){
+            cursor.close();
+        }
 
         return friendList;
     }
@@ -424,8 +441,12 @@ public class UsersDatabaseManager {
         User user = null;
         if (cursor != null && cursor.moveToFirst()) {
             user = getUserFromCursor(cursor);
+        }
+
+        if(cursor != null){
             cursor.close();
         }
+
         return user;
     }
 
@@ -437,8 +458,12 @@ public class UsersDatabaseManager {
             friend = getFriendFromCursor(cursor);
             String relationStatus = getRelationStatusNameById(context, friend.getRelationStatusId());
             friend.setRelationStatus(relationStatus);
+        }
+
+        if(cursor != null){
             cursor.close();
         }
+
         return friend;
     }
 
