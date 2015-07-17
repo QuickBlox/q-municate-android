@@ -60,7 +60,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         title = getString(R.string.nvd_title_chats);
     }
 
@@ -152,16 +151,17 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             }
         });
 
-        dialogsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                selectedPositionList = dialogsListView.getFirstVisiblePosition();
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            }
-        });
+//        dialogsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//                selectedPositionList = dialogsListView.getFirstVisiblePosition();
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//
+//            }
+//        });
     }
 
     private void checkVisibilityEmptyLabel() {
@@ -201,37 +201,26 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         return true;
     }
 
-    //    @Override
-    //    public boolean onContextItemSelected(MenuItem item) {
-    //        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-    //        switch (item.getItemId()) {
-    //            case R.id.action_delete:
-    //                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-    //                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-    //                deleteDialog(dialog);
-    //                break;
-    //        }
-    //        return true;
-    //    }
-
-    //    private void deleteDialog(QBDialog dialog) {
-    //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
-    //    }
-
     private void initChatsDialogs(Cursor newCursor) {
-        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
-        dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                checkVisibilityEmptyLabel();
-            }
-        });
+        if (dialogsAdapter == null) {
+            dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
 
-        dialogsListView.setAdapter(dialogsAdapter);
-//        dialogsAdapter.swapCursor(newCursor);
+            dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
+                @Override
+                public void onChanged() {
+                    super.onChanged();
+                    checkVisibilityEmptyLabel();
+                }
+            });
+            dialogsListView.setAdapter(dialogsAdapter);
+        } else {
+            dialogsAdapter.swapCursor(newCursor);
+//            if(selectedPositionList > ConstsCore.ZERO_INT_VALUE){
+//                dialogsListView.setSelection(selectedPositionList);
+//            }
+        }
+
     }
-
 
     private void startPrivateChatActivity(QBDialog dialog) {
         int occupantId = ChatUtils.getOccupantIdFromList(dialog.getOccupants());
@@ -262,13 +251,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         baseActivity.addAction(QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION, failAction);
         baseActivity.updateBroadcastActionList();
     }
-
-    //    @Override
-    //    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-    //        super.onCreateContextMenu(menu, view, menuInfo);
-    //        MenuInflater menuInflater = baseActivity.getMenuInflater();
-    //        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
-    //    }
 
     private class LoadChatsDialogsSuccessAction implements Command {
 

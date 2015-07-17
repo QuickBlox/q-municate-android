@@ -110,8 +110,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String error = null;
         try {
             privateChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_connection);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         }
@@ -252,8 +250,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             } else {
                 privateChat.sendStopTypingNotification();
             }
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
         } catch (SmackException.NotConnectedException e) {
             ErrorUtils.logError(e);
         }
