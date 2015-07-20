@@ -30,7 +30,7 @@ import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.roster.packet.RosterPacket;
+import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;
 import java.util.Collection;

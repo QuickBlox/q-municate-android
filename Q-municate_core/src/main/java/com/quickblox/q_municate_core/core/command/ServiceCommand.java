@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -52,6 +53,7 @@ public abstract class ServiceCommand implements Command {
         if (null != result) {
             intent.putExtras(result);
         }
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 

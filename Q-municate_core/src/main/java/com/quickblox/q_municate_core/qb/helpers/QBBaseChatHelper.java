@@ -112,6 +112,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             privateChat.sendMessage(chatMessage);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
         if (error != null) {
             throw new QBResponseException(error);
@@ -252,6 +254,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             }
         } catch (SmackException.NotConnectedException e) {
             ErrorUtils.logError(e);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
     }
 

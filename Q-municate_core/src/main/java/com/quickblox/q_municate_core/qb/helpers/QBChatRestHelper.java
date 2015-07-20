@@ -66,7 +66,8 @@ public class QBChatRestHelper extends BaseHelper {
         }
 
         @Override
-        public void authenticated(XMPPConnection xmppConnection, boolean b) {
+        public void authenticated(XMPPConnection xmppConnection) {
+
 
         }
 

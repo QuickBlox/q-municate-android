@@ -89,11 +89,8 @@ public class GCMIntentService extends IntentService {
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
 
-            Log.d("Bug fixing", "Set PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG true");
-
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
         } else {
-            Log.d("Bug fixing", "Set PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG false");
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         }
     }

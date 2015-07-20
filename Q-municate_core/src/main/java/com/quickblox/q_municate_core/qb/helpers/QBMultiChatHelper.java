@@ -131,6 +131,8 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
         } catch (IllegalStateException e) {
             tryJoinRoomChat(existingDialog);
             throw new IllegalStateException(e);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
         if (error != null) {
             throw new QBResponseException(error);

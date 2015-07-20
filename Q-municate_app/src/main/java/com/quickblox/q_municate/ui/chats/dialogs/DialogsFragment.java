@@ -148,6 +148,8 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 } else {
                     startGroupChatActivity(dialog);
                 }
+
+                selectedPositionList = parent.getFirstVisiblePosition();
             }
         });
 
@@ -174,10 +176,16 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
             checkVisibilityEmptyLabel();
         }
 
-        Log.d("DialogScroilling", selectedPositionList + " is current position");
-        dialogsListView.setSelection(selectedPositionList);
+        restoreLastUsedListPosition();
 
         super.onResume();
+    }
+
+    private void restoreLastUsedListPosition() {
+        dialogsListView.setSelection(selectedPositionList);
+
+        // Erase last used list position to prevent int using next time
+        selectedPositionList = ConstsCore.ZERO_INT_VALUE;
     }
 
     @Override

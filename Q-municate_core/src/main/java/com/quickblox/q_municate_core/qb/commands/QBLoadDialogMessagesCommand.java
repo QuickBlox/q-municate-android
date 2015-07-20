@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
@@ -43,8 +44,13 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesSkip(skipMessages);
-        customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+
+        // We use wrong skip messages value to signalize that we load new messages
+        // If we load new messages we shouldn't set restriction on loading messages count
+        if(ConstsCore.NOT_INITIALIZED_VALUE != skipMessages){
+            customObjectRequestBuilder.setPagesSkip(skipMessages);
+            customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+        }
         customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
 
         List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,

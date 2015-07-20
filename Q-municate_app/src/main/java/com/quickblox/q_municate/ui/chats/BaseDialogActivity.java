@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
@@ -118,7 +119,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private int firstVisiblePositionList;
     private View loadMoreView;
     private boolean loadingMore = true;
-    protected int skipMessages;
+    protected volatile int skipMessages;
     private int totalEntries;
     private int loadedItems;
     private boolean firstItemInList;
@@ -169,7 +170,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
         updateMessagesReason = UpdateMessagesReason.NONE;
-
         isNeedToScrollMessages = true;
 
         initUI();
@@ -211,6 +211,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        updateMessagesReason = UpdateMessagesReason.DEFAULT;
         startLoadDialogMessages();
     }
 
@@ -252,7 +253,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void createChatLocally() {
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
-            Log.d("Bug fixing", "Init baseChatHelper, now  it is: " + baseChatHelper);
             try {
                 baseChatHelper.createChatLocally(dialog, generateBundleToInitDialog());
             } catch (QBResponseException e) {
@@ -443,7 +443,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
-            skipMessages += totalEntries;
+            loadingMore = false;
+        }
+    }
+
+
+    protected void startNewMessagesLoadDialogMessages(QBDialog dialog) {
+        if (loadingMore) {
+            QBLoadDialogMessagesCommand.start(this, dialog, System.currentTimeMillis(), ConstsCore.NOT_INITIALIZED_VALUE);
             loadingMore = false;
         }
     }
@@ -474,11 +481,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
         }
 
-        if (scrollState > 3){
-            updateMessagesReason = UpdateMessagesReason.NONE;
-        }
-
-
         if(isTypingAnimationShown) {
             isTypingAnimationShown = false;
             stopMessageTypingAnimation();
@@ -489,10 +491,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
+
         firstVisiblePosition = firstVisibleItem;
         lastVisiblePosition = firstVisibleItem + visibleItemCount;
         this.visibleItemCount = visibleItemCount;
         this.isListInBottomNow = (visibleItemCount + firstVisibleItem) == totalItemCount;
+
+
+        if (firstVisiblePosition > 1){
+            updateMessagesReason = UpdateMessagesReason.NONE;
+        }
     }
 
     private void loadMoreItems() {
@@ -505,24 +513,20 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.d("POSITION", "onCreateLoader");
         return ChatDatabaseManager.getAllDialogMessagesLoaderByDialogId(this, dialogId);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
-        Log.d("POSITION", "Loading finish");
-        Log.d("POSITION", "messagesAdapter is " + messagesAdapter);
-
         if (messagesAdapter == null) {
             initListView(messagesCursor);
         } else {
-            Log.d("POSITION", "UpdateMessagesReason is " + updateMessagesReason);
             messagesAdapter.swapCursor(messagesCursor);
-
             // Set position depends on first load
             if (totalEntries > 0 && UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason ) {
-                messagesListView.setSelection(totalEntries - 1);
+                int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
+                        ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
+                messagesListView.setSelection(loadMessages - 1);
             } else if (totalEntries > 0 && UpdateMessagesReason.DEFAULT == updateMessagesReason){
                 scrollListView();
             }
@@ -535,7 +539,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Log.d("POSITION", "onLoaderReset");
+
     }
 
     protected abstract void initListView(Cursor messagesCursor);
@@ -621,7 +625,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void sendTypingStatus() {
-        Log.d("Bug fixing", "baseChatHelper is: " + baseChatHelper + " opponentFriend is: " + opponentFriend);
         if (baseChatHelper != null) {
             baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
         }
@@ -661,10 +664,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-//        if (isNeedToScrollMessages) {
-            isNeedToScrollMessages = false;
-            messagesListView.setSelection(messagesAdapter.getCount() - 1);
-//        }
+        isNeedToScrollMessages = false;
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     abstract QBDialog getQBDialog();
@@ -712,8 +713,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
+            updateMessagesReason = UpdateMessagesReason.DEFAULT;
         } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
-            startLoadDialogMessages(dialog, System.currentTimeMillis());
+            startNewMessagesLoadDialogMessages(dialog);
         } else {
             long lastMessageDateSent = lastReadMessage.getTime();
             startLoadDialogMessages(dialog, lastMessageDateSent);
@@ -793,6 +795,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+            skipMessages += totalEntries;
             loadingMore = true;
             hideActionBarProgress();
         }

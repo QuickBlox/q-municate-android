@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
@@ -112,7 +111,6 @@ public class ActivityUIHelper implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.crouton_notification_layout:
             case R.id.notification_action_button:
-                Log.d("CROUTONS FIXING", "onClick in CROUTON BTN ");
                 Crouton.clearCroutonsForActivity(activity);
                 showDialog();
                 break;

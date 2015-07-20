@@ -172,6 +172,7 @@ public class ChatDatabaseManager {
         List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());
         if (allDialogsCursor != null) {
             if (allDialogsCursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
+                allDialogsCursor.moveToFirst();
                 do {
                     dialogs.add(getDialogFromCursor(allDialogsCursor));
                 } while (allDialogsCursor.moveToNext());
@@ -295,8 +296,6 @@ public class ChatDatabaseManager {
         if(cursor != null && cursor.moveToFirst()){
             if(cursor.getCount() <= 1) {
                 messageBody = cursor.getString(cursor.getColumnIndex(NotSendMessageTable.Cols.BODY));
-            }  else {
-                Log.d("ChatDatabaseManager","Wrong count of not sent message was found for dialog " + dialogId);
             }
         }
 
@@ -438,7 +437,6 @@ public class ChatDatabaseManager {
 
     public static void saveNotSendMessage(Context context, String message, String dialogID, String attachURL){
         if(TextUtils.isEmpty(dialogID.trim())){
-            Log.d("ChatDatabaseManager", "Can't save not send message for dialog with NULL value");
             return;
         }
 
@@ -456,10 +454,8 @@ public class ChatDatabaseManager {
         String condition = NotSendMessageTable.Cols.DIALOG_ID + "='" + dialogID + "'";
         Cursor cursor = resolver.query(NotSendMessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            Log.d("NOT_SEND_MESSAGE", "Update dialog " + dialogID);
             resolver.update(NotSendMessageTable.CONTENT_URI, values, condition, null);
         } else {
-            Log.d("NOT_SEND_MESSAGE", "Insert dialog " + dialogID);
             values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
             resolver.insert(NotSendMessageTable.CONTENT_URI, values);
         }

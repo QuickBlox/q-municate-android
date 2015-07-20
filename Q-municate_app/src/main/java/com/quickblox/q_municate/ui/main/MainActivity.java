@@ -215,8 +215,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startDialog() {
-        Log.d("Bug fixing", "M±in Activity. startDialog. Set PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG false");
-
         PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
         String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
         long userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,

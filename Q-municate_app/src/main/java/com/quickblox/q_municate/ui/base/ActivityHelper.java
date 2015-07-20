@@ -200,7 +200,6 @@ public class ActivityHelper extends BaseActivityHelper {
         public void onReceive(Context context, final Intent intent) {
             String action = intent.getAction();
             if (intent != null && (action) != null) {
-                Log.d("STEPS", "executing " + action);
                 final Set<Command> commandSet = broadcastCommandMap.get(action);
 
                 if (commandSet != null && !commandSet.isEmpty()) {

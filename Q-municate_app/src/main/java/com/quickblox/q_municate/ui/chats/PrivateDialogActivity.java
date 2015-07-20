@@ -132,7 +132,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        scrollListView();
     }
 
     @Override

@@ -240,8 +240,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
 
             updateUIAfterLoading();
-
-            chatUIHelperListener.onScrollMessagesToBottom();
+//            chatUIHelperListener.onScrollMessagesToBottom();
         }
 
         private void updateUIAfterLoading() {

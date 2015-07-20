@@ -274,7 +274,6 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 stopСallButton.setEnabled(false);
                 stopСallButton.setActivated(false);
                 stopCall();
-                Log.d("Track", "Call is stopped");
                 break;
             case R.id.muteMicrophoneButton:
                 toggleMicrophone();
