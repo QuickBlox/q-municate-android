@@ -18,10 +18,10 @@ ext.buildToolsVersion = '21.0.1'
 ext.minSdkVersion = 14
 ext.targetSdkVersion = 21
 ext.versionName = '1.1.0'
-ext.versionCode = 30
+ext.versionCode = 31
 
 
-ext.prodDebug = true
+ext.prodDebug = false
 
 // Dependencies versions
 ext.universalImageLoaderVersion = '1.9.1'
