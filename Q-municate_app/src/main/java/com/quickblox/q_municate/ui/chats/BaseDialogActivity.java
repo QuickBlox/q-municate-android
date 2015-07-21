@@ -527,7 +527,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
                         ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
                 messagesListView.setSelection(loadMessages - 1);
-            } else if (totalEntries > 0 && UpdateMessagesReason.DEFAULT == updateMessagesReason){
+
+            } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
                 scrollListView();
             }
 
@@ -794,8 +795,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            skipMessages += totalEntries;
+            skipMessages += bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+
+            // Set totalEntries value only if download messages command was executed by user request.
+            // TotalEntries value used to set position of list after it was updated.
+            // If loading of messages command has executed by default reason (user returns to dialog
+            // or dialog was opened before) or at first time we shouldn't initiate totalEntries value
+            // also we should erase it if it different from zero
+            if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason){
+                totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+            } else {
+                if(totalEntries > 0){
+                    totalEntries = ConstsCore.ZERO_INT_VALUE;
+                }
+            }
+
             loadingMore = true;
             hideActionBarProgress();
         }
