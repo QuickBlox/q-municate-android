@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -24,6 +25,7 @@ public class QBFindUsersCommand extends ServiceCommand {
     }
 
     public static void start(Context context, QBUser currentUser, String constraint, int page) {
+        Log.d("Fixes", "User find command start called");
         Intent intent = new Intent(QBServiceConsts.FIND_USERS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, currentUser);
         intent.putExtra(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
@@ -33,6 +35,7 @@ public class QBFindUsersCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws QBResponseException {
+        Log.d("Fixes", "User find command started");
         String constraint = (String) extras.getSerializable(QBServiceConsts.EXTRA_CONSTRAINT);
         QBUser currentUser = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         int page = extras.getInt(QBServiceConsts.EXTRA_PAGE);
@@ -50,7 +53,8 @@ public class QBFindUsersCommand extends ServiceCommand {
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collection<User> userCollection = FriendUtils.createUsersList(userList);
         userCollection.remove(FriendUtils.createUser(currentUser));
-
+        Log.d("Fixes", "User find command got users in cont " + userCollection);
+        Log.d("Fixes", "User find command got users in cont " + userCollection.size());
         Bundle params = new Bundle();
         params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
         params.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, requestParams.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES));

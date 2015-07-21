@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,12 +51,14 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.io.File;
+import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
+    private static final String TAG = PrivateDialogActivity.class.getSimpleName();
     private ContentObserver statusContentObserver;
     private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
@@ -146,11 +149,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
             @Override
             public void onChange(boolean selfChange) {
-                opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
+                if (opponentFriend != null) {
+                    opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
                         PrivateDialogActivity.this.opponentFriend.getUserId());
-                setOnlineStatus(opponentFriend);
+                    setOnlineStatus(opponentFriend);
+                }
             }
         };
+
         friendCursor.registerContentObserver(statusContentObserver);
 
         friendsTableContentObserver = new ContentObserver(new Handler()) {
@@ -178,6 +184,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void setOnlineStatus(User friend) {
+        Log.d("Fixes", " setOnlineStatus User is " + friend);
         ActionBar actionBar = getActionBar();
         actionBar.setSubtitle(friend.getOnlineStatus(this));
     }
@@ -276,10 +283,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             if(QBChatService.getInstance().isLoggedIn()) {
                 CallActivity.start(PrivateDialogActivity.this, friend, callType);
             } else {
+//                relogin();
                 Toast.makeText(this, getString(R.string.dlg_fail_connection),Toast.LENGTH_LONG).show();
             }
         }
     }
+
 
     @Override
     protected void onResume() {
@@ -291,10 +300,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
-                opponentFriend.getUserId());
-        messageEditText.setEnabled(isFriend);
-        smilePanelImageButton.setEnabled(isFriend);
+        if (opponentFriend != null){
+            boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
+                    opponentFriend.getUserId());
+            messageEditText.setEnabled(isFriend);
+            smilePanelImageButton.setEnabled(isFriend);
+        } else {
+            Log.d(TAG, "Users cache has been already cleaned ");
+        }
     }
 
     private void acceptUser(final int userId) {

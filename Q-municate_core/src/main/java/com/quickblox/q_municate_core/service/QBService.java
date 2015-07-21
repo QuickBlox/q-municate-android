@@ -561,7 +561,7 @@ public class QBService extends Service {
         });
     }
 
-    private void forceRelogin() {
+    public void forceRelogin() {
         Intent intent = new Intent(QBServiceConsts.FORCE_RELOGIN);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

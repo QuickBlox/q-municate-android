@@ -223,6 +223,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
                 if(QBChatService.getInstance().isLoggedIn()) {
                     CallActivity.start(FriendDetailsActivity.this, friend, callType);
                 }else {
+//                    relogin();
                     Toast.makeText(this, getString(R.string.dlg_fail_connection), Toast.LENGTH_LONG).show();
                 }
             }

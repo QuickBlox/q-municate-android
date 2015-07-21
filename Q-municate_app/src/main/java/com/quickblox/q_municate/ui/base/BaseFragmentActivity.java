@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
@@ -23,7 +26,14 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener {
@@ -246,7 +256,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         @Override
         public void onReceiveContactRequestAction(Bundle extras) {
             if (currentDialog == null) {
-                Toast.makeText(getApplicationContext(),"Dialog is absent", Toast.LENGTH_LONG).show();
                 return;
             }
             if (!isFromCurrentDialog(extras)) {
@@ -260,4 +269,39 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
         return isFromCurrentChat;
     }
+
+//    protected void relogin(){
+//        if (!QBChatService.isInitialized()){
+//            QBChatService.init(getApplicationContext());
+//        }
+//
+//        if(!QBChatService.getInstance().isLoggedIn()){
+//            String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
+//            String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
+//
+//            if (!TextUtils.isEmpty(userEmail) && !TextUtils.isEmpty(userPassword)) {
+//                QBChatService.getInstance().login(new QBUser(userEmail, userPassword), new QBEntityCallback() {
+//                    @Override
+//                    public void onSuccess(Object o, Bundle bundle) {
+//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess() {
+//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(List list) {
+//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+//                        getService().forceRelogin();
+//                    }
+//                });
+//            } else {
+//                Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+//                getService().forceRelogin();
+//            }
+//        }
+//    }
 }

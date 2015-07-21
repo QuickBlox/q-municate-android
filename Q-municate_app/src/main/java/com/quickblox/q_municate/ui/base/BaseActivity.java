@@ -9,9 +9,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
+import com.quickblox.chat.QBChatService;
+import com.quickblox.core.QBEntityCallback;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
@@ -19,10 +23,15 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBLoginCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.users.model.QBUser;
+
+import java.util.List;
 
 public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
 
@@ -232,5 +241,45 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
                 activityHelper.onReceivedContactRequestNotification(extras);
             }
         }
+    }
+
+//    protected void relogin(){
+//        if (!QBChatService.isInitialized()){
+//            QBChatService.init(getApplicationContext());
+//        }
+//
+//        if(!QBChatService.getInstance().isLoggedIn()){
+//            String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
+//            String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
+//
+//            if (!TextUtils.isEmpty(userEmail) && !TextUtils.isEmpty(userPassword)) {
+//                QBUser user = new QBUser(null, userPassword, userEmail);
+//                QBLoginCommand.start(this, user);
+//                QBChatService.getInstance().login(new QBUser(userEmail, userPassword), new QBEntityCallback() {
+//                    @Override
+//                    public void onSuccess(Object o, Bundle bundle) {
+//                        Toast.makeText(BaseActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onSuccess() {
+//                        Toast.makeText(BaseActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onError(List list) {
+//                        Toast.makeText(BaseActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+//                        getService().forceRelogin();
+//                    }
+//                });
+//            } else {
+//                Toast.makeText(BaseActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+//                getService().forceRelogin();
+//            }
+//        }
+//    }
+
+    private QBService getService() {
+        return activityHelper.service;
     }
 }

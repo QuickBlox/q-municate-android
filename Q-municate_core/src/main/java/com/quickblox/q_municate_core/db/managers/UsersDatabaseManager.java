@@ -17,6 +17,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -448,6 +449,23 @@ public class UsersDatabaseManager {
         }
 
         return user;
+    }
+
+    public static List<User> getAllUsers(Context context) {
+        Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
+                null, null, null);
+        List<User> userList =  new LinkedList<>();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                userList.add(getUserFromCursor(cursor));
+            }while (cursor.moveToNext());
+        }
+
+        if(cursor != null){
+            cursor.close();
+        }
+
+        return userList;
     }
 
     public static Friend getFriendById(Context context, long friendId) {

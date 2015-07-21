@@ -45,6 +45,8 @@
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
+    <string name="relgn_success">Relogin was successfully  executed after connection has been lost</string>
+    <string name="relgn_fail">Relogin was failed. Forse app restart will be executed</string>
 
     // Forgot Password
     <string name="fpw_forgot_password_title">Forgot Password</string>
