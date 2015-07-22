@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
@@ -31,6 +32,7 @@ import com.quickblox.q_municate_core.models.FriendGroup;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
+import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -43,7 +45,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener, AbsListView.OnScrollListener {
+public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener, AbsListView.OnScrollListener, ConnectivityListener {
 
     private static final int SEARCH_DELAY = 1000;
 
@@ -72,6 +74,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     private List<FriendGroup> friendGroupList;
     private FriendGroup friendGroupAllFriends;
     private FriendGroup friendGroupAllUsers;
+    private boolean isConnectionEnabled = true;
 
     public static FriendsListFragment newInstance() {
         return new FriendsListFragment();
@@ -98,6 +101,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     public void onDestroy() {
         super.onDestroy();
         removeActions();
+        ((MainActivity)getActivity()).removeConnectivityListener(this);
     }
 
     @Override
@@ -114,6 +118,12 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchItem.setOnActionExpandListener(searchOnActionExpandListener);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.getItem(R.id.action_search).setVisible(isConnectionEnabled);
     }
 
     private void registerContentObservers() {
@@ -449,6 +459,11 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         checkVisibilityEmptyLabel();
 
         baseActivity.hideActionBarProgress();
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        isConnectionEnabled = isConnected;
     }
 
     private enum State {FRIENDS_LIST, GLOBAL_LIST}

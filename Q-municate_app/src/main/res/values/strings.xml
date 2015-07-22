@@ -47,6 +47,8 @@
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
     <string name="relgn_success">Relogin was successfully  executed after connection has been lost</string>
     <string name="relgn_fail">Relogin was failed. Forse app restart will be executed</string>
+    <string name="relgn_forse_message">Relogin was failed.Are you agree to start forse relogin which restart whole app</string>
+    <string name="dont_forget_relogin">Please don\'t forget to relogin to restore all app features</string>
 
     // Forgot Password
     <string name="fpw_forgot_password_title">Forgot Password</string>
@@ -269,6 +271,10 @@
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
     <string name="user_was_not_found_in_db">User wasn\'t found in base</string>
+    <string name="connection_lost_title">Connection was lost</string>
+    <string name="connection_lost">Connection was lost. Some features in app are not available from this moment. As far as connection appear features became enable again </string>
+    <string name="feature_unavailable">Feature unavailable. Please, check  your internet connection</string>
+
 
 
 </resources>

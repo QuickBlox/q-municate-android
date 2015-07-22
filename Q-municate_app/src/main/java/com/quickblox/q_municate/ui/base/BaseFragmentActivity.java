@@ -9,34 +9,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.core.QBEntityCallback;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
+import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.users.model.QBUser;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener {
+public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener, ConnectivityListener {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
@@ -97,6 +88,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         super.onResume();
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+
+        if(getService() != null && !isConnectionEnabled()){
+            Toast.makeText(this, getString(R.string.connection_lost),Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -122,6 +117,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         activityHelper.onStop();
         super.onStop();
     }
+
 
     public QBService getService() {
         return activityHelper.service;
@@ -155,7 +151,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     @Override
     public void onConnectedToService(QBService service) {
-
+        service.addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -207,6 +203,41 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();
+    }
+
+
+    /**
+     * Override this method in each child which need to listen connectivity state
+     * @param isConnected
+     */
+    @Override
+    public void onConnectionChange(final boolean isConnected) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("Fixes CONNECTIVITY", "onConnectionChange in BaseActivity");
+                Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected + " current connection is " + isConnectionEnabled());
+                if (isConnected) {
+                    QBReloginCommand.start(getApplicationContext());
+                } else {
+//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
+//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
+//                                .setMessage(getString(R.string.connection_lost))
+//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                });
+//                        diologBuilder.show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.connection_lost), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    public boolean isConnectionEnabled() {
+        return getService().isConnectivityExists();
     }
 
     public class SuccessAction implements Command {
@@ -269,39 +300,4 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
         return isFromCurrentChat;
     }
-
-//    protected void relogin(){
-//        if (!QBChatService.isInitialized()){
-//            QBChatService.init(getApplicationContext());
-//        }
-//
-//        if(!QBChatService.getInstance().isLoggedIn()){
-//            String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
-//            String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
-//
-//            if (!TextUtils.isEmpty(userEmail) && !TextUtils.isEmpty(userPassword)) {
-//                QBChatService.getInstance().login(new QBUser(userEmail, userPassword), new QBEntityCallback() {
-//                    @Override
-//                    public void onSuccess(Object o, Bundle bundle) {
-//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onSuccess() {
-//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(List list) {
-//                        Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
-//                        getService().forceRelogin();
-//                    }
-//                });
-//            } else {
-//                Toast.makeText(BaseFragmentActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
-//                getService().forceRelogin();
-//            }
-//        }
-//    }
 }

@@ -33,9 +33,13 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
+import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -52,6 +56,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     private ImportFriends importFriends;
     private GSMHelper gsmHelper;
     private boolean isNeedToOpenDialog;
+    private Set<ConnectivityListener> connectivityListeners;
 
     public static void start(Context context) {
 
@@ -106,6 +111,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 fragment = FeedbackFragment.newInstance();
                 break;
         }
+
+        if (fragment instanceof ConnectivityListener){
+            connectivityListeners.add((ConnectivityListener) fragment);
+        }
+
         setCurrentFragment(fragment);
     }
 
@@ -116,7 +126,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         setContentView(R.layout.activity_main);
 
         useDoubleBackPressed = true;
-
+        connectivityListeners = new HashSet<>();
         gsmHelper = new GSMHelper(this);
 
         initNavigationDrawer();
@@ -134,6 +144,16 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         loadFriendsList();
 
         initVideoChat();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        connectivityListeners.clear();
+    }
+
+    public void removeConnectivityListener(ConnectivityListener listener){
+        connectivityListeners.remove(listener);
     }
 
     private void initVideoChat() {
@@ -298,6 +318,18 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         @Override
         public void execute(Bundle bundle) {
             importFriendsFinished();
+        }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        for (ConnectivityListener listener : connectivityListeners){
+            listener.onConnectionChange(isConnected);
+        }
+
+        if(currentFragment instanceof FriendsListFragment) {
+            invalidateOptionsMenu();
         }
     }
 }

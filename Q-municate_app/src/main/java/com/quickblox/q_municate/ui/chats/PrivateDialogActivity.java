@@ -16,12 +16,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.google.android.gms.internal.is;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
@@ -51,7 +48,6 @@ import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
 import java.io.File;
-import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
@@ -63,7 +59,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
     private FriendOperationAction friendOperationAction;
-
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
     }
@@ -278,13 +273,23 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if(getService() != null) {
+            menu.findItem(R.id.action_attach).setVisible(isConnectionEnabled());
+            menu.findItem(R.id.action_audio_call).setVisible(isConnectionEnabled());
+            menu.findItem(R.id.action_video_call).setVisible(isConnectionEnabled());
+        }
+
+        return true;
+    }
+
     private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             if(QBChatService.getInstance().isLoggedIn()) {
                 CallActivity.start(PrivateDialogActivity.this, friend, callType);
-            } else {
-//                relogin();
-                Toast.makeText(this, getString(R.string.dlg_fail_connection),Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -293,9 +298,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onResume() {
         super.onResume();
-
         currentOpponent = opponentFriend.getFullName();
-
         checkMessageSendingPossibility();
     }
 
@@ -356,5 +359,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         public void onRejectUserClicked(int userId) {
             rejectUser(userId);
         }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        invalidateOptionsMenu();
+
+        sendButton.setActivated(isConnected);
     }
 }

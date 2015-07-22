@@ -21,7 +21,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -211,6 +210,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
         updateMessagesReason = UpdateMessagesReason.DEFAULT;
         startLoadDialogMessages();
     }
@@ -228,6 +228,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
         createChatLocally();
     }
 
@@ -328,6 +329,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginSuccessAction());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, new ReloginFailAction());
         updateBroadcastActionList();
     }
 
@@ -413,6 +416,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
     }
 
     protected abstract void onFileSelected(Uri originalUri);
@@ -871,6 +876,37 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
                 updateDialogData();
             }
+        }
+    }
+
+
+    public class ReloginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public class ReloginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+            AlertDialog dialog = AlertDialog.newInstance(getString(R.string.relgn_fail));
+            dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getService().forceRelogin();
+                }
+            });
+            dialog.setNegativeButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(BaseDialogActivity.this, getString(R.string.dont_forget_relogin), Toast.LENGTH_LONG).show();
+                }
+            });
+            dialog.show(getFragmentManager(), null);
         }
     }
 

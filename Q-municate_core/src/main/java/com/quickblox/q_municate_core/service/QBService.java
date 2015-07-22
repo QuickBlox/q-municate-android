@@ -5,13 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.QBChatService;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -25,8 +26,8 @@ import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.qb.commands.QBGetFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBImportFriendsCommand;
-import com.quickblox.q_municate_core.qb.commands.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitChatServiceCommand;
+import com.quickblox.q_municate_core.qb.commands.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitFriendListCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBJoinGroupDialogCommand;
@@ -47,8 +48,8 @@ import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
+import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpRestCommand;
@@ -57,9 +58,9 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.BaseHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
@@ -71,7 +72,9 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -103,8 +106,11 @@ public class QBService extends Service {
     private QBVideoChatHelper videoChatHelper;
     private QBFriendListHelper friendListHelper;
 
-    private Map<Integer, BaseHelper> helpers = new HashMap<Integer, BaseHelper>();
+    private Map<Integer, BaseHelper> helpers = new HashMap<>();
     private BroadcastReceiver broadcastReceiver = new LoginBroadcastReceiver();
+    private boolean isConnectivityExists = true;
+    private Set<ConnectivityListener> connectivityListeners = new HashSet<>();
+    private BroadcastReceiver connectivityReceier;
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -112,6 +118,7 @@ public class QBService extends Service {
 
         initHelpers();
         initCommands();
+
     }
 
     private void initThreads() {
@@ -507,6 +514,40 @@ public class QBService extends Service {
             LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                     filter);
         }
+
+        Log.d("Fixes CONNECTIVITY", "START connectivity manager");
+        initConnectivityManager();
+    }
+
+    private void initConnectivityManager() {
+        Log.d("Fixes CONNECTIVITY", "Init broadcastreceiver");
+        connectivityReceier = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent != null) {
+                    int connectivityType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
+                    // Check does connectivity equal mobile or wifi types
+                    Log.d("Fixes CONNECTIVITY", "Check does connectivity equal mobile or wifi types");
+                    if (connectivityType == ConnectivityManager.TYPE_MOBILE
+                            || connectivityType == ConnectivityManager.TYPE_WIFI) {
+
+                        // Check does connectivity EXIST for connectivity type wifi or mobile internet
+                        // Pay attention on "!" symbol  in line below
+                        Log.d("Fixes CONNECTIVITY", "Check does connectivity exist for connectivity type wifi or mobile internet");
+                        boolean connectivityState = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                        Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
+                        // Set it state to notify all listeners
+                        if (isConnectivityExists != connectivityState)
+                            Log.d("Fixes CONNECTIVITY", "Set connectivity state");
+                        setConnectivityState(connectivityState);
+                        Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
+                        notifyAllConnectivityListeners();
+                    }
+                }
+            }
+        };
+
+        registerReceiver(connectivityReceier, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
@@ -515,6 +556,8 @@ public class QBService extends Service {
         if (broadcastReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
         }
+        unregisterReceiver(connectivityReceier);
+        connectivityListeners.clear();
     }
 
     @Override
@@ -548,7 +591,7 @@ public class QBService extends Service {
                     command.execute(intent.getExtras());
                 } catch (QBResponseException e) {
                     ErrorUtils.logError(e);
-                    if (Utils.isExactError(e, ConstsCore.SESSION_DOES_NOT_EXIST)){
+                    if (Utils.isExactError(e, ConstsCore.SESSION_DOES_NOT_EXIST)) {
                         refreshSession();
                     }
 //                    else if (Utils.isTokenDestroyedError(e)) {
@@ -571,6 +614,30 @@ public class QBService extends Service {
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
+    public void setConnectivityState(boolean connectivityState) {
+        this.isConnectivityExists = connectivityState;
+    }
+
+    public boolean isConnectivityExists() {
+        return isConnectivityExists;
+    }
+
+    public void addConnectivityListener(ConnectivityListener connectivityListener){
+        if(connectivityListener != null) {
+            connectivityListeners.add(connectivityListener);
+        }
+    }
+
+    public void removeConnectivityListener(ConnectivityListener connectivityListener){
+        connectivityListeners.remove(connectivityListener);
+    }
+
+    private void notifyAllConnectivityListeners() {
+        for (ConnectivityListener listener : connectivityListeners){
+            listener.onConnectionChange(isConnectivityExists);
+        }
+    }
+
     public class QBServiceBinder extends Binder {
 
         public QBService getService() {
@@ -584,11 +651,11 @@ public class QBService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
-            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
-            }
+//            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
+//                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
+//                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
+//                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
+//            }
         }
     }
 }
