@@ -123,7 +123,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.getItem(R.id.action_search).setVisible(isConnectionEnabled);
+        menu.findItem(R.id.action_search).setVisible(isConnectionEnabled);
     }
 
     private void registerContentObservers() {
