@@ -22,6 +22,7 @@ import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ConnectivityManager;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -89,7 +90,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
 
-        if(getService() != null && !isConnectionEnabled()){
+        if(!isConnectionEnabled()){
             Toast.makeText(this, getString(R.string.connection_lost),Toast.LENGTH_LONG).show();
         }
     }
@@ -151,7 +152,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     @Override
     public void onConnectedToService(QBService service) {
-        service.addConnectivityListener(this);
+        ConnectivityManager.getInstance(getApplicationContext()).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -205,39 +206,8 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         return canPerformLogout.get();
     }
 
-
-    /**
-     * Override this method in each child which need to listen connectivity state
-     * @param isConnected
-     */
-    @Override
-    public void onConnectionChange(final boolean isConnected) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("Fixes CONNECTIVITY", "onConnectionChange in BaseActivity");
-                Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected + " current connection is " + isConnectionEnabled());
-                if (isConnected) {
-                    QBReloginCommand.start(getApplicationContext());
-                } else {
-//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
-//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
-//                                .setMessage(getString(R.string.connection_lost))
-//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        dialog.dismiss();
-//                                    }
-//                                });
-//                        diologBuilder.show();
-                    Toast.makeText(getApplicationContext(), getString(R.string.connection_lost), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
     public boolean isConnectionEnabled() {
-        return getService().isConnectivityExists();
+        return ConnectivityManager.isConnectionExists();
     }
 
     public class SuccessAction implements Command {
@@ -299,5 +269,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
         return isFromCurrentChat;
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+
     }
 }

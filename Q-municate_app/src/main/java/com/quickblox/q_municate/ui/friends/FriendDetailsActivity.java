@@ -94,11 +94,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         //initButtons
         videoCallButton = _findViewById(R.id.video_call_button);
         voiceCallButton = _findViewById(R.id.voice_call_button);
-        // Set buttons behaviour
-        if (getService() != null) {
-            videoCallButton.setClickable(isConnectionEnabled());
-            voiceCallButton.setClickable(isConnectionEnabled());
-        }
+
     }
 
     private void registerStatusChangingObserver() {
@@ -231,12 +227,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     public void videoCallClickListener(View view) {
         Log.d("Fixes CONNECTIVITY", "Video call click executes");
-        if(getService() !=null) {
-            if (isConnectionEnabled()) {
-                callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
-            } else {
-                Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
-            }
+        if (isConnectionEnabled()) {
+            callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -255,12 +249,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     public void voiceCallClickListener(View view) {
         Log.d("Fixes CONNECTIVITY", "Audio call click executes");
-        if(getService() !=null) {
-            if (isConnectionEnabled()) {
-                callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
-            } else {
-                Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show();
-            }
+        if (isConnectionEnabled()) {
+            callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show();
         }
     }
 

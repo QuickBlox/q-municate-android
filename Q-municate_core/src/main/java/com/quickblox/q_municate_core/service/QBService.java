@@ -71,6 +71,9 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -528,6 +531,7 @@ public class QBService extends Service {
                     int connectivityType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
                     // Check does connectivity equal mobile or wifi types
                     Log.d("Fixes CONNECTIVITY", "Check does connectivity equal mobile or wifi types");
+                    Log.d("Fixes CONNECTIVITY", "Connectivity types is " + connectivityType);
                     if (connectivityType == ConnectivityManager.TYPE_MOBILE
                             || connectivityType == ConnectivityManager.TYPE_WIFI) {
 
@@ -536,12 +540,14 @@ public class QBService extends Service {
                         Log.d("Fixes CONNECTIVITY", "Check does connectivity exist for connectivity type wifi or mobile internet");
                         boolean connectivityState = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
                         Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
+
                         // Set it state to notify all listeners
-                        if (isConnectivityExists != connectivityState)
+                        if (isConnectivityExists != connectivityState) {
                             Log.d("Fixes CONNECTIVITY", "Set connectivity state");
-                        setConnectivityState(connectivityState);
-                        Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
-                        notifyAllConnectivityListeners();
+                            setConnectivityState(connectivityState);
+                            Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
+                            com.quickblox.q_municate_core.utils.ConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
+                        }
                     }
                 }
             }
@@ -618,29 +624,9 @@ public class QBService extends Service {
         this.isConnectivityExists = connectivityState;
     }
 
-    public boolean isConnectivityExists() {
-        return isConnectivityExists;
-    }
-
-    public void addConnectivityListener(ConnectivityListener connectivityListener){
-        if(connectivityListener != null) {
-            connectivityListeners.add(connectivityListener);
-        }
-    }
-
-    public void removeConnectivityListener(ConnectivityListener connectivityListener){
-        connectivityListeners.remove(connectivityListener);
-    }
-
-    private void notifyAllConnectivityListeners() {
-        for (ConnectivityListener listener : connectivityListeners){
-            listener.onConnectionChange(isConnectivityExists);
-        }
-    }
-
     public class QBServiceBinder extends Binder {
 
-        public QBService getService() {
+    public QBService getService() {
             return QBService.this;
         }
     }
@@ -651,11 +637,19 @@ public class QBService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
-//            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-//                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
-//                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
-//                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
-//            }
+            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
+               // Init chat service
+                try {
+                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).initChatService();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                } catch (SmackException e) {
+                    e.printStackTrace();
+                }
+                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
+                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
+                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
+            }
         }
     }
 }

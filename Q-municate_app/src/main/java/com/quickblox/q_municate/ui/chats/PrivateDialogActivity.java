@@ -179,9 +179,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void setOnlineStatus(User friend) {
-        Log.d("Fixes", " setOnlineStatus User is " + friend);
-        ActionBar actionBar = getActionBar();
-        actionBar.setSubtitle(friend.getOnlineStatus(this));
+        if(friend != null){
+            if(getActionBar() != null) {
+                getActionBar().setSubtitle(friend.getOnlineStatus(this));
+            }
+        }
     }
 
     protected QBDialog getQBDialog() {
@@ -277,11 +279,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
-        if(getService() != null) {
             menu.findItem(R.id.action_attach).setVisible(isConnectionEnabled());
             menu.findItem(R.id.action_audio_call).setVisible(isConnectionEnabled());
             menu.findItem(R.id.action_video_call).setVisible(isConnectionEnabled());
-        }
 
         return true;
     }

@@ -191,9 +191,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if(getService() != null) {
             menu.findItem(R.id.action_attach).setVisible(isConnectionEnabled());
-        }
+            menu.findItem(R.id.action_group_details).setVisible(isConnectionEnabled());
         return true;
     }
 
@@ -229,5 +228,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 //        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
 //            scrollListView();
 //        }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        invalidateOptionsMenu();
     }
 }
