@@ -319,6 +319,7 @@ public class ChatDatabaseManager {
     }
 
     public static void saveChatMessageGlobal(Context context, MessageCache messageCache) {
+        Log.d("Fixes CHAT", "saveChatMessageGlobal start ");
         int countUnreadMessagesLocal;
         boolean ownMessage = AppSession.getSession().getUser().getId() == messageCache.getSenderId();
 
@@ -353,6 +354,9 @@ public class ChatDatabaseManager {
 
     public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
             String dialogId) {
+
+        Log.d("Fixes CHAT", "saveChatMessages start ");
+
         for (QBChatMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
@@ -396,6 +400,9 @@ public class ChatDatabaseManager {
     }
 
     private static void saveChatMessage(Context context, MessageCache messageCache) {
+
+        Log.d("Fixes CHAT", "saveChatMessage start ");
+
         ContentValues values = new ContentValues();
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
 
@@ -671,11 +678,14 @@ public class ChatDatabaseManager {
     }
 
     public static void updateStatusMessage(Context context, MessageCache messageCache) {
+        Log.d("Fixes CHAT", "updateStatusMessage in BaseManager");
+
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageCache.getId() + "'";
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
+            Log.d("Fixes CHAT", "Start update message status delivered");
             String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
             String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
@@ -703,7 +713,8 @@ public class ChatDatabaseManager {
         }
     }
 
-    public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
+    public static void  updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
+        Log.d("Fixes CHAT", "updateMessageStatusDelivered in BaseManager");
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
@@ -711,6 +722,7 @@ public class ChatDatabaseManager {
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
+            Log.d("Fixes CHAT", "update Message Status to Delivered");
             values.put(MessageTable.Cols.IS_DELIVERED, isDelivered);
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
         }

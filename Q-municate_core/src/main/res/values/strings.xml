@@ -37,7 +37,7 @@
 
      <!--Connectivity-->
     <string name="connection_lost_title">Connection was lost</string>
-    <string name="connection_lost">Connection was lost. Some features in the app are not available from this moment. As far as a connection appears features will be enabled again </string>
+    <string name="connection_lost">Connection was lost. Please, check your internet connection</string>
     <string name="feature_unavailable">Feature unavailable. Please, check  your internet connection</string>
 
     <string-array name="friends_relation_statuses_array">

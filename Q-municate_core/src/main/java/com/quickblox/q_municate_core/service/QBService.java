@@ -74,6 +74,7 @@ import com.quickblox.q_municate_core.utils.Utils;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -501,6 +502,9 @@ public class QBService extends Service {
         ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
         reloginCommand.addCommand(logoutChatCommand);
 
+        ServiceCommand initChat  = serviceCommandMap.get(QBServiceConsts.INIT_CHAT_SERVICE_ACTION);
+        reloginCommand.addCommand(initChat);
+
         ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
         reloginCommand.addCommand(loginChatCommand);
 
@@ -638,14 +642,14 @@ public class QBService extends Service {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
             if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-               // Init chat service
-                try {
-                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).initChatService();
-                } catch (XMPPException e) {
-                    e.printStackTrace();
-                } catch (SmackException e) {
-                    e.printStackTrace();
-                }
+//               // Init chat service
+//                try {
+//                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).initChatService();
+//                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).login(AppSession.getSession().getUser());
+//                } catch (XMPPException | SmackException | IOException e) {
+//                    e.printStackTrace();
+//                }
+
                 ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());

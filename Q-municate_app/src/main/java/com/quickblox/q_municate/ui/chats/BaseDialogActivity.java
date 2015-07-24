@@ -455,9 +455,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
 
-    protected void startNewMessagesLoadDialogMessages(QBDialog dialog) {
+    protected void startNewMessagesLoadDialogMessages(QBDialog dialog, long lastDateLoad, String lastReadMessageID) {
         if (loadingMore) {
-            QBLoadDialogMessagesCommand.start(this, dialog, System.currentTimeMillis(), ConstsCore.NOT_INITIALIZED_VALUE);
+            Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, lastReadMessageID, ConstsCore.NOT_INITIALIZED_VALUE);
             loadingMore = false;
         }
     }
@@ -733,7 +734,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
         } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
             Log.d("Fixes CHAT", "startLoadDialogMessages by default reason");
-            startNewMessagesLoadDialogMessages(dialog);
+            startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
         } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
             Log.d("Fixes CHAT", "startLoadDialogMessages by user request or none reason");
             startLoadDialogMessages(dialog, lastReadMessage.getTime());
@@ -926,6 +927,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             });
             dialog.show(getFragmentManager(), null);
         }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        updateMessagesReason = UpdateMessagesReason.DEFAULT;
     }
 
     /**

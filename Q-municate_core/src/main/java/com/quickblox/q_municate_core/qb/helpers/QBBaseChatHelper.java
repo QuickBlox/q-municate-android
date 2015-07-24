@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -420,15 +421,19 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         @Override
         public void processMessageDelivered(QBPrivateChat privateChat, String messageId) {
+            Log.d("Fixes CHAT", "Call processMessageDelivered in message listener ");
             updateMessageStatusDeliveredLocal(messageId, true);
         }
 
         @Override
         public void processMessageRead(QBPrivateChat privateChat, String messageId) {
+            Log.d("Fixes CHAT", "Call processMessageRead in message listener");
             try {
                 MessageCache messageCache = new MessageCache();
                 messageCache.setId(messageId);
                 messageCache.setRead(true);
+
+                Log.d("Fixes CHAT", "Call updateStatusMessageLocal in base");
                 updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

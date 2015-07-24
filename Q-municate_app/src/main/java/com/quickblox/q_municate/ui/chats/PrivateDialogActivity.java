@@ -135,7 +135,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
-        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        if (opponentFriend != null) {
+            bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        }
         return bundle;
     }
 
