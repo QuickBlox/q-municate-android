@@ -355,8 +355,6 @@ public class ChatDatabaseManager {
     public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
             String dialogId) {
 
-        Log.d("Fixes CHAT", "saveChatMessages start ");
-
         for (QBChatMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();

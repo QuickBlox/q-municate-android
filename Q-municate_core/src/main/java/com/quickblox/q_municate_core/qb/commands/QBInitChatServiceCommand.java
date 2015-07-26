@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -31,8 +32,11 @@ public class QBInitChatServiceCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws QBResponseException {
         try {
+            Log.d("Fixes CHAT", "Start perform QBInitChatServiceCommand");
             chatRestHelper.initChatService();
+            Log.d("Fixes CHAT", "Stop perform QBInitChatServiceCommand");
         } catch (XMPPException | SmackException e) {
+            Log.d("Fixes CHAT", "Failed perform QBInitChatServiceCommand");
             throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;

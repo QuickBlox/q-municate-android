@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
@@ -99,7 +100,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
     protected QBBaseChatHelper baseChatHelper;
-    protected User opponentFriend;
+    protected volatile User opponentFriend;
 
     private int keyboardHeight;
     private View rootView;
@@ -184,6 +185,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("Fixes CHAT", "BaseDialogActivity onStart");
+        // Set Default update reason to start loading of new messages
+        updateMessagesReason = UpdateMessagesReason.DEFAULT;
 
         if (TextUtils.isEmpty(messageEditText.getText().toString().trim())) {
             String messageBody = ChatDatabaseManager.getNotSendMessageBodyByDialogId(getApplicationContext(), dialogId);
@@ -196,6 +200,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("Fixes CHAT", "BaseDialogActivity onPause");
         onUpdateChatDialog();
         hideSmileLayout();
 
@@ -211,8 +216,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        // Set Default update reason to start loading of new messages
-        updateMessagesReason = UpdateMessagesReason.DEFAULT;
+        Log.d("Fixes CHAT", "BaseDialogActivity onResume");
         startLoadDialogMessages();
     }
 
@@ -330,7 +334,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginSuccessAction());
+        addAction(QBServiceConsts.RE_LOGIN_COMPLETE, new ReloginComplete());
         addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, new ReloginFailAction());
         updateBroadcastActionList();
     }
@@ -417,7 +421,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
-        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_COMPLETE);
         removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
     }
 
@@ -544,6 +548,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
                 Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
                 scrollListView();
+            } else if (UpdateMessagesReason.AFTER_RELOGIN == updateMessagesReason){
+
             }
 //
 //            // Set state to none to prevent scrolling to the bottom of the list on each data update
@@ -732,7 +738,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             Log.d("Fixes CHAT", "Last synch mesasge is null");
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
-        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
+        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason
+                || UpdateMessagesReason.AFTER_RELOGIN == updateMessagesReason){
             Log.d("Fixes CHAT", "startLoadDialogMessages by default reason");
             startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
         } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
@@ -832,6 +839,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 }
             }
 
+            // Set update
+
             loadingMore = true;
             hideActionBarProgress();
         }
@@ -898,11 +907,22 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
 
-    public class ReloginSuccessAction implements Command {
+    public class ReloginComplete implements Command {
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d("Fixes STATUS", "Relogin success action");
+            Log.d("Fixes CHAT", "ChatService is init " + QBChatService.isInitialized());
+            if (QBChatService.isInitialized()) {
+                Log.d("Fixes CHAT", "ChatService is logged in " + QBChatService.getInstance().isLoggedIn());
+            }
             Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+
+            /*
+            Set update reason to default for loading new messages if operations is success
+             */
+//            updateMessagesReason = UpdateMessagesReason.AFTER_RELOGIN;
+            updateMessagesReason = UpdateMessagesReason.DEFAULT;
             startLoadDialogMessages();
         }
     }
@@ -932,7 +952,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     public void onConnectionChange(boolean isConnected) {
         super.onConnectionChange(isConnected);
-        updateMessagesReason = UpdateMessagesReason.DEFAULT;
+        /**
+         * If network was turned off set #updateMessagesReason
+         * to {@link com.quickblox.q_municate.ui.chats.BaseDialogActivity.UpdateMessagesReason.NONE}
+         * for preventing loading data in #onResume method before async command of relogining was executed
+         */
+        if(!isConnected) {
+            updateMessagesReason = UpdateMessagesReason.NONE;
+        }
     }
 
     /**
@@ -953,6 +980,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         /**
          * User scrolled list till oldest uploaded message
          */
-        ON_USER_REQUEST;
+        ON_USER_REQUEST,
+
+        /**
+         * After relogin
+         */
+        AFTER_RELOGIN;
     }
 }

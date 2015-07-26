@@ -27,7 +27,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
     }
 
     public static void start(Context context, QBDialog dialog, MessageCache messageCache, boolean forPrivate) {
-        Log.d("Fixes CHAT", "QBUpdateStatusMessageCommand start ");
+        Log.d("Fixes STATUS", "QBUpdateStatusMessageCommand start ");
         Intent intent = new Intent(QBServiceConsts.UPDATE_STATUS_MESSAGE_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_MESSAGE, messageCache);
@@ -37,16 +37,16 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws QBResponseException {
-        Log.d("Fixes CHAT", "QBUpdateStatusMessageCommand perform ");
+        Log.d("Fixes STATUS", "QBUpdateStatusMessageCommand perform ");
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         MessageCache messageCache = (MessageCache) extras.getSerializable(QBServiceConsts.EXTRA_MESSAGE);
         boolean forPrivate = extras.getBoolean(QBServiceConsts.EXTRA_IS_FOR_PRIVATE);
 
         try {
-            Log.d("Fixes CHAT", "Try to update status read for dialog " + dialog.getDialogId() + " and message cache " + messageCache + " for private " + forPrivate);
+            Log.d("Fixes STATUS", "Try to update status read for dialog " + dialog.getDialogId() + " and message cache " + messageCache + " for private " + forPrivate);
             baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
         } catch (Exception e) {
-            Log.d("Fixes CHAT", "Exception of update  " + e);
+            Log.d("Fixes STATUS", "Exception of update  " + e);
 
             ErrorUtils.logError(TAG, e + " --- dialogId = " + dialog.getDialogId()
                     + ", messageId = " + messageCache.getId());

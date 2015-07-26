@@ -185,11 +185,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         List<QBChatMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, returnedBundle);
 
-        if (dialogMessagesList != null) {
-            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
-
         return dialogMessagesList;
+    }
+
+    public void saveLoadedMessages(String dialogID, List<QBChatMessage> dialogMessagesList) {
+        if (dialogMessagesList != null) {
+            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialogID);
+        }
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
@@ -341,7 +343,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public void updateStatusMessageRead(String dialogId, MessageCache messageCache,
             boolean forPrivate) throws Exception {
+        Log.d("Fixes STATUS", "updateStatusMessageRead ");
+        Log.d("Fixes STATUS", "Start updateStatusMessageReadServer");
         updateStatusMessageReadServer(dialogId, messageCache, forPrivate);
+        Log.d("Fixes STATUS", "Start updateStatusMessageLocal");
         updateStatusMessageLocal(messageCache);
     }
 
@@ -354,6 +359,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(messageCache.getSenderId());
             privateChat.readMessage(messageCache.getId());
+            Log.d("Fixes STATUS", "Successful mark");
+        } else {
+            Log.d("Fixes STATUS", "Failed  Not from private");
         }
     }
 

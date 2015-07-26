@@ -170,9 +170,9 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
         }
 
-        Log.d("Fixes CHAT", "Update messages status if true for " + !messageCache.isRead() + " and  " + !ownMessage );
+//        Log.d("Fixes STATUS", "Update messages status if true for " + !messageCache.isRead() + " and  " + !ownMessage );
         if (!messageCache.isRead() && !ownMessage) {
-            Log.d("Fixes CHAT", "Update messages status to READ ");
+            Log.d("Fixes STATUS", "Update messages status to READ ");
             messageCache.setRead(true);
             QBUpdateStatusMessageCommand.start(context, dialog, messageCache, true);
         }

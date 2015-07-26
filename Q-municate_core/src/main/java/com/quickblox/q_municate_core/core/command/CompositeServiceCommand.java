@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.core.command;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 
@@ -26,8 +27,11 @@ public class CompositeServiceCommand extends ServiceCommand {
 
     @Override
     protected Bundle perform(Bundle extras) throws QBResponseException {
+        Log.d("Fixes CHAT", "Start execute composite command");
+        Log.d("Fixes CHAT", "Command consist of " + commandList);
         Bundle params = extras;
         for (ServiceCommand command : commandList) {
+            Log.d("Fixes CHAT", "Start execute composite command " + command.getClass().getSimpleName());
             params = command.perform(params);
         }
         return params;

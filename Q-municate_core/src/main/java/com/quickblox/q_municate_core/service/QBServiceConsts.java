@@ -136,6 +136,7 @@ public class QBServiceConsts {
     public static final String USER_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
+    public static final String RE_LOGIN_COMPLETE = "relogin_complete";
     public static final String UPDATE_GROUP_DIALOG_SUCCESS_ACTION = "update_group_dialog_success_action";
     public static final String UPDATE_GROUP_DIALOG_FAIL_ACTION = "update_group_dialog_fail_action";
     public static final String DELETE_DIALOG_SUCCESS_ACTION = "delete_dialog_success_action";

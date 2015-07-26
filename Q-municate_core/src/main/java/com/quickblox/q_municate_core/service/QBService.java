@@ -496,20 +496,46 @@ public class QBService extends Service {
     }
 
     private void registerReloginCommand() {
-        QBReloginCommand reloginCommand = new QBReloginCommand(this,
-                QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION,
+        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
+        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
+        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
+
+        // Init commands //
+        QBReloginCommand reloginCommand = new QBReloginCommand(this,//
+                QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION,//
                 QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
+
         ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
-        reloginCommand.addCommand(logoutChatCommand);
 
-        ServiceCommand initChat  = serviceCommandMap.get(QBServiceConsts.INIT_CHAT_SERVICE_ACTION);
-        reloginCommand.addCommand(initChat);
+        QBInitChatServiceCommand initChatServiceCommand = new QBInitChatServiceCommand(this, chatRestHelper,
+                QBServiceConsts.INIT_CHAT_SERVICE_SUCCESS_ACTION,
+                QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION);
 
-        ServiceCommand loginChatCommand = serviceCommandMap.get(QBServiceConsts.LOGIN_CHAT_ACTION);
-        reloginCommand.addCommand(loginChatCommand);
+        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
+                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
+
+//        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper, privateChatHelper,
+//                QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
+//                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
+//
+//        QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, multiChatHelper,
+//                QBServiceConsts.INIT_CHATS_SUCCESS_ACTION,
+//                QBServiceConsts.INIT_CHATS_FAIL_ACTION);
+//
+//        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
 
         ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+
+        // Add commands in composite command list
+        reloginCommand.addCommand(logoutChatCommand);
+        reloginCommand.addCommand(initChatServiceCommand);
+        reloginCommand.addCommand(loginChatCommand);
+//        reloginCommand.addCommand(initFriendListCommand);
+//        reloginCommand.addCommand(initChatsCommand);
+//        reloginCommand.addCommand(initVideoChatCommand);
         reloginCommand.addCommand(joinChatCommand);
+
         serviceCommandMap.put(QBServiceConsts.RE_LOGIN_IN_CHAT_ACTION, reloginCommand);
     }
 
@@ -642,17 +668,13 @@ public class QBService extends Service {
             Log.d(TAG, "onReceive" + intent.getAction());
             String action = intent.getAction();
             if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-//               // Init chat service
-//                try {
-//                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).initChatService();
-//                    ((QBChatRestHelper)getHelper(CHAT_REST_HELPER)).login(AppSession.getSession().getUser());
-//                } catch (XMPPException | SmackException | IOException e) {
-//                    e.printStackTrace();
-//                }
-
+                Log.d("Fixes STATUS", "Start chat helpers initiation");
+                // Init chat service
                 ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
                 ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
+                Log.d("Fixes STATUS", "Finish chat helpers initiation");
+                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(QBServiceConsts.RE_LOGIN_COMPLETE));
             }
         }
     }

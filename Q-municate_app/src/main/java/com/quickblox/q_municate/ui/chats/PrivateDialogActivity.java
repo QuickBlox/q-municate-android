@@ -36,6 +36,7 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;

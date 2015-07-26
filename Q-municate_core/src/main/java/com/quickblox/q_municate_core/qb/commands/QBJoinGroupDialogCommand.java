@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
@@ -48,19 +49,27 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws QBResponseException {
         ArrayList<ParcelableQBDialog> dialogList = null;
         List<QBDialog> dialogs = null;
+        Log.d("Fixes CHAT", "Start perform QBLoginChatCommand with bundle extras " + extras);
+
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
             dialogList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST);
             dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);
+        } else {
+            Log.d("Fixes CHAT", "Failed perform QBLoginChatCommand parceble dialogs");
         }
 
         if(dialogs == null) {
             dialogs = ChatDatabaseManager.getDialogs(context);
+        } else {
+            Log.d("Fixes CHAT", "Failed perform QBLoginChatCommand dialogs is NULL");
         }
 
         if (dialogs != null && !dialogs.isEmpty()) {
             multiChatHelper.tryJoinRoomChats(dialogs);
             // save flag for join to dialogs
             PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
+        } else {
+            Log.d("Fixes CHAT", "Failed perform QBLoginChatCommand dialogs is NULL or EMPTY");
         }
 
         return extras;
