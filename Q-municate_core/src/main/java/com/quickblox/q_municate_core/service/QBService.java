@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -572,58 +573,65 @@ public class QBService extends Service {
                 if (connectivityType == ConnectivityManager.TYPE_MOBILE
                         || connectivityType == ConnectivityManager.TYPE_WIFI) {
 
-                    // Check does connectivity EXISTS for connectivity type wifi or mobile internet
-                    // Pay attention on "!" symbol  in line below
-                    connectivityState = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-                    Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
+                    ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+                    //should check null because in air plan mode it will be null
+                   if(networkInfo != null && networkInfo.isConnected()){
+                       // Check does connectivity EXISTS for connectivity type wifi or mobile internet
+                       // Pay attention on "!" symbol  in line below
+                       connectivityState = true;
+                       Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
+                   }
                 }
                 return connectivityState;
             }
 
-
-        };
-
-        wifiReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent != null) {
-                    Log.d("Fixes CONNECTIVITY", "Receive wifi change");
-                    boolean connectionState = processWifiConnectionState(intent);
-                    // Set it state to notify all listeners
-                    updateStateIfNeed(connectionState);
+            private void updateStateIfNeed(boolean connectionState) {
+                if (isConnectivityExists != connectionState) {
+                    Log.d("Fixes CONNECTIVITY", "Set connectivity state");
+                    setConnectivityState(connectionState);
+                    Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
+                    QBConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
                 }
             }
-
-            private boolean processWifiConnectionState(Intent intent) {
-                boolean wifiConnectionState = false;
-                int wifiState = intent.getIntExtra(WifiManager.EXTRA_NEW_STATE, WifiManager.WIFI_STATE_DISABLED);
-                Log.d("Fixes CONNECTIVITY", "Wifi state is " + intent.getExtras());
-                Log.d("Fixes CONNECTIVITY", "Wifi state is " + wifiState);
-                if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
-                    wifiConnectionState = true;
-                }
-                return wifiConnectionState;
-            }
         };
+
+//        wifiReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                if (intent != null) {
+//                    Log.d("Fixes CONNECTIVITY", "Receive wifi change");
+//                    boolean connectionState = processWifiConnectionState(intent);
+//                    // Set it state to notify all listeners
+//                    updateStateIfNeed(connectionState);
+//                }
+//            }
+//
+//            private boolean processWifiConnectionState(Intent intent) {
+//
+//                WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+//                wifiManager.isWifiEnabled();
+//                boolean wifiConnectionState = false;
+//                int wifiState = intent.getIntExtra(WifiManager.EXTRA_NEW_STATE, WifiManager.WIFI_STATE_DISABLED);
+//                Log.d("Fixes CONNECTIVITY", "Wifi state is " + intent.getExtras());
+//                Log.d("Fixes CONNECTIVITY", "Wifi state is " + wifiState);
+//                if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
+//                    wifiConnectionState = true;
+//                }
+//                return wifiConnectionState;
+//            }
+//        };
 
         registerReceiver(connectivityReceier, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        registerReceiver(wifiReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+//        registerReceiver(wifiReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
     }
 
-    private void updateStateIfNeed(boolean connectionState) {
-        if (isConnectivityExists != connectionState) {
-            Log.d("Fixes CONNECTIVITY", "Set connectivity state");
-            setConnectivityState(connectionState);
-            Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
-            QBConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
-        }
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         unregisterReceiver(connectivityReceier);
-        unregisterReceiver(wifiReceiver);
+//        unregisterReceiver(wifiReceiver);
         connectivityListeners.clear();
     }
 
