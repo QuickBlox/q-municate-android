@@ -334,7 +334,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.RE_LOGIN_COMPLETE, new ReloginComplete());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginSuccessAction());
         addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, new ReloginFailAction());
         updateBroadcastActionList();
     }
@@ -421,7 +421,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
-        removeAction(QBServiceConsts.RE_LOGIN_COMPLETE);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
     }
 
@@ -548,8 +548,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
                 Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
                 scrollListView();
-            } else if (UpdateMessagesReason.AFTER_RELOGIN == updateMessagesReason){
-
             }
 //
 //            // Set state to none to prevent scrolling to the bottom of the list on each data update
@@ -907,7 +905,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
 
-    public class ReloginComplete implements Command {
+    public class ReloginSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {

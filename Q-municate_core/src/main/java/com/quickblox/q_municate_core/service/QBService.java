@@ -6,16 +6,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
@@ -60,7 +59,6 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
 import com.quickblox.q_municate_core.qb.helpers.BaseHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
-import com.quickblox.q_municate_core.qb.helpers.QBBaseChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBMultiChatHelper;
@@ -69,12 +67,9 @@ import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.Utils;
 
-import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -111,10 +106,11 @@ public class QBService extends Service {
     private QBFriendListHelper friendListHelper;
 
     private Map<Integer, BaseHelper> helpers = new HashMap<>();
-    private BroadcastReceiver broadcastReceiver = new LoginBroadcastReceiver();
+//    private BroadcastReceiver broadcastReceiver = new LoginBroadcastReceiver();
     private boolean isConnectivityExists = true;
     private Set<ConnectivityListener> connectivityListeners = new HashSet<>();
     private BroadcastReceiver connectivityReceier;
+    private BroadcastReceiver wifiReceiver;
 
     public QBService() {
         threadQueue = new LinkedBlockingQueue<Runnable>();
@@ -515,15 +511,15 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
 
-//        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper, privateChatHelper,
-//                QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
-//                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
-//
-//        QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, multiChatHelper,
-//                QBServiceConsts.INIT_CHATS_SUCCESS_ACTION,
-//                QBServiceConsts.INIT_CHATS_FAIL_ACTION);
-//
-//        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
+        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper, privateChatHelper,
+                QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
+                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
+
+        QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, multiChatHelper,
+                QBServiceConsts.INIT_CHATS_SUCCESS_ACTION,
+                QBServiceConsts.INIT_CHATS_FAIL_ACTION);
+
+        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
 
         ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
 
@@ -531,9 +527,9 @@ public class QBService extends Service {
         reloginCommand.addCommand(logoutChatCommand);
         reloginCommand.addCommand(initChatServiceCommand);
         reloginCommand.addCommand(loginChatCommand);
-//        reloginCommand.addCommand(initFriendListCommand);
-//        reloginCommand.addCommand(initChatsCommand);
-//        reloginCommand.addCommand(initVideoChatCommand);
+        reloginCommand.addCommand(initFriendListCommand);
+        reloginCommand.addCommand(initChatsCommand);
+        reloginCommand.addCommand(initVideoChatCommand);
         reloginCommand.addCommand(joinChatCommand);
 
         serviceCommandMap.put(QBServiceConsts.RE_LOGIN_IN_CHAT_ACTION, reloginCommand);
@@ -543,56 +539,91 @@ public class QBService extends Service {
     public void onCreate() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
-        if (broadcastReceiver != null) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
-                    filter);
-        }
+//        if (broadcastReceiver != null) {
+//            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+//                    filter);
+//        }
 
         Log.d("Fixes CONNECTIVITY", "START connectivity manager");
         initConnectivityManager();
     }
 
     private void initConnectivityManager() {
+
         Log.d("Fixes CONNECTIVITY", "Init broadcastreceiver");
         connectivityReceier = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent != null) {
-                    int connectivityType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
-                    // Check does connectivity equal mobile or wifi types
-                    Log.d("Fixes CONNECTIVITY", "Check does connectivity equal mobile or wifi types");
-                    Log.d("Fixes CONNECTIVITY", "Connectivity types is " + connectivityType);
-                    if (connectivityType == ConnectivityManager.TYPE_MOBILE
-                            || connectivityType == ConnectivityManager.TYPE_WIFI) {
-
-                        // Check does connectivity EXIST for connectivity type wifi or mobile internet
-                        // Pay attention on "!" symbol  in line below
-                        Log.d("Fixes CONNECTIVITY", "Check does connectivity exist for connectivity type wifi or mobile internet");
-                        boolean connectivityState = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-                        Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
-
-                        // Set it state to notify all listeners
-                        if (isConnectivityExists != connectivityState) {
-                            Log.d("Fixes CONNECTIVITY", "Set connectivity state");
-                            setConnectivityState(connectivityState);
-                            Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
-                            com.quickblox.q_municate_core.utils.ConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
-                        }
-                    }
+                    // Process CONNECTIVITY changes
+                    Log.d("Fixes CONNECTIVITY", "Receive connectivity change");
+                    boolean connectionState = processConnectivityState(intent);
+                    // Set it state to notify all listeners
+                    updateStateIfNeed(connectionState);
                 }
+            }
+
+
+            private boolean processConnectivityState(Intent intent) {
+                int connectivityType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
+                // Check does connectivity equal mobile or wifi types
+                Log.d("Fixes CONNECTIVITY", "Check does connectivity equal mobile or wifi types");
+                boolean connectivityState = false;
+                if (connectivityType == ConnectivityManager.TYPE_MOBILE
+                        || connectivityType == ConnectivityManager.TYPE_WIFI) {
+
+                    // Check does connectivity EXISTS for connectivity type wifi or mobile internet
+                    // Pay attention on "!" symbol  in line below
+                    connectivityState = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+                    Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
+                }
+                return connectivityState;
+            }
+
+
+        };
+
+        wifiReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent != null) {
+                    Log.d("Fixes CONNECTIVITY", "Receive wifi change");
+                    boolean connectionState = processWifiConnectionState(intent);
+                    // Set it state to notify all listeners
+                    updateStateIfNeed(connectionState);
+                }
+            }
+
+            private boolean processWifiConnectionState(Intent intent) {
+                boolean wifiConnectionState = false;
+                int wifiState = intent.getIntExtra(WifiManager.EXTRA_NEW_STATE, WifiManager.WIFI_STATE_DISABLED);
+                Log.d("Fixes CONNECTIVITY", "Wifi state is " + intent.getExtras());
+                Log.d("Fixes CONNECTIVITY", "Wifi state is " + wifiState);
+                if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
+                    wifiConnectionState = true;
+                }
+                return wifiConnectionState;
             }
         };
 
         registerReceiver(connectivityReceier, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(wifiReceiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+    }
+
+    private void updateStateIfNeed(boolean connectionState) {
+        if (isConnectivityExists != connectionState) {
+            Log.d("Fixes CONNECTIVITY", "Set connectivity state");
+            setConnectivityState(connectionState);
+            Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
+            QBConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (broadcastReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
-        }
         unregisterReceiver(connectivityReceier);
+        unregisterReceiver(wifiReceiver);
         connectivityListeners.clear();
     }
 
@@ -661,21 +692,21 @@ public class QBService extends Service {
         }
     }
 
-    private class LoginBroadcastReceiver extends BroadcastReceiver {
+//    private class LoginBroadcastReceiver extends BroadcastReceiver {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive" + intent.getAction());
-            String action = intent.getAction();
-            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
-                Log.d("Fixes STATUS", "Start chat helpers initiation");
-                // Init chat service
-                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
-                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
-                Log.d("Fixes STATUS", "Finish chat helpers initiation");
-                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(QBServiceConsts.RE_LOGIN_COMPLETE));
-            }
-        }
-    }
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            Log.d(TAG, "onReceive" + intent.getAction());
+//            String action = intent.getAction();
+//            if(action != null && QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION.equals(action)){
+//                Log.d("Fixes STATUS", "Start chat helpers initiation");
+//                // Init chat service
+//                ((QBBaseChatHelper)getHelper(PRIVATE_CHAT_HELPER)).init(AppSession.getSession().getUser());
+//                ((QBBaseChatHelper)getHelper(MULTI_CHAT_HELPER)).init(AppSession.getSession().getUser());
+//                ((QBVideoChatHelper)getHelper(VIDEO_CHAT_HELPER)).init(QBChatService.getInstance());
+//                Log.d("Fixes STATUS", "Finish chat helpers initiation");
+//                LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(QBServiceConsts.RE_LOGIN_COMPLETE));
+//            }
+//        }
+//    }
 }

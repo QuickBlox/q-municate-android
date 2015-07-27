@@ -21,7 +21,7 @@ import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate_core.utils.ConnectivityManager;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.EmailUtils;
@@ -94,7 +94,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         fromFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ConnectivityManager.isConnectionExists()) {
+                if(QBConnectivityManager.isConnectionExists()) {
                     facebookFriendsOnClick();
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
@@ -105,7 +105,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         fromContactsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(ConnectivityManager.isConnectionExists()) {
+                if(QBConnectivityManager.isConnectionExists()) {
                     contactsFriendsOnClick();
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
@@ -205,7 +205,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.action_next).setVisible(ConnectivityManager.isConnectionExists());
+        menu.findItem(R.id.action_next).setVisible(QBConnectivityManager.isConnectionExists());
     }
 
     @Override

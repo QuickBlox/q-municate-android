@@ -17,9 +17,9 @@ import java.util.Set;
  * @author Bogatov Evgeniy bogatovevgeniy@gmail.com
  */
 
-public class ConnectivityManager implements ConnectivityListener {
+public class QBConnectivityManager implements ConnectivityListener {
 
-    private static ConnectivityManager INSTANCE;
+    private static QBConnectivityManager INSTANCE;
     private final Context context;
     private Set<ConnectivityListener> connectivityListeners;
     private static boolean isConnectivityExists = true;
@@ -28,7 +28,7 @@ public class ConnectivityManager implements ConnectivityListener {
         return isConnectivityExists;
     }
 
-    public ConnectivityManager(Context context) {
+    public QBConnectivityManager(Context context) {
         this.context = context;
         connectivityListeners = new HashSet<>();
     }
@@ -36,11 +36,11 @@ public class ConnectivityManager implements ConnectivityListener {
     /**
      * Init instance of the manager
      */
-    public static  ConnectivityManager getInstance (Context context){
+    public static QBConnectivityManager getInstance (Context context){
         if(INSTANCE == null){
-            synchronized (ConnectivityManager.class){
+            synchronized (QBConnectivityManager.class){
                 if(INSTANCE == null){
-                    INSTANCE = new ConnectivityManager(context);
+                    INSTANCE = new QBConnectivityManager(context);
                 }
             }
         }

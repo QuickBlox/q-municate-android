@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -22,11 +21,10 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConnectivityManager;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -165,7 +163,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     public void onConnectedToService(QBService service) {
-        ConnectivityManager.getInstance(getApplicationContext()).addConnectivityListener(this);
+        QBConnectivityManager.getInstance(getApplicationContext()).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -291,7 +289,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     }
 
     public boolean isConnectionEnabled() {
-        return ConnectivityManager.isConnectionExists();
+        return QBConnectivityManager.isConnectionExists();
     }
 
     @Override
