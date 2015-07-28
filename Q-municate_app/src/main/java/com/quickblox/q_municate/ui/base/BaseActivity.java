@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -21,6 +22,7 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -163,7 +165,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     public void onConnectedToService(QBService service) {
-        QBConnectivityManager.getInstance(getApplicationContext()).addConnectivityListener(this);
+        QBConnectivityManager.getInstance(this).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -294,6 +296,22 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     public void onConnectionChange(boolean isConnected) {
-
+        Log.d("Fixes CONNECTIVITY", "onConnectionChange in BaseActivity");
+        Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected);
+        if (isConnected) {
+            QBReloginCommand.start(this);
+        } else {
+//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
+//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
+//                                .setMessage(getString(R.string.connection_lost))
+//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                });
+//                        diologBuilder.show();
+            Toast.makeText(this, this.getString(com.quickblox.q_municate_core.R.string.connection_lost), Toast.LENGTH_LONG).show();
+        }
     }
 }

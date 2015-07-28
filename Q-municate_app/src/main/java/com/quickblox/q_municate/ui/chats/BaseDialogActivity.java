@@ -132,6 +132,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private UpdateMessagesReason updateMessagesReason;
     private boolean isListInBottomNow;
     private boolean isTypingAnimationShown;
+    private int lastMessagesCountInDB;
 
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
@@ -538,18 +539,46 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             Log.d("Fixes CHAT", "onLoadFinished Adapter exist");
             Log.d("Fixes CHAT", "onLoadFinished update reason " + updateMessagesReason.name());
             messagesAdapter.swapCursor(messagesCursor);
-            // Set position depends on first load
-            if (totalEntries > 0 && UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason ) {
-                int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
-                        ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
-                Log.d("Fixes CHAT", "onLoadFinished Set selection  " + loadMessages);
-                messagesListView.setSelection(loadMessages - 1);
 
-            } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
-                Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
-                scrollListView();
+
+            // Set position depends on first load
+            // We use two points in class which signaling us about loading messages
+            // It is onLoadFinished method and inner class LoadDialogMessagesSuccessAction
+            //
+            // LoadDialogMessagesSuccessAction contains execute method which called when loading messages and
+            // saving them in base completely finished. Also intent parameter contains value of loaded messages
+            //
+            // At same time onLoadFinished called each time when database data was changed, it means
+            // that QBLoadDialogMessagesCommand causes onLoadFinished dialog retrieving.
+            //
+            // Both of points of loading dialogs depends from each other and we have no warranty about order of their execution
+            // To prevent incorrect work of dialog positioning we use additional check:
+            // if total entries are equal 0 then we additionally check is messages count in our local base changed,
+            // if it is true then we set new totalEntries value equals difference of messages in base
+            // before and after  onLoadFinished method was called
+
+            int currentMessageCountInBase = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
+
+
+            if (currentMessageCountInBase > lastMessagesCountInDB) {
+                totalEntries = currentMessageCountInBase - lastMessagesCountInDB;
+                lastMessagesCountInDB = currentMessageCountInBase;
             }
-//
+
+
+            if (totalEntries > 0) {
+                if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
+                    int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
+                            ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
+                    Log.d("Fixes CHAT", "onLoadFinished Set selection  " + loadMessages);
+                    messagesListView.setSelection(loadMessages - 1);
+                    resetTotalEntries();
+                } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason) {
+                    Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
+                    scrollListView();
+                }
+            }
+
 //            // Set state to none to prevent scrolling to the bottom of the list on each data update
 //            // Update list position only for first load
 //            updateMessagesReason = UpdateMessagesReason.NONE;
@@ -728,6 +757,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             return;
         }
 
+        lastMessagesCountInDB = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
         showActionBarProgress();
 
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
@@ -736,8 +766,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             Log.d("Fixes CHAT", "Last synch mesasge is null");
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
-        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason
-                || UpdateMessagesReason.AFTER_RELOGIN == updateMessagesReason){
+        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
             Log.d("Fixes CHAT", "startLoadDialogMessages by default reason");
             startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
         } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
@@ -823,24 +852,28 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             skipMessages += bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             Log.d("Fixes CHAT", "LoadDialogMessagesSuccessAction Next skip messages " + skipMessages);
 
-            // Set totalEntries value only if download messages command was executed by user request.
-            // TotalEntries value used to set position of list after it was updated.
+            // Set totalEntries value only if download messages command have been executed by user request.
+            // TotalEntries value used for setting position of list after it was updated.
             // If loading of messages command has executed by default reason (user returns to dialog
             // or dialog was opened before) or at first time we shouldn't initiate totalEntries value
             // also we should erase it if it different from zero
 
-            if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason){
-                totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            } else {
-                if(totalEntries > 0){
-                    totalEntries = ConstsCore.ZERO_INT_VALUE;
-                }
-            }
+//            if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason){
+//                totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+//            } else {
+//                resetTotalEntries();
+//            }
 
             // Set update
 
             loadingMore = true;
             hideActionBarProgress();
+        }
+    }
+
+    private void resetTotalEntries() {
+        if(totalEntries > 0){
+            totalEntries = ConstsCore.ZERO_INT_VALUE;
         }
     }
 
@@ -966,7 +999,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private enum UpdateMessagesReason {
 
         /**
-         * Loader updates data
+         * Loader updates data. Used to reset last update reason to unspecified mode
+         * to prevent scrolling to bottom or setting some position in list
          */
         NONE,
 

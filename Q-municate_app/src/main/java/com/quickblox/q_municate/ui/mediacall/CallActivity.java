@@ -669,7 +669,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallAc
                 try {
                     videoChatHelper.rejectCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
-
+                    finishActivitiForAbsentSession();
                     Log.d(CALL_INTEGRATION, e.getMessage() + " rejectCall");
                 }
             }
@@ -769,12 +769,16 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallAc
                 try {
                     videoChatHelper.hangUpCall(userInfo);
                 } catch (QBRTCSessionIsAbsentException e) {
-                    videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.WAIT_FOR_CALL);
-                    CallActivity.this.finish();
+                    finishActivitiForAbsentSession();
                     Log.d(CALL_INTEGRATION, e.getMessage() + " hangUpCall");
                 }
             }
         };
+    }
+
+    private void finishActivitiForAbsentSession() {
+        videoChatHelper.setVideoChatHelperState(QBVideoChatHelper.VideoHelperStates.WAIT_FOR_CALL);
+        CallActivity.this.finish();
     }
 
     private Runnable initRemoteVideoTrackTask(final QBRTCVideoTrack videoTrack) {

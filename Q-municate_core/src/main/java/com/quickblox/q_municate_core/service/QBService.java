@@ -591,7 +591,7 @@ public class QBService extends Service {
                     Log.d("Fixes CONNECTIVITY", "Set connectivity state");
                     setConnectivityState(connectionState);
                     Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
-                    QBConnectivityManager.getInstance(getApplicationContext()).onConnectionChange(isConnectivityExists);
+                    QBConnectivityManager.getInstance(QBService.this).onConnectionChange(isConnectivityExists);
                 }
             }
         };

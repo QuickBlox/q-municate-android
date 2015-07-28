@@ -150,7 +150,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     @Override
     public void onConnectedToService(QBService service) {
-        QBConnectivityManager.getInstance(getApplicationContext()).addConnectivityListener(this);
+        QBConnectivityManager.getInstance(this).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {

@@ -148,10 +148,10 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
         }
 
-        if (!messageCache.isRead() && !ownMessage) {
-            messageCache.setRead(true);
-            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
-        }
+//        if (!messageCache.isRead() && !ownMessage) {
+//            messageCache.setRead(true);
+//            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
+//        }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }
