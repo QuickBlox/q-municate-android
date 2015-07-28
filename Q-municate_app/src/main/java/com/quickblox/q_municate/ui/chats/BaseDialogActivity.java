@@ -547,15 +547,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             //
             // LoadDialogMessagesSuccessAction contains execute method which called when loading messages and
             // saving them in base completely finished. Also intent parameter contains value of loaded messages
+            // which could be used as final value of loaded messages
             //
             // At same time onLoadFinished called each time when database data was changed, it means
             // that QBLoadDialogMessagesCommand causes onLoadFinished dialog retrieving.
             //
             // Both of points of loading dialogs depends from each other and we have no warranty about order of their execution
-            // To prevent incorrect work of dialog positioning we use additional check:
-            // if total entries are equal 0 then we additionally check is messages count in our local base changed,
-            // if it is true then we set new totalEntries value equals difference of messages in base
-            // before and after  onLoadFinished method was called
+            // To prevent incorrect work of dialog positioning we use difference of messages in base
+            // before and after onLoadFinished method was called to determ last visible message position in
+            // updated list
+            //
 
             int currentMessageCountInBase = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
 
