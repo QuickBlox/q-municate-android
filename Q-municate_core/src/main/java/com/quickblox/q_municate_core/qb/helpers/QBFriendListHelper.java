@@ -161,9 +161,13 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void sendInvitation(int userId) throws XMPPException, SmackException {
         if (roster.contains(userId)) {
+            Log.d("Fixes", "Roster contains user");
             roster.subscribe(userId);
+            Log.d("Fixes", "Roster subscribed");
         } else {
+            Log.d("Fixes", "Roster doesn't contain user");
             roster.createEntry(userId, null);
+            Log.d("Fixes", "Roster entry created");
         }
     }
 
@@ -228,7 +232,7 @@ public class QBFriendListHelper extends BaseHelper {
         friend.setNewFriendStatus(isNewFriendStatus);
         Log.d("Fixes", "Friend status is created");
         fillUserOnlineStatus(user);
-        Log.d("Fixes", "User online status fielded");
+        Log.d("Fixes", "User online status filled");
 
         saveUser(user);
         Log.d("Fixes", "User is saved");

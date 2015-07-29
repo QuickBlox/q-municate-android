@@ -98,7 +98,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
         int iconResourceId;
-        if (isDelivered && isRead) {
+        if (/*isDelivered && */isRead) {
             iconResourceId = R.drawable.ic_status_mes_sent_received;
         } else if (isDelivered) {
             iconResourceId = R.drawable.ic_status_mes_sent;

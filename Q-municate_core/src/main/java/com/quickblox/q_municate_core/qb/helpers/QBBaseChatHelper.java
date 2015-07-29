@@ -43,7 +43,7 @@ import org.jivesoftware.smack.XMPPException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class QBBaseChatHelper extends BaseHelper {
+public abstract class  QBBaseChatHelper extends BaseHelper {
 
     private static final String TAG = QBBaseChatHelper.class.getSimpleName();
 
@@ -359,7 +359,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(messageCache.getSenderId());
             privateChat.readMessage(messageCache.getId());
-            Log.d("Fixes STATUS", "Successful mark");
+            Log.d("Fixes STATUS", "Call privateChat.readMessage successful");
         } else {
             Log.d("Fixes STATUS", "Failed  Not from private");
         }

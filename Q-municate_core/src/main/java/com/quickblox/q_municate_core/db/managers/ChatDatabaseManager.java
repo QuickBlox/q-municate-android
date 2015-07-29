@@ -9,6 +9,7 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -24,8 +25,10 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +37,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatDatabaseManager {
+
+    private static boolean messaGeReadByUser;
 
     public static void saveDialogs(Context context, List<QBDialog> dialogsList) {
         for (QBDialog dialog : dialogsList) {
@@ -373,8 +378,9 @@ public class ChatDatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
+
             MessageCache messageCache = new MessageCache(messageId, dialogId, senderId, recipientId, message, attachURL, time,
-                    historyMessage.isRead(), true, true);
+                    isMessageReadByUser(historyMessage.getReadIds()), true, true);
 
             if (historyMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
@@ -738,5 +744,13 @@ public class ChatDatabaseManager {
     public static void deleteDialogByRoomJid(Context context, String roomJid) {
         context.getContentResolver().delete(DialogTable.CONTENT_URI,
                 DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null);
+    }
+
+    public static boolean isMessageReadByUser(Collection<Integer> readIDs) {
+        boolean messaGeReadByUser = false;
+        if (readIDs != null && readIDs.contains(QBChatService.getInstance().getUser().getId())){
+            messaGeReadByUser = true;
+        }
+        return messaGeReadByUser;
     }
 }

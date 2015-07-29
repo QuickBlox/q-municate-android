@@ -914,15 +914,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             // TODO: now it is possible only for Private chats
-            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
-                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                if (isTyping && isListInBottomNow) {
-                    isTypingAnimationShown = true;
-                    scrollListView();
-                    startMessageTypingAnimation();
-                } else {
-                    isTypingAnimationShown = false;
-                    stopMessageTypingAnimation();
+            if(dialog != null) {
+                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                    if (isTyping && isListInBottomNow) {
+                        isTypingAnimationShown = true;
+                        scrollListView();
+                        startMessageTypingAnimation();
+                    } else {
+                        isTypingAnimationShown = false;
+                        stopMessageTypingAnimation();
+                    }
                 }
             }
         }
@@ -953,8 +955,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             /*
             Set update reason to default for loading new messages if operations is success
              */
-//            updateMessagesReason = UpdateMessagesReason.AFTER_RELOGIN;
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
+
+            // Update adapter to cause message state updating
+            messagesListView.invalidateViews();
+
             startLoadDialogMessages();
         }
     }

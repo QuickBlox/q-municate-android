@@ -493,45 +493,18 @@ public class QBService extends Service {
     }
 
     private void registerReloginCommand() {
-        QBChatRestHelper chatRestHelper = (QBChatRestHelper) getHelper(CHAT_REST_HELPER);
-        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
-        QBMultiChatHelper multiChatHelper = (QBMultiChatHelper) getHelper(MULTI_CHAT_HELPER);
 
-        // Init commands //
+
+        // Init commands
         QBReloginCommand reloginCommand = new QBReloginCommand(this,//
                 QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION,//
                 QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
 
         ServiceCommand logoutChatCommand = serviceCommandMap.get(QBServiceConsts.LOGOUT_AND_DESTROY_CHAT_ACTION);
 
-        QBInitChatServiceCommand initChatServiceCommand = new QBInitChatServiceCommand(this, chatRestHelper,
-                QBServiceConsts.INIT_CHAT_SERVICE_SUCCESS_ACTION,
-                QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION);
-
-        QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, authHelper, chatRestHelper,
-                QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION,
-                QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
-
-        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper, privateChatHelper,
-                QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
-                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
-
-        QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, multiChatHelper,
-                QBServiceConsts.INIT_CHATS_SUCCESS_ACTION,
-                QBServiceConsts.INIT_CHATS_FAIL_ACTION);
-
-        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
-
-        ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-
         // Add commands in composite command list
-        reloginCommand.addCommand(logoutChatCommand);
-        reloginCommand.addCommand(initChatServiceCommand);
-        reloginCommand.addCommand(loginChatCommand);
-        reloginCommand.addCommand(initFriendListCommand);
-        reloginCommand.addCommand(initChatsCommand);
-        reloginCommand.addCommand(initVideoChatCommand);
-        reloginCommand.addCommand(joinChatCommand);
+//        reloginCommand.addCommand(logoutChatCommand);
+        addLoginChatAndInitCommands(reloginCommand);
 
         serviceCommandMap.put(QBServiceConsts.RE_LOGIN_IN_CHAT_ACTION, reloginCommand);
     }

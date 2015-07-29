@@ -45,6 +45,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         try {
             Log.d("Fixes STATUS", "Try to update status read for dialog " + dialog.getDialogId() + " and message cache " + messageCache + " for private " + forPrivate);
             baseChatHelper.updateStatusMessageRead(dialog.getDialogId(), messageCache, forPrivate);
+            Log.d("Fixes STATUS", "Status successfully updated to READ");
         } catch (Exception e) {
             Log.d("Fixes STATUS", "Exception of update  " + e);
 
