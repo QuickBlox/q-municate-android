@@ -56,7 +56,7 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
 
             QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
             requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
-            requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
+            requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE_TEMP_VALUE);  //temporary solution, need fixes
 
             Bundle requestParams = new Bundle();
             List<QBUser> userList = QBUsers.getUsersByIDs(participantIdsList, requestBuilder, requestParams);

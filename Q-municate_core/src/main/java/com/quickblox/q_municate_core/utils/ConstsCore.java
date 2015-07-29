@@ -5,6 +5,8 @@ public class ConstsCore {
     // Friend list consts
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 20;
+    public static final int FL_FRIENDS_PER_PAGE_TEMP_VALUE = 90;
+
 
     public static final int CHATS_DIALOGS_PER_PAGE = 100;
     public static final int DIALOG_MESSAGES_PER_PAGE = 20;
