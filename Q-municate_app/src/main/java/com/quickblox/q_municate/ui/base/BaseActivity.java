@@ -296,8 +296,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     public void onConnectionChange(boolean isConnected) {
-        Log.d("Fixes CONNECTIVITY", "onConnectionChange in BaseActivity");
-        Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected);
         if (isConnected) {
             QBReloginCommand.start(this);
         } else {

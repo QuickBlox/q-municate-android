@@ -343,10 +343,7 @@ public abstract class  QBBaseChatHelper extends BaseHelper {
 
     public void updateStatusMessageRead(String dialogId, MessageCache messageCache,
             boolean forPrivate) throws Exception {
-        Log.d("Fixes STATUS", "updateStatusMessageRead ");
-        Log.d("Fixes STATUS", "Start updateStatusMessageReadServer");
         updateStatusMessageReadServer(dialogId, messageCache, forPrivate);
-        Log.d("Fixes STATUS", "Start updateStatusMessageLocal");
         updateStatusMessageLocal(messageCache);
     }
 
@@ -359,9 +356,6 @@ public abstract class  QBBaseChatHelper extends BaseHelper {
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(messageCache.getSenderId());
             privateChat.readMessage(messageCache.getId());
-            Log.d("Fixes STATUS", "Call privateChat.readMessage successful");
-        } else {
-            Log.d("Fixes STATUS", "Failed  Not from private");
         }
     }
 
@@ -429,19 +423,16 @@ public abstract class  QBBaseChatHelper extends BaseHelper {
 
         @Override
         public void processMessageDelivered(QBPrivateChat privateChat, String messageId) {
-            Log.d("Fixes CHAT", "Call processMessageDelivered in message listener ");
             updateMessageStatusDeliveredLocal(messageId, true);
         }
 
         @Override
         public void processMessageRead(QBPrivateChat privateChat, String messageId) {
-            Log.d("Fixes CHAT", "Call processMessageRead in message listener");
             try {
                 MessageCache messageCache = new MessageCache();
                 messageCache.setId(messageId);
                 messageCache.setRead(true);
 
-                Log.d("Fixes CHAT", "Call updateStatusMessageLocal in base");
                 updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

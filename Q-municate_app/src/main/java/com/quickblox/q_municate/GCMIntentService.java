@@ -35,7 +35,6 @@ public class GCMIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("Fixes Notification", "createPushEvent");
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
         String messageType = gcm.getMessageType(intent);
@@ -43,42 +42,34 @@ public class GCMIntentService extends IntentService {
         if (!extras.isEmpty()) {
             if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                Log.d("Fixes Notification", "Start parse message");
                 parseMessage(extras);
             }
         }
         GcmBroadcastReceiver.completeWakefulIntent(intent);
-        Log.d("Fixes Notification", "completeWakefulIntent called");
     }
 
     private void parseMessage(Bundle extras) {
         if (extras.getString(NotificationHelper.MESSAGE) != null) {
             message = extras.getString(NotificationHelper.MESSAGE);
-            Log.d("Fixes Notification", "MESSAGE is " + message);
         }
 
         if (extras.getString(NotificationHelper.USER_ID) != null) {
             userId = Integer.parseInt(extras.getString(NotificationHelper.USER_ID));
-            Log.d("Fixes Notification", "USER_ID is " + userId);
         }
 
         if (extras.getString(NotificationHelper.DIALOG_ID) != null) {
             dialogId = extras.getString(NotificationHelper.DIALOG_ID);
-            Log.d("Fixes Notification", "DIALOG_ID is " + dialogId);
         }
 
         sendNotification();
     }
 
     private void sendNotification() {
-        Log.d("Fixes Notification", "sendNotification method called");
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
         saveOpeningDialogData(userId, dialogId);
-        Log.d("Fixes Notification", "Opening dialog data saved");
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Log.d("Fixes Notification", "PendingIntent for notification is created");
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(
                 R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
                 new NotificationCompat.BigTextStyle().bigText(message)).setContentText(message).setVibrate(
@@ -87,9 +78,7 @@ public class GCMIntentService extends IntentService {
         builder.setAutoCancel(true);
         builder.setContentIntent(contentIntent);
         builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
-        Log.d("Fixes Notification", "Notification is built");
         notificationManager.notify(NOTIFICATION_ID, builder.build());
-        Log.d("Fixes Notification", "Call notify");
     }
 
     private void saveOpeningDialogData(int userId, String dialogId) {

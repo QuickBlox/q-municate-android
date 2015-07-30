@@ -31,11 +31,8 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public static void start(Context context, QBDialog dialog, long lastDateLoad, int skipMessages) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_DIALOG " + dialog );
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_DATE_LAST_UPDATE_HISTORY " + lastDateLoad);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_SKIP_ITEMS " + skipMessages);
         intent.putExtra(QBServiceConsts.EXTRA_SKIP_ITEMS, skipMessages);
         context.startService(intent);
     }
@@ -43,13 +40,9 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public static void start(Context context, QBDialog dialog, long lastDateLoad, String lastLoadedID, int skipMessages) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_DIALOG " + dialog );
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_DATE_LAST_UPDATE_HISTORY " + lastDateLoad);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_SKIP_ITEMS " + skipMessages);
         intent.putExtra(QBServiceConsts.EXTRA_SKIP_ITEMS, skipMessages);
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand EXTRA_SKIP_ITEMS " + lastLoadedID);
         intent.putExtra(QBServiceConsts.EXTRA_LAST_CHAT_MESSAGE_ID, lastLoadedID);
         context.startService(intent);
     }
@@ -69,17 +62,14 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         // If we load new messages we shouldn't set restriction on loading messages count
         if (isOldMessageLoading) {
             // Set messages to skip in case of we load messages by user request
-            Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand LOAD OLD  MESSAGES  " + skipMessages);
             customObjectRequestBuilder.setPagesSkip(skipMessages);
             customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
         } else {
-            Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand LOAD NEW  MESSAGES  " + skipMessages);
             // This constrain not unique because few messages are could be sent at same
             // So when we receive list of messages in response of our request we should
             // additionally clear it.
             customObjectRequestBuilder.gte(ConstsCore.LAST_SENT_MESSAGE_DATE, lastDateLoad);
         }
-        Log.d("Fixes CHAT", "QBLoadDialogMessagesCommand use next  " + customObjectRequestBuilder);
 
 
         // Start load messages and save them in base
@@ -89,11 +79,6 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         // Store loaded messages in base
         baseChatHelper.saveLoadedMessages(dialog.getDialogId(), dialogMessagesList);
 
-        Log.d("Fixes CHAT", "Loaded  messages " + dialogMessagesList.size());
-
-        for(QBChatMessage messages : dialogMessagesList){
-            Log.d("Fixes CHAT", "Loaded  message " + messages);
-        }
 
         Bundle bundleResult = new Bundle();
         bundleResult.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,

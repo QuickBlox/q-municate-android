@@ -186,7 +186,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("Fixes CHAT", "BaseDialogActivity onStart");
         // Set Default update reason to start loading of new messages
         updateMessagesReason = UpdateMessagesReason.DEFAULT;
 
@@ -201,7 +200,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("Fixes CHAT", "BaseDialogActivity onPause");
         onUpdateChatDialog();
         hideSmileLayout();
 
@@ -217,7 +215,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("Fixes CHAT", "BaseDialogActivity onResume");
         startLoadDialogMessages();
     }
 
@@ -453,7 +450,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
-            Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
             loadingMore = false;
         }
@@ -462,7 +458,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startNewMessagesLoadDialogMessages(QBDialog dialog, long lastDateLoad, String lastReadMessageID) {
         if (loadingMore) {
-            Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, lastReadMessageID, ConstsCore.NOT_INITIALIZED_VALUE);
             loadingMore = false;
         }
@@ -531,13 +526,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
-        Log.d("Fixes CHAT", "onLoadFinished");
         if (messagesAdapter == null) {
-            Log.d("Fixes CHAT", "onLoadFinished Adapter absent");
             initListView(messagesCursor);
         } else {
-            Log.d("Fixes CHAT", "onLoadFinished Adapter exist");
-            Log.d("Fixes CHAT", "onLoadFinished update reason " + updateMessagesReason.name());
             messagesAdapter.swapCursor(messagesCursor);
 
 
@@ -571,18 +562,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
                     int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
                             ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
-                    Log.d("Fixes CHAT", "onLoadFinished Set selection  " + loadMessages);
                     messagesListView.setSelection(loadMessages - 1);
                     resetTotalEntries();
                 } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason) {
-                    Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
                     scrollListView();
                 }
             }
-
-//            // Set state to none to prevent scrolling to the bottom of the list on each data update
-//            // Update list position only for first load
-//            updateMessagesReason = UpdateMessagesReason.NONE;
         }
     }
 
@@ -753,7 +738,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startLoadDialogMessages() {
-        Log.d("Fixes CHAT", "startLoadDialogMessages");
         if (dialog == null) {
             return;
         }
@@ -762,16 +746,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         showActionBarProgress();
 
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
-        Log.d("Fixes CHAT", "Last synch mesasge is " + lastReadMessage);
         if (lastReadMessage == null) {
-            Log.d("Fixes CHAT", "Last synch mesasge is null");
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
         } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
-            Log.d("Fixes CHAT", "startLoadDialogMessages by default reason");
             startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
         } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
-            Log.d("Fixes CHAT", "startLoadDialogMessages by user request or none reason");
             startLoadDialogMessages(dialog, lastReadMessage.getTime());
         }
     }
@@ -849,9 +829,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
 
-            Log.d("Fixes CHAT", "LoadDialogMessagesSuccessAction");
             skipMessages += bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            Log.d("Fixes CHAT", "LoadDialogMessagesSuccessAction Next skip messages " + skipMessages);
 
             // Set totalEntries value only if download messages command have been executed by user request.
             // TotalEntries value used for setting position of list after it was updated.
@@ -882,7 +860,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("Fixes CHAT", "LoadDialogMessagesFailAction");
             loadingMore = true;
             hideActionBarProgress();
         }
@@ -945,11 +922,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            Log.d("Fixes STATUS", "Relogin success action");
-            Log.d("Fixes CHAT", "ChatService is init " + QBChatService.isInitialized());
-            if (QBChatService.isInitialized()) {
-                Log.d("Fixes CHAT", "ChatService is logged in " + QBChatService.getInstance().isLoggedIn());
-            }
             Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
 
             /*

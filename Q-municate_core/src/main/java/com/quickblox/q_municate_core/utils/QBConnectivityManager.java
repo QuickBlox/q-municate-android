@@ -57,8 +57,6 @@ public class QBConnectivityManager implements ConnectivityListener {
     public void onConnectionChange(final boolean isConnected) {
         isConnectivityExists = isConnected;
         notifyAllConnectivityListeners();
-        Log.d("Fixes CONNECTIVITY", "onConnectionChange in BaseActivity");
-        Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected);
         if (isConnected) {
             QBReloginCommand.start(context);
         } else {

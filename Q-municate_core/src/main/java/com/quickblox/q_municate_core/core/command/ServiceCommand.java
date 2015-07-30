@@ -49,21 +49,13 @@ public abstract class ServiceCommand implements Command {
     }
 
     protected void sendResult(Bundle result, String action) {
-        if (action.equals(QBServiceConsts.FIND_USERS_SUCCESS_ACTION)) {
-            Log.d("Fixes", "Find user send result " + result);
-        }
 
         Intent intent = new Intent(action);
         if (null != result) {
             intent.putExtras(result);
-        } else {
-            if (action.equals(QBServiceConsts.FIND_USERS_SUCCESS_ACTION)) {
-                Log.d("Fixes", "Find user is " + result);
-            }
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-        Log.d("Fixes", "Send broadcast  " + action + " with bundle " + result);
     }
 
     protected abstract Bundle perform(Bundle extras) throws QBResponseException;
