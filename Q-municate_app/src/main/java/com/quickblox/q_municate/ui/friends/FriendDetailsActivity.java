@@ -8,11 +8,13 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteDialogCommand;
+import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
@@ -51,6 +54,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView onlineStatusTextView;
     private TextView phoneTextView;
     private View phoneView;
+    private RelativeLayout videoCallButton;
+    private RelativeLayout voiceCallButton;
 
     private QBPrivateChatHelper privateChatHelper;
     private User user;
@@ -85,6 +90,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         onlineStatusTextView = _findViewById(R.id.online_status_textview);
         phoneTextView = _findViewById(R.id.phone_textview);
         phoneView = _findViewById(R.id.phone_relativelayout);
+
+        //initButtons
+        videoCallButton = _findViewById(R.id.video_call_button);
+        voiceCallButton = _findViewById(R.id.voice_call_button);
+
     }
 
     private void registerStatusChangingObserver() {
@@ -134,6 +144,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     @Override
     public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
         if (privateChatHelper == null) {
             privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
         }
@@ -214,7 +226,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
+        if (isConnectionEnabled()) {
+            callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
@@ -223,14 +239,19 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
                 if(QBChatService.getInstance().isLoggedIn()) {
                     CallActivity.start(FriendDetailsActivity.this, friend, callType);
                 }else {
-                    Toast.makeText(this, getString(R.string.dlg_fail_connection), Toast.LENGTH_LONG).show();
+                    QBReloginCommand.start(FriendDetailsActivity.this);
+//                    Toast.makeText(this, getString(R.string.dlg_fail_connection), Toast.LENGTH_LONG).show();
                 }
             }
         }
     }
 
     public void voiceCallClickListener(View view) {
-        callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
+        if (isConnectionEnabled()) {
+            callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean checkFriendStatus(int userId) {
@@ -269,5 +290,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
                     user.getFullName()));
             finish();
         }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
     }
 }

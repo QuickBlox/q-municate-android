@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.base;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -14,48 +15,29 @@ import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
 import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class ActivityUIHelper {
+public class ActivityUIHelper implements View.OnClickListener {
+
+    private static String TAG = ActivityUIHelper.class.getSimpleName();
 
     private Activity activity;
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
-    private Button notificationActionButton;
-
     private User senderUser;
     private QBDialog messagesDialog;
     private boolean isPrivateMessage;
+    private Crouton currentCrouton;
+    private String dialogId;
 
     public ActivityUIHelper(Activity activity) {
         this.activity = activity;
-        initUI();
-        initListeners();
-    }
-
-    private void initUI() {
-        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-        notificationActionButton = (Button) newMessageView.findViewById(R.id.notification_action_button);
-    }
-
-    private void initListeners() {
-        notificationActionButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                showDialog();
-            }
-        });
     }
 
     protected void showChatMessageNotification(Bundle extras) {
         senderUser = (User) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         String message = extras.getString(QBServiceConsts.EXTRA_CHAT_MESSAGE);
-        String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
+        dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         if (isMessagesDialogCorrect(dialogId)) {
             showNewMessageAlert(senderUser, message);
@@ -79,10 +61,31 @@ public class ActivityUIHelper {
     }
 
     public void showNewMessageAlert(User senderUser, String message) {
+        if (!PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_CROUTONS_DISABLED, false)) {
+
+            // Init new crouton view instead of overusing it and add it in croutons queue
+            // If we want overuse it we should handle crouton state to prevent changing data in it
+            // while it is showing to user.
+            View croutonView = initCroutonView(senderUser.getFullName(), message);
+
+            // Create new crouton
+                currentCrouton = Crouton.make(activity, croutonView);
+                currentCrouton.show();
+        }
+    }
+
+    private View initCroutonView(String fullName, String message) {
+        View newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        TextView newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
+        TextView senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
+        Button notificationActionButton = (Button) newMessageView.findViewById(R.id.notification_action_button);
+        newMessageView.setOnClickListener(this);
+        notificationActionButton.setOnClickListener(this);
+
         newMessageTextView.setText(message);
-        senderMessageTextView.setText(senderUser.getFullName());
-        Crouton.cancelAllCroutons();
-        Crouton.show(activity, newMessageView);
+        senderMessageTextView.setText(fullName);
+
+        return newMessageView;
     }
 
     protected void showDialog() {
@@ -91,7 +94,6 @@ public class ActivityUIHelper {
         } else {
             startGroupChatActivity();
         }
-        Crouton.cancelAllCroutons();
     }
 
     private void startPrivateChatActivity() {
@@ -100,5 +102,21 @@ public class ActivityUIHelper {
 
     private void startGroupChatActivity() {
         GroupDialogActivity.start(activity, messagesDialog);
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.crouton_notification_layout:
+            case R.id.notification_action_button:
+                Crouton.clearCroutonsForActivity(activity);
+                showDialog();
+                break;
+            default:
+                Log.d(TAG, "OnClickListener wasn't applied for view" + v);
+                break;
+        }
     }
 }

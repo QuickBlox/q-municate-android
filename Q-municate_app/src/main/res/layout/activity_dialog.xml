@@ -6,14 +6,14 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <include layout="@layout/view_load_more" />
+    <!--<include layout="@layout/view_load_more" />-->
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/messages_listview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:transcriptMode="alwaysScroll"
+        android:transcriptMode="normal"
         android:divider="@null"
         android:dividerHeight="0dp" />
 

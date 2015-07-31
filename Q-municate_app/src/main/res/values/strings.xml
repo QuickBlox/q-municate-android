@@ -45,6 +45,10 @@
     <string name="lgn_email_hint">Email</string>
     <string name="lgn_remember_me">Remember Me</string>
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
+    <string name="relgn_success">Relogin was successfully executed after  losing the Internet connection</string>
+    <string name="relgn_fail">Relogin was failed. Forse app restart will be executed</string>
+    <string name="relgn_forse_message">Relogin was failed.Are you agree to start forse relogin which restart whole app</string>
+    <string name="dont_forget_relogin">Please don\'t forget to relogin to restore all app features</string>
 
     // Forgot Password
     <string name="fpw_forgot_password_title">Forgot Password</string>
@@ -75,7 +79,7 @@
     <string name="frl_column_header_name_requests">Requests</string>
     <string name="frl_column_header_name_my_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
-    <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
+    <string name="frl_dlg_reject_friend">Do you really want to reject contact request from %1$s?</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -191,7 +195,7 @@
     <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
-    <string name="dlg_not_fullname_field_entered">Please enter fullName</string>
+    <string name="dlg_not_fullname_field_entered">Please enter Full Name</string>
     <string name="dlg_not_email_field_entered">Please enter email</string>
     <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
@@ -227,6 +231,18 @@
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
     <string name="error_email_already_taken">email has already been taken</string>
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
+    <string name="error_email_already_taken_from_app_without_facebook">Email has already been taken</string>
+
+
+    <string name="error_is_too_long_maximum_is_50_characters">full_name is too long (maximum is 50 characters)</string>
+    <string name="error_is_too_long_maximum_is_50_characters_from_app">Name mustn\'t be more than 50 characters</string>
+    <string name="error_name_must_be_more_than_2_characters_from_app">Name must be more than 2 characters</string>
+    <string name="error_name_must_do_not_contain_special_characters_from_app">Name mustn\'t contain \"&lt;\", \"&gt;\" and \";\" characters</string>
+    <string name="error_please_enter_a_valid_email_from_app">Please enter a valid email</string>
+    <string name="error_password_must_be_more_than_7_characters_from_app">Password must be more than 7 characters</string>
+    <string name="error_password_must_do_not_be_more_than_40_characters_from_app">Password mustn\'t be more than 40 characters</string>
+    <string name="error_password_must_do_not_contain_non_Latin_characters_and_spaces_from_app">Password mustn\'t contain non-Latin characters and spaces</string>
+
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>
@@ -255,6 +271,5 @@
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
     <string name="user_was_not_found_in_db">User wasn\'t found in base</string>
-
 
 </resources>

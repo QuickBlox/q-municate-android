@@ -49,7 +49,11 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+             cursor = (Cursor) getItem(position);
+        }
         return getItemViewType(cursor);
     }
 
@@ -144,10 +148,10 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
         }
 
-        if (!messageCache.isRead() && !ownMessage) {
-            messageCache.setRead(true);
-            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
-        }
+//        if (!messageCache.isRead() && !ownMessage) {
+//            messageCache.setRead(true);
+//            QBUpdateStatusMessageCommand.start(context, dialog, messageCache, false);
+//        }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);
     }

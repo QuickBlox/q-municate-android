@@ -35,6 +35,11 @@
     <string name="file_was_attached">file was attached</string>
     <string name="user_created_room">%1$s created group chat</string>
 
+     <!--Connectivity-->
+    <string name="connection_lost_title">Connection was lost</string>
+    <string name="connection_lost">Connection was lost. Please, check your internet connection</string>
+    <string name="feature_unavailable">Feature unavailable. Please, check  your internet connection</string>
+
     <string-array name="friends_relation_statuses_array">
         <item>none</item>
         <item>to</item>

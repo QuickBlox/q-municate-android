@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
@@ -40,11 +41,6 @@ public class QBFindUsersCommand extends ServiceCommand {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
         requestBuilder.setPage(page);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
-
-        //        TODO temp
-        //        ArrayList<GenericQueryRule> ruleList = new ArrayList<GenericQueryRule>();
-        //        ruleList.add(new GenericQueryRule("order", "asc+string+full_name"));
-        //        requestBuilder.setRules(ruleList);
 
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);

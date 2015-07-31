@@ -113,12 +113,13 @@ public class QBAuthHelper extends BaseHelper {
         QBUser user;
 
         String password = inputUser.getPassword();
+        String oldPassword = inputUser.getOldPassword();
 
         UserCustomData userCustomDataNew = getUserCustomData(inputUser);
         inputUser.setCustomData(Utils.customDataToString(userCustomDataNew));
 
-        inputUser.setPassword(null);
-        inputUser.setOldPassword(null);
+        inputUser.setPassword(password);
+        inputUser.setOldPassword(oldPassword);
 
         user = QBUsers.updateUser(inputUser);
 

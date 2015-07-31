@@ -11,12 +11,12 @@
 
     <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
         android:id="@+id/message_textview"
-        android:layout_width="0dp"
+        android:layout_width="0px"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|left"
-        android:layout_weight="1"
+        android:layout_gravity="center|start"
         android:paddingRight="5dp"
         android:textColor="@color/white"
+        android:layout_weight="1"
         android:textSize="@dimen/text_size_small"
         emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />
 
@@ -31,7 +31,7 @@
             android:id="@+id/time_text_message_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|top"
+            android:layout_gravity="end|top"
             android:alpha="0.5"
             android:textColor="@color/white" />
 

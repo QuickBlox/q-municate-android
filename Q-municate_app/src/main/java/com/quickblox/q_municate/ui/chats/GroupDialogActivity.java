@@ -12,11 +12,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
 import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
@@ -62,10 +65,16 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
-        initCursorLoaders();
-        startLoadDialogMessages();
-        setCurrentDialog(dialog);
+        // Check count of messages have been stored in base, if stored messages aren't only contact request then we
+        // skip count of messages in base on next dialog's messages request to server this count of messages
+        if (!isFirstDialogLaunch()) {
+            skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
+        }
 
+        initCursorLoaders();
+        updateActionBar();
+//        startLoadDialogMessages();
+        setCurrentDialog(dialog);
 //        registerForContextMenu(messagesListView);
     }
 
@@ -89,7 +98,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(originalUri.toString(), Consts.UIL_DEFAULT_DISPLAY_OPTIONS);
         new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
@@ -123,15 +132,18 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void initListView(Cursor messagesCursor) {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this,
-                dialog);
+        messagesAdapter = new GroupDialogMessagesAdapter(this, messagesCursor, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
         isNeedToScrollMessages = true;
         scrollListView();
     }
 
     protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        Cursor cursor = null;
+
+        if (messagesAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        }
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
@@ -177,6 +189,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+            menu.findItem(R.id.action_attach).setVisible(isConnectionEnabled());
+            menu.findItem(R.id.action_group_details).setVisible(isConnectionEnabled());
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -202,10 +222,17 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     protected void onResume() {
         super.onResume();
-        updateDialogData();
 
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
+        updateDialogData();
+//
+//        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+//            scrollListView();
+//        }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        invalidateOptionsMenu();
     }
 }

@@ -10,20 +10,23 @@ import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener {
+public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener, ConnectivityListener {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
@@ -80,16 +83,20 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     @Override
-    protected void onPause() {
-        activityHelper.onPause();
-        super.onPause();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+
+        if(!isConnectionEnabled()){
+            Toast.makeText(this, getString(R.string.connection_lost),Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        activityHelper.onPause();
+        super.onPause();
     }
 
     @Override
@@ -109,6 +116,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         activityHelper.onStop();
         super.onStop();
     }
+
 
     public QBService getService() {
         return activityHelper.service;
@@ -142,7 +150,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     @Override
     public void onConnectedToService(QBService service) {
-
+        QBConnectivityManager.getInstance(this).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -154,6 +162,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             NavUtils.navigateUpTo(this, intent);
         }
     }
+
 
     @SuppressWarnings("unchecked")
     protected <T> T _findViewById(int viewId) {
@@ -193,6 +202,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();
+    }
+
+    public boolean isConnectionEnabled() {
+        return QBConnectivityManager.isConnectionExists();
     }
 
     public class SuccessAction implements Command {
@@ -254,5 +267,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
         return isFromCurrentChat;
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+
     }
 }

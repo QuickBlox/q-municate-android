@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
@@ -48,6 +49,7 @@ public class QBJoinGroupDialogCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws QBResponseException {
         ArrayList<ParcelableQBDialog> dialogList = null;
         List<QBDialog> dialogs = null;
+
         if (extras != null && extras.containsKey(QBServiceConsts.EXTRA_ROOM_JID_LIST)) {
             dialogList = extras.getParcelableArrayList(QBServiceConsts.EXTRA_ROOM_JID_LIST);
             dialogs = ChatDialogUtils.parcelableDialogsToDialogs(dialogList);

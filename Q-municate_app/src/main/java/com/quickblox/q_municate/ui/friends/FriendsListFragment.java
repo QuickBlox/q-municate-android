@@ -5,6 +5,7 @@ import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
@@ -113,6 +115,12 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchItem.setOnActionExpandListener(searchOnActionExpandListener);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_search).setVisible(QBConnectivityManager.isConnectionExists());
     }
 
     private void registerContentObservers() {

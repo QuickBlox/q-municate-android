@@ -2,9 +2,6 @@ package com.quickblox.q_municate.ui.mediacall;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,28 +19,25 @@ import com.quickblox.q_municate_core.db.managers.UsersDatabaseManager;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.videochat.webrtc.QBRTCConfig;
 import com.quickblox.videochat.webrtc.QBRTCSessionDescription;
 import com.quickblox.videochat.webrtc.QBRTCTypes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
+/**
+ * Fragments contains UI of incoming call.
+ * Throws callbacks to activity about user actions (accept or reject call)
+ */
+
 
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = IncomingCallFragment.class.getSimpleName();
-    private IncomingCallFragmentInterface incomingCallClickListener;
+    private IncomingCallActionsListener incomingCallClickListener;
     private User friend;
-    private ArrayList<Integer> opponents;
     private boolean isVideoCall;
     private QBRTCTypes.QBConferenceType callType;
     private QBRTCSessionDescription sessionDescription;
-    private Handler showIncomingCallWindowTaskHandler;
-    private Runnable showIncomingCallWindowTask;
     private ImageButton acceptCallButton;
     private ImageButton denyCallButton;
-//    private User friendFromDB;
 
 
     public static IncomingCallFragment newInstance(QBRTCTypes.QBConferenceType callType, User friend) {
@@ -55,11 +49,21 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         return fragment;
     }
 
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            incomingCallClickListener = (IncomingCallActionsListener) activity;
+        } catch (ClassCastException e) {
+            ErrorUtils.logError(TAG, e);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_popup_call, container, false);
-
         parseIncomeParameters();
         initUI(rootView);
 
@@ -69,47 +73,10 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
     @Override
     public void onStart() {
         super.onStart();
-        ((CallActivity)getActivity()).startIncomeCallTimer();
+        ((CallActivity) getActivity()).startIncomeCallTimer();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.acceptCallButton:
-                Log.d(TAG, "Accept call was clicked");
-                setEnabledAllButtons(false);
-                accept();
-                break;
-            case R.id.denyCallButton:
-                Log.d(TAG, "Deny call was clicked");
-                ((CallActivity)getActivity()).stopIncomeCallTimer();
-                setEnabledAllButtons(false);
-                reject();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void setEnabledAllButtons(boolean enabled) {
-        acceptCallButton.setEnabled(enabled);
-        denyCallButton.setEnabled(enabled);
-    }
-
-    private void reject() {
-        if (incomingCallClickListener != null) {
-            incomingCallClickListener.rejectCallClick();
-        }
-    }
-
-
-    private void accept() {
-        if (incomingCallClickListener != null) {
-            incomingCallClickListener.acceptCallClick();
-        }
-    }
-
-    private void parseIncomeParameters(){
+    private void parseIncomeParameters() {
 
         if (getArguments() != null) {
             sessionDescription = (QBRTCSessionDescription) getArguments().getSerializable("sessionDescription");
@@ -126,7 +93,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
                 isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
-        if(friendFromDB !=null) {
+        if (friendFromDB != null) {
             ((TextView) rootView.findViewById(R.id.name_textview)).setText(/*friend*/friendFromDB.getFullName());
             RoundedImageView avatarView = (RoundedImageView) rootView.findViewById(R.id.avatar_imageview);
             avatarView.setOval(true);
@@ -138,25 +105,53 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
             ((TextView) rootView.findViewById(R.id.name_textview)).setText(getString(R.string.user_was_not_found_in_db));
         }
 
-        acceptCallButton = (ImageButton)rootView.findViewById(R.id.acceptCallButton);
+        acceptCallButton = (ImageButton) rootView.findViewById(R.id.acceptCallButton);
         acceptCallButton.setOnClickListener(this);
-        denyCallButton = (ImageButton)rootView.findViewById(R.id.denyCallButton);
+        denyCallButton = (ImageButton) rootView.findViewById(R.id.denyCallButton);
         denyCallButton.setOnClickListener(this);
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            incomingCallClickListener = (IncomingCallFragmentInterface) activity;
-        } catch (ClassCastException e) {
-            ErrorUtils.logError(TAG, e);
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         incomingCallClickListener = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.acceptCallButton:
+                Log.d(TAG, "Accept call was clicked");
+                setEnabledAllButtons(false);
+                accept();
+                break;
+            case R.id.denyCallButton:
+                Log.d(TAG, "Deny call was clicked");
+                ((CallActivity) getActivity()).stopIncomeCallTimer();
+                setEnabledAllButtons(false);
+                reject();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setEnabledAllButtons(boolean enabled) {
+        acceptCallButton.setEnabled(enabled);
+        denyCallButton.setEnabled(enabled);
+    }
+
+    // -----------------   Throws callbacks methods (IncomingCallFragmentInterface) --------- //
+    private void reject() {
+        if (incomingCallClickListener != null) {
+            incomingCallClickListener.rejectCallClick();
+        }
+    }
+
+
+    private void accept() {
+        if (incomingCallClickListener != null) {
+            incomingCallClickListener.acceptCallClick();
+        }
     }
 }

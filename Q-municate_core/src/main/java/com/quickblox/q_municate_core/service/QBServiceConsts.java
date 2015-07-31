@@ -136,6 +136,7 @@ public class QBServiceConsts {
     public static final String USER_CHANGED_ACTION = "friend_status_changed_action";
     public static final String RE_LOGIN_IN_CHAT_SUCCESS_ACTION = "relogin_in_chat_success_action";
     public static final String RE_LOGIN_IN_CHAT_FAIL_ACTION = "relogin_in_chat_fail_action";
+    public static final String RE_LOGIN_COMPLETE = "relogin_complete";
     public static final String UPDATE_GROUP_DIALOG_SUCCESS_ACTION = "update_group_dialog_success_action";
     public static final String UPDATE_GROUP_DIALOG_FAIL_ACTION = "update_group_dialog_fail_action";
     public static final String DELETE_DIALOG_SUCCESS_ACTION = "delete_dialog_success_action";
@@ -169,6 +170,7 @@ public class QBServiceConsts {
     public static final String EXTRA_ROOM_NAME = "room_name";
     public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";
     public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
+    public static final String EXTRA_LAST_CHAT_MESSAGE_ID = "last_chat_message_id";
     public static final String EXTRA_OPPONENT_ID = "opponent_id";
     public static final String EXTRA_COUNT_UNREAD_CHATS_DIALOGS = "count_unread_chats_dialogs";
     public static final String EXTRA_DIALOG = "dialog";
@@ -208,4 +210,15 @@ public class QBServiceConsts {
     public static final String AUTH_ACTION_TYPE = "authorize_type";
     public static final int AUTH_TYPE_REGISTRATION = 1;
     public static final int AUTH_TYPE_LOGIN = 2;
+
+    /**
+     * Loading strategy means what algorithm are we use.
+     * By default we are loading in {@link com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand}
+     * all messages which are less then some date, but in some case we can need to load greater then values so we can
+     * by setting this param true value
+     *
+     * LTE strategy - true
+     * GTE strategy - false
+     */
+    public static final String EXTRA_LOAD_STRATEGY = "extra_load_strategy";
 }

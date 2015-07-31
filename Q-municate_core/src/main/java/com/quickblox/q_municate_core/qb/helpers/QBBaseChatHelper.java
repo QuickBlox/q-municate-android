@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -42,7 +43,7 @@ import org.jivesoftware.smack.XMPPException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public abstract class QBBaseChatHelper extends BaseHelper {
+public abstract class  QBBaseChatHelper extends BaseHelper {
 
     private static final String TAG = QBBaseChatHelper.class.getSimpleName();
 
@@ -110,10 +111,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String error = null;
         try {
             privateChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_connection);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
         if (error != null) {
             throw new QBResponseException(error);
@@ -177,20 +178,20 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                                                         Bundle returnedBundle, QBDialog dialog,
                                                         long lastDateLoad) throws QBResponseException {
 
-        if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
-            customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT, lastDateLoad);
-        } else {
+        if (lastDateLoad == ConstsCore.ZERO_LONG_VALUE) {
             deleteMessagesByDialogId(dialog.getDialogId());
         }
 
         List<QBChatMessage> dialogMessagesList = QBChatService.getDialogMessages(dialog,
                 customObjectRequestBuilder, returnedBundle);
 
-        if (dialogMessagesList != null) {
-            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialog.getDialogId());
-        }
-
         return dialogMessagesList;
+    }
+
+    public void saveLoadedMessages(String dialogID, List<QBChatMessage> dialogMessagesList) {
+        if (dialogMessagesList != null) {
+            ChatDatabaseManager.saveChatMessages(context, dialogMessagesList, dialogID);
+        }
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
@@ -254,10 +255,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             } else {
                 privateChat.sendStopTypingNotification();
             }
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
         } catch (SmackException.NotConnectedException e) {
             ErrorUtils.logError(e);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
     }
 
@@ -431,6 +432,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                 MessageCache messageCache = new MessageCache();
                 messageCache.setId(messageId);
                 messageCache.setRead(true);
+
                 updateStatusMessageLocal(messageCache);
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);

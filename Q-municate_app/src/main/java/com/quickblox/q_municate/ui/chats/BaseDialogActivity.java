@@ -31,9 +31,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
@@ -51,7 +53,9 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.db.managers.ChatDatabaseManager;
+import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.models.MessageCache;
+import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -64,7 +68,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.io.File;
 import java.util.Timer;
@@ -75,6 +78,8 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener {
+
+    private static final String TAG = BaseDialogActivity.class.getSimpleName();
 
     private static final int TYPING_DELAY = 1000;
     private static final int MESSAGES_LOADER_ID = 0;
@@ -95,7 +100,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected QBDialog dialog;
     protected boolean isNeedToScrollMessages;
     protected QBBaseChatHelper baseChatHelper;
-    protected User opponentFriend;
+    protected volatile User opponentFriend;
 
     private int keyboardHeight;
     private View rootView;
@@ -114,12 +119,21 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private int firstVisiblePositionList;
     private View loadMoreView;
-    private boolean loadingMore;
-    private int skipMessages;
+    private boolean loadingMore = true;
+    protected volatile int skipMessages;
     private int totalEntries;
     private int loadedItems;
     private boolean firstItemInList;
     private int totalItemCountInList;
+    private int firstVisiblePosition;
+    private int lastVisiblePosition;
+    private int visibleItemCount;
+    private boolean isFirstUpdateListView = true;
+    private UpdateMessagesReason updateMessagesReason;
+    private boolean isListInBottomNow;
+    private boolean isTypingAnimationShown;
+    private int lastMessagesCountInDB;
+
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
         this.chatHelperIdentifier = chatHelperIdentifier;
@@ -157,19 +171,31 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
         loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
         typingTimer = new Timer();
+        updateMessagesReason = UpdateMessagesReason.NONE;
+        isNeedToScrollMessages = true;
 
         initUI();
         initListeners();
         initActionBar();
-
         addActions();
-
-        isNeedToScrollMessages = true;
-
         initLocalBroadcastManagers();
         hideSmileLayout();
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Set Default update reason to start loading of new messages
+        updateMessagesReason = UpdateMessagesReason.DEFAULT;
+
+        if (TextUtils.isEmpty(messageEditText.getText().toString().trim())) {
+            String messageBody = ChatDatabaseManager.getNotSendMessageBodyByDialogId(getApplicationContext(), dialogId);
+            if (messageBody != null){
+                messageEditText.setText(messageBody);
+            }
+        }
+    }
 
     @Override
     protected void onPause() {
@@ -189,15 +215,23 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
-                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-        if (isNeedToOpenDialog) {
-            finish();
+        startLoadDialogMessages();
+    }
+
+    @Override
+    protected void onStop() {
+        if (!TextUtils.isEmpty(messageEditText.getText().toString().trim())){
+           ChatDatabaseManager.saveNotSendMessage(getApplicationContext(), messageEditText.getText().toString(), dialogId, null);
+        } else {
+            ChatDatabaseManager.deleteNotSentMessagesByDialogId(getApplicationContext(), dialogId);
         }
+
+        super.onStop();
     }
 
     @Override
     public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
         createChatLocally();
     }
 
@@ -223,7 +257,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void createChatLocally() {
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
-            Log.d("Bug fixing", "Init baseChatHelper, now  it is: " + baseChatHelper);
             try {
                 baseChatHelper.createChatLocally(dialog, generateBundleToInitDialog());
             } catch (QBResponseException e) {
@@ -299,6 +332,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
         addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
         addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginSuccessAction());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, new ReloginFailAction());
         updateBroadcastActionList();
     }
 
@@ -384,6 +419,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
     }
 
     protected abstract void onFileSelected(Uri originalUri);
@@ -412,9 +449,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected abstract void onFileLoaded(QBFile file);
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
-        loadingMore = true;
-        QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
-        skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+        if (loadingMore) {
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
+            loadingMore = false;
+        }
+    }
+
+
+    protected void startNewMessagesLoadDialogMessages(QBDialog dialog, long lastDateLoad, String lastReadMessageID) {
+        if (loadingMore) {
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, lastReadMessageID, ConstsCore.NOT_INITIALIZED_VALUE);
+            loadingMore = false;
+        }
     }
 
     protected abstract Bundle generateBundleToInitDialog();
@@ -431,32 +477,41 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         messageTypingView = _findViewById(R.id.message_typing_view);
         messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
-        loadMoreView = _findViewById(R.id.load_more_linearlayout);
-        loadMoreView.setVisibility(View.GONE);
-//        messagesListView.setOnScrollListener(this);
+        messagesListView.setOnScrollListener(this);
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
-        if (scrollState == SCROLL_STATE_IDLE) {
-            if (firstItemInList && !loadingMore) {
-                firstVisiblePositionList = totalItemCountInList - 1;
-//                if (ConstsCore.FL_FRIENDS_PER_PAGE < totalEntries) {
+        if (scrollState == SCROLL_STATE_IDLE || scrollState == SCROLL_STATE_TOUCH_SCROLL) {
+            if (firstVisiblePosition == 0){
+                updateMessagesReason = UpdateMessagesReason.ON_USER_REQUEST;
                 loadMoreItems();
-//                }
             }
         }
+
+        if(isTypingAnimationShown) {
+            isTypingAnimationShown = false;
+            stopMessageTypingAnimation();
+        }
+
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                          int totalItemCount) {
-        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
-        totalItemCountInList = totalItemCount;
+
+        firstVisiblePosition = firstVisibleItem;
+        lastVisiblePosition = firstVisibleItem + visibleItemCount;
+        this.visibleItemCount = visibleItemCount;
+        this.isListInBottomNow = (visibleItemCount + firstVisibleItem) == totalItemCount;
+
+
+        if (firstVisiblePosition > 1){
+            updateMessagesReason = UpdateMessagesReason.NONE;
+        }
     }
 
     private void loadMoreItems() {
-//        loadMoreView.setVisibility(View.VISIBLE);
         startLoadDialogMessages();
     }
 
@@ -475,11 +530,50 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             initListView(messagesCursor);
         } else {
             messagesAdapter.swapCursor(messagesCursor);
+
+
+            // Set position depends on first load
+            // We use two points in class which signaling us about loading messages
+            // It is onLoadFinished method and inner class LoadDialogMessagesSuccessAction
+            //
+            // LoadDialogMessagesSuccessAction contains execute method which called when loading messages and
+            // saving them in base completely finished. Also intent parameter contains value of loaded messages
+            // which could be used as final value of loaded messages
+            //
+            // At same time onLoadFinished called each time when database data was changed, it means
+            // that QBLoadDialogMessagesCommand causes onLoadFinished dialog retrieving.
+            //
+            // Both of points of loading dialogs depends from each other and we have no warranty about order of their execution
+            // To prevent incorrect work of dialog positioning we use difference of messages in base
+            // before and after onLoadFinished method was called to determ last visible message position in
+            // updated list
+            //
+
+            int currentMessageCountInBase = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
+
+
+            if (currentMessageCountInBase > lastMessagesCountInDB) {
+                totalEntries = currentMessageCountInBase - lastMessagesCountInDB;
+                lastMessagesCountInDB = currentMessageCountInBase;
+            }
+
+
+            if (totalEntries > 0) {
+                if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
+                    int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
+                            ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
+                    messagesListView.setSelection(loadMessages - 1);
+                    resetTotalEntries();
+                } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason) {
+                    scrollListView();
+                }
+            }
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     protected abstract void initListView(Cursor messagesCursor);
@@ -565,8 +659,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void sendTypingStatus() {
-        Log.d("Bug fixing", "baseChatHelper is: " + baseChatHelper + " opponentFriend is: " + opponentFriend);
-        baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
+        if (baseChatHelper != null) {
+            baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
+        }
     }
 
     private void initKeyboardHeight() {
@@ -603,10 +698,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void scrollListView() {
-        if (isNeedToScrollMessages) {
-            isNeedToScrollMessages = false;
-            messagesListView.setSelection(messagesAdapter.getCount() - 1);
-        }
+        isNeedToScrollMessages = false;
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     abstract QBDialog getQBDialog();
@@ -649,14 +742,51 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             return;
         }
 
+        lastMessagesCountInDB = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialogId).getCount();
         showActionBarProgress();
 
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
-        } else {
-            long lastMessageDateSent = lastReadMessage.getTime();
-            startLoadDialogMessages(dialog, lastMessageDateSent);
+            updateMessagesReason = UpdateMessagesReason.DEFAULT;
+        } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
+            startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
+        } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
+            startLoadDialogMessages(dialog, lastReadMessage.getTime());
+        }
+    }
+
+    public boolean isFirstDialogLaunch() {
+        Cursor messagesCursor = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId());
+        boolean result = true;
+        if(messagesCursor.moveToFirst()){
+            try {
+                do {
+                    if (!isMessageTypeContactRequest(messagesCursor.getString(messagesCursor.getColumnIndex(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE)))) {
+                        result =  false;
+                        break;
+                    }
+                } while (messagesCursor.moveToNext());
+            } finally {
+                messagesCursor.close();
+            }
+        }
+        return result;
+    }
+
+    private boolean isMessageTypeContactRequest(String messageNotificationType) {
+        try{
+            Integer messageType = Integer.valueOf(messageNotificationType);
+
+            if(MessagesNotificationType.FRIENDS_REQUEST.getCode() == messageType
+                    || MessagesNotificationType.FRIENDS_ACCEPT.getCode() == messageType
+                    || MessagesNotificationType.FRIENDS_REJECT.getCode() == messageType){
+                return true;
+            } else {
+                return false;
+            }
+        } catch (NumberFormatException e){
+            return false;
         }
     }
 
@@ -698,15 +828,31 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            loadingMore = false;
-//            loadMoreView.setVisibility(View.GONE);
 
-            if (skipMessages != 0) {
-                messagesListView.setSelection(0);
-            }
+            skipMessages += bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
 
+            // Set totalEntries value only if download messages command have been executed by user request.
+            // TotalEntries value used for setting position of list after it was updated.
+            // If loading of messages command has executed by default reason (user returns to dialog
+            // or dialog was opened before) or at first time we shouldn't initiate totalEntries value
+            // also we should erase it if it different from zero
+
+//            if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason){
+//                totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+//            } else {
+//                resetTotalEntries();
+//            }
+
+            // Set update
+
+            loadingMore = true;
             hideActionBarProgress();
+        }
+    }
+
+    private void resetTotalEntries() {
+        if(totalEntries > 0){
+            totalEntries = ConstsCore.ZERO_INT_VALUE;
         }
     }
 
@@ -714,13 +860,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            loadingMore = false;
-//            loadMoreView.setVisibility(View.GONE);
-
-            if (skipMessages != 0) {
-                messagesListView.setSelection(0);
-            }
-
+            loadingMore = true;
             hideActionBarProgress();
         }
     }
@@ -751,12 +891,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             // TODO: now it is possible only for Private chats
-            if (QBDialogType.PRIVATE.equals(dialog.getType())) {
-                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                if (isTyping) {
-                    startMessageTypingAnimation();
-                } else {
-                    stopMessageTypingAnimation();
+            if(dialog != null) {
+                if (QBDialogType.PRIVATE.equals(dialog.getType())) {
+                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                    if (isTyping && isListInBottomNow) {
+                        isTypingAnimationShown = true;
+                        scrollListView();
+                        startMessageTypingAnimation();
+                    } else {
+                        isTypingAnimationShown = false;
+                        stopMessageTypingAnimation();
+                    }
                 }
             }
         }
@@ -770,5 +915,86 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 updateDialogData();
             }
         }
+    }
+
+
+    public class ReloginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+
+            /*
+            Set update reason to default for loading new messages if operations is success
+             */
+            updateMessagesReason = UpdateMessagesReason.DEFAULT;
+
+            // Update adapter to cause message state updating
+            messagesListView.invalidateViews();
+
+            startLoadDialogMessages();
+        }
+    }
+
+    public class ReloginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+            AlertDialog dialog = AlertDialog.newInstance(getString(R.string.relgn_fail));
+            dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getService().forceRelogin();
+                }
+            });
+            dialog.setNegativeButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(BaseDialogActivity.this, getString(R.string.dont_forget_relogin), Toast.LENGTH_LONG).show();
+                }
+            });
+            dialog.show(getFragmentManager(), null);
+        }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        /**
+         * If network was turned off set #updateMessagesReason
+         * to {@link com.quickblox.q_municate.ui.chats.BaseDialogActivity.UpdateMessagesReason.NONE}
+         * for preventing loading data in #onResume method before async command of relogining was executed
+         */
+        if(!isConnected) {
+            updateMessagesReason = UpdateMessagesReason.NONE;
+        }
+    }
+
+    /**
+     * Enumeration are using for marking reason on loading messages
+     */
+    private enum UpdateMessagesReason {
+
+        /**
+         * Loader updates data. Used to reset last update reason to unspecified mode
+         * to prevent scrolling to bottom or setting some position in list
+         */
+        NONE,
+
+        /**
+         * Messages are loading after activity recreating
+         */
+        DEFAULT,
+
+        /**
+         * User scrolled list till oldest uploaded message
+         */
+        ON_USER_REQUEST,
+
+        /**
+         * After relogin
+         */
+        AFTER_RELOGIN;
     }
 }

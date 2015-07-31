@@ -92,7 +92,6 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void invite(int userId) throws QBResponseException, XMPPException, SmackException {
         sendInvitation(userId);
-
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
         sendNotificationToFriend(chatMessage, userId);
     }

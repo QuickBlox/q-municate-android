@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.q_municate.ui.chats.GroupDialogDetailsActivity;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.io.File;
@@ -25,7 +28,15 @@ public class ReceiveUriScaledBitmapTask extends AsyncTask<Object, Uri, Uri> {
         File bitmapFile = null;
         Uri outputUri = null;
 
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        DisplayImageOptions displayImageOptions;
+        if(receiveUriScaledBitmapListener instanceof GroupDialogDetailsActivity){
+            displayImageOptions = Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS;
+        } else {
+            // If async task was called from SignUpActivity or ProfileActivity classes
+            displayImageOptions = Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS;
+        }
+
+        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(originalUri.toString(), displayImageOptions);
         Bitmap scaledBitmap = imageUtils.createScaledBitmap(bitmap);
 
         try {

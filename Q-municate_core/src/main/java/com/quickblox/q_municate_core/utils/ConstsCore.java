@@ -5,9 +5,14 @@ public class ConstsCore {
     // Friend list consts
     public static final int FL_FRIENDS_PAGE_NUM = 1;
     public static final int FL_FRIENDS_PER_PAGE = 20;
+    public static final int FL_FRIENDS_PER_PAGE_TEMP_VALUE = 90;
+
 
     public static final int CHATS_DIALOGS_PER_PAGE = 100;
-    public static final int DIALOG_MESSAGES_PER_PAGE = 100;
+    public static final int DIALOG_MESSAGES_PER_PAGE = 20;
+    public static final String LAST_SENT_MESSAGE_ID = "_id";
+    public static final String LAST_SENT_MESSAGE_DATE = "date_sent";
+
 
     public static final int ZERO_INT_VALUE = 0;
     public static final long ZERO_LONG_VALUE = 0L;
@@ -47,6 +52,7 @@ public class ConstsCore {
     public static final String USER_INFO = "user_info";
     public static final String SESSION_ID = "session_id";
     public static final String REMOTE_DESCRIPTION = "session_description";
+    public static final String LAST_CLICKED_DIALOG = "last_clicked_dialog";
 
     public static final int CHAT_ATTACH_WIDTH = 200;
     public static final int CHAT_ATTACH_HEIGHT = 200;
@@ -61,15 +67,15 @@ public class ConstsCore {
     public static final String TOKEN_REQUIRED_ERROR = "Token is required";
     public static final String SESSION_DOES_NOT_EXIST = "Required session does not exist";
     public static final int FULL_QUALITY = 100;
+
     public static final int TOKEN_VALID_TIME_IN_MINUTES = 1;
 
-    public static enum CALL_DIRECTION_TYPE {
+    public enum CALL_DIRECTION_TYPE {
         INCOMING, OUTGOING
     }
 
     //Sound
     public static final String ASSETS_SOUND_PATH = "sound/";
-
     // Facebook Wall
     public static final String FB_WALL_PARAM_NAME = "name";
     public static final String FB_WALL_PARAM_DESCRIPTION = "description";
@@ -77,10 +83,11 @@ public class ConstsCore {
     public static final String FB_WALL_PARAM_PICTURE = "picture";
     public static final String FB_WALL_PARAM_PLACE = "place";
     public static final String FB_WALL_PARAM_TAGS = "tags";
-    public static final String FB_WALL_PARAM_FEED = "me/feed";
 
+    public static final String FB_WALL_PARAM_FEED = "me/feed";
     // Facebook Request
     public static final String FB_REQUEST_PARAM_MESSAGE = "message";
+
     public static final String FB_REQUEST_PARAM_TITLE = "title";
 
     public static final String TYPE_OF_EMAIL = "message/rfc822";

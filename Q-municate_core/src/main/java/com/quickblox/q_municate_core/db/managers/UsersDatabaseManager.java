@@ -17,6 +17,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class UsersDatabaseManager {
             resolver.insert(UserTable.CONTENT_URI, values);
         }
 
-        if (cursor != null) {
+        if(cursor != null){
             cursor.close();
         }
     }
@@ -75,7 +76,7 @@ public class UsersDatabaseManager {
             resolver.insert(FriendTable.CONTENT_URI, values);
         }
 
-        if (cursor != null) {
+        if(cursor != null){
             cursor.close();
         }
     }
@@ -102,7 +103,7 @@ public class UsersDatabaseManager {
                     FriendsRelationTable.Cols.RELATION_STATUS_ID));
         }
 
-        if (cursor != null) {
+        if(cursor != null){
             cursor.close();
         }
 
@@ -115,18 +116,13 @@ public class UsersDatabaseManager {
         Cursor cursor = context.getContentResolver().query(FriendsRelationTable.CONTENT_URI, null, null, null,
                 null);
 
-        if (cursor != null) {
-            cursor.moveToFirst();
-
-            while (!cursor.isLast()) {
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
                 relationStatusesMap.put(cursor.getString(cursor.getColumnIndex(
                         FriendsRelationTable.Cols.RELATION_STATUS)), cursor.getInt(cursor.getColumnIndex(
                         FriendsRelationTable.Cols.RELATION_STATUS_ID)));
-                cursor.moveToNext();
-            }
-        }
 
-        if (cursor != null) {
+            } while (cursor.moveToNext());
             cursor.close();
         }
 
@@ -144,7 +140,7 @@ public class UsersDatabaseManager {
                     FriendsRelationTable.Cols.RELATION_STATUS));
         }
 
-        if (cursor != null) {
+        if(cursor != null){
             cursor.close();
         }
 
@@ -161,7 +157,7 @@ public class UsersDatabaseManager {
             relationStatusId = cursor.getInt(cursor.getColumnIndex(FriendTable.Cols.RELATION_STATUS_ID));
         }
 
-        if (cursor != null) {
+        if(cursor != null){
             cursor.close();
         }
 
@@ -397,11 +393,13 @@ public class UsersDatabaseManager {
         List<User> friendList = new ArrayList<User>();
         Cursor cursor = getAllFriendsWithPending(context);
 
-        while (cursor.moveToNext()) {
+        while (cursor != null && cursor.moveToNext()) {
             friendList.add(getUserFromCursor(cursor));
         }
 
-        cursor.close();
+        if(cursor != null){
+            cursor.close();
+        }
 
         return friendList;
     }
@@ -444,9 +442,30 @@ public class UsersDatabaseManager {
         User user = null;
         if (cursor != null && cursor.moveToFirst()) {
             user = getUserFromCursor(cursor);
+        }
+
+        if(cursor != null){
             cursor.close();
         }
+
         return user;
+    }
+
+    public static List<User> getAllUsers(Context context) {
+        Cursor cursor = context.getContentResolver().query(UserTable.CONTENT_URI, null,
+                null, null, null);
+        List<User> userList =  new LinkedList<>();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                userList.add(getUserFromCursor(cursor));
+            }while (cursor.moveToNext());
+        }
+
+        if(cursor != null){
+            cursor.close();
+        }
+
+        return userList;
     }
 
     public static Friend getFriendById(Context context, long friendId) {
@@ -457,8 +476,12 @@ public class UsersDatabaseManager {
             friend = getFriendFromCursor(cursor);
             String relationStatus = getRelationStatusNameById(context, friend.getRelationStatusId());
             friend.setRelationStatus(relationStatus);
+        }
+
+        if(cursor != null){
             cursor.close();
         }
+
         return friend;
     }
 

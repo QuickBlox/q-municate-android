@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
@@ -44,6 +45,7 @@ public class QBUpdateStatusMessageCommand extends ServiceCommand {
         } catch (Exception e) {
             ErrorUtils.logError(TAG, e + " --- dialogId = " + dialog.getDialogId()
                     + ", messageId = " + messageCache.getId());
+
         }
 
         return null;

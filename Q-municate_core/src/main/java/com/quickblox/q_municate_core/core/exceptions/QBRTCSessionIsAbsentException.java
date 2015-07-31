@@ -7,6 +7,8 @@ public class QBRTCSessionIsAbsentException extends Exception {
 
     private static final String DEFAULT_MESSAGE = "You've try to make method call on null QBRTCSession reference";
 
+
+
     @Override
     public String getMessage() {
         if (super.getMessage() == null) {

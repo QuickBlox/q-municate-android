@@ -5,24 +5,32 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
+import com.quickblox.q_municate.ui.settings.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.splash.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.commands.QBReloginCommand;
+import com.quickblox.q_municate_core.service.ConnectivityListener;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
-public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
+public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener, ConnectivityListener {
 
     public static final int DOUBLE_BACK_DELAY = 2000;
 
@@ -36,6 +44,8 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     protected ActivityHelper activityHelper;
 
     private boolean doubleBackToExitPressedOnce;
+    private QBService service;
+
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -43,6 +53,10 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     public FailAction getFailAction() {
         return failAction;
+    }
+
+    public QBService getService() {
+        return activityHelper.service;
     }
 
     public synchronized void showProgress() {
@@ -91,6 +105,13 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         successAction = new SuccessAction();
         activityHelper = new ActivityHelper(this, new GlobalListener(), this);
         activityHelper.onCreate();
+        addReloginActions();
+
+    }
+
+    private void addReloginActions() {
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION, new ReloginSuccessAction());
+        addAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION, new ReloginFailAction());
     }
 
     @Override
@@ -119,6 +140,13 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.RE_LOGIN_IN_CHAT_FAIL_ACTION);
+    }
+
+    @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
             super.onBackPressed();
@@ -137,7 +165,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     public void onConnectedToService(QBService service) {
-
+        QBConnectivityManager.getInstance(this).addConnectivityListener(this);
     }
 
     protected void navigateToParent() {
@@ -170,13 +198,13 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     }
 
     protected void onFailAction(String action) {
-
     }
 
     private boolean needShowReceivedNotification() {
         boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
         boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
-        return !isSplashActivity && !isCallActivity;
+        boolean isChangePasswordActivity = activityHelper.getContext() instanceof ChangePasswordActivity;
+        return !isSplashActivity && !isCallActivity && !isChangePasswordActivity;
     }
 
     protected void onSuccessAction(String action) {
@@ -229,6 +257,59 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
             if (needShowReceivedNotification()) {
                 activityHelper.onReceivedContactRequestNotification(extras);
             }
+        }
+    }
+
+    public class ReloginSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public class ReloginFailAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            Toast.makeText(BaseActivity.this, getString(R.string.relgn_fail), Toast.LENGTH_LONG).show();
+            AlertDialog dialog = AlertDialog.newInstance(getString(R.string.relgn_fail));
+            dialog.setPositiveButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getService().forceRelogin();
+                }
+            });
+            dialog.setNegativeButton(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(BaseActivity.this, getString(R.string.dont_forget_relogin), Toast.LENGTH_LONG).show();
+                }
+            });
+            dialog.show(getFragmentManager(), null);
+        }
+    }
+
+    public boolean isConnectionEnabled() {
+        return QBConnectivityManager.isConnectionExists();
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        if (isConnected) {
+            QBReloginCommand.start(this);
+        } else {
+//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
+//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
+//                                .setMessage(getString(R.string.connection_lost))
+//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        dialog.dismiss();
+//                                    }
+//                                });
+//                        diologBuilder.show();
+            Toast.makeText(this, this.getString(com.quickblox.q_municate_core.R.string.connection_lost), Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.quickblox.q_municate.ui.videocall;
 
-import android.opengl.GLSurfaceView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +12,16 @@ import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.videochat.webrtc.view.QBGLVideoView;
 
+/**
+ * Implementation of {@link OutgoingCallFragment} for VIDEO calls representation
+ */
+
 public class VideoCallFragment extends OutgoingCallFragment {
 
     public static final String TAG = VideoCallFragment.class.getSimpleName();
-//    private QBGLVideoView videoView;
     private ImageView imgMyCameraOff;
     private ToggleButton cameraOffButton;
     private ImageButton switchCameraButton;
-//    private boolean isVideoEnabled = true;
-//    private boolean isCameraEnabled = true;
     private QBGLVideoView localVideoView;
     private QBGLVideoView remoteVideoView;
     private VideoCallFragment.CameraState cameraState = null;
@@ -44,10 +43,13 @@ public class VideoCallFragment extends OutgoingCallFragment {
 
     @Override
     public void onPause() {
-        toggleCamera(false);
-        if (cameraState == null) {
-            cameraState = CameraState.NONE;
+        if (!isCallStopped()) {
+            toggleCamera(false);
+            if (cameraState == null) {
+                cameraState = CameraState.NONE;
+            }
         }
+
         super.onPause();
     }
 
@@ -107,51 +109,35 @@ public class VideoCallFragment extends OutgoingCallFragment {
     }
 
     private void toggleCamera(boolean isCameraEnabled) {
-        if (outgoingCallFragmentInterface != null){
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            displaymetrics.setToDefaults();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        if (callVideoActionsListener != null){
             ViewGroup.LayoutParams layoutParams = imgMyCameraOff.getLayoutParams();
-
-//            ViewGroup.LayoutParams videoViewLayoutParams = videoView.getLayoutParams();
-//            int videoViewHeight = videoView.getHeight();
-//            int videoViewWidth = videoView.getWidth();
 
             int videoViewHeight = localVideoView.getHeight();
             int videoViewWidth = localVideoView.getWidth();
-
-//        Log.d(TAG, "height - videoViewHeight " + (height - videoViewHeight) + " width-videoViewWidth " + (width - videoViewWidth) + "");
-
-
-
-//            layoutParams.height = (int)Math.ceil(((/*height*/videoViewHeight / 100) * 33));
-//            layoutParams.width = (int)Math.ceil(((/*width*/ videoViewWidth / 100) * 33));
 
             layoutParams.height = videoViewHeight;
             layoutParams.width = videoViewWidth;
             imgMyCameraOff.setLayoutParams(layoutParams);
 
             if (!isCameraEnabled){
-//                isVideoEnabled = false;
                 switchCameraButton.setVisibility(View.INVISIBLE);
                 cameraOffButton.setChecked(true);
                 imgMyCameraOff.setVisibility(View.VISIBLE);
                 Log.d(TAG, "Camera disabled");
-                outgoingCallFragmentInterface.offCam();
+                callVideoActionsListener.onCam(false);
             } else {
-//                isVideoEnabled = true;
                 switchCameraButton.setVisibility(View.VISIBLE);
                 cameraOffButton.setChecked(false);
                 imgMyCameraOff.setVisibility(View.INVISIBLE);
                 Log.d(TAG, "Camera enabled");
-                outgoingCallFragmentInterface.onCam();
+                callVideoActionsListener.onCam(true);
             }
         }
     }
 
     private void switchCamera(){
-        if (outgoingCallFragmentInterface != null) {
-            outgoingCallFragmentInterface.switchCam();
+        if (callVideoActionsListener != null) {
+            callVideoActionsListener.switchCam();
             Log.d(TAG, "Camera switched!");
         }
     }

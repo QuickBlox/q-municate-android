@@ -178,6 +178,10 @@ public class NavigationDrawerFragment extends BaseFragment {
     private void initPrefValues() {
         PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
         userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
+
+        // Set base value of droverLayout as opposite to userLearnerDrawer
+        // Made it for next behaviour: if drawer will be opened then we shouldn't show croutons
+        prefsHelper.savePref(PrefsHelper.PREF_CROUTONS_DISABLED, !userLearnedDrawer);
     }
 
     private void selectItem(int position) {
@@ -232,8 +236,19 @@ public class NavigationDrawerFragment extends BaseFragment {
         dialog.setPositiveButton(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+                // Stop porcess push notifications after logout
+                PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_NOTIFICATIONS_ON_LOGOUT, true);
+
+                // Start clear messages that was not sent
+                ChatDatabaseManager.deleteAllNotSendMessages(getActivity().getApplicationContext());
+
                 baseActivity.showProgress();
                 FacebookHelper.logout();
+
+                // Clear crouton queue
+                Crouton.cancelAllCroutons();
+
                 QBLogoutCommand.start(baseActivity);
             }
         });
@@ -287,7 +302,9 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onDrawerOpened(View drawerView) {
             super.onDrawerOpened(drawerView);
 
-            Crouton.cancelAllCroutons();
+            // Clear croutons
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_CROUTONS_DISABLED, true);
+            Crouton.clearCroutonsForActivity(getActivity());
 
             baseActivity.invalidateOptionsMenu();
 
@@ -303,6 +320,7 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onDrawerClosed(View drawerView) {
             super.onDrawerClosed(drawerView);
             baseActivity.invalidateOptionsMenu();
+            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_CROUTONS_DISABLED, false);
         }
     }
 

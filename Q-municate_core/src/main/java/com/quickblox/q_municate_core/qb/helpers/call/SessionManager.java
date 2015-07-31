@@ -6,12 +6,12 @@ import com.quickblox.videochat.webrtc.QBRTCSession;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimerTask;
 
 /**
  * Created on 4/9/15.
- *
  * @author Bogatov Evgeniy bogatovevgeniy@gmail.com
+ *
+ * Calls for storing and manage call sessions.
  */
 
 public class SessionManager {
@@ -25,7 +25,7 @@ public class SessionManager {
         this.sessionList = new LinkedList<QBRTCSession>();
     }
 
-    public void addSession(QBRTCSession qbrtcSession) {
+    public synchronized void addSession(QBRTCSession qbrtcSession) {
         Log.d("CALL_INTEGRATION", "SessionManager. addSession");
         sessionList.add(qbrtcSession);
     }
@@ -37,51 +37,32 @@ public class SessionManager {
      * @param sessionID
      * @return
      */
-
-    public QBRTCSession getSession(String sessionID) {
+    public synchronized QBRTCSession getSession(String sessionID) {
         QBRTCSession result = null;
         for (QBRTCSession session : sessionList) {
             if (session.getSessionID().equals(sessionID)) {
                 result = session;
-                Log.d("CALL_INTEGRATION", "SessionManager. Get session successful");
                 break;
             }
         }
         return result;
     }
 
-    public QBRTCSession getCurrentSession() {
+    public synchronized QBRTCSession getCurrentSession() {
         return getSession(currentSessionId);
     }
 
-    public String getLastSessionId() {
+    public synchronized String getLastSessionId() {
         return lastSessionId;
     }
 
-    public void setCurrentSession(QBRTCSession currentSession) {
+    public synchronized void setCurrentSession(QBRTCSession currentSession) {
         String sessionID = currentSession.getSessionID();
         this.currentSessionId = sessionID;
         this.lastSessionId = sessionID;
     }
 
-    public void removeCurrentSession(){
+    public synchronized void removeCurrentSession(){
         this.currentSessionId = null;
     }
-
-    private class ClearSessionTask extends TimerTask {
-
-        private String sessionId;
-        private int opponentId;
-
-        ClearSessionTask(String sessionId, int opponentId) {
-            this.sessionId = sessionId;
-            this.opponentId = opponentId;
-        }
-
-        @Override
-        public void run() {
-//            WorkingSessionPull.WorkingSession workingSession = workingSessionPull.removeSession(sessionId);
-        }
-    }
-
 }

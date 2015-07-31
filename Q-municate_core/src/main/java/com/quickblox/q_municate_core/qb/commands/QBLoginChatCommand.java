@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.chat.errors.QBChatErrorsConstants;
 import com.quickblox.core.exception.QBResponseException;

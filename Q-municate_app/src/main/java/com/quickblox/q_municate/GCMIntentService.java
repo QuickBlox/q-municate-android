@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -68,9 +69,7 @@ public class GCMIntentService extends IntentService {
         Intent intent = new Intent(this, SplashActivity.class);
 
         saveOpeningDialogData(userId, dialogId);
-
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this).setSmallIcon(
                 R.drawable.ic_launcher).setContentTitle(getString(R.string.push_title)).setStyle(
                 new NotificationCompat.BigTextStyle().bigText(message)).setContentText(message).setVibrate(
@@ -87,6 +86,7 @@ public class GCMIntentService extends IntentService {
         if (userId != ConstsCore.ZERO_INT_VALUE && !TextUtils.isEmpty(dialogId)) {
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID, userId);
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, dialogId);
+
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, true);
         } else {
             prefsHelper.savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);

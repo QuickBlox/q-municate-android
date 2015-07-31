@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.core.command;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.quickblox.core.exception.QBResponseException;
 

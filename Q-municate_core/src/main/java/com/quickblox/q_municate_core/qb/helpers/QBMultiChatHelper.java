@@ -126,13 +126,13 @@ public class QBMultiChatHelper extends QBBaseChatHelper {
 
         try {
             groupChat.sendMessage(chatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_send_msg);
         } catch (SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         } catch (IllegalStateException e) {
             tryJoinRoomChat(existingDialog);
             throw new IllegalStateException(e);
+        } catch (XMPPException e) {
+            e.printStackTrace();
         }
         if (error != null) {
             throw new QBResponseException(error);

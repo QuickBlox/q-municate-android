@@ -13,6 +13,7 @@ import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.users.model.QBUser;
 
+
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import java.util.ArrayList;

@@ -10,6 +10,7 @@ import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 
 import java.text.MessageFormat;
@@ -35,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createFriendsRelationTable(db);
         createMessageTable(db);
         createDialogTable(db);
+        createNotSendMessageTable(db);
     }
 
     private void createUserTable(SQLiteDatabase db) {
@@ -103,6 +105,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createTable(db, MessageTable.TABLE_NAME, messageTableFields.toString());
     }
 
+    private void createNotSendMessageTable(SQLiteDatabase db) {
+        StringBuilder messageTableFields = new StringBuilder();
+        messageTableFields
+                .append(MessageTable.Cols.ID).append(" INTEGER PRIMARY KEY, ")
+                .append(MessageTable.Cols.MESSAGE_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.DIALOG_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.SENDER_ID).append(" INTEGER, ")
+                .append(MessageTable.Cols.RECIPIENT_ID).append(" INTEGER, ")
+                .append(MessageTable.Cols.BODY).append(" TEXT, ")
+                .append(MessageTable.Cols.TIME).append(" LONG, ")
+                .append(MessageTable.Cols.ATTACH_FILE_ID).append(" TEXT, ")
+                .append(MessageTable.Cols.IS_READ).append(" INTEGER, ")
+                .append(MessageTable.Cols.IS_DELIVERED).append(" INTEGER, ")
+                .append(MessageTable.Cols.IS_SYNC).append(" INTEGER, ")
+                .append(MessageTable.Cols.FRIENDS_NOTIFICATION_TYPE).append(" INTEGER");
+        createTable(db, NotSendMessageTable.TABLE_NAME, messageTableFields.toString());
+    }
+
     private void createDialogTable(SQLiteDatabase db) {
         StringBuilder dialogTableFields = new StringBuilder();
         dialogTableFields
@@ -127,6 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dropTable(db, FriendsRelationTable.TABLE_NAME);
         dropTable(db, MessageTable.TABLE_NAME);
         dropTable(db, DialogTable.TABLE_NAME);
+        dropTable(db, NotSendMessageTable.TABLE_NAME);
         onCreate(db);
     }
 

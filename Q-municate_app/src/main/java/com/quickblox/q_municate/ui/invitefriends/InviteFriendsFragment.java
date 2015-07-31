@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -20,6 +21,7 @@ import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate.ui.base.BaseFragment;
+import com.quickblox.q_municate_core.utils.QBConnectivityManager;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.EmailUtils;
@@ -92,16 +94,25 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         fromFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                facebookFriendsOnClick();
+                if(QBConnectivityManager.isConnectionExists()) {
+                    facebookFriendsOnClick();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         fromContactsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                contactsFriendsOnClick();
+                if(QBConnectivityManager.isConnectionExists()) {
+                    contactsFriendsOnClick();
+                } else {
+                    Toast.makeText(getActivity(), getString(R.string.feature_unavailable), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
 
         checkAllContactsFriendsCheckBox.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
@@ -189,6 +200,12 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.invite_friends_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_next).setVisible(QBConnectivityManager.isConnectionExists());
     }
 
     @Override

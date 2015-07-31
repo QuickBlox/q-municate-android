@@ -8,12 +8,14 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
 
@@ -64,6 +67,10 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
+        if(savedInstanceState != null){
+            selectedPositionList = savedInstanceState.getInt(ConstsCore.LAST_CLICKED_DIALOG);
+        }
+
         initUI(view);
         initListeners();
         Crouton.cancelAllCroutons();
@@ -82,7 +89,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
             @Override
             public void onChange(boolean selfChange) {
-                selectedPositionList = dialogsListView.getFirstVisiblePosition();
                 initCursorLoaders();
             }
         };
@@ -109,7 +115,7 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor dialogsCursor) {
         this.dialogsCursor = dialogsCursor;
-        initChatsDialogs();
+        initChatsDialogs(dialogsCursor);
         checkVisibilityEmptyLabel();
     }
 
@@ -128,15 +134,36 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
+                Crouton.clearCroutonsForActivity(getActivity());
+
+                // Check cursor
+                Cursor selectedChatCursor = null;
+                if (dialogsAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+                    selectedChatCursor = (Cursor) dialogsAdapter.getItem(position);
+                }
+
                 QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
                 if (dialog.getType() == QBDialogType.PRIVATE) {
                     startPrivateChatActivity(dialog);
                 } else {
                     startGroupChatActivity(dialog);
                 }
+
+                selectedPositionList = parent.getFirstVisiblePosition();
             }
         });
+
+//        dialogsListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//                selectedPositionList = dialogsListView.getFirstVisiblePosition();
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//
+//            }
+//        });
     }
 
     private void checkVisibilityEmptyLabel() {
@@ -145,11 +172,20 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
 
     @Override
     public void onResume() {
-        Crouton.cancelAllCroutons();
         if (dialogsAdapter != null) {
             checkVisibilityEmptyLabel();
         }
+
+        restoreLastUsedListPosition();
+
         super.onResume();
+    }
+
+    private void restoreLastUsedListPosition() {
+        dialogsListView.setSelection(selectedPositionList);
+
+        // Erase last used list position to prevent int using next time
+        selectedPositionList = ConstsCore.ZERO_INT_VALUE;
     }
 
     @Override
@@ -173,37 +209,25 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         return true;
     }
 
-    //    @Override
-    //    public boolean onContextItemSelected(MenuItem item) {
-    //        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-    //        switch (item.getItemId()) {
-    //            case R.id.action_delete:
-    //                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-    //                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-    //                deleteDialog(dialog);
-    //                break;
-    //        }
-    //        return true;
-    //    }
+    private void initChatsDialogs(Cursor newCursor) {
+        if (dialogsAdapter == null) {
+            dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
 
-    //    private void deleteDialog(QBDialog dialog) {
-    //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
-    //    }
-
-    private void initChatsDialogs() {
-        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsCursor);
-        dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                checkVisibilityEmptyLabel();
-            }
-        });
-        dialogsListView.setAdapter(dialogsAdapter);
-
-        if (selectedPositionList != ConstsCore.ZERO_INT_VALUE) {
-            dialogsListView.setSelection(selectedPositionList);
+            dialogsAdapter.registerDataSetObserver(new DataSetObserver() {
+                @Override
+                public void onChanged() {
+                    super.onChanged();
+                    checkVisibilityEmptyLabel();
+                }
+            });
+            dialogsListView.setAdapter(dialogsAdapter);
+        } else {
+            dialogsAdapter.swapCursor(newCursor);
+//            if(selectedPositionList > ConstsCore.ZERO_INT_VALUE){
+//                dialogsListView.setSelection(selectedPositionList);
+//            }
         }
+
     }
 
     private void startPrivateChatActivity(QBDialog dialog) {
@@ -236,13 +260,6 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
         baseActivity.updateBroadcastActionList();
     }
 
-    //    @Override
-    //    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-    //        super.onCreateContextMenu(menu, view, menuInfo);
-    //        MenuInflater menuInflater = baseActivity.getMenuInflater();
-    //        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
-    //    }
-
     private class LoadChatsDialogsSuccessAction implements Command {
 
         @Override
@@ -253,5 +270,11 @@ public class DialogsFragment extends BaseFragment implements LoaderManager.Loade
                 emptyListTextView.setVisibility(View.VISIBLE);
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(ConstsCore.LAST_CLICKED_DIALOG, selectedPositionList);
     }
 }

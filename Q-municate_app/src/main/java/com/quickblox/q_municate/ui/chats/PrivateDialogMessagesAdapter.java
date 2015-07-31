@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.chats;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,8 +21,11 @@ import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
 public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
+
+    private static final String TAG = PrivateDialogMessagesAdapter.class.getSimpleName();
 
     private static int EMPTY_POSITION = -1;
 
@@ -56,7 +60,11 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) getItem(position);
+        }
         return getItemViewType(cursor);
     }
 
@@ -214,10 +222,11 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     private void findLastFriendsRequest() {
         Cursor cursor = getCursor();
-        for (int i = 0; i < getCursor().getCount(); i++) {
-            cursor.moveToPosition(i);
-            findLastFriendsRequestForCursor(cursor);
-        }
+            if(cursor.moveToFirst()){
+                do{
+                    findLastFriendsRequestForCursor(cursor);
+                }while (cursor.moveToNext());
+            }
     }
 
     private void findLastFriendsRequestForCursor(Cursor cursor) {

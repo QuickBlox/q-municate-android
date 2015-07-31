@@ -11,12 +11,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
+import com.google.android.gms.internal.is;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.chat.model.QBDialog;
@@ -34,6 +36,7 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.models.User;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
+import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -52,11 +55,11 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
+    private static final String TAG = PrivateDialogActivity.class.getSimpleName();
     private ContentObserver statusContentObserver;
     private ContentObserver friendsTableContentObserver;
     private Cursor friendCursor;
     private FriendOperationAction friendOperationAction;
-
     public PrivateDialogActivity() {
         super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
     }
@@ -81,6 +84,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         dialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         dialogId = dialog.getDialogId();
         friendCursor = UsersDatabaseManager.getFriendCursorById(this, opponentFriend.getUserId());
+
+        // Check count of messages have been stored in base, if stored messages aren't only contact request then we
+        // skip count of messages in base on next dialog's messages request to server this count of messages
+        if (!isFirstDialogLaunch()) {
+            skipMessages = ChatDatabaseManager.getAllDialogMessagesByDialogId(this, dialog.getDialogId()).getCount();
+        }
 
         initCursorLoaders();
         initActionBar();
@@ -110,7 +119,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onFileSelected(Uri originalUri) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+        Bitmap bitmap = ImageLoader.getInstance().loadImageSync(originalUri.toString(), Consts.UIL_DEFAULT_DISPLAY_OPTIONS);
         new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
     }
 
@@ -122,13 +131,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-        scrollListView();
     }
 
     @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
-        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        if (opponentFriend != null) {
+            bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        }
         return bundle;
     }
 
@@ -137,11 +147,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
             @Override
             public void onChange(boolean selfChange) {
-                opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
+                if (opponentFriend != null) {
+                    opponentFriend = UsersDatabaseManager.getUserById(PrivateDialogActivity.this,
                         PrivateDialogActivity.this.opponentFriend.getUserId());
-                setOnlineStatus(opponentFriend);
+                    setOnlineStatus(opponentFriend);
+                }
             }
         };
+
         friendCursor.registerContentObserver(statusContentObserver);
 
         friendsTableContentObserver = new ContentObserver(new Handler()) {
@@ -169,12 +182,19 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void setOnlineStatus(User friend) {
-        ActionBar actionBar = getActionBar();
-        actionBar.setSubtitle(friend.getOnlineStatus(this));
+        if(friend != null){
+            if(getActionBar() != null) {
+                getActionBar().setSubtitle(friend.getOnlineStatus(this));
+            }
+        }
     }
 
     protected QBDialog getQBDialog() {
-        Cursor cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        Cursor cursor = null;
+
+        if (messagesAdapter.getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) messagesAdapter.getItem(messagesAdapter.getCount() - 1);
+        }
 
         MessageCache messageCache = ChatDatabaseManager.getMessageCacheFromCursor(cursor);
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
@@ -258,34 +278,42 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+            menu.findItem(R.id.action_attach).setVisible(isConnectionEnabled());
+            menu.findItem(R.id.action_audio_call).setVisible(isConnectionEnabled());
+            menu.findItem(R.id.action_video_call).setVisible(isConnectionEnabled());
+
+        return true;
+    }
+
     private void callToUser(User friend, QBRTCTypes.QBConferenceType callType) {
         if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
             if(QBChatService.getInstance().isLoggedIn()) {
                 CallActivity.start(PrivateDialogActivity.this, friend, callType);
-            } else {
-                Toast.makeText(this, getString(R.string.dlg_fail_connection),Toast.LENGTH_LONG).show();
             }
         }
     }
 
+
     @Override
     protected void onResume() {
         super.onResume();
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
-        }
-
-        startLoadDialogMessages();
         currentOpponent = opponentFriend.getFullName();
-
         checkMessageSendingPossibility();
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
-                opponentFriend.getUserId());
-        messageEditText.setEnabled(isFriend);
-        smilePanelImageButton.setEnabled(isFriend);
+        if (opponentFriend != null){
+            boolean isFriend = UsersDatabaseManager.isFriendInBase(PrivateDialogActivity.this,
+                    opponentFriend.getUserId());
+            messageEditText.setEnabled(isFriend);
+            smilePanelImageButton.setEnabled(isFriend);
+        } else {
+            Log.d(TAG, "Users cache has been already cleaned ");
+        }
     }
 
     private void acceptUser(final int userId) {
@@ -334,5 +362,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         public void onRejectUserClicked(int userId) {
             rejectUser(userId);
         }
+    }
+
+    @Override
+    public void onConnectionChange(boolean isConnected) {
+        super.onConnectionChange(isConnected);
+        invalidateOptionsMenu();
+
+        sendButton.setActivated(isConnected);
     }
 }

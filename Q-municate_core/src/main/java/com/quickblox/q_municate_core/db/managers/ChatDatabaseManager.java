@@ -7,7 +7,9 @@ import android.content.CursorLoader;
 import android.database.Cursor;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
@@ -15,6 +17,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.db.tables.DialogTable;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.MessageCache;
@@ -24,10 +27,17 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChatDatabaseManager {
+
+    private static boolean messaGeReadByUser;
 
     public static void saveDialogs(Context context, List<QBDialog> dialogsList) {
         for (QBDialog dialog : dialogsList) {
@@ -45,6 +55,9 @@ public class ChatDatabaseManager {
             if (!TextUtils.isEmpty(resultDialogId)) {
                 dialog = getDialogFromCursor(cursor);
             }
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -58,6 +71,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -72,6 +88,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             dialogId = cursor.getString(cursor.getColumnIndex(DialogTable.Cols.DIALOG_ID));
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -88,6 +107,9 @@ public class ChatDatabaseManager {
             if (!TextUtils.isEmpty(resultDialogId)) {
                 dialog = getDialogFromCursor(cursor);
             }
+        }
+
+        if (cursor != null) {
             cursor.close();
         }
 
@@ -103,10 +125,11 @@ public class ChatDatabaseManager {
                 new String[]{String.valueOf(dialogType.getCode()), "%" + opponent + "%"}, null);
 
         if (cursor != null) {
-            while (cursor.moveToNext()) {
-                dialogsList.add(getDialogFromCursor(cursor));
+            if (cursor.moveToFirst()) {
+                do {
+                    dialogsList.add(getDialogFromCursor(cursor));
+                } while (cursor.moveToNext());
             }
-
             cursor.close();
         }
 
@@ -127,7 +150,7 @@ public class ChatDatabaseManager {
             resolver.insert(DialogTable.CONTENT_URI, values);
         }
 
-        if (cursor != null) {
+        if (cursor != null){
             cursor.close();
         }
     }
@@ -153,9 +176,10 @@ public class ChatDatabaseManager {
         List<QBDialog> dialogs = new ArrayList<QBDialog>(allDialogsCursor.getCount());
         if (allDialogsCursor != null) {
             if (allDialogsCursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-                while (allDialogsCursor.moveToNext()) {
+                allDialogsCursor.moveToFirst();
+                do {
                     dialogs.add(getDialogFromCursor(allDialogsCursor));
-                }
+                } while (allDialogsCursor.moveToNext());
             }
             allDialogsCursor.close();
         }
@@ -228,6 +252,10 @@ public class ChatDatabaseManager {
             messageCache = getMessageCacheFromCursor(cursor);
         }
 
+        if (cursor != null){
+            cursor.close();
+        }
+
         return messageCache;
     }
 
@@ -248,8 +276,46 @@ public class ChatDatabaseManager {
                 MessageTable.Cols.ID + " ORDER BY " + MessageTable.Cols.TIME + " COLLATE NOCASE ASC");
     }
 
+    public static Cursor getAllNotSendMessagesByDialogId(Context context) {
+        return context.getContentResolver().query(NotSendMessageTable.CONTENT_URI, null,
+                null, null,null);
+    }
+
+
+    /**
+     * Check is exists some not sent message for this dialog.
+     * Only one message which wasn't sent can be exists in the database table for one dialog.
+     *
+     * @param context - context to call content resolver
+     * @param dialogId - id for which we will search message
+     * @return
+     */
+    public static String getNotSendMessageBodyByDialogId(Context context, String dialogId) {
+        Cursor cursor = context.getContentResolver().query(NotSendMessageTable.CONTENT_URI, null,
+                NotSendMessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null,
+                null);
+
+        String messageBody = "";
+
+        if(cursor != null && cursor.moveToFirst()){
+            if(cursor.getCount() <= 1) {
+                messageBody = cursor.getString(cursor.getColumnIndex(NotSendMessageTable.Cols.BODY));
+            }
+        }
+
+        if (cursor != null){
+            cursor.close();
+        }
+
+        return messageBody;
+    }
+
     public static void deleteAllMessages(Context context) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI, null, null);
+    }
+
+    public static void deleteAllNotSendMessages(Context context) {
+        context.getContentResolver().delete(NotSendMessageTable.CONTENT_URI, null, null);
     }
 
     public static void deleteAllDialogs(Context context) {
@@ -286,11 +352,12 @@ public class ChatDatabaseManager {
         }
 
         updateDialog(context, messageCache.getDialogId(), lastMessage, messageCache.getTime(),
-                    messageCache.getSenderId(), countUnreadMessagesLocal);
+                messageCache.getSenderId(), countUnreadMessagesLocal);
     }
 
     public static void saveChatMessages(Context context, List<QBChatMessage> messagesList,
             String dialogId) {
+
         for (QBChatMessage historyMessage : messagesList) {
             String messageId = historyMessage.getId();
             String message = historyMessage.getBody();
@@ -309,8 +376,9 @@ public class ChatDatabaseManager {
 
             attachURL = ChatUtils.getAttachUrlFromMessage(historyMessage.getAttachments());
 
+
             MessageCache messageCache = new MessageCache(messageId, dialogId, senderId, recipientId, message, attachURL, time,
-                    historyMessage.isRead(), true, true);
+                    isMessageReadByUser(historyMessage.getReadIds()), true, true);
 
             if (historyMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null) {
                 friendsMessageTypeCode = Integer.parseInt(historyMessage.getProperty(
@@ -334,6 +402,7 @@ public class ChatDatabaseManager {
     }
 
     private static void saveChatMessage(Context context, MessageCache messageCache) {
+
         ContentValues values = new ContentValues();
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
 
@@ -367,6 +436,36 @@ public class ChatDatabaseManager {
 
             resolver.insert(MessageTable.CONTENT_URI, values);
         }
+
+        if (cursor != null){
+            cursor.close();
+        }
+    }
+
+    public static void saveNotSendMessage(Context context, String message, String dialogID, String attachURL){
+        if(TextUtils.isEmpty(dialogID.trim())){
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        ContentResolver resolver = context.getContentResolver();
+
+        values.put(NotSendMessageTable.Cols.BODY, message);
+
+        values.putNull(NotSendMessageTable.Cols.ATTACH_FILE_ID);
+
+        String condition = NotSendMessageTable.Cols.DIALOG_ID + "='" + dialogID + "'";
+        Cursor cursor = resolver.query(NotSendMessageTable.CONTENT_URI, null, condition, null, null);
+        if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
+            resolver.update(NotSendMessageTable.CONTENT_URI, values, condition, null);
+        } else {
+            values.put(NotSendMessageTable.Cols.DIALOG_ID, dialogID);
+            resolver.insert(NotSendMessageTable.CONTENT_URI, values);
+        }
+
+        if (cursor != null){
+            cursor.close();
+        }
     }
 
     private static String parseMessageBody(Context context, MessageCache messageCache) {
@@ -379,7 +478,29 @@ public class ChatDatabaseManager {
                     messageCache.getMessagesNotificationType(), messageCache);
         } else {
             if (!TextUtils.isEmpty(messageCache.getMessage())) {
-                resultMessage = Html.fromHtml(messageCache.getMessage()).toString();
+
+                StringBuilder result = new StringBuilder();
+
+                // Store \n positions in message
+                Set<Integer> newLinePositons = new HashSet<>();
+                Pattern p = Pattern.compile("\n");
+                Matcher m = p.matcher(messageCache.getMessage());
+
+                while(m.find()){
+                    newLinePositons.add(m.start());
+                }
+
+                // Replace all '<' and '>' symbols to string representation but removes '\n' symbols
+                result.append(Html.fromHtml(messageCache.getMessage()).toString());
+
+                // Restore removed new line symbols
+                for(Integer position : newLinePositons) {
+                    // Remove replaced instead of '\n' space
+                    result.deleteCharAt(position);
+                    result.insert(position, "\n");
+                }
+
+                resultMessage = result.toString();
             }
         }
 
@@ -391,8 +512,11 @@ public class ChatDatabaseManager {
                 DialogTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null, null);
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
-            cursor.close();
             return true;
+        }
+
+        if (cursor != null){
+            cursor.close();
         }
 
         return false;
@@ -400,6 +524,11 @@ public class ChatDatabaseManager {
 
     public static void deleteMessagesByDialogId(Context context, String dialogId) {
         context.getContentResolver().delete(MessageTable.CONTENT_URI,
+                MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
+    }
+
+    public static void deleteNotSentMessagesByDialogId(Context context, String dialogId) {
+        context.getContentResolver().delete(NotSendMessageTable.CONTENT_URI,
                 MessageTable.Cols.DIALOG_ID + " = '" + dialogId + "'", null);
     }
 
@@ -527,6 +656,9 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.moveToFirst()) {
             countMessages = cursor.getInt(cursor.getColumnIndex(DialogTable.Cols.COUNT_UNREAD_MESSAGES));
+        }
+
+        if (cursor != null){
             cursor.close();
         }
 
@@ -561,23 +693,33 @@ public class ChatDatabaseManager {
 
             values.put(MessageTable.Cols.IS_READ, messageCache.isRead());
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
-            cursor.close();
+
 
             int countUnreadMessagesLocal = getCountUnreadMessagesByDialogIdLocal(context, messageCache.getDialogId());
             countUnreadMessagesLocal = --countUnreadMessagesLocal;
 
             checkUpdatingDialogForFriendsNotificationMessage(context, messageCache, countUnreadMessagesLocal);
         }
+
+        if (cursor != null){
+            cursor.close();
+        }
     }
 
-    public static void updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
+    public static void  updateMessageStatusDelivered(Context context, String messageId, boolean isDelivered) {
+
         ContentValues values = new ContentValues();
         String condition = MessageTable.Cols.MESSAGE_ID + "='" + messageId + "'";
         ContentResolver resolver = context.getContentResolver();
+
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
+
         if (cursor != null && cursor.moveToFirst()) {
             values.put(MessageTable.Cols.IS_DELIVERED, isDelivered);
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+        }
+
+        if (cursor != null){
             cursor.close();
         }
     }
@@ -590,5 +732,13 @@ public class ChatDatabaseManager {
     public static void deleteDialogByRoomJid(Context context, String roomJid) {
         context.getContentResolver().delete(DialogTable.CONTENT_URI,
                 DialogTable.Cols.ROOM_JID_ID + " = '" + roomJid + "'", null);
+    }
+
+    public static boolean isMessageReadByUser(Collection<Integer> readIDs) {
+        boolean messaGeReadByUser = false;
+        if (readIDs != null && readIDs.contains(QBChatService.getInstance().getUser().getId())){
+            messaGeReadByUser = true;
+        }
+        return messaGeReadByUser;
     }
 }

@@ -62,7 +62,12 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     @Override
     public int getItemViewType(int position) {
-        Cursor cursor = (Cursor) getItem(position);
+        Cursor cursor = null;
+
+        if (getCursor().getCount() > ConstsCore.ZERO_INT_VALUE) {
+            cursor = (Cursor) getItem(position);
+        }
+
         return getItemViewType(cursor);
     }
 
@@ -93,7 +98,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
 
     protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
         int iconResourceId;
-        if (isDelivered && isRead) {
+        if (/*isDelivered && */isRead) {
             iconResourceId = R.drawable.ic_status_mes_sent_received;
         } else if (isDelivered) {
             iconResourceId = R.drawable.ic_status_mes_sent;
@@ -186,6 +191,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             return ConstsCore.ZERO_INT_VALUE;
         }
 
+
         if (!TextUtils.isEmpty(timeString)) {
             return timeString.subSequence(ConstsCore.ZERO_INT_VALUE, timeString.length() - 1).charAt(
                     ConstsCore.ZERO_INT_VALUE);
@@ -234,8 +240,7 @@ public class BaseDialogMessagesAdapter extends BaseCursorAdapter implements Rece
             setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
 
             updateUIAfterLoading();
-
-            chatUIHelperListener.onScrollMessagesToBottom();
+//            chatUIHelperListener.onScrollMessagesToBottom();
         }
 
         private void updateUIAfterLoading() {

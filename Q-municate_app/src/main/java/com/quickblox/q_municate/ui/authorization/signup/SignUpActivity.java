@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.authorization.base.BaseAuthActivity;
 import com.quickblox.q_municate.ui.authorization.landing.LandingActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;

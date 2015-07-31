@@ -11,6 +11,7 @@ import com.quickblox.q_municate_core.db.tables.DialogTable;
 import com.quickblox.q_municate_core.db.tables.FriendTable;
 import com.quickblox.q_municate_core.db.tables.FriendsRelationTable;
 import com.quickblox.q_municate_core.db.tables.MessageTable;
+import com.quickblox.q_municate_core.db.tables.NotSendMessageTable;
 import com.quickblox.q_municate_core.db.tables.UserTable;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
@@ -67,6 +68,11 @@ public class DatabaseProvider extends ContentProvider {
                         sortOrder);
                 break;
             }
+            case NotSendMessageTable.PATH_TOKEN: {
+                result = doQuery(db, uri, NotSendMessageTable.TABLE_NAME, projection, selection, selectionArgs,
+                        sortOrder);
+                break;
+            }
         }
 
         return result;
@@ -107,6 +113,10 @@ public class DatabaseProvider extends ContentProvider {
                 result = doInsert(db, MessageTable.TABLE_NAME, MessageTable.CONTENT_URI, uri, values);
                 break;
             }
+            case NotSendMessageTable.PATH_TOKEN: {
+                result = doInsert(db, NotSendMessageTable.TABLE_NAME, NotSendMessageTable.CONTENT_URI, uri, values);
+                break;
+            }
         }
 
         if (result == null) {
@@ -140,6 +150,10 @@ public class DatabaseProvider extends ContentProvider {
             }
             case MessageTable.PATH_TOKEN: {
                 table = MessageTable.TABLE_NAME;
+                break;
+            }
+            case NotSendMessageTable.PATH_TOKEN: {
+                table = NotSendMessageTable.TABLE_NAME;
                 break;
             }
         }
@@ -187,6 +201,10 @@ public class DatabaseProvider extends ContentProvider {
                 result = doDelete(db, uri, MessageTable.TABLE_NAME, selection, selectionArgs);
                 break;
             }
+            case NotSendMessageTable.PATH_TOKEN: {
+                result = doDelete(db, uri, NotSendMessageTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
         }
 
         return result;
@@ -220,6 +238,10 @@ public class DatabaseProvider extends ContentProvider {
                 result = doUpdate(db, uri, MessageTable.TABLE_NAME, selection, selectionArgs, values);
                 break;
             }
+            case NotSendMessageTable.PATH_TOKEN: {
+                result = doUpdate(db, uri, NotSendMessageTable.TABLE_NAME, selection, selectionArgs, values);
+                break;
+            }
         }
 
         return result;
@@ -231,7 +253,6 @@ public class DatabaseProvider extends ContentProvider {
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(tableName);
         Cursor result = builder.query(db, projection, selection, selectionArgs, sortOrder, null, null);
-
         result.setNotificationUri(getContext().getContentResolver(), uri);
 
         return result;
