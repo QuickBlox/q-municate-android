@@ -118,8 +118,10 @@ public class QBAuthHelper extends BaseHelper {
         UserCustomData userCustomDataNew = getUserCustomData(inputUser);
         inputUser.setCustomData(Utils.customDataToString(userCustomDataNew));
 
-        inputUser.setPassword(password);
-        inputUser.setOldPassword(oldPassword);
+        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
+            inputUser.setPassword(password);
+            inputUser.setOldPassword(oldPassword);
+        }
 
         user = QBUsers.updateUser(inputUser);
 
