@@ -177,6 +177,11 @@
     <string name="inf_fb_wall_param_picture">http://files.quickblox.com/ic_launcher.png</string>
     <string name="inf_fb_wall_param_place">155021662189</string>
     <string name="inf_fb_request_canceled">Request cancelled</string>
+    
+    // Post to wall
+    <string name="inf_fb_feed_result_posted">Posted</string>
+    <string name="inf_fb_feed_result_publish_canceled">Publish cancelled</string>
+    <string name="inf_fb_feed_result_posting_error">Error posting link</string>
 
     // Feedback
     <string name="fdb_feedback_title">Feedback Description</string>
