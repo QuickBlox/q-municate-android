@@ -454,13 +454,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
             Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
-            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad,
+                    skipMessages = lastDateLoad == ConstsCore.ZERO_LONG_VALUE ?
+                            ConstsCore.ZERO_INT_VALUE : skipMessages);
             loadingMore = false;
         }
     }
 
 
     protected void startNewMessagesLoadDialogMessages(QBDialog dialog, long lastDateLoad, String lastReadMessageID) {
+        Log.d("Fixes CHAT", "loadingMore = " + loadingMore);
         if (loadingMore) {
             Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, lastReadMessageID, ConstsCore.NOT_INITIALIZED_VALUE);
@@ -754,6 +757,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startLoadDialogMessages() {
         Log.d("Fixes CHAT", "startLoadDialogMessages");
+        Log.d("Fixes CHAT", "updateMessagesReason = " + String.valueOf(updateMessagesReason));
         if (dialog == null) {
             return;
         }
