@@ -78,26 +78,26 @@
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.chats.dialogs.NewDialogActivity"
+            android:name=".ui.chats.dialogslist.NewDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/ndl_title"
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.chats.PrivateDialogActivity"
+            android:name=".ui.chats.privatedialog.PrivateDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.chats.GroupDialogActivity"
+            android:name=".ui.chats.groupdialog.GroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.chats.GroupDialogDetailsActivity"
+            android:name=".ui.chats.groupdialog.GroupDialogDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/gdd_title"
-            android:parentActivityName="com.quickblox.q_municate.ui.chats.GroupDialogActivity"
+            android:parentActivityName=".ui.chats.groupdialog.GroupDialogActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.quickblox.q_municate.ui.profile.ProfileActivity"
@@ -106,10 +106,10 @@
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.chats.AddFriendsToGroupActivity"
+            android:name=".ui.chats.groupdialog.AddFriendsToGroupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/afg_title"
-            android:parentActivityName="com.quickblox.q_municate.ui.chats.GroupDialogDetailsActivity"
+            android:parentActivityName=".ui.chats.groupdialog.GroupDialogDetailsActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.quickblox.q_municate.ui.settings.ChangePasswordActivity"

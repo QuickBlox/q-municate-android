@@ -7,8 +7,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.chats.groupdialog.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;

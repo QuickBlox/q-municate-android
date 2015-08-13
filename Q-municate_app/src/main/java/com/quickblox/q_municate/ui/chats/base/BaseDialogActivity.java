@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.base;
 
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
@@ -32,11 +32,13 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
+import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
@@ -77,7 +79,7 @@ import java.util.TimerTask;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, SwitchViewListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
 
     private static final int TYPING_DELAY = 1000;
 
@@ -281,13 +283,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 });
 
         alertDialog.show();
-    }
-
-    @Override
-    public void showLastListItem() {
-        if (isSmilesLayoutShowing()) {
-            hideSmileLayout();
-        }
     }
 
     private void hideSmileLayout() {
@@ -641,7 +636,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     //    abstract QBDialog getQBDialog();
 
-
     protected void startUpdateChatDialog() {
         //        QBDialog dialog = getQBDialog();
         //        if (dialog != null) {
@@ -671,16 +665,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected abstract void updateMessagesList();
 
-    private class MessageObserver implements Observer {
-
-        @Override
-        public void update(Observable observable, Object data) {
-            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
-                updateMessagesList();
-            }
-        }
-    }
-    
     private void readAllMessages() {
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
         List<Message> updateMessagesList = new ArrayList<>();
@@ -702,6 +686,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
         }
         dataManager.getDialogNotificationDataManager().createOrUpdate(updateDialogNotificationsList);
+    }
+
+    private class MessageObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
+                updateMessagesList();
+            }
+        }
     }
 
     private class DialogNotificationObserver implements Observer {

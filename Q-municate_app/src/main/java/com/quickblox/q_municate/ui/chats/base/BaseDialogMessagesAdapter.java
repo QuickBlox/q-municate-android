@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.base;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
@@ -78,14 +79,14 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
     }
 
     protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
-        int iconResourceId;
-        if (isDelivered && isRead) {
+        int iconResourceId = 0;
+
+        if (isRead) {
             iconResourceId = R.drawable.ic_status_mes_sent_received;
         } else if (isDelivered) {
             iconResourceId = R.drawable.ic_status_mes_sent;
-        } else {
-            iconResourceId = 0;
         }
+
         return iconResourceId;
     }
 

@@ -32,7 +32,7 @@ public class QBCreatePrivateChatCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         Integer friendId = (Integer) extras.getSerializable(QBServiceConsts.EXTRA_FRIEND);
 
-        QBDialog privateDialog = chatHelper.createPrivateChatOnRest(friendId);
+        QBDialog privateDialog = chatHelper.createPrivateDialogIfNotExist(friendId);
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, privateDialog);
         return extras;
     }

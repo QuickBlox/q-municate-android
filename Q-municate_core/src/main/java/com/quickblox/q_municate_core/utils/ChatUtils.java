@@ -213,10 +213,11 @@ public class ChatUtils {
     }
 
     public static Message createLocalMessage(QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, State state) {
+        long dataSent = Long.parseLong(qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
         Message message = new Message();
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
-        message.setCreatedDate(qbChatMessage.getDateSent());
+        message.setCreatedDate(dataSent);
         if (state == null) {
             message.setState(qbChatMessage.isRead() ? State.READ : State.DELIVERED);
         } else {

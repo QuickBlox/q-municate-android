@@ -1,7 +1,8 @@
-package com.quickblox.q_municate.ui.chats.dialogs;
+package com.quickblox.q_municate.ui.chats.dialogslist;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,9 +15,10 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.chats.groupdialog.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogActivity;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -33,18 +35,18 @@ import java.util.Observer;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class DialogsFragment extends BaseFragment {
+public class DialogsListFragment extends BaseFragment {
 
     private ListView dialogsListView;
-    private DialogsAdapter dialogsAdapter;
+    private DialogsListAdapter dialogsListAdapter;
     private TextView emptyListTextView;
     private DataManager dataManager;
 
     private Observer dialogObserver;
     private Observer messageObserver;
 
-    public static DialogsFragment newInstance() {
-        return new DialogsFragment();
+    public static DialogsListFragment newInstance() {
+        return new DialogsListFragment();
     }
 
     @Override
@@ -65,7 +67,7 @@ public class DialogsFragment extends BaseFragment {
 
         initChatsDialogs();
 
-        //        registerForContextMenu(dialogsListView);
+        registerForContextMenu(dialogsListView);
 
         return view;
     }
@@ -93,7 +95,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startChat(int position) {
-        Dialog dialog = dialogsAdapter.getItem(position);
+        Dialog dialog = dialogsListAdapter.getItem(position);
         if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog);
         } else {
@@ -102,7 +104,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void checkVisibilityEmptyLabel() {
-        emptyListTextView.setVisibility(dialogsAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+        emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -110,11 +112,11 @@ public class DialogsFragment extends BaseFragment {
         super.onResume();
         addObservers();
         Crouton.cancelAllCroutons();
-        if (dialogsAdapter != null) {
+        if (dialogsListAdapter != null) {
             checkVisibilityEmptyLabel();
         }
-        if (dialogsAdapter != null) {
-            dialogsAdapter.notifyDataSetChanged();
+        if (dialogsListAdapter != null) {
+            dialogsListAdapter.notifyDataSetChanged();
         }
     }
 
@@ -151,8 +153,8 @@ public class DialogsFragment extends BaseFragment {
 
     private void initChatsDialogs() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
-        dialogsAdapter = new DialogsAdapter(baseActivity, dialogsList);
-        dialogsListView.setAdapter(dialogsAdapter);
+        dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
+        dialogsListView.setAdapter(dialogsListAdapter);
     }
 
     private void startPrivateChatActivity(Dialog dialog) {
@@ -179,34 +181,34 @@ public class DialogsFragment extends BaseFragment {
 
     private void updateDialogsList() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
-        dialogsAdapter.setNewData(dialogsList);
-        dialogsAdapter.notifyDataSetChanged();
+        dialogsListAdapter.setNewData(dialogsList);
+        dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
     }
 
-    //    @Override
-    //    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-    //        super.onCreateContextMenu(menu, view, menuInfo);
-    //        MenuInflater menuInflater = baseActivity.getMenuInflater();
-    //        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
-    //    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        MenuInflater menuInflater = baseActivity.getMenuInflater();
+        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
+    }
 
-    //    @Override
-    //    public boolean onContextItemSelected(MenuItem item) {
-    //        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-    //        switch (item.getItemId()) {
-    //            case R.id.action_delete:
-    //                Cursor selectedChatCursor = (Cursor) dialogsAdapter.getItem(adapterContextMenuInfo.position);
-    //                QBDialog dialog = ChatDatabaseManager.getDialogFromCursor(selectedChatCursor);
-    //                deleteDialog(dialog);
-    //                break;
-    //        }
-    //        return true;
-    //    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
+                deleteDialog(dialog);
+                break;
+        }
+        return true;
+    }
 
-    //    private void deleteDialog(QBDialog dialog) {
-    //        QBDeleteDialogCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
-    //    }
+    private void deleteDialog(Dialog dialog) {
+        QBDeleteChatCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
+    }
 
     private void checkEmptyList(int listSize) {
         if (listSize > 0) {

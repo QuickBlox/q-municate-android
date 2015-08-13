@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats.dialogs;
+package com.quickblox.q_municate.ui.chats.dialogslist;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +19,11 @@ import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 
-public class DialogsAdapter extends BaseListAdapter<Dialog> {
+public class DialogsListAdapter extends BaseListAdapter<Dialog> {
 
     private DataManager dataManager;
 
-    public DialogsAdapter(BaseActivity baseActivity, List<Dialog> objectsList) {
+    public DialogsListAdapter(BaseActivity baseActivity, List<Dialog> objectsList) {
         super(baseActivity, objectsList);
         dataManager = DataManager.getInstance();
     }

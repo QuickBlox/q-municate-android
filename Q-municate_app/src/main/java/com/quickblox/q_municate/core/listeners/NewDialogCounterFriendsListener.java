@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats.dialogs;
+package com.quickblox.q_municate.core.listeners;
 
 public interface NewDialogCounterFriendsListener {
 

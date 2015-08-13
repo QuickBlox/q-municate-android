@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.groupdialog;
 
 import android.view.View;
 import android.view.ViewGroup;

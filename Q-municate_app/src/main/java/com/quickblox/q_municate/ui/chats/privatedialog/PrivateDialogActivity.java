@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.privatedialog;
 
 import android.app.ActionBar;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.base.BaseDialogActivity;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
@@ -137,15 +138,21 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
                 combinationMessagesList, this, dialog);
+        findLastFriendsRequestAndScroll();
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        isNeedToScrollMessages = true;
-        scrollListView();
     }
 
     @Override
     protected void updateMessagesList() {
-        initListView();
+        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
+        messagesAdapter.setNewData(combinationMessagesList);
+        findLastFriendsRequestAndScroll();
+    }
+
+    private void findLastFriendsRequestAndScroll() {
+        ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        isNeedToScrollMessages = true;
+        scrollListView();
     }
 
     private void setOnlineStatus(User friend) {

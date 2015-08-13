@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.privatedialog;
 
 import android.content.Context;
 import android.view.View;
@@ -9,6 +9,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.base.BaseDialogMessagesAdapter;
+import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.utils.DateUtils;

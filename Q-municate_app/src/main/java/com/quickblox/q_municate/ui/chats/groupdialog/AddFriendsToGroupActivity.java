@@ -1,10 +1,11 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.groupdialog;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.ui.chats.base.BaseSelectableFriendListActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;

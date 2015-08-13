@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.dialogslist;
 
 import android.content.Context;
 import android.util.SparseBooleanArray;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
-import com.quickblox.q_municate.ui.chats.dialogs.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.models.User;

@@ -215,7 +215,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                 message.setAttachment(attachment);
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment);
             }
-            dataManager.getMessageDataManager().createOrUpdate(message);
+
+            dataManager.getMessageDataManager().create(message);
         }
     }
 
@@ -223,7 +224,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             QBChatMessage qbChatMessage) {
         DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage,
                 dialogOccupant);
-        dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification);
+        dataManager.getDialogNotificationDataManager().create(dialogNotification);
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
@@ -231,12 +232,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void deleteDialogLocal(String dialogId) {
-        dataManager.getDialogDataManager().delete(dialogId);
+        dataManager.getDialogDataManager().deleteById(dialogId);
     }
 
-    public void deleteDialog(String dialogId, QBDialogType qbDialogType) {
+    public void deleteDialog(String dialogId, Dialog.Type dialogType) {
         try {
-            if (QBDialogType.PRIVATE.equals(qbDialogType)) {
+            if (Dialog.Type.PRIVATE.equals(dialogType)) {
                 QBChatService.getInstance().getPrivateChatManager().deleteDialog(dialogId);
             } else {
                 QBChatService.getInstance().getGroupChatManager().deleteDialog(dialogId);

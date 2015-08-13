@@ -14,9 +14,9 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
-import com.quickblox.q_municate.ui.chats.dialogs.DialogsFragment;
+import com.quickblox.q_municate.ui.chats.groupdialog.GroupDialogActivity;
+import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.chats.dialogslist.DialogsListFragment;
 import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
@@ -89,7 +89,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         Fragment fragment = null;
         switch (position) {
             case ID_CHATS_LIST_FRAGMENT:
-                fragment = DialogsFragment.newInstance();
+                fragment = DialogsListFragment.newInstance();
                 break;
             case ID_CONTACTS_LIST_FRAGMENT:
                 fragment = FriendsListFragment.newInstance();

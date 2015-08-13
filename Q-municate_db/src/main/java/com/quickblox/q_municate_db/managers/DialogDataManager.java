@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
@@ -45,5 +46,17 @@ public class DialogDataManager extends BaseManager<Dialog> {
         }
 
         return dialog;
+    }
+
+    public void deleteById(String dialogId) {
+        try {
+            DeleteBuilder<Dialog, Long> deleteBuilder = dao.deleteBuilder();
+            deleteBuilder.where().eq(Dialog.Column.ID, dialogId);
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        notifyObservers(OBSERVE_KEY);
     }
 }

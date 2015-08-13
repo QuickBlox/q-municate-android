@@ -49,7 +49,7 @@ public class MessageDataManager extends BaseManager<Message> {
         try {
             QueryBuilder<Message, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList);
-            queryBuilder.orderBy(Message.Column.CREATED_DATE, true);
+            queryBuilder.orderBy(Message.Column.CREATED_DATE, false);
             PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
             message = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

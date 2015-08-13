@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.chats;
+package com.quickblox.q_municate.ui.chats.groupdialog;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import android.view.View;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.chats.base.BaseDialogActivity;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
@@ -149,7 +150,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void updateMessagesList() {
         List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter.setNewData(combinationMessagesList);
-        messagesAdapter.notifyDataSetChanged();
     }
 
     @Override
