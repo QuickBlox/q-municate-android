@@ -141,7 +141,7 @@
             android:value="@integer/google_play_services_version" />
 
         <receiver
-            android:name="com.quickblox.q_municate.GcmBroadcastReceiver"
+            android:name=".core.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -151,7 +151,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.quickblox.q_municate.GCMIntentService" />
+        <service android:name=".core.gcm.GCMIntentService" />
         <service
             android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />

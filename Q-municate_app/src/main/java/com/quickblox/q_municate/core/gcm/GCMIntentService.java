@@ -1,4 +1,4 @@
-package com.quickblox.q_municate;
+package com.quickblox.q_municate.core.gcm;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.authorization.LoginHelper;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.gcm.NotificationHelper;

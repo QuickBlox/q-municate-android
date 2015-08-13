@@ -1,4 +1,4 @@
-package com.quickblox.q_municate;
+package com.quickblox.q_municate.core.gcm;
 
 import android.app.Activity;
 import android.content.ComponentName;

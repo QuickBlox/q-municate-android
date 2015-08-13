@@ -46,7 +46,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
 
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "create() - " + e.getMessage());
         }
     }
 
@@ -57,7 +57,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
 
             notifyObservers(OBSERVE_KEY);
         } catch (SQLException e) {
-            ErrorUtils.logError(e);
+            ErrorUtils.logError(TAG, "createOrUpdate(Object) - " + e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                 }
             });
         } catch (Exception e) {
-            ErrorUtils.logError(TAG, "createOrUpdate() - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdate(Collection) - " + e.getMessage());
         }
     }
 
