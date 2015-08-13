@@ -1,0 +1,49 @@
+package com.quickblox.q_municate_db.managers;
+
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.utils.ErrorUtils;
+
+import java.sql.SQLException;
+
+public class DialogDataManager extends BaseManager<Dialog> {
+
+    private static final String TAG = DialogDataManager.class.getSimpleName();
+
+    public DialogDataManager(Dao<Dialog, Long> dialogDao) {
+        super(dialogDao, DialogDataManager.class.getSimpleName());
+    }
+
+    public Dialog getByDialogId(String dialogId) {
+        Dialog dialog = null;
+
+        try {
+            QueryBuilder<Dialog, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().eq(Dialog.Column.ID, dialogId);
+            PreparedQuery<Dialog> preparedQuery = queryBuilder.prepare();
+            dialog = dao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialog;
+    }
+
+    public Dialog getByRoomJid(String roomJid) {
+        Dialog dialog = null;
+
+        try {
+            QueryBuilder<Dialog, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().eq(Dialog.Column.ROOM_JID, roomJid);
+            PreparedQuery<Dialog> preparedQuery = queryBuilder.prepare();
+            dialog = dao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialog;
+    }
+}

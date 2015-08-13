@@ -10,7 +10,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
@@ -63,15 +63,15 @@ public class ActivityUIHelper {
     }
 
     private boolean isMessagesDialogCorrect(String dialogId) {
-        messagesDialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
+        messagesDialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
         return messagesDialog != null;
     }
 
     protected void showContactRequestNotification(Bundle extras) {
         int senderUserId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
-        senderUser = DatabaseManager.getInstance().getUserManager().get(senderUserId);
+        senderUser = DataManager.getInstance().getUserDataManager().get(senderUserId);
         String message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
-        DialogOccupant dialogOccupant = DatabaseManager.getInstance().getDialogOccupantManager().getDialogOccupantForPrivateChat(senderUserId);
+        DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager().getDialogOccupantForPrivateChat(senderUserId);
 
         if (dialogOccupant != null) {
             String dialogId = dialogOccupant.getDialog().getDialogId();

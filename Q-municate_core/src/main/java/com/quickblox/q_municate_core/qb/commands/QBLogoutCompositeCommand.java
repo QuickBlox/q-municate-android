@@ -9,7 +9,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 
 public class QBLogoutCompositeCommand extends CompositeServiceCommand {
 
@@ -38,7 +38,7 @@ public class QBLogoutCompositeCommand extends CompositeServiceCommand {
     }
 
     private void resetCacheData() {
-        DatabaseManager.getInstance().clearAllTables();
+        DataManager.getInstance().clearAllTables();
     }
 
     private void resetRememberMe() {

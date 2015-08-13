@@ -10,7 +10,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class QBAddFriendsToGroupCommand extends ServiceCommand {
         QBDialog dialog = multiChatHelper.addUsersToDialog(dialogId, friendIdsList);
 
         if (dialog != null) {
-            DatabaseManager.getInstance().getDialogManager().createOrUpdate(ChatUtils.createLocalDialog(dialog));
+            DataManager.getInstance().getDialogDataManager().createOrUpdate(ChatUtils.createLocalDialog(dialog));
         }
 
         Bundle returnedBundle = new Bundle();

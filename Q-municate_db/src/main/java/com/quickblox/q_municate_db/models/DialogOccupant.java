@@ -1,7 +1,5 @@
 package com.quickblox.q_municate_db.models;
 
-import android.provider.BaseColumns;
-
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;

@@ -25,7 +25,7 @@ import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
 public class BaseAuthActivity extends BaseActivity {
@@ -125,7 +125,7 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     private void loginWithFacebook() {
-        DatabaseManager.getInstance().clearAllTables();
+        DataManager.getInstance().clearAllTables();
         AppSession.saveRememberMe(true);
         showProgress();
         FacebookHelper.logout(); // clearing old data

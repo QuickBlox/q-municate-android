@@ -11,7 +11,7 @@ import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -21,11 +21,11 @@ import java.util.List;
 
 public class DialogsAdapter extends BaseListAdapter<Dialog> {
 
-    private DatabaseManager databaseManager;
+    private DataManager dataManager;
 
     public DialogsAdapter(BaseActivity baseActivity, List<Dialog> objectsList) {
         super(baseActivity, objectsList);
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        List<DialogOccupant> dialogOccupantsList = databaseManager.getDialogOccupantManager().getDialogOccupantsListByDialogId(
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(
                 dialog.getDialogId());
 
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
@@ -64,7 +64,7 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
         }
 
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        long unreadMessages = databaseManager.getMessageManager().getCountUnreadMessages(
+        long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(
                 dialogOccupantsIdsList);
         if (unreadMessages > ConstsCore.ZERO_INT_VALUE) {
             viewHolder.unreadMessagesTextView.setText(unreadMessages + ConstsCore.EMPTY_STRING);
@@ -73,7 +73,7 @@ public class DialogsAdapter extends BaseListAdapter<Dialog> {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        Message message = databaseManager.getMessageManager().getLastMessageByDialogId(dialogOccupantsIdsList);
+        Message message = dataManager.getMessageDataManager().getLastMessageByDialogId(dialogOccupantsIdsList);
 
         if (message != null) {
             viewHolder.lastMessageTextView.setText(message.getBody());

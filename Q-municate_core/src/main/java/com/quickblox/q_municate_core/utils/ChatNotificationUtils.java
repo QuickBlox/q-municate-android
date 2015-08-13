@@ -9,7 +9,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -197,13 +197,13 @@ public class ChatNotificationUtils {
                 User opponentUser;
 
                 if (qbChatMessage.getRecipientId().intValue() == user.getId().intValue()) {
-                    opponentUser = DatabaseManager.getInstance().getUserManager().get(
+                    opponentUser = DataManager.getInstance().getUserDataManager().get(
                             qbChatMessage.getSenderId());
                     resultMessage = resources.getString(
                             R.string.frl_friends_request_remove_message_for_friend,
                             opponentUser.getFullName());
                 } else {
-                    opponentUser = DatabaseManager.getInstance().getUserManager().get(
+                    opponentUser = DataManager.getInstance().getUserDataManager().get(
                             qbChatMessage.getRecipientId());
                     resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me,
                             opponentUser.getFullName());

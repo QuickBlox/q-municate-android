@@ -29,7 +29,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
@@ -186,7 +186,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
                 opponentFriend.getUserId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
             DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(
@@ -217,7 +217,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
                 opponentFriend.getUserId()) != null;
         messageEditText.setEnabled(isFriend);
         smilePanelImageButton.setEnabled(isFriend);
@@ -233,7 +233,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void showRejectUserDialog(final int userId) {
-        User user = DatabaseManager.getInstance().getUserManager().get(userId);
+        User user = DataManager.getInstance().getUserDataManager().get(userId);
         AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
                 R.string.frl_dlg_reject_friend, user.getFullName()));
         alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {

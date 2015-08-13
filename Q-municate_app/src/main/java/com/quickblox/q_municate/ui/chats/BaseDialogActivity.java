@@ -56,9 +56,9 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.managers.DialogNotificationManager;
-import com.quickblox.q_municate_db.managers.MessageManager;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
+import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -82,7 +82,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private static final int TYPING_DELAY = 1000;
 
     protected Resources resources;
-    protected DatabaseManager databaseManager;
+    protected DataManager dataManager;
     protected EditText chatEditText;
     protected StickyListHeadersListView messagesListView;
     protected EditText messageEditText;
@@ -152,7 +152,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setContentView(rootView);
 
         resources = getResources();
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
         imageUtils = new ImageUtils(this);
         loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
         loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
@@ -206,17 +206,17 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void addObservers() {
-        databaseManager.getMessageManager().addObserver(messageObserver);
-        databaseManager.getDialogNotificationManager().addObserver(dialogNotificationObserver);
+        dataManager.getMessageDataManager().addObserver(messageObserver);
+        dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
     }
 
     private void deleteObservers() {
-        databaseManager.getMessageManager().deleteObserver(messageObserver);
-        databaseManager.getDialogNotificationManager().deleteObserver(dialogNotificationObserver);
+        dataManager.getMessageDataManager().deleteObserver(messageObserver);
+        dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
 
     protected void updateData() {
-        dialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
         if (dialog != null) {
             updateActionBar();
         }
@@ -629,8 +629,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected List<CombinationMessage> createCombinationMessagesList() {
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
-        List<Message> messagesList = databaseManager.getMessageManager().getMessagesByDialogId(dialogId);
-        List<DialogNotification> dialogNotificationsList = databaseManager.getDialogNotificationManager()
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialogId);
         combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromDialogNotificationsList(
@@ -656,10 +656,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-        List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager()
+        List<DialogOccupant> dialogOccupantsList = DataManager.getInstance().getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        Message lastReadMessage = DatabaseManager.getInstance().getMessageManager().getLastMessageByDialogId(
+        Message lastReadMessage = DataManager.getInstance().getMessageDataManager().getLastMessageByDialogId(
                 dialogOccupantsIdsList);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
@@ -675,14 +675,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(MessageManager.OBSERVE_MESSAGE)) {
+            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
                 updateMessagesList();
             }
         }
     }
     
     private void readAllMessages() {
-        List<Message> messagesList = databaseManager.getMessageManager().getMessagesByDialogId(dialogId);
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
         List<Message> updateMessagesList = new ArrayList<>();
         for (Message message : messagesList) {
             if (message.getState().equals(State.DELIVERED)) {
@@ -690,9 +690,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 updateMessagesList.add(message);
             }
         }
-        databaseManager.getMessageManager().createOrUpdate(updateMessagesList);
+        dataManager.getMessageDataManager().createOrUpdate(updateMessagesList);
 
-        List<DialogNotification> dialogNotificationsList = databaseManager.getDialogNotificationManager()
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialogId);
         List<DialogNotification> updateDialogNotificationsList = new ArrayList<>();
         for (DialogNotification dialogNotification : dialogNotificationsList) {
@@ -701,14 +701,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 updateDialogNotificationsList.add(dialogNotification);
             }
         }
-        databaseManager.getDialogNotificationManager().createOrUpdate(updateDialogNotificationsList);
+        dataManager.getDialogNotificationDataManager().createOrUpdate(updateDialogNotificationsList);
     }
 
     private class DialogNotificationObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(DialogNotificationManager.OBSERVE_DIALOG_NOTIFICATION)) {
+            if (data != null && data.equals(DialogNotificationDataManager.OBSERVE_KEY)) {
                 updateMessagesList();
             }
         }

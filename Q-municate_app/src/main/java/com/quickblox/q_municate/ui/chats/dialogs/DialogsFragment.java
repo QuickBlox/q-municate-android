@@ -20,9 +20,9 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.managers.DialogManager;
-import com.quickblox.q_municate_db.managers.MessageManager;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.DialogDataManager;
+import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
@@ -38,7 +38,7 @@ public class DialogsFragment extends BaseFragment {
     private ListView dialogsListView;
     private DialogsAdapter dialogsAdapter;
     private TextView emptyListTextView;
-    private DatabaseManager databaseManager;
+    private DataManager dataManager;
 
     private Observer dialogObserver;
     private Observer messageObserver;
@@ -71,7 +71,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void initFields() {
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
         dialogObserver = new DialogObserver();
         messageObserver = new MessageObserver();
     }
@@ -140,23 +140,23 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void addObservers() {
-        databaseManager.getDialogManager().addObserver(dialogObserver);
-        databaseManager.getMessageManager().addObserver(messageObserver);
+        dataManager.getDialogDataManager().addObserver(dialogObserver);
+        dataManager.getMessageDataManager().addObserver(messageObserver);
     }
 
     private void deleteObservers() {
-        databaseManager.getDialogManager().deleteObserver(dialogObserver);
-        databaseManager.getMessageManager().deleteObserver(messageObserver);
+        dataManager.getDialogDataManager().deleteObserver(dialogObserver);
+        dataManager.getMessageDataManager().deleteObserver(messageObserver);
     }
 
     private void initChatsDialogs() {
-        List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
+        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
         dialogsAdapter = new DialogsAdapter(baseActivity, dialogsList);
         dialogsListView.setAdapter(dialogsAdapter);
     }
 
     private void startPrivateChatActivity(Dialog dialog) {
-        List<DialogOccupant> occupantsList = databaseManager.getDialogOccupantManager()
+        List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
@@ -169,7 +169,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void startNewDialogPage() {
-        boolean isFriends = !databaseManager.getFriendManager().getAll().isEmpty();
+        boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
         if (isFriends) {
             NewDialogActivity.start(baseActivity);
         } else {
@@ -178,7 +178,7 @@ public class DialogsFragment extends BaseFragment {
     }
 
     private void updateDialogsList() {
-        List<Dialog> dialogsList = databaseManager.getDialogManager().getAll();
+        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
         dialogsAdapter.setNewData(dialogsList);
         dialogsAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
@@ -220,7 +220,7 @@ public class DialogsFragment extends BaseFragment {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(DialogManager.OBSERVE_DIALOG)) {
+            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY)) {
                 updateDialogsList();
             }
         }
@@ -230,7 +230,7 @@ public class DialogsFragment extends BaseFragment {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(MessageManager.OBSERVE_MESSAGE)) {
+            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
                 updateDialogsList();
             }
         }

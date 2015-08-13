@@ -31,7 +31,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -55,7 +55,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     protected QBChatService chatService;
     protected QBUser chatCreator;
     protected QBDialog currentDialog;
-    protected DatabaseManager databaseManager;
+    protected DataManager dataManager;
     protected QBPrivateChatManager privateChatManager;
     protected PrivateChatMessageListener privateChatMessageListener;
     protected QBGroupChatManager groupChatManager;
@@ -75,7 +75,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         notificationChatListeners = new CopyOnWriteArrayList<QBNotificationChatListener>();
 
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
     }
 
     /*
@@ -132,19 +132,19 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogToCache(QBDialog qbDialog) {
-        databaseManager.getDialogManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
+        dataManager.getDialogDataManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
 
         saveDialogsOccupants(qbDialog);
     }
 
     protected void saveDialogsToCache(List<QBDialog> qbDialogsList) {
-        databaseManager.getDialogManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
+        dataManager.getDialogDataManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
 
         saveDialogsOccupants(qbDialogsList);
     }
 
     protected void saveDialogsOccupants(QBDialog qbDialog) {
-        DatabaseManager.getInstance().getDialogOccupantManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
+        DataManager.getInstance().getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {
@@ -196,10 +196,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     protected void saveMessageToCache(String dialogId, QBChatMessage qbChatMessage, State state) {
         DialogOccupant dialogOccupant;
         if (qbChatMessage.getSenderId() == null) {
-            dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupant(dialogId,
+            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId,
                     chatCreator.getId());
         } else {
-            dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupant(dialogId,
+            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId,
                     qbChatMessage.getSenderId());
         }
 
@@ -213,9 +213,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                         qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
                 message.setAttachment(attachment);
-                databaseManager.getAttachmentManager().createOrUpdate(attachment);
+                dataManager.getAttachmentDataManager().createOrUpdate(attachment);
             }
-            databaseManager.getMessageManager().createOrUpdate(message);
+            dataManager.getMessageDataManager().createOrUpdate(message);
         }
     }
 
@@ -223,7 +223,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             QBChatMessage qbChatMessage) {
         DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage,
                 dialogOccupant);
-        databaseManager.getDialogNotificationManager().createOrUpdate(dialogNotification);
+        dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification);
     }
 
     private void deleteMessagesByDialogId(String dialogId) {
@@ -231,7 +231,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void deleteDialogLocal(String dialogId) {
-        databaseManager.getDialogManager().delete(dialogId);
+        dataManager.getDialogDataManager().delete(dialogId);
     }
 
     public void deleteDialog(String dialogId, QBDialogType qbDialogType) {
@@ -363,9 +363,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         message.setCreatedDate(createdDate);
 
         DialogOccupant dialogOccupant = new DialogOccupant();
-        Dialog dialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
         dialogOccupant.setDialog(dialog);
-        User user = databaseManager.getUserManager().get(qbChatMessage.getSenderId());
+        User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
         dialogOccupant.setUser(user);
 
         message.setDialogOccupant(dialogOccupant);
@@ -399,14 +399,14 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void updateStatusMessageLocal(Message message) {
-        databaseManager.getMessageManager().update(message);
+        dataManager.getMessageDataManager().update(message);
     }
 
     public void updateStatusMessageLocal(String messageId, State state) {
-        Message message = databaseManager.getMessageManager().getByMessageId(messageId);
+        Message message = dataManager.getMessageDataManager().getByMessageId(messageId);
         if (message != null) {
             message.setState(state);
-            databaseManager.getMessageManager().update(message);
+            dataManager.getMessageDataManager().update(message);
         }
     }
 

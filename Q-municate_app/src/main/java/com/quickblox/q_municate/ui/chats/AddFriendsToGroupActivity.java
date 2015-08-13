@@ -10,7 +10,7 @@ import com.quickblox.q_municate_core.models.GroupDialog;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity 
     @Override
     protected List<User> getFriends() {
         dialog = (GroupDialog) getIntent().getExtras().getSerializable(EXTRA_GROUP_DIALOG);
-        return UserFriendUtils.getUsersFromFriends(DatabaseManager.getInstance().getFriendManager().getAll());
+        return UserFriendUtils.getUsersFromFriends(DataManager.getInstance().getFriendDataManager().getAll());
         // TODO temp decision
         //        return UsersDatabaseManager.getFriendsFilteredByIds(this, UserFriendUtils.getFriendIds(
         //                dialog.getOccupantList()));

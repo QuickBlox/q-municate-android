@@ -11,7 +11,7 @@ import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 
 public class App extends Application {
 
@@ -34,7 +34,7 @@ public class App extends Application {
     }
 
     private void initDB() {
-        DatabaseManager.init(this);
+        DataManager.init(this);
     }
 
     public MediaPlayerManager getMediaPlayer() {

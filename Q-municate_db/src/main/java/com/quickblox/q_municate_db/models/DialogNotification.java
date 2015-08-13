@@ -5,12 +5,12 @@ import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
 
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.BODY;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.CREATED_DATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.ID;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.NOTIFICATION_TYPE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.STATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.TABLE_NAME;
-import static com.quickblox.q_municate_db.models.DialogNotification.Column.BODY;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class DialogNotification implements Serializable {

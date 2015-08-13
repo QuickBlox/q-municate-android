@@ -31,7 +31,7 @@ import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
@@ -245,7 +245,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
                 ConstsCore.NOT_INITIALIZED_VALUE);
 
-        Dialog dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogId);
+        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
         if (dialog == null) {
             return;
         }
@@ -260,7 +260,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void startPrivateChatActivity(Dialog dialog, int userId) {
-        User occupantUser = DatabaseManager.getInstance().getUserManager().get(userId);
+        User occupantUser = DataManager.getInstance().getUserDataManager().get(userId);
         if (occupantUser != null && userId != ConstsCore.ZERO_INT_VALUE) {
             PrivateDialogActivity.start(this, occupantUser, dialog);
         }

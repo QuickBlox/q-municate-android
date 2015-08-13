@@ -22,7 +22,7 @@ import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
@@ -49,7 +49,7 @@ public class QBFriendListHelper extends BaseHelper {
     private QBRestHelper restHelper;
     private QBRoster roster;
     private QBPrivateChatHelper privateChatHelper;
-    private DatabaseManager databaseManager;
+    private DataManager dataManager;
 
     public QBFriendListHelper(Context context) {
         super(context);
@@ -62,7 +62,7 @@ public class QBFriendListHelper extends BaseHelper {
                 new SubscriptionListener());
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -226,7 +226,7 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void deleteUserRequestByUser(int userId) {
-        databaseManager.getUserRequestManager().deleteByUserId(userId);
+        dataManager.getUserRequestDataManager().deleteByUserId(userId);
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
@@ -264,28 +264,28 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private void saveUser(User user) {
-        databaseManager.getUserManager().createOrUpdate(user);
+        dataManager.getUserDataManager().createOrUpdate(user);
     }
 
     private void saveUsersAndFriends(Collection<QBUser> usersCollection) {
         for (QBUser qbUser : usersCollection) {
             User user = UserFriendUtils.createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
-            databaseManager.getUserManager().createOrUpdate(user);
-            databaseManager.getFriendManager().createOrUpdate(new Friend(user));
+            dataManager.getUserDataManager().createOrUpdate(user);
+            dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
         }
     }
 
     private void saveFriend(User user) {
-        databaseManager.getFriendManager().createOrUpdate(new Friend(user));
+        dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
     }
 
     private void deleteFriend(int userId) {
-        databaseManager.getFriendManager().delete(userId);
+        dataManager.getFriendDataManager().delete(userId);
     }
 
     private void deleteFriendOrUserRequest(int id) {
-        boolean isFriend = databaseManager.getFriendManager().getByUserId(id) != null;
-        boolean isPendingFriend = databaseManager.getUserRequestManager().getUserById(id) != null;
+        boolean isFriend = dataManager.getFriendDataManager().getByUserId(id) != null;
+        boolean isPendingFriend = dataManager.getUserRequestDataManager().getUserById(id) != null;
 
         if (isFriend) {
             deleteFriend(id);
@@ -311,7 +311,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         long currentTime = DateUtilsCore.getCurrentTime();
         UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
-        databaseManager.getUserRequestManager().createOrUpdate(userRequest);
+        dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
     }
 
     private void notifyContactRequest(int userId) {
@@ -350,7 +350,7 @@ public class QBFriendListHelper extends BaseHelper {
 
         @Override
         public void presenceChanged(QBPresence presence) {
-            User user = databaseManager.getUserManager().get(presence.getUserId());
+            User user = dataManager.getUserDataManager().get(presence.getUserId());
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {

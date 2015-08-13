@@ -15,7 +15,7 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
@@ -232,7 +232,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     combinationMessage.getNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {
-                isFriend = DatabaseManager.getInstance().getFriendManager().
+                isFriend = DataManager.getInstance().getFriendDataManager().
                         getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
                 if (!isFriend) {
                     lastRequestPosition = position;

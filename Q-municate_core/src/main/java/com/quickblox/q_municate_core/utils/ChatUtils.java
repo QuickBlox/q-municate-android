@@ -11,7 +11,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
@@ -78,11 +78,11 @@ public class ChatUtils {
     }
 
     public static QBDialog getExistPrivateDialog(int opponentId) {
-        DialogOccupant dialogOccupant = DatabaseManager.getInstance().getDialogOccupantManager()
+        DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager()
                 .getDialogOccupantForPrivateChat(opponentId);
 
         if (dialogOccupant != null) {
-            Dialog dialog = DatabaseManager.getInstance().getDialogManager().getByDialogId(dialogOccupant.getDialog().getDialogId());
+            Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogOccupant.getDialog().getDialogId());
             return createQBDialogFromLocalDialog(dialog);
         } else {
             return null;
@@ -97,7 +97,7 @@ public class ChatUtils {
             ErrorUtils.logError(e);
         }
         User user = UserFriendUtils.createLocalUser(qbUser);
-        DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
+        DataManager.getInstance().getUserDataManager().createOrUpdate(user);
         return user.getFullName();
     }
 
@@ -170,8 +170,8 @@ public class ChatUtils {
 
         for (Integer userId : qbDialog.getOccupants()) {
             DialogOccupant dialogOccupant = new DialogOccupant();
-            dialogOccupant.setUser(DatabaseManager.getInstance().getUserManager().get(userId));
-            dialogOccupant.setDialog(DatabaseManager.getInstance().getDialogManager().getByDialogId(qbDialog.getDialogId()));
+            dialogOccupant.setUser(DataManager.getInstance().getUserDataManager().get(userId));
+            dialogOccupant.setDialog(DataManager.getInstance().getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
 
             dialogOccupantsList.add(dialogOccupant);
         }
@@ -195,7 +195,7 @@ public class ChatUtils {
         qbDialog.setRoomJid(dialog.getRoomJid());
         qbDialog.setPhoto(dialog.getPhoto());
         qbDialog.setName(dialog.getTitle());
-        List<DialogOccupant> dialogOccupantsList = DatabaseManager.getInstance().getDialogOccupantManager()
+        List<DialogOccupant> dialogOccupantsList = DataManager.getInstance().getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         qbDialog.setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
         qbDialog.setType(Dialog.Type.PRIVATE.equals(

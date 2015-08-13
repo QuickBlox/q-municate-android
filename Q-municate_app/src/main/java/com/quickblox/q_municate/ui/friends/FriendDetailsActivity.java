@@ -34,8 +34,8 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
-import com.quickblox.q_municate_db.managers.UserManager;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 
@@ -53,7 +53,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private View phoneView;
 
     private QBPrivateChatHelper privateChatHelper;
-    private DatabaseManager databaseManager;
+    private DataManager dataManager;
     private int userId;
     private User user;
     private Observer userObserver;
@@ -76,10 +76,10 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void initFields() {
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
         canPerformLogout.set(true);
         userId = getIntent().getExtras().getInt(QBServiceConsts.EXTRA_FRIEND_ID);
-        user = databaseManager.getUserManager().get(userId);
+        user = dataManager.getUserDataManager().get(userId);
         userObserver = new UserObserver();
     }
 
@@ -164,11 +164,11 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void addObservers() {
-        databaseManager.getUserManager().addObserver(userObserver);
+        dataManager.getUserDataManager().addObserver(userObserver);
     }
 
     private void deleteObservers() {
-        databaseManager.getUserManager().deleteObserver(userObserver);
+        dataManager.getUserDataManager().deleteObserver(userObserver);
     }
 
     private void setName() {
@@ -235,7 +235,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private boolean checkFriendStatus(int userId) {
-        boolean isFriend = DatabaseManager.getInstance().getFriendManager().getByUserId(userId) != null;
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(userId) != null;
         if (isFriend) {
             return true;
         } else {
@@ -257,7 +257,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void deleteDialog() {
-        DialogOccupant dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupantForPrivateChat(user.getUserId());
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
         String dialogId = dialogOccupant.getDialog().getDialogId();
         QBDeleteChatCommand.start(this, dialogId, QBDialogType.PRIVATE);
     }
@@ -266,8 +266,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(UserManager.OBSERVE_USER)) {
-                user = DatabaseManager.getInstance().getUserManager().get(userId);
+            if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
+                user = DataManager.getInstance().getUserDataManager().get(userId);
                 initUIWithUsersData();
             }
         }

@@ -5,7 +5,7 @@ import android.content.Context;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -22,7 +22,7 @@ public class FinderUnknownUsers {
     private Set<Integer> loadIdsSet;
     private QBUser currentUser;
     private QBRestHelper restHelper;
-    private DatabaseManager databaseManager;
+    private DataManager dataManager;
 
     public FinderUnknownUsers(Context context, QBUser currentUser, List<QBDialog> dialogsList) {
         init(context, currentUser);
@@ -39,7 +39,7 @@ public class FinderUnknownUsers {
         this.currentUser = currentUser;
         loadIdsSet = new HashSet<Integer>();
         restHelper = new QBRestHelper(context);
-        databaseManager = DatabaseManager.getInstance();
+        dataManager = DataManager.getInstance();
     }
 
     public void find() {
@@ -66,12 +66,12 @@ public class FinderUnknownUsers {
                 int userId = loadIdsSet.iterator().next();
                 User user = restHelper.loadUser(userId);
                 if (user != null) {
-                    databaseManager.getUserManager().createOrUpdate(user);
+                    dataManager.getUserDataManager().createOrUpdate(user);
                 }
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    databaseManager.getUserManager().createOrUpdate(userCollection);
+                    dataManager.getUserDataManager().createOrUpdate(userCollection);
                 }
             }
         } catch (QBResponseException e) {
@@ -82,7 +82,7 @@ public class FinderUnknownUsers {
     private void findUserInDialog(QBDialog dialog, int currentUserId) {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
-            boolean isUserInBase = DatabaseManager.getInstance().getUserManager().get(occupantId) != null;
+            boolean isUserInBase = dataManager.getUserDataManager().get(occupantId) != null;
             if (!isUserInBase && currentUserId != occupantId) {
                 loadIdsSet.add(occupantId);
             }

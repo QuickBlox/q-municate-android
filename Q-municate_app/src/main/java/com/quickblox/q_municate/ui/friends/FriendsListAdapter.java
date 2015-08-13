@@ -19,7 +19,7 @@ import com.quickblox.q_municate.utils.TextViewHelper;
 import com.quickblox.q_municate_core.models.FriendGroup;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
@@ -188,8 +188,8 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
-        Friend friend = DatabaseManager.getInstance().getFriendManager().getByUserId(user.getUserId());
-        User pendingUser = DatabaseManager.getInstance().getUserRequestManager().getUserById(user.getUserId());
+        Friend friend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getUserId());
+        User pendingUser = DataManager.getInstance().getUserRequestDataManager().getUserById(user.getUserId());
 
         if (friend == null && pendingUser == null) {
             return;

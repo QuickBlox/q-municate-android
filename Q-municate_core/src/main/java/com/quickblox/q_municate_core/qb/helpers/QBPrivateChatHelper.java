@@ -15,7 +15,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -74,7 +74,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
-        User user = DatabaseManager.getInstance().getUserManager().get(qbChatMessage.getSenderId());
+        User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
         saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
         notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), true);
     }
@@ -101,7 +101,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         dialogNotification.setNotificationType(notificationType);
 
         QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
-                DatabaseManager.getInstance().getDialogManager().getByDialogId(qbChatMessage.getDialogId()));
+                DataManager.getInstance().getDialogDataManager().getByDialogId(qbChatMessage.getDialogId()));
 
         if (dialog == null) {
             dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage,
@@ -112,7 +112,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
             saveDialogToCache(dialog);
         }
 
-        DialogOccupant dialogOccupant = databaseManager.getDialogOccupantManager().getDialogOccupant(qbChatMessage.getDialogId(),
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbChatMessage.getDialogId(),
                 qbChatMessage.getSenderId());
         saveDialogNotificationToCache(dialogOccupant, qbChatMessage);
     }

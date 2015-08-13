@@ -17,7 +17,7 @@ import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -55,7 +55,7 @@ public class QBAuthHelper extends BaseHelper {
 
     private void saveOwnerUser(QBUser qbUser) {
         User user = UserFriendUtils.createLocalUser(qbUser, User.Role.OWNER);
-        DatabaseManager.getInstance().getUserManager().createOrUpdate(user);
+        DataManager.getInstance().getUserDataManager().createOrUpdate(user);
     }
 
     public QBUser login(String socialProvider, String accessToken,

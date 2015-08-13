@@ -52,7 +52,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.User;
@@ -95,7 +95,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private BroadcastReceiver updatingDialogDetailsBroadcastReceiver;
     private List<User> occupantsList;
     private int countOnlineFriends;
-    private DatabaseManager databaseManager;
+    private DataManager databaseManager;
 
     public static void start(Activity context, String dialogId) {
         Intent intent = new Intent(context, GroupDialogDetailsActivity.class);
@@ -109,7 +109,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         setContentView(R.layout.activity_group_dialog_details);
 
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        databaseManager = DatabaseManager.getInstance();
+        databaseManager = DataManager.getInstance();
         imageUtils = new ImageUtils(this);
         friendOperationAction = new FriendOperationAction();
         loadedDialogInfo = false;
@@ -126,7 +126,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initDialogs() {
-        currentDialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        currentDialog = databaseManager.getDialogDataManager().getByDialogId(dialogId);
         groupDialog = new GroupDialog(ChatUtils.createQBDialogFromLocalDialog(currentDialog));
     }
 
@@ -229,7 +229,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void loadGroupDialog() {
-        currentDialog = databaseManager.getDialogManager().getByDialogId(dialogId);
+        currentDialog = databaseManager.getDialogDataManager().getByDialogId(dialogId);
         QBLoadGroupDialogCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(currentDialog));
     }
 
@@ -317,7 +317,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         showProgress();
         currentNotificationTypeList.add(DialogNotification.NotificationType.LEAVE_DIALOG);
         sendNotificationToGroup();
-        Dialog dialog = databaseManager.getDialogManager().getByRoomJid(groupDialog.getRoomJid());
+        Dialog dialog = databaseManager.getDialogDataManager().getByRoomJid(groupDialog.getRoomJid());
         QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, dialog);
     }
 
@@ -341,7 +341,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void startAddFriendsActivity() {
         List<Integer> friendsIdsList = UserFriendUtils.getFriendIds(groupDialog.getOccupantList());
-        int countUnselectedFriendsInChat = DatabaseManager.getInstance().getFriendManager().getFriendsByIds(friendsIdsList).size();
+        int countUnselectedFriendsInChat = DataManager.getInstance().getFriendDataManager().getFriendsByIds(friendsIdsList).size();
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
         } else {

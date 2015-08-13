@@ -23,7 +23,7 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.q_municate_db.managers.DatabaseManager;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.Message;
@@ -77,7 +77,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             return;
         }
 
-        User user = DatabaseManager.getInstance().getUserManager().get(qbChatMessage.getSenderId());
+        User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
         Message message = parseReceivedMessage(qbChatMessage);
 
         boolean ownMessage = message.isIncoming(chatCreator.getId());
@@ -111,7 +111,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         QBDialog existingDialog = null;
         if (groupChat == null) {
             existingDialog = ChatUtils.createQBDialogFromLocalDialog(
-                    databaseManager.getDialogManager().getByDialogId(dialogId));
+                    dataManager.getDialogDataManager().getByDialogId(dialogId));
             groupChat = (QBGroupChat) createChatLocally(existingDialog, null);
         }
         String error = null;
@@ -225,7 +225,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         userIdsList.add(chatCreator.getId());
         removeUsersFromDialog(dialog.getRoomJid(), userIdsList);
 
-        DatabaseManager.getInstance().getDialogManager().delete(dialog);
+        DataManager.getInstance().getDialogDataManager().delete(dialog);
     }
 
     protected QBGroupChat createGroupChatIfNotExist(QBDialog dialog) throws QBResponseException {
@@ -261,7 +261,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public QBDialog addUsersToDialog(String dialogId, List<Integer> userIdsList) throws Exception {
         QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
-                databaseManager.getDialogManager().getByDialogId(dialogId));
+                dataManager.getDialogDataManager().getByDialogId(dialogId));
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.push(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
@@ -269,7 +269,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void removeUsersFromDialog(String roomJid, List<Integer> userIdsList) throws QBResponseException {
-        Dialog dialog = DatabaseManager.getInstance().getDialogManager().getByRoomJid(roomJid);
+        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByRoomJid(roomJid);
 
         QBRequestUpdateBuilder requestBuilder = new QBRequestUpdateBuilder();
         requestBuilder.pullAll(com.quickblox.chat.Consts.DIALOG_OCCUPANTS, userIdsList.toArray());
@@ -303,7 +303,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     private void updateDialogByNotification(QBChatMessage chatMessage) {
         String dialogId = chatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         QBDialog qbDialog = ChatUtils.createQBDialogFromLocalDialog(
-                databaseManager.getDialogManager().getByDialogId(dialogId));
+                dataManager.getDialogDataManager().getByDialogId(dialogId));
 
         ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, qbDialog);
 
