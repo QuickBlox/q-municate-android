@@ -25,6 +25,7 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 
 import java.util.ArrayList;
@@ -747,10 +748,11 @@ public class ChatDatabaseManager {
     }
 
     public static boolean isMessageReadByUser(Collection<Integer> readIDs) {
-        boolean messaGeReadByUser = false;
-        if (readIDs != null && readIDs.contains(QBChatService.getInstance().getUser().getId())){
-            messaGeReadByUser = true;
+        boolean messageReadByUser = false;
+        int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
+        if (readIDs != null && readIDs.contains(userId)) {
+            messageReadByUser = true;
         }
-        return messaGeReadByUser;
+        return messageReadByUser;
     }
 }

@@ -87,7 +87,9 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
                 returnedBundle, dialog, lastDateLoad);
 
         // Store loaded messages in base
-        baseChatHelper.saveLoadedMessages(dialog.getDialogId(), dialogMessagesList);
+        if (dialogMessagesList.size() > ConstsCore.ZERO_INT_VALUE) {
+            baseChatHelper.saveLoadedMessages(dialog.getDialogId(), dialogMessagesList);
+        }
 
         Log.d("Fixes CHAT", "Loaded  messages " + dialogMessagesList.size());
 
