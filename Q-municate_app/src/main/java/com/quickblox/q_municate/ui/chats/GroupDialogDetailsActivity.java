@@ -33,7 +33,7 @@ import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
@@ -270,7 +270,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void loadAvatar(String photoUrl) {
         ImageLoader.getInstance().displayImage(photoUrl, avatarImageView,
-                Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
+                ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void initListView() {

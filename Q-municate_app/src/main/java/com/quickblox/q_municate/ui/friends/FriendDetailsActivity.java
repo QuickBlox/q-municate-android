@@ -22,7 +22,7 @@ import com.quickblox.q_municate.ui.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
@@ -197,7 +197,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
     private void loadAvatar() {
         String url = user.getAvatar();
-        ImageLoader.getInstance().displayImage(url, avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(url, avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void showRemoveUserDialog() {

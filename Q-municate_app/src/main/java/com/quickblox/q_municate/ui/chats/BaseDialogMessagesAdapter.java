@@ -20,7 +20,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileHelper;
 import com.quickblox.q_municate.utils.ImageUtils;
@@ -65,7 +65,7 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
         ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
-                Consts.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder),
+                ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder),
                 new SimpleImageLoadingProgressListener(viewHolder));
     }
 

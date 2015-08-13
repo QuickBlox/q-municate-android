@@ -4,9 +4,4 @@
     <string name="db_name">q_municate.db</string>
     <integer name="db_version">1</integer>
 
-    <string name="qb_app_id">24827</string>
-    <string name="qb_auth_key">eCPU29GaVBc6XA6</string>
-    <string name="qb_secret">RfFxxAHsEB5h7pd</string>
-    <bool name="qb_debug">true</bool>
-
 </resources>

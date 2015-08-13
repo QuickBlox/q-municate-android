@@ -39,7 +39,7 @@ import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -380,7 +380,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override

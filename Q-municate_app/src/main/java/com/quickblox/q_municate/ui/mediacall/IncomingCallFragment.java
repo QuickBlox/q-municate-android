@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.ui.base.BaseFragment;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -58,7 +58,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         avatarView.setOval(true);
         if(!TextUtils.isEmpty(friend.getAvatar())){
             ImageLoader.getInstance().displayImage(friend.getAvatar(),
-                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
         rootView.findViewById(R.id.acceptCallButton).setOnClickListener(this);
         rootView.findViewById(R.id.denyCallButton).setOnClickListener(this);

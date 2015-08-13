@@ -8,7 +8,6 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
-import com.quickblox.q_municate.utils.Consts;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -29,26 +28,32 @@ public class App extends Application {
         registerActivityLifecycleCallbacks(new ActivityLifecycleHandler());
     }
 
+    private void initApplication() {
+        instance = this;
+
+        initQb(this);
+        initImageLoader(this);
+        initDb();
+
+        soundPlayer = new MediaPlayerManager(this);
+        new PrefsHelper(this);
+    }
+
+    private void initQb(Context context) {
+        QBChatService.setDebugEnabled(context.getResources().getBoolean(R.bool.qb_debug));
+        QBSettings.getInstance().fastConfigInit(context.getString(R.string.qb_app_id), context.getString(
+                R.string.qb_auth_key), context.getString(R.string.qb_secret));
+    }
+
+    private void initDb() {
+        DataManager.init(this);
+    }
+
     private void initImageLoader(Context context) {
         ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
     }
 
-    private void initDB() {
-        DataManager.init(this);
-    }
-
     public MediaPlayerManager getMediaPlayer() {
         return soundPlayer;
-    }
-
-    private void initApplication() {
-        instance = this;
-        QBChatService.setDebugEnabled(true);
-        initImageLoader(this);
-        initDB();
-        QBSettings.getInstance().fastConfigInit(Consts.QB_APP_ID, Consts.QB_AUTH_KEY,
-                Consts.QB_AUTH_SECRET);
-        soundPlayer = new MediaPlayerManager(this);
-        new PrefsHelper(this);
     }
 }

@@ -10,7 +10,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.mediacall.OutgoingCallFragment;
 import com.quickblox.q_municate.ui.mediacall.TimeUpdater;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 public class VoiceCallFragment extends OutgoingCallFragment {
@@ -45,7 +45,7 @@ public class VoiceCallFragment extends OutgoingCallFragment {
         avatarView.setOval(true);
         if(!TextUtils.isEmpty(opponent.getAvatar())){
             ImageLoader.getInstance().displayImage(opponent.getAvatar(),
-                    avatarView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+                    avatarView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }
 

@@ -7,7 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.users.model.QBUser;
 
@@ -51,10 +51,10 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     protected void displayGroupPhotoImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView, ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 }

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.TextViewHelper;
 import com.quickblox.q_municate_core.models.FriendGroup;
 import com.quickblox.q_municate_core.utils.ConstsCore;
@@ -62,7 +62,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     }
 
     private void displayAvatarImage(String uri, ImageView imageView) {
-        ImageLoader.getInstance().displayImage(uri, imageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        ImageLoader.getInstance().displayImage(uri, imageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     private String getAvatarUrlForUser(User user) {

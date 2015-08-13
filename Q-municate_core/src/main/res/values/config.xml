@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <bool name="qb_debug">true</bool>
+
+    <!-- Q-municate release -->
+    <string name="qb_app_id">13318</string>
+    <string name="qb_auth_key">WzrAY7vrGmbgFfP</string>
+    <string name="qb_secret">xS2uerEveGHmEun</string>
+
+    <!-- Q-municate release web -->
+    <!--<string name="qb_app_id">12496</string>-->
+    <!--<string name="qb_auth_key">DxGShn2UtN5TUfd</string>-->
+    <!--<string name="qb_secret">gypfTzd3VbqYxsK</string>-->
+
+    <!-- Q-municate dev -->
+    <!--<string name="qb_app_id">14542</string>-->
+    <!--<string name="qb_auth_key">rJqAFphrSnpyZW2</string>-->
+    <!--<string name="qb_secret">tTEB2wK-dU8X3Ra</string>-->
+
+</resources>

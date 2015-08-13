@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.q_municate.utils.Consts;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
@@ -165,7 +165,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     private void loadAvatar() {
         if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatar_url())) {
             ImageLoader.getInstance().displayImage(userCustomData.getAvatar_url(),
-                    avatarImageView, Consts.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+                    avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
         }
     }
 

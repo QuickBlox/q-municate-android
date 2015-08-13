@@ -60,7 +60,7 @@ public class ImageUtils {
                 .threadPoolSize(THREAD_POOL_SIZE)
                 .threadPriority(Thread.NORM_PRIORITY).denyCacheImageMultipleSizesInMemory().memoryCache(
                         new UsingFreqLimitedMemoryCache(MEMORY_CACHE_LIMIT)).writeDebugLogs()
-                .defaultDisplayImageOptions(Consts.UIL_DEFAULT_DISPLAY_OPTIONS).imageDecoder(
+                .defaultDisplayImageOptions(ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS).imageDecoder(
                         new SmartUriDecoder(context, new BaseImageDecoder(false)))
                 .denyCacheImageMultipleSizesInMemory().discCacheFileNameGenerator(
                         new HashCodeFileNameGeneratorWithoutToken()).build();
