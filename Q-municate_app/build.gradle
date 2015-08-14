@@ -31,12 +31,14 @@ dependencies {
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode rootProject.versionCode
         versionName rootProject.versionName
     }
+
     signingConfigs {
         release {
             storeFile file('keystore/qmun.jks')
@@ -45,6 +47,7 @@ android {
             keyPassword 'Injoit00'
         }
     }
+
     buildTypes {
         release {
             debuggable rootProject.prodDebug
@@ -52,11 +55,25 @@ android {
             proguardFile 'proguard.cfg'
         }
     }
+
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+
     lintOptions {
         abortOnError false
+    }
+
+    applicationVariants.all { variant ->
+        changeApkFileName(variant)
+    }
+}
+
+def changeApkFileName(variant) {
+    variant.outputs.each { output ->
+        def file = output.outputFile
+        def newName = 'QMUN_Android_v.' + rootProject.versionName + '_c.' + rootProject.versionCode + '-' + variant.buildType.name + '.apk'
+        output.outputFile = new File(file.parent, newName)
     }
 }

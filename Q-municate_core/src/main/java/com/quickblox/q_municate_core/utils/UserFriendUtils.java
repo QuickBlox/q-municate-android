@@ -41,6 +41,7 @@ public class UserFriendUtils {
         user.setFullName(qbUser.getFullName());
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
+        user.setLogin(qbUser.getLogin());
         user.setRole(role);
 
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());

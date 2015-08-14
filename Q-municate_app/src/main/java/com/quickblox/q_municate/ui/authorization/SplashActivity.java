@@ -6,8 +6,9 @@ import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 
-public class SplashActivity extends BaseAuthActivity implements LoginHelper.ExistingSessionListener {
+public class SplashActivity extends BaseAuthActivity implements ExistingQbSessionListener {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
 

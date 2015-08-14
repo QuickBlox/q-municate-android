@@ -25,6 +25,7 @@ import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
+import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
@@ -44,6 +45,7 @@ public class DialogsListFragment extends BaseFragment {
 
     private Observer dialogObserver;
     private Observer messageObserver;
+    private UsersObserver userObserver;
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -76,6 +78,7 @@ public class DialogsListFragment extends BaseFragment {
         dataManager = DataManager.getInstance();
         dialogObserver = new DialogObserver();
         messageObserver = new MessageObserver();
+        userObserver = new UsersObserver();
     }
 
     private void initUI(View view) {
@@ -144,11 +147,13 @@ public class DialogsListFragment extends BaseFragment {
     private void addObservers() {
         dataManager.getDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
+        dataManager.getUserDataManager().addObserver(userObserver);
     }
 
     private void deleteObservers() {
         dataManager.getDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
+        dataManager.getUserDataManager().deleteObserver(userObserver);
     }
 
     private void initChatsDialogs() {
@@ -182,7 +187,6 @@ public class DialogsListFragment extends BaseFragment {
     private void updateDialogsList() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
         dialogsListAdapter.setNewData(dialogsList);
-        dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
     }
 
@@ -233,6 +237,16 @@ public class DialogsListFragment extends BaseFragment {
         @Override
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
+                updateDialogsList();
+            }
+        }
+    }
+
+    private class UsersObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
                 updateDialogsList();
             }
         }

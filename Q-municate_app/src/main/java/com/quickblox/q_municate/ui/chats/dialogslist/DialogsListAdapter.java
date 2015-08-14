@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.chats.dialogslist;
 
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -77,6 +78,8 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
 
         if (message != null) {
             viewHolder.lastMessageTextView.setText(message.getBody());
+        } else {
+            viewHolder.lastMessageTextView.setText("");
         }
 
         return convertView;

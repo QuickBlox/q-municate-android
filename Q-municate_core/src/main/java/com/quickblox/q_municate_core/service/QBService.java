@@ -524,12 +524,12 @@ public class QBService extends Service {
                 QBServiceConsts.INIT_CHAT_SERVICE_FAIL_ACTION);
         QBLoginChatCommand loginChatCommand = new QBLoginChatCommand(this, chatRestHelper,
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
-        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper,
-                privateChatHelper, QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
-                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
         QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, groupChatHelper,
                 QBServiceConsts.INIT_CHATS_SUCCESS_ACTION, QBServiceConsts.INIT_CHATS_FAIL_ACTION);
         ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
+        QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper,
+                privateChatHelper, QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
+                QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);
         QBLoadFriendListCommand loadFriendListCommand = new QBLoadFriendListCommand(this, friendListHelper,
                 QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION, QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
         QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, groupChatHelper,
@@ -538,9 +538,9 @@ public class QBService extends Service {
 
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
-        loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(initChatsCommand);
         loginCommand.addCommand(initVideoChatCommand);
+        loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(loadFriendListCommand);
         loginCommand.addCommand(chatsDialogsCommand);
     }

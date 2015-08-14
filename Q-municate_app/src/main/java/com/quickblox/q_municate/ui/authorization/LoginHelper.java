@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
@@ -18,12 +19,12 @@ import java.util.concurrent.TimeUnit;
 public class LoginHelper {
 
     private Context context;
-    private ExistingSessionListener existingSessionListener;
+    private ExistingQbSessionListener existingQbSessionListener;
     private boolean checkedRememberMe;
 
-    public LoginHelper(Context context, ExistingSessionListener existingSessionListener, boolean checkedRememberMe) {
+    public LoginHelper(Context context, ExistingQbSessionListener existingQbSessionListener, boolean checkedRememberMe) {
         this.context = context;
-        this.existingSessionListener = existingSessionListener;
+        this.existingQbSessionListener = existingQbSessionListener;
         this.checkedRememberMe = checkedRememberMe;
     }
 
@@ -35,7 +36,7 @@ public class LoginHelper {
         if (checkedRememberMe) {
             checkStartExistSession(userEmail, userPassword);
         } else {
-            existingSessionListener.onStartSessionFail();
+            existingQbSessionListener.onStartSessionFail();
         }
     }
 
@@ -45,7 +46,7 @@ public class LoginHelper {
         if ((isEmailEntered && isPasswordEntered) || (isLoggedViaFB(isPasswordEntered))) {
             runExistSession(userEmail, userPassword);
         } else {
-            existingSessionListener.onStartSessionFail();
+            existingQbSessionListener.onStartSessionFail();
         }
     }
 
@@ -61,7 +62,7 @@ public class LoginHelper {
         //check is token valid for about 1 minute
         if (AppSession.isSessionExistOrNotExpired(TimeUnit.MINUTES.toMillis(
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
-            existingSessionListener.onStartSessionSuccess();
+            existingQbSessionListener.onStartSessionSuccess();
         } else {
             doAutoLogin(userEmail, userPassword);
         }
@@ -90,11 +91,5 @@ public class LoginHelper {
 
     public void loginChat() {
         QBLoginChatCompositeCommand.start(context);
-    }
-
-    public interface ExistingSessionListener {
-
-        public void onStartSessionSuccess();
-        public void onStartSessionFail();
     }
 }

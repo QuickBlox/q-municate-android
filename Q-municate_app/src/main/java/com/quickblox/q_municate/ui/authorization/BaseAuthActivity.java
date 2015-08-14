@@ -13,6 +13,7 @@ import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseActivity;
+import com.quickblox.q_municate.ui.dialogs.UserAgreementDialog;
 import com.quickblox.q_municate.ui.main.MainActivity;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.FacebookHelper;
@@ -57,15 +58,15 @@ public class BaseAuthActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initFields(savedInstanceState);
+    }
 
+    private void initFields(Bundle savedInstanceState) {
         resources = getResources();
-
         if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
             startedLoginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
         }
-
         facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-
         loginSuccessAction = new LoginSuccessAction();
         socialLoginSuccessAction = new SocialLoginSuccessAction();
         failAction = new FailAction();
@@ -127,7 +128,6 @@ public class BaseAuthActivity extends BaseActivity {
     private void loginWithFacebook() {
         DataManager.getInstance().clearAllTables();
         AppSession.saveRememberMe(true);
-        showProgress();
         FacebookHelper.logout(); // clearing old data
         facebookHelper.loginWithFacebook();
     }
@@ -165,14 +165,8 @@ public class BaseAuthActivity extends BaseActivity {
         return prefsHelper.getPref(PrefsHelper.PREF_USER_AGREEMENT, false);
     }
 
-    protected LoginType getCurrentLoginType() {
-        return AppSession.getSession().getLoginType();
-    }
-
     protected void parseExceptionMessage(Exception exception) {
         String errorMessage = exception.getMessage();
-
-        hideProgress();
 
         // TODO: temp decision
         if (exception.getMessage().equals(resources.getString(R.string.error_bad_timestamp))) {
@@ -185,6 +179,8 @@ public class BaseAuthActivity extends BaseActivity {
         }
 
         validationUtils.setError(errorMessage);
+
+        hideProgress();
     }
 
     protected void parseFailException(Bundle bundle) {
@@ -215,18 +211,22 @@ public class BaseAuthActivity extends BaseActivity {
 
     private void addActions() {
         addAction(QBServiceConsts.LOGIN_SUCCESS_ACTION, loginSuccessAction);
-        addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION, socialLoginSuccessAction);
         addAction(QBServiceConsts.LOGIN_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION, socialLoginSuccessAction);
         addAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION, failAction);
+
         addAction(QBServiceConsts.SIGNUP_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
     private void removeActions() {
         removeAction(QBServiceConsts.LOGIN_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOGIN_FAIL_ACTION);
+
+        removeAction(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION);
         removeAction(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION);
+
         removeAction(QBServiceConsts.SIGNUP_FAIL_ACTION);
         updateBroadcastActionList();
     }
@@ -265,6 +265,15 @@ public class BaseAuthActivity extends BaseActivity {
                 AppSession.getSession().closeAndClear();
                 QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK,
                         session.getAccessToken(), null);
+
+                if (BaseAuthActivity.this instanceof SplashActivity) {
+                    hideProgress();
+                } else {
+                    showProgress();
+                }
+
+            } else {
+                hideProgress();
             }
         }
     }

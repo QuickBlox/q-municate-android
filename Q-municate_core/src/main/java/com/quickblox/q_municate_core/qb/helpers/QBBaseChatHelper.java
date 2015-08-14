@@ -18,7 +18,6 @@ import com.quickblox.chat.listeners.QBPrivateChatManagerListener;
 import com.quickblox.chat.model.QBAttachment;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
@@ -115,9 +114,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String error = null;
         try {
             privateChat.sendMessage(qbChatMessage);
-        } catch (XMPPException e) {
-            error = context.getString(R.string.dlg_fail_connection);
-        } catch (SmackException.NotConnectedException e) {
+        } catch (XMPPException | SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         }
         if (error != null) {
@@ -288,9 +285,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             } else {
                 privateChat.sendStopTypingNotification();
             }
-        } catch (XMPPException e) {
-            ErrorUtils.logError(e);
-        } catch (SmackException.NotConnectedException e) {
+        } catch (XMPPException | SmackException.NotConnectedException e) {
             ErrorUtils.logError(e);
         }
     }

@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.authorization;
+package com.quickblox.q_municate.ui.dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -16,15 +16,15 @@ public class UserAgreementDialog extends DialogFragment {
 
     private BaseActivity activity;
 
-    private static DialogInterface.OnClickListener positiveButtonOnClickListener;
-    private static DialogInterface.OnClickListener negativeButtonOnClickListener;
+    private DialogInterface.OnClickListener positiveButtonOnClickListener;
+    private DialogInterface.OnClickListener negativeButtonOnClickListener;
     private TextView userAgreementTextView;
 
     public static UserAgreementDialog newInstance(DialogInterface.OnClickListener positiveClickListener,
                                                   DialogInterface.OnClickListener negativeClickListener) {
-        positiveButtonOnClickListener = positiveClickListener;
-        negativeButtonOnClickListener = negativeClickListener;
-        return new UserAgreementDialog();
+        UserAgreementDialog userAgreementDialog = new UserAgreementDialog();
+        userAgreementDialog.setListeners(positiveClickListener, negativeClickListener);
+        return userAgreementDialog;
     }
 
     @Override
@@ -51,5 +51,11 @@ public class UserAgreementDialog extends DialogFragment {
                 UserAgreementActivity.start(activity);
             }
         });
+    }
+
+    public void setListeners(DialogInterface.OnClickListener positiveButtonOnClickListener,
+            DialogInterface.OnClickListener negativeButtonOnClickListener) {
+        this.positiveButtonOnClickListener = positiveButtonOnClickListener;
+        this.negativeButtonOnClickListener = negativeButtonOnClickListener;
     }
 }

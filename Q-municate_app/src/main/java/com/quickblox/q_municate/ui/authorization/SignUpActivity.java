@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.authorization;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,7 +54,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        Resources resources = getResources();
 
         initUI();
         initListeners();
