@@ -1,7 +1,7 @@
 package com.quickblox.q_municate;
 
-import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDexApplication;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
@@ -12,7 +12,7 @@ import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private static App instance;
     private MediaPlayerManager soundPlayer;
