@@ -11,11 +11,23 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.forgotpassword.ForgotPasswordActivity;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
+
+import butterknife.Bind;
+import butterknife.OnCheckedChanged;
+import butterknife.OnClick;
 
 public class LoginActivity extends BaseAuthActivity {
 
-    private CheckBox rememberMeCheckBox;
+    @Bind(R.id.email_edittext)
+    EditText emailEditText;
+
+    @Bind(R.id.password_edittext)
+    EditText passwordEditText;
+
+    @Bind(R.id.remember_me_checkbox)
+    CheckBox rememberMeCheckBox;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -27,14 +39,23 @@ public class LoginActivity extends BaseAuthActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        activateButterKnife();
+
         initUI();
+        initFields(savedInstanceState);
+    }
 
-        rememberMeCheckBox.setChecked(true);
+    private void initUI() {
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+    }
 
+    private void initFields(Bundle bundle) {
         validationUtils = new ValidationUtils(LoginActivity.this,
                 new EditText[]{emailEditText, passwordEditText}, new String[]{resources.getString(
                 R.string.dlg_not_email_field_entered), resources.getString(
                 R.string.dlg_not_password_field_entered)});
+        rememberMeCheckBox.setChecked(true);
     }
 
     @Override
@@ -43,7 +64,15 @@ public class LoginActivity extends BaseAuthActivity {
         finish();
     }
 
-    public void loginOnClickListener(View view) {
+    @OnCheckedChanged(R.id.remember_me_checkbox)
+    public void rememberMeCheckedChanged(boolean checked) {
+        appSharedHelper.saveSavedRememberMe(checked);
+    }
+
+    @OnClick(R.id.login_button)
+    public void login(View view) {
+        loginType = LoginType.EMAIL;
+
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
@@ -55,16 +84,17 @@ public class LoginActivity extends BaseAuthActivity {
                 DataManager.getInstance().clearAllTables();
             }
 
-            initCheckedRememberMe();
             login(userEmail, userPassword);
         }
     }
 
-    public void forgotPasswordOnClickListener(View view) {
-        startChangePasswordActivity();
+    @OnClick(R.id.facebook_connect_button)
+    public void facebookConnect(View view) {
+        facebookConnect();
     }
 
-    private void startChangePasswordActivity() {
+    @OnClick(R.id.forgot_password_textview)
+    public void forgotPassword(View view) {
         ForgotPasswordActivity.start(this);
     }
 
@@ -76,20 +106,6 @@ public class LoginActivity extends BaseAuthActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void initUI() {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        emailEditText = _findViewById(R.id.email_textview);
-        passwordEditText = _findViewById(R.id.password_edittext);
-        rememberMeCheckBox = _findViewById(R.id.remember_me_checkbox);
-    }
-
-    private void initCheckedRememberMe() {
-        if (rememberMeCheckBox.isChecked()) {
-            checkedRememberMe = true;
         }
     }
 }

@@ -9,6 +9,7 @@ import com.quickblox.core.QBSettings;
 import com.quickblox.q_municate.ui.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.ImageUtils;
+import com.quickblox.q_municate.utils.SharedHelper;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 
@@ -16,6 +17,7 @@ public class App extends MultiDexApplication {
 
     private static App instance;
     private MediaPlayerManager soundPlayer;
+    private SharedHelper appSharedHelper;
 
     public static App getInstance() {
         return instance;
@@ -32,10 +34,10 @@ public class App extends MultiDexApplication {
         instance = this;
 
         initQb(this);
-        initImageLoader(this);
         initDb();
+        initImageLoader(this);
 
-        soundPlayer = new MediaPlayerManager(this);
+        // TODO need to delete
         new PrefsHelper(this);
     }
 
@@ -54,6 +56,14 @@ public class App extends MultiDexApplication {
     }
 
     public MediaPlayerManager getMediaPlayer() {
-        return soundPlayer;
+        return soundPlayer == null
+                ? soundPlayer = new MediaPlayerManager(this)
+                : soundPlayer;
+    }
+
+    public synchronized SharedHelper getAppSharedHelper() {
+        return appSharedHelper == null
+                ? appSharedHelper = new SharedHelper(this)
+                : appSharedHelper;
     }
 }

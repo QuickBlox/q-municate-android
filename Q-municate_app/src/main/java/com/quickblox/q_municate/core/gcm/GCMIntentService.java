@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate.ui.authorization.LoginHelper;
@@ -76,9 +77,7 @@ public class GCMIntentService extends IntentService implements ExistingQbSession
             commandBroadcastReceiver = new CommandBroadcastReceiver();
             registerCommandBroadcastReceiver();
 
-            boolean checkedRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME);
-
-            loginHelper = new LoginHelper(this, this, checkedRememberMe);
+            loginHelper = new LoginHelper(this, this);
             loginHelper.checkStartExistSession();
         } else {
             saveOpeningDialogData(false);

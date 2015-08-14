@@ -526,7 +526,7 @@ public class QBService extends Service {
                 QBServiceConsts.LOGIN_CHAT_SUCCESS_ACTION, QBServiceConsts.LOGIN_CHAT_FAIL_ACTION);
         QBInitChatsCommand initChatsCommand = new QBInitChatsCommand(this, privateChatHelper, groupChatHelper,
                 QBServiceConsts.INIT_CHATS_SUCCESS_ACTION, QBServiceConsts.INIT_CHATS_FAIL_ACTION);
-        ServiceCommand initVideoChatCommand = serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
+        QBInitVideoChatCommand initVideoChatCommand = (QBInitVideoChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
         QBInitFriendListCommand initFriendListCommand = new QBInitFriendListCommand(this, friendListHelper,
                 privateChatHelper, QBServiceConsts.INIT_FRIEND_LIST_SUCCESS_ACTION,
                 QBServiceConsts.INIT_FRIEND_LIST_FAIL_ACTION);

@@ -17,9 +17,11 @@ repositories {
 dependencies {
     compile fileTree(dir: "$buildDir/native-libs", include: 'native-libs.jar')
     compile fileTree(dir: 'libs', include: '*.jar')
+
     compile project(':Q-municate_core')
     compile project(':cropper')
     compile project(':stickyListHeaders')
+
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
@@ -29,6 +31,7 @@ dependencies {
     compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.crashlytics.android:crashlytics:1.+'
+    compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
 }
 
 android {

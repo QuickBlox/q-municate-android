@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 public class PrefsHelper {
 
-    public static final String PREF_REMEMBER_ME = "remember_me";
     public static final String PREF_LOGIN_TYPE = "login_type";
     public static final String PREF_DIALOG_ID = "dialog_id";
     public static final String PREF_USER_EMAIL = "email";
@@ -13,14 +12,11 @@ public class PrefsHelper {
     public static final String PREF_IS_LOGINED = "is_logined";
     public static final String PREF_USER_PASSWORD = "password";
     public static final String PREF_PUSH_NOTIFICATIONS = "push_notifications";
-    public static final String PREF_IMPORT_INITIALIZED = "import_initialized";
     public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-    public static final String PREF_SIGN_UP_INITIALIZED = "sign_up_initialized";
     public static final String PREF_MISSED_MESSAGE = "missed_message";
     public static final String PREF_STATUS = "status";
     public static final String PREF_PUSH_MESSAGE = "message";
     public static final String PREF_REG_USER_ID = "registered_push_user";
-    public static final String PREF_USER_AGREEMENT = "user_agreement";
     public static final String PREF_JOINED_TO_ALL_DIALOGS = "joined_to_all_dialogs";
 
     public static final String PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG = "push_need_to_open_dialog";

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.crashlytics.android.Crashlytics;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 
@@ -20,12 +19,15 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
+
+        // TODO temp. ONLY FOR TEST WITHOUT TESTERS
+        //        Crashlytics.start(this);
 
         setContentView(R.layout.activity_splash);
 
-        LoginHelper loginHelper = new LoginHelper(SplashActivity.this, this, checkedRememberMe);
+        activateButterKnife();
 
+        LoginHelper loginHelper = new LoginHelper(this, this);
         loginHelper.checkStartExistSession();
     }
 
@@ -33,25 +35,23 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     protected void onResume() {
         super.onResume();
         if (isLoggedInToServer()) {
-            startMainActivity();
-            finish();
+            startMainActivity(true);
         }
-    }
-
-    private void startLanding() {
-        LandingActivity.start(SplashActivity.this);
     }
 
     @Override
     public void onStartSessionSuccess() {
-        checkedRememberMe = true;
-        startMainActivity();
-        finish();
+        appSharedHelper.saveSavedRememberMe(true);
+        startMainActivity(true);
     }
 
     @Override
     public void onStartSessionFail() {
-        startLanding();
+        startLandingActivity();
+    }
+
+    private void startLandingActivity() {
+        LandingActivity.start(this);
         finish();
     }
 }

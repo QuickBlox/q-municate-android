@@ -13,20 +13,23 @@ allprojects {
     }
 }
 
-ext.compileSdkVersion = 21
-ext.buildToolsVersion = '21.0.1'
-ext.minSdkVersion = 14
-ext.targetSdkVersion = 21
-ext.versionName = '1.2.0'
-ext.versionCode = 120
+ext {
+    compileSdkVersion = 21
+    buildToolsVersion = '21.0.1'
+    minSdkVersion = 14
+    targetSdkVersion = 21
+    versionName = '1.1.2'
+    versionCode = 112
 
-ext.prodDebug = true
+    prodDebug = true
 
-// Dependencies versions
-ext.multiDexVersion = '1.0.1'
-ext.universalImageLoaderVersion = '1.9.1'
-ext.googlePlayServicesVersion = '7.5.0'
-ext.croutonVersion = '1.8.5'
-ext.nineoldandroidsVersion = '2.4.0'
-ext.ormliteAndroidVersion = '4.48'
-ext.ormliteCoreVersion = '4.48'
+    // Dependencies versions
+    multiDexVersion = '1.0.1'
+    universalImageLoaderVersion = '1.9.1'
+    googlePlayServicesVersion = '7.5.0'
+    croutonVersion = '1.8.5'
+    nineoldandroidsVersion = '2.4.0'
+    ormliteAndroidVersion = '4.48'
+    ormliteCoreVersion = '4.48'
+    butterknifeVersion = '7.0.1'
+}

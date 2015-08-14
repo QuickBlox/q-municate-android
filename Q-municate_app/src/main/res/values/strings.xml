@@ -188,7 +188,6 @@
     <string name="fdb_write_email">Write an Email</string>
 
     // Dialog Messages
-    <string name="dlg_click_back_again">Please click BACK again to exit</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
     <string name="dlg_not_fullname_field_entered">Please enter fullName</string>

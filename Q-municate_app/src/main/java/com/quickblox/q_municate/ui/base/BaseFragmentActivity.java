@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
@@ -25,19 +24,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener {
 
-    public static final int DOUBLE_BACK_DELAY = 2000;
-
     protected final ProgressDialog progress;
     protected App app;
     protected ActionBar actionBar;
-    protected boolean useDoubleBackPressed;
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
     protected ActivityHelper activityHelper;
     private Dialog currentDialog;
-    private boolean doubleBackToExitPressedOnce;
 
     public BaseFragmentActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -45,23 +40,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
 
     public FailAction getFailAction() {
         return failAction;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        DialogUtils.show(this, getString(R.string.dlg_click_back_again));
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, DOUBLE_BACK_DELAY);
     }
 
     @Override

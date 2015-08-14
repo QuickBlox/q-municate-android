@@ -7,7 +7,6 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.NavUtils;
 import android.view.Window;
 
@@ -16,26 +15,38 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
+import com.quickblox.q_municate.utils.SharedHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
-public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
+import butterknife.ButterKnife;
 
-    public static final int DOUBLE_BACK_DELAY = 2000;
+public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
 
     protected final ProgressDialog progress;
     protected App app;
     protected ActionBar actionBar;
-    protected boolean useDoubleBackPressed;
+    protected SharedHelper appSharedHelper;
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected ActivityHelper activityHelper;
 
-    private boolean doubleBackToExitPressedOnce;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        super.onCreate(savedInstanceState);
+        app = App.getInstance();
+        actionBar = getActionBar();
+        appSharedHelper = App.getInstance().getAppSharedHelper();
+        failAction = new FailAction();
+        successAction = new SuccessAction();
+        activityHelper = new ActivityHelper(this, new GlobalListener(), this);
+        activityHelper.onCreate();
+    }
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
@@ -82,18 +93,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        super.onCreate(savedInstanceState);
-        app = App.getInstance();
-        actionBar = getActionBar();
-        failAction = new FailAction();
-        successAction = new SuccessAction();
-        activityHelper = new ActivityHelper(this, new GlobalListener(), this);
-        activityHelper.onCreate();
-    }
-
-    @Override
     protected void onStart() {
         activityHelper.onStart();
         super.onStart();
@@ -116,23 +115,6 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     protected void onStop() {
         activityHelper.onStop();
         super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce || !useDoubleBackPressed) {
-            super.onBackPressed();
-            return;
-        }
-        this.doubleBackToExitPressedOnce = true;
-        DialogUtils.show(this, getString(R.string.dlg_click_back_again));
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, DOUBLE_BACK_DELAY);
     }
 
     @Override
@@ -181,6 +163,10 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     protected void onSuccessAction(String action) {
 
+    }
+
+    protected void activateButterKnife() {
+        ButterKnife.bind(this);
     }
 
     public class FailAction implements Command {

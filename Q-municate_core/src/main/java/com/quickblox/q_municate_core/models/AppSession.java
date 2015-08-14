@@ -51,10 +51,6 @@ public class AppSession implements Serializable {
         return new AppSession(loginType, qbUser, sessionToken);
     }
 
-    public static void saveRememberMe(boolean value) {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_REMEMBER_ME, value);
-    }
-
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
         try {
             BaseService baseService = QBAuth.getBaseService();

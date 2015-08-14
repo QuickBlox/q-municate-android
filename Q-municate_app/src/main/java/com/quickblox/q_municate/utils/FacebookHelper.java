@@ -9,10 +9,7 @@ import android.text.TextUtils;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.FacebookServiceException;
-import com.facebook.HttpMethod;
 import com.facebook.LoggingBehavior;
-import com.facebook.Request;
-import com.facebook.RequestAsyncTask;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
@@ -23,12 +20,9 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
 public class FacebookHelper {
 
-    public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
     private Activity activity;
     private Session.StatusCallback facebookStatusCallback;
     private Resources resources;
@@ -76,7 +70,6 @@ public class FacebookHelper {
     }
 
     public void loginWithFacebook() {
-        TipsManager.setIsJustLogined(true);
         Session session = Session.getActiveSession();
         if (!session.isOpened() && !session.isClosed()) {
             session.openForRead(new Session.OpenRequest(activity).setPermissions(Arrays.asList("user_friends")).setCallback(facebookStatusCallback));
@@ -97,23 +90,6 @@ public class FacebookHelper {
 
     public boolean isSessionOpened() {
         return Session.getActiveSession().isOpened();
-    }
-
-    public void postInviteToWall(Request.Callback requestCallback, String[] selectedFriends) {
-        Session session = Session.getActiveSession();
-        if (session != null) {
-            Resources resources = activity.getResources();
-            Bundle postParams = new Bundle();
-            postParams.putString(ConstsCore.FB_WALL_PARAM_NAME, resources.getString(R.string.inf_fb_wall_param_name));
-            postParams.putString(ConstsCore.FB_WALL_PARAM_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));
-            postParams.putString(ConstsCore.FB_WALL_PARAM_LINK, resources.getString(R.string.inf_fb_wall_param_link));
-            postParams.putString(ConstsCore.FB_WALL_PARAM_PICTURE, resources.getString(R.string.inf_fb_wall_param_picture));
-            postParams.putString(ConstsCore.FB_WALL_PARAM_PLACE, resources.getString(R.string.inf_fb_wall_param_place));
-            postParams.putString(ConstsCore.FB_WALL_PARAM_TAGS, TextUtils.join(",", selectedFriends));
-            Request request = new Request(session, ConstsCore.FB_WALL_PARAM_FEED, postParams, HttpMethod.POST, requestCallback);
-            RequestAsyncTask task = new RequestAsyncTask(request);
-            task.execute();
-        }
     }
 
     private Bundle getBundleForFriendsRequest() {
@@ -164,26 +140,5 @@ public class FacebookHelper {
                 DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
             }
         }
-    }
-
-    public boolean checkPermissions() {
-        Session session = Session.getActiveSession();
-        List<String> permissions = session.getPermissions();
-        if (!isSubsetOf(FacebookHelper.PERMISSIONS, permissions)) {
-            Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(activity,
-                    FacebookHelper.PERMISSIONS);
-            session.requestNewPublishPermissions(newPermissionsRequest);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isSubsetOf(Collection<String> subset, Collection<String> superset) {
-        for (String string : subset) {
-            if (!superset.contains(string)) {
-                return false;
-            }
-        }
-        return true;
     }
 }

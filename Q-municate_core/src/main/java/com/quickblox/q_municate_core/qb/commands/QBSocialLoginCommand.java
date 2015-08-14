@@ -11,7 +11,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_core.utils.CoreSharedHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
@@ -43,11 +43,11 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
         if (user.getCustomData() == null) {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
+            CoreSharedHelper.getSharedHelper().saveUsersImportInitialized(false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
         } else {
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+            CoreSharedHelper.getSharedHelper().saveUsersImportInitialized(true);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_LOGIN);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
         }
@@ -67,4 +67,4 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String isImport = "1"; // first FB login
         return new UserCustomData(avatarUrl, ConstsCore.EMPTY_STRING, isImport);
     }
-}/**/
+}

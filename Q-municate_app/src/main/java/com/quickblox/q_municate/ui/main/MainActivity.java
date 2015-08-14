@@ -113,8 +113,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         setContentView(R.layout.activity_main);
 
-        useDoubleBackPressed = true;
-
         gsmHelper = new GSMHelper(this);
         loginChatCompositeSuccessAction = new LoginChatCompositeSuccessAction();
         importFriendsSuccessAction = new ImportFriendsSuccessAction();
@@ -122,12 +120,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         initNavigationDrawer();
 
-        if (!isImportInitialized()) {
+        if (!appSharedHelper.isUsersImportInitialized()) {
             showProgress();
             facebookHelper = new FacebookHelper(this, savedInstanceState,
                     new FacebookSessionStatusCallback());
             importFriends = new ImportFriends(MainActivity.this, facebookHelper);
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SIGN_UP_INITIALIZED, false);
         }
 
         checkGCMRegistration();
@@ -145,13 +142,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         QBInitVideoChatCommand.start(this, CallActivity.class);
     }
 
-    private boolean isImportInitialized() {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        return prefsHelper.getPref(PrefsHelper.PREF_IMPORT_INITIALIZED, false);
-    }
-
-    private void performImportFriendsSuccessAction(Bundle bundle) {
-        importFriendsFinished();
+    private void performImportFriendsSuccessAction() {
+        appSharedHelper.saveUsersImportInitialized(true);
     }
 
     private void performLoginChatSuccessAction(Bundle bundle) {
@@ -206,7 +198,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void performImportFriendsFailAction(Bundle bundle) {
-        importFriendsFinished();
+        performImportFriendsSuccessAction();
         hideActionBarProgress();
     }
 
@@ -266,11 +258,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         }
     }
 
-    private void importFriendsFinished() {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
-        hideProgress();
-    }
-
     private void startGroupChatActivity(Dialog dialog) {
         GroupDialogActivity.start(this, dialog);
     }
@@ -281,7 +268,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened()) {
                 importFriends.startGetFriendsListTask(true);
-            } else if (!session.isClosed() && !isImportInitialized()) {
+            } else if (!session.isClosed() && !appSharedHelper.isUsersImportInitialized()) {
                 importFriends.startGetFriendsListTask(false);
                 hideProgress();
             }
@@ -300,7 +287,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         @Override
         public void execute(Bundle bundle) {
-            performImportFriendsSuccessAction(bundle);
+            performImportFriendsSuccessAction();
         }
     }
 

@@ -1,5 +1,5 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_image"
@@ -11,41 +11,29 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="5dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_full"
-        android:layout_marginBottom="5dp" />
+        android:src="@drawable/logo_full" />
 
     <RelativeLayout
-        android:id="@+id/connect_facebook_button"
+        android:id="@+id/facebook_connect_button"
         android:layout_width="match_parent"
         android:layout_height="@dimen/button_fb_height"
         android:layout_above="@+id/sign_up_email_button"
         android:layout_marginTop="10dp"
-        android:background="@drawable/button_connect_facebook_selector"
-        android:clickable="true"
-        android:onClick="connectFacebookOnClickListener">
+        android:background="@drawable/button_connect_facebook_selector">
 
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:drawableLeft="@drawable/ic_fb"
+            android:drawablePadding="10dp"
+            android:gravity="center"
+            android:text="@string/lnd_connect_with_facebook"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/button_text_size" />
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/button_icon_margin"
-                android:src="@drawable/ic_fb"/>
-
-            <TextView
-                android:id="@+id/connect_facebook_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/lnd_connect_with_facebook"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/button_text_size"/>
-        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
@@ -56,7 +44,6 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/button_sign_up_green_selector"
         android:clickable="true"
-        android:onClick="signUpOnClickListener"
         android:orientation="horizontal">
 
         <TextView
@@ -68,31 +55,33 @@
             android:gravity="center"
             android:text="@string/lnd_sign_up"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/button_text_size"/>
+            android:textSize="@dimen/button_text_size" />
+
     </RelativeLayout>
 
     <Button
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/version"
+        android:layout_above="@+id/app_version_textview"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:background="@drawable/button_general_selector"
         android:clickable="true"
         android:gravity="center"
-        android:onClick="loginOnClickListener"
         android:text="@string/lnd_have_account"
         android:textColor="@color/gray"
-        android:textSize="@dimen/button_text_size"/>
+        android:textSize="@dimen/button_text_size" />
 
     <TextView
-        android:id="@+id/version"
+        android:id="@+id/app_version_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:textColor="@color/gray"
-        android:textSize="8sp"/>
+        android:textSize="8sp"
+        tools:text="1-1-1" />
+
 </RelativeLayout>

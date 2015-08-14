@@ -8,9 +8,16 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.utils.Utils;
 
+import butterknife.Bind;
+import butterknife.OnClick;
+
 public class LandingActivity extends BaseAuthActivity {
+
+    @Bind(R.id.app_version_textview)
+    TextView appVersionTextView;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LandingActivity.class);
@@ -22,21 +29,34 @@ public class LandingActivity extends BaseAuthActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-        useDoubleBackPressed = true;
+        activateButterKnife();
 
         initVersionName();
     }
 
-    public void signUpOnClickListener(View view) {
-        if (!isUserAgreementShown()) {
-            positiveUserAgreementOnClickListener = new DialogInterface.OnClickListener() {
+    @OnClick(R.id.login_button)
+    public void login(View view) {
+        LoginActivity.start(LandingActivity.this);
+        finish();
+    }
+
+    @OnClick(R.id.facebook_connect_button)
+    public void facebookConnect(View view) {
+        facebookConnect();
+    }
+
+    @OnClick(R.id.sign_up_email_button)
+    public void signUp(View view) {
+        loginType = LoginType.EMAIL;
+
+        if (!appSharedHelper.isShownUserAgreement()) {
+            showUserAgreement(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    saveUserAgreementShowing();
+                    appSharedHelper.saveShownUserAgreement(true);
                     startSignUpActivity();
                 }
-            };
-            showUserAgreement(positiveUserAgreementOnClickListener, negativeUserAgreementOnClickListener);
+            }, null);
         } else {
             startSignUpActivity();
         }
@@ -47,13 +67,7 @@ public class LandingActivity extends BaseAuthActivity {
         finish();
     }
 
-    public void loginOnClickListener(View view) {
-        LoginActivity.start(LandingActivity.this);
-        finish();
-    }
-
     private void initVersionName() {
-        TextView versionView = _findViewById(R.id.version);
-        versionView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
+        appVersionTextView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
     }
 }

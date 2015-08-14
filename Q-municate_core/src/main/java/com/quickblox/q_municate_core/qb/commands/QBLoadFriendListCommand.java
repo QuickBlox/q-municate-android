@@ -29,8 +29,13 @@ public class QBLoadFriendListCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         Collection<Integer> userIdsList = friendListHelper.updateFriendList();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) userIdsList);
-        return bundle;
+
+        if (extras == null) {
+            extras = new Bundle();
+        }
+
+        extras.putSerializable(QBServiceConsts.EXTRA_FRIENDS, (java.io.Serializable) userIdsList);
+
+        return extras;
     }
 }

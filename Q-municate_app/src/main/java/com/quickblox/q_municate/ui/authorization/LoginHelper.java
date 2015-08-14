@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -20,20 +21,17 @@ public class LoginHelper {
 
     private Context context;
     private ExistingQbSessionListener existingQbSessionListener;
-    private boolean checkedRememberMe;
 
-    public LoginHelper(Context context, ExistingQbSessionListener existingQbSessionListener, boolean checkedRememberMe) {
+    public LoginHelper(Context context, ExistingQbSessionListener existingQbSessionListener) {
         this.context = context;
         this.existingQbSessionListener = existingQbSessionListener;
-        this.checkedRememberMe = checkedRememberMe;
     }
 
     public void checkStartExistSession() {
         String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
-        checkedRememberMe = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_REMEMBER_ME, false);
 
-        if (checkedRememberMe) {
+        if (App.getInstance().getAppSharedHelper().isSavedRememberMe()) {
             checkStartExistSession(userEmail, userPassword);
         } else {
             existingQbSessionListener.onStartSessionFail();
@@ -83,7 +81,7 @@ public class LoginHelper {
     }
 
     public void login(String userEmail, String userPassword) {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_IMPORT_INITIALIZED, true);
+        App.getInstance().getAppSharedHelper().saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
         QBLoginCompositeCommand.start(context, user);

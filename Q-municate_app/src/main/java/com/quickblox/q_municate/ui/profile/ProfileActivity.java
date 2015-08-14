@@ -76,7 +76,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        useDoubleBackPressed = false;
+
         user = AppSession.getSession().getUser();
         imageUtils = new ImageUtils(this);
 
