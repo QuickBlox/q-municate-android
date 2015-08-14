@@ -140,7 +140,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
             combinationMessage.setState(State.READ);
             QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    combinationMessage.toMessage(), true);
+                    combinationMessage.toMessage(), false);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

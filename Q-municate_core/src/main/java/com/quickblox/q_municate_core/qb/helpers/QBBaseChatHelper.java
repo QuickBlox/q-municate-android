@@ -354,9 +354,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected Message parseReceivedMessage(QBChatMessage qbChatMessage) {
-        long createdDate = Long.parseLong(qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
+        long createdDate = Long.parseLong(
+                (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
         String attachUrl = ChatUtils.getAttachUrlIfExists(qbChatMessage);
-        String dialogId = qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
 
         Message message = new Message();
         message.setMessageId(qbChatMessage.getId());
@@ -451,7 +452,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         public void processMessage(QBPrivateChat privateChat, final QBChatMessage chatMessage) {
             if (ChatNotificationUtils.isNotificationMessage(chatMessage)) {
                 for (QBNotificationChatListener notificationChatListener : notificationChatListeners) {
-                    notificationChatListener.onReceivedNotification(chatMessage.getProperty(
+                    notificationChatListener.onReceivedNotification((String) chatMessage.getProperty(
                             ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE), chatMessage);
                 }
             } else {

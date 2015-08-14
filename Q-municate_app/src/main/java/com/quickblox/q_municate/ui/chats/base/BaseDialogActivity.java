@@ -330,6 +330,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        readAllMessages();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (baseChatHelper != null) {
@@ -338,7 +344,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
         removeActions();
         deleteObservers();
-        readAllMessages();
     }
 
     private boolean isGalleryCalled(int requestCode) {

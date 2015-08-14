@@ -121,8 +121,8 @@ public class DialogsListFragment extends BaseFragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroy() {
+        super.onDestroy();
         deleteObservers();
     }
 

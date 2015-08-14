@@ -71,7 +71,6 @@ public class DbHelperUtils {
     public static void clearTable(ConnectionSource connectionSource, Class clazz) {
         try {
             TableUtils.clearTable(connectionSource, clazz);
-            TableUtils.createTable(connectionSource, clazz);
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }
