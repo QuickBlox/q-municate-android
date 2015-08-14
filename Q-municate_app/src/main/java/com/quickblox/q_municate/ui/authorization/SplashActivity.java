@@ -7,9 +7,13 @@ import android.os.Bundle;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class SplashActivity extends BaseAuthActivity implements ExistingQbSessionListener {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
+    private static final int DELAY_FOR_OPENING_LANDING_ACTIVITY = 1000;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SplashActivity.class);
@@ -51,7 +55,12 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     }
 
     private void startLandingActivity() {
-        LandingActivity.start(this);
-        finish();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                LandingActivity.start(SplashActivity.this);
+                finish();
+            }
+        }, DELAY_FOR_OPENING_LANDING_ACTIVITY);
     }
 }
