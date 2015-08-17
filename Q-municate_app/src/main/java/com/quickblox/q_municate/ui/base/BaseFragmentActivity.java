@@ -12,6 +12,8 @@ import android.view.Window;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
+import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.service.QBService;
@@ -22,7 +24,7 @@ import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ActivityHelper.ServiceConnectionListener {
+public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ServiceConnectionListener {
 
     protected final ProgressDialog progress;
     protected App app;
@@ -199,7 +201,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         }
     }
 
-    private class GlobalListener implements ActivityHelper.GlobalActionsListener {
+    private class GlobalListener implements GlobalActionsListener {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {

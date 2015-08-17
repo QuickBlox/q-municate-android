@@ -15,23 +15,32 @@ import static com.quickblox.q_municate_db.models.DialogNotification.Column.TABLE
 @DatabaseTable(tableName = TABLE_NAME)
 public class DialogNotification implements Serializable {
 
-    @DatabaseField(id = true, unique = true, columnName = ID)
+    @DatabaseField(
+            id = true,
+            unique = true,
+            columnName = ID)
     private String dialogNotificationId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
-    @DatabaseField(columnName = STATE)
+    @DatabaseField(
+            columnName = STATE)
     private State state;
 
-    @DatabaseField(columnName = NOTIFICATION_TYPE)
+    @DatabaseField(
+            columnName = NOTIFICATION_TYPE)
     private NotificationType notificationType;
 
-    @DatabaseField(columnName = BODY)
+    @DatabaseField(
+            columnName = BODY)
     private String body;
 
-    @DatabaseField(columnName = CREATED_DATE)
+    @DatabaseField(
+            columnName = CREATED_DATE)
     private long createdDate;
 
     public DialogNotification() {

@@ -141,7 +141,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogsOccupants(QBDialog qbDialog) {
-        DataManager.getInstance().getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
+        dataManager.getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {

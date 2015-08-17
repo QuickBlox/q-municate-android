@@ -14,20 +14,30 @@ import static com.quickblox.q_municate_db.models.UserRequest.Column.UPDATED_DATE
 @DatabaseTable(tableName = TABLE_NAME)
 public class UserRequest implements Serializable {
 
-    @DatabaseField(generatedId = true, unique = true, columnName = ID)
+    @DatabaseField(
+            generatedId = true,
+            unique = true,
+            columnName = ID)
     private int requestId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, unique = true,
-            canBeNull = false, columnName = User.Column.ID)
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            unique = true,
+            canBeNull = false,
+            columnName = User.Column.ID)
     private User user;
 
-    @DatabaseField(columnName = REQUEST_STATUS)
+    @DatabaseField(
+            columnName = REQUEST_STATUS)
     private RequestStatus requestStatus;
 
-    @DatabaseField(columnName = TEXT_STATUS)
+    @DatabaseField(
+            columnName = TEXT_STATUS)
     private String textStatus;
 
-    @DatabaseField(columnName = UPDATED_DATE)
+    @DatabaseField(
+            columnName = UPDATED_DATE)
     private long updatedDate;
 
     public UserRequest() {

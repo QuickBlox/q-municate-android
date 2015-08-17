@@ -12,14 +12,20 @@ import static com.quickblox.q_municate_db.models.Social.Column.TYPE;
 @DatabaseTable(tableName = TABLE_NAME)
 public class Social implements Serializable {
 
-    @DatabaseField(id = true, columnName = ID)
+    @DatabaseField(
+            id = true,
+            columnName = ID)
     private String socialId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = false,
             columnName = User.Column.ID)
     private User user;
 
-    @DatabaseField(columnName = TYPE)
+    @DatabaseField(
+            columnName = TYPE)
     private Type type;
 
     public Social() {

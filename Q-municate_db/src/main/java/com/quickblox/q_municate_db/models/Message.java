@@ -14,24 +14,36 @@ import static com.quickblox.q_municate_db.models.Message.Column.TABLE_NAME;
 @DatabaseTable(tableName = TABLE_NAME)
 public class Message implements Serializable {
 
-    @DatabaseField(id = true, unique = true, columnName = ID)
+    @DatabaseField(
+            id = true,
+            unique = true,
+            columnName = ID)
     private String messageId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = false,
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = true,
             columnName = Attachment.Column.ID)
     private Attachment attachment;
 
-    @DatabaseField(columnName = STATE)
+    @DatabaseField(
+            columnName = STATE)
     private State state;
 
-    @DatabaseField(columnName = BODY)
+    @DatabaseField(
+            columnName = BODY)
     private String body;
 
-    @DatabaseField(columnName = CREATED_DATE)
+    @DatabaseField(
+            columnName = CREATED_DATE)
     private long createdDate;
 
     public Message() {

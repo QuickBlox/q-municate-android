@@ -16,6 +16,8 @@ import android.util.Log;
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
+import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -37,14 +39,15 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 public class ActivityHelper extends BaseActivityHelper {
 
     protected QBService service;
+
     private Activity activity;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
-    private Map<String, Set<Command>> broadcastCommandMap = new HashMap<String, Set<Command>>();
+    private Map<String, Set<Command>> broadcastCommandMap;
     private GlobalActionsListener actionsListener;
     private Handler handler;
     private ActivityUIHelper activityUIHelper;
-
+    private LocalBroadcastManager localBroadcastManager;
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ServiceConnectionListener serviceConnectionListener;
@@ -57,6 +60,8 @@ public class ActivityHelper extends BaseActivityHelper {
         activity = (Activity) context;
         activityUIHelper = new ActivityUIHelper(activity);
         serviceConnection = new QBChatServiceConnection();
+        localBroadcastManager = LocalBroadcastManager.getInstance(context);
+        broadcastCommandMap = new HashMap<>();
     }
 
     protected void onReceivedChatMessageNotification(Bundle extras) {
@@ -117,12 +122,12 @@ public class ActivityHelper extends BaseActivityHelper {
     }
 
     public void updateBroadcastActionList() {
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
+        localBroadcastManager.unregisterReceiver(broadcastReceiver);
         IntentFilter intentFilter = new IntentFilter();
         for (String commandName : broadcastCommandMap.keySet()) {
             intentFilter.addAction(commandName);
         }
-        LocalBroadcastManager.getInstance(activity).registerReceiver(broadcastReceiver, intentFilter);
+        localBroadcastManager.registerReceiver(broadcastReceiver, intentFilter);
     }
 
     public void onPause() {
@@ -150,13 +155,12 @@ public class ActivityHelper extends BaseActivityHelper {
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
-        LocalBroadcastManager.getInstance(activity).registerReceiver(globalBroadcastReceiver,
-                globalActionsIntentFilter);
+        localBroadcastManager.registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
     }
 
     private void unregisterBroadcastReceiver() {
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(globalBroadcastReceiver);
-        LocalBroadcastManager.getInstance(activity).unregisterReceiver(broadcastReceiver);
+        localBroadcastManager.unregisterReceiver(globalBroadcastReceiver);
+        localBroadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
     private Handler getHandler() {
@@ -175,22 +179,6 @@ public class ActivityHelper extends BaseActivityHelper {
     private void connectToService() {
         Intent intent = new Intent(activity, QBService.class);
         activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    public interface GlobalActionsListener {
-
-        public void onReceiveChatMessageAction(Bundle extras);
-
-        public void onReceiveForceReloginAction(Bundle extras);
-
-        public void onReceiveRefreshSessionAction(Bundle extras);
-
-        public void onReceiveContactRequestAction(Bundle extras);
-    }
-
-    public interface ServiceConnectionListener {
-
-        public void onConnectedToService(QBService service);
     }
 
     private class BaseBroadcastReceiver extends BroadcastReceiver {

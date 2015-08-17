@@ -53,16 +53,20 @@ public class QBFriendListHelper extends BaseHelper {
 
     public QBFriendListHelper(Context context) {
         super(context);
+
+        Log.d(TAG, "QBFriendListHelper WAS CREATED!!!, context = " + context);
     }
 
     public void init(QBPrivateChatHelper privateChatHelper) {
         this.privateChatHelper = privateChatHelper;
         restHelper = new QBRestHelper(context);
+        dataManager = DataManager.getInstance();
         roster = QBChatService.getInstance().getRoster(QBRoster.SubscriptionMode.mutual,
                 new SubscriptionListener());
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
-        dataManager = DataManager.getInstance();
+
+        Log.d(TAG, "QBFriendListHelper WAS INITED!!!, context = " + context);
     }
 
     public void inviteFriend(int userId) throws Exception {

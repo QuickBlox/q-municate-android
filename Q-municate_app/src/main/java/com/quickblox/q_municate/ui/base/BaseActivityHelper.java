@@ -11,7 +11,6 @@ public abstract class BaseActivityHelper {
         this.context = context;
     }
 
-
     public Context getContext() {
         return context;
     }

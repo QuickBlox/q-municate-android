@@ -12,6 +12,8 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 
 public class QBInitFriendListCommand extends ServiceCommand {
 
+    private final static String TAG = QBInitFriendListCommand.class.getSimpleName();
+
     private QBFriendListHelper friendListHelper;
     private QBPrivateChatHelper privateChatHelper;
 

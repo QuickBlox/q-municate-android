@@ -24,6 +24,7 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
+import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -34,18 +35,27 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import butterknife.Bind;
+import butterknife.OnItemClick;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class DialogsListFragment extends BaseFragment {
 
-    private ListView dialogsListView;
+    private static final String TAG = DialogsListFragment.class.getSimpleName();
+
+    @Bind(R.id.chats_listview)
+    ListView dialogsListView;
+
+    @Bind(R.id.empty_list_textview)
+    TextView emptyListTextView;
+
     private DialogsListAdapter dialogsListAdapter;
-    private TextView emptyListTextView;
     private DataManager dataManager;
 
     private Observer dialogObserver;
     private Observer messageObserver;
-    private UsersObserver userObserver;
+    private Observer userObserver;
+    private Observer dialogOccupantsObserver;
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -61,9 +71,10 @@ public class DialogsListFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
+        activateButterKnife(view);
+
         initFields();
         initUI(view);
-        initListeners();
 
         Crouton.cancelAllCroutons();
 
@@ -79,25 +90,15 @@ public class DialogsListFragment extends BaseFragment {
         dialogObserver = new DialogObserver();
         messageObserver = new MessageObserver();
         userObserver = new UsersObserver();
+        dialogOccupantsObserver = new DialogOccupantsObserver();
     }
 
     private void initUI(View view) {
         setHasOptionsMenu(true);
-        dialogsListView = (ListView) view.findViewById(R.id.chats_listview);
-        emptyListTextView = (TextView) view.findViewById(R.id.empty_list_textview);
     }
 
-    private void initListeners() {
-        dialogsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long arg3) {
-                startChat(position);
-            }
-        });
-    }
-
-    private void startChat(int position) {
+    @OnItemClick(R.id.chats_listview)
+    public void startChat(int position) {
         Dialog dialog = dialogsListAdapter.getItem(position);
         if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog);
@@ -114,10 +115,13 @@ public class DialogsListFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         addObservers();
+
         Crouton.cancelAllCroutons();
+
         if (dialogsListAdapter != null) {
             checkVisibilityEmptyLabel();
         }
+
         if (dialogsListAdapter != null) {
             dialogsListAdapter.notifyDataSetChanged();
         }
@@ -148,12 +152,14 @@ public class DialogsListFragment extends BaseFragment {
         dataManager.getDialogDataManager().addObserver(dialogObserver);
         dataManager.getMessageDataManager().addObserver(messageObserver);
         dataManager.getUserDataManager().addObserver(userObserver);
+        dataManager.getDialogOccupantDataManager().addObserver(dialogOccupantsObserver);
     }
 
     private void deleteObservers() {
         dataManager.getDialogDataManager().deleteObserver(dialogObserver);
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getUserDataManager().deleteObserver(userObserver);
+        dataManager.getDialogOccupantDataManager().deleteObserver(dialogOccupantsObserver);
     }
 
     private void initChatsDialogs() {
@@ -187,6 +193,7 @@ public class DialogsListFragment extends BaseFragment {
     private void updateDialogsList() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
         dialogsListAdapter.setNewData(dialogsList);
+        dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
     }
 
@@ -247,6 +254,16 @@ public class DialogsListFragment extends BaseFragment {
         @Override
         public void update(Observable observable, Object data) {
             if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
+                updateDialogsList();
+            }
+        }
+    }
+
+    private class DialogOccupantsObserver implements Observer {
+
+        @Override
+        public void update(Observable observable, Object data) {
+            if (data != null && data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
                 updateDialogsList();
             }
         }

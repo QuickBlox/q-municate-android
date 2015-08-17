@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.chats.dialogslist;
 
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -55,9 +54,14 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
                 dialog.getDialogId());
 
         if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-            User opponentUser = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(currentQBUser), dialogOccupantsList);
-            viewHolder.nameTextView.setText(opponentUser.getFullName());
-            displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
+            User opponentUser = ChatUtils.getOpponentFromPrivateDialog(
+                    UserFriendUtils.createLocalUser(currentQBUser), dialogOccupantsList);
+            if (opponentUser.getFullName() != null) {
+                viewHolder.nameTextView.setText(opponentUser.getFullName());
+                displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
+            } else {
+                viewHolder.nameTextView.setText("");
+            }
         } else {
             viewHolder.nameTextView.setText(dialog.getTitle());
             viewHolder.avatarImageView.setImageResource(R.drawable.placeholder_group);

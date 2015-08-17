@@ -13,18 +13,30 @@ import static com.quickblox.q_municate_db.models.DialogOccupant.Column.TABLE_NAM
 @DatabaseTable(tableName = TABLE_NAME)
 public class DialogOccupant implements Serializable {
 
-    @DatabaseField(generatedId = true, unique = true, columnName = ID)
+    @DatabaseField(
+            generatedId = true,
+            unique = true,
+            columnName = ID)
     private int dialogOccupantId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, uniqueCombo = true,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = false,
+            uniqueCombo = true,
             columnName = Dialog.Column.ID)
     private Dialog dialog;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = false, uniqueCombo = true,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = false,
+            uniqueCombo = true,
             columnName = User.Column.ID)
     private User user;
 
-    @ForeignCollectionField(eager = true)
+    @ForeignCollectionField(
+            eager = true)
     private ForeignCollection<Message> messageCollection;
 
     public DialogOccupant() {

@@ -12,6 +12,8 @@ import android.view.Window;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
+import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
@@ -24,7 +26,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends Activity implements ActivityHelper.ServiceConnectionListener {
+public abstract class BaseActivity extends Activity implements ServiceConnectionListener {
 
     protected final ProgressDialog progress;
     protected App app;
@@ -190,7 +192,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         }
     }
 
-    private class GlobalListener implements ActivityHelper.GlobalActionsListener {
+    private class GlobalListener implements GlobalActionsListener {
 
         @Override
         public void onReceiveChatMessageAction(Bundle extras) {

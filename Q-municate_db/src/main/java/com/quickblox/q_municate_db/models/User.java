@@ -18,32 +18,45 @@ import static com.quickblox.q_municate_db.models.User.Column.TABLE_NAME;
 @DatabaseTable(tableName = TABLE_NAME)
 public class User implements Serializable {
 
-    @DatabaseField(id = true, unique = true, columnName = ID)
+    @DatabaseField(
+            id = true,
+            unique = true,
+            columnName = ID)
     private Integer userId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, canBeNull = true,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            canBeNull = true,
             columnName = Social.Column.ID)
     private Social social;
 
-    @DatabaseField(columnName = ROLE)
+    @DatabaseField(
+            columnName = ROLE)
     private Role role;
 
-    @DatabaseField(columnName = FULL_NAME)
+    @DatabaseField(
+            columnName = FULL_NAME)
     private String fullName;
 
-    @DatabaseField(columnName = EMAIL)
+    @DatabaseField(
+            columnName = EMAIL)
     private String email;
 
-    @DatabaseField(columnName = LOGIN)
+    @DatabaseField(
+            columnName = LOGIN)
     private String login;
 
-    @DatabaseField(columnName = PHONE)
+    @DatabaseField(
+            columnName = PHONE)
     private String phone;
 
-    @DatabaseField(columnName = AVATAR)
+    @DatabaseField(
+            columnName = AVATAR)
     private String avatar;
 
-    @DatabaseField(columnName = STATUS)
+    @DatabaseField(
+            columnName = STATUS)
     private String status;
 
     private boolean online;

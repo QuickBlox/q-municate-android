@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 
 import com.quickblox.q_municate.App;
 
+import butterknife.ButterKnife;
+
 public abstract class BaseFragment extends Fragment {
 
     protected static final String ARG_TITLE = "title";
@@ -49,5 +51,9 @@ public abstract class BaseFragment extends Fragment {
 
     protected boolean isExistActivity() {
         return ((!isDetached()) && (getBaseActivity() != null));
+    }
+
+    protected void activateButterKnife(View view) {
+        ButterKnife.bind(this, view);
     }
 }

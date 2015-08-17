@@ -15,19 +15,26 @@ import static com.quickblox.q_municate_db.models.Dialog.Column.TYPE;
 @DatabaseTable(tableName = TABLE_NAME)
 public class Dialog implements Serializable {
 
-    @DatabaseField(id = true, unique = true, columnName = ID)
+    @DatabaseField(
+            id = true,
+            unique = true,
+            columnName = ID)
     private String dialogId;
 
-    @DatabaseField(columnName = TYPE)
+    @DatabaseField(
+            columnName = TYPE)
     private Type type;
 
-    @DatabaseField(columnName = ROOM_JID)
+    @DatabaseField(
+            columnName = ROOM_JID)
     private String roomJid;
 
-    @DatabaseField(columnName = TITLE)
+    @DatabaseField(
+            columnName = TITLE)
     private String title;
 
-    @DatabaseField(columnName = PHOTO)
+    @DatabaseField(
+            columnName = PHOTO)
     private String photo;
 
     public Dialog() {

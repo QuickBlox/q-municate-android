@@ -17,25 +17,35 @@ import static com.quickblox.q_municate_db.models.Attachment.Column.TYPE;
 @DatabaseTable(tableName = TABLE_NAME)
 public class Attachment implements Serializable {
 
-    @DatabaseField(generatedId = true, unique = true, columnName = ID)
+    @DatabaseField(
+            generatedId = true,
+            unique = true,
+            columnName = ID)
     private int attachmentId;
 
-    @DatabaseField(unique = true, columnName = BLOB_ID)
+    @DatabaseField(
+            unique = true,
+            columnName = BLOB_ID)
     private int blobId;
 
-    @DatabaseField(columnName = TYPE)
+    @DatabaseField(
+            columnName = TYPE)
     private Type type;
 
-    @DatabaseField(columnName = NAME)
+    @DatabaseField(
+            columnName = NAME)
     private String name;
 
-    @DatabaseField(columnName = SIZE)
+    @DatabaseField(
+            columnName = SIZE)
     private double size;
 
-    @DatabaseField(columnName = REMOTE_URL)
+    @DatabaseField(
+            columnName = REMOTE_URL)
     private String remoteUrl;
 
-    @DatabaseField(columnName = ADDITIONAL_INFO)
+    @DatabaseField(
+            columnName = ADDITIONAL_INFO)
     private String additionalInfo;
 
     public Attachment() {

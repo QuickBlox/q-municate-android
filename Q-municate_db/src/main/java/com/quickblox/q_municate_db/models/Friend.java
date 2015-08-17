@@ -11,10 +11,17 @@ import static com.quickblox.q_municate_db.models.Friend.Column.TABLE_NAME;
 @DatabaseTable(tableName = TABLE_NAME)
 public class Friend implements Serializable {
 
-    @DatabaseField(generatedId = true, unique = true, columnName = ID)
+    @DatabaseField(
+            generatedId = true,
+            unique = true,
+            columnName = ID)
     private int friendId;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, unique = true, canBeNull = false,
+    @DatabaseField(
+            foreign = true,
+            foreignAutoRefresh = true,
+            unique = true,
+            canBeNull = false,
             columnName = User.Column.ID)
     private User user;
 
