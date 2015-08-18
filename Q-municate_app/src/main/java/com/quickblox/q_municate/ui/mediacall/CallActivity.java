@@ -5,26 +5,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.media.MediaPlayerManager;
+import com.quickblox.q_municate.ui.videocall.VideoCallFragment;
+import com.quickblox.q_municate.ui.voicecall.VoiceCallFragment;
+import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
+import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.DialogUtils;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.videochat.webrtc.QBVideoChannel;
 import com.quickblox.videochat.webrtc.listener.QBVideoChatWebRTCSignalingListenerImpl;
 import com.quickblox.videochat.webrtc.model.ConnectionConfig;
-import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.R;
-import com.quickblox.q_municate_core.core.communication.SessionDescriptionWrapper;
-import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.push.QBSendPushCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.media.MediaPlayerManager;
-import com.quickblox.q_municate.ui.videocall.VideoCallFragment;
-import com.quickblox.q_municate.ui.voicecall.VoiceCallFragment;
-import com.quickblox.q_municate_core.utils.DialogUtils;
-import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
 import com.quickblox.videochat.webrtc.signaling.SignalingIgnoreFilter;
 
@@ -46,7 +44,6 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private ConnectionConfig currentConfig;
 
     public static void start(Context context, User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
-        Log.i (TAG,  "Friend.isOnline() = " + friend.isOnline());
         Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(ConstsCore.EXTRA_FRIEND, friend);
         intent.putExtra(ConstsCore.CALL_DIRECTION_TYPE_EXTRA, ConstsCore.CALL_DIRECTION_TYPE.OUTGOING);
@@ -108,6 +105,8 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
 
     @Override
     public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
         if (ConstsCore.CALL_DIRECTION_TYPE.INCOMING.equals(call_direction_type)) {
             videoChatHelper = (QBVideoChatHelper) service.getHelper(QBService.VIDEO_CHAT_HELPER);
             signalingChannel = videoChatHelper.getSignalingChannel(opponent.getUserId());
@@ -173,12 +172,13 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         Log.i(TAG, "opponentId=" + opponent);
     }
 
-    private void notifyFriendOnCall(User friend){
-        if (!friend.isOnline()) {
-            String callMsg = getResources().getString(R.string.dlg_offline_call,
-                    AppSession.getSession().getUser().getFullName());
-            QBSendPushCommand.start(this, callMsg, friend.getUserId());
-        }
+    private void notifyFriendOnCall(User friend) {
+        // TODO temp
+        //        if (!friend.isOnline()) {
+        //            String callMsg = getResources().getString(R.string.dlg_offline_call,
+        //                    AppSession.getSession().getUser().getFullName());
+        //            QBSendPushCommand.start(this, callMsg, friend.getUserId());
+        //        }
     }
 
     private void showOutgoingFragment() {

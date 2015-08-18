@@ -14,8 +14,12 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
@@ -24,7 +28,7 @@ import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ServiceConnectionListener {
+public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ServiceConnectionListener, UserStatusChangingListener {
 
     protected final ProgressDialog progress;
     protected App app;
@@ -34,6 +38,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected SuccessAction successAction;
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
     protected ActivityHelper activityHelper;
+
+    protected QBFriendListHelper friendListHelper;
+    protected QBPrivateChatHelper privateChatHelper;
+    protected QBGroupChatHelper groupChatHelper;
+
     private Dialog currentDialog;
 
     public BaseFragmentActivity() {
@@ -55,7 +64,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         actionBar = getActionBar();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityHelper = new ActivityHelper(this, new GlobalListener(), this);
+        activityHelper = new ActivityHelper(this, new GlobalListener(), this, this);
         activityHelper.onCreate();
     }
 
@@ -120,11 +129,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         activityHelper.removeAction(action);
     }
 
-    @Override
-    public void onConnectedToService(QBService service) {
-
-    }
-
     protected void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
         if (intent == null) {
@@ -154,12 +158,29 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         return transaction;
     }
 
-    protected void onFailAction(String action) {
+    @Override
+    public void onConnectedToService(QBService service) {
+        if (friendListHelper == null) {
+            friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
+        }
 
+        if (privateChatHelper == null) {
+            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
+        }
+
+        if (groupChatHelper == null) {
+            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        }
     }
 
     protected void onSuccessAction(String action) {
+    }
 
+    protected void onFailAction(String action) {
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
     }
 
     public void hideActionBarProgress() {

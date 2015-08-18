@@ -87,6 +87,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
+    protected void onConnectServiceLocally(QBService service) {
+        onConnectServiceLocally();
+    }
+
+    @Override
     protected void onUpdateChatDialog() {
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
             startUpdateChatDialog();

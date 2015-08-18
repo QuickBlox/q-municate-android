@@ -23,6 +23,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.FriendGroup;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -162,6 +163,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         if (page == -1) {
             friendsListView.removeFooterView(listLoadingView);
         }
+
+        friendsListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -179,6 +182,13 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchItem.setOnActionExpandListener(searchOnActionExpandListener);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
+        friendsListAdapter.setFriendListHelper(friendListHelper);
     }
 
     private void addObservers() {
@@ -236,6 +246,7 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
         friendsListAdapter = new FriendsListAdapter(baseActivity, friendOperationAction, friendGroupList);
         friendsListAdapter.setSearchCharacters(constraint);
+        friendsListAdapter.setFriendListHelper(friendListHelper);
         friendsListView.setAdapter(friendsListAdapter);
         friendsListView.setGroupIndicator(null);
         friendsListView.setOnScrollListener(this);
@@ -270,8 +281,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             if (!TextUtils.isEmpty(constraint)) {
                 performQueryTextChange();
-            } else {
-                baseActivity.hideActionBarProgress();
             }
 
             checkUsersListLoader();
@@ -327,7 +336,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         searchTimer.cancel();
         searchTimer = new Timer();
         searchTimer.schedule(new SearchTimerTask(), SEARCH_DELAY);
-        baseActivity.showActionBarProgress();
     }
 
     private void findUsers() {
@@ -420,8 +428,13 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         constraint = null;
         initFriendList();
         checkVisibilityEmptyLabel();
+    }
 
-        baseActivity.hideActionBarProgress();
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+
+        friendsListAdapter.notifyDataSetChanged();
     }
 
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
@@ -515,7 +528,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
 
             friendsListView.removeFooterView(listLoadingView);
             friendsListView.setSelection(firstVisiblePositionList);
-            baseActivity.hideActionBarProgress();
         }
     }
 
@@ -529,7 +541,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             checkVisibilityEmptyLabel();
 
             friendsListView.removeFooterView(listLoadingView);
-            baseActivity.hideActionBarProgress();
         }
     }
 

@@ -15,6 +15,7 @@ import com.quickblox.q_municate.ui.base.BaseActivity;
 import com.quickblox.q_municate.ui.base.BaseListAdapter;
 import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.models.User;
 
@@ -28,6 +29,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
     private int counterFriends;
     private List<User> selectedFriends;
     private SparseBooleanArray sparseArrayCheckBoxes;
+    private QBFriendListHelper friendListHelper;
 
     public DialogsSelectableFriendsAdapter(BaseActivity context, List<User> userList) {
         super(context, userList);
@@ -38,6 +40,11 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
 
     public void setCounterChangedListener(NewDialogCounterFriendsListener listener) {
         counterChangedListener = listener;
+    }
+
+    public void setFriendListHelper(QBFriendListHelper friendListHelper) {
+        this.friendListHelper = friendListHelper;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -64,14 +71,9 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         }
 
         viewHolder.nameTextView.setText(user.getFullName());
-        viewHolder.statusMessageTextView.setText(OnlineStatusHelper.getOnlineStatus(user.isOnline()));
         viewHolder.nameTextView.setText(user.getFullName());
 
-        if (user.isOnline()) {
-            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.onlineImageView.setVisibility(View.GONE);
-        }
+        checkUserOnlineStatus(viewHolder, user);
 
         viewHolder.selectFriendCheckBox.setOnClickListener(new View.OnClickListener() {
 
@@ -100,6 +102,20 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checked));
 
         return convertView;
+    }
+
+    private void checkUserOnlineStatus(ViewHolder viewHolder, User user) {
+        if (friendListHelper != null) {
+            boolean online = friendListHelper.isUserOnline(user.getUserId());
+
+            if (online) {
+                viewHolder.onlineImageView.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.onlineImageView.setVisibility(View.GONE);
+            }
+
+            viewHolder.statusMessageTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
+        }
     }
 
     private void notifyCounterChanged(boolean isIncrease) {

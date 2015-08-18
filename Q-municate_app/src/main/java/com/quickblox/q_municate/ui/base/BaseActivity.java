@@ -14,11 +14,15 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.SharedHelper;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
@@ -26,7 +30,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseActivity extends Activity implements ServiceConnectionListener {
+public abstract class BaseActivity extends Activity implements ServiceConnectionListener, UserStatusChangingListener {
 
     protected final ProgressDialog progress;
     protected App app;
@@ -37,6 +41,12 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
     protected SuccessAction successAction;
     protected ActivityHelper activityHelper;
 
+    protected QBFriendListHelper friendListHelper;
+    protected QBPrivateChatHelper privateChatHelper;
+    protected QBGroupChatHelper groupChatHelper;
+
+    private UserStatusChangingListener fragmentUserStatusChangingListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -46,12 +56,17 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         appSharedHelper = App.getInstance().getAppSharedHelper();
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityHelper = new ActivityHelper(this, new GlobalListener(), this);
+        activityHelper = new ActivityHelper(this, new GlobalListener(), this, this);
         activityHelper.onCreate();
     }
 
     public BaseActivity() {
         progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
+    }
+
+    public void setFragmentUserStatusChangingListener(
+            UserStatusChangingListener fragmentUserStatusChangingListener) {
+        this.fragmentUserStatusChangingListener = fragmentUserStatusChangingListener;
     }
 
     public FailAction getFailAction() {
@@ -121,7 +136,17 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 
     @Override
     public void onConnectedToService(QBService service) {
+        if (friendListHelper == null) {
+            friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
+        }
 
+        if (privateChatHelper == null) {
+            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
+        }
+
+        if (groupChatHelper == null) {
+            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        }
     }
 
     protected void navigateToParent() {
@@ -153,10 +178,6 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         return transaction;
     }
 
-    protected void onFailAction(String action) {
-
-    }
-
     private boolean needShowReceivedNotification() {
         boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
         boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
@@ -164,7 +185,16 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
     }
 
     protected void onSuccessAction(String action) {
+    }
 
+    protected void onFailAction(String action) {
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        if (fragmentUserStatusChangingListener != null) {
+            fragmentUserStatusChangingListener.onChangedUserStatus(userId, online);
+        }
     }
 
     protected void activateButterKnife() {
@@ -178,7 +208,6 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
             Exception e = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             ErrorUtils.showError(BaseActivity.this, e);
             hideProgress();
-            hideActionBarProgress();
             onFailAction(bundle.getString(QBServiceConsts.COMMAND_ACTION));
         }
     }

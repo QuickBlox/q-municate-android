@@ -12,6 +12,7 @@ import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.dialogslist.DialogsSelectableFriendsAdapter;
 import com.quickblox.q_municate.ui.uihelper.SimpleActionModeCallback;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.User;
 
@@ -24,6 +25,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
 
     protected DialogsSelectableFriendsAdapter friendsAdapter;
     protected ListView friendsListView;
+
     private ActionMode actionMode;
     private boolean isNeedToCloseWithoutRedirect;
 
@@ -51,8 +53,18 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     private void initListView() {
         friendsAdapter = new DialogsSelectableFriendsAdapter(this, getFriends());
         friendsAdapter.setCounterChangedListener(this);
+        friendsAdapter.setFriendListHelper(friendListHelper);
         friendsListView.setAdapter(friendsAdapter);
         friendsListView.setSelector(R.drawable.list_item_background_selector);
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
+        if (friendListHelper != null) {
+            friendsAdapter.setFriendListHelper(friendListHelper);
+        }
     }
 
     @Override
@@ -110,6 +122,13 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         public int compare(User friend1, User friend2) {
             return (new Integer(friend1.getUserId())).compareTo(friend2.getUserId());
         }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+
+        friendsAdapter.notifyDataSetChanged();
     }
 
     private class ActionModeCallback extends SimpleActionModeCallback {

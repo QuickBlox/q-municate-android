@@ -57,9 +57,9 @@ public class QBLoadGroupDialogCommand extends ServiceCommand {
         Map<Integer, User> friendMap = UserFriendUtils.createUserMap(userList);
         for (Integer onlineParticipantId : onlineParticipantIdsList) {
             User user = friendMap.get(onlineParticipantId);
-            if (user != null) {
-                user.setOnline(true);
-            }
+//            if (user != null) {
+//                user.setOnline(true);
+//            }
         }
 
         ArrayList<User> friendList = new ArrayList<User>(friendMap.values());

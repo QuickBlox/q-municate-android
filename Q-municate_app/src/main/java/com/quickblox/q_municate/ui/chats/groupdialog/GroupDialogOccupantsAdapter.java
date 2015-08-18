@@ -6,6 +6,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.ui.friends.FriendOperationListener;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -20,10 +22,16 @@ import java.util.List;
 public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
     private FriendOperationListener friendOperationListener;
+    private QBFriendListHelper friendListHelper;
 
     public GroupDialogOccupantsAdapter(BaseActivity baseActivity, FriendOperationListener friendOperationListener, List<User> objectsList) {
         super(baseActivity, objectsList);
         this.friendOperationListener = friendOperationListener;
+    }
+
+    public void setFriendListHelper(QBFriendListHelper friendListHelper) {
+        this.friendListHelper = friendListHelper;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -76,12 +84,15 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
     }
 
     private void setOnlineStatusVisibility(ViewHolder viewHolder, User user) {
+        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
+
         if (isMe(user)) {
-            user.setOnline(true);
+            online = true;
         }
 
-//        viewHolder.onlineStatusTextView.setText(user.getOnlineStatus(baseActivity));
-        if (user.isOnline()) {
+        viewHolder.onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
+
+        if (online) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.onlineImageView.setVisibility(View.GONE);

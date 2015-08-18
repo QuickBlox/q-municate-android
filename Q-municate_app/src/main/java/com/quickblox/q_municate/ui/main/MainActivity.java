@@ -148,8 +148,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void performLoginChatSuccessAction(Bundle bundle) {
         initVideoChat();
-
-        hideActionBarProgress();
         hideProgress();
     }
 
@@ -175,7 +173,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         super.onResume();
         addActions();
         gsmHelper.checkPlayServices();
-        showActionBarProgress();
         checkVisibilityProgressBars();
     }
 
@@ -199,16 +196,11 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void performImportFriendsFailAction(Bundle bundle) {
         performImportFriendsSuccessAction();
-        hideActionBarProgress();
     }
 
     private void checkVisibilityProgressBars() {
         boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
                 PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-
-        if (isJoinedToDialogs()) {
-            hideActionBarProgress();
-        }
 
         if (isLoggedInChat()) {
             initVideoChat();

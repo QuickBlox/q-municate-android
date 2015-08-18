@@ -26,7 +26,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -51,7 +50,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     private TextView phoneTextView;
     private View phoneView;
 
-    private QBPrivateChatHelper privateChatHelper;
     private DataManager dataManager;
     private int userId;
     private User user;
@@ -92,6 +90,15 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         phoneView = _findViewById(R.id.phone_relativelayout);
     }
 
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
+        if (friendListHelper != null) {
+            setOnlineStatus(user);
+        }
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
@@ -118,19 +125,14 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     protected void onResume() {
         super.onResume();
         addObservers();
+
+        setOnlineStatus(user);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         deleteObservers();
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
     }
 
     @Override
@@ -190,13 +192,16 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void setOnlineStatus(User user) {
-        if (user != null) {
-            if (user.isOnline()) {
+        if (user != null && friendListHelper != null) {
+            boolean online = friendListHelper.isUserOnline(user.getUserId());
+
+            if (online) {
                 onlineImageView.setVisibility(View.VISIBLE);
             } else {
                 onlineImageView.setVisibility(View.GONE);
             }
-            onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(user.isOnline()));
+
+            onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
         }
     }
 
@@ -261,6 +266,12 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
     }
 
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        setOnlineStatus(user);
+    }
+
     private class UserObserver implements Observer {
 
         @Override
@@ -277,8 +288,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
         @Override
         public void execute(Bundle bundle) {
             deleteDialog();
-            DialogUtils.showLong(FriendDetailsActivity.this, getString(R.string.dlg_friend_removed,
-                    user.getFullName()));
+            DialogUtils.showLong(FriendDetailsActivity.this,
+                    getString(R.string.dlg_friend_removed, user.getFullName()));
             finish();
         }
     }

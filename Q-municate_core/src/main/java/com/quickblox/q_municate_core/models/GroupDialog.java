@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.models;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -64,10 +65,10 @@ public class GroupDialog extends Dialog {
         return occupantList.size();
     }
 
-    public int getOnlineOccupantsCount() {
+    public int getOnlineOccupantsCount(QBFriendListHelper friendListHelper) {
         int onlineOccupantsCount = 0;
         for (User friend : occupantList) {
-            if (friend.isOnline()) {
+            if (friendListHelper.isUserOnline(friend.getUserId())) {
                 onlineOccupantsCount++;
             }
         }

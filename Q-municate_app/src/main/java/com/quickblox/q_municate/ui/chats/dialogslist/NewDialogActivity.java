@@ -13,8 +13,6 @@ import com.quickblox.q_municate.ui.chats.groupdialog.GroupDialogActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
-import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
@@ -27,8 +25,6 @@ import java.util.List;
 
 public class NewDialogActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
-    private QBGroupChatHelper multiChatHelper;
-
     public static void start(Context context) {
         Intent intent = new Intent(context, NewDialogActivity.class);
         context.startActivity(intent);
@@ -38,13 +34,6 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     protected void onResume() {
         super.onResume();
         addActions();
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        if (multiChatHelper == null) {
-            multiChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
-        }
     }
 
     @Override
@@ -66,11 +55,14 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     protected void removeActions() {
         removeAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
+
+        updateBroadcastActionList();
     }
 
     protected void addActions() {
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
+
         updateBroadcastActionList();
     }
 
@@ -101,7 +93,8 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
         public void execute(Bundle bundle) {
             hideProgress();
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            if (dialog.getRoomJid() != null) {
+
+            if (dialog != null && dialog.getRoomJid() != null) {
                 GroupDialogActivity.start(NewDialogActivity.this, ChatUtils.createLocalDialog(dialog));
                 //                sendNotificationToGroup(dialog);
                 finish();

@@ -59,8 +59,6 @@ public class User implements Serializable {
             columnName = STATUS)
     private String status;
 
-    private boolean online;
-
     public User() {
     }
 
@@ -73,14 +71,6 @@ public class User implements Serializable {
         this.email = email;
         this.phone = phone;
         this.avatar = avatar;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
     }
 
     public Role getRole() {

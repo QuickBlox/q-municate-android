@@ -61,7 +61,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         friendOperationAction = new FriendOperationAction();
         opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        dialogId = dialog.getDialogId();
+
+        if (dialog != null) {
+            dialogId = dialog.getDialogId();
+        } else {
+            finish();
+        }
 
         initActionBar();
         setCurrentDialog(dialog);
@@ -89,6 +94,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void updateActionBar() {
+    }
+
+    @Override
+    protected void onConnectServiceLocally(QBService service) {
+        onConnectServiceLocally();
+        setOnlineStatus(opponentFriend);
     }
 
     @Override
@@ -158,16 +169,30 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     private void setOnlineStatus(User friend) {
         if (friend != null) {
             ActionBar actionBar = getActionBar();
-            actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(friend.isOnline()));
+            if (actionBar != null && friendListHelper != null) {
+                actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(
+                        friendListHelper.isUserOnline(friend.getUserId())));
+            }
         }
     }
 
     private void initActionBar() {
         actionBar.setTitle(opponentFriend.getFullName());
-        actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(opponentFriend.isOnline()));
         actionBar.setLogo(R.drawable.placeholder_user);
+
+        setOnlineStatus(opponentFriend);
+
         if (!TextUtils.isEmpty(opponentFriend.getAvatar())) {
             loadLogoActionBar(opponentFriend.getAvatar());
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+
+        if (opponentFriend != null && opponentFriend.getUserId() == userId) {
+            setOnlineStatus(opponentFriend);
         }
     }
 

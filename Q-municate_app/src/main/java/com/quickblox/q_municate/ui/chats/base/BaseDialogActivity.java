@@ -176,7 +176,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         hideSmileLayout();
     }
 
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -204,7 +203,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onConnectedToService(QBService service) {
-        createChatLocally();
+        super.onConnectedToService(service);
+        onConnectServiceLocally(service);
     }
 
     private void addObservers() {
@@ -237,7 +237,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
-    protected void createChatLocally() {
+    protected abstract void onConnectServiceLocally(QBService service);
+
+    protected void onConnectServiceLocally() {
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {

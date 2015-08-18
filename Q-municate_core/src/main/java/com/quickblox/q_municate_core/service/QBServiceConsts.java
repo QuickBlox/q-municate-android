@@ -207,6 +207,7 @@ public class QBServiceConsts {
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_SKIP_ITEMS = "skip_items";
+    public static final String EXTRA_USER_STATUS = "user_status";
 
     public static final String UPDATE_DIALOG = "update_dialog";
     public static final String UPDATE_DIALOG_DETAILS = "update_dialog_details";
@@ -219,6 +220,7 @@ public class QBServiceConsts {
     public static final String REFRESH_SESSION = "refresh_session";
     public static final String FRIEND_ALERT_SHOW = "friend_alert";
     public static final String AUTH_ACTION_TYPE = "authorize_type";
+    public static final String USER_STATUS_CHANGED_ACTION = "user_status_changed";
     public static final int AUTH_TYPE_REGISTRATION = 1;
     public static final int AUTH_TYPE_LOGIN = 2;
 }

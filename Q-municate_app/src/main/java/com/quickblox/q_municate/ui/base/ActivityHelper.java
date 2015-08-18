@@ -18,6 +18,7 @@ import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -41,8 +42,6 @@ public class ActivityHelper extends BaseActivityHelper {
     protected QBService service;
 
     private Activity activity;
-    private BaseBroadcastReceiver broadcastReceiver;
-    private GlobalBroadcastReceiver globalBroadcastReceiver;
     private Map<String, Set<Command>> broadcastCommandMap;
     private GlobalActionsListener actionsListener;
     private Handler handler;
@@ -51,12 +50,19 @@ public class ActivityHelper extends BaseActivityHelper {
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ServiceConnectionListener serviceConnectionListener;
+    private UserStatusChangingListener userStatusChangingListener;
+    private BaseBroadcastReceiver broadcastReceiver;
+    private GlobalBroadcastReceiver globalBroadcastReceiver;
+    private UserStatusBroadcastReceiver userStatusBroadcastReceiver;
 
-    public ActivityHelper(Context context, GlobalActionsListener actionsListener,
-            ServiceConnectionListener serviceConnectionListener) {
+    public ActivityHelper(Context context,
+            GlobalActionsListener actionsListener,
+            ServiceConnectionListener serviceConnectionListener,
+            UserStatusChangingListener userStatusChangingListener) {
         super(context);
         this.actionsListener = actionsListener;
         this.serviceConnectionListener = serviceConnectionListener;
+        this.userStatusChangingListener = userStatusChangingListener;
         activity = (Activity) context;
         activityUIHelper = new ActivityUIHelper(activity);
         serviceConnection = new QBChatServiceConnection();
@@ -90,6 +96,7 @@ public class ActivityHelper extends BaseActivityHelper {
     public void onCreate() {
         broadcastReceiver = new BaseBroadcastReceiver();
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
+        userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
     }
 
     public void hideActionBarProgress() {
@@ -131,12 +138,12 @@ public class ActivityHelper extends BaseActivityHelper {
     }
 
     public void onPause() {
-        unregisterBroadcastReceiver();
+        unregisterBroadcastReceivers();
         Crouton.cancelAllCroutons();
     }
 
     public void onResume() {
-        registerGlobalReceiver();
+        registerBroadcastReceivers();
         updateBroadcastActionList();
     }
 
@@ -148,7 +155,7 @@ public class ActivityHelper extends BaseActivityHelper {
         unbindService();
     }
 
-    private void registerGlobalReceiver() {
+    private void registerBroadcastReceivers() {
         IntentFilter globalActionsIntentFilter = new IntentFilter();
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
@@ -156,11 +163,14 @@ public class ActivityHelper extends BaseActivityHelper {
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
         globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
         localBroadcastManager.registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
+
+        localBroadcastManager.registerReceiver(userStatusBroadcastReceiver, new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION));
     }
 
-    private void unregisterBroadcastReceiver() {
+    private void unregisterBroadcastReceivers() {
         localBroadcastManager.unregisterReceiver(globalBroadcastReceiver);
         localBroadcastManager.unregisterReceiver(broadcastReceiver);
+        localBroadcastManager.unregisterReceiver(userStatusBroadcastReceiver);
     }
 
     private Handler getHandler() {
@@ -229,6 +239,16 @@ public class ActivityHelper extends BaseActivityHelper {
                     }
                 }
             });
+        }
+    }
+
+    private class UserStatusBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, 0);
+            boolean status = intent.getBooleanExtra(QBServiceConsts.EXTRA_USER_STATUS, false);
+            userStatusChangingListener.onChangedUserStatus(userId, status);
         }
     }
 

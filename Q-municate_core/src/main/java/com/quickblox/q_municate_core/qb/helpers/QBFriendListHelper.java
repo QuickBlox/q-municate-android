@@ -31,11 +31,12 @@ import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.packet.RosterPacket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class QBFriendListHelper extends BaseHelper {
+public class QBFriendListHelper extends BaseHelper implements Serializable {
 
     private static final String TAG = QBFriendListHelper.class.getSimpleName();
     private static final String PRESENCE_CHANGE_ERROR = "Presence change error: could not find friend in DB by id = ";
@@ -216,7 +217,6 @@ public class QBFriendListHelper extends BaseHelper {
             return;
         }
 
-        newUser.setOnline(isFriendOnline(roster.getPresence(userId)));
         saveUser(newUser);
 
         if (UserFriendUtils.isPendingFriend(rosterEntry)) {
@@ -226,7 +226,7 @@ public class QBFriendListHelper extends BaseHelper {
             deleteUserRequestByUser(newUser.getUserId());
         }
 
-        fillUserOnlineStatus(newUser);
+        notifyUserStatusChanged(userId);
     }
 
     private void deleteUserRequestByUser(int userId) {
@@ -242,29 +242,14 @@ public class QBFriendListHelper extends BaseHelper {
         return QBUsers.getUsersByIDs(userIds, requestBuilder, params);
     }
 
-    //    private void fillUsersWithRosterData(Collection<User> usersList) {
-    //        for (User user : usersList) {
-    //            fillUserOnlineStatus(user);
-    //        }
-    //    }
-
-    private void fillUserOnlineStatus(User user) {
-        if (roster != null) {
-            QBPresence presence = roster.getPresence(user.getUserId());
-            fillUserOnlineStatus(user, presence);
-        }
-    }
-
-    private void fillUserOnlineStatus(User user, QBPresence presence) {
-        if (isFriendOnline(presence)) {
-            user.setOnline(true);
-        } else {
-            user.setOnline(false);
-        }
-    }
-
-    private boolean isFriendOnline(QBPresence presence) {
+    private boolean isUserOnline(QBPresence presence) {
         return QBPresence.Type.online.equals(presence.getType());
+    }
+
+    public boolean isUserOnline(int userId) {
+        return roster != null
+                && roster.getPresence(userId) != null
+                && isUserOnline(roster.getPresence(userId));
     }
 
     private void saveUser(User user) {
@@ -328,6 +313,13 @@ public class QBFriendListHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    private void notifyUserStatusChanged(int userId) {
+        Intent intent = new Intent(QBServiceConsts.USER_STATUS_CHANGED_ACTION);
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
+        intent.putExtra(QBServiceConsts.EXTRA_USER_STATUS, isUserOnline(userId));
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -358,7 +350,7 @@ public class QBFriendListHelper extends BaseHelper {
             if (user == null) {
                 ErrorUtils.logError(TAG, PRESENCE_CHANGE_ERROR + presence.getUserId());
             } else {
-                fillUserOnlineStatus(user, presence);
+                notifyUserStatusChanged(user.getUserId());
             }
         }
     }

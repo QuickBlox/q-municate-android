@@ -17,6 +17,7 @@ import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.TextViewHelper;
 import com.quickblox.q_municate_core.models.FriendGroup;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -35,6 +36,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
     private LayoutInflater layoutInflater;
     private Resources resources;
     private String searchCharacters;
+    private QBFriendListHelper friendListHelper;
 
     public FriendsListAdapter(Context context, FriendOperationListener friendOperationListener,
             List<FriendGroup> friendGroupList) {
@@ -59,6 +61,11 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
 
     public void setSearchCharacters(String searchCharacters) {
         this.searchCharacters = searchCharacters;
+    }
+
+    public void setFriendListHelper(QBFriendListHelper friendListHelper) {
+        this.friendListHelper = friendListHelper;
+        notifyDataSetChanged();
     }
 
     private void displayAvatarImage(String uri, ImageView imageView) {
@@ -196,14 +203,13 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
         }
 
         String status;
+        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
 
         if (pendingUser != null) {
             viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.frl_pending_request_status);
         } else {
-            // TODO temp
-            //            status = user.getOnlineStatus(context);
-            status = resources.getString(OnlineStatusHelper.getOnlineStatus(user.isOnline()));
+            status = resources.getString(OnlineStatusHelper.getOnlineStatus(online));
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);
@@ -211,7 +217,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
 
         viewHolder.statusTextView.setVisibility(View.VISIBLE);
 
-        setStatusVisibility(viewHolder, user.isOnline());
+        setStatusVisibility(viewHolder, online);
     }
 
     private void setStatusVisibility(ViewHolder viewHolder, boolean status) {
