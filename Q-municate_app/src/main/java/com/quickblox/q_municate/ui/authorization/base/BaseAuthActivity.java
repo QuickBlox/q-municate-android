@@ -36,8 +36,6 @@ public class BaseAuthActivity extends BaseActivity {
     protected ValidationUtils validationUtils;
     protected Resources resources;
 
-    protected UserAgreementDialog userAgreementDialog;
-
     protected DialogInterface.OnClickListener positiveUserAgreementOnClickListener;
     protected DialogInterface.OnClickListener negativeUserAgreementOnClickListener;
 
@@ -107,9 +105,7 @@ public class BaseAuthActivity extends BaseActivity {
 
     protected void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,
                                      DialogInterface.OnClickListener negativeClickListener) {
-        if (userAgreementDialog == null) {
-            userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener, negativeClickListener);
-        }
+        UserAgreementDialog userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener, negativeClickListener);
         userAgreementDialog.show(getFragmentManager(), null);
     }
 
