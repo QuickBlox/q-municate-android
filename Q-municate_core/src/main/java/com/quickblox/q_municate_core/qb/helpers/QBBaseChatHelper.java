@@ -23,6 +23,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.q_municate_core.R;
+import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -141,7 +142,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogsOccupants(QBDialog qbDialog) {
-        dataManager.getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(qbDialog));
+        dataManager.getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(
+                qbDialog));
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {
@@ -186,7 +188,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     protected void saveMessagesToCache(List<QBChatMessage> qbMessagesList, String dialogId) {
         for (QBChatMessage qbChatMessage : qbMessagesList) {
-            saveMessageToCache(dialogId, qbChatMessage, null);
+            saveMessageToCache(dialogId, qbChatMessage, State.READ);
         }
     }
 
@@ -214,7 +216,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment);
             }
 
-            dataManager.getMessageDataManager().create(message);
+            dataManager.getMessageDataManager().createOrUpdate(message);
         }
     }
 
@@ -378,26 +380,35 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return message;
     }
 
-    public void updateStatusMessageRead(String dialogId, Message message,
-            boolean forPrivate) throws Exception {
-        updateStatusMessageReadServer(dialogId, message, forPrivate);
-        updateStatusMessageLocal(message);
+    public void updateStatusNotificationMessageRead(String dialogId, CombinationMessage combinationMessage) throws Exception {
+        updateStatusMessageReadServer(dialogId, combinationMessage, false);
+        updateStatusNotificationMessageLocal(combinationMessage.toDialogNotification());
     }
 
-    public void updateStatusMessageReadServer(String dialogId, Message message,
+    public void updateStatusMessageRead(String dialogId, CombinationMessage combinationMessage,
+            boolean forPrivate) throws Exception {
+        updateStatusMessageReadServer(dialogId, combinationMessage, forPrivate);
+        updateStatusMessageLocal(combinationMessage.toMessage());
+    }
+
+    public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
             boolean fromPrivate) throws Exception {
         StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
-        messagesIdsList.add(message.getMessageId());
+        messagesIdsList.add(combinationMessage.getMessageId());
         QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
 
         if (fromPrivate) {
-            QBPrivateChat privateChat = createPrivateChatIfNotExist(message.getDialogOccupant().getUser().getUserId());
-            privateChat.readMessage(message.getMessageId());
+            QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
+            privateChat.readMessage(combinationMessage.getMessageId());
         }
     }
 
     public void updateStatusMessageLocal(Message message) {
         dataManager.getMessageDataManager().update(message);
+    }
+
+    public void updateStatusNotificationMessageLocal(DialogNotification dialogNotification) {
+        dataManager.getDialogNotificationDataManager().update(dialogNotification);
     }
 
     public void updateStatusMessageLocal(String messageId, State state) {

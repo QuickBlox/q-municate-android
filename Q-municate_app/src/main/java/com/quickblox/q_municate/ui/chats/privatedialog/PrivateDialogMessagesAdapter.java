@@ -166,8 +166,8 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    combinationMessage.toMessage(), true);
+            QBUpdateStatusMessageCommand.start(context,
+                    ChatUtils.createQBDialogFromLocalDialog(dialog), combinationMessage, true);
         }
 
         // check if last messageCombination is request messageCombination

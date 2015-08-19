@@ -49,6 +49,17 @@ public class CombinationMessage implements Serializable {
         return message;
     }
 
+    public DialogNotification toDialogNotification() {
+        DialogNotification dialogNotification = new DialogNotification();
+        dialogNotification.setDialogNotificationId(messageId);
+        dialogNotification.setDialogOccupant(dialogOccupant);
+        dialogNotification.setState(state);
+        dialogNotification.setType(notificationType);
+        dialogNotification.setBody(body);
+        dialogNotification.setCreatedDate(createdDate);
+        return dialogNotification;
+    }
+
     public String getMessageId() {
         return messageId;
     }
