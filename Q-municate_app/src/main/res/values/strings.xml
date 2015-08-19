@@ -93,7 +93,6 @@
     <string name="dlg_reply">Reply</string>
     <string name="dlg_user_is_not_friend">User is not your friend</string>
     <string name="dlg_confirm_sending_attach">Do you really want to send attachment?</string>
-    <string name="dlg_select_attach_type">Select attachments type</string>
 
     <string-array name="dlg_attach_types_array">
         <item>Take Photo</item>
@@ -188,6 +187,7 @@
     <string name="fdb_write_email">Write an Email</string>
 
     // Dialog Messages
+    <string name="dlg_select_image_from">Select image from…</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
     <string name="dlg_not_fullname_field_entered">Please enter fullName</string>
@@ -226,6 +226,10 @@
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
     <string name="error_email_already_taken">email has already been taken</string>
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
+    <string-array name="dlg_image_pick">
+        <item>Gallery</item>
+        <item>Camera</item>
+    </string-array>
 
     // Facebook
     <string name="facebook_exception">Facebook exception: </string>

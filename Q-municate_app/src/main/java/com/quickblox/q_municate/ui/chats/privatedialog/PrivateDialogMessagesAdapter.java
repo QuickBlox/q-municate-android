@@ -42,7 +42,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     private int getItemViewType(CombinationMessage combinationMessage) {
-        boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
+        boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
         if (combinationMessage.getNotificationType() == null) {
             if (ownMessage) {
                 return TYPE_OWN_MESSAGE;
@@ -69,7 +69,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         ViewHolder viewHolder;
 
         CombinationMessage combinationMessage = getItem(position);
-        boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
+        boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
 
         if (view == null) {
             viewHolder = new ViewHolder();
@@ -118,7 +118,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        boolean friendsRequestMessage = DialogNotification.NotificationType.FRIENDS_REQUEST.equals(
+        boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
                 combinationMessage.getNotificationType());
         boolean friendsInfoRequestMessage = combinationMessage
                 .getNotificationType() != null && !friendsRequestMessage;
@@ -230,7 +230,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (combinationMessage.getNotificationType() != null) {
             ownMessage = isOwnMessage(combinationMessage.getDialogOccupant().getUser().getUserId());
-            friendsRequestMessage = DialogNotification.NotificationType.FRIENDS_REQUEST.equals(
+            friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
                     combinationMessage.getNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {

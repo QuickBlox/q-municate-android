@@ -8,7 +8,7 @@ import java.io.Serializable;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.BODY;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.CREATED_DATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.ID;
-import static com.quickblox.q_municate_db.models.DialogNotification.Column.NOTIFICATION_TYPE;
+import static com.quickblox.q_municate_db.models.DialogNotification.Column.TYPE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.STATE;
 import static com.quickblox.q_municate_db.models.DialogNotification.Column.TABLE_NAME;
 
@@ -24,6 +24,7 @@ public class DialogNotification implements Serializable {
     @DatabaseField(
             foreign = true,
             foreignAutoRefresh = true,
+            canBeNull = false,
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 
@@ -32,8 +33,8 @@ public class DialogNotification implements Serializable {
     private State state;
 
     @DatabaseField(
-            columnName = NOTIFICATION_TYPE)
-    private NotificationType notificationType;
+            columnName = TYPE)
+    private Type type;
 
     @DatabaseField(
             columnName = BODY)
@@ -47,11 +48,11 @@ public class DialogNotification implements Serializable {
     }
 
     public DialogNotification(String dialogNotificationId, DialogOccupant dialogOccupant, State state,
-            NotificationType notificationType, long createdDate) {
+            Type type, long createdDate) {
         this.dialogNotificationId = dialogNotificationId;
         this.dialogOccupant = dialogOccupant;
         this.state = state;
-        this.notificationType = notificationType;
+        this.type = type;
         this.createdDate = createdDate;
     }
 
@@ -71,12 +72,12 @@ public class DialogNotification implements Serializable {
         this.dialogOccupant = dialogOccupant;
     }
 
-    public NotificationType getNotificationType() {
-        return notificationType;
+    public Type getType() {
+        return type;
     }
 
-    public void setNotificationType(NotificationType NotificationType) {
-        this.notificationType = NotificationType;
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public String getBody() {
@@ -103,21 +104,21 @@ public class DialogNotification implements Serializable {
         this.state = state;
     }
 
-    public enum NotificationType {
+    public enum Type {
 
         FRIENDS_REQUEST(4), FRIENDS_ACCEPT(5), FRIENDS_REJECT(6), FRIENDS_REMOVE(7),
         CREATE_DIALOG(25), ADDED_DIALOG(21), NAME_DIALOG(22), PHOTO_DIALOG(23), LEAVE_DIALOG(24);
 
         private int code;
 
-        NotificationType(int code) {
+        Type(int code) {
             this.code = code;
         }
 
-        public static NotificationType parseByCode(int code) {
-            NotificationType[] valuesArray = NotificationType.values();
-            NotificationType result = null;
-            for (NotificationType value : valuesArray) {
+        public static Type parseByCode(int code) {
+            Type[] valuesArray = Type.values();
+            Type result = null;
+            for (Type value : valuesArray) {
                 if (value.getCode() == code) {
                     result = value;
                     break;
@@ -138,6 +139,6 @@ public class DialogNotification implements Serializable {
         String STATE = "state";
         String BODY = "body";
         String CREATED_DATE = "created_date";
-        String NOTIFICATION_TYPE = "notification_type";
+        String TYPE = "type";
     }
 }

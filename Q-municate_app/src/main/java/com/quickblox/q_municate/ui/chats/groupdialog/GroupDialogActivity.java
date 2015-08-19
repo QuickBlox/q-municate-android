@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,10 +33,6 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
-    public GroupDialogActivity() {
-        super(R.layout.activity_dialog, QBService.GROUP_CHAT_HELPER);
-    }
-
     public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
@@ -44,7 +41,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     public static void start(Context context, Dialog dialog) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
-        intent.putExtra(QBServiceConsts.EXTRA_ROOM_JID, dialog.getDialogId());
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         context.startActivity(intent);
     }
@@ -52,10 +48,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getIntent().hasExtra(QBServiceConsts.EXTRA_ROOM_JID)) {
-            dialogId = getIntent().getStringExtra(QBServiceConsts.EXTRA_ROOM_JID);
-        }
 
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
@@ -73,13 +65,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         updateData();
 
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            Log.d("Scroll-test", "onResume()");
             scrollListView();
         }
     }
 
     protected void updateActionBar() {
         actionBar.setTitle(dialog.getTitle());
-        //        actionBar.setSubtitle(getString(R.string.gdd_participants, dialog.getOccupants().size()));
+
         actionBar.setLogo(R.drawable.placeholder_group);
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
             loadLogoActionBar(dialog.getPhoto());
@@ -88,14 +81,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onConnectServiceLocally(QBService service) {
-        onConnectServiceLocally();
+        onConnectServiceLocally(QBService.GROUP_CHAT_HELPER);
     }
 
     @Override
     protected void onUpdateChatDialog() {
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            startUpdateChatDialog();
-        }
     }
 
     @Override
@@ -147,7 +137,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-        isNeedToScrollMessages = true;
+
         scrollListView();
     }
 

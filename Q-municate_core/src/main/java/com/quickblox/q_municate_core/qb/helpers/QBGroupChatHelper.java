@@ -84,7 +84,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
         if (ChatNotificationUtils.isNotificationMessage(qbChatMessage)) {
             DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
-            dialogNotification.setNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
+            dialogNotification.setType(ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
             dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context, qbChatMessage));
 
             if (!ownMessage) {
@@ -293,7 +293,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     public void sendNotificationToFriends(QBDialog dialog,
-            DialogNotification.NotificationType notificationType,
+            DialogNotification.Type notificationType,
             Collection<Integer> addedFriendIdsList) throws QBResponseException {
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForUpdateChat(context,
                 dialog, notificationType, addedFriendIdsList);
@@ -326,10 +326,10 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     private void createDialogByNotification(QBChatMessage chatMessage,
-            DialogNotification.NotificationType notificationType) {
+            DialogNotification.Type notificationType) {
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(
                 parseReceivedMessage(chatMessage));
-        dialogNotification.setNotificationType(notificationType);
+        dialogNotification.setType(notificationType);
 
         String roomJidId;
 
@@ -355,7 +355,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
             if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(
                     notificationType)) {
-                createDialogByNotification(chatMessage, DialogNotification.NotificationType.CREATE_DIALOG);
+                createDialogByNotification(chatMessage, DialogNotification.Type.CREATE_DIALOG);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(
                     notificationType)) {
                 updateDialogByNotification(chatMessage);

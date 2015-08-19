@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Window;
 
 import com.quickblox.q_municate.App;
@@ -15,7 +16,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
-import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
@@ -28,11 +29,13 @@ import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import butterknife.ButterKnife;
+
 public class BaseFragmentActivity extends FragmentActivity implements QBLogeable, ServiceConnectionListener, UserStatusChangingListener {
 
-    protected final ProgressDialog progress;
     protected App app;
     protected ActionBar actionBar;
+    protected LocalBroadcastManager localBroadcastManager;
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
@@ -44,10 +47,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     protected QBGroupChatHelper groupChatHelper;
 
     private Dialog currentDialog;
-
-    public BaseFragmentActivity() {
-        progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
-    }
 
     public FailAction getFailAction() {
         return failAction;
@@ -62,6 +61,7 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
             canPerformLogout = new AtomicBoolean(savedInstanceState.getBoolean(CAN_PERFORM_LOGOUT));
         }
         actionBar = getActionBar();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
         failAction = new FailAction();
         successAction = new SuccessAction();
         activityHelper = new ActivityHelper(this, new GlobalListener(), this, this);
@@ -112,13 +112,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     }
 
     public void showProgress() {
-        progress.show(getFragmentManager(), null);
+        ProgressDialogFragment.show(getFragmentManager());
     }
 
     public void hideProgress() {
-        if (progress != null && progress.getActivity() != null) {
-            progress.dismissAllowingStateLoss();
-        }
+        ProgressDialogFragment.hide(getFragmentManager());
     }
 
     public void addAction(String action, Command command) {
@@ -200,6 +198,10 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         boolean isFromCurrentChat = dialogId != null && dialogId.equals(currentDialog.getDialogId());
         return isFromCurrentChat;
+    }
+
+    protected void activateButterKnife() {
+        ButterKnife.bind(this);
     }
 
     public class SuccessAction implements Command {

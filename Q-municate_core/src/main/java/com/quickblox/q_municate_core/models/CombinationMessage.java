@@ -18,14 +18,14 @@ public class CombinationMessage implements Serializable {
     private State state;
     private String body;
     private long createdDate;
-    private DialogNotification.NotificationType notificationType;
+    private DialogNotification.Type notificationType;
 
     public CombinationMessage(DialogNotification dialogNotification) {
         this.messageId = dialogNotification.getDialogNotificationId();
         this.dialogOccupant = dialogNotification.getDialogOccupant();
         this.state = dialogNotification.getState();
         this.createdDate = dialogNotification.getCreatedDate();
-        this.notificationType = dialogNotification.getNotificationType();
+        this.notificationType = dialogNotification.getType();
         this.body = dialogNotification.getBody();
     }
 
@@ -57,11 +57,11 @@ public class CombinationMessage implements Serializable {
         this.messageId = messageId;
     }
 
-    public DialogNotification.NotificationType getNotificationType() {
+    public DialogNotification.Type getNotificationType() {
         return notificationType;
     }
 
-    public void setNotificationType(DialogNotification.NotificationType notificationType) {
+    public void setNotificationType(DialogNotification.Type notificationType) {
         this.notificationType = notificationType;
     }
 

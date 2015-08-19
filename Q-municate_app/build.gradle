@@ -1,17 +1,24 @@
 buildscript {
     repositories {
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven {
+            url 'http://download.crashlytics.com/maven'
+        }
     }
 
     dependencies {
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
+
 apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
 
 repositories {
     maven { url 'http://download.crashlytics.com/maven' }
+}
+
+repositories {
+    maven { url 'https://dl.bintray.com/drummer-aidan/maven' }
 }
 
 dependencies {
@@ -32,6 +39,8 @@ dependencies {
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
+    compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
+    compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
 }
 
 android {

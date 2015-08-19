@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,7 +25,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
@@ -44,10 +44,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private FriendOperationAction friendOperationAction;
 
-    public PrivateDialogActivity() {
-        super(R.layout.activity_dialog, QBService.PRIVATE_CHAT_HELPER);
-    }
-
     public static void start(Context context, User opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_OPPONENT, opponent);
@@ -59,12 +55,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         friendOperationAction = new FriendOperationAction();
-        opponentFriend = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
-        if (dialog != null) {
-            dialogId = dialog.getDialogId();
-        } else {
+        if (dialog == null) {
             finish();
         }
 
@@ -83,11 +77,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onResume() {
         super.onResume();
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+            Log.d("Scroll-test", "onResume()");
             scrollListView();
         }
 
         startLoadDialogMessages();
-        currentOpponent = opponentFriend.getFullName();
 
         checkMessageSendingPossibility();
     }
@@ -98,21 +92,18 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onConnectServiceLocally(QBService service) {
-        onConnectServiceLocally();
-        setOnlineStatus(opponentFriend);
+        onConnectServiceLocally(QBService.PRIVATE_CHAT_HELPER);
+        setOnlineStatus(opponentUser);
     }
 
     @Override
     protected void onUpdateChatDialog() {
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            startUpdateChatDialog();
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        currentOpponent = null;
+        opponentUser = null;
     }
 
     @Override
@@ -129,18 +120,19 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onFileLoaded(QBFile file) {
         try {
-            ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessageWithAttachImage(file,
-                    opponentFriend.getUserId());
+            privateChatHelper.sendPrivateMessageWithAttachImage(file, opponentUser.getUserId());
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
+
+        Log.d("Scroll-test", "onFileLoaded()");
         scrollListView();
     }
 
     @Override
     protected Bundle generateBundleToInitDialog() {
         Bundle bundle = new Bundle();
-        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentFriend.getUserId());
+        bundle.putInt(QBServiceConsts.EXTRA_OPPONENT_ID, opponentUser.getUserId());
         return bundle;
     }
 
@@ -149,7 +141,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
                 combinationMessagesList, this, dialog);
-        findLastFriendsRequestAndScroll();
+        findLastFriendsRequest();
+
+        Log.d("Scroll-test", "initListView()");
+        scrollListView();
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
 
@@ -157,13 +152,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void updateMessagesList() {
         List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter.setNewData(combinationMessagesList);
-        findLastFriendsRequestAndScroll();
+        findLastFriendsRequest();
     }
 
-    private void findLastFriendsRequestAndScroll() {
+    private void findLastFriendsRequest() {
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
-        isNeedToScrollMessages = true;
-        scrollListView();
     }
 
     private void setOnlineStatus(User friend) {
@@ -177,13 +170,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initActionBar() {
-        actionBar.setTitle(opponentFriend.getFullName());
+        actionBar.setTitle(opponentUser.getFullName());
         actionBar.setLogo(R.drawable.placeholder_user);
 
-        setOnlineStatus(opponentFriend);
+        setOnlineStatus(opponentUser);
 
-        if (!TextUtils.isEmpty(opponentFriend.getAvatar())) {
-            loadLogoActionBar(opponentFriend.getAvatar());
+        if (!TextUtils.isEmpty(opponentUser.getAvatar())) {
+            loadLogoActionBar(opponentUser.getAvatar());
         }
     }
 
@@ -191,8 +184,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     public void onChangedUserStatus(int userId, boolean online) {
         super.onChangedUserStatus(userId, online);
 
-        if (opponentFriend != null && opponentFriend.getUserId() == userId) {
-            setOnlineStatus(opponentFriend);
+        if (opponentUser != null && opponentUser.getUserId() == userId) {
+            setOnlineStatus(opponentUser);
         }
     }
 
@@ -219,7 +212,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
-                opponentFriend.getUserId()) != null;
+                opponentUser.getUserId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
             DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(
                     R.string.dlg_user_is_not_friend));
@@ -233,10 +226,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                 attachButtonOnClick();
                 return true;
             case R.id.action_audio_call:
-                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
+                callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
                 return true;
             case R.id.action_video_call:
-                callToUser(opponentFriend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+                callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -250,7 +243,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void checkMessageSendingPossibility() {
         boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
-                opponentFriend.getUserId()) != null;
+                opponentUser.getUserId()) != null;
         messageEditText.setEnabled(isFriend);
         smilePanelImageButton.setEnabled(isFriend);
     }

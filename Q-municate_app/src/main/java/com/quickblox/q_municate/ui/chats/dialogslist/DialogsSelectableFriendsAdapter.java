@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseActivity;
-import com.quickblox.q_municate.ui.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;

@@ -29,7 +29,6 @@ import java.util.List;
 public class ChatUtils {
 
     public static final String OCCUPANT_IDS_DIVIDER = ",";
-    public static final int NOT_RESET_COUNTER = -1;
 
     public static String getAttachUrlFromMessage(Collection<QBAttachment> attachmentsCollection) {
         if (attachmentsCollection != null) {
@@ -230,6 +229,7 @@ public class ChatUtils {
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
         Attachment attachment = new Attachment();
+        attachment.setAttachmentId(qbAttachment.getId());
         attachment.setRemoteUrl(qbAttachment.getUrl());
         attachment.setName(qbAttachment.getName());
         attachment.setSize(qbAttachment.getSize());
@@ -244,16 +244,16 @@ public class ChatUtils {
         int friendsMessageTypeCode = Integer.parseInt(qbChatMessage.getProperty(
                 ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE).toString());
         if (ChatNotificationUtils.isFriendsNotificationMessage(friendsMessageTypeCode)) {
-            dialogNotification.setNotificationType(DialogNotification.NotificationType.parseByCode(
-                    friendsMessageTypeCode));
+            dialogNotification.setType(DialogNotification.Type.parseByCode(friendsMessageTypeCode));
             dialogNotification.setBody(ChatNotificationUtils.getBodyForFriendsNotificationMessage(context,
-                    DialogNotification.NotificationType.parseByCode(friendsMessageTypeCode),
+                    DialogNotification.Type.parseByCode(friendsMessageTypeCode),
                     qbChatMessage));
         } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)
                 || ChatNotificationUtils.PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(friendsMessageTypeCode + ConstsCore.EMPTY_STRING)) {
             dialogNotification.setBody(ChatNotificationUtils.getBodyForUpdateChatNotificationMessage(context,
                     qbChatMessage));
-            dialogNotification.setNotificationType(ChatNotificationUtils.getUpdateChatNotificationMessageType(qbChatMessage));
+            dialogNotification.setType(ChatNotificationUtils.getUpdateChatNotificationMessageType(
+                    qbChatMessage));
         }
 
         dialogNotification.setCreatedDate(qbChatMessage.getDateSent());

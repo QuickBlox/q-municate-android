@@ -18,13 +18,12 @@ import static com.quickblox.q_municate_db.models.Attachment.Column.TYPE;
 public class Attachment implements Serializable {
 
     @DatabaseField(
-            generatedId = true,
+            id = true,
             unique = true,
             columnName = ID)
-    private int attachmentId;
+    private String attachmentId;
 
     @DatabaseField(
-            unique = true,
             columnName = BLOB_ID)
     private int blobId;
 
@@ -51,8 +50,9 @@ public class Attachment implements Serializable {
     public Attachment() {
     }
 
-    public Attachment(int blobId, Type type, String name, long size, String remoteUrl,
+    public Attachment(String attachmentId, int blobId, Type type, String name, long size, String remoteUrl,
             String additionalInfo) {
+        this.attachmentId = attachmentId;
         this.blobId = blobId;
         this.type = type;
         this.name = name;
@@ -61,11 +61,11 @@ public class Attachment implements Serializable {
         this.additionalInfo = additionalInfo;
     }
 
-    public int getAttachmentId() {
+    public String getAttachmentId() {
         return attachmentId;
     }
 
-    public void setAttachmentId(int attachmentId) {
+    public void setAttachmentId(String attachmentId) {
         this.attachmentId = attachmentId;
     }
 

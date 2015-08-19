@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.base;
+package com.quickblox.q_municate.ui.adapters.base;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -20,14 +20,14 @@ public abstract class BaseListAdapter<T> extends BaseAdapter {
     protected List<T> objectsList;
     protected Resources resources;
 
-    protected QBUser currentQBUser;
+    protected QBUser currentUser;
 
     public BaseListAdapter(Context context, List<T> objectsList) {
         this.context = context;
         this.objectsList = objectsList;
         this.layoutInflater = LayoutInflater.from(context);
         resources = context.getResources();
-        currentQBUser = AppSession.getSession().getUser();
+        currentUser = AppSession.getSession().getUser();
     }
 
     @Override

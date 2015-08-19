@@ -8,24 +8,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
@@ -33,15 +28,18 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
 import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
-import com.quickblox.q_municate.ui.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.dialogs.AlertDialog;
-import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.q_municate.ui.dialogs.ImageSourcePickDialogFragment;
+import com.quickblox.q_municate.utils.ActionBarUtils;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.ImageSource;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -55,7 +53,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -77,65 +74,197 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import butterknife.Bind;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements AbsListView.OnScrollListener, ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener, EmojiFragment.OnEmojiBackspaceClickedListener {
+public abstract class BaseDialogActivity extends BaseFragmentActivity implements
+        ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
+        EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
 
     private static final int TYPING_DELAY = 1000;
 
+    @Bind(R.id.messages_listview)
+    protected StickyListHeadersListView messagesListView;
+
+    @Bind(R.id.message_edittext)
+    protected EditText messageEditText;
+
+    @Bind(R.id.send_button)
+    protected ImageButton sendButton;
+
+    @Bind(R.id.message_typing_view)
+    protected View messageTypingView;
+
+    @Bind(R.id.smile_panel_imagebutton)
+    protected ImageButton smilePanelImageButton;
+
+    @Bind(R.id.message_typing_box_imageview)
+    protected ImageView messageTypingBoxImageView;
+
+    @Bind(R.id.load_more_linearlayout)
+    protected View loadMoreView;
+
+    protected View emojisFragment;
+
     protected Resources resources;
     protected DataManager dataManager;
-    protected EditText chatEditText;
-    protected StickyListHeadersListView messagesListView;
-    protected EditText messageEditText;
-    protected TextView messageTextView;
-    protected ImageButton sendButton;
-    protected ImageButton smilePanelImageButton;
-    protected String currentOpponent;
-    protected String dialogId;
-    protected View emojisFragment;
     protected ImageUtils imageUtils;
-    protected int layoutResID;
     protected BaseListAdapter messagesAdapter;
     protected Dialog dialog;
-    protected boolean isNeedToScrollMessages;
+    protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
-    protected User opponentFriend;
 
-    private int keyboardHeight;
     private View rootView;
+    private int keyboardHeight;
     private boolean needToShowSmileLayout;
-    private View messageTypingView;
-    private ImageView messageTypingBoxImageView;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private LoadDialogMessagesFailAction loadDialogMessagesFailAction;
-    private int chatHelperIdentifier;
     private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
-    private int firstVisiblePositionList;
-    private View loadMoreView;
-    private boolean loadingMore;
     private int skipMessages;
-    private boolean firstItemInList;
-    private int totalItemCountInList;
     private Observer messageObserver;
     private Observer dialogNotificationObserver;
-
-    public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
-        this.chatHelperIdentifier = chatHelperIdentifier;
-        this.layoutResID = layoutResID;
-    }
+    private BroadcastReceiver typingMessageBroadcastReceiver;
+    private BroadcastReceiver updatingDialogBroadcastReceiver;
 
     @Override
-    public void onEmojiconClicked(EmojiObject emojiObject) {
-        EmojiFragment.input(messageEditText, emojiObject);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        rootView = getLayoutInflater().inflate(R.layout.activity_dialog, null);
+        setContentView(rootView);
+
+        activateButterKnife();
+
+        initActionBar();
+        initFields();
+        initUI();
+        initListeners();
+
+        addActions();
+        registerBroadcastReceivers();
+        addObservers();
+        hideSmileLayout();
     }
 
-    @Override
-    public void onEmojiBackspaceClicked(View v) {
-        EmojiFragment.backspace(messageEditText);
+    private void initActionBar() {
+        actionBar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);
+        ActionBarUtils.initColorsActionBar(this);
+    }
+
+    private void initFields() {
+        resources = getResources();
+        dataManager = DataManager.getInstance();
+        imageUtils = new ImageUtils(this);
+        loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
+        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
+        loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
+        typingTimer = new Timer();
+        messageObserver = new MessageObserver();
+        dialogNotificationObserver = new DialogNotificationObserver();
+        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+    }
+
+    private void initUI() {
+        emojisFragment = _findViewById(R.id.emojicons_fragment);
+        sendButton.setEnabled(false);
+        messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
+        loadMoreView.setVisibility(View.GONE);
+    }
+
+    private void initListeners() {
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+
+                    @Override
+                    public void onGlobalLayout() {
+                        initKeyboardHeight();
+                        if (needToShowSmileLayout) {
+                            showSmileLayout(keyboardHeight);
+                        }
+                    }
+                });
+    }
+
+    @OnTextChanged(R.id.message_edittext)
+    public void messageEditTextChanged(CharSequence charSequence) {
+        setSendButtonVisibility(charSequence);
+
+        // TODO: now it is possible only for Private chats
+        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+            if (!isTypingNow) {
+                isTypingNow = true;
+                sendTypingStatus();
+            }
+            checkStopTyping();
+        }
+    }
+
+    @OnClick(R.id.smile_panel_imagebutton)
+    public void smilePanelImageButtonClicked() {
+        if (isSmilesLayoutShowing()) {
+            hideSmileLayout();
+            KeyboardUtils.showKeyboard(BaseDialogActivity.this);
+        } else {
+            KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
+            needToShowSmileLayout = true;
+            if (keyboardHeight == ConstsCore.ZERO_INT_VALUE) {
+                showSmileLayout(ConstsCore.ZERO_INT_VALUE);
+            }
+        }
+    }
+
+    protected void addActions() {
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, loadAttachFileSuccessAction);
+        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
+        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, loadDialogMessagesFailAction);
+
+        addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
+        addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
+        addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
+
+        updateBroadcastActionList();
+    }
+
+    protected void removeActions() {
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
+
+        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+
+        updateBroadcastActionList();
+    }
+
+    private void registerBroadcastReceivers() {
+        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.TYPING_MESSAGE));
+        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver, new IntentFilter(
+                QBServiceConsts.UPDATE_DIALOG));
+    }
+
+    private void unregisterBroadcastReceivers() {
+        localBroadcastManager.unregisterReceiver(updatingDialogBroadcastReceiver);
+        localBroadcastManager.unregisterReceiver(typingMessageBroadcastReceiver);
+    }
+
+    private void addObservers() {
+        dataManager.getMessageDataManager().addObserver(messageObserver);
+        dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
+    }
+
+    private void deleteObservers() {
+        dataManager.getMessageDataManager().deleteObserver(messageObserver);
+        dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
     }
 
     @Override
@@ -148,37 +277,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        rootView = getLayoutInflater().inflate(layoutResID, null);
-        setContentView(rootView);
-
-        resources = getResources();
-        dataManager = DataManager.getInstance();
-        imageUtils = new ImageUtils(this);
-        loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
-        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
-        loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
-        typingTimer = new Timer();
-        messageObserver = new MessageObserver();
-        dialogNotificationObserver = new DialogNotificationObserver();
-
-        initUI();
-        initListeners();
-        initActionBar();
-
-        addActions();
-
-        isNeedToScrollMessages = true;
-
-        initLocalBroadcastManagers();
-        addObservers();
-        hideSmileLayout();
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
+
         onUpdateChatDialog();
         hideSmileLayout();
 
@@ -194,11 +295,47 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
+        // TODO need to refactor!
         boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
                 PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
+
         if (isNeedToOpenDialog) {
             finish();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        readAllMessages();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (baseChatHelper != null) {
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                    generateBundleToInitDialog());
+        }
+
+        removeActions();
+        deleteObservers();
+        unregisterBroadcastReceivers();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        canPerformLogout.set(true);
+        if ((isGalleryCalled(requestCode) || isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
+            if (data.getData() == null) {
+                onFileSelected((Bitmap) data.getExtras().get("data"));
+            } else {
+                onFileSelected(data.getData());
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -207,39 +344,25 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         onConnectServiceLocally(service);
     }
 
-    private void addObservers() {
-        dataManager.getMessageDataManager().addObserver(messageObserver);
-        dataManager.getDialogNotificationDataManager().addObserver(dialogNotificationObserver);
+    @Override
+    public void onEmojiconClicked(EmojiObject emojiObject) {
+        EmojiFragment.input(messageEditText, emojiObject);
     }
 
-    private void deleteObservers() {
-        dataManager.getMessageDataManager().deleteObserver(messageObserver);
-        dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
+    @Override
+    public void onEmojiBackspaceClicked(View v) {
+        EmojiFragment.backspace(messageEditText);
     }
 
     protected void updateData() {
-        dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
+        dialog = dataManager.getDialogDataManager().getByDialogId(dialog.getDialogId());
         if (dialog != null) {
             updateActionBar();
         }
         updateMessagesList();
     }
 
-    protected abstract void updateActionBar();
-
-    private void initLocalBroadcastManagers() {
-        BroadcastReceiver typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(typingMessageBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
-
-        BroadcastReceiver updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(updatingDialogBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
-    }
-
-    protected abstract void onConnectServiceLocally(QBService service);
-
-    protected void onConnectServiceLocally() {
+    protected void onConnectServiceLocally(int chatHelperIdentifier) {
         if (baseChatHelper == null) {
             baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
             try {
@@ -264,27 +387,24 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void attachButtonOnClick() {
         canPerformLogout.set(false);
+        ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
+    }
 
-        CharSequence[] itemsArray = resources.getStringArray(R.array.dlg_attach_types_array);
+    @Override
+    public void onImageSourcePicked(ImageSource source) {
+        switch (source) {
+            case GALLERY:
+                imageUtils.getImage();
+                break;
+            case CAMERA:
+                imageUtils.getCaptureImage();
+                break;
+        }
+    }
 
-        final android.app.Dialog alertDialog = DialogUtils.createSingleChoiceItemsDialog(this,
-                resources.getString(R.string.dlg_select_attach_type), itemsArray,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        switch (item) {
-                            case 0:
-                                imageUtils.getCaptureImage();
-                                break;
-                            case 1:
-                                imageUtils.getImage();
-                                break;
-                        }
-
-                        //                alertDialog.dismiss();
-                    }
-                });
-
-        alertDialog.show();
+    @Override
+    public void onImageSourceClosed() {
+        canPerformLogout.set(true);
     }
 
     private void hideSmileLayout() {
@@ -303,82 +423,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         setSmilePanelIcon(R.drawable.ic_keyboard);
     }
 
-    protected void addActions() {
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION, loadAttachFileSuccessAction);
-        addAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
-        addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, loadDialogMessagesFailAction);
-        addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
-        addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
-        addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
-    }
-
-    protected abstract void onUpdateChatDialog();
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        canPerformLogout.set(true);
-        if ((isGalleryCalled(requestCode) || isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
-            isNeedToScrollMessages = true;
-            if (data.getData() == null) {
-                onFileSelected((Bitmap) data.getExtras().get("data"));
-            } else {
-                onFileSelected(data.getData());
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        readAllMessages();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (baseChatHelper != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    generateBundleToInitDialog());
-        }
-        removeActions();
-        deleteObservers();
-    }
-
     private boolean isGalleryCalled(int requestCode) {
         return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
     }
 
     private boolean isCaptureCalled(int requestCode) {
         return ImageUtils.CAPTURE_CALLED == requestCode;
-    }
-
-    private void initActionBar() {
-        actionBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);
-        initColorsActionBar();
-    }
-
-    private void initColorsActionBar() {
-        int actionBarTitleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
-        int actionBarSubTitleId = Resources.getSystem().getIdentifier("action_bar_subtitle", "id", "android");
-        if (actionBarTitleId > ConstsCore.ZERO_INT_VALUE) {
-            TextView title = (TextView) findViewById(actionBarTitleId);
-            if (title != null) {
-                title.setTextColor(Color.WHITE);
-            }
-        }
-        if (actionBarSubTitleId > ConstsCore.ZERO_INT_VALUE) {
-            TextView subTitle = (TextView) findViewById(actionBarSubTitleId);
-            if (subTitle != null) {
-                float alpha = 0.5f;
-                subTitle.setTextColor(Color.WHITE);
-                subTitle.setAlpha(alpha);
-            }
-        }
     }
 
     protected void loadLogoActionBar(String logoUrl) {
@@ -400,17 +450,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         actionBar.setLogo(new BitmapDrawable(getResources(), roundedBitmap));
     }
 
-    protected void removeActions() {
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
-    }
-
-    protected abstract void onFileSelected(Uri originalUri);
-
-    protected abstract void onFileSelected(Bitmap bitmap);
-
     protected void startLoadAttachFile(final File file) {
         final AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
                 R.string.dlg_confirm_sending_attach));
@@ -430,54 +469,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         alertDialog.show(getFragmentManager(), null);
     }
 
-    protected abstract void onFileLoaded(QBFile file);
-
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        loadingMore = true;
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog),
-                lastDateLoad, skipMessages);
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog), lastDateLoad,
+                skipMessages);
         skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
     }
-
-    protected abstract Bundle generateBundleToInitDialog();
-
-    private void initUI() {
-        emojisFragment = _findViewById(R.id.emojicons_fragment);
-        chatEditText = _findViewById(R.id.message_edittext);
-        messagesListView = _findViewById(R.id.messages_listview);
-        messageEditText = _findViewById(R.id.message_edittext);
-        sendButton = _findViewById(R.id.send_button);
-        smilePanelImageButton = _findViewById(R.id.smile_panel_imagebutton);
-        sendButton.setEnabled(false);
-        messageTextView = _findViewById(R.id.message_textview);
-        messageTypingView = _findViewById(R.id.message_typing_view);
-        messageTypingBoxImageView = _findViewById(R.id.message_typing_box_imageview);
-        messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
-        loadMoreView = _findViewById(R.id.load_more_linearlayout);
-        loadMoreView.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        if (scrollState == SCROLL_STATE_IDLE) {
-            if (firstItemInList && !loadingMore) {
-                firstVisiblePositionList = totalItemCountInList - 1;
-                loadMoreItems();
-            }
-        }
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        firstItemInList = (firstVisibleItem + totalItemCount) == totalItemCount;
-        totalItemCountInList = totalItemCount;
-    }
-
-    private void loadMoreItems() {
-        startLoadDialogMessages();
-    }
-
-    protected abstract void initListView();
 
     private void setSendButtonVisibility(CharSequence charSequence) {
         if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
@@ -487,70 +483,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    private void initListeners() {
-        messageEditText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent event) {
-                hideSmileLayout();
+    @Override
+    public void onScrollMessagesToBottom() {
+        scrollListView();
+    }
 
-                // TODO: now it is possible only for Private chats
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    if (!isTypingNow) {
-                        isTypingNow = true;
-                        sendTypingStatus();
-                    }
-                }
-
-                return false;
-            }
-        });
-
-        messageEditText.addTextChangedListener(new SimpleTextWatcher() {
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
-                super.onTextChanged(charSequence, start, before, count);
-                setSendButtonVisibility(charSequence);
-
-                // TODO: now it is possible only for Private chats
-                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                    if (!isTypingNow) {
-                        isTypingNow = true;
-                        sendTypingStatus();
-                    }
-                    checkStopTyping();
-                }
-            }
-        });
-
-        smilePanelImageButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (isSmilesLayoutShowing()) {
-                    hideSmileLayout();
-                    KeyboardUtils.showKeyboard(BaseDialogActivity.this);
-                } else {
-                    KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
-                    needToShowSmileLayout = true;
-                    if (keyboardHeight == ConstsCore.ZERO_INT_VALUE) {
-                        showSmileLayout(ConstsCore.ZERO_INT_VALUE);
-                    }
-                }
-            }
-        });
-
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                    @Override
-                    public void onGlobalLayout() {
-                        initKeyboardHeight();
-                        if (needToShowSmileLayout) {
-                            showSmileLayout(keyboardHeight);
-                        }
-                    }
-                });
+    @Override
+    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
+        this.canPerformLogout.set(canPerformLogout);
     }
 
     private void checkStopTyping() {
@@ -560,7 +500,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void sendTypingStatus() {
-        baseChatHelper.sendTypingStatusToServer(opponentFriend.getUserId(), isTypingNow);
+        baseChatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
     }
 
     private void initKeyboardHeight() {
@@ -586,21 +526,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         return emojisFragment.getVisibility() == View.VISIBLE;
     }
 
-    @Override
-    public void onScrollMessagesToBottom() {
-        scrollListView();
-    }
-
-    @Override
-    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
-        this.canPerformLogout.set(canPerformLogout);
-    }
-
     protected void scrollListView() {
-        if (isNeedToScrollMessages) {
-            isNeedToScrollMessages = false;
-            messagesListView.setSelection(messagesAdapter.getCount() - 1);
-        }
+        messagesListView.setSelection(messagesAdapter.getCount() - 1);
     }
 
     protected void sendMessage(boolean privateMessage) {
@@ -608,7 +535,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         try {
             if (privateMessage) {
                 ((QBPrivateChatHelper) baseChatHelper).sendPrivateMessage(
-                        messageEditText.getText().toString(), opponentFriend.getUserId());
+                        messageEditText.getText().toString(), opponentUser.getUserId());
             } else {
                 ((QBGroupChatHelper) baseChatHelper).sendGroupMessage(dialog.getRoomJid(),
                         messageEditText.getText().toString());
@@ -624,30 +551,20 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         if (!error) {
             messageEditText.setText(ConstsCore.EMPTY_STRING);
-            isNeedToScrollMessages = true;
             scrollListView();
         }
     }
 
     protected List<CombinationMessage> createCombinationMessagesList() {
         List<CombinationMessage> combinationMessagesList = new ArrayList<>();
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialogId);
+                .getDialogNotificationsByDialogId(dialog.getDialogId());
         combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromMessagesList(messagesList));
         combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromDialogNotificationsList(
                 dialogNotificationsList));
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
         return combinationMessagesList;
-    }
-
-    //    abstract QBDialog getQBDialog();
-
-    protected void startUpdateChatDialog() {
-        //        QBDialog dialog = getQBDialog();
-        //        if (dialog != null) {
-        //            QBUpdateDialogLocalCommand.start(this, dialog);
-        //        }
     }
 
     protected void startLoadDialogMessages() {
@@ -670,10 +587,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
     }
 
-    protected abstract void updateMessagesList();
-
     private void readAllMessages() {
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<Message> updateMessagesList = new ArrayList<>();
         for (Message message : messagesList) {
             if (message.getState().equals(State.DELIVERED)) {
@@ -684,7 +599,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         dataManager.getMessageDataManager().createOrUpdate(updateMessagesList);
 
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialogId);
+                .getDialogNotificationsByDialogId(dialog.getDialogId());
         List<DialogNotification> updateDialogNotificationsList = new ArrayList<>();
         for (DialogNotification dialogNotification : dialogNotificationsList) {
             if (dialogNotification.getState().equals(State.DELIVERED)) {
@@ -694,6 +609,24 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         }
         dataManager.getDialogNotificationDataManager().createOrUpdate(updateDialogNotificationsList);
     }
+
+    protected abstract void updateActionBar();
+
+    protected abstract void onConnectServiceLocally(QBService service);
+
+    protected abstract void onUpdateChatDialog();
+
+    protected abstract void onFileSelected(Uri originalUri);
+
+    protected abstract void onFileSelected(Bitmap bitmap);
+
+    protected abstract Bundle generateBundleToInitDialog();
+
+    protected abstract void initListView();
+
+    protected abstract void updateMessagesList();
+
+    protected abstract void onFileLoaded(QBFile file);
 
     private class MessageObserver implements Observer {
 
@@ -729,8 +662,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         protected Bitmap doInBackground(Object[] params) {
             Bitmap bitmap = (Bitmap) params[0];
-            Bitmap roundedBitmap = imageUtils.getRoundedBitmap(bitmap);
-            return roundedBitmap;
+            return imageUtils.getRoundedBitmap(bitmap);
         }
 
         @Override
@@ -753,9 +685,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            //            totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
-            loadingMore = false;
-
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);
             }
@@ -768,8 +697,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
-            loadingMore = false;
-
             if (skipMessages != 0) {
                 messagesListView.setSelection(0);
             }

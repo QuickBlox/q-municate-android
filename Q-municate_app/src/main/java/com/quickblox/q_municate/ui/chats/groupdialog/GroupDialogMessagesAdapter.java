@@ -32,7 +32,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     }
 
     private int getItemViewType(CombinationMessage combinationMessage) {
-        boolean ownMessage = combinationMessage.isIncoming(currentQBUser.getId());
+        boolean ownMessage = combinationMessage.isIncoming(currentUser.getId());
         if (combinationMessage.getNotificationType() == null) {
             if (ownMessage) {
                 return TYPE_OWN_MESSAGE;
@@ -59,7 +59,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         ViewHolder viewHolder;
 
         CombinationMessage combinationMessage = getItem(position);
-        boolean ownMessage = !combinationMessage.isIncoming(currentQBUser.getId());
+        boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
         boolean notificationMessage = combinationMessage.getNotificationType() != null;
 
         if (view == null) {
@@ -119,28 +119,28 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             } else {
                 senderName = combinationMessage.getDialogOccupant().getUser().getFullName();
                 avatarUrl = combinationMessage.getDialogOccupant().getUser().getAvatar();
-                viewHolder.nameTextView.setTextColor(getTextColor(
-                        combinationMessage.getDialogOccupant().getUser().getUserId()));
+                viewHolder.nameTextView.setTextColor(
+                        colorUtils.getRandomTextColorById(combinationMessage.getDialogOccupant().getUser().getUserId()));
                 viewHolder.nameTextView.setText(senderName);
             }
 
             if (combinationMessage.getAttachment() != null) {
-                viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(
-                        combinationMessage.getCreatedDate()));
+                viewHolder.timeAttachMessageTextView.setText(
+                        DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
                 setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
                 displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
             } else {
                 setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-                viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
-                        combinationMessage.getCreatedDate()));
+                viewHolder.timeTextMessageTextView.setText(
+                        DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
                 viewHolder.messageTextView.setText(combinationMessage.getBody());
             }
         }
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    combinationMessage.toMessage(), false);
+            QBUpdateStatusMessageCommand.start(context,
+                    ChatUtils.createQBDialogFromLocalDialog(dialog), combinationMessage.toMessage(), false);
         }
 
         displayAvatarImage(avatarUrl, viewHolder.avatarImageView);

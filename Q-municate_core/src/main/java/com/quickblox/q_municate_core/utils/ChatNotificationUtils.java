@@ -146,7 +146,7 @@ public class ChatNotificationUtils {
         if (chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE) != null) {
             String inputCode = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
             if (PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE.equals(inputCode)) {
-                friendsMessageTypeCode = DialogNotification.NotificationType.CREATE_DIALOG.getCode();
+                friendsMessageTypeCode = DialogNotification.Type.CREATE_DIALOG.getCode();
             } else {
                 friendsMessageTypeCode = Integer.parseInt(inputCode);
             }
@@ -167,7 +167,7 @@ public class ChatNotificationUtils {
     }
 
     public static String getBodyForFriendsNotificationMessage(Context context,
-            DialogNotification.NotificationType notificationType, QBChatMessage qbChatMessage) {
+            DialogNotification.Type notificationType, QBChatMessage qbChatMessage) {
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.frl_friends_contact_request);
         QBUser user = AppSession.getSession().getUser();
@@ -252,7 +252,7 @@ public class ChatNotificationUtils {
     }
 
     public static QBChatMessage createNotificationMessageForUpdateChat(Context context, QBDialog dialog,
-            DialogNotification.NotificationType notificationType, Collection<Integer> addedFriendIdsList) {
+            DialogNotification.Type notificationType, Collection<Integer> addedFriendIdsList) {
         QBUser user = AppSession.getSession().getUser();
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
@@ -287,7 +287,7 @@ public class ChatNotificationUtils {
         return chatMessage;
     }
 
-    public static DialogNotification.NotificationType getUpdateChatNotificationMessageType(
+    public static DialogNotification.Type getUpdateChatNotificationMessageType(
             QBChatMessage chatMessage) {
         String notificationType = (String) chatMessage.getProperty(PROPERTY_NOTIFICATION_TYPE);
         String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
@@ -297,24 +297,24 @@ public class ChatNotificationUtils {
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
                 PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE)) {
-            return DialogNotification.NotificationType.ADDED_DIALOG;
+            return DialogNotification.Type.ADDED_DIALOG;
         }
 
         if (!TextUtils.isEmpty(occupantsIds) && notificationType.equals(
                 PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE)) {
-            return DialogNotification.NotificationType.CREATE_DIALOG;
+            return DialogNotification.Type.CREATE_DIALOG;
         }
 
         if (!TextUtils.isEmpty(dialogName)) {
-            return DialogNotification.NotificationType.NAME_DIALOG;
+            return DialogNotification.Type.NAME_DIALOG;
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {
-            return DialogNotification.NotificationType.PHOTO_DIALOG;
+            return DialogNotification.Type.PHOTO_DIALOG;
         }
 
         if (!TextUtils.isEmpty(leave)) {
-            return DialogNotification.NotificationType.LEAVE_DIALOG;
+            return DialogNotification.Type.LEAVE_DIALOG;
         }
 
         return null;

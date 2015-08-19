@@ -9,7 +9,7 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate.ui.base.BaseActivity;
-import com.quickblox.q_municate.ui.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 
 import java.util.List;

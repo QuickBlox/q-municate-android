@@ -36,6 +36,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     protected QBService service;
 
     private ServiceConnection serviceConnection;
+    private boolean bounded;
 
     public String getTitle() {
         return title;
@@ -70,6 +71,19 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
         getActivity().getActionBar().setTitle(title);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        unbindService();
+    }
+
+    private void unbindService() {
+        if (bounded && service.isRestricted()) {
+            baseActivity.unbindService(serviceConnection);
+        }
+    }
+
     public BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
     }
@@ -83,8 +97,10 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     }
 
     private void connectToService() {
-        Intent intent = new Intent(baseActivity, QBService.class);
-        baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        if (service != null && !service.isRestricted()) {
+            Intent intent = new Intent(baseActivity, QBService.class);
+            baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     public void onConnectedToService(QBService service) {
@@ -109,6 +125,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
+            bounded = true;
             service = ((QBService.QBServiceBinder) binder).getService();
             onConnectedToService(service);
         }

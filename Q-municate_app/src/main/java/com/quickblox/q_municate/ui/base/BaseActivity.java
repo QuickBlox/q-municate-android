@@ -15,7 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
-import com.quickblox.q_municate.ui.dialogs.ProgressDialog;
+import com.quickblox.q_municate.ui.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.SharedHelper;
@@ -32,7 +32,6 @@ import butterknife.ButterKnife;
 
 public abstract class BaseActivity extends Activity implements ServiceConnectionListener, UserStatusChangingListener {
 
-    protected final ProgressDialog progress;
     protected App app;
     protected ActionBar actionBar;
     protected SharedHelper appSharedHelper;
@@ -60,10 +59,6 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         activityHelper.onCreate();
     }
 
-    public BaseActivity() {
-        progress = ProgressDialog.newInstance(R.string.dlg_wait_please);
-    }
-
     public void setFragmentUserStatusChangingListener(
             UserStatusChangingListener fragmentUserStatusChangingListener) {
         this.fragmentUserStatusChangingListener = fragmentUserStatusChangingListener;
@@ -74,15 +69,11 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
     }
 
     public synchronized void showProgress() {
-        if (!progress.isAdded()) {
-            progress.show(getFragmentManager(), null);
-        }
+        ProgressDialogFragment.show(getFragmentManager());
     }
 
     public synchronized void hideProgress() {
-        if (progress != null && progress.getActivity() != null) {
-            progress.dismissAllowingStateLoss();
-        }
+        ProgressDialogFragment.hide(getFragmentManager());
     }
 
     public void hideActionBarProgress() {

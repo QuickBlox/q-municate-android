@@ -10,6 +10,9 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
@@ -120,15 +123,16 @@ public class SettingsFragment extends BaseFragment {
     }
 
     private void logout() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_logout, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                baseActivity.showProgress();
-                QBLogoutCompositeCommand.start(getActivity());
-            }
-        });
-        dialog.show(getFragmentManager(), null);
+        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        baseActivity.showProgress();
+                        FacebookHelper.logout();
+                        QBLogoutCompositeCommand.start(baseActivity);
+                    }
+                });
     }
 
     private void savePushNotification(boolean value) {

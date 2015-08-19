@@ -210,6 +210,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                         qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
                 message.setAttachment(attachment);
+
                 dataManager.getAttachmentDataManager().createOrUpdate(attachment);
             }
 

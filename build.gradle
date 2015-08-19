@@ -14,10 +14,10 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 21
+    compileSdkVersion = 22
     buildToolsVersion = '21.0.1'
     minSdkVersion = 14
-    targetSdkVersion = 21
+    targetSdkVersion = 22
     versionName = '1.1.2'
     versionCode = 112
 
@@ -26,10 +26,12 @@ ext {
     // Dependencies versions
     multiDexVersion = '1.0.1'
     universalImageLoaderVersion = '1.9.1'
-    googlePlayServicesVersion = '7.5.0'
+    googlePlayServicesVersion = '7.8.0'
     croutonVersion = '1.8.5'
     nineoldandroidsVersion = '2.4.0'
     ormliteAndroidVersion = '4.48'
     ormliteCoreVersion = '4.48'
     butterknifeVersion = '7.0.1'
+    materialDialogsVersion = '0.7.8.1'
+    recyclerViewVersion = '23.0.0'
 }

@@ -22,11 +22,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
+import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.friends.FriendDetailsActivity;
 import com.quickblox.q_municate.ui.friends.FriendOperationListener;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;
@@ -44,7 +46,6 @@ import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
-import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
@@ -87,7 +88,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private String groupNameOld;
     private ImageUtils imageUtils;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
-    private List<DialogNotification.NotificationType> currentNotificationTypeList;
+    private List<DialogNotification.Type> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
     private FriendOperationAction friendOperationAction;
     private boolean loadedDialogInfo;
@@ -308,19 +309,19 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void showLeaveGroupDialog() {
-        ConfirmDialog dialog = ConfirmDialog.newInstance(R.string.dlg_leave_group, R.string.dlg_confirm);
-        dialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                leaveGroup();
-            }
-        });
-        dialog.show(getFragmentManager(), null);
+        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_leave_group, R.string.dlg_confirm,
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        leaveGroup();
+                    }
+                });
     }
 
     private void leaveGroup() {
         showProgress();
-        currentNotificationTypeList.add(DialogNotification.NotificationType.LEAVE_DIALOG);
+        currentNotificationTypeList.add(DialogNotification.Type.LEAVE_DIALOG);
         sendNotificationToGroup();
         Dialog dialog = databaseManager.getDialogDataManager().getByRoomJid(groupDialog.getRoomJid());
         QBLeaveGroupDialogCommand.start(GroupDialogDetailsActivity.this, dialog);
@@ -339,7 +340,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             } catch (Exception e) {
                 ErrorUtils.logError(e);
             }
-            currentNotificationTypeList.add(DialogNotification.NotificationType.ADDED_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.Type.ADDED_DIALOG);
             sendNotificationToGroup();
         }
     }
@@ -401,13 +402,13 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (!currentDialog.getTitle().equals(groupNameCurrent)) {
             currentDialog.setTitle(groupNameCurrent);
 
-            currentNotificationTypeList.add(DialogNotification.NotificationType.NAME_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.Type.NAME_DIALOG);
         }
 
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
 
-            currentNotificationTypeList.add(DialogNotification.NotificationType.PHOTO_DIALOG);
+            currentNotificationTypeList.add(DialogNotification.Type.PHOTO_DIALOG);
         } else {
             updateGroupDialog(null);
         }
@@ -416,7 +417,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void sendNotificationToGroup() {
-        for (DialogNotification.NotificationType messagesNotificationType : currentNotificationTypeList) {
+        for (DialogNotification.Type messagesNotificationType : currentNotificationTypeList) {
             try {
                 groupChatHelper.sendNotificationToFriends(ChatUtils.createQBDialogFromLocalDialog(
                         currentDialog), messagesNotificationType, addedFriendIdsList);

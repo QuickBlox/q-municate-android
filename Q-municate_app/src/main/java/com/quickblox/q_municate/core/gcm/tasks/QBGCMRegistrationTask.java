@@ -12,29 +12,26 @@ import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEnvironment;
 import com.quickblox.messages.model.QBSubscription;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.concurrency.BaseProgressTask;
-import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.core.concurrency.BaseErrorAsyncTask;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class QBGCMRegistrationTask extends BaseProgressTask<GoogleCloudMessaging, Void, Bundle> {
+public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessaging, Void, Bundle> {
 
     private static final String TAG = QBGCMRegistrationTask.class.getSimpleName();
 
     public QBGCMRegistrationTask(Activity activity) {
-        super(activity, ConstsCore.NOT_INITIALIZED_VALUE, false);
+        super(activity);
     }
 
     @Override
     public void onResult(Bundle bundle) {
-        super.onResult(bundle);
         if (!bundle.isEmpty()) {
             storeRegistration(activityRef.get(), bundle);
         }

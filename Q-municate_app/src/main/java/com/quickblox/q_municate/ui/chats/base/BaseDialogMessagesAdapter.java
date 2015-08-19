@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.chats.base;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +17,13 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.ui.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.views.MaskedImageView;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
-import com.quickblox.q_municate.utils.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileHelper;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -31,51 +31,40 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Dialog;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<CombinationMessage> implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
+public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<CombinationMessage> implements
+        ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
 
     protected static int TYPE_REQUEST_MESSAGE = 0;
     protected static int TYPE_OWN_MESSAGE = 1;
     protected static int TYPE_OPPONENT_MESSAGE = 2;
     protected static int COMMON_TYPE_COUNT = 3;
-    private static Map<Integer, Integer> colorsMap = new HashMap<Integer, Integer>();
-    private final int colorMaxValue = 255;
-    private final float colorAlpha = 0.8f;
+
     protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected Dialog dialog;
-    private Random random;
+
+    protected ColorUtils colorUtils;
     private FileHelper fileHelper;
 
     public BaseDialogMessagesAdapter(Context context, List<CombinationMessage> objectsList) {
         super(context, objectsList);
-        random = new Random();
         imageUtils = new ImageUtils((android.app.Activity) context);
+        colorUtils = new ColorUtils();
         fileHelper = new FileHelper();
     }
 
     protected boolean isOwnMessage(int senderId) {
-        return senderId == currentQBUser.getId();
+        return senderId == currentUser.getId();
     }
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
         ImageLoader.getInstance().displayImage(attachUrl, viewHolder.attachImageView,
                 ImageLoaderUtils.UIL_DEFAULT_DISPLAY_OPTIONS, new ImageLoadingListener(viewHolder),
                 new SimpleImageLoadingProgressListener(viewHolder));
-    }
-
-    protected int getTextColor(Integer senderId) {
-        if (colorsMap.get(senderId) == null) {
-            int colorValue = getRandomColor();
-            colorsMap.put(senderId, colorValue);
-        }
-        return colorsMap.get(senderId);
     }
 
     protected int getMessageStatusIconId(boolean isDelivered, boolean isRead) {
@@ -98,16 +87,6 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
         setViewVisibility(viewHolder.attachMessageRelativeLayout, View.GONE);
         setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
         setViewVisibility(viewHolder.textMessageView, View.GONE);
-    }
-
-    private int getRandomColor() {
-        float[] hsv = new float[3];
-        int color = Color.argb(colorMaxValue, random.nextInt(colorMaxValue), random.nextInt(colorMaxValue),
-                random.nextInt(colorMaxValue));
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= colorAlpha;
-        color = Color.HSVToColor(hsv);
-        return color;
     }
 
     @Override
@@ -205,8 +184,6 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
             setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
 
             updateUIAfterLoading();
-
-            chatUIHelperListener.onScrollMessagesToBottom();
         }
 
         private void updateUIAfterLoading() {

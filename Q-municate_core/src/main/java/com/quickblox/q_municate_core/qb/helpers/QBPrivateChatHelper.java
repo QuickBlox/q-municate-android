@@ -95,10 +95,10 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     private void friendRequestMessageReceived(QBChatMessage qbChatMessage,
-            DialogNotification.NotificationType notificationType) {
+            DialogNotification.Type notificationType) {
         Message message = parseReceivedMessage(qbChatMessage);
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
-        dialogNotification.setNotificationType(notificationType);
+        dialogNotification.setType(notificationType);
 
         QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
                 DataManager.getInstance().getDialogDataManager().getByDialogId(qbChatMessage.getDialogId()));
@@ -124,16 +124,16 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
             if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
                     notificationType)) {
                 friendRequestMessageReceived(chatMessage,
-                        DialogNotification.NotificationType.FRIENDS_REQUEST);
+                        DialogNotification.Type.FRIENDS_REQUEST);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_ACCEPT);
+                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_ACCEPT);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_REJECT);
+                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REJECT);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(
                     notificationType)) {
-                friendRequestMessageReceived(chatMessage, DialogNotification.NotificationType.FRIENDS_REMOVE);
+                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REMOVE);
             }
         }
     }
