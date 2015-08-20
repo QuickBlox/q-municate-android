@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -50,7 +49,10 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onCreate(savedInstanceState);
 
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-
+        if (dialog == null) {
+            finish();
+        }
+        
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 
@@ -65,7 +67,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         updateData();
 
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            Log.d("Scroll-test", "onResume()");
             scrollListView();
         }
     }
@@ -94,17 +95,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             finish();
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeActions();
-    }
-
-    protected void removeActions() {
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOAD_ATTACH_FILE_FAIL_ACTION);
     }
 
     @Override

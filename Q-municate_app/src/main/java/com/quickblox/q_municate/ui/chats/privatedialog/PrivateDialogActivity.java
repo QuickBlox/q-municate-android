@@ -2,23 +2,22 @@ package com.quickblox.q_municate.ui.chats.privatedialog;
 
 import android.app.ActionBar;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.chats.base.BaseDialogActivity;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
+import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -54,9 +53,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        friendOperationAction = new FriendOperationAction();
-        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+
+        initFields();
 
         if (dialog == null) {
             finish();
@@ -65,6 +63,12 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         initActionBar();
         setCurrentDialog(dialog);
         initListView();
+    }
+
+    private void initFields() {
+        friendOperationAction = new FriendOperationAction();
+        opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
     }
 
     @Override
@@ -76,8 +80,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     protected void onResume() {
         super.onResume();
+
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            Log.d("Scroll-test", "onResume()");
             scrollListView();
         }
 
@@ -101,12 +105,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        opponentUser = null;
-    }
-
-    @Override
     protected void onFileSelected(Uri originalUri) {
         Bitmap bitmap = imageUtils.getBitmap(originalUri);
         new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
@@ -125,7 +123,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             ErrorUtils.showError(this, exc);
         }
 
-        Log.d("Scroll-test", "onFileLoaded()");
         scrollListView();
     }
 
@@ -143,7 +140,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                 combinationMessagesList, this, dialog);
         findLastFriendsRequest();
 
-        Log.d("Scroll-test", "initListView()");
         scrollListView();
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
     }
@@ -259,21 +255,19 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void showRejectUserDialog(final int userId) {
         User user = DataManager.getInstance().getUserDataManager().get(userId);
-        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
-                R.string.frl_dlg_reject_friend, user.getFullName()));
-        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
+        if (user == null) {
+            return;
+        }
+
+        TwoButtonsDialogFragment.show(getFragmentManager(), getResources().getString(
+                R.string.frl_dlg_reject_friend, user.getFullName()), new MaterialDialog.ButtonCallback() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onPositive(MaterialDialog dialog) {
+                super.onPositive(dialog);
                 showProgress();
                 QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
             }
         });
-        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        alertDialog.show(getFragmentManager(), null);
     }
 
     public interface FriendOperationListener {

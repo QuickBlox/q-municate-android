@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.chats.base;
 import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
@@ -22,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.content.model.QBFile;
@@ -29,14 +29,14 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
-import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogMessagesAdapter;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
 import com.quickblox.q_municate.ui.dialogs.ImageSourcePickDialogFragment;
+import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ActionBarUtils;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ImageSource;
@@ -62,12 +62,9 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
-import com.quickblox.q_municate_db.models.State;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -241,6 +238,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION);
         removeAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION);
+
+        removeAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION);
+
+        removeAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION);
 
         updateBroadcastActionList();
     }
@@ -451,22 +454,15 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startLoadAttachFile(final File file) {
-        final AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
-                R.string.dlg_confirm_sending_attach));
-        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                showProgress();
-                QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
-            }
-        });
-        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                alertDialog.dismiss();
-            }
-        });
-        alertDialog.show(getFragmentManager(), null);
+        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_confirm_sending_attach,
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        showProgress();
+                        QBLoadAttachFileCommand.start(BaseDialogActivity.this, file);
+                    }
+                });
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
@@ -556,15 +552,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected List<CombinationMessage> createCombinationMessagesList() {
-        List<CombinationMessage> combinationMessagesList = new ArrayList<>();
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
-        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromMessagesList(messagesList));
-        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromDialogNotificationsList(
-                dialogNotificationsList));
-        Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
-        return combinationMessagesList;
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
     protected void startLoadDialogMessages() {
@@ -589,25 +580,12 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void readAllMessages() {
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
-        List<Message> updateMessagesList = new ArrayList<>();
-        for (Message message : messagesList) {
-            if (message.getState().equals(State.DELIVERED)) {
-                message.setState(State.READ);
-                updateMessagesList.add(message);
-            }
-        }
-        dataManager.getMessageDataManager().createOrUpdate(updateMessagesList);
+        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.readAllMessages(messagesList));
 
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
-        List<DialogNotification> updateDialogNotificationsList = new ArrayList<>();
-        for (DialogNotification dialogNotification : dialogNotificationsList) {
-            if (dialogNotification.getState().equals(State.DELIVERED)) {
-                dialogNotification.setState(State.READ);
-                updateDialogNotificationsList.add(dialogNotification);
-            }
-        }
-        dataManager.getDialogNotificationDataManager().createOrUpdate(updateDialogNotificationsList);
+        dataManager.getDialogNotificationDataManager().createOrUpdate(ChatUtils.readAllDialogNotification(
+                dialogNotificationsList));
     }
 
     protected abstract void updateActionBar();
@@ -690,6 +668,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
 
             hideActionBarProgress();
+
+            if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
+                scrollListView();
+            }
         }
     }
 

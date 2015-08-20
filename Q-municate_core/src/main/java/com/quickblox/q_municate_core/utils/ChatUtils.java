@@ -24,6 +24,7 @@ import com.quickblox.users.model.QBUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class ChatUtils {
@@ -289,5 +290,41 @@ public class ChatUtils {
         dialogNotification.setCreatedDate(message.getCreatedDate());
         dialogNotification.setState(message.getState());
         return dialogNotification;
+    }
+
+    public static List<DialogNotification> readAllDialogNotification(List<DialogNotification> dialogNotificationsList) {
+        List<DialogNotification> updateDialogNotificationsList = new ArrayList<>(dialogNotificationsList.size());
+
+        for (DialogNotification dialogNotification : dialogNotificationsList) {
+            if (dialogNotification.getState().equals(State.DELIVERED)) {
+                dialogNotification.setState(State.READ);
+                updateDialogNotificationsList.add(dialogNotification);
+            }
+        }
+
+        return updateDialogNotificationsList;
+    }
+
+    public static List<Message> readAllMessages(List<Message> messagesList) {
+        List<Message> updateMessagesList = new ArrayList<>(messagesList.size());
+
+        for (Message message : messagesList) {
+            if (message.getState().equals(State.DELIVERED)) {
+                message.setState(State.READ);
+                updateMessagesList.add(message);
+            }
+        }
+
+        return updateMessagesList;
+    }
+
+    public static List<CombinationMessage> createCombinationMessagesList(List<Message> messagesList,
+            List<DialogNotification> dialogNotificationsList) {
+        List<CombinationMessage> combinationMessagesList = new ArrayList<>();
+        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromMessagesList(messagesList));
+        combinationMessagesList.addAll(ChatUtils.getCombinationMessagesListFromDialogNotificationsList(
+                dialogNotificationsList));
+        Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
+        return combinationMessagesList;
     }
 }
