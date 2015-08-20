@@ -79,7 +79,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     }
 
     private void unbindService() {
-        if (bounded && service.isRestricted()) {
+        if (bounded && service != null && service.isRestricted()) {
             baseActivity.unbindService(serviceConnection);
         }
     }
@@ -97,10 +97,8 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     }
 
     private void connectToService() {
-        if (service != null && !service.isRestricted()) {
-            Intent intent = new Intent(baseActivity, QBService.class);
-            baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        }
+        Intent intent = new Intent(baseActivity, QBService.class);
+        baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     public void onConnectedToService(QBService service) {

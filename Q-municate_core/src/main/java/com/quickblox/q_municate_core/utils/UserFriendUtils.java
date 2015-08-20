@@ -58,7 +58,7 @@ public class UserFriendUtils {
         return createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
     }
 
-    public static boolean isPendingFriend(QBRosterEntry rosterEntry) {
+    public static boolean isOutgoingFriend(QBRosterEntry rosterEntry) {
         return RosterPacket.ItemStatus.subscribe.equals(rosterEntry.getStatus());
     }
 
@@ -98,16 +98,11 @@ public class UserFriendUtils {
         return friendIdsList;
     }
 
-//    public static Collection<Integer> getUserIdsFromRoster(Collection<QBRosterEntry> rosterEntryCollection) {
-//        List<Integer> userIds = new ArrayList<Integer>();
-//        for (QBRosterEntry rosterEntry : rosterEntryCollection) {
-//            if (!isPendingFriend(rosterEntry) && !isNoneFriend(rosterEntry)) {
-//                userIds.add(rosterEntry.getUserId());
-//            }
-//            if (isPendingFriend(rosterEntry)) {
-//
-//            }
-//        }
-//        return userIds;
-//    }
+    public static ArrayList<Integer> getFriendIdsFromUsersList(List<User> friendList) {
+        ArrayList<Integer> friendIdsList = new ArrayList<Integer>();
+        for (User friend : friendList) {
+            friendIdsList.add(friend.getUserId());
+        }
+        return friendIdsList;
+    }
 }

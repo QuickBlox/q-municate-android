@@ -107,9 +107,9 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         if (isMe(user)) {
             return true;
         } else {
-            boolean isFriendPending = DataManager.getInstance().getUserRequestDataManager().getUserById(user.getUserId()) != null;
-            boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getUserId()) != null;
-            return isFriend || isFriendPending;
+            boolean outgoingUserRequest = DataManager.getInstance().getUserRequestDataManager().existsByUserId(user.getUserId());
+            boolean friend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getUserId()) != null;
+            return friend || outgoingUserRequest;
         }
     }
 

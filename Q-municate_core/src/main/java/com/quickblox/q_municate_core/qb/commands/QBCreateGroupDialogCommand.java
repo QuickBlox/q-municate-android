@@ -9,7 +9,7 @@ import com.quickblox.q_municate_core.core.command.ServiceCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtilsCore;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -37,7 +37,8 @@ public class QBCreateGroupDialogCommand extends ServiceCommand {
                 QBServiceConsts.EXTRA_FRIENDS);
         String roomName = (String) extras.getSerializable(QBServiceConsts.EXTRA_ROOM_NAME);
 
-        QBDialog dialog = multiChatHelper.createGroupChat(roomName, ChatUtilsCore.getFriendIdsList(friendList));
+        QBDialog dialog = multiChatHelper.createGroupChat(roomName, UserFriendUtils.getFriendIdsFromUsersList(
+                friendList));
         extras.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
         return extras;
     }

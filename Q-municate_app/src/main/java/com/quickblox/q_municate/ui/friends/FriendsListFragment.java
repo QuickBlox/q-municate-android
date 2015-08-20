@@ -138,9 +138,9 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                     int childPosition, long id) {
                 User selectedUser = (User) friendsListAdapter.getChild(groupPosition, childPosition);
-                boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(selectedUser.getUserId()) != null;
-                boolean isPendingFriend = DataManager.getInstance().getUserRequestDataManager().getUserById(selectedUser.getUserId()) != null;
-                if (isFriend || isPendingFriend) {
+                boolean isFriend = dataManager.getFriendDataManager().getByUserId(selectedUser.getUserId()) != null;
+                boolean outgoingUser = dataManager.getUserRequestDataManager().existsByUserId(selectedUser.getUserId());
+                if (isFriend || outgoingUser) {
                     startFriendDetailsActivity(selectedUser.getUserId());
                 }
                 return false;
@@ -499,7 +499,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             int userId = bundle.getInt(QBServiceConsts.EXTRA_FRIEND_ID);
 
             User addedUser = dataManager.getUserDataManager().get(userId);
-            friendGroupAllFriends.getUserList().add(addedUser);
             friendGroupAllUsers.getUserList().remove(addedUser);
             initFriendAdapter();
 

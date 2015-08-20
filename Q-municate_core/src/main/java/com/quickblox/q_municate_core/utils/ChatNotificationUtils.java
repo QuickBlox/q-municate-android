@@ -50,7 +50,7 @@ public class ChatNotificationUtils {
         String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
         String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
         String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        long lastMessageDateSent = Long.parseLong((String) chatMessage.getProperty(PROPERTY_DATE_SENT));
+        long dateSent = ChatUtils.getMessageDateSent(chatMessage);
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
@@ -77,7 +77,7 @@ public class ChatNotificationUtils {
             dialog.setLastMessage(chatMessage.getBody());
         }
 
-        dialog.setLastMessageDateSent(lastMessageDateSent);
+        dialog.setLastMessageDateSent(dateSent);
         dialog.setUnreadMessageCount(ConstsCore.ZERO_INT_VALUE);
 
         return dialog;
@@ -171,40 +171,46 @@ public class ChatNotificationUtils {
         Resources resources = context.getResources();
         String resultMessage = resources.getString(R.string.frl_friends_contact_request);
         QBUser user = AppSession.getSession().getUser();
-        boolean ownMessage = user.getId().equals(qbChatMessage.getSenderId());
+        int senderId;
+
+        if (qbChatMessage.getSenderId() == null) {
+            senderId = user.getId();
+        } else {
+            senderId = qbChatMessage.getSenderId();
+        }
+
+        boolean ownMessage = user.getId() == senderId;
 
         switch (notificationType) {
             case FRIENDS_REQUEST: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_message_for_friend, ChatUtils.getFullNameById(
-                                qbChatMessage.getSenderId()));
+                resultMessage = ownMessage
+                        ? resources.getString(R.string.frl_friends_request_message_for_me)
+                        : resources.getString(R.string.frl_friends_request_message_for_friend,
+                        ChatUtils.getFullNameById(senderId));
                 break;
             }
             case FRIENDS_ACCEPT: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_accept_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_accept_message_for_friend);
+                resultMessage = ownMessage
+                        ? resources.getString(R.string.frl_friends_request_accept_message_for_me)
+                        : resources.getString(R.string.frl_friends_request_accept_message_for_friend);
                 break;
             }
             case FRIENDS_REJECT: {
-                resultMessage = ownMessage ? resources.getString(
-                        R.string.frl_friends_request_reject_message_for_me) : resources.getString(
-                        R.string.frl_friends_request_reject_message_for_friend);
+                resultMessage = ownMessage
+                        ? resources.getString(R.string.frl_friends_request_reject_message_for_me)
+                        : resources.getString(R.string.frl_friends_request_reject_message_for_friend);
                 break;
             }
             case FRIENDS_REMOVE: {
                 User opponentUser;
 
                 if (qbChatMessage.getRecipientId().intValue() == user.getId().intValue()) {
-                    opponentUser = DataManager.getInstance().getUserDataManager().get(
-                            qbChatMessage.getSenderId());
-                    resultMessage = resources.getString(
-                            R.string.frl_friends_request_remove_message_for_friend,
+                    opponentUser = DataManager.getInstance().getUserDataManager().get(senderId);
+                    resultMessage =
+                            resources.getString(R.string.frl_friends_request_remove_message_for_friend,
                             opponentUser.getFullName());
                 } else {
-                    opponentUser = DataManager.getInstance().getUserDataManager().get(
-                            qbChatMessage.getRecipientId());
+                    opponentUser = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getRecipientId());
                     resultMessage = resources.getString(R.string.frl_friends_request_remove_message_for_me,
                             opponentUser.getFullName());
                 }

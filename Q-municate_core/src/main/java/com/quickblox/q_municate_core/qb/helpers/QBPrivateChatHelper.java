@@ -16,6 +16,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
@@ -100,16 +101,14 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
         dialogNotification.setType(notificationType);
 
-        QBDialog dialog = ChatUtils.createQBDialogFromLocalDialog(
-                DataManager.getInstance().getDialogDataManager().getByDialogId(qbChatMessage.getDialogId()));
-
+        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(qbChatMessage.getDialogId());
         if (dialog == null) {
-            dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage,
+            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage,
                     QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
                     chatCreator.getId(), qbChatMessage.getSenderId());
-            dialog.setOccupantsIds(occupantsIdsList);
-            saveDialogToCache(dialog);
+            qbDialog.setOccupantsIds(occupantsIdsList);
+            saveDialogToCache(qbDialog);
         }
 
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbChatMessage.getDialogId(),
@@ -121,18 +120,13 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
         @Override
         public void onReceivedNotification(String notificationType, QBChatMessage chatMessage) {
-            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(
-                    notificationType)) {
-                friendRequestMessageReceived(chatMessage,
-                        DialogNotification.Type.FRIENDS_REQUEST);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(
-                    notificationType)) {
+            if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST.equals(notificationType)) {
+                friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REQUEST);
+            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_ACCEPT);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT.equals(
-                    notificationType)) {
+            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REJECT);
-            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(
-                    notificationType)) {
+            } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REMOVE);
             }
         }

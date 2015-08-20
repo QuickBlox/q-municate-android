@@ -213,12 +213,11 @@ public class ChatUtils {
     }
 
     public static Message createLocalMessage(QBChatMessage qbChatMessage, DialogOccupant dialogOccupant, State state) {
-        String dateSent = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT);
-        long dataSent = dateSent != null ? Long.parseLong(dateSent) : qbChatMessage.getDateSent();
+        long dateSent = getMessageDateSent(qbChatMessage);
         Message message = new Message();
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
-        message.setCreatedDate(dataSent);
+        message.setCreatedDate(dateSent);
         if (!message.isIncoming(AppSession.getSession().getUser().getId())) {
             message.setState(null);
         } else if (state == null) {
@@ -228,6 +227,11 @@ public class ChatUtils {
         }
         message.setBody(qbChatMessage.getBody());
         return message;
+    }
+
+    public static long getMessageDateSent(QBChatMessage qbChatMessage) {
+        String dateSentString = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT);
+        return dateSentString != null ? Long.parseLong(dateSentString) : qbChatMessage.getDateSent();
     }
 
     public static Attachment createLocalAttachment(QBAttachment qbAttachment) {
@@ -259,8 +263,10 @@ public class ChatUtils {
                     qbChatMessage));
         }
 
-        dialogNotification.setCreatedDate(qbChatMessage.getDateSent());
+        long dateSent = getMessageDateSent(qbChatMessage);
+        dialogNotification.setCreatedDate(dateSent);
         dialogNotification.setState(qbChatMessage.isRead() ? State.READ : State.DELIVERED);
+
         return dialogNotification;
     }
 

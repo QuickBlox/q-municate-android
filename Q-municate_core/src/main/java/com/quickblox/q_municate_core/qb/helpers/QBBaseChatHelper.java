@@ -222,8 +222,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     protected void saveDialogNotificationToCache(DialogOccupant dialogOccupant,
             QBChatMessage qbChatMessage) {
-        DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage,
-                dialogOccupant);
+        DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage, dialogOccupant);
         dataManager.getDialogNotificationDataManager().create(dialogNotification);
     }
 
@@ -352,15 +351,15 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected Message parseReceivedMessage(QBChatMessage qbChatMessage) {
-        long createdDate = Long.parseLong(
-                (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT));
+        String dateSentString = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DATE_SENT);
+        long dateSent = dateSentString != null ? Long.parseLong(dateSentString) : qbChatMessage.getDateSent();
         String attachUrl = ChatUtils.getAttachUrlIfExists(qbChatMessage);
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
 
         Message message = new Message();
         message.setMessageId(qbChatMessage.getId());
         message.setBody(qbChatMessage.getBody());
-        message.setCreatedDate(createdDate);
+        message.setCreatedDate(dateSent);
 
         DialogOccupant dialogOccupant = new DialogOccupant();
         Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);

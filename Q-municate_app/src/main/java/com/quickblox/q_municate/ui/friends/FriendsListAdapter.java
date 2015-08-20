@@ -196,7 +196,7 @@ public class FriendsListAdapter extends BaseExpandableListAdapter {
 
     private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
         Friend friend = DataManager.getInstance().getFriendDataManager().getByUserId(user.getUserId());
-        User pendingUser = DataManager.getInstance().getUserRequestDataManager().getUserById(user.getUserId());
+        User pendingUser = DataManager.getInstance().getUserRequestDataManager().getUserRequestById(user.getUserId());
 
         if (friend == null && pendingUser == null) {
             return;

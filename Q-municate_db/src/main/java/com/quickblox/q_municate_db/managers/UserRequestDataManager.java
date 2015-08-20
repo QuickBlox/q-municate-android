@@ -19,7 +19,7 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         super(userRequestDao, UserRequestDataManager.class.getSimpleName());
     }
 
-    public User getUserById(int userId) {
+    public User getUserRequestById(int userId) {
         UserRequest userRequest = null;
 
         try {
@@ -44,5 +44,9 @@ public class UserRequestDataManager extends BaseManager<UserRequest> {
         }
 
         notifyObservers(OBSERVE_KEY);
+    }
+
+    public boolean existsByUserId(int userId) {
+        return getUserRequestById(userId) != null;
     }
 }
