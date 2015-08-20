@@ -46,16 +46,19 @@
             android:name=".ui.authorization.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.authorization.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/lgn_login"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.authorization.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/sup_sign_up"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.quickblox.q_municate.ui.main.MainActivity"

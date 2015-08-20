@@ -219,7 +219,9 @@ public class ChatUtils {
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
         message.setCreatedDate(dataSent);
-        if (state == null) {
+        if (!message.isIncoming(AppSession.getSession().getUser().getId())) {
+            message.setState(null);
+        } else if (state == null) {
             message.setState(qbChatMessage.isRead() ? State.READ : State.DELIVERED);
         } else {
             message.setState(state);
@@ -292,11 +294,12 @@ public class ChatUtils {
         return dialogNotification;
     }
 
-    public static List<DialogNotification> readAllDialogNotification(List<DialogNotification> dialogNotificationsList) {
+    public static List<DialogNotification> readAllDialogNotification(List<DialogNotification> dialogNotificationsList, QBUser currentQbUser) {
         List<DialogNotification> updateDialogNotificationsList = new ArrayList<>(dialogNotificationsList.size());
 
         for (DialogNotification dialogNotification : dialogNotificationsList) {
-            if (dialogNotification.getState().equals(State.DELIVERED)) {
+            if (!State.READ.equals(dialogNotification.getState())
+                    && currentQbUser.getId() != dialogNotification.getDialogOccupant().getUser().getUserId()) {
                 dialogNotification.setState(State.READ);
                 updateDialogNotificationsList.add(dialogNotification);
             }
@@ -305,11 +308,12 @@ public class ChatUtils {
         return updateDialogNotificationsList;
     }
 
-    public static List<Message> readAllMessages(List<Message> messagesList) {
+    public static List<Message> readAllMessages(List<Message> messagesList, QBUser currentQbUser) {
         List<Message> updateMessagesList = new ArrayList<>(messagesList.size());
 
         for (Message message : messagesList) {
-            if (message.getState().equals(State.DELIVERED)) {
+            if (!State.READ.equals(message.getState())
+                    && currentQbUser.getId() != message.getDialogOccupant().getUser().getUserId()) {
                 message.setState(State.READ);
                 updateMessagesList.add(message);
             }

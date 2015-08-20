@@ -153,6 +153,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void findLastFriendsRequest() {
         ((PrivateDialogMessagesAdapter) messagesAdapter).findLastFriendsRequestMessagesPosition();
+        messagesAdapter.notifyDataSetChanged();
     }
 
     private void setOnlineStatus(User friend) {

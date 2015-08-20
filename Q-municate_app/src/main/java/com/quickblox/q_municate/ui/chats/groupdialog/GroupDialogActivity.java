@@ -52,7 +52,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         if (dialog == null) {
             finish();
         }
-        
+
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 

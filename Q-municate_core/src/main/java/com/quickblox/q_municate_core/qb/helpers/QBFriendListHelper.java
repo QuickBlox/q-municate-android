@@ -77,13 +77,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     public void addFriend(int userId) throws Exception {
-        // TODO auto adding friend logic
-        //        if (isNewFriend(userId)) {
-        //            acceptFriend(userId);
-        //        } else {
         createUserRequest(userId, UserRequest.RequestStatus.OUTGOING);
         invite(userId);
-        //        }
     }
 
     public void invite(int userId) throws Exception {
@@ -112,8 +107,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForRejectFriendsRequest(
-                context);
+        QBChatMessage chatMessage = ChatNotificationUtils
+                .createNotificationMessageForRejectFriendsRequest(context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
@@ -269,7 +264,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private void deleteFriend(int userId) {
-        dataManager.getFriendDataManager().delete(userId);
+        dataManager.getFriendDataManager().deleteByUserId(userId);
     }
 
     private void deleteFriendOrUserRequest(int id) {

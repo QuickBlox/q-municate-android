@@ -104,7 +104,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         addNecessaryPropertyForQBChatMessage(qbChatMessage, dialogId);
 
         sendPrivateMessage(qbChatMessage, opponentId);
-        saveMessageToCache(dialogId, qbChatMessage, State.READ);
+        saveMessageToCache(dialogId, qbChatMessage, null);
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId) throws QBResponseException {

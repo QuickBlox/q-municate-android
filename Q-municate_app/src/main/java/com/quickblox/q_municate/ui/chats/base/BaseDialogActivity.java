@@ -43,6 +43,7 @@ import com.quickblox.q_municate.utils.ImageSource;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -580,12 +581,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     private void readAllMessages() {
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
-        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.readAllMessages(messagesList));
+        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.readAllMessages(messagesList,
+                AppSession.getSession().getUser()));
 
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
         dataManager.getDialogNotificationDataManager().createOrUpdate(ChatUtils.readAllDialogNotification(
-                dialogNotificationsList));
+                dialogNotificationsList, AppSession.getSession().getUser()));
     }
 
     protected abstract void updateActionBar();

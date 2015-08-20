@@ -8,6 +8,7 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.State;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -59,14 +60,21 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public long getCountUnreadMessages(List<Integer> dialogOccupantsList) {
+    public long getCountUnreadMessages(List<Integer> dialogOccupantsList, int currentUserId) {
         long count = 0;
 
         try {
             QueryBuilder<Message, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.setCountOf(true);
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().ne(User.Column.ID, currentUserId);
+
+            queryBuilder.join(dialogOccupantQueryBuilder);
+
             queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList).and().eq(
                     Message.Column.STATE, State.DELIVERED);
+
             PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
             count = dao.countOf(preparedQuery);
         } catch (SQLException e) {

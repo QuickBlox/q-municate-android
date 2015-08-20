@@ -39,7 +39,7 @@ import butterknife.Bind;
 import butterknife.OnItemClick;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class DialogsListFragment extends BaseFragment {
+public class  DialogsListFragment extends BaseFragment {
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
 
