@@ -61,18 +61,6 @@ public class QBConnectivityManager implements ConnectivityListener {
         Log.d("Fixes CONNECTIVITY", "Connection is " + isConnected);
         if (isConnected) {
             QBReloginCommand.start(context);
-        } else {
-//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
-//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
-//                                .setMessage(getString(R.string.connection_lost))
-//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        dialog.dismiss();
-//                                    }
-//                                });
-//                        diologBuilder.show();
-            Toast.makeText(context, context.getString(R.string.connection_lost), Toast.LENGTH_LONG).show();
         }
     }
 

@@ -133,6 +133,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean isListInBottomNow;
     private boolean isTypingAnimationShown;
     private int lastMessagesCountInDB;
+    private boolean isNeedShowTostAboutDisconnected;
+
 
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
@@ -217,12 +219,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        isNeedShowTostAboutDisconnected = true;
         Log.d("Fixes CHAT", "BaseDialogActivity onResume");
         startLoadDialogMessages();
     }
 
     @Override
     protected void onStop() {
+        isNeedShowTostAboutDisconnected = false;
         if (!TextUtils.isEmpty(messageEditText.getText().toString().trim())){
            ChatDatabaseManager.saveNotSendMessage(getApplicationContext(), messageEditText.getText().toString(), dialogId, null);
         } else {
@@ -1000,6 +1004,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
          */
         if(!isConnected) {
             updateMessagesReason = UpdateMessagesReason.NONE;
+            showToastAboutDisconnectedIfNeed();
+        }
+    }
+
+    private void showToastAboutDisconnectedIfNeed() {
+        if (isNeedShowTostAboutDisconnected){
+            Toast.makeText(this, this.getString(com.quickblox.q_municate_core.R.string.connection_lost), Toast.LENGTH_LONG).show();
         }
     }
 
