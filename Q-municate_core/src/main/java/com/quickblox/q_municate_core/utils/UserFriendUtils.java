@@ -66,6 +66,10 @@ public class UserFriendUtils {
         return RosterPacket.ItemType.none.equals(rosterEntry.getType());
     }
 
+    public static boolean isEmptyFriendsStatus(QBRosterEntry rosterEntry) {
+        return rosterEntry.getStatus() == null;
+    }
+
     public static List<User> createUsersList(Collection<QBUser> usersList) {
         List<User> users = new ArrayList<User>();
         for (QBUser user : usersList) {

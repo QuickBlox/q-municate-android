@@ -2,7 +2,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -15,7 +15,6 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.core.exception.QBResponseException;
-import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
@@ -26,8 +25,6 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
-import com.quickblox.users.QBUsers;
-import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.packet.RosterPacket;
 
@@ -44,8 +41,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private static final String ENTRIES_DELETED_ERROR = "Failed to delete friends";
     private static final String SUBSCRIPTION_ERROR = "Failed to confirm subscription";
     private static final String ROSTER_INIT_ERROR = "ROSTER isn't initialized. Please make relogin";
-
-    private static final int FIRST_PAGE = 1;
 
     private QBRestHelper restHelper;
     private QBRoster roster;
@@ -73,22 +68,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     public void addFriend(int userId) throws Exception {
-        Log.d("friends-logs", "addFriend(), userId = " + userId);
-        createUserRequest(userId, UserRequest.RequestStatus.OUTGOING);
         invite(userId);
-    }
-
-    public void invite(int userId) throws Exception {
-        sendInvitation(userId);
-
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
-        sendNotificationToFriend(chatMessage, userId);
-    }
-
-    private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId,
-                chatMessage.getBody());
-        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
     }
 
     public void acceptFriend(int userId) throws Exception {
@@ -109,25 +89,35 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         sendNotificationToFriend(chatMessage, userId);
     }
 
-    private void clearRosterEntry(int userId) throws Exception {
-        QBRosterEntry rosterEntry = roster.getEntry(userId);
-        if (rosterEntry != null && roster.contains(userId)) {
-            roster.removeEntry(rosterEntry);
-        }
-    }
-
     public void removeFriend(int userId) throws Exception {
         roster.unsubscribe(userId);
         clearRosterEntry(userId);
         deleteFriendOrUserRequest(userId);
 
-        QBChatMessage qbChatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(context);
+        QBChatMessage qbChatMessage = ChatNotificationUtils.createNotificationMessageForRemoveFriendsRequest(
+                context);
         qbChatMessage.setRecipientId(userId);
         sendNotificationToFriend(qbChatMessage, userId);
     }
 
-    private boolean isNotInvited(int userId) {
-        return !isInvited(userId);
+    public void invite(int userId) throws Exception {
+        sendInvitation(userId);
+
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
+        sendNotificationToFriend(chatMessage, userId);
+    }
+
+    private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
+        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId,
+                chatMessage.getBody());
+        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
+    }
+
+    private void clearRosterEntry(int userId) throws Exception {
+        QBRosterEntry rosterEntry = roster.getEntry(userId);
+        if (rosterEntry != null && roster.contains(userId)) {
+            roster.removeEntry(rosterEntry);
+        }
     }
 
     private boolean isInvited(int userId) {
@@ -138,6 +128,10 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         boolean isSubscribedToUser = rosterEntry.getType() == RosterPacket.ItemType.from;
         boolean isBothSubscribed = rosterEntry.getType() == RosterPacket.ItemType.both;
         return isSubscribedToUser || isBothSubscribed;
+    }
+
+    private boolean isNotInvited(int userId) {
+        return !isInvited(userId);
     }
 
     private void sendInvitation(int userId) throws Exception {
@@ -178,9 +172,9 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         }
 
         if (!userList.isEmpty()) {
-            List<QBUser> loadedUserList = loadUsers(userList);
-            for (QBUser user : loadedUserList) {
-                createUserRequest(user.getId(), UserRequest.RequestStatus.OUTGOING);
+            List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
+            for (User user : loadedUserList) {
+                createUserRequest(user, UserRequest.RequestStatus.OUTGOING);
             }
         }
 
@@ -188,7 +182,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private void updateFriends(Collection<Integer> friendIdsList) throws QBResponseException {
-        List<QBUser> usersList = loadUsers(friendIdsList);
+        List<User> usersList = (List<User>) restHelper.loadUsers(friendIdsList);
 
         saveUsersAndFriends(usersList);
     }
@@ -202,65 +196,50 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private void updateFriend(int userId) throws QBResponseException {
         QBRosterEntry rosterEntry = roster.getEntry(userId);
 
-        User newUser = restHelper.loadUser(userId);
-
-        Log.d("friends-logs", "updateFriend(), userId = " + userId);
+        User newUser = loadAndSaveUser(userId);
 
         if (newUser == null) {
             return;
         }
 
-        saveUser(newUser);
-
-        Log.d("friends-logs", "updateFriend. UserFriendUtils.isOutgoingFriend(rosterEntry) = " + UserFriendUtils.isOutgoingFriend(rosterEntry));
-
         boolean outgoingUserRequest = UserFriendUtils.isOutgoingFriend(rosterEntry);
+        boolean deletedUser = UserFriendUtils.isEmptyFriendsStatus(rosterEntry) && UserFriendUtils.isNoneFriend(rosterEntry);
 
-//        if (dataManager.getUserRequestDataManager().existsByUserId(userId) && outgoingUserRequest) {
-//            Log.d("friends-logs", "updateFriend. 0");
-//            return;
-//        }
-
-        if (outgoingUserRequest) {
-            Log.d("friends-logs", "updateFriend. 1");
-            createUserRequest(userId, UserRequest.RequestStatus.OUTGOING);
+        if (deletedUser) {
+            deleteFriendOrUserRequest(userId);
+        } else if (outgoingUserRequest) {
+            createUserRequest(newUser, UserRequest.RequestStatus.OUTGOING);
         } else {
-            Log.d("friends-logs", "updateFriend. 2");
             saveFriend(newUser);
             deleteUserRequestByUser(newUser.getUserId());
         }
+    }
+
+    private void createUserRequest(User user, UserRequest.RequestStatus requestStatus) {
+        long currentTime = DateUtilsCore.getCurrentTime();
+        UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
+        dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
+    }
+
+    private void createUserRequest(int userId, UserRequest.RequestStatus requestStatus) {
+        User user = loadAndSaveUser(userId);
+        if (user == null) {
+            return;
+        }
+
+        createUserRequest(user, requestStatus);
     }
 
     private void deleteUserRequestByUser(int userId) {
         dataManager.getUserRequestDataManager().deleteByUserId(userId);
     }
 
-    private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
-        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(FIRST_PAGE);
-        requestBuilder.setPerPage(userIds.size());
-
-        Bundle params = new Bundle();
-        return QBUsers.getUsersByIDs(userIds, requestBuilder, params);
-    }
-
-    private boolean isUserOnline(QBPresence presence) {
-        return QBPresence.Type.online.equals(presence.getType());
-    }
-
-    public boolean isUserOnline(int userId) {
-        return roster != null
-                && roster.getPresence(userId) != null
-                && isUserOnline(roster.getPresence(userId));
-    }
-
     private void saveUser(User user) {
         dataManager.getUserDataManager().createOrUpdate(user);
     }
 
-    private void saveUsersAndFriends(Collection<QBUser> usersCollection) {
-        for (QBUser qbUser : usersCollection) {
-            User user = UserFriendUtils.createLocalUser(qbUser, User.Role.SIMPLE_ROLE);
+    private void saveUsersAndFriends(Collection<User> usersCollection) {
+        for (User user : usersCollection) {
             dataManager.getUserDataManager().createOrUpdate(user);
             dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
         }
@@ -271,18 +250,17 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     }
 
     private void deleteFriend(int userId) {
-        Log.d("friends-logs", "deleteFriend(), userId = " + userId);
         dataManager.getFriendDataManager().deleteByUserId(userId);
     }
 
-    private void deleteFriendOrUserRequest(int id) {
-        boolean isFriend = dataManager.getFriendDataManager().getByUserId(id) != null;
-        boolean isPendingFriend = dataManager.getUserRequestDataManager().existsByUserId(id);
+    private void deleteFriendOrUserRequest(int userId) {
+        boolean friend = dataManager.getFriendDataManager().getByUserId(userId) != null;
+        boolean outgoingUserRequest = dataManager.getUserRequestDataManager().existsByUserId(userId);
 
-        if (isFriend) {
-            deleteFriend(id);
-        } else if (isPendingFriend) {
-            deleteUserRequestByUser(id);
+        if (friend) {
+            deleteFriend(userId);
+        } else if (outgoingUserRequest) {
+            deleteUserRequestByUser(userId);
         }
     }
 
@@ -292,20 +270,27 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         }
     }
 
-    private void createUserRequest(int userId, UserRequest.RequestStatus requestStatus) {
+    @Nullable
+    private User loadAndSaveUser(int userId) {
         User user = restHelper.loadUser(userId);
 
         if (user == null) {
-            return;
+            return null;
         } else {
             saveUser(user);
         }
 
-        Log.d("friends-logs", "createUserRequest(), userId = " + userId + ", fullName = " + user.getFullName());
+        return user;
+    }
 
-        long currentTime = DateUtilsCore.getCurrentTime();
-        UserRequest userRequest = new UserRequest(currentTime, null, requestStatus, user);
-        dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
+    private boolean isUserOnline(QBPresence presence) {
+        return QBPresence.Type.online.equals(presence.getType());
+    }
+
+    public boolean isUserOnline(int userId) {
+        return roster != null
+                && roster.getPresence(userId) != null
+                && isUserOnline(roster.getPresence(userId));
     }
 
     private void notifyContactRequest(int userId) {
