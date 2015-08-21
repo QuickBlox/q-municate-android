@@ -1,7 +1,6 @@
 package com.quickblox.q_municate.ui.friends;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,12 +11,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogActivity;
-import com.quickblox.q_municate.ui.dialogs.AlertDialog;
+import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.views.RoundedImageView;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
@@ -105,6 +105,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreatePrivateChatSuccessAction());
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
+
+        updateBroadcastActionList();
     }
 
     private void initUIWithUsersData() {
@@ -168,6 +170,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
 
         removeAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION);
+
+        updateBroadcastActionList();
     }
 
     private void addObservers() {
@@ -211,21 +215,16 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void showRemoveUserDialog() {
-        AlertDialog alertDialog = AlertDialog.newInstance(getResources().getString(
-                R.string.frd_dlg_remove_friend, user.getFullName()));
-        alertDialog.setPositiveButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                showProgress();
-                QBRemoveFriendCommand.start(FriendDetailsActivity.this, user.getUserId());
-            }
-        });
-        alertDialog.setNegativeButton(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        alertDialog.show(getFragmentManager(), null);
+        TwoButtonsDialogFragment.show(getFragmentManager(),
+                getResources().getString(R.string.frd_dlg_remove_friend, user.getFullName()),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        showProgress();
+                        QBRemoveFriendCommand.start(FriendDetailsActivity.this, user.getUserId());
+                    }
+                });
     }
 
     public void videoCallClickListener(View view) {

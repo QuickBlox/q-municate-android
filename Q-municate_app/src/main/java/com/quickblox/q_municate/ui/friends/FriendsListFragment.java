@@ -94,7 +94,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         initListeners();
         initFriendList();
 
-        addActions();
         addObservers();
 
         return rootView;
@@ -157,6 +156,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onResume() {
         super.onResume();
+
+        addActions();
 
         checkVisibilityEmptyLabel();
 

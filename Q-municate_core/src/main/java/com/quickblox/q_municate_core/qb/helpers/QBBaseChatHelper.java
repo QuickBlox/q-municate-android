@@ -130,7 +130,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogToCache(QBDialog qbDialog) {
-        dataManager.getDialogDataManager().createOrUpdate(ChatUtils.createLocalDialog(qbDialog));
+        Dialog dialog = ChatUtils.createLocalDialog(qbDialog);
+        dataManager.getDialogDataManager().createOrUpdate(dialog);
 
         saveDialogsOccupants(qbDialog);
     }
@@ -142,8 +143,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogsOccupants(QBDialog qbDialog) {
-        dataManager.getDialogOccupantDataManager().createOrUpdate(ChatUtils.createDialogOccupantsList(
-                qbDialog));
+        List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(qbDialog);
+        dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupantsList);
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {

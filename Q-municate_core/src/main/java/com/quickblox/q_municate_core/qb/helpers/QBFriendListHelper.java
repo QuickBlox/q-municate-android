@@ -103,14 +103,17 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     public void invite(int userId) throws Exception {
         sendInvitation(userId);
 
+        loadAndSaveUser(userId);
+
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
         sendNotificationToFriend(chatMessage, userId);
     }
 
-    private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
-        QBDialog existingPrivateDialog = privateChatHelper.createPrivateDialogIfNotExist(userId,
-                chatMessage.getBody());
-        privateChatHelper.sendPrivateMessage(chatMessage, userId, existingPrivateDialog.getDialogId());
+    private synchronized void sendNotificationToFriend(QBChatMessage qbChatMessage, int userId) throws QBResponseException {
+        QBDialog qbDialog = privateChatHelper.createPrivateDialogIfNotExist(userId);
+        if (qbDialog != null) {
+            privateChatHelper.sendPrivateMessage(qbChatMessage, userId, qbDialog.getDialogId());
+        }
     }
 
     private void clearRosterEntry(int userId) throws Exception {
@@ -174,6 +177,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         if (!userList.isEmpty()) {
             List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
             for (User user : loadedUserList) {
+                saveUser(user);
                 createUserRequest(user, UserRequest.RequestStatus.OUTGOING);
             }
         }
@@ -240,8 +244,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
 
     private void saveUsersAndFriends(Collection<User> usersCollection) {
         for (User user : usersCollection) {
-            dataManager.getUserDataManager().createOrUpdate(user);
-            dataManager.getFriendDataManager().createOrUpdate(new Friend(user));
+            saveUser(user);
+            saveFriend(user);
         }
     }
 

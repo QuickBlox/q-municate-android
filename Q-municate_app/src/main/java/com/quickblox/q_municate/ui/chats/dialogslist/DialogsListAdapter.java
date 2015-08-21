@@ -13,6 +13,7 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
@@ -79,14 +80,26 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
         }
 
         Message message = dataManager.getMessageDataManager().getLastMessageByDialogId(dialogOccupantsIdsList);
+        DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
+                .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
 
-        if (message != null) {
-            viewHolder.lastMessageTextView.setText(message.getBody());
-        } else {
-            viewHolder.lastMessageTextView.setText("");
-        }
+        viewHolder.lastMessageTextView.setText(getLastMessage(message, dialogNotification));
 
         return convertView;
+    }
+
+    private String getLastMessage(Message message, DialogNotification dialogNotification) {
+        String lastMessage = "";
+
+        if (message == null && dialogNotification != null) {
+            lastMessage = dialogNotification.getBody();
+        } else if (dialogNotification == null && message != null) {
+            lastMessage = message.getBody();
+        } else if (message != null && dialogNotification != null) {
+            lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate() ? message.getBody() : dialogNotification.getBody();
+        }
+
+        return lastMessage;
     }
 
     private static class ViewHolder {
