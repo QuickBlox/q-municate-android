@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.listeners.FriendOperationListener;
 import com.quickblox.q_municate.ui.chats.base.BaseDialogMessagesAdapter;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiTextView;
@@ -30,10 +31,10 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
     private int lastRequestPosition = EMPTY_POSITION;
     private int lastInfoRequestPosition = EMPTY_POSITION;
-    private PrivateDialogActivity.FriendOperationListener friendOperationListener;
+    private FriendOperationListener friendOperationListener;
 
     public PrivateDialogMessagesAdapter(Context context,
-            PrivateDialogActivity.FriendOperationListener friendOperationListener,
+            FriendOperationListener friendOperationListener,
             List<CombinationMessage> objectsList, ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
         super(context, objectsList);
         this.friendOperationListener = friendOperationListener;

@@ -55,7 +55,7 @@ public class App extends MultiDexApplication {
         ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
     }
 
-    public MediaPlayerManager getMediaPlayer() {
+    public synchronized MediaPlayerManager getMediaPlayer() {
         return soundPlayer == null
                 ? soundPlayer = new MediaPlayerManager(this)
                 : soundPlayer;

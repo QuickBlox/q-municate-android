@@ -224,12 +224,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_SUCCESS_ACTION, loadDialogMessagesSuccessAction);
         addAction(QBServiceConsts.LOAD_DIALOG_MESSAGES_FAIL_ACTION, loadDialogMessagesFailAction);
 
-        addAction(QBServiceConsts.ACCEPT_FRIEND_SUCCESS_ACTION, new AcceptFriendSuccessAction());
-        addAction(QBServiceConsts.ACCEPT_FRIEND_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.REJECT_FRIEND_SUCCESS_ACTION, new RejectFriendSuccessAction());
-        addAction(QBServiceConsts.REJECT_FRIEND_FAIL_ACTION, failAction);
-
         updateBroadcastActionList();
     }
 
@@ -686,26 +680,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
             }
 
             hideActionBarProgress();
-        }
-    }
-
-    private class AcceptFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            hideProgress();
-            startLoadDialogMessages();
-        }
-    }
-
-    private class RejectFriendSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
-            hideProgress();
-            startLoadDialogMessages();
         }
     }
 
