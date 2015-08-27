@@ -54,6 +54,7 @@ public class QBFriendListHelper extends BaseHelper {
     private static final String ROSTER_INIT_ERROR = "ROSTER isn't initialized. Please make relogin";
 
     private static final int FIRST_PAGE = 1;
+    private static final int PER_PAGE = 100;
     // Default value equals 0, bigger value allows to prevent overwriting of presence that contains status
     // with presence that is sent on login by default
     private static final int STATUS_PRESENCE_PRIORITY = 1;
@@ -241,12 +242,42 @@ public class QBFriendListHelper extends BaseHelper {
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
-        QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(FIRST_PAGE);
-        requestBuilder.setPerPage(userIds.size());
+        List<QBUser> allFriends;
+        if (userIds.size() > PER_PAGE) {
+            allFriends = loadMoreUsers(userIds);
+        } else {
+            QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+            requestBuilder.setPage(FIRST_PAGE);
+            requestBuilder.setPerPage(PER_PAGE);
 
-        Bundle params = new Bundle();
-        return QBUsers.getUsersByIDs(userIds, requestBuilder, params);
+            Bundle params = new Bundle();
+            allFriends = QBUsers.getUsersByIDs(userIds, requestBuilder, params);
+        }
+        return allFriends;
+    }
+
+    private List<QBUser> loadMoreUsers(Collection<Integer> userIds) throws QBResponseException {
+        List<Integer> allFriendsIds = new ArrayList<>(userIds);
+        List<QBUser> allFriends = new ArrayList<>();
+        List<Integer> tempListFriendsIds;
+
+         do {
+            if (allFriendsIds.size() > PER_PAGE){
+                tempListFriendsIds = allFriendsIds.subList(0, PER_PAGE);
+            } else {
+                tempListFriendsIds = allFriendsIds.subList(0, allFriendsIds.size());
+            }
+
+            QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
+            requestBuilder.setPage(FIRST_PAGE);
+            requestBuilder.setPerPage(tempListFriendsIds.size());
+
+            Bundle params = new Bundle();
+            List<QBUser> tempUsersList = QBUsers.getUsersByIDs(tempListFriendsIds, requestBuilder, params);
+            allFriends.addAll(tempUsersList);
+            tempListFriendsIds.clear();
+        } while (allFriendsIds.size() > 0);
+        return allFriends;
     }
 
     private void fillUsersWithRosterData(List<User> usersList) {

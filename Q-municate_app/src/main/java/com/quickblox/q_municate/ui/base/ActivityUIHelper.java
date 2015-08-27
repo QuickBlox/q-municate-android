@@ -55,7 +55,7 @@ public class ActivityUIHelper implements View.OnClickListener {
         String message = extras.getString(QBServiceConsts.EXTRA_MESSAGE);
         String dialogId = ChatDatabaseManager.getPrivateDialogIdByOpponentId(activity, senderUserId);
         isPrivateMessage = true;
-        if (isMessagesDialogCorrect(dialogId)) {
+        if (isMessagesDialogCorrect(dialogId) && senderUser != null) {
             showNewMessageAlert(senderUser, message);
         }
     }
