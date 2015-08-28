@@ -749,7 +749,7 @@ public class ChatDatabaseManager {
 
     public static boolean isMessageReadByUser(Collection<Integer> readIDs) {
         boolean messageReadByUser = false;
-        int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
+        int userId = AppSession.getSession().getUser().getId();
         if (readIDs != null && readIDs.contains(userId)) {
             messageReadByUser = true;
         }
