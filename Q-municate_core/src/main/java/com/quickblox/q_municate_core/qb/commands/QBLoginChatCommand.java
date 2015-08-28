@@ -44,18 +44,15 @@ public class QBLoginChatCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws QBResponseException {
         final QBUser currentUser = AppSession.getSession().getUser();
         try {
-            Log.d("Fixes CHAT", "Start perform QBLoginChatCommand");
             tryLogin(currentUser);
 
             // clear old dialogs data
             PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
 
             if (!chatRestHelper.isLoggedIn()) {
-                Log.d("Fixes CHAT", "Failed  perform QBLoginChatCommand chatRestHelper IS NOT LoggedIn");
                 throw new QBResponseException(QBChatErrorsConstants.AUTHENTICATION_FAILED);
             }
         } catch (XMPPException | SmackException | IOException e) {
-            Log.d("Fixes CHAT", "Failed  perform QBLoginChatCommand");
             throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;
@@ -64,16 +61,11 @@ public class QBLoginChatCommand extends ServiceCommand {
     private void tryLogin(QBUser currentUser) throws XMPPException, IOException, SmackException {
         long startTime = new Date().getTime();
         long currentTime = startTime;
-        Log.d("Fixes CHAT", "Start tryRelogin if !chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT"
-        + " result is " + (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT));
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {
-                Log.d("Fixes CHAT", "Start tryRelogin");
                 chatRestHelper.login(currentUser);
-                Log.d("Fixes CHAT", "Stop tryRelogin");
             } catch (SmackException ignore) {
-                Log.d("Fixes CHAT", "Failed tryRelogin");
                 ignore.printStackTrace();
             }
         }

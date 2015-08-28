@@ -515,18 +515,13 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
             loadingMore = false;
 
-            Log.d("Fixes", "User find successful");
-
             if (FriendsListFragment.this.constraint.equals(constraint)) {
                 Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(
                         QBServiceConsts.EXTRA_USERS);
                 if (!newUsersCollection.isEmpty()) {
                     updateFriendList(newUsersCollection);
-                } else {
-                    Log.d("Fixes", "New User collection is empty  constrains");
                 }
             } else {
-                Log.d("Fixes", "User fail constrains");
                 onQueryTextChange(FriendsListFragment.this.constraint);
             }
 

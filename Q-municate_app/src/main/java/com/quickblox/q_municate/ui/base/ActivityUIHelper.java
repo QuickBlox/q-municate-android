@@ -63,9 +63,9 @@ public class ActivityUIHelper implements View.OnClickListener {
     public void showNewMessageAlert(User senderUser, String message) {
         if (!PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_CROUTONS_DISABLED, false)) {
 
-            // Init new crouton view instead of overusing. In case of overusing we should store all
-            // incoming messages in queue and handle a cases of showing croutons depending on current
-            // dialog if some dialog shown now.
+            // Init new crouton view instead of overusing it and add it in croutons queue
+            // If we want overuse it we should handle crouton state to prevent changing data in it
+            // while it is showing to user.
             View croutonView = initCroutonView(senderUser.getFullName(), message);
 
             // Create new crouton

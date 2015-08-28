@@ -226,7 +226,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void videoCallClickListener(View view) {
-        Log.d("Fixes CONNECTIVITY", "Video call click executes");
         if (isConnectionEnabled()) {
             callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_VIDEO);
         } else {
@@ -248,7 +247,6 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     public void voiceCallClickListener(View view) {
-        Log.d("Fixes CONNECTIVITY", "Audio call click executes");
         if (isConnectionEnabled()) {
             callToUser(user, QBRTCTypes.QBConferenceType.QB_CONFERENCE_TYPE_AUDIO);
         } else {

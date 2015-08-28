@@ -20,7 +20,6 @@ public class NotificationHelper {
     public static final String CALL_TYPE = "call";
 
     public static QBEvent createPushEvent(List<Integer> userIdsList, String message, String messageType) {
-        Log.d("Fixes Notification", "createPushEvent");
         StringifyArrayList<Integer> userIds = new StringifyArrayList<Integer>();
         userIds.addAll(userIdsList);
         QBEvent event = new QBEvent();
@@ -28,7 +27,6 @@ public class NotificationHelper {
         event.setEnvironment(QBEnvironment.PRODUCTION);
         event.setNotificationType(QBNotificationType.PUSH);
         event.setMessage(message);
-        Log.d("Fixes Notification", "Created push " + event);
         return event;
     }
 }

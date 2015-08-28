@@ -32,11 +32,8 @@ public class QBInitChatServiceCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws QBResponseException {
         try {
-            Log.d("Fixes CHAT", "Start perform QBInitChatServiceCommand");
             chatRestHelper.initChatService();
-            Log.d("Fixes CHAT", "Stop perform QBInitChatServiceCommand");
         } catch (XMPPException | SmackException e) {
-            Log.d("Fixes CHAT", "Failed perform QBInitChatServiceCommand");
             throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;

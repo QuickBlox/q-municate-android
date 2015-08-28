@@ -518,19 +518,16 @@ public class QBService extends Service {
 //                    filter);
 //        }
 
-        Log.d("Fixes CONNECTIVITY", "START connectivity manager");
         initConnectivityManager();
     }
 
     private void initConnectivityManager() {
 
-        Log.d("Fixes CONNECTIVITY", "Init broadcastreceiver");
         connectivityReceier = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent != null) {
                     // Process CONNECTIVITY changes
-                    Log.d("Fixes CONNECTIVITY", "Receive connectivity change");
                     boolean connectionState = processConnectivityState(intent);
                     // Set it state to notify all listeners
                     updateStateIfNeed(connectionState);
@@ -541,7 +538,6 @@ public class QBService extends Service {
             private boolean processConnectivityState(Intent intent) {
                 int connectivityType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
                 // Check does connectivity equal mobile or wifi types
-                Log.d("Fixes CONNECTIVITY", "Check does connectivity equal mobile or wifi types");
                 boolean connectivityState = false;
                 if (connectivityType == ConnectivityManager.TYPE_MOBILE
                         || connectivityType == ConnectivityManager.TYPE_WIFI) {
@@ -553,7 +549,6 @@ public class QBService extends Service {
                        // Check does connectivity EXISTS for connectivity type wifi or mobile internet
                        // Pay attention on "!" symbol  in line below
                        connectivityState = true;
-                       Log.d("Fixes CONNECTIVITY", "Connectivity is " + connectivityState + " current is " + isConnectivityExists);
                    }
                 }
                 return connectivityState;
@@ -561,9 +556,7 @@ public class QBService extends Service {
 
             private void updateStateIfNeed(boolean connectionState) {
                 if (isConnectivityExists != connectionState) {
-                    Log.d("Fixes CONNECTIVITY", "Set connectivity state");
                     setConnectivityState(connectionState);
-                    Log.d("Fixes CONNECTIVITY", "Notify about  connectivity state");
                     QBConnectivityManager.getInstance(QBService.this).onConnectionChange(isConnectivityExists);
                 }
             }

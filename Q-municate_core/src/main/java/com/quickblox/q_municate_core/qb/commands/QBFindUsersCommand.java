@@ -25,7 +25,6 @@ public class QBFindUsersCommand extends ServiceCommand {
     }
 
     public static void start(Context context, QBUser currentUser, String constraint, int page) {
-        Log.d("Fixes", "User find command start called");
         Intent intent = new Intent(QBServiceConsts.FIND_USERS_ACTION, null, context, QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_USER, currentUser);
         intent.putExtra(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
@@ -35,7 +34,6 @@ public class QBFindUsersCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws QBResponseException {
-        Log.d("Fixes", "User find command started");
         String constraint = (String) extras.getSerializable(QBServiceConsts.EXTRA_CONSTRAINT);
         QBUser currentUser = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         int page = extras.getInt(QBServiceConsts.EXTRA_PAGE);
@@ -44,17 +42,11 @@ public class QBFindUsersCommand extends ServiceCommand {
         requestBuilder.setPage(page);
         requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
 
-        //        TODO temp
-        //        ArrayList<GenericQueryRule> ruleList = new ArrayList<GenericQueryRule>();
-        //        ruleList.add(new GenericQueryRule("order", "asc+string+full_name"));
-        //        requestBuilder.setRules(ruleList);
-
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collection<User> userCollection = FriendUtils.createUsersList(userList);
         userCollection.remove(FriendUtils.createUser(currentUser));
-        Log.d("Fixes", "User find command got users in cont " + userCollection);
-        Log.d("Fixes", "User find command got users in cont " + userCollection.size());
+
         Bundle params = new Bundle();
         params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);
         params.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, requestParams.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES));

@@ -49,24 +49,15 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
             destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
         }
         try {
-            Log.d("Fixes CHAT", "Start perform QBLogoutAndDestroyChatCommand");
-            Log.d("Fixes CHAT", "NEED TRUE  result is " + (chatRestHelper != null && chatRestHelper.isLoggedIn()));
             if (chatRestHelper != null && chatRestHelper.isLoggedIn()) {
                 multiChatHelper.leaveDialogs();
-                Log.d("Fixes CHAT", "Start perform logout");
                 chatRestHelper.logout();
-                Log.d("Fixes CHAT", "Stop perform logout");
                 if (destroy) {
-                    Log.d("Fixes CHAT", "Start perform destroy chat service");
                     chatRestHelper.destroy();
-                    Log.d("Fixes CHAT", "Stop perform destroy chat service");
                 }
-                Log.d("Fixes CHAT", "Start perform clearDialogsDataFromPreferences");
                 clearDialogsDataFromPreferences();
-                Log.d("Fixes CHAT", "Stop perform clearDialogsDataFromPreferences");
             }
         } catch (XMPPException | SmackException e){
-            Log.d("Fixes CHAT", "Failed perform QBLogoutAndDestroyChatCommand");
             throw new QBResponseException(e.getLocalizedMessage());
         }
         return extras;

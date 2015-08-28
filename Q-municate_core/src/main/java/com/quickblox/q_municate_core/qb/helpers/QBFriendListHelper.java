@@ -84,25 +84,17 @@ public class QBFriendListHelper extends BaseHelper {
 
     public void addFriend(int userId) throws QBResponseException, XMPPException, SmackException {
         if (isNewFriend(userId)) {
-            Log.d("Fixes", "Try to accept friend");
             acceptFriend(userId);
-            Log.d("Fixes", "Friend accepted");
         } else {
-            Log.d("Fixes", "Try to create and invite friend ");
             createFriend(userId, false);
-            Log.d("Fixes", "Friend created");
             invite(userId);
-            Log.d("Fixes", "Friend invited");
         }
     }
 
     public void invite(int userId) throws QBResponseException, XMPPException, SmackException {
         sendInvitation(userId);
-        Log.d("Fixes", "Invitation is sent");
         QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForFriendsRequest(context);
-        Log.d("Fixes", "Notification is created");
         sendNotificationToFriend(chatMessage, userId);
-        Log.d("Fixes", "Notification is sent");
     }
 
     private void sendNotificationToFriend(QBChatMessage chatMessage, int userId) throws QBResponseException {
@@ -162,13 +154,9 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void sendInvitation(int userId) throws XMPPException, SmackException {
         if (roster.contains(userId)) {
-            Log.d("Fixes", "Roster contains user");
             roster.subscribe(userId);
-            Log.d("Fixes", "Roster subscribed");
         } else {
-            Log.d("Fixes", "Roster doesn't contain user");
             roster.createEntry(userId, null);
-            Log.d("Fixes", "Roster entry created");
         }
     }
 
@@ -227,18 +215,12 @@ public class QBFriendListHelper extends BaseHelper {
 
     private void createFriend(int userId, boolean isNewFriendStatus) throws QBResponseException {
         User user = restHelper.loadUser(userId);
-        Log.d("Fixes", "User  is loaded");
         Friend friend = FriendUtils.createFriend(userId);
-        Log.d("Fixes", "Friend is created");
         friend.setNewFriendStatus(isNewFriendStatus);
-        Log.d("Fixes", "Friend status is created");
         fillUserOnlineStatus(user);
-        Log.d("Fixes", "User online status filled");
 
         saveUser(user);
-        Log.d("Fixes", "User is saved");
         saveFriend(friend);
-        Log.d("Fixes", "Friend is saved");
     }
 
     private List<QBUser> loadUsers(Collection<Integer> userIds) throws QBResponseException {
