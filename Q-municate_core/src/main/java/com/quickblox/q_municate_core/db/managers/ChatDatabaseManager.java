@@ -25,6 +25,8 @@ import com.quickblox.q_municate_core.models.MessagesNotificationType;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_core.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -323,6 +325,7 @@ public class ChatDatabaseManager {
     }
 
     public static void saveChatMessageGlobal(Context context, MessageCache messageCache) {
+        Log.d("Fixes CHAT", "saveChatMessageGlobal start ");
         int countUnreadMessagesLocal;
         boolean ownMessage = AppSession.getSession().getUser().getId() == messageCache.getSenderId();
 
@@ -402,6 +405,7 @@ public class ChatDatabaseManager {
     }
 
     private static void saveChatMessage(Context context, MessageCache messageCache) {
+        Log.d("Fixes CHAT", "Start save message  in CHAT_DATATBASE_MANAGER");
 
         ContentValues values = new ContentValues();
         MessagesNotificationType messagesNotificationType = messageCache.getMessagesNotificationType();
@@ -423,6 +427,7 @@ public class ChatDatabaseManager {
 
         if (cursor != null && cursor.getCount() > ConstsCore.ZERO_INT_VALUE) {
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
+            Log.d("Fixes CHAT", "Update message " + messageCache.getId() + " in CHAT_DATATBASE_MANAGER");
         } else {
             values.put(MessageTable.Cols.MESSAGE_ID, messageCache.getId());
             values.put(MessageTable.Cols.DIALOG_ID, messageCache.getDialogId());
@@ -435,6 +440,8 @@ public class ChatDatabaseManager {
             }
 
             resolver.insert(MessageTable.CONTENT_URI, values);
+
+            Log.d("Fixes CHAT", "Save message " + messageCache.getId() + " in CHAT_DATATBASE_MANAGER");
         }
 
         if (cursor != null){
@@ -452,7 +459,11 @@ public class ChatDatabaseManager {
 
         values.put(NotSendMessageTable.Cols.BODY, message);
 
-        values.putNull(NotSendMessageTable.Cols.ATTACH_FILE_ID);
+//        if (TextUtils.isEmpty(attachURL.trim())) {
+//            values.put(NotSendMessageTable.Cols.ATTACH_FILE_ID, attachURL);
+//        } else {
+            values.putNull(NotSendMessageTable.Cols.ATTACH_FILE_ID);
+//        }
 
         String condition = NotSendMessageTable.Cols.DIALOG_ID + "='" + dialogID + "'";
         Cursor cursor = resolver.query(NotSendMessageTable.CONTENT_URI, null, condition, null, null);
@@ -679,6 +690,7 @@ public class ChatDatabaseManager {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
         if (cursor != null && cursor.moveToFirst()) {
+            Log.d("Fixes CHAT", "Start update message status in CHAT_DATATBASE_MANAGER");
             String dialogId = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.DIALOG_ID));
             String message = cursor.getString(cursor.getColumnIndex(MessageTable.Cols.BODY));
             long time = cursor.getLong(cursor.getColumnIndex(MessageTable.Cols.TIME));
@@ -715,6 +727,7 @@ public class ChatDatabaseManager {
         Cursor cursor = resolver.query(MessageTable.CONTENT_URI, null, condition, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
+            Log.d("Fixes CHAT", "Start update message status delivered  in CHAT_DATATBASE_MANAGER");
             values.put(MessageTable.Cols.IS_DELIVERED, isDelivered);
             resolver.update(MessageTable.CONTENT_URI, values, condition, null);
         }
@@ -735,10 +748,11 @@ public class ChatDatabaseManager {
     }
 
     public static boolean isMessageReadByUser(Collection<Integer> readIDs) {
-        boolean messaGeReadByUser = false;
-        if (readIDs != null && readIDs.contains(QBChatService.getInstance().getUser().getId())){
-            messaGeReadByUser = true;
+        boolean messageReadByUser = false;
+        int userId = AppSession.getSession().getUser().getId();
+        if (readIDs != null && readIDs.contains(userId)) {
+            messageReadByUser = true;
         }
-        return messaGeReadByUser;
+        return messageReadByUser;
     }
 }

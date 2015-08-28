@@ -28,6 +28,7 @@ import java.util.List;
 
 public class FacebookHelper {
 
+    private String TAG = FacebookHelper.class.getSimpleName();
     public static final List<String> PERMISSIONS = Arrays.asList("publish_actions", "publish_stream");
     private Activity activity;
     private Session.StatusCallback facebookStatusCallback;
@@ -116,6 +117,15 @@ public class FacebookHelper {
         }
     }
 
+    private Bundle getBundleForPostToWall() {
+        Bundle postParams = new Bundle();
+        postParams.putString(ConstsCore.FB_WALL_PARAM_NAME, resources.getString(R.string.inf_fb_wall_param_name));
+        postParams.putString(ConstsCore.FB_WALL_PARAM_DESCRIPTION, resources.getString(R.string.inf_fb_wall_param_description));
+        postParams.putString(ConstsCore.FB_WALL_PARAM_LINK, resources.getString(R.string.inf_fb_wall_param_link));
+        postParams.putString(ConstsCore.FB_WALL_PARAM_PICTURE, resources.getString(R.string.inf_fb_wall_param_picture));
+        return postParams;
+    }
+
     private Bundle getBundleForFriendsRequest() {
         Bundle postParams = new Bundle();
         postParams.putString(ConstsCore.FB_REQUEST_PARAM_TITLE, resources.getString(R.string.inf_subject_of_invitation));
@@ -124,8 +134,8 @@ public class FacebookHelper {
     }
 
     public WebDialog getWebDialogRequest() {
-        Bundle postParams = getBundleForFriendsRequest();
-        return (new WebDialog.RequestsDialogBuilder(activity,
+        Bundle postParams = getBundleForPostToWall();
+        return (new WebDialog.FeedDialogBuilder(activity,
                 Session.getActiveSession(), postParams)).setOnCompleteListener(
                 getWebDialogOnCompleteListener()).build();
     }
@@ -135,7 +145,7 @@ public class FacebookHelper {
 
             @Override
             public void onComplete(Bundle values, FacebookException facebookException) {
-                parseFacebookRequestError(values, facebookException);
+                parseFacebookFeedError(values, facebookException);
             }
         };
     }
@@ -162,6 +172,24 @@ public class FacebookHelper {
                 DialogUtils.showLong(activity, resources.getString(R.string.dlg_success_request_facebook));
             } else {
                 DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+            }
+        }
+    }
+
+    private void parseFacebookFeedError(Bundle values, FacebookException facebookException) {
+        if (facebookException != null) {
+            if (facebookException instanceof FacebookOperationCanceledException) {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_feed_result_publish_canceled));
+            } else if (!TextUtils.isEmpty(facebookException.getMessage())) {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_feed_result_posting_error));
+            }
+        } else {
+            final String postId = values.getString("post_id");
+
+            if (postId != null) {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_feed_result_posted));
+            } else {
+                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_feed_result_publish_canceled));
             }
         }
     }

@@ -133,6 +133,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     private boolean isListInBottomNow;
     private boolean isTypingAnimationShown;
     private int lastMessagesCountInDB;
+    private boolean isNeedShowTostAboutDisconnected;
+
 
 
     public BaseDialogActivity(int layoutResID, int chatHelperIdentifier) {
@@ -186,6 +188,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        Log.d("Fixes CHAT", "BaseDialogActivity onStart");
         // Set Default update reason to start loading of new messages
         updateMessagesReason = UpdateMessagesReason.DEFAULT;
 
@@ -200,6 +203,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("Fixes CHAT", "BaseDialogActivity onPause");
         onUpdateChatDialog();
         hideSmileLayout();
 
@@ -215,11 +219,14 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        isNeedShowTostAboutDisconnected = true;
+        Log.d("Fixes CHAT", "BaseDialogActivity onResume");
         startLoadDialogMessages();
     }
 
     @Override
     protected void onStop() {
+        isNeedShowTostAboutDisconnected = false;
         if (!TextUtils.isEmpty(messageEditText.getText().toString().trim())){
            ChatDatabaseManager.saveNotSendMessage(getApplicationContext(), messageEditText.getText().toString(), dialogId, null);
         } else {
@@ -450,14 +457,19 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void startLoadDialogMessages(QBDialog dialog, long lastDateLoad) {
         if (loadingMore) {
-            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, skipMessages);
+            Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
+            QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad,
+                    skipMessages = lastDateLoad == ConstsCore.ZERO_LONG_VALUE ?
+                            ConstsCore.ZERO_INT_VALUE : skipMessages);
             loadingMore = false;
         }
     }
 
 
     protected void startNewMessagesLoadDialogMessages(QBDialog dialog, long lastDateLoad, String lastReadMessageID) {
+        Log.d("Fixes CHAT", "loadingMore = " + loadingMore);
         if (loadingMore) {
+            Log.d("Fixes CHAT", "start Load Dialog Messages for dialog " + dialog + " where last date load " + lastDateLoad + " skip messages " + skipMessages);
             QBLoadDialogMessagesCommand.start(this, dialog, lastDateLoad, lastReadMessageID, ConstsCore.NOT_INITIALIZED_VALUE);
             loadingMore = false;
         }
@@ -526,9 +538,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor messagesCursor) {
+        Log.d("Fixes CHAT", "onLoadFinished");
         if (messagesAdapter == null) {
+            Log.d("Fixes CHAT", "onLoadFinished Adapter absent");
             initListView(messagesCursor);
         } else {
+            Log.d("Fixes CHAT", "onLoadFinished Adapter exist");
+            Log.d("Fixes CHAT", "onLoadFinished update reason " + updateMessagesReason.name());
             messagesAdapter.swapCursor(messagesCursor);
 
 
@@ -562,12 +578,18 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
                 if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
                     int loadMessages = ConstsCore.DIALOG_MESSAGES_PER_PAGE < totalEntries ?
                             ConstsCore.DIALOG_MESSAGES_PER_PAGE : totalEntries;
+                    Log.d("Fixes CHAT", "onLoadFinished Set selection  " + loadMessages);
                     messagesListView.setSelection(loadMessages - 1);
                     resetTotalEntries();
                 } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason) {
+                    Log.d("Fixes CHAT", "onLoadFinished load messages by default reason");
                     scrollListView();
                 }
             }
+
+//            // Set state to none to prevent scrolling to the bottom of the list on each data update
+//            // Update list position only for first load
+//            updateMessagesReason = UpdateMessagesReason.NONE;
         }
     }
 
@@ -738,6 +760,8 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     protected void startLoadDialogMessages() {
+        Log.d("Fixes CHAT", "startLoadDialogMessages");
+        Log.d("Fixes CHAT", "updateMessagesReason = " + String.valueOf(updateMessagesReason));
         if (dialog == null) {
             return;
         }
@@ -746,12 +770,16 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         showActionBarProgress();
 
         MessageCache lastReadMessage = ChatDatabaseManager.getLastSyncMessage(this, dialog);
+        Log.d("Fixes CHAT", "Last synch mesasge is " + lastReadMessage);
         if (lastReadMessage == null) {
+            Log.d("Fixes CHAT", "Last synch mesasge is null");
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
             updateMessagesReason = UpdateMessagesReason.DEFAULT;
         } else if (UpdateMessagesReason.DEFAULT == updateMessagesReason){
+            Log.d("Fixes CHAT", "startLoadDialogMessages by default reason");
             startNewMessagesLoadDialogMessages(dialog, lastReadMessage.getTime(), lastReadMessage.getId());
         } else if (UpdateMessagesReason.ON_USER_REQUEST == updateMessagesReason) {
+            Log.d("Fixes CHAT", "startLoadDialogMessages by user request or none reason");
             startLoadDialogMessages(dialog, lastReadMessage.getTime());
         }
     }
@@ -829,7 +857,9 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         @Override
         public void execute(Bundle bundle) {
 
+            Log.d("Fixes CHAT", "LoadDialogMessagesSuccessAction");
             skipMessages += bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
+            Log.d("Fixes CHAT", "LoadDialogMessagesSuccessAction Next skip messages " + skipMessages);
 
             // Set totalEntries value only if download messages command have been executed by user request.
             // TotalEntries value used for setting position of list after it was updated.
@@ -860,6 +890,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d("Fixes CHAT", "LoadDialogMessagesFailAction");
             loadingMore = true;
             hideActionBarProgress();
         }
@@ -922,6 +953,11 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            Log.d("Fixes STATUS", "Relogin success action");
+            Log.d("Fixes CHAT", "ChatService is init " + QBChatService.isInitialized());
+            if (QBChatService.isInitialized()) {
+                Log.d("Fixes CHAT", "ChatService is logged in " + QBChatService.getInstance().isLoggedIn());
+            }
             Toast.makeText(BaseDialogActivity.this, getString(R.string.relgn_success), Toast.LENGTH_LONG).show();
 
             /*
@@ -968,6 +1004,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
          */
         if(!isConnected) {
             updateMessagesReason = UpdateMessagesReason.NONE;
+            showToastAboutDisconnectedIfNeed();
+        }
+    }
+
+    private void showToastAboutDisconnectedIfNeed() {
+        if (isNeedShowTostAboutDisconnected){
+            Toast.makeText(this, this.getString(com.quickblox.q_municate_core.R.string.connection_lost), Toast.LENGTH_LONG).show();
         }
     }
 

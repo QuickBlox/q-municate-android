@@ -87,10 +87,6 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
         super.onResume();
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
-
-        if(!isConnectionEnabled()){
-            Toast.makeText(this, getString(R.string.connection_lost),Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
@@ -108,6 +104,11 @@ public class BaseFragmentActivity extends FragmentActivity implements QBLogeable
     @Override
     protected void onStart() {
         activityHelper.onStart();
+
+        if(!isConnectionEnabled()){
+            Toast.makeText(this, getString(R.string.connection_lost),Toast.LENGTH_LONG).show();
+        }
+
         super.onStart();
     }
 

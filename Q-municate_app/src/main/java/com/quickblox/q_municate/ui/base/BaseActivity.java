@@ -42,6 +42,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     protected FailAction failAction;
     protected SuccessAction successAction;
     protected ActivityHelper activityHelper;
+    protected boolean isNeedShowTostAboutDisconnected;
 
     private boolean doubleBackToExitPressedOnce;
     private QBService service;
@@ -123,6 +124,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
     @Override
     protected void onResume() {
         super.onResume();
+        isNeedShowTostAboutDisconnected = true;
         activityHelper.onResume();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
@@ -135,6 +137,7 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
 
     @Override
     protected void onStop() {
+        isNeedShowTostAboutDisconnected = false;
         activityHelper.onStop();
         super.onStop();
     }
@@ -299,16 +302,12 @@ public abstract class BaseActivity extends Activity implements ActivityHelper.Se
         if (isConnected) {
             QBReloginCommand.start(this);
         } else {
-//                        android.app.AlertDialog.Builder diologBuilder = new android.app.AlertDialog.Builder(getApplicationContext());
-//                        diologBuilder.setTitle(getString(R.string.connection_lost_title))
-//                                .setMessage(getString(R.string.connection_lost))
-//                                .setPositiveButton(R.string.dlg_ok, new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        dialog.dismiss();
-//                                    }
-//                                });
-//                        diologBuilder.show();
+            showToastAboutDisconnectedIfNeed();
+        }
+    }
+
+    private void showToastAboutDisconnectedIfNeed() {
+        if (isNeedShowTostAboutDisconnected){
             Toast.makeText(this, this.getString(com.quickblox.q_municate_core.R.string.connection_lost), Toast.LENGTH_LONG).show();
         }
     }
