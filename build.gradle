@@ -17,7 +17,7 @@ ext.compileSdkVersion = 21
 ext.buildToolsVersion = '21.0.1'
 ext.minSdkVersion = 14
 ext.targetSdkVersion = 21
-ext.versionName = '1.1.1'
+ext.versionName = '1.1.2_1_01.09.2015'
 ext.versionCode = 32
 
 

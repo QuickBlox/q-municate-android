@@ -121,6 +121,9 @@ public class QBAuthHelper extends BaseHelper {
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             inputUser.setPassword(password);
             inputUser.setOldPassword(oldPassword);
+        } else if (LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType())){
+            inputUser.setPassword(null);
+            inputUser.setOldPassword(null);
         }
 
         user = QBUsers.updateUser(inputUser);
