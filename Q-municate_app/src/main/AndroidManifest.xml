@@ -58,7 +58,7 @@
             android:name=".ui.authorization.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/sup_sign_up"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.quickblox.q_municate.ui.main.MainActivity"

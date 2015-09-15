@@ -330,9 +330,6 @@ public class QBService extends Service {
 
         addLoginChatAndInitCommands(joinGroupChatsCommand);
 
-        ServiceCommand joinChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-        joinGroupChatsCommand.addCommand(joinChatCommand);
-
         serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, joinGroupChatsCommand);
     }
 

@@ -157,8 +157,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         Bundle bundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);
-        List<QBDialog> qbDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder,
-                bundle);
+        List<QBDialog> qbDialogsList = QBChatService.getChatDialogs(null, customObjectRequestBuilder, bundle);
 
         new FinderUnknownUsers(context, chatCreator, qbDialogsList).find();
 

@@ -152,6 +152,14 @@ public class ChatUtils {
             dialog.setType(Dialog.Type.GROUP);
         }
 
+        dialog.setState(Dialog.State.SYNC);
+
+        return dialog;
+    }
+
+    public static Dialog createLocalDialog(QBDialog qbDialog, Dialog.State state) {
+        Dialog dialog = createLocalDialog(qbDialog);
+        dialog.setState(state);
         return dialog;
     }
 
