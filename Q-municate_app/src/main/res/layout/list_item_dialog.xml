@@ -38,8 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textSize="@dimen/text_size"
-                android:maxLines="2"
-                android:ellipsize="end" />
+                android:maxLines="2" />
 
             <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
                 android:id="@+id/last_message_textview"
@@ -48,8 +47,7 @@
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="@dimen/text_size"
-                android:singleLine="true"
-                android:ellipsize="end" />
+                android:singleLine="true" />
         </LinearLayout>
 
         <TextView

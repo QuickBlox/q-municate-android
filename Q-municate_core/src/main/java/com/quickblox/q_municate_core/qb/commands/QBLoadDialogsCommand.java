@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.commands;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
@@ -11,7 +12,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +34,18 @@ public class QBLoadDialogsCommand extends ServiceCommand {
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         List<QBDialog> dialogsList = multiChatHelper.getDialogs();
-        ArrayList<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
+        List<ParcelableQBDialog> parcelableQBDialog = new ArrayList<>();
 
         if (dialogsList != null && !dialogsList.isEmpty()) {
-            parcelableQBDialog = ChatUtils.dialogsToParcelableDialogs(dialogsList);
+            parcelableQBDialog = ChatUtils.qbDialogsToParcelableQBDialogs(dialogsList);
             multiChatHelper.tryJoinRoomChats(dialogsList);
-            // save flag for join to dialogs
-            PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS, true);
         }
 
-        extras.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, parcelableQBDialog);
+        if (extras == null) {
+            extras = new Bundle();
+        }
+
+        extras.putParcelableArrayList(QBServiceConsts.EXTRA_CHATS_DIALOGS, (ArrayList<? extends Parcelable>) parcelableQBDialog);
 
         return extras;
     }

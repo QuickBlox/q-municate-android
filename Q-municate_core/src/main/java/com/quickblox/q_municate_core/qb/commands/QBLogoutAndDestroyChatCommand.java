@@ -9,7 +9,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 
 public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
 
@@ -33,24 +32,22 @@ public class QBLogoutAndDestroyChatCommand extends ServiceCommand {
        start(context, false);
     }
 
-    private void clearDialogsDataFromPreferences() {
-        PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
-    }
-
     @Override
     public Bundle perform(Bundle extras) throws Exception {
         boolean destroy = true;
+
         if (extras != null) {
             destroy = extras.getBoolean(QBServiceConsts.DESTROY_CHAT, true);
         }
-        if(chatRestHelper != null && chatRestHelper.isLoggedIn()) {
+
+        if (chatRestHelper != null && chatRestHelper.isLoggedIn()) {
             multiChatHelper.leaveDialogs();
             chatRestHelper.logout();
             if (destroy) {
                 chatRestHelper.destroy();
             }
-            clearDialogsDataFromPreferences();
         }
+
         return extras;
     }
 }

@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.settings;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.quickblox.q_municate.ui.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
@@ -21,7 +21,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.authorization.LoginActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.profile.ProfileActivity;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_core.utils.Utils;

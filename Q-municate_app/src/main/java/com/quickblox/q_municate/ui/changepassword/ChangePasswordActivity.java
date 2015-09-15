@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.settings;
+package com.quickblox.q_municate.ui.changepassword;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinDialogsCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinGroupChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -92,9 +92,9 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
         addAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, new LogoutChatSuccessAction());
-        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION, new LoginChatSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatSuccessAction());
         addAction(QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, failAction);
         updateBroadcastActionList();
     }
 
@@ -130,7 +130,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginAndJoinDialogsCommand.start(ChangePasswordActivity.this);
+            QBLoginAndJoinGroupChatCommand.start(ChangePasswordActivity.this);
         }
     }
 

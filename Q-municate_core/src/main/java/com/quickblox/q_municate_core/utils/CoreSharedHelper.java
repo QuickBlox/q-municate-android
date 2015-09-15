@@ -11,6 +11,7 @@ public class CoreSharedHelper {
 
         String NAME = "Q-municate";
         String IMPORT_INITIALIZED = "import_initialized";
+        String FIRST_AUTH = "first_auth";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -75,5 +76,13 @@ public class CoreSharedHelper {
 
     public void saveUsersImportInitialized(boolean save) {
         savePref(Constants.IMPORT_INITIALIZED, save);
+    }
+
+    public boolean isFirstAuth() {
+        return getPref(Constants.FIRST_AUTH, false);
+    }
+
+    public void saveFirstAuth(boolean firstAuth) {
+        savePref(Constants.FIRST_AUTH, firstAuth);
     }
 }

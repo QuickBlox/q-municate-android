@@ -153,7 +153,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
     }
 
-    public List<QBDialog> getDialogs() throws QBResponseException, XMPPException, SmackException {
+    public List<QBDialog> getDialogs() throws Exception {
         Bundle bundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
         customObjectRequestBuilder.setPagesLimit(ConstsCore.CHATS_DIALOGS_PER_PAGE);

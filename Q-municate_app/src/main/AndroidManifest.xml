@@ -115,7 +115,7 @@
             android:parentActivityName=".ui.chats.groupdialog.GroupDialogDetailsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.quickblox.q_municate.ui.settings.ChangePasswordActivity"
+            android:name=".ui.changepassword.ChangePasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/cpw_change_password_title"
             android:parentActivityName="com.quickblox.q_municate.ui.main.MainActivity"

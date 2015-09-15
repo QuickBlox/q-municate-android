@@ -139,15 +139,25 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         sendGroupMessage(chatMessage, roomJidId, currentDialog.getDialogId());
     }
 
-    public void tryJoinRoomChats(List<QBDialog> chatDialogsList) {
-        if (!chatDialogsList.isEmpty()) {
+    public void tryJoinRoomChats(List<QBDialog> qbDialogsList) {
+        if (!qbDialogsList.isEmpty()) {
             initGroupDialogsList();
-            for (QBDialog dialog : chatDialogsList) {
+            for (QBDialog dialog : qbDialogsList) {
                 if (!QBDialogType.PRIVATE.equals(dialog.getType())) {
                     groupDialogsList.add(dialog);
                     tryJoinRoomChat(dialog);
                 }
             }
+        }
+    }
+
+    public void tryJoinRoomChats() {
+        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
+        List<QBDialog> qbDialogsList;
+
+        if (dialogsList != null) {
+            qbDialogsList = ChatUtils.createQBDialogsListFromDialogsList(dialogsList);
+            tryJoinRoomChats(qbDialogsList);
         }
     }
 
@@ -242,7 +252,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         return groupChat;
     }
 
-    public void joinRoomChat(QBDialog dialog) throws XMPPException, SmackException, QBResponseException {
+    public void joinRoomChat(QBDialog dialog) throws Exception {
         QBGroupChat roomChat = createGroupChatIfNotExist(dialog);
         if (!roomChat.isJoined()) {
             DiscussionHistory history = new DiscussionHistory();

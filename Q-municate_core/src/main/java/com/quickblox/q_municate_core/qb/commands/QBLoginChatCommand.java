@@ -11,13 +11,10 @@ import com.quickblox.q_municate_core.qb.helpers.QBChatRestHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.XMPPException;
 
-import java.io.IOException;
 import java.util.Date;
 
 public class QBLoginChatCommand extends ServiceCommand {
@@ -43,18 +40,17 @@ public class QBLoginChatCommand extends ServiceCommand {
 
         tryLogin(currentUser);
 
-        // clear old dialogs data
-        PrefsHelper.getPrefsHelper().delete(PrefsHelper.PREF_JOINED_TO_ALL_DIALOGS);
-
         if (!chatRestHelper.isLoggedIn()) {
             throw new Exception(QBChatErrorsConstants.AUTHENTICATION_FAILED);
         }
+
         return extras;
     }
 
-    private void tryLogin(QBUser currentUser) throws XMPPException, IOException, SmackException {
+    private void tryLogin(QBUser currentUser) throws Exception {
         long startTime = new Date().getTime();
         long currentTime = startTime;
+
         while (!chatRestHelper.isLoggedIn() && (currentTime - startTime) < ConstsCore.LOGIN_TIMEOUT) {
             currentTime = new Date().getTime();
             try {

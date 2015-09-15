@@ -26,7 +26,9 @@ public class CompositeServiceCommand extends ServiceCommand {
     protected Bundle perform(Bundle extras) throws Exception {
         Bundle params = extras;
         for (ServiceCommand command : commandList) {
-            params = command.perform(params);
+            if (command != null) {
+                params = command.perform(params);
+            }
         }
         return params;
     }

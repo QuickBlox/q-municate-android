@@ -189,6 +189,7 @@ public class QBServiceConsts {
     public static final String EXTRA_DIALOG_TYPE = "dialog_type";
     public static final String EXTRA_IS_OWN_MESSAGE = "is_own_message";
     public static final String EXTRA_GROUP_DIALOG = "group_dialog";
+    public static final String EXTRA_GROUP_DIALOGS = "group_dialogs";
     public static final String EXTRA_GROUP_CHAT_ID = "group_chat_id";
     public static final String EXTRA_OPPONENT = "opponent_friend";
     public static final String EXTRA_DIALOG_MESSAGES = "dialog_messages";

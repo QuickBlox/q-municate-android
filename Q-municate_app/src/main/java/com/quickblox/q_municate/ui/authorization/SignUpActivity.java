@@ -218,6 +218,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
     protected void performUpdateUserSuccessAction(Bundle bundle) {
         QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
+        appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
         startMainActivity(user);
 

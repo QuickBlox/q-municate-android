@@ -170,6 +170,7 @@ public class BaseAuthActivity extends BaseActivity {
     }
 
     protected void login(String userEmail, String userPassword) {
+        appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
@@ -242,8 +243,7 @@ public class BaseAuthActivity extends BaseActivity {
         @Override
         public void call(Session session, SessionState state, Exception exception) {
             if (session.isOpened() && loginType.equals(LoginType.FACEBOOK)) {
-                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK,
-                        session.getAccessToken(), null);
+                QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
 
                 if (BaseAuthActivity.this instanceof SplashActivity) {
                     hideProgress();

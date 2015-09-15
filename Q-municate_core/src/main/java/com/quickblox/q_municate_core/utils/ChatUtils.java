@@ -121,13 +121,23 @@ public class ChatUtils {
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
 
-    public static ArrayList<ParcelableQBDialog> dialogsToParcelableDialogs(List<QBDialog> dialogList){
-        ArrayList<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
+    public static List<ParcelableQBDialog> qbDialogsToParcelableQBDialogs(List<QBDialog> dialogList){
+        List<ParcelableQBDialog> parcelableDialogList = new ArrayList<ParcelableQBDialog>(dialogList.size());
         for (QBDialog dialog : dialogList) {
             ParcelableQBDialog parcelableQBDialog = new ParcelableQBDialog(dialog);
             parcelableDialogList.add(parcelableQBDialog);
         }
         return parcelableDialogList;
+    }
+
+
+    public static List<QBDialog> parcelableQBDialogsToQBDialogs(List<ParcelableQBDialog> parcelableQBDialogsList){
+        List<QBDialog> qbDialogsList = new ArrayList<QBDialog>(parcelableQBDialogsList.size());
+        for (ParcelableQBDialog parcelableQBDialog : parcelableQBDialogsList) {
+            QBDialog qbDialog = parcelableQBDialog.getDialog();
+            qbDialogsList.add(qbDialog);
+        }
+        return qbDialogsList;
     }
 
     public static User getOpponentFromPrivateDialog(User currentUser, List<DialogOccupant> occupantsList) {
@@ -171,6 +181,16 @@ public class ChatUtils {
         }
 
         return dialogsList;
+    }
+
+    public static List<QBDialog> createQBDialogsListFromDialogsList(List<Dialog> dialogsList) {
+        List<QBDialog> qbDialogsList = new ArrayList<>(dialogsList.size());
+
+        for (Dialog dialog : dialogsList) {
+            qbDialogsList.add(createQBDialogFromLocalDialog(dialog));
+        }
+
+        return qbDialogsList;
     }
 
     public static List<DialogOccupant> createDialogOccupantsList(QBDialog qbDialog) {

@@ -7,9 +7,9 @@ import com.quickblox.q_municate_core.core.command.CompositeServiceCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-public class QBLoginAndJoinDialogsCommand extends CompositeServiceCommand {
+public class QBLoginAndJoinGroupChatCommand extends CompositeServiceCommand {
 
-    public QBLoginAndJoinDialogsCommand(Context context, String successAction, String failAction) {
+    public QBLoginAndJoinGroupChatCommand(Context context, String successAction, String failAction) {
         super(context, successAction, failAction);
     }
 

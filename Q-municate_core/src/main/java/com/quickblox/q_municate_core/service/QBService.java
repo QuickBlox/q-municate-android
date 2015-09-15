@@ -29,6 +29,7 @@ import com.quickblox.q_municate_core.qb.commands.QBInitChatServiceCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitFriendListCommand;
 import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
+import com.quickblox.q_municate_core.qb.commands.QBJoinGroupChatsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLeaveGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogMessagesCommand;
@@ -36,7 +37,7 @@ import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinDialogsCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinGroupChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
@@ -134,7 +135,7 @@ public class QBService extends Service {
         // login/signUp commands
         registerLoginRestCommand();
         registerLoginRestSocialCommand();
-        registerLoginChatWithLoadDialogsCommand();
+        registerLoginChatWithJoinGroupChatsCommand();
         registerSignUpCommand();
 
         // chat commands
@@ -173,7 +174,7 @@ public class QBService extends Service {
         registerLogoutCommand();
 
         registerLoginCommand();
-        registerLoginAndJoinGroupChat();
+        registerJoinGroupChatsCommand();
     }
 
     // ------------------ login commands
@@ -197,14 +198,17 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.SOCIAL_LOGIN_ACTION, loginRestCommand);
     }
 
-    private void registerLoginChatWithLoadDialogsCommand() {
-        CompositeServiceCommand loginCommand = new QBLoginChatCompositeCommand(this,
+    private void registerLoginChatWithJoinGroupChatsCommand() {
+        CompositeServiceCommand loginChatCommand = new QBLoginChatCompositeCommand(this,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION,
                 QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
 
-        addLoginChatAndInitCommands(loginCommand);
+        addLoginChatAndInitCommands(loginChatCommand);
 
-        serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginCommand);
+        ServiceCommand joinGroupChatCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+        loginChatCommand.addCommand(joinGroupChatCommand);
+
+        serviceCommandMap.put(QBServiceConsts.LOGIN_CHAT_COMPOSITE_ACTION, loginChatCommand);
     }
 
     private void registerSignUpCommand() {
@@ -323,15 +327,28 @@ public class QBService extends Service {
         serviceCommandMap.put(QBServiceConsts.LOAD_GROUP_DIALOG_ACTION, loadGroupDialogCommand);
     }
 
-    private void registerLoginAndJoinGroupChat() {
-        QBLoginAndJoinDialogsCommand joinGroupChatsCommand = new QBLoginAndJoinDialogsCommand(this,
-                QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION,
-                QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION);
+    private void registerJoinGroupChatsCommand() {
+        QBGroupChatHelper groupChatHelper = (QBGroupChatHelper) getHelper(GROUP_CHAT_HELPER);
 
-        addLoginChatAndInitCommands(joinGroupChatsCommand);
+        QBJoinGroupChatsCommand joinGroupChatsCommand = new QBJoinGroupChatsCommand(this, groupChatHelper,
+                QBServiceConsts.JOIN_GROUP_CHAT_SUCCESS_ACTION,
+                QBServiceConsts.JOIN_GROUP_CHAT_FAIL_ACTION);
 
-        serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, joinGroupChatsCommand);
+        serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatsCommand);
     }
+
+//    private void registerLoginAndJoinGroupChat() {
+//        QBLoginAndJoinGroupChatCommand loginAndJoinGroupChatCommand = new QBLoginAndJoinGroupChatCommand(this,
+//                QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION,
+//                QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION);
+//
+//        addLoginChatAndInitCommands(loginAndJoinGroupChatCommand);
+//
+//        ServiceCommand joinGroupChatsCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
+//        loginAndJoinGroupChatCommand.addCommand(joinGroupChatsCommand);
+//
+//        serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, loginAndJoinGroupChatCommand);
+//    }
 
     private void registerLoadAttachFileCommand() {
         QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
@@ -565,9 +582,9 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
         QBInitVideoChatCommand initVideoChatCommand = (QBInitVideoChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
-        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, groupChatHelper,
-                QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
-                QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
+//        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, groupChatHelper,
+//                QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
+//                QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
@@ -575,7 +592,7 @@ public class QBService extends Service {
         loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(loadFriendListCommand);
         loginCommand.addCommand(initVideoChatCommand);
-        loginCommand.addCommand(chatsDialogsCommand);
+//        loginCommand.addCommand(chatsDialogsCommand);
     }
 
     //    private void registerReLoginCommand() {
