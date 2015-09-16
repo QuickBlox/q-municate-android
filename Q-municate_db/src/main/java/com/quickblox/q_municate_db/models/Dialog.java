@@ -11,7 +11,6 @@ import static com.quickblox.q_municate_db.models.Dialog.Column.ROOM_JID;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TABLE_NAME;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TITLE;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TYPE;
-import static com.quickblox.q_municate_db.models.Dialog.Column.STATE;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class Dialog implements Serializable {
@@ -25,10 +24,6 @@ public class Dialog implements Serializable {
     @DatabaseField(
             columnName = TYPE)
     private Type type;
-
-    @DatabaseField(
-            columnName = STATE)
-    private State state;
 
     @DatabaseField(
             columnName = ROOM_JID)
@@ -85,14 +80,6 @@ public class Dialog implements Serializable {
         this.type = type;
     }
 
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
     public enum Type {
 
         PRIVATE(0),
@@ -121,34 +108,6 @@ public class Dialog implements Serializable {
         }
     }
 
-    public enum State {
-
-        DOWNLOAD(0),
-        SYNC(1);
-
-        private int code;
-
-        State(int code) {
-            this.code = code;
-        }
-
-        public static State parseByCode(int code) {
-            State[] valuesArray = State.values();
-            State result = null;
-            for (State value : valuesArray) {
-                if (value.getCode() == code) {
-                    result = value;
-                    break;
-                }
-            }
-            return result;
-        }
-
-        public int getCode() {
-            return code;
-        }
-    }
-
     public interface Column {
 
         String TABLE_NAME = "dialog";
@@ -157,6 +116,5 @@ public class Dialog implements Serializable {
         String TITLE = "title";
         String PHOTO = "photo";
         String TYPE = "type";
-        String STATE = "state";
     }
 }

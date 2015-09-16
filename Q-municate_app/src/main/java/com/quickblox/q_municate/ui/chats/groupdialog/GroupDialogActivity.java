@@ -53,6 +53,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
             finish();
         }
 
+        deleteTempMessages();
         startLoadDialogMessages();
         setCurrentDialog(dialog);
 

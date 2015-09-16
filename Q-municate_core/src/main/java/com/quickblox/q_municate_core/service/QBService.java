@@ -37,20 +37,19 @@ import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadFriendListCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadUserCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinGroupChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
-import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
+import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpRestCommand;
+import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogLocalCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
@@ -113,8 +112,7 @@ public class QBService extends Service {
     }
 
     private void initThreads() {
-        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME,
-                KEEP_ALIVE_TIME_UNIT, threadQueue);
+        threadPool = new ThreadPoolExecutor(NUMBER_OF_CORES, NUMBER_OF_CORES, KEEP_ALIVE_TIME, KEEP_ALIVE_TIME_UNIT, threadQueue);
         threadPool.allowCoreThreadTimeOut(true);
     }
 
@@ -152,6 +150,7 @@ public class QBService extends Service {
         registerLoadChatsDialogsCommand();
         registerUpdateChatDialogLocalCommand();
         registerLoadDialogMessagesCommand();
+        registerJoinGroupChatsCommand();
 
         // users/friends commands
         registerLoadUsersCommand();
@@ -174,7 +173,6 @@ public class QBService extends Service {
         registerLogoutCommand();
 
         registerLoginCommand();
-        registerJoinGroupChatsCommand();
     }
 
     // ------------------ login commands
@@ -336,19 +334,6 @@ public class QBService extends Service {
 
         serviceCommandMap.put(QBServiceConsts.JOIN_GROUP_CHAT_ACTION, joinGroupChatsCommand);
     }
-
-//    private void registerLoginAndJoinGroupChat() {
-//        QBLoginAndJoinGroupChatCommand loginAndJoinGroupChatCommand = new QBLoginAndJoinGroupChatCommand(this,
-//                QBServiceConsts.LOGIN_AND_JOIN_CHATS_SUCCESS_ACTION,
-//                QBServiceConsts.LOGIN_AND_JOIN_CHATS_FAIL_ACTION);
-//
-//        addLoginChatAndInitCommands(loginAndJoinGroupChatCommand);
-//
-//        ServiceCommand joinGroupChatsCommand = serviceCommandMap.get(QBServiceConsts.JOIN_GROUP_CHAT_ACTION);
-//        loginAndJoinGroupChatCommand.addCommand(joinGroupChatsCommand);
-//
-//        serviceCommandMap.put(QBServiceConsts.LOGIN_AND_JOIN_CHAT_ACTION, loginAndJoinGroupChatCommand);
-//    }
 
     private void registerLoadAttachFileCommand() {
         QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
@@ -582,9 +567,6 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_FRIENDS_SUCCESS_ACTION,
                 QBServiceConsts.LOAD_FRIENDS_FAIL_ACTION);
         QBInitVideoChatCommand initVideoChatCommand = (QBInitVideoChatCommand) serviceCommandMap.get(QBServiceConsts.INIT_VIDEO_CHAT_ACTION);
-//        QBLoadDialogsCommand chatsDialogsCommand = new QBLoadDialogsCommand(this, groupChatHelper,
-//                QBServiceConsts.LOAD_CHATS_DIALOGS_SUCCESS_ACTION,
-//                QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         loginCommand.addCommand(initChatServiceCommand);
         loginCommand.addCommand(loginChatCommand);
@@ -592,7 +574,6 @@ public class QBService extends Service {
         loginCommand.addCommand(initFriendListCommand);
         loginCommand.addCommand(loadFriendListCommand);
         loginCommand.addCommand(initVideoChatCommand);
-//        loginCommand.addCommand(chatsDialogsCommand);
     }
 
     //    private void registerReLoginCommand() {

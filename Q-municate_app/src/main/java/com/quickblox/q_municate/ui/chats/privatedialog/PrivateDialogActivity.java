@@ -66,6 +66,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             finish();
         }
 
+        deleteTempMessages();
+
         addObservers();
 
         initActionBar();

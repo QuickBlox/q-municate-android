@@ -18,6 +18,7 @@ import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;

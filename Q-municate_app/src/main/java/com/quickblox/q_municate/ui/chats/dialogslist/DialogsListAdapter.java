@@ -79,7 +79,8 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);
         }
 
-        Message message = dataManager.getMessageDataManager().getLastMessageByDialogId(dialogOccupantsIdsList);
+        Message message = dataManager.getMessageDataManager().getLastMessageWithTempByDialogId(
+                dialogOccupantsIdsList);
         DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
                 .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
 

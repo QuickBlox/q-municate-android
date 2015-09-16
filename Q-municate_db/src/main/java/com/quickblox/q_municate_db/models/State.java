@@ -4,7 +4,9 @@ public enum State {
 
     DELIVERED(0),
     READ(1),
-    SYNC(2);
+    SYNC(2),
+    TEMP_LOCAL(3),
+    TEMP_LOCAL_UNREAD(4);
 
     private int code;
 

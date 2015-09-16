@@ -34,7 +34,6 @@ import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
-import com.quickblox.q_municate.ui.chats.privatedialog.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.dialogs.ImageSourcePickDialogFragment;
 import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ActionBarUtils;
@@ -244,10 +243,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     }
 
     private void registerBroadcastReceivers() {
-        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.TYPING_MESSAGE));
-        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver, new IntentFilter(
-                QBServiceConsts.UPDATE_DIALOG));
+        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
     private void unregisterBroadcastReceivers() {
@@ -386,6 +385,13 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
     protected void attachButtonOnClick() {
         canPerformLogout.set(false);
         ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
+    }
+
+    protected void deleteTempMessages() {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+        dataManager.getMessageDataManager().deleteTempMessages(dialogOccupantsIdsList);
     }
 
     @Override
@@ -560,10 +566,10 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
         showActionBarProgress();
 
-        List<DialogOccupant> dialogOccupantsList = DataManager.getInstance().getDialogOccupantDataManager()
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        Message lastReadMessage = DataManager.getInstance().getMessageDataManager().getLastMessageByDialogId(
+        Message lastReadMessage = dataManager.getMessageDataManager().getLastMessageByDialogId(
                 dialogOccupantsIdsList);
         if (lastReadMessage == null) {
             startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);

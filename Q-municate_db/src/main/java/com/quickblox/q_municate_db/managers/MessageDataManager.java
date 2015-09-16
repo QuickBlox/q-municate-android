@@ -1,8 +1,10 @@
 package com.quickblox.q_municate_db.managers;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -44,7 +46,7 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public Message getLastMessageByDialogId(List<Integer> dialogOccupantsList) {
+    public Message getLastMessageWithTempByDialogId(List<Integer> dialogOccupantsList) {
         Message message = null;
 
         try {
@@ -60,7 +62,24 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public long getCountUnreadMessages(List<Integer> dialogOccupantsList, int currentUserId) {
+    public Message getLastMessageByDialogId(List<Integer> dialogOccupantsList) {
+        Message message = null;
+
+        try {
+            QueryBuilder<Message, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList)
+                    .and().eq(Message.Column.STATE, State.READ);
+            queryBuilder.orderBy(Message.Column.CREATED_DATE, false);
+            PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
+            message = dao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return message;
+    }
+
+    public long getCountUnreadMessages(List<Integer> dialogOccupantsIdsList, int currentUserId) {
         long count = 0;
 
         try {
@@ -72,8 +91,14 @@ public class MessageDataManager extends BaseManager<Message> {
 
             queryBuilder.join(dialogOccupantQueryBuilder);
 
-            queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList).and().eq(
-                    Message.Column.STATE, State.DELIVERED);
+            Where<Message, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(Message.Column.STATE, State.DELIVERED),
+                            where.eq(Message.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
 
             PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
             count = dao.countOf(preparedQuery);
@@ -121,5 +146,26 @@ public class MessageDataManager extends BaseManager<Message> {
         }
 
         return messagesList;
+    }
+
+    public void deleteTempMessages(List<Integer> dialogOccupantsIdsList) {
+        try {
+            DeleteBuilder<Message, Long> deleteBuilder = dao.deleteBuilder();
+
+            Where<Message, Long> where = deleteBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(Message.Column.STATE, State.TEMP_LOCAL),
+                            where.eq(Message.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
+
+            deleteBuilder.delete();
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        notifyObservers(OBSERVE_KEY);
     }
 }

@@ -45,6 +45,7 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -129,22 +130,29 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         qbChatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
     }
 
-    protected void saveDialogToCache(QBDialog qbDialog) {
+    public void saveDialogToCache(QBDialog qbDialog) {
         Dialog dialog = ChatUtils.createLocalDialog(qbDialog);
         dataManager.getDialogDataManager().createOrUpdate(dialog);
 
         saveDialogsOccupants(qbDialog);
     }
 
-    protected void saveDialogsToCache(List<QBDialog> qbDialogsList) {
+    public void saveDialogsToCache(List<QBDialog> qbDialogsList) {
         dataManager.getDialogDataManager().createOrUpdate(ChatUtils.createLocalDialogsList(qbDialogsList));
 
         saveDialogsOccupants(qbDialogsList);
+
+        saveTempMessages(qbDialogsList);
     }
 
-    protected void saveDialogsOccupants(QBDialog qbDialog) {
+    private void saveTempMessages(List<QBDialog> qbDialogsList) {
+        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.createTempLocalMessagesList(qbDialogsList));
+    }
+
+    protected List<DialogOccupant> saveDialogsOccupants(QBDialog qbDialog) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(qbDialog);
         dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupantsList);
+        return dialogOccupantsList;
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {
@@ -258,8 +266,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
 
         chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
-        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY,
-                ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
+        chatMessage.setProperty(
+                ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY, ChatNotificationUtils.VALUE_SAVE_TO_HISTORY
+        );
 
         return chatMessage;
     }
@@ -303,16 +312,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public QBDialog createPrivateChatOnRest(int opponentId) throws QBResponseException {
         QBDialog dialog = privateChatManager.createDialog(opponentId);
         return dialog;
-    }
-
-    public QBDialog createPrivateDialogIfNotExist(int userId, String lastMessage) throws QBResponseException {
-        QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(userId);
-        if (existingPrivateDialog == null) {
-            existingPrivateDialog = createPrivateChatOnRest(userId);
-            saveDialogToCache(existingPrivateDialog);
-        }
-        existingPrivateDialog.setLastMessage(lastMessage);
-        return existingPrivateDialog;
     }
 
     public QBDialog createPrivateDialogIfNotExist(int userId) throws QBResponseException {

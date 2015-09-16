@@ -162,14 +162,6 @@ public class ChatUtils {
             dialog.setType(Dialog.Type.GROUP);
         }
 
-        dialog.setState(Dialog.State.SYNC);
-
-        return dialog;
-    }
-
-    public static Dialog createLocalDialog(QBDialog qbDialog, Dialog.State state) {
-        Dialog dialog = createLocalDialog(qbDialog);
-        dialog.setState(state);
         return dialog;
     }
 
@@ -181,6 +173,50 @@ public class ChatUtils {
         }
 
         return dialogsList;
+    }
+
+    private static int getRandomUserFromOccupantsList(List<Integer> occupantsList) {
+        for (Integer id : occupantsList) {
+            if (!id.equals(AppSession.getSession().getUser().getId())) {
+                return id;
+            }
+        }
+        return 0;
+    }
+
+    public static List<Message> createTempLocalMessagesList(List<QBDialog> qbDialogsList) {
+        List<Message> messagesList = new ArrayList<>();
+
+        for (QBDialog qbDialog : qbDialogsList) {
+            DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager()
+                    .getDialogOccupant(qbDialog.getDialogId(), getRandomUserFromOccupantsList(qbDialog.getOccupants()));
+            long tempMessageId = qbDialog.getDialogId().hashCode();
+            Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
+            messagesList.add(message);
+
+            if (qbDialog.getUnreadMessageCount() != null && qbDialog.getUnreadMessageCount() > 0) {
+                for (int i = 0; i < qbDialog.getUnreadMessageCount(); i++) {
+                    messagesList.add(createTempLocalMessage(--tempMessageId, dialogOccupant, null, State.TEMP_LOCAL_UNREAD));
+                }
+            }
+        }
+
+        return messagesList;
+    }
+
+    private static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, State state) {
+        Message message = new Message();
+        message.setMessageId(dialogOccupant.getDialog().getDialogId() + String.valueOf(messageId));
+        message.setDialogOccupant(dialogOccupant);
+        message.setState(state);
+        message.setBody(body);
+        return message;
+    }
+
+    private static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, long createdDate, State state) {
+        Message message = createTempLocalMessage(messageId, dialogOccupant, body, state);
+        message.setCreatedDate(createdDate);
+        return message;
     }
 
     public static List<QBDialog> createQBDialogsListFromDialogsList(List<Dialog> dialogsList) {
