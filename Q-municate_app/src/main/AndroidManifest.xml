@@ -35,8 +35,7 @@
             android:name=".ui.authorization.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -46,8 +45,7 @@
             android:name=".ui.authorization.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.authorization.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

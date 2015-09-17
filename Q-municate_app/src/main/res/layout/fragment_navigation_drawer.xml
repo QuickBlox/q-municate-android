@@ -7,7 +7,7 @@
     android:focusable="false">
 
     <ListView
-        android:id="@+id/navigation_listview"
+        android:id="@+id/navigation_drawer_listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/footer_linearlayout"

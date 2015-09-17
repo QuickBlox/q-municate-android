@@ -67,7 +67,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     @Override
     public void onStart() {
         super.onStart();
-        getActivity().getActionBar().setTitle(title);
+//        getActivity().getActionBar().setTitle(title);
     }
 
     @Override

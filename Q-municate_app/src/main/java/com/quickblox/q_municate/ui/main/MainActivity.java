@@ -21,12 +21,10 @@ import com.quickblox.q_municate.ui.feedback.FeedbackFragment;
 import com.quickblox.q_municate.ui.friends.FriendsListFragment;
 import com.quickblox.q_municate.ui.importfriends.ImportFriends;
 import com.quickblox.q_municate.ui.invitefriends.InviteFriendsFragment;
-import com.quickblox.q_municate.ui.mediacall.CallActivity;
 import com.quickblox.q_municate.ui.settings.SettingsFragment;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.QBInitVideoChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -35,6 +33,8 @@ import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
+
+import butterknife.Bind;
 
 public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -45,6 +45,9 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static final int ID_FEEDBACK_FRAGMENT = 4;
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    @Bind(R.id.main_content_drawerlayout)
+    DrawerLayout drawerLayout;
 
     private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
@@ -58,6 +61,45 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     public static void start(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
+        activateButterKnife();
+
+        initActionBar();
+
+        initFields(savedInstanceState);
+        initNavigationDrawer();
+
+        checkGCMRegistration();
+
+        if (!isLoggedInChat()) {
+            loginChat();
+        }
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
+    }
+
+    private void initFields(Bundle savedInstanceState) {
+        gsmHelper = new GSMHelper(this);
+        loginChatCompositeSuccessAction = new LoginChatCompositeSuccessAction();
+        importFriendsSuccessAction = new ImportFriendsSuccessAction();
+        importFriendsFailAction = new ImportFriendsFailAction();
+
+        if (!appSharedHelper.isUsersImportInitialized()) {
+            showProgress();
+            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
+        }
     }
 
     @Override
@@ -86,7 +128,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onDrawerItemSelected(int position) {
         Fragment fragment = null;
         switch (position) {
             case ID_CHATS_LIST_FRAGMENT:
@@ -106,35 +148,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
                 break;
         }
         setCurrentFragment(fragment);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
-
-        initFields(savedInstanceState);
-        initNavigationDrawer();
-
-        checkGCMRegistration();
-
-        if (!isLoggedInChat()) {
-            loginChat();
-        }
-    }
-
-    private void initFields(Bundle savedInstanceState) {
-        gsmHelper = new GSMHelper(this);
-        loginChatCompositeSuccessAction = new LoginChatCompositeSuccessAction();
-        importFriendsSuccessAction = new ImportFriendsSuccessAction();
-        importFriendsFailAction = new ImportFriendsFailAction();
-
-        if (!appSharedHelper.isUsersImportInitialized()) {
-            showProgress();
-            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-            importFriends = new ImportFriends(MainActivity.this, facebookHelper);
-        }
     }
 
     private void loginChat() {
@@ -164,10 +177,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void initNavigationDrawer() {
-        navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(
-                R.id.navigation_drawer);
-        navigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(
-                R.id.drawer_layout));
+        navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer_fragment);
+        navigationDrawerFragment.setUp(drawerLayout);
     }
 
     private void checkGCMRegistration() {

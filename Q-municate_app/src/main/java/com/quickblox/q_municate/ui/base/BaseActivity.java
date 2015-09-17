@@ -1,25 +1,44 @@
 package com.quickblox.q_municate.ui.base;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Window;
 
+import com.facebook.Session;
+import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.GlobalActionsListener;
-import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.core.bridge.ActionBarBridge;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
+import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.ui.mediacall.CallActivity;
-import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate.utils.SharedHelper;
 import com.quickblox.q_municate_core.core.command.Command;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.LoginType;
+import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
+import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
@@ -28,35 +47,125 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
-import butterknife.ButterKnife;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public abstract class BaseActivity extends Activity implements ServiceConnectionListener, UserStatusChangingListener {
+import butterknife.ButterKnife;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
+public abstract class BaseActivity extends AppCompatActivity implements UserStatusChangingListener, ActionBarBridge {
 
     protected App app;
     protected ActionBar actionBar;
+    protected Toolbar toolbar;
     protected SharedHelper appSharedHelper;
     protected Fragment currentFragment;
     protected FailAction failAction;
     protected SuccessAction successAction;
-    protected ActivityHelper activityHelper;
-
     protected QBFriendListHelper friendListHelper;
     protected QBPrivateChatHelper privateChatHelper;
     protected QBGroupChatHelper groupChatHelper;
+    protected QBService service;
+    protected LocalBroadcastManager localBroadcastManager;
 
+    private Map<String, Set<Command>> broadcastCommandMap;
+    private Handler handler;
+    private BaseBroadcastReceiver broadcastReceiver;
+    private GlobalBroadcastReceiver globalBroadcastReceiver;
+    private UserStatusBroadcastReceiver userStatusBroadcastReceiver;
+    private boolean bounded;
+    private ServiceConnection serviceConnection;
+    private ActivityUIHelper activityUIHelper;
     private UserStatusChangingListener fragmentUserStatusChangingListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
+
         app = App.getInstance();
-        actionBar = getActionBar();
         appSharedHelper = App.getInstance().getAppSharedHelper();
+        activityUIHelper = new ActivityUIHelper(this);
         failAction = new FailAction();
         successAction = new SuccessAction();
-        activityHelper = new ActivityHelper(this, new GlobalListener(), this, this);
-        activityHelper.onCreate();
+        broadcastReceiver = new BaseBroadcastReceiver();
+        globalBroadcastReceiver = new GlobalBroadcastReceiver();
+        userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
+        broadcastCommandMap = new HashMap<>();
+        serviceConnection = new QBChatServiceConnection();
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    }
+
+    @Override
+    public void initActionBar() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+        }
+
+        actionBar = getSupportActionBar();
+    }
+
+    @Override
+    public void setActionBarTitle(String title) {
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    public void setActionBarTitle(@StringRes int title) {
+        setActionBarTitle(getString(title));
+    }
+
+    @Override
+    public void setActionBarSubtitle(String subtitle) {
+        if (actionBar != null) {
+            actionBar.setSubtitle(subtitle);
+        }
+    }
+
+    @Override
+    public void setActionBarSubtitle(@StringRes int subtitle) {
+        setActionBarSubtitle(getString(subtitle));
+    }
+
+    @Override
+    public void setActionBarIcon(Drawable icon) {
+        if (actionBar != null) {
+            // In appcompat v21 there will be no icon if we don't add this display option
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(icon);
+        }
+    }
+
+    @Override
+    public void setActionBarIcon(@DrawableRes int icon) {
+        Drawable drawable;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            drawable = getDrawable(icon);
+        } else {
+            drawable = getResources().getDrawable(icon);
+        }
+
+        setActionBarIcon(drawable);
+    }
+
+    @Override
+    public void setActionBarUpButtonEnabled(boolean enabled) {
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(enabled);
+            actionBar.setDisplayHomeAsUpEnabled(enabled);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService();
     }
 
     public void setFragmentUserStatusChangingListener(
@@ -76,56 +185,28 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         ProgressDialogFragment.hide(getFragmentManager());
     }
 
-    public void hideActionBarProgress() {
-        activityHelper.hideActionBarProgress();
-    }
-
-    public void showActionBarProgress() {
-        activityHelper.showActionBarProgress();
-    }
-
-    public void addAction(String action, Command command) {
-        activityHelper.addAction(action, command);
-    }
-
-    public boolean hasAction(String action) {
-        return activityHelper.hasAction(action);
-    }
-
-    public void removeAction(String action) {
-        activityHelper.removeAction(action);
-    }
-
-    public void updateBroadcastActionList() {
-        activityHelper.updateBroadcastActionList();
-    }
-
     @Override
-    protected void onStart() {
-        activityHelper.onStart();
-        super.onStart();
+    protected void onPause() {
+        super.onPause();
+        unregisterBroadcastReceivers();
+        Crouton.cancelAllCroutons();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        activityHelper.onResume();
+
+        registerBroadcastReceivers();
+        updateBroadcastActionList();
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
     @Override
-    protected void onPause() {
-        activityHelper.onPause();
-        super.onPause();
+    protected void onStart() {
+        super.onStart();
+        connectToService();
     }
 
-    @Override
-    protected void onStop() {
-        activityHelper.onStop();
-        super.onStop();
-    }
-
-    @Override
     public void onConnectedToService(QBService service) {
         if (friendListHelper == null) {
             friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
@@ -138,6 +219,36 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         if (groupChatHelper == null) {
             groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
         }
+    }
+
+    private void unbindService() {
+        if (bounded) {
+            unbindService(serviceConnection);
+        }
+    }
+
+    private void connectToService() {
+        Intent intent = new Intent(this, QBService.class);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void registerBroadcastReceivers() {
+        IntentFilter globalActionsIntentFilter = new IntentFilter();
+        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
+        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
+        globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
+        globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
+        globalActionsIntentFilter.addAction(QBServiceConsts.TYPING_MESSAGE);
+        localBroadcastManager.registerReceiver(globalBroadcastReceiver, globalActionsIntentFilter);
+
+        localBroadcastManager.registerReceiver(userStatusBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.USER_STATUS_CHANGED_ACTION));
+    }
+
+    private void unregisterBroadcastReceivers() {
+        localBroadcastManager.unregisterReceiver(globalBroadcastReceiver);
+        localBroadcastManager.unregisterReceiver(broadcastReceiver);
+        localBroadcastManager.unregisterReceiver(userStatusBroadcastReceiver);
     }
 
     protected void navigateToParent() {
@@ -170,8 +281,8 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
     }
 
     private boolean needShowReceivedNotification() {
-        boolean isSplashActivity = activityHelper.getContext() instanceof SplashActivity;
-        boolean isCallActivity = activityHelper.getContext() instanceof CallActivity;
+        boolean isSplashActivity = this instanceof SplashActivity;
+        boolean isCallActivity = this instanceof CallActivity;
         return !isSplashActivity && !isCallActivity;
     }
 
@@ -190,6 +301,95 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
 
     protected void activateButterKnife() {
         ButterKnife.bind(this);
+    }
+
+    protected void onReceivedChatMessageNotification(Bundle extras) {
+        activityUIHelper.showChatMessageNotification(extras);
+    }
+
+    protected void onReceivedContactRequestNotification(Bundle extras) {
+        activityUIHelper.showContactRequestNotification(extras);
+    }
+
+    public void forceRelogin() {
+        ErrorUtils.showError(this, getString(R.string.dlg_force_relogin_on_token_required));
+        SplashActivity.start(this);
+        finish();
+    }
+
+    public void refreshSession() {
+        if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
+            QBLoginRestCommand.start(this, AppSession.getSession().getUser());
+        } else {
+            QBSocialLoginCommand
+                    .start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(), null);
+        }
+    }
+
+    private Handler getHandler() {
+        if (handler == null) {
+            handler = new Handler();
+        }
+        return handler;
+    }
+
+    public void hideActionBarProgress() {
+        setVisibilityActionBarProgress(false);
+    }
+
+    public void showActionBarProgress() {
+        setVisibilityActionBarProgress(true);
+    }
+
+    public void setVisibilityActionBarProgress(boolean visibility) {
+        setProgressBarIndeterminateVisibility(visibility);
+    }
+
+    public void addAction(String action, Command command) {
+        Set<Command> commandSet = broadcastCommandMap.get(action);
+        if (commandSet == null) {
+            commandSet = new HashSet<Command>();
+            broadcastCommandMap.put(action, commandSet);
+        }
+        commandSet.add(command);
+    }
+
+    public boolean hasAction(String action) {
+        return broadcastCommandMap.containsKey(action);
+    }
+
+    public void removeAction(String action) {
+        broadcastCommandMap.remove(action);
+    }
+
+    public void updateBroadcastActionList() {
+        localBroadcastManager.unregisterReceiver(broadcastReceiver);
+        IntentFilter intentFilter = new IntentFilter();
+        for (String commandName : broadcastCommandMap.keySet()) {
+            intentFilter.addAction(commandName);
+        }
+        localBroadcastManager.registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    public void onReceiveChatMessageAction(Bundle extras) {
+        if (needShowReceivedNotification()) {
+            onReceivedChatMessageNotification(extras);
+        }
+    }
+
+    public void onReceiveForceReloginAction(Bundle extras) {
+        forceRelogin();
+    }
+
+    public void onReceiveRefreshSessionAction(Bundle extras) {
+        DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
+        refreshSession();
+    }
+
+    public void onReceiveContactRequestAction(Bundle extras) {
+        if (needShowReceivedNotification()) {
+            onReceivedContactRequestNotification(extras);
+        }
     }
 
     public class FailAction implements Command {
@@ -212,31 +412,77 @@ public abstract class BaseActivity extends Activity implements ServiceConnection
         }
     }
 
-    private class GlobalListener implements GlobalActionsListener {
+    private class BaseBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceiveChatMessageAction(Bundle extras) {
-            if (needShowReceivedNotification()) {
-                activityHelper.onReceivedChatMessageNotification(extras);
+        public void onReceive(Context context, final Intent intent) {
+            String action = intent.getAction();
+            if (intent != null && (action) != null) {
+                Log.d("STEPS", "executing " + action);
+                final Set<Command> commandSet = broadcastCommandMap.get(action);
+
+                if (commandSet != null && !commandSet.isEmpty()) {
+                    getHandler().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Command command : commandSet) {
+                                try {
+                                    command.execute(intent.getExtras());
+                                } catch (Exception e) {
+                                    ErrorUtils.logError(e);
+                                }
+                            }
+                        }
+                    });
+                }
             }
         }
+    }
+
+    private class GlobalBroadcastReceiver extends BroadcastReceiver {
 
         @Override
-        public void onReceiveForceReloginAction(Bundle extras) {
-            activityHelper.forceRelogin();
+        public void onReceive(Context context, final Intent intent) {
+            getHandler().post(new Runnable() {
+                @Override
+                public void run() {
+                    Bundle extras = intent.getExtras();
+                    if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+                        onReceiveChatMessageAction(intent.getExtras());
+                    } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
+                        onReceiveContactRequestAction(intent.getExtras());
+                    } else if (QBServiceConsts.FORCE_RELOGIN.equals(intent.getAction())) {
+                        onReceiveForceReloginAction(intent.getExtras());
+                    } else if (QBServiceConsts.REFRESH_SESSION.equals(intent.getAction())) {
+                        onReceiveRefreshSessionAction(intent.getExtras());
+                    }
+                }
+            });
+        }
+    }
+
+    private class UserStatusBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, 0);
+            boolean status = intent.getBooleanExtra(QBServiceConsts.EXTRA_USER_STATUS, false);
+            onChangedUserStatus(userId, status);
+        }
+    }
+
+    private class QBChatServiceConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            bounded = true;
+            service = ((QBService.QBServiceBinder) binder).getService();
+            onConnectedToService(service);
         }
 
         @Override
-        public void onReceiveRefreshSessionAction(Bundle extras) {
-            DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
-            activityHelper.refreshSession();
-        }
+        public void onServiceDisconnected(ComponentName name) {
 
-        @Override
-        public void onReceiveContactRequestAction(Bundle extras) {
-            if (needShowReceivedNotification()) {
-                activityHelper.onReceivedContactRequestNotification(extras);
-            }
         }
     }
 }

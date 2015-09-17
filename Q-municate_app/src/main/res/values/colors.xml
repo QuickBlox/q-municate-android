@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <color name="primary">@color/blue</color>
+    <color name="primary_dark">@color/dark_blue</color>
+    <color name="accent">@color/green</color>
+    <color name="action_mode_background">@color/gray</color>
+
+    <color name="light_gray">#ffefefef</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="gray">#999999</color>
+    <color name="dark_gray">#ff6c6c6c</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#1cba48</color>
+    <color name="blue">#0d70b3</color>
+    <color name="dark_blue">#0c4d81</color>
+    <color name="light_blue">#ff0d8cd1</color>
+
     <color name="action_bar_background_color">#0d70b3</color>
     <color name="link_text_color">#0d70b3</color>
 
@@ -31,16 +48,6 @@
     <color name="menu_item_background_longpressed_color">#ff9de8a2</color>
     <color name="menu_item_background_activated_color">#1cba48</color>
     <color name="list_item_background_pressed_color">#e4f4ff</color>
-
-    <color name="light_gray">#ffefefef</color>
-    <color name="white">#ffffff</color>
-    <color name="black">#000000</color>
-    <color name="gray">#999999</color>
-    <color name="dark_gray">#ff6c6c6c</color>
-    <color name="red">#ff0000</color>
-    <color name="green">#1cba48</color>
-    <color name="blue">#0d70b3</color>
-    <color name="light_blue">#ff0d8cd1</color>
 
     <color name="chat_background_color">#f5f5f5</color>
     <color name="chat_emoji_panel_color">#ff303030</color>

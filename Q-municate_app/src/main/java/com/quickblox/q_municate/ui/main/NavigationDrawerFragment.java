@@ -1,25 +1,17 @@
 package com.quickblox.q_municate.ui.main;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -27,7 +19,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.base.BaseFragment;
-import com.quickblox.q_municate.ui.dialogs.ConfirmDialog;
 import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -40,80 +31,95 @@ import com.quickblox.users.model.QBUser;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.OnClick;
+import butterknife.OnItemClick;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class NavigationDrawerFragment extends BaseFragment {
 
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-    private static DrawerLayout drawerLayout;
-    private static View fragmentContainerView;
-    private Resources resources;
-    private ListView drawerListView;
-    private TextView fullNameTextView;
-    private ImageButton logoutButton;
+
+    @Bind(R.id.navigation_drawer_listview)
+    ListView drawerListView;
+
+    @Bind(R.id.fullname_textview)
+    TextView fullNameTextView;
 
     private NavigationDrawerCallbacks navigationDrawerCallbacks;
-    private NavigationDrawerCounterListener navigationDrawerCounterListener;
-    private ActionBarDrawerToggle drawerToggle;
-    private int currentSelectedPosition = 0;
-    private boolean fromSavedInstanceState;
-    private boolean userLearnedDrawer;
-    private NavigationDrawerAdapter navigationDrawerAdapter;
-    private BroadcastReceiver countUnreadDialogsBroadcastReceiver;
+    private NavigationDrawerCounterListener drawerCounterListener;
+    private android.support.v7.app.ActionBarDrawerToggle actionBarDrawerToggle;
+    private DrawerLayout drawerLayout;
 
-    public static boolean isDrawerOpen() {
-        return drawerLayout != null && drawerLayout.isDrawerOpen(fragmentContainerView);
+    private int currentDrawerPosition;
+    private boolean fromSavedInstanceState;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            navigationDrawerCallbacks = (NavigationDrawerCallbacks) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Activity must implement NavigationDrawerCallbacks.");
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        resources = getResources();
-
-        initPrefValues();
-
         if (savedInstanceState != null) {
-            currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+            currentDrawerPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             fromSavedInstanceState = true;
         }
 
-        selectItem(currentSelectedPosition);
-
-        initLocalBroadcastManagers();
+        // Select either the default item (0) or the last selected item.
+        selectItem(currentDrawerPosition);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
 
-        initUI(rootView);
-        initListeners();
+        activateButterKnife(rootView);
+
         initNavigationAdapter();
 
-        drawerListView.setItemChecked(currentSelectedPosition, true);
+        drawerListView.setItemChecked(currentDrawerPosition, true);
 
         return rootView;
     }
 
-    private void initLocalBroadcastManagers() {
-        countUnreadDialogsBroadcastReceiver = new CountUnreadDialogsBroadcastReceiver();
-
-        LocalBroadcastManager.getInstance(baseActivity).registerReceiver(countUnreadDialogsBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.GOT_CHAT_MESSAGE));
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        navigationDrawerCallbacks = (NavigationDrawerCallbacks) activity;
+    private void initNavigationAdapter() {
+        NavigationDrawerAdapter navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity,
+                getDrawerItems());
+        drawerListView.setAdapter(navigationDrawerAdapter);
+        drawerCounterListener = (NavigationDrawerCounterListener) navigationDrawerAdapter;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        // Indicate that this fragment would like to influence the set of actions in the action bar.
         setHasOptionsMenu(true);
-        baseActivity.getActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    private List<String> getDrawerItems() {
+        String[] itemsArray = getResources().getStringArray(R.array.nvd_items_array);
+        return Arrays.asList(itemsArray);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_SELECTED_POSITION, currentDrawerPosition);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Forward the new configuration the drawer toggle component.
+        actionBarDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -127,18 +133,6 @@ public class NavigationDrawerFragment extends BaseFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, currentSelectedPosition);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         navigationDrawerCallbacks = null;
@@ -146,91 +140,59 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    public void setUp(int fragmentId, final DrawerLayout drawerLayout) {
-        fragmentContainerView = baseActivity.findViewById(fragmentId);
+    public boolean isDrawerOpen() {
+        return drawerLayout != null && drawerLayout.isDrawerOpen(Gravity.LEFT);
+    }
+
+    public void setUp(DrawerLayout drawerLayout) {
         this.drawerLayout = drawerLayout;
 
-        drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        actionBarDrawerToggle = new SimpleActionBarDrawerToggle(baseActivity, drawerLayout, R.string.nvd_open,
+                R.string.nvd_close);
 
-        ActionBar actionBar = baseActivity.getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+        this.drawerLayout.setDrawerListener(actionBarDrawerToggle);
 
-        drawerToggle = new QMActionBarDrawerToggle(baseActivity, drawerLayout, R.drawable.ic_drawer,
-                R.string.nvd_open, R.string.nvd_close);
-
-        if (!userLearnedDrawer && !fromSavedInstanceState) {
-            drawerLayout.openDrawer(fragmentContainerView);
+        if (!PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false) && !fromSavedInstanceState) {
+            this.drawerLayout.openDrawer(Gravity.LEFT);
         }
 
-        drawerLayout.post(new Runnable() {
+        // Defer code dependent on restoration of previous instance state.
+        this.drawerLayout.post(new Runnable() {
             @Override
             public void run() {
-                drawerToggle.syncState();
+                actionBarDrawerToggle.syncState();
             }
         });
-
-        drawerLayout.setDrawerListener(drawerToggle);
     }
 
-    private void initPrefValues() {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        userLearnedDrawer = prefsHelper.getPref(PrefsHelper.PREF_USER_LEARNED_DRAWER, false);
-    }
+    @OnItemClick(R.id.navigation_drawer_listview)
+    public void selectItem(int position) {
+        currentDrawerPosition = position;
 
-    private void selectItem(int position) {
-        currentSelectedPosition = position;
         if (drawerListView != null) {
             drawerListView.setItemChecked(position, true);
         }
+
         if (drawerLayout != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
+            drawerLayout.closeDrawer(Gravity.LEFT);
         }
+
         if (navigationDrawerCallbacks != null) {
-            navigationDrawerCallbacks.onNavigationDrawerItemSelected(position);
+            navigationDrawerCallbacks.onDrawerItemSelected(position);
         }
     }
 
-    private void initNavigationAdapter() {
-        navigationDrawerAdapter = new NavigationDrawerAdapter(baseActivity, getNavigationDrawerItems());
-        drawerListView.setAdapter(navigationDrawerAdapter);
-        navigationDrawerCounterListener = navigationDrawerAdapter;
-    }
-
-    private void initUI(View rootView) {
-        drawerListView = (ListView) rootView.findViewById(R.id.navigation_listview);
-        logoutButton = (ImageButton) rootView.findViewById(R.id.logout_imagebutton);
-        fullNameTextView = (TextView) rootView.findViewById(R.id.fullname_textview);
-    }
-
-    private void initListeners() {
-        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-                selectItem(position);
-            }
-        });
-
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
-    }
-
-
-    private List<String> getNavigationDrawerItems() {
-        String[] itemsArray = resources.getStringArray(R.array.nvd_items_array);
-        return Arrays.asList(itemsArray);
-    }
-
-    private void logout() {
-        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_logout,
-                R.string.dlg_confirm, new MaterialDialog.ButtonCallback() {
+    @OnClick(R.id.logout_imagebutton)
+    public void logout(View view) {
+        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
+                new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
@@ -247,24 +209,20 @@ public class NavigationDrawerFragment extends BaseFragment {
         baseActivity.updateBroadcastActionList();
     }
 
-    private void saveUserLearnedDrawer() {
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_USER_LEARNED_DRAWER, true);
-    }
-
     private int getCountUnreadDialogs() {
         // TODO temp
         //        return ChatDatabaseManager.getCountUnreadDialogs(baseActivity);
         return 0;
     }
 
-    public interface NavigationDrawerCallbacks {
-
-        void onNavigationDrawerItemSelected(int position);
-    }
-
     public interface NavigationDrawerCounterListener {
 
         public void onUpdateCountUnreadDialogs(int count);
+    }
+
+    public interface NavigationDrawerCallbacks {
+
+        void onDrawerItemSelected(int position);
     }
 
     private class CountUnreadDialogsBroadcastReceiver extends BroadcastReceiver {
@@ -273,17 +231,16 @@ public class NavigationDrawerFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
+                drawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
             }
         }
     }
 
-    private class QMActionBarDrawerToggle extends ActionBarDrawerToggle {
+    private class SimpleActionBarDrawerToggle extends android.support.v7.app.ActionBarDrawerToggle {
 
-        public QMActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes,
+        public SimpleActionBarDrawerToggle(Activity activity, DrawerLayout drawerLayout,
                 int openDrawerContentDescRes, int closeDrawerContentDescRes) {
-            super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes,
-                    closeDrawerContentDescRes);
+            super(activity, drawerLayout, openDrawerContentDescRes, closeDrawerContentDescRes);
         }
 
         @Override
@@ -292,20 +249,20 @@ public class NavigationDrawerFragment extends BaseFragment {
 
             Crouton.cancelAllCroutons();
 
-            baseActivity.invalidateOptionsMenu();
+            drawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
 
-            if (!userLearnedDrawer) {
-                userLearnedDrawer = true;
-                saveUserLearnedDrawer();
+            if (!isAdded()) {
+                return;
             }
 
-            navigationDrawerCounterListener.onUpdateCountUnreadDialogs(getCountUnreadDialogs());
+            if (drawerListView != null) {
+                drawerListView.setItemChecked(currentDrawerPosition, true);
+            }
         }
 
         @Override
         public void onDrawerClosed(View drawerView) {
             super.onDrawerClosed(drawerView);
-            baseActivity.invalidateOptionsMenu();
         }
     }
 

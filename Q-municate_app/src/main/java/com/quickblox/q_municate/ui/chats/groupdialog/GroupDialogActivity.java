@@ -55,7 +55,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         deleteTempMessages();
         startLoadDialogMessages();
-        setCurrentDialog(dialog);
 
         initListView();
 

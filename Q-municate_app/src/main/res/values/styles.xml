@@ -1,37 +1,37 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/MyActionBar</item>
-        <item name="android:actionModeStyle">@style/MyActionMode</item>
-    </style>
+    <!--<style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">-->
+        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
+        <!--<item name="android:actionModeStyle">@style/MyActionMode</item>-->
+    <!--</style>-->
 
-    <!-- ActionBar styles -->
-    <style name="MyActionBar" parent="android:Widget.ActionBar">
-        <item name="android:background">@color/action_bar_background_color</item>
-        <item name="android:displayOptions">showTitle</item>
-        <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
-        <item name="android:indeterminateProgressStyle">@style/IndeterminateProgressStyle</item>
-    </style>
+    <!--&lt;!&ndash; ActionBar styles &ndash;&gt;-->
+    <!--<style name="MyActionBar" parent="android:Widget.ActionBar">-->
+        <!--<item name="android:background">@color/action_bar_background_color</item>-->
+        <!--<item name="android:displayOptions">showTitle</item>-->
+        <!--<item name="android:titleTextStyle">@style/MyActionBarTitleText</item>-->
+        <!--<item name="android:indeterminateProgressStyle">@style/IndeterminateProgressStyle</item>-->
+    <!--</style>-->
 
     <!-- ActionBar title body -->
-    <style name="MyActionBarTitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/white</item>
-    </style>
+    <!--<style name="MyActionBarTitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">-->
+        <!--<item name="android:textColor">@color/white</item>-->
+    <!--</style>-->
 
-    <style name="AppTheme.NoActionBar" parent="android:Theme.Holo.Light.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-    </style>
+    <!--<style name="AppTheme.NoActionBar" parent="android:Theme.Holo.Light.NoActionBar">-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+    <!--</style>-->
 
-    <style name="MyActionMode">
-        <item name="android:actionModeCloseDrawable">@drawable/badge_action_mode</item>
-        <item name="android:actionModeBackground">@drawable/badge_action_mode</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:titleTextStyle">@style/MyActionModeTitleText</item>
-    </style>
+    <!--<style name="MyActionMode">-->
+        <!--<item name="android:actionModeCloseDrawable">@drawable/badge_action_mode</item>-->
+        <!--<item name="android:actionModeBackground">@drawable/badge_action_mode</item>-->
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <!--<item name="android:titleTextStyle">@style/MyActionModeTitleText</item>-->
+    <!--</style>-->
 
-    <style name="MyActionModeTitleText" parent="android:TextAppearance.Holo.Widget.ActionMode.Title">
-        <item name="android:textColor">@color/white</item>
-    </style>
+    <!--<style name="MyActionModeTitleText" parent="android:TextAppearance.Holo.Widget.ActionMode.Title">-->
+        <!--<item name="android:textColor">@color/white</item>-->
+    <!--</style>-->
 
     <style name="baseToggleBtn">
 

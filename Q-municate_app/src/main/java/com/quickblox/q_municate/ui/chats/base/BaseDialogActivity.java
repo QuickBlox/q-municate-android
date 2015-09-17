@@ -30,7 +30,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
-import com.quickblox.q_municate.ui.base.BaseFragmentActivity;
+import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiFragment;
 import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
@@ -76,7 +76,7 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseFragmentActivity implements
+public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
 
@@ -137,6 +137,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         activateButterKnife();
 
         initActionBar();
+
         initFields();
         initUI();
         initListeners();
@@ -145,12 +146,6 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
         registerBroadcastReceivers();
         addObservers();
         hideSmileLayout();
-    }
-
-    private void initActionBar() {
-        actionBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_USE_LOGO);
-        ActionBarUtils.initColorsActionBar(this);
     }
 
     private void initFields() {
@@ -361,7 +356,7 @@ public abstract class BaseDialogActivity extends BaseFragmentActivity implements
 
     protected void onConnectServiceLocally(int chatHelperIdentifier) {
         if (baseChatHelper == null) {
-            baseChatHelper = (QBBaseChatHelper) getService().getHelper(chatHelperIdentifier);
+            baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
             try {
                 baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
                         generateBundleToInitDialog());

@@ -70,8 +70,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         addObservers();
 
-        initActionBar();
-        setCurrentDialog(dialog);
+        fullActionBar();
         initListView();
     }
 
@@ -204,9 +203,9 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
-    private void initActionBar() {
-        actionBar.setTitle(opponentUser.getFullName());
-        actionBar.setLogo(R.drawable.placeholder_user);
+    private void fullActionBar() {
+        setActionBarTitle(opponentUser.getFullName());
+        setActionBarIcon(R.drawable.placeholder_user);
 
         setOnlineStatus(opponentUser);
 
