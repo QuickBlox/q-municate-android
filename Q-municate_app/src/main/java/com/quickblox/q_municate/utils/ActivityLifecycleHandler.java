@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.quickblox.core.helper.Lo;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinGroupChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate.ui.base.QBLogeable;

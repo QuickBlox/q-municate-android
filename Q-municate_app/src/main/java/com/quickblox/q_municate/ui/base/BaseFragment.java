@@ -53,7 +53,6 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
         app = App.getInstance();
 
         serviceConnection = new QBChatServiceConnection();
-        connectToService();
 
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
@@ -72,15 +71,21 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onResume() {
+        super.onResume();
+        connectToService();
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
         unbindService();
     }
 
     private void unbindService() {
         if (bounded && service != null && service.isRestricted()) {
             baseActivity.unbindService(serviceConnection);
+            bounded = false;
         }
     }
 

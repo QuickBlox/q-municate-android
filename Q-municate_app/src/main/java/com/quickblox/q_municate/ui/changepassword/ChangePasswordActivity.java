@@ -8,13 +8,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLoginAndJoinGroupChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.base.BaseLogeableActivity;
@@ -130,7 +130,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            QBLoginAndJoinGroupChatCommand.start(ChangePasswordActivity.this);
+            QBLoginChatCompositeCommand.start(ChangePasswordActivity.this);
         }
     }
 

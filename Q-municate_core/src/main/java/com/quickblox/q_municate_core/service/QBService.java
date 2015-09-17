@@ -133,8 +133,8 @@ public class QBService extends Service {
         // login/signUp commands
         registerLoginRestCommand();
         registerLoginRestSocialCommand();
-        registerLoginChatWithJoinGroupChatsCommand();
         registerSignUpCommand();
+        registerLoginCommand();
 
         // chat commands
         registerCreatePrivateChatCommand();
@@ -151,6 +151,7 @@ public class QBService extends Service {
         registerUpdateChatDialogLocalCommand();
         registerLoadDialogMessagesCommand();
         registerJoinGroupChatsCommand();
+        registerLoginChatWithJoinGroupChatsCommand();
 
         // users/friends commands
         registerLoadUsersCommand();
@@ -171,8 +172,6 @@ public class QBService extends Service {
 
         // logout commands
         registerLogoutCommand();
-
-        registerLoginCommand();
     }
 
     // ------------------ login commands

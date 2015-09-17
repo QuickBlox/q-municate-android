@@ -153,10 +153,9 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     public void tryJoinRoomChats() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
-        List<QBDialog> qbDialogsList;
 
         if (dialogsList != null) {
-            qbDialogsList = ChatUtils.createQBDialogsListFromDialogsList(dialogsList);
+            List<QBDialog> qbDialogsList = ChatUtils.createQBDialogsListFromDialogsList(dialogsList);
             tryJoinRoomChats(qbDialogsList);
         }
     }
