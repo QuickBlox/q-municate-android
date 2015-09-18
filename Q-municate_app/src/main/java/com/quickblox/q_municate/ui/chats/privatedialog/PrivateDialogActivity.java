@@ -70,7 +70,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         addObservers();
 
-        fullActionBar();
+        fillActionBar();
         initListView();
     }
 
@@ -203,7 +203,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
-    private void fullActionBar() {
+    private void fillActionBar() {
         setActionBarTitle(opponentUser.getFullName());
         setActionBarIcon(R.drawable.placeholder_user);
 
@@ -297,14 +297,15 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             return;
         }
 
-        TwoButtonsDialogFragment.show(getFragmentManager(), getResources().getString(
-                R.string.frl_dlg_reject_friend, user.getFullName()), new MaterialDialog.ButtonCallback() {
-            @Override
-            public void onPositive(MaterialDialog dialog) {
-                super.onPositive(dialog);
-                showProgress();
-                QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
-            }
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+                getString(R.string.frl_dlg_reject_friend, user.getFullName()),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        showProgress();
+                        QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
+                    }
         });
     }
 

@@ -55,9 +55,13 @@ public class SettingsFragment extends BaseFragment {
 
         initListeners();
 
-        //        TipsManager.showTipIfNotShownYet(this, getActivity().getString(R.string.tip_settings));
-
         return rootView;
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        actionBarBridge.setActionBarTitle(R.string.nvd_title_settings);
     }
 
     private void initUI(View rootView) {
@@ -66,13 +70,6 @@ public class SettingsFragment extends BaseFragment {
         changePasswordButton = (Button) rootView.findViewById(R.id.change_password_button);
         logoutButton = (Button) rootView.findViewById(R.id.logout_button);
         versionView = (TextView) rootView.findViewById(R.id.version_textview);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-        title = getString(R.string.nvd_title_settings);
     }
 
     @Override

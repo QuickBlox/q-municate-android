@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.base;
+package com.quickblox.q_municate.utils.helpers;
 
 import android.app.Activity;
 import android.util.Log;

@@ -32,12 +32,8 @@
                 android:id="@+id/bug_radiobutton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:button="@null"
                 android:checked="true"
-                android:drawableRight="@android:drawable/btn_radio"
-                android:gravity="left|center"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:text="@string/fdb_bug_type"
                 android:textSize="@dimen/text_size" />
 
@@ -45,11 +41,7 @@
                 android:id="@+id/improvement_radiobutton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:button="@null"
-                android:drawableRight="@android:drawable/btn_radio"
-                android:gravity="left|center"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:text="@string/fdb_improvement_type"
                 android:textSize="@dimen/text_size" />
 
@@ -57,11 +49,7 @@
                 android:id="@+id/suggestion_radiobutton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:button="@null"
-                android:drawableRight="@android:drawable/btn_radio"
-                android:gravity="left|center"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:text="@string/fdb_suggestion_type"
                 android:textSize="@dimen/text_size" />
 

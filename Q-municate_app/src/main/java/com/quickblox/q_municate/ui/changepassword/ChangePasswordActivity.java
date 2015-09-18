@@ -39,7 +39,10 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_change_password);
+
+        initActionBar();
 
         resources = getResources();
         canPerformLogout.set(false);
@@ -49,6 +52,12 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         addActions();
 
         user = AppSession.getSession().getUser();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     public void changePasswordOnClickListener(View view) {

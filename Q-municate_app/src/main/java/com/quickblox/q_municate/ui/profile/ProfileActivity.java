@@ -80,6 +80,7 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         user = AppSession.getSession().getUser();
         imageUtils = new ImageUtils(this);
 
+        initActionBar();
         initUI();
         initListeners();
         initUIWithUsersData();
@@ -87,6 +88,12 @@ public class ProfileActivity extends BaseLogeableActivity implements ReceiveFile
         initTextChangedListeners();
         updateOldUserData();
         hideAction();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initUI() {

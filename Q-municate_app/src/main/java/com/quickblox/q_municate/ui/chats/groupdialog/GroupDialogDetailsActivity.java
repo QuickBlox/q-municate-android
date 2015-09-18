@@ -106,7 +106,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_group_dialog_details);
+
+        initActionBar();
 
         dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         databaseManager = DataManager.getInstance();
@@ -123,6 +126,12 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         addActions();
 
         initLocalBroadcastManagers();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initUIWithData() {
@@ -309,7 +318,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void showLeaveGroupDialog() {
-        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_leave_group, R.string.dlg_confirm,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+                R.string.dlg_leave_group,
+                R.string.dlg_confirm,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

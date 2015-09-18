@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/selectUserCheckBox"
+        android:layout_toLeftOf="@+id/select_user_checkbox"
         android:layout_toRightOf="@id/avatar_imageview"
         android:orientation="vertical">
 
@@ -36,7 +36,7 @@
             android:textSize="@dimen/text_size" />
 
         <TextView
-            android:id="@+id/viaTextView"
+            android:id="@+id/via_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -46,9 +46,11 @@
     </LinearLayout>
 
     <CheckBox
-        android:id="@+id/selectUserCheckBox"
+        android:id="@+id/select_user_checkbox"
+        android:button="@drawable/abc_btn_check_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true" />
+
 </RelativeLayout>

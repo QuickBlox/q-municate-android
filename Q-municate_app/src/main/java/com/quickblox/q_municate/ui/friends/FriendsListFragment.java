@@ -1,6 +1,9 @@
 package com.quickblox.q_municate.ui.friends;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -11,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +47,7 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener, AbsListView.OnScrollListener {
+public class FriendsListFragment extends BaseFragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener, AbsListView.OnScrollListener {
 
     private static final int SEARCH_DELAY = 1000;
 
@@ -79,13 +81,6 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        title = getString(R.string.nvd_title_contacts);
-        state = State.FRIENDS_LIST;
-    }
-
-    @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = layoutInflater.inflate(R.layout.fragment_friend_list, container, false);
 
@@ -99,7 +94,14 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         return rootView;
     }
 
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        actionBarBridge.setActionBarTitle(R.string.nvd_title_contacts);
+    }
+
     private void initFields() {
+        state = State.FRIENDS_LIST;
         dataManager = DataManager.getInstance();
         friendOperationAction = new FriendOperationAction();
         searchTimer = new Timer();
@@ -178,11 +180,21 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.friend_list_menu, menu);
-        SearchOnActionExpandListener searchOnActionExpandListener = new SearchOnActionExpandListener();
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchItem.setOnActionExpandListener(searchOnActionExpandListener);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        android.support.v7.widget.SearchView searchView = null;
+
+        if (searchMenuItem != null) {
+            searchView = (android.support.v7.widget.SearchView) searchMenuItem.getActionView();
+        }
+
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+            searchView.setOnQueryTextListener(this);
+            searchView.setOnCloseListener(this);
+            searchView.onActionViewExpanded();
+        }
     }
 
     @Override
@@ -438,6 +450,14 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         friendsListAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public boolean onClose() {
+        if (state == State.GLOBAL_LIST) {
+            cancelSearch();
+        }
+        return false;
+    }
+
     private enum State {FRIENDS_LIST, GLOBAL_LIST}
 
     private class SearchTimerTask extends TimerTask {
@@ -448,22 +468,22 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
         }
     }
 
-    private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
-
-        @Override
-        public boolean onMenuItemActionExpand(MenuItem item) {
-            state = State.GLOBAL_LIST;
-            return true;
-        }
-
-        @Override
-        public boolean onMenuItemActionCollapse(MenuItem item) {
-            if (state == State.GLOBAL_LIST) {
-                cancelSearch();
-            }
-            return true;
-        }
-    }
+//    private class SearchOnActionExpandListener implements MenuItem.OnActionExpandListener {
+//
+//        @Override
+//        public boolean onMenuItemActionExpand(MenuItem item) {
+//            state = State.GLOBAL_LIST;
+//            return true;
+//        }
+//
+//        @Override
+//        public boolean onMenuItemActionCollapse(MenuItem item) {
+//            if (state == State.GLOBAL_LIST) {
+//                cancelSearch();
+//            }
+//            return true;
+//        }
+//    }
 
     private class FriendObserver implements Observer {
 
@@ -515,9 +535,8 @@ public class FriendsListFragment extends BaseFragment implements SearchView.OnQu
             loadingMore = false;
 
             if (FriendsListFragment.this.constraint.equals(constraint)) {
-                Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(
-                        QBServiceConsts.EXTRA_USERS);
-                if (!newUsersCollection.isEmpty()) {
+                Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
+                if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
                     updateFriendList(newUsersCollection);
                 }
             } else {

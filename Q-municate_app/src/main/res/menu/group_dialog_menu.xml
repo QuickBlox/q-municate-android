@@ -1,13 +1,14 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_attach"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_attach"
-        android:showAsAction="ifRoom"
-        android:title="@string/acb_chat_attach_title"/>
+        android:title="@string/acb_chat_attach_title" />
 
     <item
         android:id="@+id/action_group_details"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_chat_info"
-        android:showAsAction="ifRoom"
-        android:title="@string/acb_chat_details_title"/>
+        android:title="@string/acb_chat_details_title" />
 </menu>

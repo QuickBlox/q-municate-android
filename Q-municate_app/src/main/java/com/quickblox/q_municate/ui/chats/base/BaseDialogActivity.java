@@ -1,6 +1,5 @@
 package com.quickblox.q_municate.ui.chats.base;
 
-import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +35,6 @@ import com.quickblox.q_municate.ui.chats.emoji.EmojiGridFragment;
 import com.quickblox.q_municate.ui.chats.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.dialogs.ImageSourcePickDialogFragment;
 import com.quickblox.q_municate.ui.dialogs.base.TwoButtonsDialogFragment;
-import com.quickblox.q_municate.utils.ActionBarUtils;
 import com.quickblox.q_municate.utils.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.ImageSource;
 import com.quickblox.q_municate.utils.ImageUtils;
@@ -146,6 +144,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         registerBroadcastReceivers();
         addObservers();
         hideSmileLayout();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields() {
@@ -450,7 +454,8 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void startLoadAttachFile(final File file) {
-        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+                R.string.dlg_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

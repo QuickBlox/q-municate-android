@@ -62,12 +62,6 @@ public class  DialogsListFragment extends BaseFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        title = getString(R.string.nvd_title_chats);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialogs_list, container, false);
 
@@ -83,6 +77,12 @@ public class  DialogsListFragment extends BaseFragment {
         registerForContextMenu(dialogsListView);
 
         return view;
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        actionBarBridge.setActionBarTitle(R.string.nvd_title_chats);
     }
 
     private void initFields() {

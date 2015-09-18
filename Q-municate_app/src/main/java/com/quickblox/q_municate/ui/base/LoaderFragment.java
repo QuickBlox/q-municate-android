@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.base;
 import android.content.Loader;
 import android.os.Bundle;
 
+import com.quickblox.q_municate.utils.helpers.QMLoaderHelper;
 import com.quickblox.q_municate_core.core.ui.BaseLoader;
 import com.quickblox.q_municate_core.core.ui.LoaderHelper;
 import com.quickblox.q_municate_core.core.ui.LoaderManager;

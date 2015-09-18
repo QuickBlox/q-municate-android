@@ -31,7 +31,7 @@
             android:drawablePadding="10dp"
             android:gravity="center"
             android:text="@string/lnd_connect_with_facebook"
-            android:textColor="@android:color/white"
+            android:textColor="@color/white"
             android:textSize="@dimen/button_text_size" />
 
     </RelativeLayout>
@@ -54,21 +54,22 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:text="@string/lnd_sign_up"
-            android:textColor="@android:color/white"
+            android:textColor="@color/white"
             android:textSize="@dimen/button_text_size" />
 
     </RelativeLayout>
 
-    <Button
+    <TextView
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/app_version_textview"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+        android:layout_margin="10dp"
         android:background="@drawable/button_general_selector"
         android:clickable="true"
+        android:padding="10dp"
         android:gravity="center"
         android:text="@string/lnd_have_account"
         android:textColor="@color/gray"

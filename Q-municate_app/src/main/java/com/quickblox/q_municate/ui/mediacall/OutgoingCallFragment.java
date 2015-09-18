@@ -261,7 +261,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
     private void connectToService() {
         Intent intent = new Intent(getActivity(), QBService.class);
         if (isExistActivity()) {
-            getBaseActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+            baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -274,7 +274,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
 
     private void unbindService() {
         if (isExistActivity() && bounded) {
-            getBaseActivity().unbindService(serviceConnection);
+            baseActivity.unbindService(serviceConnection);
         }
     }
 
@@ -351,7 +351,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         public void onAccepted(ConnectionConfig connectionConfig) {
             cancelCallTimer();
             if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
+                baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         DialogUtils.show(getActivity(), "accepted");
@@ -370,7 +370,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         public void onRejected(ConnectionConfig connectionConfig) {
             cancelCallTimer();
             if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
+                baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         DialogUtils.show(getActivity(), "Rejected");
@@ -383,7 +383,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         @Override
         public void onClosed(final String error) {
             if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
+                baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ErrorUtils.showError(getActivity(), error);
@@ -395,7 +395,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         @Override
         public void onError(final QBSignalingChannel.PacketType state, final QBChatException e) {
             if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
+                baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         ErrorUtils.showError(getActivity(), e.getLocalizedMessage());
@@ -435,7 +435,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
         @Override
         public void run() {
             if (isExistActivity()) {
-                getBaseActivity().runOnUiThread(new Runnable() {
+                baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         stopCall(true, STOP_TYPE.CLOSED);

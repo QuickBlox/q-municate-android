@@ -14,10 +14,10 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 22
+    compileSdkVersion = 23
     buildToolsVersion = '21.0.1'
     minSdkVersion = 14
-    targetSdkVersion = 22
+    targetSdkVersion = 23
     versionName = '1.1.2'
     versionCode = 112
 
@@ -34,4 +34,5 @@ ext {
     butterknifeVersion = '7.0.1'
     materialDialogsVersion = '0.7.8.1'
     recyclerViewVersion = '23.0.0'
+    appcompatVersion = '23.0.0'
 }

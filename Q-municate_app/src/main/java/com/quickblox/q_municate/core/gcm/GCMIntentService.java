@@ -14,10 +14,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
-import com.quickblox.q_municate.ui.authorization.LoginHelper;
+import com.quickblox.q_municate.utils.helpers.LoginHelper;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.service.QBServiceConsts;

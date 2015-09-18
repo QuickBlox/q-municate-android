@@ -6,6 +6,8 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar" />
+
     <include layout="@layout/view_load_more" />
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView

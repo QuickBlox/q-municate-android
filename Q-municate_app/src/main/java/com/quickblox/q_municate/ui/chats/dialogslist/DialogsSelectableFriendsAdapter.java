@@ -124,7 +124,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
     }
 
     private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.list_item_background_pressed_color) : resources.getColor(
+        return isSelect ? resources.getColor(R.color.button_general_background_pressed_color) : resources.getColor(
                 R.color.white);
     }
 

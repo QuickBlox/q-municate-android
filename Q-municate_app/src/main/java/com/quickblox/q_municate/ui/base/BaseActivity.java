@@ -1,8 +1,8 @@
 package com.quickblox.q_municate.ui.base;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +29,9 @@ import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.bridge.ActionBarBridge;
+import com.quickblox.q_municate.core.bridge.ConnectionBridge;
+import com.quickblox.q_municate.core.bridge.LoadingBridge;
+import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.dialogs.base.ProgressDialogFragment;
@@ -55,7 +58,7 @@ import java.util.Set;
 import butterknife.ButterKnife;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public abstract class BaseActivity extends AppCompatActivity implements UserStatusChangingListener, ActionBarBridge {
+public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge {
 
     protected App app;
     protected ActionBar actionBar;
@@ -79,12 +82,17 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
     private UserStatusChangingListener fragmentUserStatusChangingListener;
+    private ServiceConnectionListener fragmentServiceConnectionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
 
+        initFields();
+    }
+
+    private void initFields() {
         app = App.getInstance();
         appSharedHelper = App.getInstance().getAppSharedHelper();
         activityUIHelper = new ActivityUIHelper(this);
@@ -101,11 +109,9 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
     @Override
     public void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
-
         actionBar = getSupportActionBar();
     }
 
@@ -163,26 +169,41 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
     }
 
     @Override
+    public synchronized void showProgress() {
+        ProgressDialogFragment.show(getSupportFragmentManager());
+    }
+
+    @Override
+    public synchronized void hideProgress() {
+        ProgressDialogFragment.hide(getSupportFragmentManager());
+    }
+
+    @Override
+    public void hideActionBarProgress() {
+        setVisibilityActionBarProgress(false);
+    }
+
+    @Override
+    public void showActionBarProgress() {
+        setVisibilityActionBarProgress(true);
+    }
+
+    @Override
+    public boolean checkNetworkAvailableWithError() {
+        // TODO network checking here
+        return false;
+    }
+
+    @Override
+    public boolean isNetworkAvailable() {
+        // TODO network checking here
+        return false;
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         unbindService();
-    }
-
-    public void setFragmentUserStatusChangingListener(
-            UserStatusChangingListener fragmentUserStatusChangingListener) {
-        this.fragmentUserStatusChangingListener = fragmentUserStatusChangingListener;
-    }
-
-    public FailAction getFailAction() {
-        return failAction;
-    }
-
-    public synchronized void showProgress() {
-        ProgressDialogFragment.show(getFragmentManager());
-    }
-
-    public synchronized void hideProgress() {
-        ProgressDialogFragment.hide(getFragmentManager());
     }
 
     @Override
@@ -198,6 +219,7 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
 
         registerBroadcastReceivers();
         updateBroadcastActionList();
+
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
     }
 
@@ -205,6 +227,22 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
     protected void onStart() {
         super.onStart();
         connectToService();
+    }
+
+    public void setFragmentUserStatusChangingListener(
+            UserStatusChangingListener fragmentUserStatusChangingListener) {
+        this.fragmentUserStatusChangingListener = fragmentUserStatusChangingListener;
+    }
+
+    public void setFragmentServiceConnectionListener (
+            ServiceConnectionListener fragmentServiceConnectionListener) {
+        this.fragmentServiceConnectionListener = fragmentServiceConnectionListener;
+    }
+
+    public void onChangedUserStatus(int userId, boolean online) {
+        if (fragmentUserStatusChangingListener != null) {
+            fragmentUserStatusChangingListener.onChangedUserStatus(userId, online);
+        }
     }
 
     public void onConnectedToService(QBService service) {
@@ -218,6 +256,10 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
 
         if (groupChatHelper == null) {
             groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+        }
+
+        if (fragmentServiceConnectionListener != null) {
+            fragmentServiceConnectionListener.onConnectedToService(service);
         }
     }
 
@@ -268,14 +310,14 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
 
     protected void setCurrentFragment(Fragment fragment) {
         currentFragment = fragment;
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
         transaction.replace(R.id.container, fragment, null);
         transaction.commit();
     }
 
     private FragmentTransaction buildTransaction() {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         return transaction;
     }
@@ -290,17 +332,6 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
     }
 
     protected void onFailAction(String action) {
-    }
-
-    @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        if (fragmentUserStatusChangingListener != null) {
-            fragmentUserStatusChangingListener.onChangedUserStatus(userId, online);
-        }
-    }
-
-    protected void activateButterKnife() {
-        ButterKnife.bind(this);
     }
 
     protected void onReceivedChatMessageNotification(Bundle extras) {
@@ -321,8 +352,8 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
-            QBSocialLoginCommand
-                    .start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(), null);
+            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(),
+                    null);
         }
     }
 
@@ -331,14 +362,6 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
             handler = new Handler();
         }
         return handler;
-    }
-
-    public void hideActionBarProgress() {
-        setVisibilityActionBarProgress(false);
-    }
-
-    public void showActionBarProgress() {
-        setVisibilityActionBarProgress(true);
     }
 
     public void setVisibilityActionBarProgress(boolean visibility) {
@@ -390,6 +413,10 @@ public abstract class BaseActivity extends AppCompatActivity implements UserStat
         if (needShowReceivedNotification()) {
             onReceivedContactRequestNotification(extras);
         }
+    }
+
+    protected void activateButterKnife() {
+        ButterKnife.bind(this);
     }
 
     public class FailAction implements Command {

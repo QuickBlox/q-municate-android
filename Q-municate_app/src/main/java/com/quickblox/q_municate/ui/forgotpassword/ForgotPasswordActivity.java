@@ -31,13 +31,22 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_forgot_password);
+
+        initActionBar();
 
         resources = getResources();
 
         initUI();
 
         addActions();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     public void forgotPasswordOnClickListener(View view) {

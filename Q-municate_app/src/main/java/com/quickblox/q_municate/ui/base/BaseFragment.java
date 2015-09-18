@@ -1,17 +1,15 @@
 package com.quickblox.q_municate.ui.base;
 
-import android.app.Fragment;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.app.Activity;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.view.LayoutInflater;
+import android.support.v4.app.Fragment;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.quickblox.q_municate.App;
+import com.quickblox.q_municate.core.bridge.ActionBarBridge;
+import com.quickblox.q_municate.core.bridge.ConnectionBridge;
+import com.quickblox.q_municate.core.bridge.LoadingBridge;
+import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
@@ -20,14 +18,15 @@ import com.quickblox.q_municate_core.service.QBService;
 
 import butterknife.ButterKnife;
 
-public abstract class BaseFragment extends Fragment implements UserStatusChangingListener {
-
-    protected static final String ARG_TITLE = "title";
+public abstract class BaseFragment extends Fragment implements UserStatusChangingListener, ServiceConnectionListener {
 
     protected App app;
     protected BaseActivity baseActivity;
     protected BaseActivity.FailAction failAction;
     protected String title;
+    protected ConnectionBridge connectionBridge;
+    protected ActionBarBridge actionBarBridge;
+    protected LoadingBridge loadingBridge;
 
     protected QBFriendListHelper friendListHelper;
     protected QBPrivateChatHelper privateChatHelper;
@@ -35,107 +34,71 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
 
     protected QBService service;
 
-    private ServiceConnection serviceConnection;
-    private boolean bounded;
-
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (activity instanceof BaseActivity) {
+            baseActivity = (BaseActivity) activity;
+            service = baseActivity.service;
+            friendListHelper = baseActivity.friendListHelper;
+            privateChatHelper = baseActivity.privateChatHelper;
+            groupChatHelper = baseActivity.groupChatHelper;
+        }
+
+        if (activity instanceof ConnectionBridge) {
+            connectionBridge = (ConnectionBridge) activity;
+        }
+
+        if (activity instanceof ActionBarBridge) {
+            actionBarBridge = (ActionBarBridge) activity;
+        }
+
+        if (activity instanceof LoadingBridge) {
+            loadingBridge = (LoadingBridge) activity;
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        baseActivity = (BaseActivity) getActivity();
         baseActivity.setFragmentUserStatusChangingListener(this);
+        baseActivity.setFragmentServiceConnectionListener(this);
 
-        failAction = baseActivity.getFailAction();
         app = App.getInstance();
-
-        serviceConnection = new QBChatServiceConnection();
-
-        if (getArguments() != null) {
-            title = getArguments().getString(ARG_TITLE);
-        }
+        failAction = baseActivity.failAction;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-//        getActivity().getActionBar().setTitle(title);
+    public void initActionBar() {
+        actionBarBridge.setActionBarUpButtonEnabled(true);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        connectToService();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        unbindService();
-    }
-
-    private void unbindService() {
-        if (bounded && service != null && service.isRestricted()) {
-            baseActivity.unbindService(serviceConnection);
-            bounded = false;
-        }
-    }
-
-    public BaseActivity getBaseActivity() {
-        return (BaseActivity) getActivity();
+        initActionBar();
     }
 
     protected boolean isExistActivity() {
-        return ((!isDetached()) && (getBaseActivity() != null));
+        return ((!isDetached()) && (baseActivity != null));
     }
 
     protected void activateButterKnife(View view) {
         ButterKnife.bind(this, view);
     }
 
-    private void connectToService() {
-        Intent intent = new Intent(baseActivity, QBService.class);
-        baseActivity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    public void onConnectedToService(QBService service) {
-        if (friendListHelper == null) {
-            friendListHelper = (QBFriendListHelper) service.getHelper(QBService.FRIEND_LIST_HELPER);
-        }
-
-        if (privateChatHelper == null) {
-            privateChatHelper = (QBPrivateChatHelper) service.getHelper(QBService.PRIVATE_CHAT_HELPER);
-        }
-
-        if (groupChatHelper == null) {
-            groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
-        }
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        // nothing by default
     }
 
     @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-    }
-
-    private class QBChatServiceConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder binder) {
-            bounded = true;
-            service = ((QBService.QBServiceBinder) binder).getService();
-            onConnectedToService(service);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
+    public void onConnectedToService(QBService service) {
+        // nothing by default
     }
 }

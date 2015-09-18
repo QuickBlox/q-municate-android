@@ -37,6 +37,12 @@ public class FeedbackFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        actionBarBridge.setActionBarTitle(R.string.nvd_title_feedback);
+    }
+
     private void initListeners() {
         writeEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override

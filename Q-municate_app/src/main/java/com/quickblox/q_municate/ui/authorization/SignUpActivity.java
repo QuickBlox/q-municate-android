@@ -69,8 +69,15 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
         activateButterKnife();
 
+        initActionBar();
         initUI();
         initFields(savedInstanceState);
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initUI() {

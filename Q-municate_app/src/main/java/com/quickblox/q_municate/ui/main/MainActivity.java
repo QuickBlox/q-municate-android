@@ -1,12 +1,11 @@
 package com.quickblox.q_municate.ui.main;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Menu;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -49,7 +48,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     @Bind(R.id.main_content_drawerlayout)
     DrawerLayout drawerLayout;
 
-    private NavigationDrawerFragment navigationDrawerFragment;
     private FacebookHelper facebookHelper;
     private ImportFriends importFriends;
     private GSMHelper gsmHelper;
@@ -72,7 +70,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         activateButterKnife();
 
         initActionBar();
-
         initFields(savedInstanceState);
         initNavigationDrawer();
 
@@ -103,27 +100,12 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (navigationDrawerFragment != null) {
-            prepareMenu(menu);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (currentFragment instanceof InviteFriendsFragment) {
             currentFragment.onActivityResult(requestCode, resultCode, data);
         } else if (facebookHelper != null) {
             facebookHelper.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void prepareMenu(Menu menu) {
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setVisible(!navigationDrawerFragment.isDrawerOpen());
-            menu.getItem(i).collapseActionView();
         }
     }
 
@@ -177,7 +159,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     private void initNavigationDrawer() {
-        navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer_fragment);
+        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.navigation_drawer_fragment);
         navigationDrawerFragment.setUp(drawerLayout);
     }
 

@@ -32,10 +32,21 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_base_group_friendlist);
+
+        activateButterKnife();
+
+        initActionBar();
         initBase();
         initUI();
         initListView();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     @Override

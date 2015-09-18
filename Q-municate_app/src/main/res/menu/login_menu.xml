@@ -1,6 +1,7 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_register"
-        android:showAsAction="ifRoom"
-        android:title="@string/sup_sign_up" />
+        android:title="@string/sup_sign_up"
+        app:showAsAction="ifRoom" />
 </menu>

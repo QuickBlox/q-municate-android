@@ -1,42 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!--<style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">-->
-        <!--<item name="android:actionBarStyle">@style/MyActionBar</item>-->
-        <!--<item name="android:actionModeStyle">@style/MyActionMode</item>-->
-    <!--</style>-->
+    <style name="ToolbarStyle">
+        <item name="android:minHeight">?actionBarSize</item>
+        <item name="android:background">?colorPrimary</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ToolbarTheme</item>
+    </style>
 
-    <!--&lt;!&ndash; ActionBar styles &ndash;&gt;-->
-    <!--<style name="MyActionBar" parent="android:Widget.ActionBar">-->
-        <!--<item name="android:background">@color/action_bar_background_color</item>-->
-        <!--<item name="android:displayOptions">showTitle</item>-->
-        <!--<item name="android:titleTextStyle">@style/MyActionBarTitleText</item>-->
-        <!--<item name="android:indeterminateProgressStyle">@style/IndeterminateProgressStyle</item>-->
-    <!--</style>-->
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/button_general_selector</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
 
-    <!-- ActionBar title body -->
-    <!--<style name="MyActionBarTitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">-->
-        <!--<item name="android:textColor">@color/white</item>-->
-    <!--</style>-->
-
-    <!--<style name="AppTheme.NoActionBar" parent="android:Theme.Holo.Light.NoActionBar">-->
-        <!--<item name="android:windowNoTitle">true</item>-->
-    <!--</style>-->
-
-    <!--<style name="MyActionMode">-->
-        <!--<item name="android:actionModeCloseDrawable">@drawable/badge_action_mode</item>-->
-        <!--<item name="android:actionModeBackground">@drawable/badge_action_mode</item>-->
-        <!--<item name="android:windowContentOverlay">@null</item>-->
-        <!--<item name="android:titleTextStyle">@style/MyActionModeTitleText</item>-->
-    <!--</style>-->
-
-    <!--<style name="MyActionModeTitleText" parent="android:TextAppearance.Holo.Widget.ActionMode.Title">-->
-        <!--<item name="android:textColor">@color/white</item>-->
-    <!--</style>-->
-
-    <style name="baseToggleBtn">
-
-        <item name="android:textOff"></item>
-        <item name="android:textOn"></item>
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/dark_gray</item>
     </style>
 
     <!-- EmojiTabs styles -->
@@ -93,13 +72,18 @@
     </style>
 
     <style name="ActionButtonText.Done">
-        <item name="android:drawableLeft">@drawable/ic_action_done</item>
+        <item name="android:drawableLeft">@drawable/ic_action_done_dark</item>
         <item name="android:text">@string/dlg_done</item>
     </style>
 
     <style name="ActionButtonText.Cancel">
         <item name="android:drawableLeft">@drawable/ic_action_cancel</item>
         <item name="android:text">@string/dlg_cancel</item>
+    </style>
+
+    <style name="baseToggleBtn">
+        <item name="android:textOff"></item>
+        <item name="android:textOn"></item>
     </style>
 
 </resources>

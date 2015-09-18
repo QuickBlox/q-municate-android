@@ -37,12 +37,20 @@ public class LoginActivity extends BaseAuthActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
 
         activateButterKnife();
 
+        initActionBar();
         initUI();
         initFields(savedInstanceState);
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initUI() {

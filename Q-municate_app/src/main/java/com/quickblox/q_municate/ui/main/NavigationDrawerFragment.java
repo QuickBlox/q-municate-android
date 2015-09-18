@@ -191,7 +191,7 @@ public class NavigationDrawerFragment extends BaseFragment {
 
     @OnClick(R.id.logout_imagebutton)
     public void logout(View view) {
-        TwoButtonsDialogFragment.show(getFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
+        TwoButtonsDialogFragment.show(getChildFragmentManager(), R.string.dlg_logout, R.string.dlg_confirm,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

@@ -1,93 +1,101 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="true"
-    android:background="@color/white"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/email_edittext"
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/lgn_email_hint"
-        android:inputType="textEmailAddress"
-        android:maxLength="128"
-        tools:text="sergey1@ser.com"
-        android:text="sergey1@ser.com" />
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:baselineAligned="true"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <EditText
-        android:id="@+id/password_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:hint="@string/lgn_password_hint"
-        android:inputType="textPassword"
-        android:maxLength="256"
-        tools:text="serik111"
-        android:text="serik111" />
+        <EditText
+            android:id="@+id/email_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/lgn_email_hint"
+            android:inputType="textEmailAddress"
+            android:maxLength="128"
+            android:text="sergey1@ser.com"
+            tools:text="sergey1@ser.com" />
 
-    <CheckBox
-        android:id="@+id/remember_me_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="@string/lgn_remember_me"
-        android:textColor="@color/gray"
-        android:textSize="18sp" />
+        <EditText
+            android:id="@+id/password_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="@string/lgn_password_hint"
+            android:inputType="textPassword"
+            android:maxLength="256"
+            android:text="serik111"
+            tools:text="serik111" />
 
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/button_log_in_selector"
-        android:text="@string/lgn_login"
-        android:textColor="@android:color/white"
-        android:textSize="@dimen/button_text_size" />
-
-    <RelativeLayout
-        android:id="@+id/facebook_connect_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/button_connect_facebook_oval_selector"
-        android:clickable="true">
-
-        <LinearLayout
+        <CheckBox
+            android:id="@+id/remember_me_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:layout_marginTop="25dp"
+            android:text="@string/lgn_remember_me"
+            android:textColor="@color/gray"
+            android:textSize="18sp" />
 
-            <ImageView
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/button_log_in_selector"
+            android:text="@string/lgn_login"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/button_text_size" />
+
+        <RelativeLayout
+            android:id="@+id/facebook_connect_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/button_connect_facebook_oval_selector"
+            android:clickable="true">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/button_icon_margin"
-                android:src="@drawable/ic_fb" />
+                android:layout_centerInParent="true"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/connect_facebook_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/lnd_connect_with_facebook"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/button_text_size" />
-        </LinearLayout>
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/connect_facebook_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:drawableLeft="@drawable/ic_fb"
+                    android:drawablePadding="5dp"
+                    android:gravity="center"
+                    android:text="@string/lnd_connect_with_facebook"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/button_text_size" />
 
-    <TextView
-        android:id="@+id/forgot_password_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
-        android:background="@drawable/button_general_selector"
-        android:padding="5dp"
-        android:text="@string/lgn_forgot_password"
-        android:textColor="@color/gray"
-        android:textSize="18sp" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/forgot_password_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/button_general_selector"
+            android:padding="5dp"
+            android:text="@string/lgn_forgot_password"
+            android:textColor="@color/gray"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 
 </LinearLayout>

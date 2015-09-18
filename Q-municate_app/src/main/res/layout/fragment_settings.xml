@@ -76,5 +76,7 @@
             android:paddingBottom="14dp"
             android:paddingTop="14dp"
             android:textSize="@dimen/text_size" />
+
     </LinearLayout>
+
 </LinearLayout>

@@ -1,7 +1,8 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_next"
         android:title="@string/inf_send"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom" />
+        android:icon="@drawable/ic_action_done_white"
+        app:showAsAction="ifRoom" />
 </menu>

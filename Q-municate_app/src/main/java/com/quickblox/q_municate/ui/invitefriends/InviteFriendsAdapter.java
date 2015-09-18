@@ -46,8 +46,8 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
                     R.id.contentRelativeLayout);
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            viewHolder.viaTextView = (TextView) convertView.findViewById(R.id.viaTextView);
-            viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.selectUserCheckBox);
+            viewHolder.viaTextView = (TextView) convertView.findViewById(R.id.via_textview);
+            viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.select_user_checkbox);
 
             convertView.setTag(viewHolder);
 
@@ -94,8 +94,8 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
     }
 
     private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.list_item_background_pressed_color) : resources.getColor(
-                R.color.white);
+        return isSelect ? resources.getColor(R.color.button_general_background_pressed_color) : resources.getColor(
+                R.color.invite_friends_item);
     }
 
     private static class ViewHolder {

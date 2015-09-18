@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    // About Properties
+    // https://gist.github.com/seanKenkeremath/c945c39cdf92af138395
+
     <style name="Base.AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
 
         <item name="windowActionModeOverlay">true</item>
@@ -9,20 +12,20 @@
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorControlNormal">@color/white</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/gray</item>
 
         <item name="android:textColorPrimary">@color/white</item>
 
         <item name="actionModeBackground">@color/action_mode_background</item>
 
-        <!--<item name="android:editTextStyle">@style/EditTextStyle</item>-->
-        <!--<item name="editTextStyle">@style/EditTextStyle</item>-->
+        <item name="android:editTextStyle">@style/EditTextStyle</item>
+        <item name="editTextStyle">@style/EditTextStyle</item>
 
-        <!--<item name="android:buttonStyle">@style/ButtonStyle</item>-->
-        <!--<item name="buttonStyle">@style/ButtonStyle</item>-->
+        <item name="android:buttonStyle">@style/ButtonStyle</item>
+        <item name="buttonStyle">@style/ButtonStyle</item>
 
-        <!--<item name="android:spinnerItemStyle">@style/SpinnerStyle</item>-->
+        <item name="android:textColorSecondary">#757575</item>
 
         <!-- Material Dialog theme -->
         <item name="md_dark_theme">false</item>
@@ -30,5 +33,9 @@
     </style>
 
     <style name="AppTheme" parent="Base.AppTheme" />
+
+    <style name="ToolbarTheme">
+        <item name="colorControlNormal">@color/white</item>
+    </style>
 
 </resources>

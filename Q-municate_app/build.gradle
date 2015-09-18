@@ -30,6 +30,7 @@ dependencies {
     compile project(':stickyListHeaders')
 
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
+    compile "com.android.support:appcompat-v7:${rootProject.appcompatVersion}"
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
     compile("de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}@aar") {

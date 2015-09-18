@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
+import com.quickblox.q_municate.utils.helpers.LoginHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;

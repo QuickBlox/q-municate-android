@@ -64,12 +64,20 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_friend_details);
 
+        initActionBar();
         initFields();
         initUI();
         initUIWithUsersData();
         addActions();
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields() {
@@ -147,7 +155,7 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.friend_details_menu, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -215,8 +223,8 @@ public class FriendDetailsActivity extends BaseLogeableActivity {
     }
 
     private void showRemoveUserDialog() {
-        TwoButtonsDialogFragment.show(getFragmentManager(),
-                getResources().getString(R.string.frd_dlg_remove_friend, user.getFullName()),
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+                getString(R.string.frd_dlg_remove_friend, user.getFullName()),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {

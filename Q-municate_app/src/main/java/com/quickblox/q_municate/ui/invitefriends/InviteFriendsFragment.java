@@ -50,26 +50,28 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        title = getString(R.string.nvd_title_invite_friends);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_invite_friends, container, false);
 
+        initFields(savedInstanceState);
         initUI();
-
-        facebookSessionStatusCallback = new FacebookSessionStatusCallback();
-        facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
-
         initFriendsLists();
         initHeaderUI(headerList);
 
         initListeners();
 
         return view;
+    }
+
+    @Override
+    public void initActionBar() {
+        super.initActionBar();
+        actionBarBridge.setActionBarTitle(R.string.nvd_title_invite_friends);
+    }
+
+    private void initFields(Bundle savedInstanceState) {
+        facebookSessionStatusCallback = new FacebookSessionStatusCallback();
+        facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
     }
 
     @Override
