@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:padding="4dp">
 
-        <com.quickblox.q_municate.ui.views.RoundedImageView
-            style="@style/AvatarImageView"
+        <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+            style="@style/AvatarImageViewStyle"
             android:id="@+id/avatar_imageview"
             android:layout_width="@dimen/image_view_small_avatar_layout_width"
             android:layout_height="@dimen/image_view_small_avatar_layout_height"
@@ -40,7 +40,7 @@
                 android:textSize="@dimen/text_size"
                 android:maxLines="2" />
 
-            <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+            <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

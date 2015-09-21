@@ -43,8 +43,8 @@
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp">
 
-                    <com.quickblox.q_municate.ui.views.RoundedImageView
-                        style="@style/AvatarImageView"
+                    <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                        style="@style/AvatarImageViewStyle"
                         android:id="@+id/avatar_imageview"
                         android:duplicateParentState="true"
                         app:border_color="@color/dark_gray"

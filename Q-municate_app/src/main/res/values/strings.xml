@@ -76,6 +76,8 @@
     <string name="frl_column_header_name_my_contacts">My Contacts</string>
     <string name="frl_column_header_name_all_users">All Users</string>
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
+    <string name="frl_local_list">Local</string>
+    <string name="frl_global_list">Global</string>
 
     // Friend Details
     <string name="frd_title">Details</string>
@@ -250,5 +252,7 @@
     <string name="error_playing_ringtone">Error during playing ringtone</string>
     <string name="error_playing_wrong_source">Wrong sound resource</string>
     <string name="ignore_content_description">ignored</string>
+    <string name="coming_soon">Coming soon…</string>
+    <string name="search_at_last_items">Enter more symbols, not less than 3</string>
 
 </resources>

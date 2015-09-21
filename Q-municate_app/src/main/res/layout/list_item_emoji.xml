@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+    <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
         android:id="@+id/emojicon_icon"
         android:layout_width="32dp"
         android:layout_height="32dp"

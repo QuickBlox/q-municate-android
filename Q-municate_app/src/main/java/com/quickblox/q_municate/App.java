@@ -6,7 +6,7 @@ import android.support.multidex.MultiDexApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
-import com.quickblox.q_municate.ui.media.MediaPlayerManager;
+import com.quickblox.q_municate.utils.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.ImageUtils;
 import com.quickblox.q_municate.utils.SharedHelper;

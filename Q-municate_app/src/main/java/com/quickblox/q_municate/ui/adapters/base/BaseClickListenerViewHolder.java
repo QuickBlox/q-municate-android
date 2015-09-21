@@ -3,8 +3,13 @@ package com.quickblox.q_municate.ui.adapters.base;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.core.listeners.OnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.ImageLoaderUtils;
+
+import butterknife.ButterKnife;
 
 public class BaseClickListenerViewHolder<V> extends RecyclerView.ViewHolder {
 
@@ -12,6 +17,9 @@ public class BaseClickListenerViewHolder<V> extends RecyclerView.ViewHolder {
 
     public BaseClickListenerViewHolder(final View.OnClickListener onClickListener, View itemView) {
         super(itemView);
+
+        ButterKnife.bind(this, itemView);
+
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -24,7 +32,11 @@ public class BaseClickListenerViewHolder<V> extends RecyclerView.ViewHolder {
     @SuppressWarnings("unchecked")
     public BaseClickListenerViewHolder(final BaseRecyclerViewAdapter adapter, final OnRecycleItemClickListener<V> onRecycleItemClickListener, final View itemView) {
         super(itemView);
+
+        ButterKnife.bind(this, itemView);
+
         this.adapter = adapter;
+
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,5 +68,9 @@ public class BaseClickListenerViewHolder<V> extends RecyclerView.ViewHolder {
 
     protected void onLongClickPerformed(View v, @Nullable V entity) {
         // Nothing by default
+    }
+
+    protected void displayAvatarImage(String uri, ImageView imageView) {
+        ImageLoader.getInstance().displayImage(uri, imageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 }

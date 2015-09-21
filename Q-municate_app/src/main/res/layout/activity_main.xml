@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/navigation_drawer_fragment"
-        android:name="com.quickblox.q_municate.ui.main.NavigationDrawerFragment"
+        android:name="com.quickblox.q_municate.ui.fragments.main.NavigationDrawerFragment"
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"

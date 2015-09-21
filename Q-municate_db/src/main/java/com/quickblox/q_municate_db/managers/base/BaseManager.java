@@ -8,6 +8,7 @@ import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.Callable;
@@ -106,7 +107,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             ErrorUtils.logError(e);
         }
 
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

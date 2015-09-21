@@ -9,7 +9,6 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
-import com.quickblox.q_municate.ui.base.QBLogeable;
 
 public class ActivityLifecycleHandler implements Application.ActivityLifecycleCallbacks {
 

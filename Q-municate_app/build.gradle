@@ -42,6 +42,7 @@ dependencies {
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
     compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
+    compile "com.github.orangegangsters:swipy:${rootProject.swipyVersion}@aar"
 }
 
 android {

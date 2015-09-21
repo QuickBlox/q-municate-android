@@ -7,7 +7,7 @@ import android.widget.EditText;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
-import com.quickblox.q_municate.ui.uihelper.SimpleTextWatcher;
+import com.quickblox.q_municate.ui.uihelpers.SimpleTextWatcher;
 
 public class ValidationUtils extends SimpleTextWatcher {
 

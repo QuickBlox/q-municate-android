@@ -8,7 +8,7 @@
     android:padding="5dp"
     android:visibility="gone">
 
-    <com.quickblox.q_municate.ui.views.MaskedImageView
+    <com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView
         android:id="@+id/attach_imageview"
         android:layout_width="@dimen/chat_attach_width"
         android:layout_height="@dimen/chat_attach_height"

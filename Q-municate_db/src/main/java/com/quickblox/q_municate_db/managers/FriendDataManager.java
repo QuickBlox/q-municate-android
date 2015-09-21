@@ -61,4 +61,8 @@ public class FriendDataManager extends BaseManager<Friend> {
 
         notifyObservers(OBSERVE_KEY);
     }
+
+    public boolean existsByUserId(int userId) {
+        return getByUserId(userId) != null;
+    }
 }

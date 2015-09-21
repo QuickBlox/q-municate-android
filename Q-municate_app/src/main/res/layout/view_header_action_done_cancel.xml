@@ -3,16 +3,16 @@
 
     <FrameLayout
         android:id="@+id/action_cancel_view"
-        style="@style/ActionButton">
+        style="@style/ActionButtonStyle">
 
-        <TextView style="@style/ActionButtonText.Cancel" />
+        <TextView style="@style/ActionButtonTextStyle.Cancel" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/action_done_view"
-        style="@style/ActionButton">
+        style="@style/ActionButtonStyle">
 
-        <TextView style="@style/ActionButtonText.Done" />
+        <TextView style="@style/ActionButtonTextStyle.Done" />
     </FrameLayout>
 
 </LinearLayout>

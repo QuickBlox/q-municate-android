@@ -21,7 +21,7 @@
         android:background="@color/white"
         android:padding="5dp">
 
-        <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+        <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
             android:id="@+id/message_textview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

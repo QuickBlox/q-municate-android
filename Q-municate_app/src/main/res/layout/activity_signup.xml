@@ -49,8 +49,8 @@
             android:clickable="true"
             android:orientation="horizontal">
 
-            <com.quickblox.q_municate.ui.views.RoundedImageView
-                style="@style/AvatarImageView"
+            <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+                style="@style/AvatarImageViewStyle"
                 android:id="@+id/avatar_imageview"
                 app:border_color="@color/dark_gray"
                 app:border_width="@dimen/avatar_border_width"

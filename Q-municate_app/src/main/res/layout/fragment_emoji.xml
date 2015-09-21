@@ -15,32 +15,32 @@
 
         <ImageButton
             android:id="@+id/emoji_tab_people_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:src="@drawable/ic_smiles" />
 
         <ImageButton
             android:id="@+id/emoji_tab_nature_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:src="@drawable/ic_flowers" />
 
         <ImageButton
             android:id="@+id/emoji_tab_objects_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:src="@drawable/ic_alert" />
 
         <ImageButton
             android:id="@+id/emoji_tab_cars_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:src="@drawable/ic_car" />
 
         <ImageButton
             android:id="@+id/emoji_tab_punctuation_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:src="@drawable/ic_symb" />
 
         <ImageButton
             android:id="@+id/emojis_backspace_imagebutton"
-            style="@style/EmojiTabImageButton"
+            style="@style/EmojiTabImageButtonStyle"
             android:background="@color/dark_gray"
             android:src="@drawable/ic_backspace" />
 

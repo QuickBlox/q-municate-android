@@ -35,4 +35,5 @@ ext {
     materialDialogsVersion = '0.7.8.1'
     recyclerViewVersion = '23.0.0'
     appcompatVersion = '23.0.0'
+    swipyVersion = '1.2.0'
 }

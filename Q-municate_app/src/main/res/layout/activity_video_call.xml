@@ -50,7 +50,7 @@
                 android:src="@drawable/ic_call_mute" />
 
             <ToggleButton
-                style="@style/baseToggleBtn"
+                style="@style/ToggleButtonStyle"
                 android:id="@+id/muteMicrophoneButton"
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"

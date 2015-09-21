@@ -12,8 +12,8 @@
         android:layout_toLeftOf="@+id/addFriendButton"
         android:padding="10dp">
 
-        <com.quickblox.q_municate.ui.views.RoundedImageView
-            style="@style/AvatarImageView"
+        <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
+            style="@style/AvatarImageViewStyle"
             android:layout_width="@dimen/image_view_small_avatar_layout_width"
             android:layout_height="@dimen/image_view_small_avatar_layout_height"
             android:layout_marginLeft="5dp"

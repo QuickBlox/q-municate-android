@@ -36,9 +36,9 @@
 
         </LinearLayout>
 
-        <com.quickblox.q_municate.ui.views.RoundedImageView
+        <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
             android:id="@+id/avatar_imageview"
-            style="@style/AvatarImageView"
+            style="@style/AvatarImageViewStyle"
             android:layout_width="@dimen/act_call_avatar_size"
             android:layout_height="@dimen/act_call_avatar_size"
             android:layout_alignParentTop="false"
@@ -60,7 +60,7 @@
             android:orientation="horizontal">
 
             <ToggleButton
-                style="@style/baseToggleBtn"
+                style="@style/ToggleButtonStyle"
                 android:id="@+id/muteDynamicButton"
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"
@@ -78,7 +78,7 @@
                 android:src="@drawable/ic_encall" />
 
             <ToggleButton
-                style="@style/baseToggleBtn"
+                style="@style/ToggleButtonStyle"
                 android:id="@+id/muteMicrophoneButton"
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"

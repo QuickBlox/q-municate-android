@@ -11,6 +11,7 @@
         <item name="android:background">@drawable/button_general_selector</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
@@ -18,28 +19,19 @@
         <item name="android:textColorHint">@color/dark_gray</item>
     </style>
 
-    <!-- EmojiTabs styles -->
-    <style name="EmojiTabImageButton" parent="android:Widget.ImageButton">
+    <style name="EmojiTabImageButtonStyle" parent="android:Widget.ImageButton">
         <item name="android:background">@drawable/tab_emoji_selector</item>
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
     </style>
 
-    <!-- Avatars ImageView style -->
-    <style name="AvatarImageView">
+    <style name="AvatarImageViewStyle">
         <item name="android:layout_width">@dimen/image_view_big_avatar_layout_width</item>
         <item name="android:layout_height">@dimen/image_view_big_avatar_layout_height</item>
         <item name="android:layout_gravity">center|top</item>
         <item name="android:scaleType">centerCrop</item>
         <item name="android:src">@drawable/placeholder_user</item>
-    </style>
-
-    <style name="IndeterminateProgressStyle" parent="@android:style/Widget.ProgressBar">
-        <item name="android:minHeight">24dp</item>
-        <item name="android:maxHeight">24dp</item>
-        <item name="android:minWidth">32dp</item>
-        <item name="android:maxWidth">32dp</item>
     </style>
 
     <style name="DoneCancelBar">
@@ -52,14 +44,14 @@
         <item name="android:background">@color/action_button_bar</item>
     </style>
 
-    <style name="ActionButton">
+    <style name="ActionButtonStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
         <item name="android:background">@drawable/action_selectable_background</item>
     </style>
 
-    <style name="ActionButtonText">
+    <style name="ActionButtonTextStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
@@ -71,19 +63,29 @@
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="ActionButtonText.Done">
+    <style name="ActionButtonTextStyle.Done">
         <item name="android:drawableLeft">@drawable/ic_action_done_dark</item>
         <item name="android:text">@string/dlg_done</item>
     </style>
 
-    <style name="ActionButtonText.Cancel">
+    <style name="ActionButtonTextStyle.Cancel">
         <item name="android:drawableLeft">@drawable/ic_action_cancel</item>
         <item name="android:text">@string/dlg_cancel</item>
     </style>
 
-    <style name="baseToggleBtn">
+    <style name="ToggleButtonStyle">
         <item name="android:textOff"></item>
         <item name="android:textOn"></item>
+    </style>
+
+    <style name="ContactsRadioButtonStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/contact_item_header_height</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:button">@android:color/transparent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/selector_contacts_mode_tab</item>
     </style>
 
 </resources>

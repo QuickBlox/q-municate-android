@@ -9,7 +9,7 @@
     android:padding="5dp"
     android:visibility="gone">
 
-    <com.quickblox.q_municate.ui.chats.emoji.EmojiTextView
+    <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
         android:id="@+id/message_textview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
