@@ -43,7 +43,7 @@ public class QBFindUsersCommand extends ServiceCommand {
         Bundle requestParams = new Bundle();
         Collection<QBUser> userList = QBUsers.getUsersByFullName(constraint, requestBuilder, requestParams);
         Collection<User> userCollection = UserFriendUtils.createUsersList(userList);
-        userCollection.remove(UserFriendUtils.createLocalUser(currentUser));
+//        userCollection.remove(UserFriendUtils.createLocalUser(currentUser));
 
         Bundle params = new Bundle();
         params.putString(QBServiceConsts.EXTRA_CONSTRAINT, constraint);

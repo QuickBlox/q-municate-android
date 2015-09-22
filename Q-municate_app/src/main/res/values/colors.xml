@@ -17,6 +17,10 @@
     <color name="dark_blue">#0c4d81</color>
     <color name="light_blue">#ff0d8cd1</color>
 
+    <color name="text_white">@color/white</color>
+    <color name="text_light_dark">#ff6c6c6c</color>
+    <color name="text_dark">@color/black</color>
+
     <color name="action_bar_background_color">#0d70b3</color>
     <color name="link_text_color">#0d70b3</color>
 

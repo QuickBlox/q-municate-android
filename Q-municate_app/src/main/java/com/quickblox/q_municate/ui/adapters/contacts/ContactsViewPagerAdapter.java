@@ -44,6 +44,13 @@ public class ContactsViewPagerAdapter extends FragmentStatePagerAdapter {
         return COUNT_CONTACTS_TYPES;
     }
 
+    public void prepareSearch(int position) {
+        UserSearchListener userSearchListener = getUserSearchListener(position);
+        if (userSearchListener != null) {
+            userSearchListener.prepareSearch();
+        }
+    }
+
     public void search(int position, String searchQuery) {
         UserSearchListener userSearchListener = getUserSearchListener(position);
         if (userSearchListener != null) {

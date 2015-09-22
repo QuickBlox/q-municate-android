@@ -213,8 +213,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        super.onChangedUserStatus(userId, online);
+    public void notifyChangedUserStatus(int userId, boolean online) {
+        super.notifyChangedUserStatus(userId, online);
 
         if (opponentUser != null && opponentUser.getUserId() == userId) {
             setOnlineStatus(opponentUser);

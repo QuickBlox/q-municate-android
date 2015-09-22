@@ -81,7 +81,8 @@
     <style name="ContactsRadioButtonStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/contact_item_header_height</item>
-        <item name="android:textColor">@color/gray</item>
+        <item name="android:textColor">@drawable/selector_contacts_tab_text</item>
+        <item name="android:textSize">@dimen/text_size</item>
         <item name="android:button">@android:color/transparent</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>

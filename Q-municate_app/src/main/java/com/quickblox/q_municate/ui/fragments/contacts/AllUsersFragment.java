@@ -11,6 +11,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutD
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.UserOperationListener;
 import com.quickblox.q_municate.core.listeners.UserSearchListener;
+import com.quickblox.q_municate.ui.adapters.contacts.ContactsAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -77,6 +78,14 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        checkVisibilityEmptyLabel();
+        contactsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         removeActions();
@@ -114,8 +123,16 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
     }
 
     @Override
+    public void prepareSearch() {
+        contactsAdapter.setUserType(ContactsAdapter.UserType.GLOBAL);
+        clearOldData();
+        updateContactsList();
+    }
+
+    @Override
     public void search(String searchQuery) {
         this.searchQuery = searchQuery;
+        clearOldData();
         startSearch();
     }
 
@@ -123,6 +140,13 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
     public void cancelSearch() {
         searchQuery = null;
         searchTimer.cancel();
+        clearOldData();
+        updateContactsList();
+    }
+
+    private void clearOldData() {
+        usersList.clear();
+        page = 1;
     }
 
     private void startSearch() {
@@ -155,14 +179,14 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
 
     @Override
     public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
-        if (!usersList.isEmpty() && usersList.size() + 1 < totalEntries) {
+        if (!usersList.isEmpty() && usersList.size() < totalEntries) {
             page++;
             searchUsers();
         }
     }
 
     private void checkForEnablingRefreshLayout() {
-        swipyRefreshLayout.setEnabled(usersList.size() + 1 != totalEntries);
+        swipyRefreshLayout.setEnabled(usersList.size() != totalEntries);
     }
 
     private void parseResult(Bundle bundle) {

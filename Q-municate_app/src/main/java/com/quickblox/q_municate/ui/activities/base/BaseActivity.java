@@ -53,6 +53,7 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,6 +76,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected LocalBroadcastManager localBroadcastManager;
 
     private Map<String, Set<Command>> broadcastCommandMap;
+    private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
+    private Set<ServiceConnectionListener> fragmentsServiceConnectionSet;
     private Handler handler;
     private BaseBroadcastReceiver broadcastReceiver;
     private GlobalBroadcastReceiver globalBroadcastReceiver;
@@ -82,8 +85,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private boolean bounded;
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
-    private UserStatusChangingListener fragmentUserStatusChangingListener;
-    private ServiceConnectionListener fragmentServiceConnectionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         globalBroadcastReceiver = new GlobalBroadcastReceiver();
         userStatusBroadcastReceiver = new UserStatusBroadcastReceiver();
         broadcastCommandMap = new HashMap<>();
+        fragmentsStatusChangingSet = new HashSet<>();
+        fragmentsServiceConnectionSet = new HashSet<>();
         serviceConnection = new QBChatServiceConnection();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
     }
@@ -230,19 +233,41 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         connectToService();
     }
 
-    public void setFragmentUserStatusChangingListener(
+    public void addFragmentUserStatusChangingListener(
             UserStatusChangingListener fragmentUserStatusChangingListener) {
-        this.fragmentUserStatusChangingListener = fragmentUserStatusChangingListener;
+        fragmentsStatusChangingSet.add(fragmentUserStatusChangingListener);
     }
 
-    public void setFragmentServiceConnectionListener (
+    public void removeFragmentUserStatusChangingListener(
+            UserStatusChangingListener fragmentUserStatusChangingListener) {
+        fragmentsStatusChangingSet.remove(fragmentUserStatusChangingListener);
+    }
+
+    public void addFragmentServiceConnectionListener (
             ServiceConnectionListener fragmentServiceConnectionListener) {
-        this.fragmentServiceConnectionListener = fragmentServiceConnectionListener;
+        fragmentsServiceConnectionSet.add(fragmentServiceConnectionListener);
     }
 
-    public void onChangedUserStatus(int userId, boolean online) {
-        if (fragmentUserStatusChangingListener != null) {
-            fragmentUserStatusChangingListener.onChangedUserStatus(userId, online);
+    public void removeFragmentServiceConnectionListener (
+            ServiceConnectionListener fragmentServiceConnectionListener) {
+        fragmentsServiceConnectionSet.remove(fragmentServiceConnectionListener);
+    }
+
+    public void notifyChangedUserStatus(int userId, boolean online) {
+        if (!fragmentsStatusChangingSet.isEmpty()) {
+            Iterator<UserStatusChangingListener> iterator = fragmentsStatusChangingSet.iterator();
+            while (iterator.hasNext()) {
+                iterator.next().onChangedUserStatus(userId, online);
+            }
+        }
+    }
+
+    public void notifyConnectedToService() {
+        if (!fragmentsServiceConnectionSet.isEmpty()) {
+            Iterator<ServiceConnectionListener> iterator = fragmentsServiceConnectionSet.iterator();
+            while (iterator.hasNext()) {
+                iterator.next().onConnectedToService(service);
+            }
         }
     }
 
@@ -259,9 +284,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
         }
 
-        if (fragmentServiceConnectionListener != null) {
-            fragmentServiceConnectionListener.onConnectedToService(service);
-        }
+        notifyConnectedToService();
     }
 
     private void unbindService() {
@@ -515,7 +538,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         public void onReceive(Context context, Intent intent) {
             int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, 0);
             boolean status = intent.getBooleanExtra(QBServiceConsts.EXTRA_USER_STATUS, false);
-            onChangedUserStatus(userId, status);
+            notifyChangedUserStatus(userId, status);
         }
     }
 

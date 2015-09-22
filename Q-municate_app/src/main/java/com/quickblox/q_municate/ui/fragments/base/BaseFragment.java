@@ -68,8 +68,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        baseActivity.setFragmentUserStatusChangingListener(this);
-        baseActivity.setFragmentServiceConnectionListener(this);
+        addListeners();
 
         app = App.getInstance();
         failAction = baseActivity.getFailAction();
@@ -84,6 +83,22 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     public void onResume() {
         super.onResume();
         initActionBar();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        removeListeners();
+    }
+
+    private void addListeners() {
+        baseActivity.addFragmentUserStatusChangingListener(this);
+        baseActivity.addFragmentServiceConnectionListener(this);
+    }
+
+    private void removeListeners() {
+        baseActivity.removeFragmentUserStatusChangingListener(this);
+        baseActivity.removeFragmentServiceConnectionListener(this);
     }
 
     protected boolean isExistActivity() {

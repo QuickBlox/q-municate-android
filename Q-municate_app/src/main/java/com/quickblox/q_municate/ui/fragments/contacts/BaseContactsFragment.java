@@ -12,8 +12,8 @@ import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.contacts.ContactsAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.uihelpers.SimpleOnRecycleItemClickListener;
+import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.UserRequestDataManager;
@@ -59,7 +59,8 @@ public abstract class BaseContactsFragment extends BaseFragment {
     protected void initContactsList(List<User> usersList) {
         contactsAdapter = new ContactsAdapter(baseActivity, usersList);
         contactsAdapter.setFriendListHelper(friendListHelper);
-        contactsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));;
+        contactsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        contactsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));;
         contactsRecyclerView.setAdapter(contactsAdapter);
     }
 
@@ -69,22 +70,13 @@ public abstract class BaseContactsFragment extends BaseFragment {
             @Override
             public void onItemClicked(View view, User user, int position) {
                 boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
-                boolean outgoingUser = dataManager.getUserRequestDataManager().existsByUserId(
-                        user.getUserId());
+                boolean outgoingUser = dataManager.getUserRequestDataManager()
+                        .existsByUserId(user.getUserId());
                 if (isFriend || outgoingUser) {
                     startFriendDetailsActivity(user.getUserId());
                 }
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        checkVisibilityEmptyLabel();
-
-        contactsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -97,18 +89,6 @@ public abstract class BaseContactsFragment extends BaseFragment {
     public boolean touchContactsList(View view, MotionEvent event) {
         KeyboardUtils.hideKeyboard(baseActivity);
         return false;
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
-        contactsAdapter.setFriendListHelper(friendListHelper);
-    }
-
-    @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        super.onChangedUserStatus(userId, online);
-        contactsAdapter.notifyDataSetChanged();
     }
 
     private void addObservers() {

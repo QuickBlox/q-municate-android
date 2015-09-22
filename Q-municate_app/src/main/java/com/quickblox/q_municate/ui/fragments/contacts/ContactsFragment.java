@@ -108,9 +108,11 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
             switch (checkedId) {
                 case R.id.your_contacts_radiobutton:
                     contactsViewPager.setCurrentItem(ContactsViewPagerAdapter.POSITION_YOUR_CONTACTS);
+                    contactsPagerAdapter.prepareSearch(ContactsViewPagerAdapter.POSITION_YOUR_CONTACTS);
                     break;
                 case R.id.all_users_radiobutton:
                     contactsViewPager.setCurrentItem(ContactsViewPagerAdapter.POSITION_ALL_USERS);
+                    contactsPagerAdapter.prepareSearch(ContactsViewPagerAdapter.POSITION_ALL_USERS);
                     break;
             }
         }

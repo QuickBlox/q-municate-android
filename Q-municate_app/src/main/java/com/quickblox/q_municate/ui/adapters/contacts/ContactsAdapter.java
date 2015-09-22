@@ -15,7 +15,11 @@ import com.quickblox.q_municate.ui.adapters.base.FilterAdapter;
 import com.quickblox.q_municate.core.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.TextViewHelper;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
@@ -25,12 +29,16 @@ import butterknife.Bind;
 public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     private Resources resources;
+    private DataManager dataManager;
+    private UserType userType;
     private UserOperationListener userOperationListener;
     private QBFriendListHelper friendListHelper;
 
     public ContactsAdapter(Activity activity, List<User> list) {
         super(activity, list);
         resources = context.getResources();
+        dataManager = DataManager.getInstance();
+        userType = UserType.LOCAl;
     }
 
     @Override
@@ -57,6 +65,8 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
         String avatarUrl = user.getAvatar();
         displayAvatarImage(avatarUrl, holder.avatarImageView);
 
+        checkVisibilityItems(holder, user);
+
         initListeners(holder, user.getUserId());
 
         if (!TextUtils.isEmpty(query)) {
@@ -73,6 +83,10 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
         });
     }
 
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
     public void setUserOperationListener(UserOperationListener userOperationListener) {
         this.userOperationListener = userOperationListener;
     }
@@ -80,6 +94,66 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
     public void setFriendListHelper(QBFriendListHelper friendListHelper) {
         this.friendListHelper = friendListHelper;
         notifyDataSetChanged();
+    }
+
+    private void checkVisibilityItems(ViewHolder viewHolder, User user) {
+        if (UserType.GLOBAL.equals(userType)) {
+            checkVisibilityItemsAllUsers(viewHolder, user);
+        } else if (UserType.LOCAl.equals(userType)) {
+            checkVisibilityItemsMyContacts(viewHolder, user);
+        }
+    }
+
+    private void checkVisibilityItemsAllUsers(ViewHolder viewHolder, User user) {
+        boolean me = AppSession.getSession().getUser().getId() == user.getUserId();
+        boolean friendOrPending = isFriendOrPending(user);
+        viewHolder.addFriendImageView.setVisibility(me || friendOrPending ? View.GONE : View.VISIBLE);
+        viewHolder.onlineImageView.setVisibility(View.GONE);
+        viewHolder.statusTextView.setVisibility(View.GONE);
+    }
+
+    private void checkVisibilityItemsMyContacts(ViewHolder viewHolder, User user) {
+        Friend friend = dataManager.getFriendDataManager().getByUserId(user.getUserId());
+        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getUserId());
+
+        if (friend == null && pendingUser == null) {
+            return;
+        }
+
+        String status;
+        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
+
+        if (pendingUser != null) {
+            viewHolder.onlineImageView.setVisibility(View.GONE);
+            status = resources.getString(R.string.frl_pending_request_status);
+        } else {
+            status = resources.getString(OnlineStatusHelper.getOnlineStatus(online));
+        }
+
+        viewHolder.addFriendImageView.setVisibility(View.GONE);
+        viewHolder.statusTextView.setText(status);
+
+        viewHolder.statusTextView.setVisibility(View.VISIBLE);
+
+        setStatusVisibility(viewHolder, online);
+    }
+
+    private boolean isFriendOrPending(User user) {
+        Friend friend = dataManager.getFriendDataManager().getByUserId(user.getUserId());
+        User pendingUser = dataManager.getUserRequestDataManager().getUserRequestById(user.getUserId());
+        return friend != null || pendingUser != null;
+    }
+
+    private void setStatusVisibility(ViewHolder viewHolder, boolean status) {
+        if (status) {
+            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.onlineImageView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public enum UserType {
+        LOCAl, GLOBAL
     }
 
     protected static class ViewHolder extends BaseViewHolder<User> {

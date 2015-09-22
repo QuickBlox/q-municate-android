@@ -278,8 +278,8 @@ public class UserProfileActivity extends BaseLogeableActivity {
     }
 
     @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        super.onChangedUserStatus(userId, online);
+    public void notifyChangedUserStatus(int userId, boolean online) {
+        super.notifyChangedUserStatus(userId, online);
         setOnlineStatus(user);
     }
 
