@@ -21,10 +21,16 @@ import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
+import butterknife.Bind;
+
 public class ChangePasswordActivity extends BaseLogeableActivity {
 
-    private EditText oldPasswordEditText;
-    private EditText newPasswordEditText;
+    @Bind(R.id.old_password_edittext)
+    EditText oldPasswordEditText;
+
+    @Bind(R.id.new_password_edittext)
+    EditText newPasswordEditText;
+
     private ValidationUtils validationUtils;
     private Resources resources;
     private QBUser user;
@@ -42,22 +48,71 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
 
         setContentView(R.layout.activity_change_password);
 
+        activateButterKnife();
+
         initActionBar();
-
-        resources = getResources();
-        canPerformLogout.set(false);
-
-        initUI();
+        initFields();
 
         addActions();
-
-        user = AppSession.getSession().getUser();
     }
 
     @Override
     public void initActionBar() {
         super.initActionBar();
         setActionBarUpButtonEnabled(true);
+    }
+
+    private void initFields() {
+        resources = getResources();
+        canPerformLogout.set(false);
+        user = AppSession.getSession().getUser();
+        validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
+                new String[]{resources.getString(R.string.cpw_not_old_password_field_entered), resources
+                        .getString(R.string.cpw_not_new_password_field_entered)}
+        );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                navigateToParent();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
+        addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
+
+        addAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, new LogoutChatSuccessAction());
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatSuccessAction());
+
+        addAction(QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION, failAction);
+        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, failAction);
+
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION);
+
+        removeAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION);
+
+        removeAction(QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION);
+        removeAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION);
+
+        updateBroadcastActionList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
     }
 
     public void changePasswordOnClickListener(View view) {
@@ -73,38 +128,6 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private void updatePasswords(String oldPasswordText, String newPasswordText) {
         user.setOldPassword(oldPasswordText);
         user.setPassword(newPasswordText);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void initUI() {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        oldPasswordEditText = _findViewById(R.id.old_password_edittext);
-        newPasswordEditText = _findViewById(R.id.new_password_edittext);
-        validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
-                new String[]{resources.getString(R.string.cpw_not_old_password_field_entered), resources
-                        .getString(R.string.cpw_not_new_password_field_entered)}
-        );
-    }
-
-    private void addActions() {
-        addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
-        addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
-        addAction(QBServiceConsts.LOGOUT_CHAT_SUCCESS_ACTION, new LogoutChatSuccessAction());
-        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION, new LoginChatSuccessAction());
-        addAction(QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION, failAction);
-        addAction(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION, failAction);
-        updateBroadcastActionList();
     }
 
     private void clearFields() {

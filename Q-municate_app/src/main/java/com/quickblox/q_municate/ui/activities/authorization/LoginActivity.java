@@ -43,7 +43,6 @@ public class LoginActivity extends BaseAuthActivity {
         activateButterKnife();
 
         initActionBar();
-        initUI();
         initFields(savedInstanceState);
     }
 
@@ -51,11 +50,6 @@ public class LoginActivity extends BaseAuthActivity {
     public void initActionBar() {
         super.initActionBar();
         setActionBarUpButtonEnabled(true);
-    }
-
-    private void initUI() {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void initFields(Bundle bundle) {

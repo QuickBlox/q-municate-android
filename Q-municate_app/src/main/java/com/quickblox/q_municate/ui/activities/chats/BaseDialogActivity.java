@@ -8,9 +8,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -435,22 +433,16 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(
+                logoUrl,
+                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        startUpdatingActionBarLogo(loadedBitmap);
+                        setActionBarIcon(ImageUtils.getRoundIconDrawable(loadedBitmap));
                     }
                 });
-    }
-
-    private void startUpdatingActionBarLogo(Bitmap loadedBitmap) {
-        new ReceiveRoundedBitmapPathTask().execute(loadedBitmap);
-    }
-
-    private void updateActionBarLogo(Bitmap roundedBitmap) {
-        actionBar.setLogo(new BitmapDrawable(getResources(), roundedBitmap));
     }
 
     protected void startLoadAttachFile(final File file) {
@@ -634,20 +626,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         public void run() {
             isTypingNow = false;
             sendTypingStatus();
-        }
-    }
-
-    private class ReceiveRoundedBitmapPathTask extends AsyncTask<Object, Bitmap, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(Object[] params) {
-            Bitmap bitmap = (Bitmap) params[0];
-            return imageUtils.getRoundedBitmap(bitmap);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            updateActionBarLogo(bitmap);
         }
     }
 

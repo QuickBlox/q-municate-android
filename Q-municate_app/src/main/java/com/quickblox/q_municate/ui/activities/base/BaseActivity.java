@@ -50,6 +50,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.models.Dialog;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +64,6 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge {
 
     protected App app;
-    protected ActionBar actionBar;
     protected Toolbar toolbar;
     protected SharedHelper appSharedHelper;
     protected Fragment currentFragment;
@@ -75,6 +75,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
 
+    private ActionBar actionBar;
     private Map<String, Set<Command>> broadcastCommandMap;
     private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
     private Set<ServiceConnectionListener> fragmentsServiceConnectionSet;

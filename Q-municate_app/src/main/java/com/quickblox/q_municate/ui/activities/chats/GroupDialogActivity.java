@@ -32,6 +32,8 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
+    private Dialog currentDialog;
+
     public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_FRIENDS, friends);
@@ -72,11 +74,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     protected void updateActionBar() {
-        actionBar.setTitle(dialog.getTitle());
+        setActionBarTitle(dialog.getTitle());
 
-        actionBar.setLogo(R.drawable.placeholder_group);
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
             loadLogoActionBar(dialog.getPhoto());
+        } else {
+            setActionBarIcon(R.drawable.placeholder_group);
         }
     }
 

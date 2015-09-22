@@ -136,6 +136,13 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         }
     }
 
+    public void clearSelectedFriends() {
+        sparseArrayCheckBoxes.clear();
+        selectedFriends.clear();
+        counterFriends = 0;
+        notifyDataSetChanged();
+    }
+
     public ArrayList<User> getSelectedFriends() {
         return (ArrayList<User>) selectedFriends;
     }

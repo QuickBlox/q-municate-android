@@ -1,7 +1,7 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
 import android.os.Bundle;
-import android.view.ActionMode;
+import android.support.v7.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,7 +27,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     protected ListView friendsListView;
 
     private ActionMode actionMode;
-    private boolean isNeedToCloseWithoutRedirect;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,12 +46,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public void initActionBar() {
         super.initActionBar();
         setActionBarUpButtonEnabled(true);
-    }
-
-    @Override
-    public void onBackPressed() {
-        isNeedToCloseWithoutRedirect = true;
-        super.onBackPressed();
     }
 
     private void initUI() {
@@ -82,7 +75,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public void onCounterFriendsChanged(int valueCounter) {
         if (actionMode != null) {
             if (valueCounter == ConstsCore.ZERO_INT_VALUE) {
-                closeActionModeWithRedirect(true);
+                actionMode.finish();
                 return;
             }
         } else {
@@ -92,12 +85,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     }
 
     private void startAction() {
-        actionMode = startActionMode(new ActionModeCallback());
-    }
-
-    private void closeActionModeWithRedirect(boolean isNeedToCloseWithoutRedirect) {
-        this.isNeedToCloseWithoutRedirect = isNeedToCloseWithoutRedirect;
-        actionMode.finish();
+        actionMode = startSupportActionMode(new ActionModeCallback());
     }
 
     private void initBase() {
@@ -107,10 +95,8 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            closeActionModeWithRedirect(true);
+            actionMode.finish();
             return true;
-        } else {
-            isNeedToCloseWithoutRedirect = false;
         }
         return super.dispatchKeyEvent(event);
     }
@@ -119,7 +105,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                isNeedToCloseWithoutRedirect = true;
                 navigateToParent();
                 return true;
         }
@@ -145,18 +130,30 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     private class ActionModeCallback extends SimpleActionModeCallback {
 
         @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater().inflate(R.menu.actionmode_done_menu, menu);
             return true;
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            if (!isNeedToCloseWithoutRedirect) {
-                ArrayList<User> selectedFriends = new ArrayList<User>(
-                        friendsAdapter.getSelectedFriends());
-                Collections.sort(selectedFriends, new SimpleComparator());
-                onFriendsSelected(selectedFriends);
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_done:
+                    ArrayList<User> selectedFriends = new ArrayList<User>(
+                            friendsAdapter.getSelectedFriends());
+                    Collections.sort(selectedFriends, new SimpleComparator());
+                    onFriendsSelected(selectedFriends);
+
+                    actionMode.finish();
+                    return true;
             }
+
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            friendsAdapter.clearSelectedFriends();
             actionMode = null;
         }
     }

@@ -9,8 +9,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.view.ActionMode;
 import android.text.TextUtils;
-import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -267,8 +267,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void initUI() {
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
         avatarImageView = _findViewById(R.id.avatar_imageview);
         groupNameEditText = _findViewById(R.id.name_textview);
         participantsTextView = _findViewById(R.id.participants_textview);
@@ -385,7 +383,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (actionMode != null) {
             return;
         }
-        actionMode = startActionMode(new ActionModeCallback());
+        actionMode = startSupportActionMode(new ActionModeCallback());
     }
 
     private void updateCurrentUserData() {
@@ -555,15 +553,26 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private class ActionModeCallback extends SimpleActionModeCallback {
 
         @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater().inflate(R.menu.actionmode_done_menu, menu);
             return true;
         }
 
         @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            if (!closeActionMode) {
-                updateUserData();
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_done:
+                    updateUserData();
+                    actionMode.finish();
+                    return true;
             }
+
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            resetGroupData();
             actionMode = null;
         }
     }

@@ -99,7 +99,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
         super.onCreate(savedInstanceState);
         canPerformLogout.set(false);
         setContentView(R.layout.activity_main_call);
-        actionBar.hide();
+//        actionBar.hide();
         mediaPlayer = App.getInstance().getMediaPlayer();
         parseIntentExtras(getIntent().getExtras());
         addAction(QBServiceConsts.SEND_PUSH_MESSAGES_FAIL_ACTION, failAction);
