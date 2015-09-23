@@ -9,7 +9,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.media.CallTimeUpdater;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 public class VoiceCallFragment extends OutgoingCallFragment {

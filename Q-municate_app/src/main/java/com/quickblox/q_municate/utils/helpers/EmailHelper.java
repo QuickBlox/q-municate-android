@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils;
+package com.quickblox.q_municate.utils.helpers;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -10,13 +10,14 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.DeviceInfoUtils;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmailUtils {
+public class EmailHelper {
 
     public static void sendInviteEmail(Context context, String[] selectedFriends) {
         Resources resources = context.getResources();

@@ -9,8 +9,6 @@ import com.facebook.model.GraphUser;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate_core.qb.commands.QBImportFriendsCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate.utils.EmailUtils;
-import com.quickblox.q_municate.utils.FacebookHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ public class ImportFriendsHelper {
 
     public void startGetFriendsListTask(boolean isGetFacebookFriends) {
         expectedFriendsCallbacks++;
-        friendsContactsList = EmailUtils.getContactsWithEmail(activity);
+        friendsContactsList = EmailHelper.getContactsWithEmail(activity);
         if (isGetFacebookFriends) {
             expectedFriendsCallbacks++;
             getFacebookFriendsList();

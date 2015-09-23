@@ -10,7 +10,7 @@ import android.widget.RadioGroup;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
-import com.quickblox.q_municate.utils.EmailUtils;
+import com.quickblox.q_municate.utils.helpers.EmailHelper;
 
 public class FeedbackFragment extends BaseFragment {
 
@@ -47,7 +47,7 @@ public class FeedbackFragment extends BaseFragment {
         writeEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EmailUtils.sendFeedbackEmail(baseActivity, getSelectedFeedbackType());
+                EmailHelper.sendFeedbackEmail(baseActivity, getSelectedFeedbackType());
             }
         });
     }

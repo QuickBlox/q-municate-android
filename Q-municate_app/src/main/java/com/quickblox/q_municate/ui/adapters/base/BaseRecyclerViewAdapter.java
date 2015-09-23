@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.core.listeners.OnRecycleItemClickListener;
-import com.quickblox.q_municate.utils.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.users.model.QBUser;
 

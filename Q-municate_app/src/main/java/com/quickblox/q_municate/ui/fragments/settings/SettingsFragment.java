@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
-import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutCompositeCommand;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;

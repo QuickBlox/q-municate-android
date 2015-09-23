@@ -24,8 +24,8 @@ import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DialogUtils;
-import com.quickblox.q_municate.utils.EmailUtils;
-import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.EmailHelper;
+import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,7 +150,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void getContactsFriendsList() {
-        friendsContactsList.addAll(EmailUtils.getContactsWithEmail(baseActivity));
+        friendsContactsList.addAll(EmailHelper.getContactsWithEmail(baseActivity));
         updateFriendsList();
         setVisibilityCountPart();
     }
@@ -260,7 +260,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void sendInviteToContacts() {
-        EmailUtils.sendInviteEmail(baseActivity, selectedContactsFriendsArray);
+        EmailHelper.sendInviteEmail(baseActivity, selectedContactsFriendsArray);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

@@ -14,7 +14,7 @@ import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.FilterAdapter;
 import com.quickblox.q_municate.core.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.TextViewHelper;
+import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;

@@ -22,10 +22,10 @@ import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ColorUtils;
 import com.quickblox.q_municate.utils.DateUtils;
-import com.quickblox.q_municate.utils.FileHelper;
-import com.quickblox.q_municate.utils.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.ImageUtils;
-import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.FileUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -48,13 +48,13 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
     protected Dialog dialog;
 
     protected ColorUtils colorUtils;
-    private FileHelper fileHelper;
+    private FileUtils fileUtils;
 
     public BaseDialogMessagesAdapter(Context context, List<CombinationMessage> objectsList) {
         super(context, objectsList);
         imageUtils = new ImageUtils((android.app.Activity) context);
         colorUtils = new ColorUtils();
-        fileHelper = new FileHelper();
+        fileUtils = new FileUtils();
     }
 
     protected boolean isOwnMessage(int senderId) {
@@ -173,7 +173,7 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
         @Override
         public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
             initMaskedImageView(loadedBitmap);
-            fileHelper.checkExsistFile(imageUri, loadedBitmap);
+            fileUtils.checkExsistFile(imageUri, loadedBitmap);
         }
 
         private void initMaskedImageView(Bitmap loadedBitmap) {

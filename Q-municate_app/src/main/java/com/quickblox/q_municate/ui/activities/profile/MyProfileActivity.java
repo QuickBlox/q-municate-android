@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.q_municate.utils.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
@@ -29,10 +29,10 @@ import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.uihelpers.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate_core.utils.DialogUtils;
-import com.quickblox.q_municate.utils.ImageUtils;
+import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.utils.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.image.ReceiveUriScaledBitmapTask;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;

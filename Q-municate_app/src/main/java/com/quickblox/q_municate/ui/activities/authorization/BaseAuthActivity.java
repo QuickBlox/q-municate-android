@@ -14,7 +14,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
-import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -120,6 +120,7 @@ public class BaseAuthActivity extends BaseActivity {
     private void loginWithFacebook() {
         AppSession.getSession().closeAndClear();
         DataManager.getInstance().clearAllTables();
+        appSharedHelper.saveFirstAuth(true);
         appSharedHelper.saveSavedRememberMe(true);
         FacebookHelper.logout(); // clearing old data
         facebookHelper.loginWithFacebook();

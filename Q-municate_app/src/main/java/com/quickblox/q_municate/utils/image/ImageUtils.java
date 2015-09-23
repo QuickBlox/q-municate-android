@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.utils;
+package com.quickblox.q_municate.utils.image;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,6 +32,7 @@ import com.nostra13.universalimageloader.core.decode.ImageDecoder;
 import com.nostra13.universalimageloader.core.decode.ImageDecodingInfo;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.SizeUtility;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;

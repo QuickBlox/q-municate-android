@@ -22,7 +22,7 @@ import com.quickblox.q_municate.ui.fragments.main.NavigationDrawerFragment;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.ui.fragments.invitefriends.InviteFriendsFragment;
 import com.quickblox.q_municate.ui.fragments.settings.SettingsFragment;
-import com.quickblox.q_municate.utils.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;

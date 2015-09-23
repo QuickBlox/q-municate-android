@@ -12,7 +12,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
-import com.quickblox.q_municate.utils.ImageSource;
+import com.quickblox.q_municate.utils.image.ImageSource;
 
 public class ImageSourcePickDialogFragment extends DialogFragment {
 

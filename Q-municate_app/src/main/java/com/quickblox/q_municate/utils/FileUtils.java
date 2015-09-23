@@ -13,13 +13,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FileHelper {
+public class FileUtils {
 
     private File filesFolder;
     private static final String folderName = "/Q-municate";
     private static final String fileType = ".png";
 
-    public FileHelper() {
+    public FileUtils() {
         initFilesFolder();
     }
 

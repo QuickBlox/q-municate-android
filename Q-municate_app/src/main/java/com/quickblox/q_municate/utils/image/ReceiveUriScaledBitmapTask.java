@@ -1,9 +1,10 @@
-package com.quickblox.q_municate.utils;
+package com.quickblox.q_municate.utils.image;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.io.File;
