@@ -61,7 +61,8 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
                 viewHolder.nameTextView.setText(opponentUser.getFullName());
                 displayAvatarImage(opponentUser.getAvatar(), viewHolder.avatarImageView);
             } else {
-                viewHolder.nameTextView.setText("");
+                viewHolder.nameTextView.setText(resources.getString(R.string.deleted_user));
+                dataManager.getDialogDataManager().deleteById(dialog.getDialogId());
             }
         } else {
             viewHolder.nameTextView.setText(dialog.getTitle());
@@ -93,11 +94,12 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
         String lastMessage = "";
 
         if (message == null && dialogNotification != null) {
-            lastMessage = dialogNotification.getBody();
+            lastMessage = resources.getString(R.string.cht_notification_message);
         } else if (dialogNotification == null && message != null) {
             lastMessage = message.getBody();
         } else if (message != null && dialogNotification != null) {
-            lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate() ? message.getBody() : dialogNotification.getBody();
+            lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate()
+                    ? message.getBody() : resources.getString(R.string.cht_notification_message);
         }
 
         return lastMessage;

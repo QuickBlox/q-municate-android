@@ -274,7 +274,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected void onPause() {
         super.onPause();
 
-        onUpdateChatDialog();
         hideSmileLayout();
 
         // TODO: now it is possible only for Private chats
@@ -585,8 +584,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
-
-    protected abstract void onUpdateChatDialog();
 
     protected abstract void onFileSelected(Uri originalUri);
 

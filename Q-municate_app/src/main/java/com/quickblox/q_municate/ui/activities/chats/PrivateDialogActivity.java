@@ -136,10 +136,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onUpdateChatDialog() {
-    }
-
-    @Override
     protected void onFileSelected(Uri originalUri) {
         Bitmap bitmap = imageUtils.getBitmap(originalUri);
         new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);

@@ -89,10 +89,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
-    protected void onUpdateChatDialog() {
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (GroupDialogDetailsActivity.UPDATE_DIALOG_REQUEST_CODE == requestCode && GroupDialogDetailsActivity.RESULT_LEAVE_GROUP == resultCode) {
             finish();

@@ -22,7 +22,7 @@ public class User implements Serializable {
             id = true,
             unique = true,
             columnName = ID)
-    private Integer userId;
+    private int userId;
 
     @DatabaseField(
             foreign = true,
@@ -73,16 +73,20 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public Role getRole() {
         return role;
     }
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 
     public String getLogin() {
@@ -104,12 +108,12 @@ public class User implements Serializable {
 
         User user = (User) object;
 
-        return userId.equals(user.getUserId());
+        return userId == user.getUserId();
     }
 
     @Override
     public int hashCode() {
-        return userId.hashCode();
+        return userId;
     }
 
     @Override
@@ -139,14 +143,6 @@ public class User implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public String getPhone() {

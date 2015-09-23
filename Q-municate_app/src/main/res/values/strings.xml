@@ -254,5 +254,6 @@
     <string name="ignore_content_description">ignored</string>
     <string name="coming_soon">Coming soon…</string>
     <string name="search_at_last_items">Enter more symbols, not less than 3</string>
+    <string name="deleted_user">DELETED USER</string>
 
 </resources>

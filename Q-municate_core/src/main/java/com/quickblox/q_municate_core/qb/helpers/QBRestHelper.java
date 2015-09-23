@@ -34,8 +34,8 @@ public class QBRestHelper extends BaseHelper {
 
     public Collection<User> loadUsers(Collection<Integer> usersIdsList) throws QBResponseException {
         QBPagedRequestBuilder requestBuilder = new QBPagedRequestBuilder();
-        requestBuilder.setPage(ConstsCore.FL_FRIENDS_PAGE_NUM);
-        requestBuilder.setPerPage(ConstsCore.FL_FRIENDS_PER_PAGE);
+        requestBuilder.setPage(ConstsCore.USERS_PAGE_NUM);
+        requestBuilder.setPerPage(ConstsCore.USERS_PER_PAGE);
         Collection<QBUser> usersList = QBUsers.getUsersByIDs(usersIdsList, requestBuilder, new Bundle());
         Collection<User> usersListResult = UserFriendUtils.createUsersList(usersList);
         return usersListResult;

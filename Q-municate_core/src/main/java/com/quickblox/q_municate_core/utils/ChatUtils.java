@@ -206,7 +206,7 @@ public class ChatUtils {
 
     private static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, State state) {
         Message message = new Message();
-        message.setMessageId(dialogOccupant.getDialog().getDialogId() + String.valueOf(messageId));
+        message.setMessageId(messageId + String.valueOf(messageId));
         message.setDialogOccupant(dialogOccupant);
         message.setState(state);
         message.setBody(body);
