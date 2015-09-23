@@ -8,15 +8,14 @@
     </style>
 
     <style name="ButtonStyle" parent="Widget.AppCompat.Button">
-        <item name="android:background">@drawable/button_general_selector</item>
+        <item name="android:background">@drawable/selector_button_general</item>
         <item name="android:layout_width">wrap_content</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/text_dark</item>
     </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:textColor">@color/black</item>
-        <item name="android:textColorHint">@color/dark_gray</item>
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:textColorHint">@color/text_light_dark</item>
     </style>
 
     <style name="EmojiTabImageButtonStyle" parent="android:Widget.ImageButton">
@@ -34,42 +33,42 @@
         <item name="android:src">@drawable/placeholder_user</item>
     </style>
 
-    <style name="DoneCancelBar">
+    <style name="StaticActionModeStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/action_bar_height</item>
         <item name="android:orientation">horizontal</item>
-        <item name="android:divider">@drawable/ic_action_divider</item>
+        <item name="android:divider">@drawable/divider_static_action_mode</item>
         <item name="android:showDividers" tools:ignore="NewApi">middle</item>
         <item name="android:dividerPadding" tools:ignore="NewApi">12dp</item>
-        <item name="android:background">@color/action_button_bar</item>
+        <item name="android:background">@color/static_action_mode_background</item>
     </style>
 
-    <style name="ActionButtonStyle">
+    <style name="StaticActionModeButtonStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:background">@drawable/action_selectable_background</item>
+        <item name="android:background">@drawable/selector_static_action_mode</item>
     </style>
 
-    <style name="ActionButtonTextStyle">
+    <style name="StaticActionModeButtonTextStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:paddingRight">20dp</item> <!-- Offsets left drawable -->
         <item name="android:drawablePadding">8dp</item>
-        <item name="android:textColor">@color/action_button_text</item>
+        <item name="android:textColor">@color/static_action_mode_button_text</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">13sp</item>
     </style>
 
-    <style name="ActionButtonTextStyle.Done">
+    <style name="StaticActionModeButtonTextStyle.Done">
         <item name="android:drawableLeft">@drawable/ic_action_done_dark</item>
         <item name="android:text">@string/dlg_done</item>
     </style>
 
-    <style name="ActionButtonTextStyle.Cancel">
-        <item name="android:drawableLeft">@drawable/ic_action_cancel</item>
+    <style name="StaticActionModeButtonTextStyle.Cancel">
+        <item name="android:drawableLeft">@drawable/ic_action_cancel_dark</item>
         <item name="android:text">@string/dlg_cancel</item>
     </style>
 
@@ -87,6 +86,27 @@
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
         <item name="android:background">@drawable/selector_contacts_mode_tab</item>
+    </style>
+
+    <style name="TextViewDrawableStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:drawablePadding">15dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
+    <style name="TextViewLinkStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_light_dark</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
     </style>
 
 </resources>

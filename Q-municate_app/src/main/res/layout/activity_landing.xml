@@ -2,78 +2,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_image"
+    android:background="@color/bg_main"
     android:orientation="vertical">
 
     <ImageView
-        android:id="@+id/logo_full_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="5dp"
+        android:layout_above="@+id/label_1_textview"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_full" />
-
-    <RelativeLayout
-        android:id="@+id/facebook_connect_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_fb_height"
-        android:layout_above="@+id/sign_up_email_button"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_connect_facebook_selector">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:drawableLeft="@drawable/ic_fb"
-            android:drawablePadding="10dp"
-            android:gravity="center"
-            android:text="@string/lnd_connect_with_facebook"
-            android:textColor="@color/white"
-            android:textSize="@dimen/button_text_size" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/sign_up_email_button"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height"
-        android:layout_above="@+id/login_button"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/button_sign_up_green_selector"
-        android:clickable="true"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@string/lnd_sign_up"
-            android:textColor="@color/white"
-            android:textSize="@dimen/button_text_size" />
-
-    </RelativeLayout>
+        android:src="@drawable/logo_splash" />
 
     <TextView
-        android:id="@+id/login_button"
+        android:id="@+id/label_1_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/lnd_q_municate"
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/text_size_xxxlarge" />
+
+    <TextView
+        android:id="@+id/label_2_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/label_1_textview"
+        android:layout_centerInParent="true"
+        android:text="@string/lnd_your_own_chat"
+        android:textColor="@color/accent"
+        android:textSize="@dimen/text_size_large" />
+
+    <TextView
+        style="@style/TextViewDrawableStyle"
+        android:id="@+id/facebook_connect_button"
+        android:layout_width="@dimen/button_landing_width"
+        android:layout_above="@+id/sign_up_email_button"
+        android:layout_centerInParent="true"
+        android:background="@drawable/selector_button_connect_facebook"
+        android:drawableLeft="@drawable/ic_fb"
+        android:text="@string/lnd_connect_with_facebook" />
+
+    <Button
+        android:id="@+id/sign_up_email_button"
+        android:layout_width="@dimen/button_landing_width"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/login_button"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/selector_button_light_gray"
+        android:padding="10dp"
+        android:text="@string/lnd_sign_up"
+        android:textColor="@color/text_light_dark"
+        android:textSize="@dimen/text_size" />
+
+    <TextView
+        style="@style/TextViewLinkStyle"
+        android:id="@+id/login_button"
         android:layout_above="@+id/app_version_textview"
         android:layout_centerInParent="true"
-        android:layout_gravity="center"
-        android:layout_margin="10dp"
-        android:background="@drawable/button_general_selector"
-        android:clickable="true"
-        android:padding="10dp"
-        android:gravity="center"
-        android:text="@string/lnd_have_account"
-        android:textColor="@color/gray"
-        android:textSize="@dimen/button_text_size" />
+        android:layout_marginTop="10dp"
+        android:text="@string/lnd_have_account" />
 
     <TextView
         android:id="@+id/app_version_textview"
@@ -81,8 +70,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
         android:textColor="@color/gray"
-        android:textSize="8sp"
-        tools:text="1-1-1" />
+        android:textSize="10sp"
+        tools:text="1.1.1" />
 
 </RelativeLayout>

@@ -2,10 +2,10 @@ package com.quickblox.q_municate.ui.activities.changepassword;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
@@ -32,10 +32,8 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     EditText newPasswordEditText;
 
     private ValidationUtils validationUtils;
-    private Resources resources;
     private QBUser user;
     private String oldPasswordText;
-    private String newPasswordText;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ChangePasswordActivity.class);
@@ -63,7 +61,6 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     }
 
     private void initFields() {
-        resources = getResources();
         canPerformLogout.set(false);
         user = AppSession.getSession().getUser();
         validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
@@ -74,10 +71,20 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 navigateToParent();
+                return true;
+            case R.id.action_done:
+                changePassword();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -116,9 +123,9 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         removeActions();
     }
 
-    public void changePasswordOnClickListener(View view) {
+    private void changePassword() {
         oldPasswordText = oldPasswordEditText.getText().toString();
-        newPasswordText = newPasswordEditText.getText().toString();
+        String newPasswordText = newPasswordEditText.getText().toString();
         if (validationUtils.isValidChangePasswordData(oldPasswordText, newPasswordText)) {
             updatePasswords(oldPasswordText, newPasswordText);
             showProgress();
@@ -192,10 +199,14 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            hideProgress();
-            DialogUtils.showLong(ChangePasswordActivity.this, exception.getMessage());
+            if (exception != null) {
+                DialogUtils.showLong(ChangePasswordActivity.this, exception.getMessage());
+            }
+
             updatePasswords(oldPasswordText, oldPasswordText);
             clearFieldNewPassword();
+
+            hideProgress();
         }
     }
 }

@@ -3,7 +3,6 @@
     <item
         android:id="@+id/action_search"
         android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/ic_action_search"
         android:title="@string/acb_search_title"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always"/>

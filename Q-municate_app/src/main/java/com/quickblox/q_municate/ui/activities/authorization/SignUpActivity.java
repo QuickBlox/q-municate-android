@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -42,7 +44,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     @Bind(R.id.password_edittext)
     EditText passwordEditText;
 
-    @Bind(R.id.fullname_edittext)
+    @Bind(R.id.full_name_edittext)
     EditText fullNameEditText;
 
     @Bind(R.id.avatar_imageview)
@@ -93,6 +95,27 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_done:
+                signUp();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         addActions();
@@ -125,17 +148,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
         } else if (resultCode == Crop.RESULT_ERROR) {
             DialogUtils.showLong(this, Crop.getError(result).getMessage());
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -175,8 +187,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         imageUtils.getImage();
     }
 
-    @OnClick(R.id.sign_up_email_button)
-    public void signUp(View view) {
+    private void signUp() {
         loginType = LoginType.EMAIL;
 
         String fullNameText = fullNameEditText.getText().toString();

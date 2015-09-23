@@ -1,4 +1,5 @@
 <resources>
+
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
@@ -8,7 +9,7 @@
     <dimen name="button_text_size">18sp</dimen>
     <dimen name="button_icon_margin">10dp</dimen>
 
-    <dimen name="button_fb_height">70dp</dimen>
+    <dimen name="button_landing_width">300dp</dimen>
 
     <dimen name="divider_height">1dip</dimen>
     <dimen name="divider_width">1dip</dimen>
@@ -16,6 +17,9 @@
     <dimen name="text_size_small">15sp</dimen>
     <dimen name="text_size">18sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="text_size_xxlarge">28sp</dimen>
+    <dimen name="text_size_xxxlarge">42sp</dimen>
 
     <dimen name="image_view_small_avatar_layout_width">53dp</dimen>
     <dimen name="image_view_small_avatar_layout_height">53dp</dimen>
@@ -35,7 +39,7 @@
 
     <dimen name="tip_height">250dp</dimen>
 
-    <dimen name="corners_small_value">5dp</dimen>
+    <dimen name="corners_small_value">3dp</dimen>
     <dimen name="corners_middle_value">10dp</dimen>
     <dimen name="corners_big_value">15dp</dimen>
 

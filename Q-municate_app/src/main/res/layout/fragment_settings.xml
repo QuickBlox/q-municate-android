@@ -10,7 +10,7 @@
         android:id="@+id/profile_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_general_selector"
+        android:background="@drawable/selector_button_general"
         android:gravity="left"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"
@@ -19,13 +19,15 @@
 
     <include layout="@layout/view_separator_gray" />
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/push_notification_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="14dp"
-        android:paddingTop="14dp"
+        android:layout_marginTop="15dp"
+        android:paddingBottom="15dp"
+        android:textAllCaps="true"
         android:text="@string/stn_push_notifivation"
+        android:textColor="@color/text_dark"
         android:textSize="@dimen/text_size" />
 
     <LinearLayout
@@ -40,7 +42,7 @@
             android:id="@+id/change_password_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_general_selector"
+            android:background="@drawable/selector_button_general"
             android:gravity="left"
             android:paddingBottom="14dp"
             android:paddingTop="14dp"
@@ -54,7 +56,7 @@
         android:id="@+id/logout_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_general_selector"
+        android:background="@drawable/selector_button_general"
         android:gravity="left"
         android:paddingBottom="14dp"
         android:paddingTop="14dp"

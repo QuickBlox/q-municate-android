@@ -39,6 +39,6 @@
         android:layout_height="74dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:background="@drawable/button_general_selector"
-        android:src="@drawable/ic_add_friend" />
+        android:background="@drawable/selector_button_general"
+        android:src="@drawable/ic_action_add_user_dark" />
 </RelativeLayout>

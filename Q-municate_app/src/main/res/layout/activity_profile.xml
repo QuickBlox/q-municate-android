@@ -34,7 +34,7 @@
                     android:id="@+id/change_avatar_linearlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_general_selector"
+                    android:background="@drawable/selector_button_general"
                     android:clickable="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -68,7 +68,7 @@
                     android:id="@+id/email_linearlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_general_selector"
+                    android:background="@drawable/selector_button_general"
                     android:orientation="vertical"
                     android:paddingTop="15dp">
 
@@ -107,12 +107,12 @@
                     android:id="@+id/change_fullname_relativelayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_general_selector"
+                    android:background="@drawable/selector_button_general"
                     android:clickable="true"
                     android:paddingTop="5dp">
 
                     <EditText
-                        android:id="@+id/fullname_edittext"
+                        android:id="@+id/full_name_edittext"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
@@ -133,7 +133,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:background="@drawable/button_general_selector"
+                        android:background="@drawable/selector_button_general"
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"
@@ -154,7 +154,7 @@
                     android:id="@+id/change_phone_relativelayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_general_selector"
+                    android:background="@drawable/selector_button_general"
                     android:clickable="true"
                     android:paddingTop="5dp">
 
@@ -181,7 +181,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:background="@drawable/button_general_selector"
+                        android:background="@drawable/selector_button_general"
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"
@@ -202,7 +202,7 @@
                     android:id="@+id/change_status_relativelayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_general_selector"
+                    android:background="@drawable/selector_button_general"
                     android:clickable="true"
                     android:paddingTop="5dp">
 
@@ -227,7 +227,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
-                        android:background="@drawable/button_general_selector"
+                        android:background="@drawable/selector_button_general"
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"

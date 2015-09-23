@@ -60,7 +60,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.main.MainActivity"
-            android:icon="@drawable/actionbar_logo"
             android:screenOrientation="portrait">
         </activity>
         <activity

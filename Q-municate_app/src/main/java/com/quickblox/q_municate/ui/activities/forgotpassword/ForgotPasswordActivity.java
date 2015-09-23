@@ -2,10 +2,10 @@ package com.quickblox.q_municate.ui.activities.forgotpassword;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
@@ -17,11 +17,14 @@ import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
+import butterknife.Bind;
+
 public class ForgotPasswordActivity extends BaseActivity {
 
-    private EditText emailEditText;
+    @Bind(R.id.email_edittext)
+    EditText emailEditText;
+
     private ValidationUtils validationUtils;
-    private Resources resources;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ForgotPasswordActivity.class);
@@ -34,11 +37,10 @@ public class ForgotPasswordActivity extends BaseActivity {
 
         setContentView(R.layout.activity_forgot_password);
 
+        activateButterKnife();
+
         initActionBar();
-
-        resources = getResources();
-
-        initUI();
+        iniFields();
 
         addActions();
     }
@@ -49,13 +51,16 @@ public class ForgotPasswordActivity extends BaseActivity {
         setActionBarUpButtonEnabled(true);
     }
 
-    public void forgotPasswordOnClickListener(View view) {
-        KeyboardUtils.hideKeyboard(this);
-        String emailText = emailEditText.getText().toString();
-        if (validationUtils.isValidForgotPasswordData(emailText)) {
-            showProgress();
-            QBResetPasswordCommand.start(this, emailText);
-        }
+    private void iniFields() {
+        validationUtils = new ValidationUtils(this, new EditText[]{emailEditText},
+                new String[]{getString(R.string.fpw_not_email_field_entered)});
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -64,20 +69,40 @@ public class ForgotPasswordActivity extends BaseActivity {
             case android.R.id.home:
                 navigateToParent();
                 return true;
+            case R.id.action_done:
+                forgotPassword();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void initUI() {
-        emailEditText = _findViewById(R.id.email_edittext);
-        validationUtils = new ValidationUtils(this, new EditText[]{emailEditText},
-                new String[]{getString(R.string.fpw_not_email_field_entered)});
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
+    }
+
+    private void forgotPassword() {
+        KeyboardUtils.hideKeyboard(this);
+        String emailText = emailEditText.getText().toString();
+        if (validationUtils.isValidForgotPasswordData(emailText)) {
+            showProgress();
+            QBResetPasswordCommand.start(this, emailText);
+        }
     }
 
     private void addActions() {
         addAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION, new ResetPasswordSuccessAction());
         addAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION, new ResetPasswordFailAction());
+
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.RESET_PASSWORD_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.RESET_PASSWORD_FAIL_ACTION);
+
         updateBroadcastActionList();
     }
 
@@ -97,8 +122,11 @@ public class ForgotPasswordActivity extends BaseActivity {
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
+            if (exception != null) {
+                emailEditText.setError(exception.getMessage());
+            }
+
             hideProgress();
-            emailEditText.setError(exception.getMessage());
         }
     }
 }

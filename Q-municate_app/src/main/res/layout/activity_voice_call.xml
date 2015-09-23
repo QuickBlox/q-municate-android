@@ -65,7 +65,7 @@
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_gravity="center|left"
-                android:background="@drawable/button_dynamic_selector" />
+                android:background="@drawable/selector_button_dynamic" />
 
             <ImageButton
                 android:id="@+id/stopСallButton"
@@ -74,7 +74,7 @@
                 android:layout_width="0dp"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_weight="1"
-                android:background="@drawable/button_end_call_selector"
+                android:background="@drawable/selector_button_end_call"
                 android:src="@drawable/ic_encall" />
 
             <ToggleButton
@@ -83,7 +83,7 @@
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_gravity="center|right"
-                android:background="@drawable/button_microphone_selector" />
+                android:background="@drawable/selector_button_microphone" />
         </LinearLayout>
 
     </RelativeLayout>

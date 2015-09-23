@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/bg_main" >
 
     <include layout="@layout/toolbar" />
 
@@ -14,7 +15,7 @@
         android:padding="20dp">
 
         <EditText
-            android:id="@+id/fullname_edittext"
+            android:id="@+id/full_name_edittext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sup_fullname_hint"
@@ -44,8 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:background="@drawable/button_general_selector"
+            android:background="@drawable/selector_button_general"
             android:clickable="true"
             android:orientation="horizontal">
 
@@ -63,32 +63,17 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="5dp"
                 android:text="@string/sup_choose_user_picture"
-                android:textColor="@color/gray"
+                android:textColor="@color/text_dark"
                 android:textSize="18sp" />
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/sign_up_email_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/button_sign_up_blue_selector"
-            android:text="@string/sup_sign_up"
-            android:textColor="@color/white"
-            android:textSize="@dimen/button_text_size" />
-
         <TextView
+            style="@style/TextViewLinkStyle"
             android:id="@+id/user_agreement_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:background="@drawable/button_general_selector"
-            android:clickable="true"
-            android:gravity="center"
-            android:text="@string/uag_user_agreement"
-            android:textColor="@color/gray"
-            android:textSize="@dimen/text_size_small" />
+            android:layout_gravity="center"
+            android:text="@string/uag_user_agreement" />
 
     </LinearLayout>
 

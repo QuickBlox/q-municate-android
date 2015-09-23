@@ -68,7 +68,7 @@
                 android:layout_centerInParent="true"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:background="@drawable/button_red_oval_selector"
+                android:background="@drawable/selector_button_red_oval"
                 android:src="@drawable/ic_encall" />
 
             <ImageButton
@@ -80,8 +80,8 @@
                 android:layout_gravity="center|right"
                 android:layout_margin="5dp"
                 android:layout_weight="1"
-                android:background="@drawable/button_green_oval_selector"
-                android:src="@drawable/ic_call" />
+                android:background="@drawable/selector_button_green_oval"
+                android:src="@drawable/ic_action_call_white" />
 
 
         </LinearLayout>

@@ -1,6 +1,18 @@
-<android.support.v7.widget.Toolbar
-    android:id="@+id/toolbar"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/ToolbarStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="top"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        style="@style/ToolbarStyle"
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="@drawable/shadow_toolbar" />
+
+</LinearLayout>

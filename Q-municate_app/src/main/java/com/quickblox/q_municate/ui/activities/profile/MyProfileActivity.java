@@ -107,7 +107,7 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
         changePhoneRelativeLayout = _findViewById(R.id.change_phone_relativelayout);
         changeStatusRelativeLayout = _findViewById(R.id.change_status_relativelayout);
         emailTextView = _findViewById(R.id.email_textview);
-        fullNameEditText = _findViewById(R.id.fullname_edittext);
+        fullNameEditText = _findViewById(R.id.full_name_edittext);
         phoneEditText = _findViewById(R.id.phone_edittext);
         statusEditText = _findViewById(R.id.status_edittext);
     }

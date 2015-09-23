@@ -26,7 +26,7 @@
         <ImageButton
             android:id="@+id/emoji_tab_objects_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
-            android:src="@drawable/ic_alert" />
+            android:src="@drawable/ic_alert_white" />
 
         <ImageButton
             android:id="@+id/emoji_tab_cars_imagebutton"
@@ -42,7 +42,7 @@
             android:id="@+id/emojis_backspace_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
             android:background="@color/dark_gray"
-            android:src="@drawable/ic_backspace" />
+            android:src="@drawable/ic_backspace_white" />
 
     </LinearLayout>
 

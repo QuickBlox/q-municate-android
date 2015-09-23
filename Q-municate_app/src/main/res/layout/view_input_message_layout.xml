@@ -20,7 +20,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="2dp"
-        android:background="@drawable/button_general_selector"
+        android:background="@drawable/selector_button_general"
         android:onClick="sendMessageOnClick"
         android:padding="5dp"
         android:src="@drawable/ic_send_message" />
@@ -50,7 +50,7 @@
         android:layout_alignParentRight="false"
         android:layout_centerVertical="true"
         android:layout_marginTop="2dp"
-        android:background="@drawable/button_general_selector"
+        android:background="@drawable/selector_button_general"
         android:padding="5dp"
         android:src="@drawable/ic_smile" />
 

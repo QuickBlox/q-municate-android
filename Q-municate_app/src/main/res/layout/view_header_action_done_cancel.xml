@@ -1,18 +1,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/DoneCancelBar">
+    style="@style/StaticActionModeStyle">
 
     <FrameLayout
         android:id="@+id/action_cancel_view"
-        style="@style/ActionButtonStyle">
+        style="@style/StaticActionModeButtonStyle">
 
-        <TextView style="@style/ActionButtonTextStyle.Cancel" />
+        <TextView style="@style/StaticActionModeButtonTextStyle.Cancel" />
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/action_done_view"
-        style="@style/ActionButtonStyle">
+        style="@style/StaticActionModeButtonStyle">
 
-        <TextView style="@style/ActionButtonTextStyle.Done" />
+        <TextView style="@style/StaticActionModeButtonTextStyle.Done" />
     </FrameLayout>
 
 </LinearLayout>

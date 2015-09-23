@@ -31,6 +31,8 @@
     </string-array>
 
     // Landing
+    <string name="lnd_q_municate">Q-municate</string>
+    <string name="lnd_your_own_chat">Your own chat</string>
     <string name="lnd_connect_with_facebook">Connect with Facebook</string>
     <string name="lnd_have_account">Already have an account?</string>
     <string name="lnd_sign_up">Sign Up with Email</string>
@@ -49,8 +51,8 @@
     // Forgot Password
     <string name="fpw_forgot_password_title">Forgot Password</string>
     <string name="fpw_email">Email</string>
-    <string name="fpw_reset_password">Reset Password</string>
     <string name="fpw_not_email_field_entered">Please enter email</string>
+    <string name="fpw_label">Enter your email and we\'ll send a link to reset your password</string>
     <string name="fpw_email_was_sent">Mail was sent to %1$s</string>
 
     // Sing Up
@@ -61,7 +63,7 @@
 
     // User Agreement
     <string name="uag_user_agreement_title">User Agreement</string>
-    <string name="uag_user_agreement">By clicking Sign Up, you agree to \nQ-municate <b><u>User Agreement</u></b></string>
+    <string name="uag_user_agreement">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
     <string name="uag_policy_link">http://q-municate.com/agreement/</string>
 
     // Friend List

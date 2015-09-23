@@ -3,9 +3,11 @@ package com.quickblox.q_municate.ui.activities.authorization;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
@@ -26,8 +28,8 @@ public class LoginActivity extends BaseAuthActivity {
     @Bind(R.id.password_edittext)
     EditText passwordEditText;
 
-    @Bind(R.id.remember_me_checkbox)
-    CheckBox rememberMeCheckBox;
+    @Bind(R.id.remember_me_switch)
+    SwitchCompat rememberMeSwitch;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
@@ -58,7 +60,28 @@ public class LoginActivity extends BaseAuthActivity {
                 new String[]{
                 getString(R.string.dlg_not_email_field_entered),
                 getString(R.string.dlg_not_password_field_entered)});
-        rememberMeCheckBox.setChecked(true);
+        rememberMeSwitch.setChecked(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_done:
+                login();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -67,13 +90,17 @@ public class LoginActivity extends BaseAuthActivity {
         finish();
     }
 
-    @OnCheckedChanged(R.id.remember_me_checkbox)
+    @OnCheckedChanged(R.id.remember_me_switch)
     public void rememberMeCheckedChanged(boolean checked) {
         appSharedHelper.saveSavedRememberMe(checked);
     }
 
-    @OnClick(R.id.login_button)
-    public void login(View view) {
+    @OnClick(R.id.forgot_password_textview)
+    public void forgotPassword(View view) {
+        ForgotPasswordActivity.start(this);
+    }
+
+    private void login() {
         loginType = LoginType.EMAIL;
 
         String userEmail = emailEditText.getText().toString();
@@ -88,27 +115,6 @@ public class LoginActivity extends BaseAuthActivity {
             }
 
             login(userEmail, userPassword);
-        }
-    }
-
-    @OnClick(R.id.facebook_connect_button)
-    public void facebookConnect(View view) {
-        facebookConnect();
-    }
-
-    @OnClick(R.id.forgot_password_textview)
-    public void forgotPassword(View view) {
-        ForgotPasswordActivity.start(this);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 }

@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/button_height"
             android:layout_marginTop="10dp"
-            android:background="@drawable/button_green_oval_selector"
+            android:background="@drawable/selector_button_green_oval"
             android:text="@string/fdb_write_email"
             android:textColor="@android:color/white"
             android:textSize="@dimen/button_text_size" />

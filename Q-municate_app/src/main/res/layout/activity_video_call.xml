@@ -34,7 +34,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|left"
-                android:background="@drawable/button_general_selector"
+                android:background="@drawable/selector_button_general"
                 android:padding="5dp"
                 android:enabled="false"
                 android:visibility="invisible"
@@ -46,7 +46,7 @@
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_centerInParent="true"
                 android:layout_weight="1"
-                android:background="@drawable/button_general_selector"
+                android:background="@drawable/selector_button_general"
                 android:src="@drawable/ic_call_mute" />
 
             <ToggleButton
@@ -55,7 +55,7 @@
                 android:layout_width="@dimen/act_call_end_button_height"
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_gravity="center|right"
-                android:background="@drawable/button_microphone_selector"
+                android:background="@drawable/selector_button_microphone"
                 android:padding="5dp" />
         </LinearLayout>
     </RelativeLayout>

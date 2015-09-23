@@ -39,7 +39,7 @@
         android:layout_height="@dimen/chat_button_reply_height"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
-        android:background="@drawable/button_blue_selector"
+        android:background="@drawable/selector_button_general"
         android:text="@string/go"
         android:textColor="@color/white"
         android:textSize="@dimen/button_text_size" />

@@ -1,12 +1,12 @@
 package com.quickblox.q_municate.ui.fragments.settings;
 
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -28,7 +28,7 @@ import com.quickblox.q_municate_core.utils.Utils;
 public class SettingsFragment extends BaseFragment {
 
     private Button profileButton;
-    private Switch pushNotificationSwitch;
+    private SwitchCompat pushNotificationSwitch;
     private Button changePasswordButton;
     private Button logoutButton;
     private TextView versionView;
@@ -66,7 +66,7 @@ public class SettingsFragment extends BaseFragment {
 
     private void initUI(View rootView) {
         profileButton = (Button) rootView.findViewById(R.id.profile_button);
-        pushNotificationSwitch = (Switch) rootView.findViewById(R.id.push_notification_switch);
+        pushNotificationSwitch = (SwitchCompat) rootView.findViewById(R.id.push_notification_switch);
         changePasswordButton = (Button) rootView.findViewById(R.id.change_password_button);
         logoutButton = (Button) rootView.findViewById(R.id.logout_button);
         versionView = (TextView) rootView.findViewById(R.id.version_textview);

@@ -50,7 +50,7 @@ public class IncomingCallFragment extends BaseFragment implements View.OnClickLi
         friend = (User) getArguments().getSerializable(ConstsCore.EXTRA_FRIEND);
         boolean isVideoCall = com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO.equals(callType);
         ((ImageButton) rootView.findViewById(R.id.acceptCallButton)).setImageResource(
-                isVideoCall ? R.drawable.ic_video : R.drawable.ic_call);
+                isVideoCall ? R.drawable.ic_video : R.drawable.ic_action_call_white);
         ((TextView) rootView.findViewById(R.id.callTextView)).setText(
                 isVideoCall ? R.string.cll_incoming_call_video : R.string.cll_incoming_call_audio);
         ((TextView) rootView.findViewById(R.id.name_textview)).setText(friend.getFullName());

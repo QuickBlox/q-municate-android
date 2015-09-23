@@ -63,9 +63,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:background="@drawable/button_general_selector"
+        android:background="@drawable/selector_button_general"
         android:padding="10dp"
-        android:src="@drawable/ic_add_friend"
+        android:src="@drawable/ic_action_add_user_dark"
         android:visibility="gone" />
 
 </RelativeLayout>

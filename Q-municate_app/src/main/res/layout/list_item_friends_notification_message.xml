@@ -44,7 +44,7 @@
                 android:id="@+id/reject_friend_imagebutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_general_selector"
+                android:background="@drawable/selector_button_general"
                 android:padding="10dp"
                 android:src="@drawable/ic_friend_reject" />
 
@@ -59,7 +59,7 @@
                 android:id="@+id/accept_friend_imagebutton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/button_general_selector"
+                android:background="@drawable/selector_button_general"
                 android:padding="10dp"
                 android:src="@drawable/ic_friend_accept" />
         </LinearLayout>
