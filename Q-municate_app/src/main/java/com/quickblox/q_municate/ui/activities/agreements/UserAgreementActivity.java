@@ -23,7 +23,6 @@ public class UserAgreementActivity extends BaseActivity {
         setContentView(R.layout.activity_user_agreement);
 
         initActionBar();
-
         initUserAgreementWebView();
     }
 

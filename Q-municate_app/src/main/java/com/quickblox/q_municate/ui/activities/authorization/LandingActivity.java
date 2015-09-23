@@ -1,13 +1,14 @@
 package com.quickblox.q_municate.ui.activities.authorization;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.utils.Utils;
 
@@ -50,13 +51,15 @@ public class LandingActivity extends BaseAuthActivity {
         loginType = LoginType.EMAIL;
 
         if (!appSharedHelper.isShownUserAgreement()) {
-            showUserAgreement(new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    appSharedHelper.saveShownUserAgreement(true);
-                    startSignUpActivity();
-                }
-            }, null);
+            UserAgreementDialogFragment
+                    .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            appSharedHelper.saveShownUserAgreement(true);
+                            startSignUpActivity();
+                        }
+                    });
         } else {
             startSignUpActivity();
         }

@@ -1,18 +1,18 @@
 package com.quickblox.q_municate.ui.activities.authorization;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialog;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
+import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
 import com.quickblox.q_municate.utils.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
@@ -103,13 +103,15 @@ public class BaseAuthActivity extends BaseActivity {
         loginType = LoginType.FACEBOOK;
 
         if (!appSharedHelper.isShownUserAgreement()) {
-            showUserAgreement(new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    appSharedHelper.saveShownUserAgreement(true);
-                    loginWithFacebook();
-                }
-            }, null);
+            UserAgreementDialogFragment
+                    .show(getSupportFragmentManager(), new MaterialDialog.ButtonCallback() {
+                                @Override
+                                public void onPositive(MaterialDialog dialog) {
+                                    super.onPositive(dialog);
+                                    appSharedHelper.saveShownUserAgreement(true);
+                                    loginWithFacebook();
+                                }
+                            });
         } else {
             loginWithFacebook();
         }
@@ -121,13 +123,6 @@ public class BaseAuthActivity extends BaseActivity {
         appSharedHelper.saveSavedRememberMe(true);
         FacebookHelper.logout(); // clearing old data
         facebookHelper.loginWithFacebook();
-    }
-
-    protected void showUserAgreement(DialogInterface.OnClickListener positiveClickListener,
-            DialogInterface.OnClickListener negativeClickListener) {
-        UserAgreementDialog userAgreementDialog = UserAgreementDialog.newInstance(positiveClickListener,
-                    negativeClickListener);
-        userAgreementDialog.show(getFragmentManager(), null);
     }
 
     protected void startMainActivity(QBUser user) {
