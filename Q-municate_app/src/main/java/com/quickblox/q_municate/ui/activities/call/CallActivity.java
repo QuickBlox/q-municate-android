@@ -177,7 +177,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
     private void notifyFriendOnCall(User friend) {
         // TODO temp
         //        if (!friend.isOnline()) {
-        //            String callMsg = getResources().getString(R.string.dlg_offline_call,
+        //            String callMsg = getString(R.string.dlg_offline_call,
         //                    AppSession.getSession().getUser().getFullName());
         //            QBSendPushCommand.start(this, callMsg, friend.getUserId());
         //        }

@@ -260,7 +260,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
         if (isFriend) {
             return true;
         } else {
-            DialogUtils.showLong(this, getResources().getString(R.string.dlg_user_is_not_friend));
+            DialogUtils.showLong(this, getString(R.string.dlg_user_is_not_friend));
             return false;
         }
     }

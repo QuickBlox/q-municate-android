@@ -54,9 +54,10 @@ public class LoginActivity extends BaseAuthActivity {
 
     private void initFields(Bundle bundle) {
         validationUtils = new ValidationUtils(LoginActivity.this,
-                new EditText[]{emailEditText, passwordEditText}, new String[]{resources.getString(
-                R.string.dlg_not_email_field_entered), resources.getString(
-                R.string.dlg_not_password_field_entered)});
+                new EditText[]{emailEditText, passwordEditText},
+                new String[]{
+                getString(R.string.dlg_not_email_field_entered),
+                getString(R.string.dlg_not_password_field_entered)});
         rememberMeCheckBox.setChecked(true);
     }
 

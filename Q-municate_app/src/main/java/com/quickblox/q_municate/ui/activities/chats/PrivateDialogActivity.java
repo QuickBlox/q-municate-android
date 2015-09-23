@@ -246,8 +246,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
                 opponentUser.getUserId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
-            DialogUtils.showLong(PrivateDialogActivity.this, getResources().getString(
-                    R.string.dlg_user_is_not_friend));
+            DialogUtils.showLong(PrivateDialogActivity.this, getString(R.string.dlg_user_is_not_friend));
             return true;
         }
         switch (item.getItemId()) {

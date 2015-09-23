@@ -67,8 +67,9 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         canPerformLogout.set(false);
         user = AppSession.getSession().getUser();
         validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
-                new String[]{resources.getString(R.string.cpw_not_old_password_field_entered), resources
-                        .getString(R.string.cpw_not_new_password_field_entered)}
+                new String[]{
+                        getString(R.string.cpw_not_old_password_field_entered),
+                        getString(R.string.cpw_not_new_password_field_entered)}
         );
     }
 

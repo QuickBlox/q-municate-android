@@ -72,7 +72,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     private void initUI() {
         emailEditText = _findViewById(R.id.email_edittext);
         validationUtils = new ValidationUtils(this, new EditText[]{emailEditText},
-                new String[]{resources.getString(R.string.fpw_not_email_field_entered)});
+                new String[]{getString(R.string.fpw_not_email_field_entered)});
     }
 
     private void addActions() {

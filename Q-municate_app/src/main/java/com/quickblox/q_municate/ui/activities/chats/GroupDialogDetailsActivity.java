@@ -216,8 +216,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 return true;
             case R.id.action_add:
                 if (!loadedDialogInfo) {
-                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getResources().getString(
-                            R.string.gdd_group_info_is_loading));
+                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getString(R.string.gdd_group_info_is_loading));
                 } else {
                     startAddFriendsActivity();
                 }
@@ -359,7 +358,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
         } else {
-            DialogUtils.showLong(this, getResources().getString(R.string.gdd_all_friends_is_in_group));
+            DialogUtils.showLong(this, getString(R.string.gdd_all_friends_is_in_group));
         }
     }
 

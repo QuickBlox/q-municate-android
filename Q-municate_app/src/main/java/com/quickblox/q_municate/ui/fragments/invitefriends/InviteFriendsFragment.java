@@ -211,7 +211,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         if (selectedContactsFriendsArray.length > ConstsCore.ZERO_INT_VALUE) {
             sendInviteToContacts();
         } else {
-            DialogUtils.showLong(baseActivity, getResources().getString(R.string.dlg_no_friends_selected));
+            DialogUtils.showLong(baseActivity, getString(R.string.dlg_no_friends_selected));
         }
 
         clearCheckedFriends();
@@ -250,7 +250,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             fromContactsButton.setClickable(true);
             counterContactsTextView.setVisibility(View.GONE);
             checkAllContactsFriendsCheckBox.setVisibility(View.GONE);
-            DialogUtils.showLong(getActivity(), getResources().getString(R.string.dlg_no_friends));
+            DialogUtils.showLong(getActivity(), getString(R.string.dlg_no_friends));
         }
     }
 

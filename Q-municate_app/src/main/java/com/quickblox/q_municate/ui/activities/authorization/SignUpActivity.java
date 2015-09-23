@@ -84,9 +84,10 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         imageUtils = new ImageUtils(this);
         validationUtils = new ValidationUtils(SignUpActivity.this,
                 new EditText[]{ fullNameEditText, emailEditText, passwordEditText },
-                new String[]{ resources.getString(R.string.dlg_not_fullname_field_entered), resources
-                        .getString(R.string.dlg_not_email_field_entered), resources.getString(
-                        R.string.dlg_not_password_field_entered) });
+                new String[]{
+                        getString(R.string.dlg_not_fullname_field_entered),
+                        getString(R.string.dlg_not_email_field_entered),
+                        getString(R.string.dlg_not_password_field_entered) });
         signUpSuccessAction = new SignUpSuccessAction();
         updateUserSuccessAction = new UpdateUserSuccessAction();
     }

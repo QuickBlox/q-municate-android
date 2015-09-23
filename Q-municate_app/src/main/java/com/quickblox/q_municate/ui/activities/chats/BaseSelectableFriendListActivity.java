@@ -81,7 +81,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         } else {
             startAction();
         }
-        actionMode.setTitle(getResources().getString(R.string.ndl_ac_mode_title) + ConstsCore.SPACE + valueCounter);
+        actionMode.setTitle(getString(R.string.ndl_ac_mode_title) + ConstsCore.SPACE + valueCounter);
     }
 
     private void startAction() {
