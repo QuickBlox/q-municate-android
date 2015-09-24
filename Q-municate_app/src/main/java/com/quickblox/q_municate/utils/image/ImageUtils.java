@@ -384,7 +384,7 @@ public class ImageUtils {
 
         private void addVideoIcon(Bitmap source) {
             Canvas canvas = new Canvas(source);
-            Bitmap icon = BitmapFactory.decodeResource(context.get().getResources(), R.drawable.video_icon);
+            Bitmap icon = BitmapFactory.decodeResource(context.get().getResources(), R.drawable.ic_play_video_dark);
 
             float left = (source.getWidth() / 2) - (icon.getWidth() / 2);
             float top = (source.getHeight() / 2) - (icon.getHeight() / 2);

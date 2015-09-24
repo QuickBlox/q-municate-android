@@ -409,7 +409,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     private void hideSmileLayout() {
         emojisFragment.setVisibility(View.GONE);
-        setSmilePanelIcon(R.drawable.ic_smile);
+        setSmilePanelIcon(R.drawable.ic_smile_dark);
     }
 
     private void showSmileLayout(int keyboardHeight) {
@@ -420,7 +420,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
             params.height = keyboardHeight;
             emojisFragment.setLayoutParams(params);
         }
-        setSmilePanelIcon(R.drawable.ic_keyboard);
+        setSmilePanelIcon(R.drawable.ic_keyboard_dark);
     }
 
     private boolean isGalleryCalled(int requestCode) {

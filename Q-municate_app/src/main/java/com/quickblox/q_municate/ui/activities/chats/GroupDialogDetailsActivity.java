@@ -553,7 +553,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            actionMode.getMenuInflater().inflate(R.menu.actionmode_done_menu, menu);
+            actionMode.getMenuInflater().inflate(R.menu.done_menu, menu);
             return true;
         }
 

@@ -14,7 +14,7 @@
         android:layout_marginRight="10dp"
         android:focusable="false" />
 
-    <include layout="@layout/list_item_dialog_friend"
+    <include layout="@layout/item_dialog_friend"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"

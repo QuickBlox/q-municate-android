@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_splash"
+        android:src="@drawable/app_logo"
         android:layout_centerInParent="true" />
 
     <ProgressBar

@@ -23,7 +23,7 @@
         android:background="@drawable/selector_button_general"
         android:onClick="sendMessageOnClick"
         android:padding="5dp"
-        android:src="@drawable/ic_send_message" />
+        android:src="@drawable/ic_send_message_dark" />
 
     <com.quickblox.q_municate.ui.views.emoji.EmojiEditText
         android:id="@+id/message_edittext"
@@ -52,6 +52,6 @@
         android:layout_marginTop="2dp"
         android:background="@drawable/selector_button_general"
         android:padding="5dp"
-        android:src="@drawable/ic_smile" />
+        android:src="@drawable/ic_smile_dark" />
 
 </RelativeLayout>

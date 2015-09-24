@@ -3,6 +3,6 @@
     <item
         android:id="@+id/action_next"
         android:title="@string/inf_send"
-        android:icon="@drawable/ic_action_done_dark"
+        android:icon="@drawable/ic_done_dark"
         app:showAsAction="ifRoom" />
 </menu>

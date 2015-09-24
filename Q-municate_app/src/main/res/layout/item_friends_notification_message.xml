@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/selector_button_general"
                 android:padding="10dp"
-                android:src="@drawable/ic_friend_reject" />
+                android:src="@drawable/ic_friend_reject_red" />
 
             <View
                 android:id="@+id/divider_view"
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/selector_button_general"
                 android:padding="10dp"
-                android:src="@drawable/ic_friend_accept" />
+                android:src="@drawable/ic_friend_accept_green" />
         </LinearLayout>
 
     </LinearLayout>

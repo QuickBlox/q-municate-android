@@ -19,7 +19,7 @@
         android:id="@+id/from_facebook_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/list_item_background_selector"
+        android:background="@drawable/selector_list_item"
         android:clickable="true"
         android:orientation="vertical">
 
@@ -69,7 +69,7 @@
         android:id="@+id/from_contacts_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/list_item_background_selector"
+        android:background="@drawable/selector_list_item"
         android:clickable="true"
         android:orientation="vertical">
 
@@ -84,7 +84,7 @@
                 android:layout_height="@dimen/inf_list_item_height"
                 android:layout_alignParentLeft="true"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_contacts" />
+                android:src="@drawable/ic_contacts_dark" />
 
             <TextView
                 android:id="@+id/from_contact_textview"

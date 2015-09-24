@@ -59,7 +59,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         friendsAdapter.setCounterChangedListener(this);
         friendsAdapter.setFriendListHelper(friendListHelper);
         friendsListView.setAdapter(friendsAdapter);
-        friendsListView.setSelector(R.drawable.list_item_background_selector);
+        friendsListView.setSelector(R.drawable.selector_list_item);
     }
 
     @Override
@@ -131,7 +131,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
 
         @Override
         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            actionMode.getMenuInflater().inflate(R.menu.actionmode_done_menu, menu);
+            actionMode.getMenuInflater().inflate(R.menu.done_menu, menu);
             return true;
         }
 

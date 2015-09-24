@@ -40,7 +40,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         User user = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_dialog_friend, null);
+            convertView = layoutInflater.inflate(R.layout.item_dialog_friend, null);
             viewHolder = new ViewHolder();
 
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);

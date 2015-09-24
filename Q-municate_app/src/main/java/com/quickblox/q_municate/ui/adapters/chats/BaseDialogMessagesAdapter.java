@@ -113,7 +113,7 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
 
         if (convertView == null) {
             holder = new HeaderViewHolder();
-            convertView = layoutInflater.inflate(R.layout.list_item_chat_sticky_header_date, parent, false);
+            convertView = layoutInflater.inflate(R.layout.item_chat_sticky_header_date, parent, false);
             holder.headerTextView = (TextView) convertView.findViewById(R.id.header_date_textview);
             convertView.setTag(holder);
         } else {

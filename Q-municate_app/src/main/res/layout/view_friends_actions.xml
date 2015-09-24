@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/selector_button_general"
         android:padding="10dp"
-        android:src="@drawable/ic_action_add_user_dark"
+        android:src="@drawable/ic_add_user_dark"
         android:visibility="gone" />
 
     <ImageView

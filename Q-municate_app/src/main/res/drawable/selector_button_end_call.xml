@@ -1,7 +1,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape>
-            <solid android:color="@color/button_end_call_normal_color" />
+            <solid android:color="@color/button_end_call_normal" />
             <corners
                 android:bottomLeftRadius="@dimen/corners_small_value"
                 android:bottomRightRadius="@dimen/corners_small_value"
@@ -11,7 +11,7 @@
     </item>
     <item android:state_pressed="true">
         <shape>
-            <solid android:color="@color/button_end_call_pressed_color" />
+            <solid android:color="@color/button_end_call_pressed" />
             <corners
                 android:bottomLeftRadius="@dimen/corners_small_value"
                 android:bottomRightRadius="@dimen/corners_small_value"

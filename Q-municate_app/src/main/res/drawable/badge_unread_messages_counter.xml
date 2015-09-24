@@ -1,5 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/badge_unread_messages_counter_color" />
+    <solid android:color="@color/badge_unread_messages_counter" />
     <corners
         android:bottomLeftRadius="12dp"
         android:bottomRightRadius="12dp"

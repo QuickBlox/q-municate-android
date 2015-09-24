@@ -2,17 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_attach"
-        android:icon="@drawable/ic_action_attach_white"
+        android:icon="@drawable/ic_attach_white"
         android:title="@string/acb_chat_attach_title"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_audio_call"
-        android:icon="@drawable/ic_action_call_white"
+        android:icon="@drawable/ic_friend_call_dark"
         android:title="@string/frd_audio_call"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_video_call"
-        android:icon="@drawable/ic_video"
+        android:icon="@drawable/ic_friend_video_dark"
         android:title="@string/frd_video_call"
         app:showAsAction="ifRoom" />
 </menu>

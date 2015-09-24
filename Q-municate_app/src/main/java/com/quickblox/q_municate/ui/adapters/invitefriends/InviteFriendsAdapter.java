@@ -40,7 +40,7 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
         final InviteFriend data = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_invite_friend, null);
+            convertView = layoutInflater.inflate(R.layout.item_invite_friend, null);
             viewHolder = new ViewHolder();
 
             viewHolder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
@@ -95,7 +95,7 @@ public class InviteFriendsAdapter extends BaseListAdapter<InviteFriend> {
     }
 
     private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.button_general_background_pressed_color) : resources.getColor(
+        return isSelect ? resources.getColor(R.color.button_general_pressed) : resources.getColor(
                 R.color.invite_friends_item);
     }
 

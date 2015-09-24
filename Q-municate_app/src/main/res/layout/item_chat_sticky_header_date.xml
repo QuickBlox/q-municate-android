@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/header_date_color"
+    android:background="@color/chat_header_date_background"
     android:alpha="0.9">
 
     <TextView
@@ -19,6 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/header_date_textview"
-        android:background="@color/chat_background_color" />
+        android:background="@color/chat_background" />
 
 </RelativeLayout>

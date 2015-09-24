@@ -3,7 +3,7 @@
     <item android:id="@android:id/background">
         <shape>
             <corners android:radius="10dip" />
-            <solid android:color="@color/chat_attach_background_color" />
+            <solid android:color="@color/chat_attach_background" />
         </shape>
     </item>
     <item android:id="@android:id/progress">

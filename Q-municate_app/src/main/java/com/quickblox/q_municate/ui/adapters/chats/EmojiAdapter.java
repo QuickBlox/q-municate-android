@@ -12,14 +12,14 @@ import com.quickblox.q_municate.ui.views.emoji.emojiTypes.EmojiObject;
 public class EmojiAdapter extends ArrayAdapter<EmojiObject> {
 
     public EmojiAdapter(Context context, EmojiObject[] data) {
-        super(context, R.layout.list_item_emoji, data);
+        super(context, R.layout.item_emoji, data);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            view = View.inflate(getContext(), R.layout.list_item_emoji, null);
+            view = View.inflate(getContext(), R.layout.item_emoji, null);
             ViewHolder holder = new ViewHolder();
             holder.iconTextView = (TextView) view.findViewById(R.id.emojicon_icon);
             view.setTag(holder);

@@ -53,7 +53,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         final User user = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_chat_friend_selectable, null);
+            convertView = layoutInflater.inflate(R.layout.item_chat_friend_selectable, null);
             viewHolder = new ViewHolder();
 
             viewHolder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
@@ -124,7 +124,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
     }
 
     private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.button_general_background_pressed_color) : resources.getColor(
+        return isSelect ? resources.getColor(R.color.button_general_pressed) : resources.getColor(
                 R.color.white);
     }
 

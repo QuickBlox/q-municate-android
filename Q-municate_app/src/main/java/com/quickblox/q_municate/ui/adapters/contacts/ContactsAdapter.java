@@ -48,7 +48,7 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
 
     @Override
     public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(this, layoutInflater.inflate(R.layout.list_item_friend, parent, false));
+        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend, parent, false));
     }
 
     @Override

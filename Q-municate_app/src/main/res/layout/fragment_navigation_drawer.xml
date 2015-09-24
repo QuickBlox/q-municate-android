@@ -43,6 +43,6 @@
             android:layout_gravity="right"
             android:background="@drawable/selector_button_general"
             android:padding="10dp"
-            android:src="@drawable/ic_logout" />
+            android:src="@drawable/ic_logout_dark" />
     </LinearLayout>
 </RelativeLayout>

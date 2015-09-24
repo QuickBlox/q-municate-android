@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.FriendOperationListener;
-import com.quickblox.q_municate.ui.adapters.chats.BaseDialogMessagesAdapter;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.views.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
@@ -77,9 +76,9 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
             if (combinationMessage.getNotificationType() == null) {
                 if (ownMessage) {
-                    view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
+                    view = layoutInflater.inflate(R.layout.item_message_own, null, true);
                 } else {
-                    view = layoutInflater.inflate(R.layout.list_item_private_message_opponent, null, true);
+                    view = layoutInflater.inflate(R.layout.item_private_message_opponent, null, true);
             }
 
             viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(
@@ -101,7 +100,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
 
             } else {
-                view = layoutInflater.inflate(R.layout.list_item_friends_notification_message, null, true);
+                view = layoutInflater.inflate(R.layout.item_friends_notification_message, null, true);
 
                 viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
                 viewHolder.timeTextMessageTextView = (TextView) view.findViewById(

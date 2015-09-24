@@ -68,7 +68,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <include layout="@layout/view_separator_blue" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <TextView
             android:id="@+id/status_textview"
@@ -81,7 +81,7 @@
             android:textColor="@color/black"
             android:textSize="@dimen/text_size" />
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <RelativeLayout
             android:id="@+id/phone_relativelayout"
@@ -114,7 +114,7 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <RelativeLayout
             android:id="@+id/video_call_button"
@@ -152,11 +152,11 @@
                     android:background="@drawable/selector_button_general"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:src="@drawable/ic_friends_video" />
+                    android:src="@drawable/ic_friend_video_dark" />
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <RelativeLayout
             android:id="@+id/voice_call_button"
@@ -195,11 +195,11 @@
                     android:background="@drawable/selector_button_general"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:src="@drawable/ic_friends_call" />
+                    android:src="@drawable/ic_friend_call_dark" />
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <RelativeLayout
             android:id="@+id/chat_button"
@@ -237,11 +237,11 @@
                     android:background="@null"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:src="@drawable/ic_friends_chat" />
+                    android:src="@drawable/ic_friend_chat_dark" />
             </LinearLayout>
         </RelativeLayout>
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
     </LinearLayout>
 

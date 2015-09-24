@@ -36,7 +36,7 @@ public class ActivityUIHelper {
     }
 
     private void initUI() {
-        newMessageView = activity.getLayoutInflater().inflate(R.layout.list_item_new_message, null);
+        newMessageView = activity.getLayoutInflater().inflate(R.layout.item_new_message, null);
         newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
         senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
         notificationActionButton = (Button) newMessageView.findViewById(R.id.notification_action_button);

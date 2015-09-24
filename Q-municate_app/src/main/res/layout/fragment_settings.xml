@@ -17,7 +17,7 @@
         android:text="@string/stn_profile"
         android:textSize="@dimen/text_size" />
 
-    <include layout="@layout/view_separator_gray" />
+    <include layout="@layout/view_horizontal_divider_gray" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/push_notification_switch"
@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <Button
             android:id="@+id/change_password_button"
@@ -50,7 +50,7 @@
             android:textSize="@dimen/text_size" />
     </LinearLayout>
 
-    <include layout="@layout/view_separator_gray" />
+    <include layout="@layout/view_horizontal_divider_gray" />
 
     <Button
         android:id="@+id/logout_button"
@@ -68,7 +68,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/view_separator_gray" />
+        <include layout="@layout/view_horizontal_divider_gray" />
 
         <TextView
             android:id="@+id/version_textview"

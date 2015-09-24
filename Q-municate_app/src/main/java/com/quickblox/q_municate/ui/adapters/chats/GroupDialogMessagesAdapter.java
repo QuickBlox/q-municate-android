@@ -8,7 +8,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.chats.BaseDialogMessagesAdapter;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.views.emoji.EmojiTextView;
 import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
@@ -67,9 +66,9 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
             if (!notificationMessage) {
                 if (ownMessage) {
-                    view = layoutInflater.inflate(R.layout.list_item_message_own, null, true);
+                    view = layoutInflater.inflate(R.layout.item_message_own, null, true);
                 } else {
-                    view = layoutInflater.inflate(R.layout.list_item_group_message_opponent, null, true);
+                    view = layoutInflater.inflate(R.layout.item_group_message_opponent, null, true);
                     viewHolder.avatarImageView = (RoundedImageView) view.findViewById(R.id.avatar_imageview);
                     setViewVisibility(viewHolder.avatarImageView, View.VISIBLE);
                     viewHolder.nameTextView = (TextView) view.findViewById(R.id.name_textview);
@@ -92,7 +91,7 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                         R.drawable.vertical_progressbar));
                 viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
             } else {
-                view = layoutInflater.inflate(R.layout.list_item_notification_message, null, true);
+                view = layoutInflater.inflate(R.layout.item_notification_message, null, true);
 
                 viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
                 viewHolder.timeTextMessageTextView = (TextView) view.findViewById(

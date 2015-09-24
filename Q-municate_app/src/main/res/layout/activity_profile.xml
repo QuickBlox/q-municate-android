@@ -15,7 +15,7 @@
 
         <include
             android:id="@+id/action_view"
-            layout="@layout/view_header_action_done_cancel" />
+            layout="@layout/view_static_action_mode" />
 
         <ScrollView
             android:layout_width="wrap_content"

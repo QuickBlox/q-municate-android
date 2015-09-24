@@ -30,7 +30,7 @@ public class NavigationDrawerAdapter extends BaseListAdapter<String> implements 
                 R.array.nvd_items_array)[MainActivity.ID_CHATS_LIST_FRAGMENT];
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_navigation_drawer, null);
+            convertView = layoutInflater.inflate(R.layout.item_navigation_drawer, null);
             viewHolder = new ViewHolder();
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
             viewHolder.counterTextView = (TextView) convertView.findViewById(

@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:background="@color/screen_call_background_color"
+            android:background="@color/call_background"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -38,7 +38,7 @@
                 android:padding="5dp"
                 android:enabled="false"
                 android:visibility="invisible"
-                android:src="@drawable/ic_call_switch" />
+                android:src="@drawable/ic_call_switch_dark" />
 
             <ImageButton
                 android:id="@+id/stopСallButton"
@@ -47,7 +47,7 @@
                 android:layout_centerInParent="true"
                 android:layout_weight="1"
                 android:background="@drawable/selector_button_general"
-                android:src="@drawable/ic_call_mute" />
+                android:src="@drawable/ic_call_mute_red" />
 
             <ToggleButton
                 style="@style/ToggleButtonStyle"

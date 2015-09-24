@@ -5,7 +5,7 @@
     android:id="@+id/popupMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_call_background_color"
+    android:background="@color/call_background"
     android:orientation="vertical"
     android:padding="15dp">
 
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/cll_incoming_call_audio"
-                android:textColor="@color/screen_call_timer_text_color"
+                android:textColor="@color/call_timer_text"
                 android:textSize="@dimen/act_call_name_size" />
 
         </LinearLayout>
@@ -69,7 +69,7 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/selector_button_red_oval"
-                android:src="@drawable/ic_encall" />
+                android:src="@drawable/ic_end_call_white" />
 
             <ImageButton
                 android:id="@+id/acceptCallButton"
@@ -81,7 +81,7 @@
                 android:layout_margin="5dp"
                 android:layout_weight="1"
                 android:background="@drawable/selector_button_green_oval"
-                android:src="@drawable/ic_action_call_white" />
+                android:src="@drawable/ic_call_white" />
 
 
         </LinearLayout>

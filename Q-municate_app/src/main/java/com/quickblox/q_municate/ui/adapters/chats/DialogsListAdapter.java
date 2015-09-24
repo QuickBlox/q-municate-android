@@ -36,7 +36,7 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
         Dialog dialog = getItem(position);
 
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.list_item_dialog, null);
+            convertView = layoutInflater.inflate(R.layout.item_dialog, null);
 
             viewHolder = new ViewHolder();
 

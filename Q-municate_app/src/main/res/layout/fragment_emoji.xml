@@ -4,24 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/chat_emoji_panel_color">
+    android:background="@color/chat_emoji_panel">
 
     <LinearLayout
         android:id="@+id/emojis_tab_linearlayout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/chat_emojis_tab_height"
         android:orientation="horizontal"
-        android:background="@color/chat_emoji_tabs_color">
+        android:background="@color/chat_emoji_tabs">
 
         <ImageButton
             android:id="@+id/emoji_tab_people_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
-            android:src="@drawable/ic_smiles" />
+            android:src="@drawable/ic_smile_white" />
 
         <ImageButton
             android:id="@+id/emoji_tab_nature_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
-            android:src="@drawable/ic_flowers" />
+            android:src="@drawable/ic_flowers_white" />
 
         <ImageButton
             android:id="@+id/emoji_tab_objects_imagebutton"
@@ -31,12 +31,12 @@
         <ImageButton
             android:id="@+id/emoji_tab_cars_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
-            android:src="@drawable/ic_car" />
+            android:src="@drawable/ic_car_white" />
 
         <ImageButton
             android:id="@+id/emoji_tab_punctuation_imagebutton"
             style="@style/EmojiTabImageButtonStyle"
-            android:src="@drawable/ic_symb" />
+            android:src="@drawable/ic_symbol_white" />
 
         <ImageButton
             android:id="@+id/emojis_backspace_imagebutton"

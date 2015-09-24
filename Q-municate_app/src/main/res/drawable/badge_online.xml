@@ -3,5 +3,5 @@
     android:shape="ring"
     android:thickness="7dp"
     android:useLevel="false">
-    <solid android:color="@color/badge_online_color" />
+    <solid android:color="@color/badge_online" />
 </shape>

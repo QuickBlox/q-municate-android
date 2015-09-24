@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_call_background_color"
+    android:background="@color/call_background"
     android:orientation="vertical"
     android:padding="15dp">
 
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="00:00"
-                android:textColor="@color/screen_call_timer_text_color"
+                android:textColor="@color/call_timer_text"
                 android:textSize="@dimen/act_call_name_size" />
 
         </LinearLayout>
@@ -75,7 +75,7 @@
                 android:layout_height="@dimen/act_call_end_button_height"
                 android:layout_weight="1"
                 android:background="@drawable/selector_button_end_call"
-                android:src="@drawable/ic_encall" />
+                android:src="@drawable/ic_end_call_white" />
 
             <ToggleButton
                 style="@style/ToggleButtonStyle"

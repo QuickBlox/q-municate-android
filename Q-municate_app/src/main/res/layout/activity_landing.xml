@@ -12,7 +12,7 @@
         android:layout_centerInParent="true"
         android:layout_marginBottom="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/logo_splash" />
+        android:src="@drawable/app_logo" />
 
     <TextView
         android:id="@+id/label_1_textview"
@@ -40,7 +40,7 @@
         android:layout_above="@+id/sign_up_email_button"
         android:layout_centerInParent="true"
         android:background="@drawable/selector_button_connect_facebook"
-        android:drawableLeft="@drawable/ic_fb"
+        android:drawableLeft="@drawable/ic_fb_white"
         android:text="@string/lnd_connect_with_facebook" />
 
     <Button
