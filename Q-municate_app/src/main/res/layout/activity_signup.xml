@@ -2,8 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_main" >
+    android:background="@color/bg_main"
+    android:orientation="vertical" >
 
     <include layout="@layout/toolbar" />
 
@@ -71,8 +71,8 @@
         <TextView
             style="@style/TextViewLinkStyle"
             android:id="@+id/user_agreement_textview"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             android:text="@string/uag_user_agreement" />
 
     </LinearLayout>

@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg_main"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
@@ -8,7 +9,6 @@
     <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical">
@@ -36,9 +36,6 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/selector_button_general"
                     android:clickable="true"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:gravity="center_horizontal"
                     android:orientation="horizontal"
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp">
@@ -46,7 +43,6 @@
                     <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
                         style="@style/AvatarImageViewStyle"
                         android:id="@+id/avatar_imageview"
-                        android:duplicateParentState="true"
                         app:border_color="@color/dark_gray"
                         app:border_width="@dimen/avatar_border_width"
                         app:oval="true" />
@@ -57,20 +53,19 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="15dp"
-                        android:layout_marginTop="5dp"
                         android:gravity="center"
                         android:text="@string/sup_choose_user_picture"
-                        android:textColor="@color/dark_gray"
+                        android:textColor="@color/text_dark"
                         android:textSize="@dimen/text_size" />
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/email_linearlayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/selector_button_general"
                     android:orientation="vertical"
-                    android:paddingTop="15dp">
+                    android:layout_marginTop="15dp">
 
                     <TextView
                         style="?android:attr/listSeparatorTextViewStyle"
@@ -88,7 +83,6 @@
                         android:background="@null"
                         android:clickable="false"
                         android:ellipsize="end"
-                        android:paddingTop="10dp"
                         android:singleLine="true"
                         android:textColor="@color/dark_gray"
                         android:textSize="@dimen/text_size" />
@@ -99,7 +93,7 @@
                     style="?android:attr/listSeparatorTextViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="15dp"
+                    android:layout_marginTop="15dp"
                     android:text="@string/prf_full_name"
                     android:textColor="@color/dark_gray" />
 
@@ -137,7 +131,7 @@
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"
-                        android:textColor="@color/link_text_color"
+                        android:textColor="@color/accent"
                         android:textSize="@dimen/text_size" />
 
                 </RelativeLayout>
@@ -146,7 +140,7 @@
                     style="?android:attr/listSeparatorTextViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="15dp"
+                    android:layout_marginTop="15dp"
                     android:text="@string/prf_phone"
                     android:textColor="@color/dark_gray" />
 
@@ -185,7 +179,7 @@
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"
-                        android:textColor="@color/link_text_color"
+                        android:textColor="@color/accent"
                         android:textSize="@dimen/text_size" />
 
                 </RelativeLayout>
@@ -194,7 +188,7 @@
                     style="?android:attr/listSeparatorTextViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="15dp"
+                    android:layout_marginTop="15dp"
                     android:text="@string/prf_status_message"
                     android:textColor="@color/dark_gray" />
 
@@ -231,7 +225,7 @@
                         android:clickable="false"
                         android:duplicateParentState="true"
                         android:text="@string/prf_change"
-                        android:textColor="@color/link_text_color"
+                        android:textColor="@color/accent"
                         android:textSize="@dimen/text_size" />
 
                 </RelativeLayout>

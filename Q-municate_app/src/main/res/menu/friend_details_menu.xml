@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_delete"
-        android:icon="@drawable/ic_delete_white"
+        android:icon="@drawable/ic_delete_dark"
         app:showAsAction="ifRoom"
         android:title="@string/acb_delete_friend_title"/>
 </menu>

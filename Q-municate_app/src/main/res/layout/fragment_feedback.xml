@@ -1,7 +1,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/bg_main"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -55,15 +55,6 @@
 
         </RadioGroup>
 
-        <Button
-            android:id="@+id/write_email_button"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/selector_button_green_oval"
-            android:text="@string/fdb_write_email"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/button_text_size" />
-
     </LinearLayout>
+
 </ScrollView>

@@ -1,7 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/bg_main"
     android:orientation="vertical"
     android:paddingLeft="20dp"
     android:paddingRight="20dp">
@@ -23,10 +24,10 @@
         android:id="@+id/push_notification_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:paddingBottom="15dp"
-        android:textAllCaps="true"
+        android:paddingTop="15dp"
         android:text="@string/stn_push_notifivation"
+        android:textAllCaps="true"
         android:textColor="@color/text_dark"
         android:textSize="@dimen/text_size" />
 
@@ -74,10 +75,12 @@
             android:id="@+id/version_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="left"
+            android:gravity="right"
             android:paddingBottom="14dp"
             android:paddingTop="14dp"
-            android:textSize="@dimen/text_size" />
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size"
+            tools:text="version 1.1.1" />
 
     </LinearLayout>
 

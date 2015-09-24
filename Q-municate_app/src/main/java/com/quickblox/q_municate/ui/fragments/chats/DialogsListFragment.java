@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.chats;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -13,17 +14,24 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogDataManager;
 import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
@@ -70,7 +78,6 @@ public class  DialogsListFragment extends BaseFragment {
         activateButterKnife(view);
 
         initFields();
-        initUI(view);
 
         Crouton.cancelAllCroutons();
 
@@ -85,6 +92,7 @@ public class  DialogsListFragment extends BaseFragment {
     public void initActionBar() {
         super.initActionBar();
         actionBarBridge.setActionBarTitle(R.string.nvd_title_chats);
+        checkVisibilityUserIcon();
     }
 
     private void initFields() {
@@ -93,10 +101,6 @@ public class  DialogsListFragment extends BaseFragment {
         messageObserver = new MessageObserver();
         userObserver = new UsersObserver();
         dialogOccupantsObserver = new DialogOccupantsObserver();
-    }
-
-    private void initUI(View view) {
-        setHasOptionsMenu(true);
     }
 
     @OnItemClick(R.id.chats_listview)
@@ -148,6 +152,27 @@ public class  DialogsListFragment extends BaseFragment {
                 break;
         }
         return true;
+    }
+
+    private void checkVisibilityUserIcon() {
+        UserCustomData userCustomData =
+                Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
+        if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
+            loadLogoActionBar(userCustomData.getAvatar_url());
+        }
+    }
+
+    private void loadLogoActionBar(String logoUrl) {
+        ImageLoader.getInstance().loadImage(
+                logoUrl,
+                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+                new SimpleImageLoadingListener() {
+
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
+                        actionBarBridge.setActionBarIcon(ImageUtils.getRoundIconDrawable(getActivity(), loadedBitmap));
+                    }
+                });
     }
 
     private void addObservers() {

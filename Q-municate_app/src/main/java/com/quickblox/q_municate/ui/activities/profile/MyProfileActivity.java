@@ -313,11 +313,10 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
 
         showProgress();
 
-        QBUser newUser = createUserForUpdating();
-
         if (isNeedUpdateAvatar) {
             new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
         } else {
+            QBUser newUser = createUserForUpdating();
             QBUpdateUserCommand.start(this, newUser, null);
         }
 
@@ -329,6 +328,8 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
     private QBUser createUserForUpdating() {
         QBUser newUser = new QBUser();
         newUser.setId(user.getId());
+        newUser.setPassword(user.getPassword());
+        newUser.setOldPassword(user.getOldPassword());
 
         if (isFieldValueChanged(fullNameCurrent, fullNameOld)) {
             user.setFullName(fullNameCurrent);
@@ -400,7 +401,10 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            DialogUtils.showLong(MyProfileActivity.this, exception.getMessage());
+            if (exception != null) {
+                DialogUtils.showLong(MyProfileActivity.this, exception.getMessage());
+            }
+
             resetUserData();
             hideProgress();
         }

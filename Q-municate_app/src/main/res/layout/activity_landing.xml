@@ -33,20 +33,28 @@
         android:textColor="@color/accent"
         android:textSize="@dimen/text_size_large" />
 
-    <TextView
-        style="@style/TextViewDrawableStyle"
+    <RelativeLayout
         android:id="@+id/facebook_connect_button"
-        android:layout_width="@dimen/button_landing_width"
+        android:layout_width="@dimen/landing_button_width"
+        android:layout_height="@dimen/landing_button_height"
         android:layout_above="@+id/sign_up_email_button"
         android:layout_centerInParent="true"
-        android:background="@drawable/selector_button_connect_facebook"
-        android:drawableLeft="@drawable/ic_fb_white"
-        android:text="@string/lnd_connect_with_facebook" />
+        android:clickable="true"
+        android:background="@drawable/selector_button_connect_facebook">
+
+        <TextView
+            style="@style/TextViewDrawableStyle"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:drawableLeft="@drawable/ic_fb_white"
+            android:text="@string/lnd_connect_with_facebook" />
+
+    </RelativeLayout>
 
     <Button
         android:id="@+id/sign_up_email_button"
-        android:layout_width="@dimen/button_landing_width"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/landing_button_height"
+        android:layout_width="@dimen/landing_button_width"
         android:layout_above="@+id/login_button"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"

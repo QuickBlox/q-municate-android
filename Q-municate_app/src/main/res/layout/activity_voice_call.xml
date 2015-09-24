@@ -19,11 +19,11 @@
                 android:id="@+id/name_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/act_call_margin_top"
+                android:layout_marginTop="@dimen/call_margin_top"
                 android:gravity="center"
                 android:text=""
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/act_call_name_size" />
+                android:textSize="@dimen/call_name_size" />
 
             <TextView
                 android:id="@+id/timerTextView"
@@ -32,18 +32,18 @@
                 android:gravity="center"
                 android:text="00:00"
                 android:textColor="@color/call_timer_text"
-                android:textSize="@dimen/act_call_name_size" />
+                android:textSize="@dimen/call_name_size" />
 
         </LinearLayout>
 
         <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
             android:id="@+id/avatar_imageview"
             style="@style/AvatarImageViewStyle"
-            android:layout_width="@dimen/act_call_avatar_size"
-            android:layout_height="@dimen/act_call_avatar_size"
+            android:layout_width="@dimen/call_avatar_size"
+            android:layout_height="@dimen/call_avatar_size"
             android:layout_alignParentTop="false"
             android:layout_centerInParent="true"
-            android:layout_marginTop="@dimen/act_call_margin_top"
+            android:layout_marginTop="@dimen/call_margin_top"
             app:border_color="@color/dark_gray"
             app:border_width="@dimen/avatar_border_width"
             app:oval="true" />
@@ -62,8 +62,8 @@
             <ToggleButton
                 style="@style/ToggleButtonStyle"
                 android:id="@+id/muteDynamicButton"
-                android:layout_width="@dimen/act_call_end_button_height"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_width="@dimen/call_end_button_height"
+                android:layout_height="@dimen/call_end_button_height"
                 android:layout_gravity="center|left"
                 android:background="@drawable/selector_button_dynamic" />
 
@@ -72,7 +72,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_height="@dimen/call_end_button_height"
                 android:layout_weight="1"
                 android:background="@drawable/selector_button_end_call"
                 android:src="@drawable/ic_end_call_white" />
@@ -80,8 +80,8 @@
             <ToggleButton
                 style="@style/ToggleButtonStyle"
                 android:id="@+id/muteMicrophoneButton"
-                android:layout_width="@dimen/act_call_end_button_height"
-                android:layout_height="@dimen/act_call_end_button_height"
+                android:layout_width="@dimen/call_end_button_height"
+                android:layout_height="@dimen/call_end_button_height"
                 android:layout_gravity="center|right"
                 android:background="@drawable/selector_button_microphone" />
         </LinearLayout>

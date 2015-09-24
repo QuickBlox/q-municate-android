@@ -293,10 +293,6 @@ public class ImageUtils {
         return actionBarHeight - margin;
     }
 
-    public static Drawable getRoundIconDrawable(Bitmap avatarBitmap) {
-        return getRoundIconDrawable(avatarBitmap, AVATAR_SIZE);
-    }
-
     private static Drawable getRoundIconDrawable(Bitmap avatarBitmap, int size) {
         // TODO Remove freaking hardcoded values
         Resources res = App.getInstance().getResources();

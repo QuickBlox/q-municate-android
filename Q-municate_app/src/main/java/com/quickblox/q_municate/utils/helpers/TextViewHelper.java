@@ -22,7 +22,7 @@ public class TextViewHelper {
 
         while (true) {
             startSpan = stringTextViewLowerCase.indexOf(target.toLowerCase(), endSpan);
-            ForegroundColorSpan foreColour = new ForegroundColorSpan(context.getResources().getColor(R.color.red));
+            ForegroundColorSpan foreColour = new ForegroundColorSpan(context.getResources().getColor(R.color.accent));
             if (startSpan < 0) {
                 break;
             }

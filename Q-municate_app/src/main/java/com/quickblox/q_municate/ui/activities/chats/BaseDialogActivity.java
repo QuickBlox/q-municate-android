@@ -439,7 +439,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        setActionBarIcon(ImageUtils.getRoundIconDrawable(loadedBitmap));
+                        setActionBarIcon(ImageUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
                     }
                 });
     }

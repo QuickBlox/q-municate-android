@@ -44,7 +44,6 @@ public class QBUpdateUserCommand extends ServiceCommand {
         QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
         File file = (File) extras.getSerializable(QBServiceConsts.EXTRA_FILE);
 
-        user.setOldPassword(user.getPassword());
         int authorizationType = extras.getInt(QBServiceConsts.AUTH_ACTION_TYPE, ConstsCore.NOT_INITIALIZED_VALUE);
 
         Bundle result = new Bundle();

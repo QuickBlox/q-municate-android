@@ -24,7 +24,6 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     protected App app;
     protected BaseActivity baseActivity;
     protected BaseActivity.FailAction failAction;
-    protected String title;
     protected ConnectionBridge connectionBridge;
     protected ActionBarBridge actionBarBridge;
     protected LoadingBridge loadingBridge;
@@ -34,10 +33,6 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     protected QBGroupChatHelper groupChatHelper;
 
     protected QBService service;
-
-    public String getTitle() {
-        return title;
-    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -76,6 +71,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
 
     public void initActionBar() {
         actionBarBridge.setActionBarUpButtonEnabled(true);
+        actionBarBridge.setActionBarIcon(null);
         setHasOptionsMenu(true);
     }
 

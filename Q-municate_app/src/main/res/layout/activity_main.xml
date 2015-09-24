@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar_view"
-            android:background="@color/white" />
+            android:background="@color/bg_main" />
 
     </RelativeLayout>
 

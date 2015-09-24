@@ -149,6 +149,7 @@ public class QBAuthHelper extends BaseHelper {
 
         QBFile qbFile = QBContent.uploadFileTask(file, true, (String) null);
         newUser.setId(user.getId());
+        newUser.setPassword(user.getPassword());
         newUser.setFileId(qbFile.getId());
 
         UserCustomData userCustomData = getUserCustomData(user);

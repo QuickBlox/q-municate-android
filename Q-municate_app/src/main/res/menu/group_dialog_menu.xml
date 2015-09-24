@@ -3,12 +3,12 @@
     <item
         android:id="@+id/action_attach"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_attach_white"
+        android:icon="@drawable/ic_attach_dark"
         android:title="@string/acb_chat_attach_title" />
 
     <item
         android:id="@+id/action_group_details"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_chat_info_white"
+        android:icon="@drawable/ic_chat_info_dark"
         android:title="@string/acb_chat_details_title" />
 </menu>
