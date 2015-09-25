@@ -31,6 +31,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.bridge.ActionBarBridge;
 import com.quickblox.q_municate.core.bridge.ConnectionBridge;
 import com.quickblox.q_municate.core.bridge.LoadingBridge;
+import com.quickblox.q_municate.core.gcm.GCMIntentService;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
@@ -225,6 +226,8 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         updateBroadcastActionList();
 
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
+
+        GCMIntentService.clearNotificationEvent(this);
     }
 
     @Override

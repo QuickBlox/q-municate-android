@@ -75,9 +75,11 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
-        User user = DataManager.getInstance().getUserDataManager().get(qbChatMessage.getSenderId());
-        saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
-        notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), true);
+        if (qbChatMessage.getId() != null) {
+            User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
+            saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
+            notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), true);
+        }
     }
 
     public void updateDialog(QBDialog dialog) {

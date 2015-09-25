@@ -71,10 +71,13 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
         }
 
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(
-                dialogOccupantsIdsList, currentUser.getId());
-        if (unreadMessages > ConstsCore.ZERO_INT_VALUE) {
-            viewHolder.unreadMessagesTextView.setText(unreadMessages + ConstsCore.EMPTY_STRING);
+        long unreadMessages = dataManager.getMessageDataManager().getCountUnreadMessages(dialogOccupantsIdsList, currentUser.getId());
+        long unreadDialogNotifications = dataManager.getDialogNotificationDataManager().getCountUnreadDialogNotifications(dialogOccupantsIdsList, currentUser.getId());
+
+        long totalCount = unreadMessages + unreadDialogNotifications;
+
+        if (totalCount > ConstsCore.ZERO_INT_VALUE) {
+            viewHolder.unreadMessagesTextView.setText(totalCount + ConstsCore.EMPTY_STRING);
             viewHolder.unreadMessagesTextView.setVisibility(View.VISIBLE);
         } else {
             viewHolder.unreadMessagesTextView.setVisibility(View.GONE);

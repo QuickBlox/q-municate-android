@@ -177,10 +177,9 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         dialogToCreate.setOccupantsIds(occupantIdsList);
 
         QBDialog dialog = groupChatManager.createDialog(dialogToCreate);
+        saveDialogToCache(dialog);
 
         joinRoomChat(dialog);
-
-        saveDialogToCache(dialog);
 
         sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendIdsList);
 
@@ -317,7 +316,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         ChatNotificationUtils.updateDialogFromQBMessage(context, chatMessage, qbDialog);
 
         saveDialogToCache(qbDialog);
-        saveDialogsOccupants(qbDialog);
 
         notifyUpdatingDialog();
     }
@@ -336,26 +334,27 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
     private void createDialogByNotification(QBChatMessage chatMessage,
             DialogNotification.Type notificationType) {
+
+        QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
+                chatMessage.getBody(), QBDialogType.GROUP);
+
+        saveDialogToCache(qbDialog);
+
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(
                 parseReceivedMessage(chatMessage));
         dialogNotification.setType(notificationType);
 
-        String roomJidId;
-
-        QBDialog dialog = ChatNotificationUtils.parseDialogFromQBMessage(context, chatMessage,
-                dialogNotification.getBody(), QBDialogType.GROUP);
-        dialog.setUnreadMessageCount(1);
-        saveDialogToCache(dialog);
-
-        roomJidId = dialog.getRoomJid();
-
+        String roomJidId = qbDialog.getRoomJid();
         if (roomJidId != null) {
-            tryJoinRoomChat(dialog);
-            new FinderUnknownUsers(context, chatCreator, dialog).find();
+            tryJoinRoomChat(qbDialog);
+            new FinderUnknownUsers(context, chatCreator, qbDialog).find();
         }
 
+        Message message = ChatUtils.createTempLocalMessage(dialogNotification);
+        saveTempMessage(message);
+
         notifyMessageReceived(chatMessage, dialogNotification.getDialogOccupant().getUser(),
-                dialogNotification.getDialogOccupant().getDialog().getDialogId(), false);
+                qbDialog.getDialogId(), false);
     }
 
     private class GroupChatNotificationListener implements QBNotificationChatListener {

@@ -204,12 +204,21 @@ public class ChatUtils {
         return messagesList;
     }
 
-    private static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, State state) {
+    public static Message createTempLocalMessage(long messageId, DialogOccupant dialogOccupant, String body, State state) {
         Message message = new Message();
         message.setMessageId(messageId + String.valueOf(messageId));
         message.setDialogOccupant(dialogOccupant);
         message.setState(state);
         message.setBody(body);
+        return message;
+    }
+
+    public static Message createTempLocalMessage(DialogNotification dialogNotification) {
+        Message message = new Message();
+        message.setMessageId(dialogNotification.getDialogNotificationId());
+        message.setDialogOccupant(dialogNotification.getDialogOccupant());
+        message.setState(State.TEMP_LOCAL_UNREAD);
+        message.setBody(dialogNotification.getBody());
         return message;
     }
 

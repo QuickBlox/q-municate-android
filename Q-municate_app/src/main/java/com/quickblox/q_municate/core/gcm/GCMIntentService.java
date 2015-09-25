@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.core.gcm;
 
+import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,6 +15,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ExistingQbSessionListener;
 import com.quickblox.q_municate.utils.helpers.LoginHelper;
@@ -23,9 +25,11 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
 
+import java.util.List;
+
 public class GCMIntentService extends IntentService implements ExistingQbSessionListener {
 
-    public final static int NOTIFICATION_ID = 1;
+    public final static int NOTIFICATION_ID = 18231;
     public final static long VIBRATOR_DURATION = 1500;
 
     private String message;
@@ -85,8 +89,11 @@ public class GCMIntentService extends IntentService implements ExistingQbSession
     }
 
     private void sendNotification() {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(
-                Context.NOTIFICATION_SERVICE);
+        if (isAppRunningNow()) {
+            return;
+        }
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent intent = new Intent(this, SplashActivity.class);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, ConstsCore.ZERO_INT_VALUE, intent,
@@ -101,6 +108,23 @@ public class GCMIntentService extends IntentService implements ExistingQbSession
         builder.setContentIntent(contentIntent);
         builder.getNotification().flags |= Notification.FLAG_AUTO_CANCEL;
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    public static boolean isAppRunningNow() {
+        ActivityManager activityManager = (ActivityManager) App.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
+
+        if (!runningTasks.isEmpty()) {
+            return runningTasks.get(0).topActivity.getPackageName().equalsIgnoreCase(App.getInstance().getPackageName());
+        } else {
+            return false;
+        }
+    }
+
+    public static void clearNotificationEvent(Context context) {
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(
+                Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_ID);
     }
 
     private void saveOpeningDialogData(int userId, String dialogId, boolean save) {
@@ -149,10 +173,10 @@ public class GCMIntentService extends IntentService implements ExistingQbSession
         public void onReceive(Context context, final Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION)) {
                 saveOpeningDialogData(true);
+                sendNotification();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION)) {
                 saveOpeningDialogData(false);
             }
-            sendNotification();
         }
     }
 }

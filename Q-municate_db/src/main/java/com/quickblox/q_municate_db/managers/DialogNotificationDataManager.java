@@ -3,10 +3,14 @@ package com.quickblox.q_municate_db.managers;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
+import com.quickblox.q_municate_db.models.Message;
+import com.quickblox.q_municate_db.models.State;
+import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -66,5 +70,35 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         }
 
         return dialogNotification;
+    }
+
+    public long getCountUnreadDialogNotifications(List<Integer> dialogOccupantsIdsList, int currentUserId) {
+        long count = 0;
+
+        try {
+            QueryBuilder<DialogNotification, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.setCountOf(true);
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().ne(User.Column.ID, currentUserId);
+
+            queryBuilder.join(dialogOccupantQueryBuilder);
+
+            Where<DialogNotification, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsIdsList),
+                    where.or(
+                            where.eq(DialogNotification.Column.STATE, State.DELIVERED),
+                            where.eq(DialogNotification.Column.STATE, State.TEMP_LOCAL_UNREAD)
+                    )
+            );
+
+            PreparedQuery<DialogNotification> preparedQuery = queryBuilder.prepare();
+            count = dao.countOf(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return count;
     }
 }

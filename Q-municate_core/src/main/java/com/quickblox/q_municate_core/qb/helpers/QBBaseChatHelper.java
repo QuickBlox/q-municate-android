@@ -146,13 +146,22 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void saveTempMessages(List<QBDialog> qbDialogsList) {
-        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.createTempLocalMessagesList(qbDialogsList));
+        dataManager.getMessageDataManager().createOrUpdate(
+                ChatUtils.createTempLocalMessagesList(qbDialogsList));
+    }
+
+    protected void saveTempMessage(Message message) {
+        dataManager.getMessageDataManager().createOrUpdate(message);
     }
 
     protected List<DialogOccupant> saveDialogsOccupants(QBDialog qbDialog) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(qbDialog);
         dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupantsList);
         return dialogOccupantsList;
+    }
+
+    protected void saveDialogOccupant(DialogOccupant dialogOccupant) {
+        dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupant);
     }
 
     private void saveDialogsOccupants(List<QBDialog> qbDialogsList) {
@@ -231,6 +240,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     protected void saveDialogNotificationToCache(DialogOccupant dialogOccupant,
             QBChatMessage qbChatMessage) {
         DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage, dialogOccupant);
+        saveDialogNotificationToCache(dialogNotification);
+    }
+
+    protected void saveDialogNotificationToCache(DialogNotification dialogNotification) {
         dataManager.getDialogNotificationDataManager().create(dialogNotification);
     }
 
@@ -266,9 +279,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
 
         chatMessage.setProperty(ChatNotificationUtils.PROPERTY_DATE_SENT, time + ConstsCore.EMPTY_STRING);
-        chatMessage.setProperty(
-                ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY, ChatNotificationUtils.VALUE_SAVE_TO_HISTORY
-        );
+        chatMessage.setProperty(ChatNotificationUtils.PROPERTY_SAVE_TO_HISTORY,
+                ChatNotificationUtils.VALUE_SAVE_TO_HISTORY);
 
         return chatMessage;
     }
@@ -359,12 +371,20 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         message.setMessageId(qbChatMessage.getId());
         message.setBody(qbChatMessage.getBody());
         message.setCreatedDate(dateSent);
+        message.setState(State.DELIVERED);
 
-        DialogOccupant dialogOccupant = new DialogOccupant();
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
-        dialogOccupant.setDialog(dialog);
-        User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
-        dialogOccupant.setUser(user);
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
+        if (dialogOccupant == null) {
+            dialogOccupant = new DialogOccupant();
+            Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
+            if (dialog != null) {
+                dialogOccupant.setDialog(dialog);
+            }
+            User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
+            if (user != null) {
+                dialogOccupant.setUser(user);
+            }
+        }
 
         message.setDialogOccupant(dialogOccupant);
 
