@@ -3,7 +3,7 @@
     <item
         android:id="@+id/action_search"
         android:actionViewClass="android.widget.SearchView"
-        android:title="@string/acb_search_title"
+        android:title="@string/action_bar_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always"/>
 </menu>

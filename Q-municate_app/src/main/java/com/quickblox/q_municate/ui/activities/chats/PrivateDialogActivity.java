@@ -19,6 +19,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.FriendOperationListener;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.CombinationMessage;
@@ -26,7 +27,6 @@ import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -242,7 +242,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
                 opponentUser.getUserId()) != null;
         if (!isFriend && item.getItemId() != android.R.id.home) {
-            DialogUtils.showLong(PrivateDialogActivity.this, getString(R.string.dlg_user_is_not_friend));
+            ToastUtils.longToast(R.string.dlg_user_is_not_friend);
             return true;
         }
         switch (item.getItemId()) {

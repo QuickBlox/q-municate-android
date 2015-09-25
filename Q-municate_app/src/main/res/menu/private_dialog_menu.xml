@@ -3,7 +3,7 @@
     <item
         android:id="@+id/action_attach"
         android:icon="@drawable/ic_attach_dark"
-        android:title="@string/acb_chat_attach_title"
+        android:title="@string/action_bar_add_chat_attach"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_audio_call"

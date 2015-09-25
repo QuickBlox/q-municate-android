@@ -1,34 +1,17 @@
-<android.support.v4.widget.DrawerLayout
-    android:id="@+id/main_content_drawerlayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
-    <RelativeLayout
+    <include
+        android:id="@+id/toolbar_view"
+        layout="@layout/toolbar" />
+
+    <FrameLayout
+        android:id="@+id/container_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true">
+        android:layout_below="@id/toolbar_view"
+        android:background="@color/bg_main" />
 
-        <include
-            android:id="@+id/toolbar_view"
-            layout="@layout/toolbar" />
-
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/toolbar_view"
-            android:background="@color/bg_main" />
-
-    </RelativeLayout>
-
-    <fragment
-        android:id="@+id/navigation_drawer_fragment"
-        android:name="com.quickblox.q_municate.ui.fragments.main.NavigationDrawerFragment"
-        android:layout_width="@dimen/navigation_drawer_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        tools:layout="@layout/fragment_navigation_drawer" />
-
-</android.support.v4.widget.DrawerLayout>
+</RelativeLayout>

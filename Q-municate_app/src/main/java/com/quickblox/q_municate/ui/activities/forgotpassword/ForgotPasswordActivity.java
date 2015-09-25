@@ -9,11 +9,11 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
@@ -112,8 +112,7 @@ public class ForgotPasswordActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             hideProgress();
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
-            DialogUtils.showLong(ForgotPasswordActivity.this, getString(R.string.fpw_email_was_sent,
-                    emailText));
+            ToastUtils.longToast(getString(R.string.fpw_email_was_sent, emailText));
         }
     }
 

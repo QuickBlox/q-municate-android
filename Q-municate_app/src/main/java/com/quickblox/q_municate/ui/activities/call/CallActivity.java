@@ -10,6 +10,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.OutgoingCallFragment;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.media.MediaPlayerManager;
 import com.quickblox.q_municate.ui.fragments.call.VideoCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.VoiceCallFragment;
@@ -18,7 +19,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -118,7 +118,7 @@ public class CallActivity extends BaseLogeableActivity implements IncomingCallFr
                 signalingChannel.addSignalingIgnoreFilter(messageHandler, new SignalingIgnoreFilter.Equals(
                         QBSignalingChannel.PacketType.qbvideochat_call));
             } else {
-                DialogUtils.showLong(this, getString(R.string.dlg_wrong_signaling));
+                ToastUtils.longToast(R.string.dlg_wrong_signaling);
                 finish();
             }
         }

@@ -8,6 +8,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
@@ -18,7 +19,6 @@ import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 
 import butterknife.Bind;
@@ -189,7 +189,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         public void execute(Bundle bundle) {
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             saveUserCredentials(user);
-            DialogUtils.showLong(ChangePasswordActivity.this, getString(R.string.dlg_password_changed));
+            ToastUtils.longToast(R.string.dlg_password_changed);
             logoutChat();
         }
     }
@@ -200,7 +200,7 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             if (exception != null) {
-                DialogUtils.showLong(ChangePasswordActivity.this, exception.getMessage());
+                ToastUtils.longToast(exception.getMessage());
             }
 
             updatePasswords(oldPasswordText, oldPasswordText);

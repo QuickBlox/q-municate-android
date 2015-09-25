@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -28,7 +29,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.uihelpers.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
@@ -233,7 +233,7 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             showAction();
         } else if (resultCode == Crop.RESULT_ERROR) {
-            DialogUtils.showLong(this, Crop.getError(result).getMessage());
+            ToastUtils.longToast(Crop.getError(result).getMessage());
         }
         canPerformLogout.set(true);
     }
@@ -307,7 +307,7 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
 
     private void saveChanges() {
         if (!isUserDataCorrect()) {
-            DialogUtils.showLong(this, getString(R.string.dlg_not_all_fields_entered));
+            ToastUtils.longToast(R.string.dlg_not_all_fields_entered);
             return;
         }
 
@@ -402,7 +402,7 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             if (exception != null) {
-                DialogUtils.showLong(MyProfileActivity.this, exception.getMessage());
+                ToastUtils.longToast(exception.getMessage());
             }
 
             resetUserData();

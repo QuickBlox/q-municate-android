@@ -15,8 +15,8 @@ import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.Arrays;
@@ -119,12 +119,12 @@ public class FacebookHelper {
     private void parseFacebookRequestError(Bundle values, FacebookException facebookException) {
         if (facebookException != null) {
             if (facebookException instanceof FacebookOperationCanceledException) {
-                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+                ToastUtils.longToast(R.string.inf_fb_request_canceled);
             } else if (facebookException instanceof FacebookServiceException) {
                 final int errorCodeCancel = 4201;
                 FacebookServiceException facebookServiceException = (FacebookServiceException) facebookException;
                 if (errorCodeCancel == facebookServiceException.getRequestError().getErrorCode()) {
-                    DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+                    ToastUtils.longToast(R.string.inf_fb_request_canceled);
                 } else {
                     ErrorUtils.showError(activity,
                             facebookServiceException.getRequestError().getErrorMessage());
@@ -135,9 +135,9 @@ public class FacebookHelper {
         } else {
             final String requestId = values.getString("request");
             if (requestId != null) {
-                DialogUtils.showLong(activity, resources.getString(R.string.dlg_success_request_facebook));
+                ToastUtils.longToast(R.string.dlg_success_request_facebook);
             } else {
-                DialogUtils.showLong(activity, resources.getString(R.string.inf_fb_request_canceled));
+                ToastUtils.longToast(R.string.inf_fb_request_canceled);
             }
         }
     }

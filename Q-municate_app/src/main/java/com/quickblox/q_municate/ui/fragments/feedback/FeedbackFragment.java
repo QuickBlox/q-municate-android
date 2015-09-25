@@ -37,7 +37,7 @@ public class FeedbackFragment extends BaseFragment {
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.nvd_title_feedback);
+        actionBarBridge.setActionBarTitle(R.string.action_bar_feedback);
     }
 
     @Override

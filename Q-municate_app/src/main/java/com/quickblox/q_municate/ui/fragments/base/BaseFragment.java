@@ -70,7 +70,6 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     }
 
     public void initActionBar() {
-        actionBarBridge.setActionBarUpButtonEnabled(true);
         actionBarBridge.setActionBarIcon(null);
         setHasOptionsMenu(true);
     }

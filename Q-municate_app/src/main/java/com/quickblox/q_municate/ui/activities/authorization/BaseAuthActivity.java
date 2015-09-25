@@ -14,6 +14,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -22,7 +23,6 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
@@ -150,7 +150,7 @@ public class BaseAuthActivity extends BaseActivity {
         } else if (exception.getMessage().equals(getString(R.string.error_email_already_taken))
                 && loginType.equals(LoginType.FACEBOOK)) {
             errorMessage = getString(R.string.error_email_already_taken_from_app);
-            DialogUtils.showLong(BaseAuthActivity.this, errorMessage);
+            ToastUtils.longToast(errorMessage);
             return;
         }
 

@@ -22,7 +22,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Window;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
@@ -37,6 +36,7 @@ import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -49,7 +49,6 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.util.HashMap;
@@ -89,9 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);
-
         initFields();
     }
 
@@ -335,11 +332,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return (T) findViewById(viewId);
     }
 
-    protected void setCurrentFragment(Fragment fragment) {
+    public void setCurrentFragment(Fragment fragment) {
         currentFragment = fragment;
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         FragmentTransaction transaction = buildTransaction();
-        transaction.replace(R.id.container, fragment, null);
+        transaction.replace(R.id.container_fragment, fragment, null);
         transaction.commit();
     }
 
@@ -432,7 +429,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     public void onReceiveRefreshSessionAction(Bundle extras) {
-        DialogUtils.show(BaseActivity.this, getString(R.string.dlg_refresh_session));
+        ToastUtils.longToast(R.string.dlg_refresh_session);
         refreshSession();
     }
 

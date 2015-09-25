@@ -34,6 +34,7 @@ import com.quickblox.q_municate.ui.activities.profile.MyProfileActivity;
 import com.quickblox.q_municate.ui.uihelpers.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.uihelpers.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
@@ -49,7 +50,6 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -216,7 +216,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
                 return true;
             case R.id.action_add:
                 if (!loadedDialogInfo) {
-                    DialogUtils.showLong(GroupDialogDetailsActivity.this, getString(R.string.gdd_group_info_is_loading));
+                    ToastUtils.longToast(R.string.gdd_group_info_is_loading);
                 } else {
                     startAddFriendsActivity();
                 }
@@ -358,7 +358,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
             AddFriendsToGroupActivity.start(this, groupDialog);
         } else {
-            DialogUtils.showLong(this, getString(R.string.gdd_all_friends_is_in_group));
+            ToastUtils.longToast(R.string.gdd_all_friends_is_in_group);
         }
     }
 
@@ -369,7 +369,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
             startAction();
         } else if (resultCode == Crop.RESULT_ERROR) {
-            DialogUtils.showLong(this, Crop.getError(result).getMessage());
+            ToastUtils.longToast(Crop.getError(result).getMessage());
         }
     }
 
@@ -402,7 +402,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void saveChanges() {
         if (!isUserDataCorrect()) {
-            DialogUtils.showLong(this, getString(R.string.gdd_name_not_entered));
+            ToastUtils.longToast(R.string.gdd_name_not_entered);
             return;
         }
 
@@ -534,7 +534,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
+            if (exception != null) {
+                ToastUtils.longToast(exception.getMessage());
+            }
+
             hideProgress();
         }
     }
@@ -619,7 +622,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         @Override
         public void execute(Bundle bundle) {
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
-            DialogUtils.showLong(GroupDialogDetailsActivity.this, exception.getMessage());
+            if (exception != null) {
+                ToastUtils.longToast(exception.getMessage());
+            }
+
             resetGroupData();
             hideProgress();
         }

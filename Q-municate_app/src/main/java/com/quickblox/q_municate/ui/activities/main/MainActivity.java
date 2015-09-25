@@ -1,11 +1,11 @@
 package com.quickblox.q_municate.ui.activities.main;
 
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -13,41 +13,24 @@ import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.ui.fragments.feedback.FeedbackFragment;
-import com.quickblox.q_municate.ui.fragments.contacts.ContactsFragment;
-import com.quickblox.q_municate.ui.fragments.main.NavigationDrawerFragment;
-import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate.ui.fragments.invitefriends.InviteFriendsFragment;
 import com.quickblox.q_municate.ui.fragments.settings.SettingsFragment;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
-import com.quickblox.q_municate_db.models.Dialog;
-import com.quickblox.q_municate_db.models.User;
 
-import butterknife.Bind;
-
-public class MainActivity extends BaseLogeableActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-    public static final int ID_CHATS_LIST_FRAGMENT = 0;
-    public static final int ID_CONTACTS_LIST_FRAGMENT = 1;
-    public static final int ID_INVITE_FRIENDS_FRAGMENT = 2;
-    public static final int ID_SETTINGS_FRAGMENT = 3;
-    public static final int ID_FEEDBACK_FRAGMENT = 4;
+public class MainActivity extends BaseLogeableActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    @Bind(R.id.main_content_drawerlayout)
-    DrawerLayout drawerLayout;
 
     private FacebookHelper facebookHelper;
     private ImportFriendsHelper importFriendsHelper;
@@ -72,19 +55,14 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
         initActionBar();
         initFields(savedInstanceState);
-        initNavigationDrawer();
 
         checkGCMRegistration();
 
         if (!isLoggedInChat()) {
             loginChat();
         }
-    }
 
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+        launchDialogsListFragment();
     }
 
     private void initFields(Bundle savedInstanceState) {
@@ -101,6 +79,40 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_chat:
+                boolean isFriends = !DataManager.getInstance().getFriendDataManager().getAll().isEmpty();
+                if (isFriends) {
+                    NewDialogActivity.start(this);
+                } else {
+                    ToastUtils.longToast(R.string.ndl_no_friends_for_new_chat);
+                }
+                break;
+            case R.id.action_start_invite_friends:
+                launchInviteFriendsFragment();
+                break;
+            case R.id.action_start_feedback:
+                launchFeedbackFragment();
+                break;
+            case R.id.action_start_settings:
+                launchSettingsFragment();
+                break;
+            case R.id.action_start_about:
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (currentFragment instanceof InviteFriendsFragment) {
@@ -110,35 +122,8 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         }
     }
 
-    @Override
-    public void onDrawerItemSelected(int position) {
-        Fragment fragment = null;
-        switch (position) {
-            case ID_CHATS_LIST_FRAGMENT:
-                fragment = DialogsListFragment.newInstance();
-                break;
-            case ID_CONTACTS_LIST_FRAGMENT:
-                fragment = ContactsFragment.newInstance();
-                break;
-            case ID_INVITE_FRIENDS_FRAGMENT:
-                fragment = InviteFriendsFragment.newInstance();
-                break;
-            case ID_SETTINGS_FRAGMENT:
-                fragment = SettingsFragment.newInstance();
-                break;
-            case ID_FEEDBACK_FRAGMENT:
-                fragment = FeedbackFragment.newInstance();
-                break;
-        }
-        setCurrentFragment(fragment);
-    }
-
     private void loginChat() {
         QBLoginChatCompositeCommand.start(this);
-    }
-
-    private void initVideoChat() {
-//        QBInitVideoChatCommand.start(this, CallActivity.class);
     }
 
     private void performImportFriendsSuccessAction() {
@@ -147,9 +132,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
 
     private void performLoginChatSuccessAction(Bundle bundle) {
         checkLoadDialogs();
-
-        initVideoChat();
-
         hideProgress();
     }
 
@@ -157,12 +139,6 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         if (appSharedHelper.isFirstAuth()) {
             QBLoadDialogsCommand.start(this);
         }
-    }
-
-    private void initNavigationDrawer() {
-        NavigationDrawerFragment navigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.navigation_drawer_fragment);
-        navigationDrawerFragment.setUp(drawerLayout);
     }
 
     private void checkGCMRegistration() {
@@ -179,8 +155,7 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
     protected void onResume() {
         super.onResume();
         addActions();
-        gsmHelper.checkPlayServices();
-        checkVisibilityProgressBars();
+        checkGCMRegistration();
     }
 
     @Override
@@ -207,55 +182,28 @@ public class MainActivity extends BaseLogeableActivity implements NavigationDraw
         performImportFriendsSuccessAction();
     }
 
-    private void checkVisibilityProgressBars() {
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
-                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-
-        if (isLoggedInChat()) {
-            initVideoChat();
-        }
-
-        if (isNeedToOpenDialog) {
-            startDialog();
-        }
-    }
-
     private boolean isLoggedInChat() {
         return QBChatService.isInitialized() && QBChatService.getInstance().isLoggedIn();
     }
 
-    private void startDialog() {
-        String dialogId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_DIALOG_ID, null);
-        int userId = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_PUSH_MESSAGE_USER_ID,
-                ConstsCore.NOT_INITIALIZED_VALUE);
-
-        Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(dialogId);
-        if (dialog == null) {
-            return;
-        }
-
-        if (dialog.getType() == Dialog.Type.PRIVATE) {
-            startPrivateChatActivity(dialog, userId);
-        } else {
-            startGroupChatActivity(dialog);
-        }
-
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-    }
-
-    private void startPrivateChatActivity(Dialog dialog, int userId) {
-        User occupantUser = DataManager.getInstance().getUserDataManager().get(userId);
-        if (occupantUser != null && userId != ConstsCore.ZERO_INT_VALUE) {
-            PrivateDialogActivity.start(this, occupantUser, dialog);
-        }
-    }
-
-    private void startGroupChatActivity(Dialog dialog) {
-        GroupDialogActivity.start(this, dialog);
-    }
-
     private void performLoadChatsSuccessAction(Bundle bundle) {
         appSharedHelper.saveFirstAuth(false);
+    }
+
+    private void launchDialogsListFragment() {
+        setCurrentFragment(DialogsListFragment.newInstance());
+    }
+
+    private void launchInviteFriendsFragment() {
+        setCurrentFragment(InviteFriendsFragment.newInstance());
+    }
+
+    private void launchSettingsFragment() {
+        setCurrentFragment(SettingsFragment.newInstance());
+    }
+
+    private void launchFeedbackFragment() {
+        setCurrentFragment(FeedbackFragment.newInstance());
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

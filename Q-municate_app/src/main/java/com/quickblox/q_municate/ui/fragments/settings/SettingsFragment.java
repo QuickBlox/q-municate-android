@@ -61,7 +61,7 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.nvd_title_settings);
+        actionBarBridge.setActionBarTitle(R.string.action_bar_settings);
     }
 
     private void initUI(View rootView) {

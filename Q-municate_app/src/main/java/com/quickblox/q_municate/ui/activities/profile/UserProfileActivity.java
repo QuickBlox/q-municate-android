@@ -20,6 +20,7 @@ import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -29,7 +30,6 @@ import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -260,7 +260,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
         if (isFriend) {
             return true;
         } else {
-            DialogUtils.showLong(this, getString(R.string.dlg_user_is_not_friend));
+            ToastUtils.longToast(R.string.dlg_user_is_not_friend);
             return false;
         }
     }
@@ -299,8 +299,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
         @Override
         public void execute(Bundle bundle) {
             deleteDialog();
-            DialogUtils.showLong(UserProfileActivity.this,
-                    getString(R.string.dlg_friend_removed, user.getFullName()));
+            ToastUtils.longToast(getString(R.string.dlg_friend_removed, user.getFullName()));
             finish();
         }
     }

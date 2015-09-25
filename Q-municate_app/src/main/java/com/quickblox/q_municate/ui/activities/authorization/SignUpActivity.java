@@ -15,6 +15,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.utils.image.ReceiveUriScaledBitmapTask;
@@ -25,7 +26,6 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -147,7 +147,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
             avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
             avatarImageView.setImageBitmap(avatarBitmapCurrent);
         } else if (resultCode == Crop.RESULT_ERROR) {
-            DialogUtils.showLong(this, Crop.getError(result).getMessage());
+            ToastUtils.longToast(Crop.getError(result).getMessage());
         }
     }
 

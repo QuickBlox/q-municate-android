@@ -49,7 +49,7 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.nvd_title_contacts);
+        actionBarBridge.setActionBarTitle(R.string.action_bar_contacts);
     }
 
     private void initViewPagerAdapter() {

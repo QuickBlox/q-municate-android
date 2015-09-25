@@ -20,10 +20,10 @@ import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.models.InviteFriend;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 
@@ -68,7 +68,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.nvd_title_invite_friends);
+        actionBarBridge.setActionBarTitle(R.string.action_bar_invite_friends);
     }
 
     private void initFields(Bundle savedInstanceState) {
@@ -211,7 +211,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         if (selectedContactsFriendsArray.length > ConstsCore.ZERO_INT_VALUE) {
             sendInviteToContacts();
         } else {
-            DialogUtils.showLong(baseActivity, getString(R.string.dlg_no_friends_selected));
+            ToastUtils.longToast(R.string.dlg_no_friends_selected);
         }
 
         clearCheckedFriends();
@@ -250,7 +250,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             fromContactsButton.setClickable(true);
             counterContactsTextView.setVisibility(View.GONE);
             checkAllContactsFriendsCheckBox.setVisibility(View.GONE);
-            DialogUtils.showLong(getActivity(), getString(R.string.dlg_no_friends));
+            ToastUtils.longToast(R.string.dlg_no_friends);
         }
     }
 

@@ -4,11 +4,11 @@
         android:id="@+id/action_attach"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_attach_dark"
-        android:title="@string/acb_chat_attach_title" />
+        android:title="@string/action_bar_add_chat_attach" />
 
     <item
         android:id="@+id/action_group_details"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_chat_info_dark"
-        android:title="@string/acb_chat_details_title" />
+        android:title="@string/action_bar_chat_details" />
 </menu>

@@ -15,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.quickblox.chat.exception.QBChatException;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -24,7 +25,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBVideoChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.MediaUtils;
 import com.quickblox.q_municate_core.utils.Utils;
@@ -354,7 +354,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DialogUtils.show(getActivity(), "accepted");
+                        ToastUtils.longToast("accepted");
                         onConnectionEstablished();
                     }
                 });
@@ -373,7 +373,7 @@ public abstract class OutgoingCallFragment extends BaseFragment implements View.
                 baseActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        DialogUtils.show(getActivity(), "Rejected");
+                        ToastUtils.longToast("rejected");
                         stopCall(false, STOP_TYPE.REJECTED);
                     }
                 });

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,9 +15,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
@@ -29,7 +26,6 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.DialogUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -40,6 +36,7 @@ import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 import java.util.Observable;
@@ -62,6 +59,8 @@ public class  DialogsListFragment extends BaseFragment {
     private DialogsListAdapter dialogsListAdapter;
     private DataManager dataManager;
 
+    private QBUser qbUser;
+
     private Observer dialogObserver;
     private Observer messageObserver;
     private Observer userObserver;
@@ -78,12 +77,11 @@ public class  DialogsListFragment extends BaseFragment {
         activateButterKnife(view);
 
         initFields();
-
-        Crouton.cancelAllCroutons();
-
         initChatsDialogs();
 
         registerForContextMenu(dialogsListView);
+
+        Crouton.cancelAllCroutons();
 
         return view;
     }
@@ -91,7 +89,9 @@ public class  DialogsListFragment extends BaseFragment {
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.nvd_title_chats);
+        // HACK
+        actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
+
         checkVisibilityUserIcon();
     }
 
@@ -101,20 +101,27 @@ public class  DialogsListFragment extends BaseFragment {
         messageObserver = new MessageObserver();
         userObserver = new UsersObserver();
         dialogOccupantsObserver = new DialogOccupantsObserver();
+        qbUser = AppSession.getSession().getUser();
     }
 
-    @OnItemClick(R.id.chats_listview)
-    public void startChat(int position) {
-        Dialog dialog = dialogsListAdapter.getItem(position);
-        if (dialog.getType() == Dialog.Type.PRIVATE) {
-            startPrivateChatActivity(dialog);
-        } else {
-            startGroupChatActivity(dialog);
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        MenuInflater menuInflater = baseActivity.getMenuInflater();
+        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
+                deleteDialog(dialog);
+                break;
         }
-    }
-
-    private void checkVisibilityEmptyLabel() {
-        emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
+        return true;
     }
 
     @Override
@@ -139,38 +146,36 @@ public class  DialogsListFragment extends BaseFragment {
         deleteObservers();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.dialogs_list_menu, menu);
+    @OnItemClick(R.id.chats_listview)
+    public void startChat(int position) {
+        Dialog dialog = dialogsListAdapter.getItem(position);
+        if (dialog.getType() == Dialog.Type.PRIVATE) {
+            startPrivateChatActivity(dialog);
+        } else {
+            startGroupChatActivity(dialog);
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                startNewDialogPage();
-                break;
-        }
-        return true;
+    private void checkVisibilityEmptyLabel() {
+        emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void checkVisibilityUserIcon() {
-        UserCustomData userCustomData =
-                Utils.customDataToObject(AppSession.getSession().getUser().getCustomData());
+        UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
         if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
             loadLogoActionBar(userCustomData.getAvatar_url());
         }
     }
 
     private void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(
-                logoUrl,
+        ImageLoader.getInstance().loadImage(logoUrl,
                 ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        actionBarBridge.setActionBarIcon(ImageUtils.getRoundIconDrawable(getActivity(), loadedBitmap));
+                        actionBarBridge.setActionBarIcon(
+                                ImageUtils.getRoundIconDrawable(getActivity(), loadedBitmap));
                     }
                 });
     }
@@ -208,40 +213,11 @@ public class  DialogsListFragment extends BaseFragment {
         GroupDialogActivity.start(baseActivity, dialog);
     }
 
-    private void startNewDialogPage() {
-        boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
-        if (isFriends) {
-            NewDialogActivity.start(baseActivity);
-        } else {
-            DialogUtils.showLong(baseActivity, getString(R.string.ndl_no_friends_for_new_chat));
-        }
-    }
-
     private void updateDialogsList() {
         List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
         dialogsListAdapter.setNewData(dialogsList);
         dialogsListAdapter.notifyDataSetChanged();
         checkEmptyList(dialogsList.size());
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, view, menuInfo);
-        MenuInflater menuInflater = baseActivity.getMenuInflater();
-        menuInflater.inflate(R.menu.dialogs_list_ctx_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item
-                .getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.action_delete:
-                Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
-                deleteDialog(dialog);
-                break;
-        }
-        return true;
     }
 
     private void deleteDialog(Dialog dialog) {
