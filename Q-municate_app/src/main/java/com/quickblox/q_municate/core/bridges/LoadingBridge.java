@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.core.bridge;
+package com.quickblox.q_municate.core.bridges;
 
 public interface LoadingBridge {
 

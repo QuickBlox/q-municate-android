@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.core.bridge;
+package com.quickblox.q_municate.core.bridges;
 
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;

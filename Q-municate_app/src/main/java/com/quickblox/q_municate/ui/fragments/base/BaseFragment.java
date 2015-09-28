@@ -6,9 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.core.bridge.ActionBarBridge;
-import com.quickblox.q_municate.core.bridge.ConnectionBridge;
-import com.quickblox.q_municate.core.bridge.LoadingBridge;
+import com.quickblox.q_municate.core.bridges.ActionBarBridge;
+import com.quickblox.q_municate.core.bridges.ConnectionBridge;
+import com.quickblox.q_municate.core.bridges.LoadingBridge;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;

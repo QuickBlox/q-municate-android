@@ -1,8 +1,12 @@
 package com.quickblox.q_municate.ui.fragments.chats;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -16,6 +20,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.core.loader.BaseListLoader;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
@@ -38,6 +43,7 @@ import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -46,9 +52,10 @@ import butterknife.Bind;
 import butterknife.OnItemClick;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class  DialogsListFragment extends BaseFragment {
+public class  DialogsListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<Dialog>> {
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
+    private static final int LOADER_ID = DialogsListFragment.class.getSimpleName().hashCode();
 
     @Bind(R.id.chats_listview)
     ListView dialogsListView;
@@ -60,11 +67,11 @@ public class  DialogsListFragment extends BaseFragment {
     private DataManager dataManager;
 
     private QBUser qbUser;
-
     private Observer dialogObserver;
     private Observer messageObserver;
     private Observer userObserver;
     private Observer dialogOccupantsObserver;
+    private DialogsListLoader dialogsListLoader;
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -102,6 +109,23 @@ public class  DialogsListFragment extends BaseFragment {
         userObserver = new UsersObserver();
         dialogOccupantsObserver = new DialogOccupantsObserver();
         qbUser = AppSession.getSession().getUser();
+        dialogsListLoader = new DialogsListLoader(getActivity(), dataManager);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Log.i(TAG, "+++ Calling initLoader()! +++");
+        if (getLoaderManager().getLoader(LOADER_ID) == null) {
+            Log.i(TAG, "+++ Initializing the new Loader... +++");
+        } else {
+            Log.i(TAG, "+++ Reconnecting with existing Loader (id '1')... +++");
+        }
+
+        // Initialize a Loader with id '1'. If the Loader with this id already
+        // exists, then the LoaderManager will reuse the existing Loader.
+        getLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     @Override
@@ -195,7 +219,7 @@ public class  DialogsListFragment extends BaseFragment {
     }
 
     private void initChatsDialogs() {
-        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
+        List<Dialog> dialogsList = Collections.emptyList();
         dialogsListAdapter = new DialogsListAdapter(baseActivity, dialogsList);
         dialogsListView.setAdapter(dialogsListAdapter);
     }
@@ -214,10 +238,7 @@ public class  DialogsListFragment extends BaseFragment {
     }
 
     private void updateDialogsList() {
-        List<Dialog> dialogsList = dataManager.getDialogDataManager().getAll();
-        dialogsListAdapter.setNewData(dialogsList);
-        dialogsListAdapter.notifyDataSetChanged();
-        checkEmptyList(dialogsList.size());
+        dialogsListLoader.onContentChanged();
     }
 
     private void deleteDialog(Dialog dialog) {
@@ -229,6 +250,35 @@ public class  DialogsListFragment extends BaseFragment {
             emptyListTextView.setVisibility(View.GONE);
         } else {
             emptyListTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public Loader<List<Dialog>> onCreateLoader(int id, Bundle args) {
+        return dialogsListLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
+        dialogsListAdapter.setNewData(dialogsList);
+        dialogsListAdapter.notifyDataSetChanged();
+        checkEmptyList(dialogsList.size());
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Dialog>> loader) {
+
+    }
+
+    private static class DialogsListLoader extends BaseListLoader<List<Dialog>> {
+
+        public DialogsListLoader(Context context, DataManager dataManager) {
+            super(context, dataManager);
+        }
+
+        @Override
+        protected List<Dialog> getItems() {
+            return dataManager.getDialogDataManager().getAll();
         }
     }
 
