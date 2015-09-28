@@ -16,6 +16,7 @@ import android.widget.RadioGroup;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.contacts.ContactsViewPagerAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
+import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import butterknife.Bind;
@@ -49,6 +50,7 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
     @Override
     public void initActionBar() {
         super.initActionBar();
+        actionBarBridge.setActionBarUpButtonEnabled(true);
         actionBarBridge.setActionBarTitle(R.string.action_bar_contacts);
     }
 
@@ -65,7 +67,7 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.friend_list_menu, menu);
+        inflater.inflate(R.menu.contacts_list_menu, menu);
 
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
@@ -79,26 +81,56 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setOnQueryTextListener(this);
             searchView.setOnCloseListener(this);
+            searchView.onActionViewExpanded();
         }
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                launchDialogsListFragment();
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onQueryTextSubmit(String searchQuery) {
-        contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
         KeyboardUtils.hideKeyboard(baseActivity);
+
+        if (contactsPagerAdapter != null && contactsViewPager != null) {
+            contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
+        }
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String searchQuery) {
-        contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
+        if (contactsPagerAdapter != null && contactsViewPager != null) {
+            contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
+        }
         return true;
     }
 
     @Override
     public boolean onClose() {
-        contactsPagerAdapter.cancelSearch(contactsViewPager.getCurrentItem());
+        if (contactsPagerAdapter != null && contactsViewPager != null) {
+            contactsPagerAdapter.cancelSearch(contactsViewPager.getCurrentItem());
+        }
         return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        KeyboardUtils.hideKeyboard(getActivity());
+    }
+
+    private void launchDialogsListFragment() {
+        baseActivity.setCurrentFragment(DialogsListFragment.newInstance());
     }
 
     private class RadioGroupListener implements RadioGroup.OnCheckedChangeListener {

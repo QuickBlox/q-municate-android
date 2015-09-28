@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center|right"
-                android:layout_toLeftOf="@+id/check_contacts_checkbox"
+                android:layout_toLeftOf="@+id/check_all_contacts_checkbox"
                 android:background="@drawable/badge_friend_counter"
                 android:clickable="false"
                 android:gravity="center"
@@ -115,7 +115,7 @@
                 android:visibility="gone" />
 
             <CheckBox
-                android:id="@+id/check_contacts_checkbox"
+                android:id="@+id/check_all_contacts_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"

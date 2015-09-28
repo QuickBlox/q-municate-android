@@ -47,19 +47,26 @@ public class YourContactsFragment extends BaseContactsFragment implements UserSe
 
     @Override
     public void prepareSearch() {
-        contactsAdapter.setUserType(ContactsAdapter.UserType.LOCAl);
-        contactsAdapter.flushFilter();
+        if (contactsAdapter != null) {
+            contactsAdapter.setUserType(ContactsAdapter.UserType.LOCAl);
+            contactsAdapter.flushFilter();
+        }
     }
 
     @Override
     public void search(String searchQuery) {
-        contactsAdapter.setFilter(searchQuery);
+        if (contactsAdapter != null) {
+            contactsAdapter.setFilter(searchQuery);
+        }
     }
 
     @Override
     public void cancelSearch() {
         searchQuery = null;
-        contactsAdapter.flushFilter();
+
+        if (contactsAdapter != null) {
+            contactsAdapter.flushFilter();
+        }
     }
 
     @Override

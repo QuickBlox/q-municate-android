@@ -67,6 +67,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_signup);
 
         activateButterKnife();
@@ -104,15 +105,13 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
             case R.id.action_done:
                 signUp();
-                return true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override
@@ -183,7 +182,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     @OnClick(R.id.change_avatar_linearlayout)
-    public void selectAvatar(View view) {
+    void selectAvatar(View view) {
         imageUtils.getImage();
     }
 
@@ -211,7 +210,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     @OnClick(R.id.user_agreement_textview)
-    public void openUserAgreement(View view) {
+    void openUserAgreement(View view) {
         UserAgreementActivity.start(SignUpActivity.this);
     }
 

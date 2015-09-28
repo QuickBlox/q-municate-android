@@ -246,20 +246,19 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             return true;
         }
         switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
             case R.id.action_attach:
                 attachButtonOnClick();
-                return true;
+                break;
             case R.id.action_audio_call:
                 callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
-                return true;
+                break;
             case R.id.action_video_call:
                 callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
-                return true;
+                break;
+            default:
+                super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {

@@ -31,7 +31,7 @@ public class UserAgreementDialogFragment extends DialogFragment {
     }
 
     private void initUI() {
-        customDialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_user_agreement, null);
+        customDialogView = getActivity().getLayoutInflater().inflate(R.layout.fragment_user_agreement, null);
         ButterKnife.bind(this, customDialogView);
     }
 

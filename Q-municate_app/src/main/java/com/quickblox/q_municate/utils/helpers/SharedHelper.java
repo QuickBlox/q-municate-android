@@ -10,6 +10,7 @@ public class SharedHelper extends CoreSharedHelper {
 
         String USER_AGREEMENT = "user_agreement";
         String REMEMBER_ME = "remember_me";
+        String ENABLING_PUSH_NOTIFICATIONS = "enabling_push_notifications";
     }
 
     public SharedHelper(Context context) {
@@ -30,5 +31,13 @@ public class SharedHelper extends CoreSharedHelper {
 
     public void saveSavedRememberMe(boolean save) {
         savePref(Constants.REMEMBER_ME, save);
+    }
+
+    public boolean isEnablePushNotifications() {
+        return getPref(Constants.ENABLING_PUSH_NOTIFICATIONS, false);
+    }
+
+    public void saveEnablePushNotifications(boolean enable) {
+        savePref(Constants.ENABLING_PUSH_NOTIFICATIONS, enable);
     }
 }

@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,10 +22,17 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.loader.BaseListLoader;
+import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
+import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
+import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
+import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.fragments.contacts.ContactsFragment;
+import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.models.AppSession;
@@ -96,6 +104,8 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     @Override
     public void initActionBar() {
         super.initActionBar();
+        actionBarBridge.setActionBarUpButtonEnabled(false);
+
         // HACK
         actionBarBridge.setActionBarTitle(" " + qbUser.getFullName());
 
@@ -129,6 +139,45 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.dialogs_list_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                launchContactsFragment();
+                break;
+            case R.id.action_add_chat:
+                boolean isFriends = !DataManager.getInstance().getFriendDataManager().getAll().isEmpty();
+                if (isFriends) {
+                    NewDialogActivity.start(getActivity());
+                } else {
+                    ToastUtils.longToast(R.string.ndl_no_friends_for_new_chat);
+                }
+                break;
+            case R.id.action_start_invite_friends:
+                InviteFriendsActivity.start(getActivity());
+                break;
+            case R.id.action_start_feedback:
+                FeedbackActivity.start(getActivity());
+                break;
+            case R.id.action_start_settings:
+                SettingsActivity.start(getActivity());
+                break;
+            case R.id.action_start_about:
+                OneButtonDialogFragment
+                        .show(getChildFragmentManager(), R.string.coming_soon, true);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         MenuInflater menuInflater = baseActivity.getMenuInflater();
@@ -137,8 +186,7 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item
-                .getMenuInfo();
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.action_delete:
                 Dialog dialog = dialogsListAdapter.getItem(adapterContextMenuInfo.position);
@@ -171,7 +219,7 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     }
 
     @OnItemClick(R.id.chats_listview)
-    public void startChat(int position) {
+    void startChat(int position) {
         Dialog dialog = dialogsListAdapter.getItem(position);
         if (dialog.getType() == Dialog.Type.PRIVATE) {
             startPrivateChatActivity(dialog);
@@ -268,6 +316,10 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     @Override
     public void onLoaderReset(Loader<List<Dialog>> loader) {
 
+    }
+
+    private void launchContactsFragment() {
+        baseActivity.setCurrentFragment(ContactsFragment.newInstance());
     }
 
     private static class DialogsListLoader extends BaseListLoader<List<Dialog>> {

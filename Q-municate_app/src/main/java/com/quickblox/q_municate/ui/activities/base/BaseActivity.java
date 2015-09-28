@@ -22,6 +22,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
@@ -203,16 +204,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterBroadcastReceivers();
-        Crouton.cancelAllCroutons();
+    protected void onStart() {
+        super.onStart();
+        connectToService();
     }
 
     @Override
@@ -228,9 +222,26 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        connectToService();
+    protected void onStop() {
+        super.onStop();
+        unbindService();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterBroadcastReceivers();
+        Crouton.cancelAllCroutons();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                navigateToParent();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void addFragmentUserStatusChangingListener(
@@ -317,7 +328,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         localBroadcastManager.unregisterReceiver(userStatusBroadcastReceiver);
     }
 
-    protected void navigateToParent() {
+    private void navigateToParent() {
         Intent intent = NavUtils.getParentActivityIntent(this);
         if (intent == null) {
             finish();

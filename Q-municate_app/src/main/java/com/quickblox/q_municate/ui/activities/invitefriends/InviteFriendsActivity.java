@@ -1,13 +1,12 @@
-package com.quickblox.q_municate.ui.fragments.invitefriends;
+package com.quickblox.q_municate.ui.activities.invitefriends;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -19,158 +18,116 @@ import com.facebook.SessionState;
 import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.CounterChangedListener;
+import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.models.InviteFriend;
-import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
-import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate_core.models.InviteFriend;
+import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class InviteFriendsFragment extends BaseFragment implements CounterChangedListener {
+import butterknife.Bind;
 
-    private View view;
-    private View headerList;
+import static butterknife.ButterKnife.findById;
+
+public class InviteFriendsActivity extends BaseLogeableActivity implements CounterChangedListener {
+
+    @Bind(R.id.friends_listview)
+    ListView friendsListView;
+
+    private View headerView;
     private LinearLayout fromFacebookButton;
     private LinearLayout fromContactsButton;
-    private ListView friendsListView;
     private TextView counterContactsTextView;
-    private CheckBox checkAllContactsFriendsCheckBox;
+    private CheckBox checkAllContactsCheckBox;
+
     private FacebookHelper facebookHelper;
-    private FacebookSessionStatusCallback facebookSessionStatusCallback;
     private List<InviteFriend> friendsContactsList;
     private InviteFriendsAdapter friendsAdapter;
     private String[] selectedContactsFriendsArray;
 
-    public static InviteFriendsFragment newInstance() {
-        return new InviteFriendsFragment();
+    public static void start(Context context) {
+        Intent intent = new Intent(context, InviteFriendsActivity.class);
+        context.startActivity(intent);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_invite_friends, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_invite_friends);
+
+        activateButterKnife();
+
+        initActionBar();
         initFields(savedInstanceState);
-        initUI();
-        initFriendsLists();
-        initHeaderUI(headerList);
-
-        initListeners();
-
-        return view;
+        initCustomUI();
+        initCustomListeners();
+        initFriendsList();
     }
 
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.action_bar_invite_friends);
-    }
-
-    private void initFields(Bundle savedInstanceState) {
-        facebookSessionStatusCallback = new FacebookSessionStatusCallback();
-        facebookHelper = new FacebookHelper(getActivity(), savedInstanceState, facebookSessionStatusCallback);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        facebookHelper.onActivityStart();
-    }
-
-    private void initFriendsLists() {
-        friendsContactsList = new ArrayList<InviteFriend>();
-
-        friendsAdapter = new InviteFriendsAdapter(baseActivity, friendsContactsList);
-        friendsAdapter.setCounterChangedListener(this);
-
-        friendsListView.addHeaderView(headerList);
-        friendsListView.setAdapter(friendsAdapter);
-    }
-
-    private void initListeners() {
+    private void initCustomListeners() {
         fromFacebookButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                facebookFriendsOnClick();
+                selectFromFacebook();
             }
         });
 
         fromContactsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                contactsFriendsOnClick();
+                selectFromContacts();
             }
         });
 
-        checkAllContactsFriendsCheckBox.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        initCheckAllFriends(isChecked);
-                    }
-                });
-    }
+        checkAllContactsCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-    private void initCheckAllFriends(boolean isCheck) {
-        friendsAdapter.setCounterContacts(getCheckedFriends(friendsContactsList, isCheck));
-        friendsAdapter.notifyDataSetChanged();
-    }
-
-    private int getCheckedFriends(List<InviteFriend> friends, boolean isCheck) {
-        int newCounter;
-        for (InviteFriend friend : friends) {
-            friend.setSelected(isCheck);
-        }
-        newCounter = isCheck ? friends.size() : ConstsCore.ZERO_INT_VALUE;
-
-        onCounterContactsChanged(newCounter);
-
-        return newCounter;
-    }
-
-    private void setCheckedCheckBox(int countSelected, CheckBox checkBox) {
-        if (countSelected == ConstsCore.ZERO_INT_VALUE) {
-            checkBox.setChecked(false);
-        }
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                checkAllContacts(isChecked);
+            }
+        });
     }
 
     @Override
-    public void onCounterContactsChanged(int valueCounterContacts) {
-        setCheckedCheckBox(valueCounterContacts, checkAllContactsFriendsCheckBox);
-        counterContactsTextView.setText(valueCounterContacts + "");
+    public void initActionBar() {
+        super.initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
-    private void contactsFriendsOnClick() {
-        getContactsFriendsList();
+    private void initFields(Bundle savedInstanceState) {
+        FacebookSessionStatusCallback facebookSessionStatusCallback = new FacebookSessionStatusCallback();
+        facebookHelper = new FacebookHelper(this, savedInstanceState, facebookSessionStatusCallback);
     }
 
-    private void getContactsFriendsList() {
-        friendsContactsList.addAll(EmailHelper.getContactsWithEmail(baseActivity));
-        updateFriendsList();
-        setVisibilityCountPart();
+    private void initCustomUI() {
+        headerView = getLayoutInflater().inflate(R.layout.view_section_title_invite_friends, null);
+        fromFacebookButton = findById(headerView, R.id.from_facebook_linearlayout);
+        fromContactsButton = findById(headerView, R.id.from_contacts_linearlayout);
+        counterContactsTextView = findById(headerView, R.id.counter_contacts_textview);
+        checkAllContactsCheckBox = findById(headerView, R.id.check_all_contacts_checkbox);
     }
 
-    private void facebookFriendsOnClick() {
-        facebookHelper.loginWithFacebook();
+    private void initFriendsList() {
+        friendsContactsList = new ArrayList<InviteFriend>();
+
+        friendsAdapter = new InviteFriendsAdapter(this, friendsContactsList);
+        friendsAdapter.setCounterChangedListener(this);
+
+        friendsListView.addHeaderView(headerView);
+        friendsListView.setAdapter(friendsAdapter);
     }
 
-    private void initHeaderUI(View view) {
-        fromFacebookButton = (LinearLayout) view.findViewById(R.id.from_facebook_linearlayout);
-        fromContactsButton = (LinearLayout) view.findViewById(R.id.from_contacts_linearlayout);
-        counterContactsTextView = (TextView) view.findViewById(R.id.counter_contacts_textview);
-        checkAllContactsFriendsCheckBox = (CheckBox) view.findViewById(R.id.check_contacts_checkbox);
-    }
-
-    private void initUI() {
-        setHasOptionsMenu(true);
-        friendsListView = (ListView) view.findViewById(R.id.friends_listview);
-        headerList = getActivity().getLayoutInflater().inflate(R.layout.view_section_title_invite_friends,
-                null);
+    @Override
+    public void onStart() {
+        super.onStart();
+        facebookHelper.onActivityStart();
     }
 
     @Override
@@ -191,8 +148,10 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.invite_friends_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -201,8 +160,49 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
             case R.id.action_next:
                 performActionNext();
                 break;
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onCounterContactsChanged(int valueCounterContacts) {
+        setCheckedCheckBox(valueCounterContacts, checkAllContactsCheckBox);
+        counterContactsTextView.setText(String.valueOf(valueCounterContacts));
+    }
+
+    private void selectFromFacebook() {
+        facebookHelper.loginWithFacebook();
+    }
+
+    private void selectFromContacts() {
+        friendsContactsList.addAll(EmailHelper.getContactsWithEmail(this));
+        updateFriendsList();
+        setVisibilityCountPart();
+    }
+
+    private void checkAllContacts(boolean isCheck) {
+        friendsAdapter.setCounterContacts(getCheckedFriends(friendsContactsList, isCheck));
+        friendsAdapter.notifyDataSetChanged();
+    }
+
+    private int getCheckedFriends(List<InviteFriend> friends, boolean isCheck) {
+        int newCounter;
+        for (InviteFriend friend : friends) {
+            friend.setSelected(isCheck);
+        }
+        newCounter = isCheck ? friends.size() : ConstsCore.ZERO_INT_VALUE;
+
+        onCounterContactsChanged(newCounter);
+
+        return newCounter;
+    }
+
+    private void setCheckedCheckBox(int countSelected, CheckBox checkBox) {
+        if (countSelected == ConstsCore.ZERO_INT_VALUE) {
+            checkBox.setChecked(false);
+        }
     }
 
     private void performActionNext() {
@@ -245,11 +245,11 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
         if (!friendsContactsList.isEmpty()) {
             fromContactsButton.setClickable(false);
             counterContactsTextView.setVisibility(View.VISIBLE);
-            checkAllContactsFriendsCheckBox.setVisibility(View.VISIBLE);
+            checkAllContactsCheckBox.setVisibility(View.VISIBLE);
         } else {
             fromContactsButton.setClickable(true);
             counterContactsTextView.setVisibility(View.GONE);
-            checkAllContactsFriendsCheckBox.setVisibility(View.GONE);
+            checkAllContactsCheckBox.setVisibility(View.GONE);
             ToastUtils.longToast(R.string.dlg_no_friends);
         }
     }
@@ -260,7 +260,7 @@ public class InviteFriendsFragment extends BaseFragment implements CounterChange
     }
 
     private void sendInviteToContacts() {
-        EmailHelper.sendInviteEmail(baseActivity, selectedContactsFriendsArray);
+        EmailHelper.sendInviteEmail(this, selectedContactsFriendsArray);
     }
 
     private class FacebookSessionStatusCallback implements Session.StatusCallback {

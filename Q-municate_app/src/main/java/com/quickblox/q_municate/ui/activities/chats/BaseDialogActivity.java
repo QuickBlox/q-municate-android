@@ -127,6 +127,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         rootView = getLayoutInflater().inflate(R.layout.activity_dialog, null);
         setContentView(rootView);
 
@@ -186,7 +187,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     @OnTextChanged(R.id.message_edittext)
-    public void messageEditTextChanged(CharSequence charSequence) {
+    void messageEditTextChanged(CharSequence charSequence) {
         setSendButtonVisibility(charSequence);
 
         // TODO: now it is possible only for Private chats
@@ -200,7 +201,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     @OnClick(R.id.smile_panel_imagebutton)
-    public void smilePanelImageButtonClicked() {
+    void smilePanelImageButtonClicked() {
         if (isSmilesLayoutShowing()) {
             hideSmileLayout();
             KeyboardUtils.showKeyboard(BaseDialogActivity.this);

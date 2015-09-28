@@ -36,18 +36,18 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     @OnClick(R.id.login_button)
-    public void login(View view) {
+    void login(View view) {
         LoginActivity.start(LandingActivity.this);
         finish();
     }
 
     @OnClick(R.id.facebook_connect_button)
-    public void facebookConnect(View view) {
+    void facebookConnect(View view) {
         facebookConnect();
     }
 
     @OnClick(R.id.sign_up_email_button)
-    public void signUp(View view) {
+    void signUp(View view) {
         loginType = LoginType.EMAIL;
 
         if (!appSharedHelper.isShownUserAgreement()) {

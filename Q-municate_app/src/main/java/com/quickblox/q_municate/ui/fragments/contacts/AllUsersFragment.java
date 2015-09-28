@@ -124,9 +124,12 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
 
     @Override
     public void prepareSearch() {
-        contactsAdapter.setUserType(ContactsAdapter.UserType.GLOBAL);
         clearOldData();
-        updateContactsList();
+
+        if (contactsAdapter != null) {
+            contactsAdapter.setUserType(ContactsAdapter.UserType.GLOBAL);
+            updateContactsList();
+        }
     }
 
     @Override
@@ -141,7 +144,10 @@ public class AllUsersFragment extends BaseContactsFragment implements UserSearch
         searchQuery = null;
         searchTimer.cancel();
         clearOldData();
-        updateContactsList();
+
+        if (contactsAdapter != null) {
+            updateContactsList();
+        }
     }
 
     private void clearOldData() {

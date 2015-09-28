@@ -66,15 +66,13 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
             case R.id.action_done:
                 forgotPassword();
-                return true;
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override

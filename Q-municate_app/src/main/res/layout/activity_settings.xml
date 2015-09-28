@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
-    android:orientation="vertical"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
 
     <Button
         android:id="@+id/profile_button"
@@ -13,8 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_button_general"
         android:gravity="left"
-        android:paddingBottom="14dp"
-        android:paddingTop="14dp"
+        android:padding="15dp"
         android:text="@string/stn_profile"
         android:textSize="@dimen/text_size" />
 
@@ -24,15 +23,14 @@
         android:id="@+id/push_notification_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="15dp"
-        android:paddingTop="15dp"
+        android:padding="15dp"
         android:text="@string/stn_push_notifivation"
         android:textAllCaps="true"
         android:textColor="@color/text_dark"
         android:textSize="@dimen/text_size" />
 
     <LinearLayout
-        android:id="@+id/change_password_linearlyout"
+        android:id="@+id/change_password_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -45,10 +43,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/selector_button_general"
             android:gravity="left"
-            android:paddingBottom="14dp"
-            android:paddingTop="14dp"
+            android:padding="15dp"
             android:text="@string/stn_change_password"
             android:textSize="@dimen/text_size" />
+
     </LinearLayout>
 
     <include layout="@layout/view_horizontal_divider_gray" />
@@ -59,8 +57,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/selector_button_general"
         android:gravity="left"
-        android:paddingBottom="14dp"
-        android:paddingTop="14dp"
+        android:padding="15dp"
         android:text="@string/stn_logout"
         android:textSize="@dimen/text_size" />
 
@@ -76,8 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="right"
-            android:paddingBottom="14dp"
-            android:paddingTop="14dp"
+            android:padding="15dp"
             android:textColor="@color/gray"
             android:textSize="@dimen/text_size"
             tools:text="version 1.1.1" />

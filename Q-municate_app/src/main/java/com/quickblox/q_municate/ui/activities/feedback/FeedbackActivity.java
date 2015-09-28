@@ -1,56 +1,62 @@
-package com.quickblox.q_municate.ui.fragments.feedback;
+package com.quickblox.q_municate.ui.activities.feedback;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
+import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 
 import butterknife.Bind;
 
-public class FeedbackFragment extends BaseFragment {
+public class FeedbackActivity extends BaseLogeableActivity {
 
     @Bind(R.id.feedback_types_radiogroup)
     RadioGroup feedbackTypesRadioGroup;
 
-    public static FeedbackFragment newInstance() {
-        return new FeedbackFragment();
+    public static void start(Context context) {
+        Intent intent = new Intent(context, FeedbackActivity.class);
+        context.startActivity(intent);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_feedback, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        setContentView(R.layout.activity_feedback);
 
-        activateButterKnife(view);
+        activateButterKnife();
 
-        return view;
+        initActionBar();
     }
 
     @Override
     public void initActionBar() {
         super.initActionBar();
-        actionBarBridge.setActionBarTitle(R.string.action_bar_feedback);
+        setActionBarUpButtonEnabled(true);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                EmailHelper.sendFeedbackEmail(baseActivity, getSelectedFeedbackType());
+                EmailHelper.sendFeedbackEmail(this, getSelectedFeedbackType());
                 break;
+            default:
+                super.onOptionsItemSelected(item);
         }
         return true;
     }

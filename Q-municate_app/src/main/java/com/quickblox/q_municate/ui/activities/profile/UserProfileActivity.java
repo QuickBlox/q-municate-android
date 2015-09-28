@@ -162,15 +162,13 @@ public class UserProfileActivity extends BaseLogeableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
             case R.id.action_delete:
                 showRemoveUserDialog();
-                return true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     private void removeActions() {

@@ -73,15 +73,13 @@ public class LoginActivity extends BaseAuthActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
             case R.id.action_done:
                 login();
-                return true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     @Override
@@ -91,12 +89,12 @@ public class LoginActivity extends BaseAuthActivity {
     }
 
     @OnCheckedChanged(R.id.remember_me_switch)
-    public void rememberMeCheckedChanged(boolean checked) {
+    void rememberMeCheckedChanged(boolean checked) {
         appSharedHelper.saveSavedRememberMe(checked);
     }
 
     @OnClick(R.id.forgot_password_textview)
-    public void forgotPassword(View view) {
+    void forgotPassword(View view) {
         ForgotPasswordActivity.start(this);
     }
 

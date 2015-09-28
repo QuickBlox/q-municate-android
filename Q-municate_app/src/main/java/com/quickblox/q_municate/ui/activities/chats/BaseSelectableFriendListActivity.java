@@ -101,16 +101,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         return super.dispatchKeyEvent(event);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     protected abstract void onFriendsSelected(ArrayList<User> selectedFriends);
 
     public static class SimpleComparator implements Comparator<User> {

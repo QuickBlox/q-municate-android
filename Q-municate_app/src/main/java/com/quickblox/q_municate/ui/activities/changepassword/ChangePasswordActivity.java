@@ -80,15 +80,13 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                navigateToParent();
-                return true;
             case R.id.action_done:
                 changePassword();
-                return true;
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+                super.onOptionsItemSelected(item);
         }
+        return true;
     }
 
     private void addActions() {
