@@ -25,6 +25,10 @@ public class LandingActivity extends BaseAuthActivity {
         context.startActivity(intent);
     }
 
+    public static void start(Context context, Intent intent) {
+        context.startActivity(intent);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

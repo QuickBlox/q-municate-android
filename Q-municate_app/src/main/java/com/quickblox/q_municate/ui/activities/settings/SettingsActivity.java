@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.authorization.LoginActivity;
+import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.activities.profile.MyProfileActivity;
@@ -122,12 +122,17 @@ public class SettingsActivity extends BaseLogeableActivity {
                 });
     }
 
+    private void startLandingScreen() {
+        Intent intent = new Intent(this, LandingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        LandingActivity.start(this, intent);
+    }
+
     private class LogoutSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
-            LoginActivity.start(SettingsActivity.this);
-            finish();
+            startLandingScreen();
         }
     }
 }
