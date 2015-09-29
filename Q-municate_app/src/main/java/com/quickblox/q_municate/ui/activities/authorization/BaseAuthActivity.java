@@ -210,6 +210,11 @@ public class BaseAuthActivity extends BaseActivity {
         updateBroadcastActionList();
     }
 
+    protected void startLandingScreen() {
+        LandingActivity.start(this);
+        finish();
+    }
+
     private class LoginSuccessAction implements Command {
 
         @Override

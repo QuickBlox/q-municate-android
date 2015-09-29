@@ -105,6 +105,9 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                startLandingScreen();
+                break;
             case R.id.action_done:
                 signUp();
                 break;
@@ -166,8 +169,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
     @Override
     public void onBackPressed() {
-        LandingActivity.start(this);
-        finish();
+        startLandingScreen();
     }
 
     private void startCropActivity(Uri originalUri) {

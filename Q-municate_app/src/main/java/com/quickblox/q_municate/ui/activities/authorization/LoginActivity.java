@@ -73,6 +73,9 @@ public class LoginActivity extends BaseAuthActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                startLandingScreen();
+                break;
             case R.id.action_done:
                 login();
                 break;
@@ -84,8 +87,7 @@ public class LoginActivity extends BaseAuthActivity {
 
     @Override
     public void onBackPressed() {
-        LandingActivity.start(this);
-        finish();
+        startLandingScreen();
     }
 
     @OnCheckedChanged(R.id.remember_me_switch)
