@@ -23,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
@@ -75,6 +77,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected QBService service;
     protected LocalBroadcastManager localBroadcastManager;
 
+    private ProgressBar toolbarProgressBar;
     private ActionBar actionBar;
     private Map<String, Set<Command>> broadcastCommandMap;
     private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
@@ -112,6 +115,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     @Override
     public void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progressbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
@@ -183,12 +187,12 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     @Override
     public void hideActionBarProgress() {
-        setVisibilityActionBarProgress(false);
+        toolbarProgressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void showActionBarProgress() {
-        setVisibilityActionBarProgress(true);
+        toolbarProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override

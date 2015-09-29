@@ -133,6 +133,7 @@ public class MainActivity extends BaseLogeableActivity {
 
     private void checkLoadDialogs() {
         if (appSharedHelper.isFirstAuth()) {
+            showActionBarProgress();
             QBLoadDialogsCommand.start(this);
         }
     }
@@ -157,6 +158,7 @@ public class MainActivity extends BaseLogeableActivity {
 
     private void performLoadChatsSuccessAction(Bundle bundle) {
         appSharedHelper.saveFirstAuth(false);
+        hideActionBarProgress();
     }
 
     private void launchDialogsListFragment() {
