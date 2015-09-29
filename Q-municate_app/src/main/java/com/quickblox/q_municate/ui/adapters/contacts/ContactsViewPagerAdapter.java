@@ -5,8 +5,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.quickblox.q_municate.core.listeners.UserSearchListener;
-import com.quickblox.q_municate.ui.fragments.contacts.AllUsersFragmentBase;
-import com.quickblox.q_municate.ui.fragments.contacts.YourContactsFragmentBase;
+import com.quickblox.q_municate.ui.fragments.contacts.AllUsersFragment;
+import com.quickblox.q_municate.ui.fragments.contacts.YourContactsFragment;
 
 public class ContactsViewPagerAdapter extends FragmentStatePagerAdapter {
 
@@ -14,13 +14,13 @@ public class ContactsViewPagerAdapter extends FragmentStatePagerAdapter {
     public static final int POSITION_YOUR_CONTACTS = 0;
     public static final int POSITION_ALL_USERS = 1;
 
-    private YourContactsFragmentBase yourContactsFragment;
-    private AllUsersFragmentBase allUsersFragment;
+    private YourContactsFragment yourContactsFragment;
+    private AllUsersFragment allUsersFragment;
 
     public ContactsViewPagerAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
-        yourContactsFragment = YourContactsFragmentBase.newInstance();
-        allUsersFragment = AllUsersFragmentBase.newInstance();
+        yourContactsFragment = YourContactsFragment.newInstance();
+        allUsersFragment = AllUsersFragment.newInstance();
     }
 
     @Override

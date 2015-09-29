@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class AllUsersFragmentBase extends BaseContactsFragmentBase implements UserSearchListener, SwipyRefreshLayout.OnRefreshListener {
+public class AllUsersFragment extends BaseContactsFragment implements UserSearchListener, SwipyRefreshLayout.OnRefreshListener {
 
     private static final int SEARCH_DELAY = 1000;
     private static final int MIN_VALUE_FOR_SEARCH = 3;
@@ -37,8 +37,8 @@ public class AllUsersFragmentBase extends BaseContactsFragmentBase implements Us
     private int totalEntries;
     private UserOperationAction userOperationAction;
 
-    public static AllUsersFragmentBase newInstance() {
-        return new AllUsersFragmentBase();
+    public static AllUsersFragment newInstance() {
+        return new AllUsersFragment();
     }
 
     @Override
@@ -199,7 +199,7 @@ public class AllUsersFragmentBase extends BaseContactsFragmentBase implements Us
         String searchQuery = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
         totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
 
-        if (AllUsersFragmentBase.this.searchQuery.equals(searchQuery)) {
+        if (AllUsersFragment.this.searchQuery.equals(searchQuery)) {
             Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
             if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
                 usersList.addAll(newUsersCollection);
@@ -207,7 +207,7 @@ public class AllUsersFragmentBase extends BaseContactsFragmentBase implements Us
                 updateContactsList(usersList);
             }
         } else {
-            search(AllUsersFragmentBase.this.searchQuery);
+            search(AllUsersFragment.this.searchQuery);
         }
     }
 

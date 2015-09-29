@@ -29,7 +29,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnTouch;
 
-public abstract class BaseContactsFragmentBase extends BaseLoaderFragment<List<User>> {
+public abstract class BaseContactsFragment extends BaseLoaderFragment<List<User>> {
 
     @Bind(R.id.contacts_swipyrefreshlayout)
     SwipyRefreshLayout swipyRefreshLayout;

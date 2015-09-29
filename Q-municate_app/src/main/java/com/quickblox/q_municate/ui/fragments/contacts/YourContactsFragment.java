@@ -19,12 +19,12 @@ import com.quickblox.q_municate_db.models.User;
 import java.util.Collections;
 import java.util.List;
 
-public class YourContactsFragmentBase extends BaseContactsFragmentBase implements UserSearchListener {
+public class YourContactsFragment extends BaseContactsFragment implements UserSearchListener {
 
-    private final static int LOADER_ID = YourContactsFragmentBase.class.hashCode();
+    private final static int LOADER_ID = YourContactsFragment.class.hashCode();
 
-    public static YourContactsFragmentBase newInstance() {
-        return new YourContactsFragmentBase();
+    public static YourContactsFragment newInstance() {
+        return new YourContactsFragment();
     }
 
     @Override
