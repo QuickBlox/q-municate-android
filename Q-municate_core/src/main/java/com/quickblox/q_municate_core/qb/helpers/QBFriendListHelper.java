@@ -32,8 +32,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class QBFriendListHelper extends BaseHelper implements Serializable {
+
+    private static final int LOADING_DELAY = 500;
 
     private static final String TAG = QBFriendListHelper.class.getSimpleName();
     private static final String PRESENCE_CHANGE_ERROR = "Presence change error: could not find friend in DB by id = ";
@@ -46,6 +50,8 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
     private QBRoster roster;
     private QBPrivateChatHelper privateChatHelper;
     private DataManager dataManager;
+    private Timer userLoadingTimer;
+    private List<Integer> userLoadingIdsList;
 
     public QBFriendListHelper(Context context) {
         super(context);
@@ -59,6 +65,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
                 new SubscriptionListener());
         roster.setSubscriptionMode(QBRoster.SubscriptionMode.mutual);
         roster.addRosterListener(new RosterListener());
+        userLoadingTimer = new Timer();
     }
 
     public void inviteFriend(int userId) throws Exception {
@@ -174,13 +181,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
             }
         }
 
-        if (!userList.isEmpty()) {
-            List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
-            for (User user : loadedUserList) {
-                saveUser(user);
-                createUserRequest(user, UserRequest.RequestStatus.OUTGOING);
-            }
-        }
+        loadAndSaveUsers(userList, UserRequest.RequestStatus.OUTGOING);
 
         return friendList;
     }
@@ -225,13 +226,20 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         dataManager.getUserRequestDataManager().createOrUpdate(userRequest);
     }
 
-    private void createUserRequest(int userId, UserRequest.RequestStatus requestStatus) {
-        User user = loadAndSaveUser(userId);
-        if (user == null) {
-            return;
+    private void createUserRequest(int userId) {
+        if (userLoadingIdsList == null) {
+            userLoadingIdsList = new ArrayList<>();
         }
+        userLoadingIdsList.add(userId);
+        checkLoadingUser();
+    }
 
-        createUserRequest(user, requestStatus);
+    private void checkLoadingUser() {
+        if (userLoadingTimer != null) {
+            userLoadingTimer.cancel();
+        }
+        userLoadingTimer = new Timer();
+        userLoadingTimer.schedule(new UserLoadingTimerTask(), LOADING_DELAY);
     }
 
     private void deleteUserRequestByUser(int userId) {
@@ -314,6 +322,28 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
+    private void loadAndSaveUsers(Collection<Integer> userList, UserRequest.RequestStatus status) throws QBResponseException {
+        if (!userList.isEmpty()) {
+            List<User> loadedUserList = (List<User>) restHelper.loadUsers(userList);
+            for (User user : loadedUserList) {
+                saveUser(user);
+                createUserRequest(user, status);
+            }
+        }
+    }
+
+    private class UserLoadingTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            try {
+                loadAndSaveUsers(userLoadingIdsList, UserRequest.RequestStatus.INCOMING);
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
+            }
+        }
+    }
+
     private class RosterListener implements QBRosterListener {
 
         @Override
@@ -354,7 +384,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         @Override
         public void subscriptionRequested(int userId) {
             try {
-                createUserRequest(userId, UserRequest.RequestStatus.INCOMING);
+                createUserRequest(userId);
                 notifyContactRequest(userId);
             } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);

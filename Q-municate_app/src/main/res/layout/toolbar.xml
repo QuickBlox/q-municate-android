@@ -25,4 +25,9 @@
         android:layout_height="5dp"
         android:background="@drawable/shadow_toolbar" />
 
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/snackbar_position_coordinatorlayout" />
+
 </LinearLayout>

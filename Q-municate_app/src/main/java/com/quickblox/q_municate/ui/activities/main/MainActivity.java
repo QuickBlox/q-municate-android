@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -133,7 +134,7 @@ public class MainActivity extends BaseLogeableActivity {
 
     private void checkLoadDialogs() {
         if (appSharedHelper.isFirstAuth()) {
-            showActionBarProgress();
+            showSnackbar(R.string.dlgs_loading_dialogs, Snackbar.LENGTH_INDEFINITE);
             QBLoadDialogsCommand.start(this);
         }
     }
@@ -158,7 +159,7 @@ public class MainActivity extends BaseLogeableActivity {
 
     private void performLoadChatsSuccessAction(Bundle bundle) {
         appSharedHelper.saveFirstAuth(false);
-        hideActionBarProgress();
+        hideSnackBar();
     }
 
     private void launchDialogsListFragment() {

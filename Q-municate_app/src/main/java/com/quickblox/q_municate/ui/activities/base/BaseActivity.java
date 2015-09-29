@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.activities.base;
 
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -33,6 +34,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.bridges.ActionBarBridge;
 import com.quickblox.q_municate.core.bridges.ConnectionBridge;
 import com.quickblox.q_municate.core.bridges.LoadingBridge;
+import com.quickblox.q_municate.core.bridges.SnackbarBridge;
 import com.quickblox.q_municate.core.gcm.GCMIntentService;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
@@ -63,7 +65,7 @@ import java.util.Set;
 import butterknife.ButterKnife;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge {
+public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
     protected App app;
     protected Toolbar toolbar;
@@ -78,7 +80,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected LocalBroadcastManager localBroadcastManager;
 
     private ProgressBar toolbarProgressBar;
+    private View snackBarView;
     private ActionBar actionBar;
+    private Snackbar snackbar;
     private Map<String, Set<Command>> broadcastCommandMap;
     private Set<UserStatusChangingListener> fragmentsStatusChangingSet;
     private Set<ServiceConnectionListener> fragmentsServiceConnectionSet;
@@ -116,6 +120,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     public void initActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarProgressBar = (ProgressBar) findViewById(R.id.toolbar_progressbar);
+        snackBarView = findViewById(R.id.snackbar_position_coordinatorlayout);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
         }
@@ -205,6 +210,31 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     public boolean isNetworkAvailable() {
         // TODO network checking here
         return false;
+    }
+
+    @Override
+    public void createSnackBar(int titleResId, int duration) {
+        snackbar = Snackbar.make(snackBarView, titleResId, duration);
+    }
+
+    @Override
+    public void showSnackbar(int titleResId, int duration) {
+        createSnackBar(titleResId, duration);
+        snackbar.show();
+    }
+
+    @Override
+    public void showSnackbar(int titleResId, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
+        createSnackBar(titleResId, duration);
+        snackbar.setAction(buttonTitleResId, onClickListener);
+        snackbar.show();
+    }
+
+    @Override
+    public void hideSnackBar() {
+        if (snackbar != null) {
+            snackbar.dismiss();
+        }
     }
 
     @Override

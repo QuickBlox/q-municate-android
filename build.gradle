@@ -18,13 +18,14 @@ ext {
     buildToolsVersion = '21.0.1'
     minSdkVersion = 14
     targetSdkVersion = 23
-    versionName = '1.2.0.01'
+    versionName = '1.2.0.02'
     versionCode = 1
 
     prodDebug = true
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
+    supportDesignVersion = '23.0.0'
     universalImageLoaderVersion = '1.9.1'
     googlePlayServicesVersion = '7.8.0'
     croutonVersion = '1.8.5'

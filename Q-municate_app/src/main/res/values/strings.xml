@@ -101,6 +101,7 @@
 
     // Dialogs
     <string name="dlgs_ctx_menu_remove">Delete dialog</string>
+    <string name="dlgs_loading_dialogs">Loading dialogs… Please wait</string>
 
     // Group Dialog Details
     <string name="gdd_title">Group Details</string>
@@ -247,5 +248,6 @@
     <string name="coming_soon">Coming soon…</string>
     <string name="search_at_last_items">Enter more symbols, not less than 3</string>
     <string name="deleted_user">DELETED USER</string>
+    <string name="loading">Loading…</string>
 
 </resources>

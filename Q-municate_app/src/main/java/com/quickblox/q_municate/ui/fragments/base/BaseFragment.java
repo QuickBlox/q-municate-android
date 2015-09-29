@@ -9,6 +9,7 @@ import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.core.bridges.ActionBarBridge;
 import com.quickblox.q_municate.core.bridges.ConnectionBridge;
 import com.quickblox.q_municate.core.bridges.LoadingBridge;
+import com.quickblox.q_municate.core.bridges.SnackbarBridge;
 import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
 import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -27,6 +28,7 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
     protected ConnectionBridge connectionBridge;
     protected ActionBarBridge actionBarBridge;
     protected LoadingBridge loadingBridge;
+    protected SnackbarBridge snackbarBridge;
 
     protected QBFriendListHelper friendListHelper;
     protected QBPrivateChatHelper privateChatHelper;
@@ -56,6 +58,10 @@ public abstract class BaseFragment extends Fragment implements UserStatusChangin
 
         if (activity instanceof LoadingBridge) {
             loadingBridge = (LoadingBridge) activity;
+        }
+
+        if (activity instanceof SnackbarBridge) {
+            snackbarBridge = (SnackbarBridge) activity;
         }
     }
 
