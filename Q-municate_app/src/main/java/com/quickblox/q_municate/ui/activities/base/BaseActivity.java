@@ -246,6 +246,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     public void addFragmentUserStatusChangingListener(
             UserStatusChangingListener fragmentUserStatusChangingListener) {
+        if (fragmentsStatusChangingSet == null) {
+            fragmentsStatusChangingSet = new HashSet<>();
+        }
         fragmentsStatusChangingSet.add(fragmentUserStatusChangingListener);
     }
 
@@ -256,6 +259,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     public void addFragmentServiceConnectionListener (
             ServiceConnectionListener fragmentServiceConnectionListener) {
+        if (fragmentsServiceConnectionSet == null) {
+            fragmentsServiceConnectionSet = new HashSet<>();
+        }
         fragmentsServiceConnectionSet.add(fragmentServiceConnectionListener);
     }
 

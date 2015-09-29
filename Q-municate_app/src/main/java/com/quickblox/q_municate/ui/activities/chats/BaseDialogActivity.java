@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.content.Loader;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -26,8 +27,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate.ui.activities.base.BaseLoaderActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiFragment;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiGridFragment;
 import com.quickblox.q_municate.ui.views.emoji.emojiTypes.EmojiObject;
@@ -72,7 +74,7 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public abstract class BaseDialogActivity extends BaseLogeableActivity implements
+public abstract class BaseDialogActivity extends BaseLoaderActivity<List<CombinationMessage>> implements
         ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
 
@@ -101,13 +103,14 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     protected View emojisFragment;
 
+    protected static Dialog dialog;
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
     protected BaseListAdapter messagesAdapter;
-    protected Dialog dialog;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
+    protected List<CombinationMessage> combinationMessagesList;
 
     private View rootView;
     private int keyboardHeight;
@@ -433,14 +436,13 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(
-                logoUrl,
-                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedBitmap) {
-                        setActionBarIcon(ImageUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
+                        setActionBarIcon(
+                                ImageUtils.getRoundIconDrawable(BaseDialogActivity.this, loadedBitmap));
                     }
                 });
     }
@@ -544,7 +546,8 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         }
     }
 
-    protected List<CombinationMessage> createCombinationMessagesList() {
+    private static List<CombinationMessage> createCombinationMessagesList() {
+        DataManager dataManager = DataManager.getInstance();
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
@@ -582,6 +585,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 dialogNotificationsList, AppSession.getSession().getUser()));
     }
 
+    @Override
+    public Loader<List<CombinationMessage>> createDataLoader() {
+        return new CombinationMessageLoader(this, dataManager);
+    }
+
     protected abstract void updateActionBar();
 
     protected abstract void onConnectServiceLocally(QBService service);
@@ -597,6 +605,18 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected abstract void updateMessagesList();
 
     protected abstract void onFileLoaded(QBFile file);
+
+    public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
+
+        public CombinationMessageLoader(Context context, DataManager dataManager) {
+            super(context, dataManager);
+        }
+
+        @Override
+        protected List<CombinationMessage> getItems() {
+            return createCombinationMessagesList();
+        }
+    }
 
     private class MessageObserver implements Observer {
 

@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.core.loader;
+package com.quickblox.q_municate_core.core.loader;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
@@ -6,14 +6,14 @@ import android.util.Log;
 
 import com.quickblox.q_municate_db.managers.DataManager;
 
-public abstract class BaseListLoader<T> extends AsyncTaskLoader<T> {
+public abstract class BaseLoader<T> extends AsyncTaskLoader<T> {
 
-    private static final String TAG = BaseListLoader.class.getSimpleName();
+    private static final String TAG = BaseLoader.class.getSimpleName();
 
     protected DataManager dataManager;
     private T objectsList;
 
-    public BaseListLoader(Context context, DataManager dataManager) {
+    public BaseLoader(Context context, DataManager dataManager) {
         // Loaders may be used across multiple Activitys (assuming they aren't
         // bound to the LoaderManager), so NEVER hold a reference to the context
         // directly. Doing so will cause you to leak an entire Activity's context.

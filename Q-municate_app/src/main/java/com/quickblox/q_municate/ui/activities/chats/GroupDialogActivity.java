@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.Loader;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,13 +27,14 @@ import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
-    private Dialog currentDialog;
+    private static final int LOADER_ID = GroupDialogActivity.class.getSimpleName().hashCode();
 
     public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
@@ -50,7 +52,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        initFields();
+
         if (dialog == null) {
             finish();
         }
@@ -60,7 +63,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
         initListView();
 
+        initDataLoader(LOADER_ID);
+
         //        registerForContextMenu(messagesListView);
+    }
+
+    private void initFields() {
+        dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        combinationMessagesList = Collections.emptyList();
     }
 
     @Override
@@ -123,7 +133,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void initListView() {
-        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
         messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
         messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
 
@@ -132,8 +141,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void updateMessagesList() {
-        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
-        messagesAdapter.setNewData(combinationMessagesList);
+        onChangedData();
     }
 
     @Override
@@ -176,5 +184,11 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
                 super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<CombinationMessage>> loader, List<CombinationMessage> combinationMessagesList) {
+        this.combinationMessagesList = combinationMessagesList;
+        messagesAdapter.setNewData(combinationMessagesList);
     }
 }

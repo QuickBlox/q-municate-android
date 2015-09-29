@@ -1,5 +1,7 @@
 package com.quickblox.q_municate.ui.fragments.contacts;
 
+import android.content.Context;
+import android.support.v4.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,14 +9,22 @@ import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.UserSearchListener;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.adapters.contacts.ContactsAdapter;
 import com.quickblox.q_municate.utils.ContactsUtils;
 import com.quickblox.q_municate_core.service.QBService;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.User;
 
-public class YourContactsFragment extends BaseContactsFragment implements UserSearchListener {
+import java.util.Collections;
+import java.util.List;
 
-    public static YourContactsFragment newInstance() {
-        return new YourContactsFragment();
+public class YourContactsFragmentBase extends BaseContactsFragmentBase implements UserSearchListener {
+
+    private final static int LOADER_ID = YourContactsFragmentBase.class.hashCode();
+
+    public static YourContactsFragmentBase newInstance() {
+        return new YourContactsFragmentBase();
     }
 
     @Override
@@ -26,6 +36,7 @@ public class YourContactsFragment extends BaseContactsFragment implements UserSe
         initFields();
         initContactsList(usersList);
         initCustomListeners();
+        initDataLoader(LOADER_ID);
 
         return view;
     }
@@ -33,7 +44,7 @@ public class YourContactsFragment extends BaseContactsFragment implements UserSe
     @Override
     protected void initFields() {
         super.initFields();
-        usersList = ContactsUtils.createContactsList(dataManager);
+        usersList = Collections.emptyList();
         swipyRefreshLayout.setEnabled(false);
     }
 
@@ -71,7 +82,10 @@ public class YourContactsFragment extends BaseContactsFragment implements UserSe
 
     @Override
     protected void updateContactsList() {
-        usersList = ContactsUtils.createContactsList(dataManager);
+        onChangedData();
+    }
+
+    private void updateLocal() {
         contactsAdapter.setList(usersList);
 
         if (searchQuery != null) {
@@ -89,5 +103,28 @@ public class YourContactsFragment extends BaseContactsFragment implements UserSe
     public void onChangedUserStatus(int userId, boolean online) {
         super.onChangedUserStatus(userId, online);
         contactsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected Loader<List<User>> createDataLoader() {
+        return new UsersLoader(getActivity(), dataManager);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<User>> loader, List<User> usersList) {
+        this.usersList = usersList;
+        updateLocal();
+    }
+
+    private static class UsersLoader extends BaseLoader<List<User>> {
+
+        public UsersLoader(Context context, DataManager dataManager) {
+            super(context, dataManager);
+        }
+
+        @Override
+        protected List<User> getItems() {
+            return ContactsUtils.createContactsList(dataManager);
+        }
     }
 }

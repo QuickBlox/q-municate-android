@@ -1,5 +1,6 @@
 package com.quickblox.q_municate.ui.fragments.contacts;
 
+import android.support.v4.content.Loader;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +11,7 @@ import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.contacts.ContactsAdapter;
-import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
+import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.uihelpers.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.utils.KeyboardUtils;
@@ -28,7 +29,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnTouch;
 
-public abstract class BaseContactsFragment extends BaseFragment {
+public abstract class BaseContactsFragmentBase extends BaseLoaderFragment<List<User>> {
 
     @Bind(R.id.contacts_swipyrefreshlayout)
     SwipyRefreshLayout swipyRefreshLayout;
@@ -119,6 +120,17 @@ public abstract class BaseContactsFragment extends BaseFragment {
     }
 
     protected abstract void updateContactsList();
+
+    @Override
+    protected Loader<List<User>> createDataLoader() {
+        // nothing by default
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<User>> loader, List<User> dialogsList) {
+        // nothing by default
+    }
 
     private class FriendObserver implements Observer {
 

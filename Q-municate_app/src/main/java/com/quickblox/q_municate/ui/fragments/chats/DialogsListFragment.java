@@ -3,10 +3,8 @@ package com.quickblox.q_municate.ui.fragments.chats;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,15 +19,15 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.loader.BaseListLoader;
+import com.quickblox.q_municate_core.core.loader.BaseLoader;
+import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
+import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
 import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
-import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
-import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
+import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
 import com.quickblox.q_municate.ui.fragments.contacts.ContactsFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -60,10 +58,10 @@ import butterknife.Bind;
 import butterknife.OnItemClick;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
-public class  DialogsListFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<List<Dialog>> {
+public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     private static final String TAG = DialogsListFragment.class.getSimpleName();
-    private static final int LOADER_ID = DialogsListFragment.class.getSimpleName().hashCode();
+    private static final int LOADER_ID = DialogsListFragment.class.hashCode();
 
     @Bind(R.id.chats_listview)
     ListView dialogsListView;
@@ -79,7 +77,6 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     private Observer messageObserver;
     private Observer userObserver;
     private Observer dialogOccupantsObserver;
-    private DialogsListLoader dialogsListLoader;
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -119,23 +116,13 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
         userObserver = new UsersObserver();
         dialogOccupantsObserver = new DialogOccupantsObserver();
         qbUser = AppSession.getSession().getUser();
-        dialogsListLoader = new DialogsListLoader(getActivity(), dataManager);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i(TAG, "+++ Calling initLoader()! +++");
-        if (getLoaderManager().getLoader(LOADER_ID) == null) {
-            Log.i(TAG, "+++ Initializing the new Loader... +++");
-        } else {
-            Log.i(TAG, "+++ Reconnecting with existing Loader (id '1')... +++");
-        }
-
-        // Initialize a Loader with id '1'. If the Loader with this id already
-        // exists, then the LoaderManager will reuse the existing Loader.
-        getLoaderManager().initLoader(LOADER_ID, null, this);
+        initDataLoader(LOADER_ID);
     }
 
     @Override
@@ -240,8 +227,7 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     }
 
     private void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl,
-                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
@@ -286,7 +272,7 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
     }
 
     private void updateDialogsList() {
-        dialogsListLoader.onContentChanged();
+        onChangedData();
     }
 
     private void deleteDialog(Dialog dialog) {
@@ -301,9 +287,13 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
         }
     }
 
+    private void launchContactsFragment() {
+        baseActivity.setCurrentFragment(ContactsFragment.newInstance());
+    }
+
     @Override
-    public Loader<List<Dialog>> onCreateLoader(int id, Bundle args) {
-        return dialogsListLoader;
+    protected Loader<List<Dialog>> createDataLoader() {
+        return new DialogsListLoader(getActivity(), dataManager);
     }
 
     @Override
@@ -313,16 +303,7 @@ public class  DialogsListFragment extends BaseFragment implements LoaderManager.
         checkEmptyList(dialogsList.size());
     }
 
-    @Override
-    public void onLoaderReset(Loader<List<Dialog>> loader) {
-
-    }
-
-    private void launchContactsFragment() {
-        baseActivity.setCurrentFragment(ContactsFragment.newInstance());
-    }
-
-    private static class DialogsListLoader extends BaseListLoader<List<Dialog>> {
+    private static class DialogsListLoader extends BaseLoader<List<Dialog>> {
 
         public DialogsListLoader(Context context, DataManager dataManager) {
             super(context, dataManager);

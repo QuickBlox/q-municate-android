@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.Loader;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -43,6 +45,8 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
+
+    private static final int LOADER_ID = PrivateDialogActivity.class.getSimpleName().hashCode();
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
@@ -70,6 +74,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         fillActionBar();
         initListView();
+
+        initDataLoader(LOADER_ID);
     }
 
     private void initFields() {
@@ -77,6 +83,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         friendObserver = new FriendObserver();
         opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
+        combinationMessagesList = Collections.emptyList();
     }
 
     private void addObservers() {
@@ -166,9 +173,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void initListView() {
-        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
-        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction,
-                combinationMessagesList, this, dialog);
+        messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
         findLastFriendsRequest();
 
         scrollListView();
@@ -177,9 +182,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void updateMessagesList() {
-        List<CombinationMessage> combinationMessagesList = createCombinationMessagesList();
-        messagesAdapter.setNewData(combinationMessagesList);
-        findLastFriendsRequest();
+        onChangedData();
     }
 
     private void findLastFriendsRequest() {
@@ -300,6 +303,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                         QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
                     }
         });
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<CombinationMessage>> loader, List<CombinationMessage> combinationMessagesList) {
+        this.combinationMessagesList = combinationMessagesList;
+        messagesAdapter.setNewData(combinationMessagesList);
+        findLastFriendsRequest();
     }
 
     private class FriendOperationAction implements FriendOperationListener {
