@@ -63,7 +63,6 @@ import java.util.Map;
 import java.util.Set;
 
 import butterknife.ButterKnife;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public abstract class BaseActivity extends AppCompatActivity implements ActionBarBridge, ConnectionBridge, LoadingBridge, SnackbarBridge {
 
@@ -231,6 +230,13 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     @Override
+    public void showSnackbar(String title, int duration, int buttonTitleResId, View.OnClickListener onClickListener) {
+        snackbar = Snackbar.make(snackBarView, title, duration);
+        snackbar.setAction(buttonTitleResId, onClickListener);
+        snackbar.show();
+    }
+
+    @Override
     public void hideSnackBar() {
         if (snackbar != null) {
             snackbar.dismiss();
@@ -265,7 +271,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     protected void onPause() {
         super.onPause();
         unregisterBroadcastReceivers();
-        Crouton.cancelAllCroutons();
     }
 
     @Override
@@ -437,10 +442,6 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             handler = new Handler();
         }
         return handler;
-    }
-
-    public void setVisibilityActionBarProgress(boolean visibility) {
-        setProgressBarIndeterminateVisibility(visibility);
     }
 
     public void addAction(String action, Command command) {

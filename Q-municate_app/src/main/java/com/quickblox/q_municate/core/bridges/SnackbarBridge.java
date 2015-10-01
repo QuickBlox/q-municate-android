@@ -10,5 +10,7 @@ public interface SnackbarBridge {
 
     void showSnackbar(int titleResId, int duration, int buttonTitleResId, View.OnClickListener onClickListener);
 
+    void showSnackbar(String title, int duration, int buttonTitleResId, View.OnClickListener onClickListener);
+
     void hideSnackBar();
 }

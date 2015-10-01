@@ -335,6 +335,16 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return existingPrivateDialog;
     }
 
+    protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user, boolean isPrivateChat) {
+        if (currentDialog != null) {
+            if (!ownMessage && !currentDialog.getDialogId().equals(qbChatMessage.getDialogId())) {
+                notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), isPrivateChat);
+            }
+        } else {
+            notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), isPrivateChat);
+        }
+    }
+
     protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
             boolean isPrivateMessage) {
         Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
@@ -355,8 +365,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    protected void notifyMessageTyping(boolean isTyping) {
+    protected void notifyMessageTyping(int userId, boolean isTyping) {
         Intent intent = new Intent(QBServiceConsts.TYPING_MESSAGE);
+        intent.putExtra(QBServiceConsts.EXTRA_USER_ID, userId);
         intent.putExtra(QBServiceConsts.EXTRA_IS_TYPING, isTyping);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -515,12 +526,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         @Override
         public void processUserIsTyping(QBPrivateChat privateChat) {
-            notifyMessageTyping(true);
+            notifyMessageTyping(privateChat.getParticipant(), true);
         }
 
         @Override
         public void processUserStopTyping(QBPrivateChat privateChat) {
-            notifyMessageTyping(false);
+            notifyMessageTyping(privateChat.getParticipant(), false);
         }
     }
 }

@@ -1,10 +1,11 @@
-package com.quickblox.q_municate.ui.fragments.contacts;
+package com.quickblox.q_municate.ui.fragments.search;
 
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,30 +15,30 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.adapters.contacts.ContactsViewPagerAdapter;
+import com.quickblox.q_municate.ui.adapters.search.SearchViewPagerAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseFragment;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import butterknife.Bind;
 
-public class ContactsFragment extends BaseFragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class SearchFragment extends BaseFragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    @Bind(R.id.contacts_viewpager)
-    ViewPager contactsViewPager;
+    @Bind(R.id.search_viewpager)
+    ViewPager searchViewPager;
 
-    @Bind(R.id.contacts_radiogroup)
-    RadioGroup modeRadioGroup;
+    @Bind(R.id.search_radiogroup)
+    RadioGroup searchRadioGroup;
 
-    private ContactsViewPagerAdapter contactsPagerAdapter;
+    private SearchViewPagerAdapter searchViewPagerAdapter;
 
-    public static ContactsFragment newInstance() {
-        return new ContactsFragment();
+    public static SearchFragment newInstance() {
+        return new SearchFragment();
     }
 
     @Override
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = layoutInflater.inflate(R.layout.fragment_contacts, container, false);
+        View view = layoutInflater.inflate(R.layout.fragment_search, container, false);
 
         activateButterKnife(view);
 
@@ -55,19 +56,20 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
     }
 
     private void initViewPagerAdapter() {
-        contactsPagerAdapter = new ContactsViewPagerAdapter(getChildFragmentManager());
-        contactsViewPager.setAdapter(contactsPagerAdapter);
-        contactsViewPager.setOnPageChangeListener(new PageChangeListener());
-        modeRadioGroup.check(R.id.your_contacts_radiobutton);
+        searchViewPagerAdapter = new SearchViewPagerAdapter(getChildFragmentManager());
+        searchViewPager.setAdapter(searchViewPagerAdapter);
+        searchViewPager.setOnPageChangeListener(new PageChangeListener());
+        searchRadioGroup.check(R.id.local_search_radiobutton);
+        searchRadioGroup.setVisibility(View.GONE);
     }
 
     private void initCustomListeners() {
-        modeRadioGroup.setOnCheckedChangeListener(new RadioGroupListener());
+        searchRadioGroup.setOnCheckedChangeListener(new RadioGroupListener());
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.contacts_list_menu, menu);
+        inflater.inflate(R.menu.search_menu, menu);
 
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
@@ -100,26 +102,19 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
     @Override
     public boolean onQueryTextSubmit(String searchQuery) {
         KeyboardUtils.hideKeyboard(baseActivity);
-
-        if (contactsPagerAdapter != null && contactsViewPager != null) {
-            contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
-        }
+        search(searchQuery);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String searchQuery) {
-        if (contactsPagerAdapter != null && contactsViewPager != null) {
-            contactsPagerAdapter.search(contactsViewPager.getCurrentItem(), searchQuery);
-        }
+        search(searchQuery);
         return true;
     }
 
     @Override
     public boolean onClose() {
-        if (contactsPagerAdapter != null && contactsViewPager != null) {
-            contactsPagerAdapter.cancelSearch(contactsViewPager.getCurrentItem());
-        }
+        cancelSearch();
         return false;
     }
 
@@ -133,18 +128,31 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
         baseActivity.setCurrentFragment(DialogsListFragment.newInstance());
     }
 
+    private void search(String searchQuery) {
+        if (searchViewPagerAdapter != null && searchViewPager != null && !TextUtils.isEmpty(searchQuery)) {
+            searchViewPagerAdapter.search(searchViewPager.getCurrentItem(), searchQuery);
+            searchRadioGroup.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void cancelSearch() {
+        if (searchViewPagerAdapter != null && searchViewPager != null) {
+            searchViewPagerAdapter.cancelSearch(searchViewPager.getCurrentItem());
+        }
+    }
+
     private class RadioGroupListener implements RadioGroup.OnCheckedChangeListener {
 
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
             switch (checkedId) {
-                case R.id.your_contacts_radiobutton:
-                    contactsViewPager.setCurrentItem(ContactsViewPagerAdapter.POSITION_YOUR_CONTACTS);
-                    contactsPagerAdapter.prepareSearch(ContactsViewPagerAdapter.POSITION_YOUR_CONTACTS);
+                case R.id.local_search_radiobutton:
+                    searchViewPager.setCurrentItem(SearchViewPagerAdapter.LOCAl_SEARCH);
+                    searchViewPagerAdapter.prepareSearch(SearchViewPagerAdapter.LOCAl_SEARCH);
                     break;
-                case R.id.all_users_radiobutton:
-                    contactsViewPager.setCurrentItem(ContactsViewPagerAdapter.POSITION_ALL_USERS);
-                    contactsPagerAdapter.prepareSearch(ContactsViewPagerAdapter.POSITION_ALL_USERS);
+                case R.id.global_search_radiobutton:
+                    searchViewPager.setCurrentItem(SearchViewPagerAdapter.GLOBAL_SEARCH);
+                    searchViewPagerAdapter.prepareSearch(SearchViewPagerAdapter.GLOBAL_SEARCH);
                     break;
             }
         }
@@ -159,11 +167,11 @@ public class ContactsFragment extends BaseFragment implements SearchView.OnQuery
         @Override
         public void onPageSelected(int position) {
             switch (position) {
-                case ContactsViewPagerAdapter.POSITION_YOUR_CONTACTS:
-                    modeRadioGroup.check(R.id.your_contacts_radiobutton);
+                case SearchViewPagerAdapter.LOCAl_SEARCH:
+                    searchRadioGroup.check(R.id.local_search_radiobutton);
                     break;
-                case ContactsViewPagerAdapter.POSITION_ALL_USERS:
-                    modeRadioGroup.check(R.id.all_users_radiobutton);
+                case SearchViewPagerAdapter.GLOBAL_SEARCH:
+                    searchRadioGroup.check(R.id.global_search_radiobutton);
                     break;
             }
         }

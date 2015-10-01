@@ -5,25 +5,25 @@
     android:orientation="vertical">
 
     <RadioGroup
-        android:id="@+id/contacts_radiogroup"
+        android:id="@+id/search_radiogroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <RadioButton
-            style="@style/ContactsRadioButtonStyle"
-            android:id="@+id/your_contacts_radiobutton"
+            style="@style/SearchRadioButtonStyle"
+            android:id="@+id/local_search_radiobutton"
             android:text="@string/frl_local_list" />
 
         <RadioButton
-            style="@style/ContactsRadioButtonStyle"
-            android:id="@+id/all_users_radiobutton"
+            style="@style/SearchRadioButtonStyle"
+            android:id="@+id/global_search_radiobutton"
             android:text="@string/frl_global_list" />
 
     </RadioGroup>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/contacts_viewpager"
+        android:id="@+id/search_viewpager"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

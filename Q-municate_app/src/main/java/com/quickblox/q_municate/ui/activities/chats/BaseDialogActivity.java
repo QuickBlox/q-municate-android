@@ -103,7 +103,7 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
     protected View emojisFragment;
 
-    protected static Dialog dialog;
+    protected Dialog dialog;
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
@@ -111,6 +111,7 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
+    protected int chatHelperIdentifier;
 
     private View rootView;
     private int keyboardHeight;
@@ -275,18 +276,9 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        hideSmileLayout();
-
-        // TODO: now it is possible only for Private chats
-        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-            if (isTypingNow) {
-                isTypingNow = false;
-                sendTypingStatus();
-            }
-        }
+    protected void onStart() {
+        super.onStart();
+        createChatLocally();
     }
 
     @Override
@@ -303,19 +295,30 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        hideSmileLayout();
+
+        // TODO: now it is possible only for Private chats
+        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+            if (isTypingNow) {
+                isTypingNow = false;
+                sendTypingStatus();
+            }
+        }
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         readAllMessages();
+        closeChatLocally();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        if (baseChatHelper != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
-                    generateBundleToInitDialog());
-        }
 
         removeActions();
         deleteObservers();
@@ -359,17 +362,8 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         updateMessagesList();
     }
 
-    protected void onConnectServiceLocally(int chatHelperIdentifier) {
-        if (baseChatHelper == null) {
-            baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
-            try {
-                baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
-                        generateBundleToInitDialog());
-            } catch (QBResponseException e) {
-                ErrorUtils.showError(this, e.getMessage());
-                finish();
-            }
-        }
+    protected void onConnectServiceLocally() {
+        createChatLocally();
     }
 
     protected void startMessageTypingAnimation() {
@@ -448,8 +442,7 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     }
 
     protected void startLoadAttachFile(final File file) {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
-                R.string.dlg_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dlg_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -546,14 +539,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         }
     }
 
-    private static List<CombinationMessage> createCombinationMessagesList() {
-        DataManager dataManager = DataManager.getInstance();
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
-        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
-                .getDialogNotificationsByDialogId(dialog.getDialogId());
-        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
-    }
-
     protected void startLoadDialogMessages() {
         if (dialog == null) {
             return;
@@ -575,7 +560,8 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     }
 
     private void readAllMessages() {
-        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(
+                dialog.getDialogId());
         dataManager.getMessageDataManager().createOrUpdate(ChatUtils.readAllMessages(messagesList,
                 AppSession.getSession().getUser()));
 
@@ -587,7 +573,30 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
     @Override
     public Loader<List<CombinationMessage>> createDataLoader() {
-        return new CombinationMessageLoader(this, dataManager);
+        return new CombinationMessageLoader(this, dataManager, dialog.getDialogId());
+    }
+
+    private void createChatLocally() {
+        if (service != null) {
+            baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
+            if (baseChatHelper != null && dialog != null) {
+                try {
+                    baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                            generateBundleToInitDialog());
+                } catch (QBResponseException e) {
+                    ErrorUtils.showError(this, e.getMessage());
+                    finish();
+                }
+            }
+        }
+    }
+
+    private void closeChatLocally() {
+        if (baseChatHelper != null) {
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                    generateBundleToInitDialog());
+        }
+        dialog = null;
     }
 
     protected abstract void updateActionBar();
@@ -608,13 +617,24 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
     public static class CombinationMessageLoader extends BaseLoader<List<CombinationMessage>> {
 
-        public CombinationMessageLoader(Context context, DataManager dataManager) {
+        private String dialogId;
+
+        public CombinationMessageLoader(Context context, DataManager dataManager, String dialogId) {
             super(context, dataManager);
+            this.dialogId = dialogId;
         }
 
         @Override
         protected List<CombinationMessage> getItems() {
             return createCombinationMessagesList();
+        }
+
+        private List<CombinationMessage> createCombinationMessagesList() {
+            DataManager dataManager = DataManager.getInstance();
+            List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
+            List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                    .getDialogNotificationsByDialogId(dialogId);
+            return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
         }
     }
 
@@ -690,13 +710,16 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
+            int userId = extras.getInt(QBServiceConsts.EXTRA_USER_ID);
             // TODO: now it is possible only for Private chats
-            if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-                boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
-                if (isTyping) {
-                    startMessageTypingAnimation();
-                } else {
-                    stopMessageTypingAnimation();
+            if (dialog != null && opponentUser != null && userId == opponentUser.getUserId()) {
+                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+                    boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
+                    if (isTyping) {
+                        startMessageTypingAnimation();
+                    } else {
+                        stopMessageTypingAnimation();
+                    }
                 }
             }
         }

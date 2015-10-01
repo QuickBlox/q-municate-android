@@ -125,13 +125,13 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(
                     combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(
                     combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
@@ -141,7 +141,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             resetUI(viewHolder);
 
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.longToMessageDate(
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(
                     combinationMessage.getCreatedDate()));
 
             if (ownMessage) {
@@ -155,8 +155,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
             setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(
-                    combinationMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             if (ownMessage) {
                 setMessageStatus(viewHolder.messageDeliveryStatusImageView, State.DELIVERED.equals(

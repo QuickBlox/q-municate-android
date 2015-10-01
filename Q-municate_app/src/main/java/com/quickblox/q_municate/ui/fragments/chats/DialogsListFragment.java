@@ -28,7 +28,7 @@ import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivit
 import com.quickblox.q_municate.ui.activities.settings.SettingsActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsListAdapter;
 import com.quickblox.q_municate.ui.fragments.base.BaseLoaderFragment;
-import com.quickblox.q_municate.ui.fragments.contacts.ContactsFragment;
+import com.quickblox.q_municate.ui.fragments.search.SearchFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.OneButtonDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -56,7 +56,6 @@ import java.util.Observer;
 
 import butterknife.Bind;
 import butterknife.OnItemClick;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
@@ -71,12 +70,8 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     private DialogsListAdapter dialogsListAdapter;
     private DataManager dataManager;
-
     private QBUser qbUser;
-    private Observer dialogObserver;
-    private Observer messageObserver;
-    private Observer userObserver;
-    private Observer dialogOccupantsObserver;
+    private Observer commonObserver;
 
     public static DialogsListFragment newInstance() {
         return new DialogsListFragment();
@@ -92,8 +87,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         initChatsDialogs();
 
         registerForContextMenu(dialogsListView);
-
-        Crouton.cancelAllCroutons();
 
         return view;
     }
@@ -111,10 +104,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
     private void initFields() {
         dataManager = DataManager.getInstance();
-        dialogObserver = new DialogObserver();
-        messageObserver = new MessageObserver();
-        userObserver = new UsersObserver();
-        dialogOccupantsObserver = new DialogOccupantsObserver();
+        commonObserver = new CommonObserver();
         qbUser = AppSession.getSession().getUser();
     }
 
@@ -138,7 +128,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
                 launchContactsFragment();
                 break;
             case R.id.action_add_chat:
-                boolean isFriends = !DataManager.getInstance().getFriendDataManager().getAll().isEmpty();
+                boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
                 if (isFriends) {
                     NewDialogActivity.start(getActivity());
                 } else {
@@ -187,8 +177,6 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     public void onResume() {
         super.onResume();
         addObservers();
-
-        Crouton.cancelAllCroutons();
 
         if (dialogsListAdapter != null) {
             checkVisibilityEmptyLabel();
@@ -239,17 +227,17 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     private void addObservers() {
-        dataManager.getDialogDataManager().addObserver(dialogObserver);
-        dataManager.getMessageDataManager().addObserver(messageObserver);
-        dataManager.getUserDataManager().addObserver(userObserver);
-        dataManager.getDialogOccupantDataManager().addObserver(dialogOccupantsObserver);
+        dataManager.getDialogDataManager().addObserver(commonObserver);
+        dataManager.getMessageDataManager().addObserver(commonObserver);
+        dataManager.getUserDataManager().addObserver(commonObserver);
+        dataManager.getDialogOccupantDataManager().addObserver(commonObserver);
     }
 
     private void deleteObservers() {
-        dataManager.getDialogDataManager().deleteObserver(dialogObserver);
-        dataManager.getMessageDataManager().deleteObserver(messageObserver);
-        dataManager.getUserDataManager().deleteObserver(userObserver);
-        dataManager.getDialogOccupantDataManager().deleteObserver(dialogOccupantsObserver);
+        dataManager.getDialogDataManager().deleteObserver(commonObserver);
+        dataManager.getMessageDataManager().deleteObserver(commonObserver);
+        dataManager.getUserDataManager().deleteObserver(commonObserver);
+        dataManager.getDialogOccupantDataManager().deleteObserver(commonObserver);
     }
 
     private void initChatsDialogs() {
@@ -261,7 +249,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
+        User occupant = ChatUtils.getOpponentFromPrivateDialog(UserFriendUtils.createLocalUser(qbUser), occupantsList);
         if (!TextUtils.isEmpty(dialog.getDialogId())) {
             PrivateDialogActivity.start(baseActivity, occupant, dialog);
         }
@@ -288,7 +276,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     private void launchContactsFragment() {
-        baseActivity.setCurrentFragment(ContactsFragment.newInstance());
+        baseActivity.setCurrentFragment(SearchFragment.newInstance());
     }
 
     @Override
@@ -311,46 +299,20 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
 
         @Override
         protected List<Dialog> getItems() {
-            return dataManager.getDialogDataManager().getAll();
+            return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
+                    dataManager, dataManager.getDialogDataManager().getAll());
         }
     }
 
-    private class DialogObserver implements Observer {
+    private class CommonObserver implements Observer {
 
         @Override
         public void update(Observable observable, Object data) {
-            if (data != null && data.equals(DialogDataManager.OBSERVE_KEY)) {
-                updateDialogsList();
-            }
-        }
-    }
-
-    private class MessageObserver implements Observer {
-
-        @Override
-        public void update(Observable observable, Object data) {
-            if (data != null && data.equals(MessageDataManager.OBSERVE_KEY)) {
-                updateDialogsList();
-            }
-        }
-    }
-
-    private class UsersObserver implements Observer {
-
-        @Override
-        public void update(Observable observable, Object data) {
-            if (data != null && data.equals(UserDataManager.OBSERVE_KEY)) {
-                updateDialogsList();
-            }
-        }
-    }
-
-    private class DialogOccupantsObserver implements Observer {
-
-        @Override
-        public void update(Observable observable, Object data) {
-            if (data != null && data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
-                updateDialogsList();
+            if (data != null) {
+                if (data.equals(DialogDataManager.OBSERVE_KEY) || data.equals(MessageDataManager.OBSERVE_KEY)
+                        || data.equals(UserDataManager.OBSERVE_KEY) || data.equals(DialogOccupantDataManager.OBSERVE_KEY)) {
+                    updateDialogsList();
+                }
             }
         }
     }

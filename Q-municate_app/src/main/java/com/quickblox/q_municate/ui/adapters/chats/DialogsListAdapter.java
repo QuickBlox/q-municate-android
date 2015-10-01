@@ -88,24 +88,10 @@ public class DialogsListAdapter extends BaseListAdapter<Dialog> {
         DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
                 .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
 
-        viewHolder.lastMessageTextView.setText(getLastMessage(message, dialogNotification));
+        viewHolder.lastMessageTextView.setText(
+                ChatUtils.getDialogLastMessage(resources.getString(R.string.cht_notification_message), message, dialogNotification));
 
         return convertView;
-    }
-
-    private String getLastMessage(Message message, DialogNotification dialogNotification) {
-        String lastMessage = "";
-
-        if (message == null && dialogNotification != null) {
-            lastMessage = resources.getString(R.string.cht_notification_message);
-        } else if (dialogNotification == null && message != null) {
-            lastMessage = message.getBody();
-        } else if (message != null && dialogNotification != null) {
-            lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate()
-                    ? message.getBody() : resources.getString(R.string.cht_notification_message);
-        }
-
-        return lastMessage;
     }
 
     private static class ViewHolder {

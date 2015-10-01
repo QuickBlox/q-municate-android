@@ -410,4 +410,43 @@ public class ChatUtils {
         Collections.sort(combinationMessagesList, new CombinationMessage.DateComparator());
         return combinationMessagesList;
     }
+
+    public static String getDialogLastMessage(String defaultLasMessage, Message message, DialogNotification dialogNotification) {
+        String lastMessage = "";
+
+        if (message == null && dialogNotification != null) {
+            lastMessage = defaultLasMessage;
+        } else if (dialogNotification == null && message != null) {
+            lastMessage = message.getBody();
+        } else if (message != null && dialogNotification != null) {
+            lastMessage = message.getCreatedDate() > dialogNotification.getCreatedDate()
+                    ? message.getBody() : defaultLasMessage;
+        }
+
+        return lastMessage;
+    }
+
+    public static List<Dialog> fillTitleForPrivateDialogsList(String titleForDeletedUser, DataManager dataManager,
+            List<Dialog> inputDialogsList) {
+        List<Dialog> dialogsList = new ArrayList<>(inputDialogsList.size());
+
+        for (Dialog dialog : inputDialogsList) {
+            if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+                List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                        .getDialogOccupantsListByDialogId(dialog.getDialogId());
+                User currentUser =  UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+                User opponentUser = ChatUtils.getOpponentFromPrivateDialog(currentUser, dialogOccupantsList);
+                if (opponentUser.getFullName() != null) {
+                    dialog.setTitle(opponentUser.getFullName());
+                    dialogsList.add(dialog);
+                } else {
+                    dialog.setTitle(titleForDeletedUser);
+                }
+            } else {
+                dialogsList.add(dialog);
+            }
+        }
+
+        return dialogsList;
+    }
 }

@@ -13,6 +13,7 @@ import com.quickblox.q_municate_core.qb.commands.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
 import java.util.concurrent.TimeUnit;
@@ -28,6 +29,11 @@ public class LoginHelper {
     }
 
     public void checkStartExistSession() {
+        if (needToClearAllData()) {
+            existingQbSessionListener.onStartSessionFail();
+            return;
+        }
+
         String userEmail = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_EMAIL);
         String userPassword = PrefsHelper.getPrefsHelper().getPref(PrefsHelper.PREF_USER_PASSWORD);
 
@@ -89,5 +95,15 @@ public class LoginHelper {
 
     public void loginChat() {
         QBLoginChatCompositeCommand.start(context);
+    }
+
+    private boolean needToClearAllData() {
+        if (DataManager.getInstance().getUserDataManager().getAll().isEmpty()) {
+            App.getInstance().getAppSharedHelper().clearAll();
+            AppSession.getSession().closeAndClear();
+            return true;
+        } else {
+            return false;
+        }
     }
 }

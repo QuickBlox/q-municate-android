@@ -32,17 +32,16 @@ dependencies {
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
     compile "com.android.support:appcompat-v7:${rootProject.appcompatVersion}"
     compile "com.android.support:design:${rootProject.supportDesignVersion}"
-    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+    compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
-    compile("de.keyboardsurfer.android.widget:crouton:${rootProject.croutonVersion}@aar") {
-        exclude group: 'com.google.android', module: 'support-v4'
-    }
+
+    compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
+
     compile "com.nineoldandroids:library:${rootProject.nineoldandroidsVersion}"
     compile 'com.github.chrisbanes.actionbarpulltorefresh:library:+'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
-    compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
     compile "com.github.orangegangsters:swipy:${rootProject.swipyVersion}@aar"
 }
 

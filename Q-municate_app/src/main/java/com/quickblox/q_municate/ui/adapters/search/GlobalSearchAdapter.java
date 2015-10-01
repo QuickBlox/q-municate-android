@@ -1,4 +1,4 @@
-package com.quickblox.q_municate.ui.adapters.contacts;
+package com.quickblox.q_municate.ui.adapters.search;
 
 import android.app.Activity;
 import android.content.res.Resources;
@@ -26,7 +26,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHolder<User>> {
+public class GlobalSearchAdapter extends FilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     private Resources resources;
     private DataManager dataManager;
@@ -34,7 +34,7 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
     private UserOperationListener userOperationListener;
     private QBFriendListHelper friendListHelper;
 
-    public ContactsAdapter(Activity activity, List<User> list) {
+    public GlobalSearchAdapter(Activity activity, List<User> list) {
         super(activity, list);
         resources = context.getResources();
         dataManager = DataManager.getInstance();
@@ -173,7 +173,7 @@ public class ContactsAdapter extends FilterAdapter<User, BaseClickListenerViewHo
         @Bind(R.id.online_imageview)
         ImageView onlineImageView;
 
-        public ViewHolder(ContactsAdapter adapter, View view) {
+        public ViewHolder(GlobalSearchAdapter adapter, View view) {
             super(adapter, view);
         }
     }

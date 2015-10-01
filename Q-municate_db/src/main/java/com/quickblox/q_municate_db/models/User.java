@@ -9,6 +9,7 @@ import static com.quickblox.q_municate_db.models.User.Column.AVATAR;
 import static com.quickblox.q_municate_db.models.User.Column.EMAIL;
 import static com.quickblox.q_municate_db.models.User.Column.FULL_NAME;
 import static com.quickblox.q_municate_db.models.User.Column.ID;
+import static com.quickblox.q_municate_db.models.User.Column.LAST_LOGIN;
 import static com.quickblox.q_municate_db.models.User.Column.LOGIN;
 import static com.quickblox.q_municate_db.models.User.Column.PHONE;
 import static com.quickblox.q_municate_db.models.User.Column.ROLE;
@@ -58,6 +59,10 @@ public class User implements Serializable {
     @DatabaseField(
             columnName = STATUS)
     private String status;
+
+    @DatabaseField(
+            columnName = LAST_LOGIN)
+    private long lastLogin;
 
     public User() {
     }
@@ -169,6 +174,14 @@ public class User implements Serializable {
         this.social = social;
     }
 
+    public long getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(long lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
     public enum Role {
 
         OWNER(0),
@@ -208,5 +221,6 @@ public class User implements Serializable {
         String AVATAR = "avatar";
         String STATUS = "status";
         String ROLE = "role";
+        String LAST_LOGIN = "last_login";
     }
 }

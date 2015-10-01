@@ -108,7 +108,8 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (notificationMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(
+                    combinationMessage.getCreatedDate()));
         } else {
 
             resetUI(viewHolder);
@@ -124,14 +125,13 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             }
 
             if (combinationMessage.getAttachment() != null) {
-                viewHolder.timeAttachMessageTextView.setText(
-                        DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
+                viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(
+                        combinationMessage.getCreatedDate()));
                 setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
                 displayAttachImage(combinationMessage.getAttachment().getRemoteUrl(), viewHolder);
             } else {
                 setViewVisibility(viewHolder.textMessageView, View.VISIBLE);
-                viewHolder.timeTextMessageTextView.setText(
-                        DateUtils.longToMessageDate(combinationMessage.getCreatedDate()));
+                viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
                 viewHolder.messageTextView.setText(combinationMessage.getBody());
             }
         }

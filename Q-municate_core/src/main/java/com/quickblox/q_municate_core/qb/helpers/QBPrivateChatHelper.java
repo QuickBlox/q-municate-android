@@ -15,7 +15,6 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -31,11 +30,9 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
     private static final String TAG = QBPrivateChatHelper.class.getSimpleName();
 
-    private QBNotificationChatListener notificationChatListener;
-
     public QBPrivateChatHelper(Context context) {
         super(context);
-        notificationChatListener = new PrivateChatNotificationListener();
+        QBNotificationChatListener notificationChatListener = new PrivateChatNotificationListener();
         addNotificationChatListener(notificationChatListener);
     }
 
@@ -58,16 +55,18 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     }
 
     @Override
-    public QBPrivateChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
+    public synchronized QBPrivateChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
+        currentDialog = dialog;
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
         QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
-        currentDialog = dialog;
         return privateChat;
     }
 
     @Override
-    public void closeChat(QBDialog dialogId, Bundle additional) {
-        currentDialog = null;
+    public synchronized void closeChat(QBDialog qbDialog, Bundle additional) {
+        if (currentDialog != null && currentDialog.getDialogId().equals(qbDialog.getDialogId())) {
+            currentDialog = null;
+        }
     }
 
     public void init(QBUser user) {
@@ -78,7 +77,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         if (qbChatMessage.getId() != null) {
             User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
             saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
-            notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), true);
+
+            checkForSendingNotification(false, qbChatMessage, user, true);
         }
     }
 

@@ -1,12 +1,12 @@
 package com.quickblox.q_municate.utils.helpers;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseActivity;
+import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -15,41 +15,16 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-
 public class ActivityUIHelper {
 
-    private Activity activity;
-    private View newMessageView;
-    private TextView newMessageTextView;
-    private TextView senderMessageTextView;
-    private Button notificationActionButton;
+    private BaseActivity baseActivity;
 
     private User senderUser;
     private Dialog messagesDialog;
     private boolean isPrivateMessage;
 
-    public ActivityUIHelper(Activity activity) {
-        this.activity = activity;
-        initUI();
-        initListeners();
-    }
-
-    private void initUI() {
-        newMessageView = activity.getLayoutInflater().inflate(R.layout.item_new_message, null);
-        newMessageTextView = (TextView) newMessageView.findViewById(R.id.message_textview);
-        senderMessageTextView = (TextView) newMessageView.findViewById(R.id.sender_textview);
-        notificationActionButton = (Button) newMessageView.findViewById(R.id.notification_action_button);
-    }
-
-    private void initListeners() {
-        notificationActionButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                showDialog();
-            }
-        });
+    public ActivityUIHelper(BaseActivity baseActivity) {
+        this.baseActivity = baseActivity;
     }
 
     public void showChatMessageNotification(Bundle extras) {
@@ -58,7 +33,8 @@ public class ActivityUIHelper {
         String dialogId = extras.getString(QBServiceConsts.EXTRA_DIALOG_ID);
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         if (isMessagesDialogCorrect(dialogId)) {
-            showNewMessageAlert(senderUser, message);
+            message = baseActivity.getString(R.string.glgm_snackbar_new_message_title, senderUser.getFullName(), message);
+            showNewNotification(senderUser, message);
         }
     }
 
@@ -77,36 +53,48 @@ public class ActivityUIHelper {
             String dialogId = dialogOccupant.getDialog().getDialogId();
             isPrivateMessage = true;
             if (isMessagesDialogCorrect(dialogId)) {
-                showNewMessageAlert(senderUser, message);
+                message = baseActivity.getString(R.string.glgm_snackbar_new_contact_request_title, senderUser.getFullName());
+                showNewNotification(senderUser, message);
             }
         }
     }
 
-    public void showNewMessageAlert(User senderUser, String message) {
+    public void showNewNotification(User senderUser, String message) {
         if (senderUser == null) {
             return;
         }
 
-        newMessageTextView.setText(message);
-        senderMessageTextView.setText(senderUser.getFullName());
-        Crouton.cancelAllCroutons();
-        Crouton.show(activity, newMessageView);
+        baseActivity.hideSnackBar();
+        baseActivity.showSnackbar(
+                message,
+                Snackbar.LENGTH_LONG,
+                R.string.dlg_reply,
+                new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        showDialog();
+                    }
+                });
     }
 
     protected void showDialog() {
+        if (baseActivity instanceof BaseDialogActivity) {
+            baseActivity.finish();
+        }
+
         if (isPrivateMessage) {
             startPrivateChatActivity();
         } else {
             startGroupChatActivity();
         }
-        Crouton.cancelAllCroutons();
     }
 
     private void startPrivateChatActivity() {
-        PrivateDialogActivity.start(activity, senderUser, messagesDialog);
+        PrivateDialogActivity.start(baseActivity, senderUser, messagesDialog);
     }
 
     private void startGroupChatActivity() {
-        GroupDialogActivity.start(activity, messagesDialog);
+        GroupDialogActivity.start(baseActivity, messagesDialog);
     }
 }

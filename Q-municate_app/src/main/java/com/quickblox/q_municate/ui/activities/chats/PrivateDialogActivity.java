@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
@@ -79,6 +78,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void initFields() {
+        chatHelperIdentifier = QBService.PRIVATE_CHAT_HELPER;
         friendOperationAction = new FriendOperationAction();
         friendObserver = new FriendObserver();
         opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
@@ -108,12 +108,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        Crouton.cancelAllCroutons();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
@@ -138,7 +132,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void onConnectServiceLocally(QBService service) {
-        onConnectServiceLocally(QBService.PRIVATE_CHAT_HELPER);
+        onConnectServiceLocally();
         setOnlineStatus(opponentUser);
     }
 

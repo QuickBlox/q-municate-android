@@ -69,6 +69,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     private void initFields() {
+        chatHelperIdentifier = QBService.GROUP_CHAT_HELPER;
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         combinationMessagesList = Collections.emptyList();
     }
@@ -95,7 +96,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void onConnectServiceLocally(QBService service) {
-        onConnectServiceLocally(QBService.GROUP_CHAT_HELPER);
+        onConnectServiceLocally();
     }
 
     @Override

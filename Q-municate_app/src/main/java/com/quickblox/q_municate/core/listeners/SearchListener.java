@@ -1,6 +1,6 @@
 package com.quickblox.q_municate.core.listeners;
 
-public interface UserSearchListener {
+public interface SearchListener {
 
     void prepareSearch();
 

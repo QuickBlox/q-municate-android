@@ -77,7 +77,7 @@
         <item name="android:textOn"></item>
     </style>
 
-    <style name="ContactsRadioButtonStyle">
+    <style name="SearchRadioButtonStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/contact_item_header_height</item>
         <item name="android:textColor">@drawable/selector_contacts_tab_text</item>
