@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.Loader;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
@@ -38,14 +36,10 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
-
-    private static final int LOADER_ID = PrivateDialogActivity.class.getSimpleName().hashCode();
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
@@ -74,10 +68,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
         fillActionBar();
         initMessagesRecyclerView();
-
-        initDataLoader(LOADER_ID);
-
-        showActionBarProgress();
     }
 
     private void initFields() {
@@ -86,7 +76,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         friendObserver = new FriendObserver();
         opponentUser = (User) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_OPPONENT);
         dialog = (Dialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        combinationMessagesList = Collections.emptyList();
+        combinationMessagesList = createCombinationMessagesList();
     }
 
     private void addObservers() {
@@ -181,8 +171,10 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     @Override
     protected void updateMessagesList() {
-        showActionBarProgress();
-        onChangedData();
+        this.combinationMessagesList = createCombinationMessagesList();
+        messagesAdapter.setList(combinationMessagesList);
+        findLastFriendsRequest();
+        scrollMessagesToBottom();
     }
 
     private void findLastFriendsRequest() {
@@ -302,15 +294,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
                         QBRejectFriendCommand.start(PrivateDialogActivity.this, userId);
                     }
         });
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<CombinationMessage>> loader, List<CombinationMessage> combinationMessagesList) {
-        this.combinationMessagesList = combinationMessagesList;
-        messagesAdapter.setList(combinationMessagesList);
-        findLastFriendsRequest();
-        hideActionBarProgress();
-        scrollMessagesToBottom();
     }
 
     private class FriendOperationAction implements FriendOperationListener {

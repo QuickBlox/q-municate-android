@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.content.Loader;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -32,9 +31,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
+import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
-import com.quickblox.q_municate.ui.activities.base.BaseLoaderActivity;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiFragment;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiGridFragment;
 import com.quickblox.q_municate.ui.views.emoji.emojiTypes.EmojiObject;
@@ -77,7 +76,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public abstract class BaseDialogActivity extends BaseLoaderActivity<List<CombinationMessage>> implements
+public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
 
@@ -181,12 +180,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     protected void initMessagesRecyclerView() {
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        mainThreadHandler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
-//            }
-//        });
     }
 
     private void initListeners() {
@@ -546,17 +539,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
         if (!error) {
             messageEditText.setText(ConstsCore.EMPTY_STRING);
-//            Message tempLocalMessage = ChatUtils.createTempLocalMessage(
-//                    dialog.hashCode() - System.currentTimeMillis(),
-//                    null,
-//                    messageEditText.getText().toString(),
-//                    null);
-//            DialogOccupant dialogOccupant = new DialogOccupant();
-//            dialogOccupant.setDialog(dialog);
-//            dialogOccupant.setUser(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()));
-//            tempLocalMessage.setDialogOccupant(dialogOccupant);
-//            tempLocalMessage.setCreatedDate(DateUtilsCore.getCurrentTime()-20);
-//            messagesAdapter.addItem(new CombinationMessage(tempLocalMessage));
             scrollMessagesToBottom();
         }
     }
@@ -593,11 +575,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
                 dialogNotificationsList, AppSession.getSession().getUser()));
     }
 
-    @Override
-    public Loader<List<CombinationMessage>> createDataLoader() {
-        return new CombinationMessageLoader(this, dataManager, dialog.getDialogId());
-    }
-
     private void createChatLocally() {
         if (service != null) {
             baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
@@ -619,6 +596,13 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
                     generateBundleToInitDialog());
         }
         dialog = null;
+    }
+
+    protected List<CombinationMessage> createCombinationMessagesList() {
+        List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialog.getDialogId());
+        List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
+                .getDialogNotificationsByDialogId(dialog.getDialogId());
+        return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
     }
 
     protected abstract void updateActionBar();
@@ -703,6 +687,8 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
             if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
                 scrollMessagesToBottom();
             }
+
+            hideActionBarProgress();
         }
     }
 
