@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.Loader;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -11,6 +13,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +32,9 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
+import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.activities.base.BaseLoaderActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiFragment;
 import com.quickblox.q_municate.ui.fragments.chats.EmojiGridFragment;
 import com.quickblox.q_municate.ui.views.emoji.emojiTypes.EmojiObject;
@@ -52,7 +57,6 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.DialogNotificationDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
@@ -72,16 +76,18 @@ import java.util.TimerTask;
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public abstract class BaseDialogActivity extends BaseLoaderActivity<List<CombinationMessage>> implements
         ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
         EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
 
     private static final int TYPING_DELAY = 1000;
+    private static final int DELAY_SCROLLING_LIST = 300;
 
-    @Bind(R.id.messages_listview)
-    protected StickyListHeadersListView messagesListView;
+    private static Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+
+    @Bind(R.id.messages_recycleview)
+    protected RecyclerView messagesRecyclerView;
 
     @Bind(R.id.message_edittext)
     protected EditText messageEditText;
@@ -98,16 +104,13 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     @Bind(R.id.message_typing_box_imageview)
     protected ImageView messageTypingBoxImageView;
 
-    @Bind(R.id.load_more_linearlayout)
-    protected View loadMoreView;
-
     protected View emojisFragment;
 
     protected Dialog dialog;
     protected Resources resources;
     protected DataManager dataManager;
     protected ImageUtils imageUtils;
-    protected BaseListAdapter messagesAdapter;
+    protected BaseRecyclerViewAdapter messagesAdapter;
     protected User opponentUser;
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
@@ -173,7 +176,17 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         emojisFragment = _findViewById(R.id.emojicons_fragment);
         sendButton.setEnabled(false);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
-        loadMoreView.setVisibility(View.GONE);
+    }
+
+    protected void initMessagesRecyclerView() {
+        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        mainThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+//            }
+//        });
     }
 
     private void initListeners() {
@@ -282,19 +295,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        // TODO need to refactor!
-        boolean isNeedToOpenDialog = PrefsHelper.getPrefsHelper().getPref(
-                PrefsHelper.PREF_PUSH_MESSAGE_NEED_TO_OPEN_DIALOG, false);
-
-        if (isNeedToOpenDialog) {
-            finish();
-        }
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
 
@@ -313,13 +313,12 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
     protected void onStop() {
         super.onStop();
         readAllMessages();
-        closeChatLocally();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        closeChatLocally();
         removeActions();
         deleteObservers();
         unregisterBroadcastReceivers();
@@ -469,7 +468,7 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
     @Override
     public void onScrollMessagesToBottom() {
-        scrollListView();
+        scrollMessagesToBottom();
     }
 
     @Override
@@ -510,8 +509,17 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         return emojisFragment.getVisibility() == View.VISIBLE;
     }
 
-    protected void scrollListView() {
-        messagesListView.setSelection(messagesAdapter.getCount() - 1);
+    protected void scrollMessagesToBottom() {
+        scrollMessagesWithDelay();
+    }
+
+    private void scrollMessagesWithDelay() {
+        mainThreadHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                messagesRecyclerView.scrollToPosition(messagesAdapter.getItemCount() - 1);
+            }
+        }, DELAY_SCROLLING_LIST);
     }
 
     protected void sendMessage(boolean privateMessage) {
@@ -531,11 +539,25 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
             ErrorUtils.showError(this, this.getString(
                     com.quickblox.q_municate_core.R.string.dlg_not_joined_room));
             error = true;
+        } catch (Exception e) {
+            ErrorUtils.showError(this, e);
+            error = true;
         }
 
         if (!error) {
             messageEditText.setText(ConstsCore.EMPTY_STRING);
-            scrollListView();
+//            Message tempLocalMessage = ChatUtils.createTempLocalMessage(
+//                    dialog.hashCode() - System.currentTimeMillis(),
+//                    null,
+//                    messageEditText.getText().toString(),
+//                    null);
+//            DialogOccupant dialogOccupant = new DialogOccupant();
+//            dialogOccupant.setDialog(dialog);
+//            dialogOccupant.setUser(UserFriendUtils.createLocalUser(AppSession.getSession().getUser()));
+//            tempLocalMessage.setDialogOccupant(dialogOccupant);
+//            tempLocalMessage.setCreatedDate(DateUtilsCore.getCurrentTime()-20);
+//            messagesAdapter.addItem(new CombinationMessage(tempLocalMessage));
+            scrollMessagesToBottom();
         }
     }
 
@@ -609,8 +631,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
     protected abstract Bundle generateBundleToInitDialog();
 
-    protected abstract void initListView();
-
     protected abstract void updateMessagesList();
 
     protected abstract void onFileLoaded(QBFile file);
@@ -630,7 +650,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
         }
 
         private List<CombinationMessage> createCombinationMessagesList() {
-            DataManager dataManager = DataManager.getInstance();
             List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(dialogId);
             List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                     .getDialogNotificationsByDialogId(dialogId);
@@ -681,14 +700,8 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
         @Override
         public void execute(Bundle bundle) {
-            if (skipMessages != 0) {
-                messagesListView.setSelection(0);
-            }
-
-            hideActionBarProgress();
-
             if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-                scrollListView();
+                scrollMessagesToBottom();
             }
         }
     }
@@ -697,10 +710,6 @@ public abstract class BaseDialogActivity extends BaseLoaderActivity<List<Combina
 
         @Override
         public void execute(Bundle bundle) {
-            if (skipMessages != 0) {
-                messagesListView.setSelection(0);
-            }
-
             hideActionBarProgress();
         }
     }

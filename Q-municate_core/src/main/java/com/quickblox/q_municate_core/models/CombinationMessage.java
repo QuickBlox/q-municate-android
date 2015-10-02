@@ -117,7 +117,7 @@ public class CombinationMessage implements Serializable {
     }
 
     public boolean isIncoming(int currentUserId) {
-        return currentUserId != dialogOccupant.getUser().getUserId();
+        return dialogOccupant != null && dialogOccupant.getUser() != null && currentUserId != dialogOccupant.getUser().getUserId();
     }
 
     @Override

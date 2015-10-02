@@ -56,7 +56,8 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         createOrUpdate(object, true);
     }
 
-    private void createOrUpdate(Object object, boolean notify) {
+    @Override
+    public void createOrUpdate(Object object, boolean notify) {
         try {
             dao.createOrUpdate((T) object);
 
@@ -112,10 +113,17 @@ public abstract class BaseManager<T> extends Observable implements Manager {
 
     @Override
     public void update(Object object) {
+        update(object, true);
+    }
+
+    @Override
+    public void update(Object object, boolean notify) {
         try {
             dao.update((T) object);
 
-            notifyObservers(OBSERVE_KEY);
+            if (notify) {
+                notifyObservers(OBSERVE_KEY);
+            }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
         }

@@ -50,7 +50,6 @@ import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSignUpRestCommand;
 import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
-import com.quickblox.q_municate_core.qb.commands.QBUpdateDialogLocalCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
@@ -148,7 +147,6 @@ public class QBService extends Service {
         registerLeaveGroupDialogCommand();
         registerLoadAttachFileCommand();
         registerLoadChatsDialogsCommand();
-        registerUpdateChatDialogLocalCommand();
         registerLoadDialogMessagesCommand();
         registerJoinGroupChatsCommand();
         registerLoginChatWithJoinGroupChatsCommand();
@@ -352,17 +350,6 @@ public class QBService extends Service {
                 QBServiceConsts.LOAD_CHATS_DIALOGS_FAIL_ACTION);
 
         serviceCommandMap.put(QBServiceConsts.LOAD_CHATS_DIALOGS_ACTION, chatsDialogsCommand);
-    }
-
-    private void registerUpdateChatDialogLocalCommand() {
-        QBPrivateChatHelper privateChatHelper = (QBPrivateChatHelper) getHelper(PRIVATE_CHAT_HELPER);
-
-        QBUpdateDialogLocalCommand updateChatDialogLocalCommand = new QBUpdateDialogLocalCommand(this,
-                privateChatHelper,
-                QBServiceConsts.UPDATE_CHAT_DIALOG_SUCCESS_ACTION,
-                QBServiceConsts.UPDATE_CHAT_DIALOG_FAIL_ACTION);
-
-        serviceCommandMap.put(QBServiceConsts.UPDATE_CHAT_DIALOG_ACTION, updateChatDialogLocalCommand);
     }
 
     private void registerLoadDialogMessagesCommand() {

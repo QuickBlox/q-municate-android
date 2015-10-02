@@ -42,7 +42,7 @@ public class UserFriendUtils {
         user.setEmail(qbUser.getEmail());
         user.setPhone(qbUser.getPhone());
         user.setLogin(qbUser.getLogin());
-        user.setLastLogin(qbUser.getLastRequestAt().getTime());
+        user.setLastLogin(qbUser.getLastRequestAt() != null ? qbUser.getLastRequestAt().getTime() : 0);
         user.setRole(role);
 
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());

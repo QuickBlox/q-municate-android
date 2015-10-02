@@ -24,13 +24,13 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
@@ -61,11 +61,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         deleteTempMessages();
         startLoadDialogMessages();
 
-        initListView();
+        initMessagesRecyclerView();
 
         initDataLoader(LOADER_ID);
 
-        //        registerForContextMenu(messagesListView);
+        showActionBarProgress();
+        //        registerForContextMenu(messagesRecyclerView);
     }
 
     private void initFields() {
@@ -75,12 +76,22 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
+    protected void initMessagesRecyclerView() {
+        super.initMessagesRecyclerView();
+        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
+        messagesRecyclerView.addItemDecoration(new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+        messagesRecyclerView.setAdapter(messagesAdapter);
+
+        scrollMessagesToBottom();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         updateData();
 
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
+            scrollMessagesToBottom();
         }
     }
 
@@ -133,15 +144,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     }
 
     @Override
-    protected void initListView() {
-        messagesAdapter = new GroupDialogMessagesAdapter(this, combinationMessagesList, this, dialog);
-        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
-
-        scrollListView();
-    }
-
-    @Override
     protected void updateMessagesList() {
+        showActionBarProgress();
         onChangedData();
     }
 
@@ -190,6 +194,8 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     public void onLoadFinished(Loader<List<CombinationMessage>> loader, List<CombinationMessage> combinationMessagesList) {
         this.combinationMessagesList = combinationMessagesList;
-        messagesAdapter.setNewData(combinationMessagesList);
+        messagesAdapter.setList(combinationMessagesList);
+        hideActionBarProgress();
+        scrollMessagesToBottom();
     }
 }

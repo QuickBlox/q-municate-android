@@ -8,16 +8,11 @@
 
     <include layout="@layout/toolbar" />
 
-    <include layout="@layout/view_load_more" />
-
-    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
-        android:id="@+id/messages_listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/messages_recycleview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:transcriptMode="alwaysScroll"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
+        android:layout_weight="1"/>
 
     <include layout="@layout/view_message_typing_status" />
 

@@ -45,7 +45,6 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -100,12 +99,11 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         notificationChatListeners.add(notificationChatListener);
     }
 
-    public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId,
-            String dialogId) throws QBResponseException {
+    public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId, String dialogId) throws QBResponseException {
         addNecessaryPropertyForQBChatMessage(qbChatMessage, dialogId);
 
         sendPrivateMessage(qbChatMessage, opponentId);
-        saveMessageToCache(dialogId, qbChatMessage, null);
+        saveMessageToCache(dialogId, qbChatMessage, null, true);
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId) throws QBResponseException {
@@ -146,8 +144,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void saveTempMessages(List<QBDialog> qbDialogsList) {
-        dataManager.getMessageDataManager().createOrUpdate(
-                ChatUtils.createTempLocalMessagesList(qbDialogsList));
+        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.createTempLocalMessagesList(qbDialogsList));
     }
 
     protected void saveTempMessage(Message message) {
@@ -189,8 +186,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
             customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT, lastDateLoad);
-        } else {
-            deleteMessagesByDialogId(qbDialog.getDialogId());
         }
 
         List<QBChatMessage> qbMessagesList = QBChatService.getDialogMessages(qbDialog,
@@ -204,51 +199,45 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveMessagesToCache(List<QBChatMessage> qbMessagesList, String dialogId) {
-        for (QBChatMessage qbChatMessage : qbMessagesList) {
-            saveMessageToCache(dialogId, qbChatMessage, State.READ);
+        for (int i = 0; i < qbMessagesList.size(); i++) {
+            QBChatMessage qbChatMessage = qbMessagesList.get(i);
+            boolean notify = i == qbMessagesList.size() - 1;
+            saveMessageToCache(dialogId, qbChatMessage, State.READ, notify);
         }
     }
 
-    protected void saveMessageToCache(String dialogId, QBChatMessage qbChatMessage, State state) {
+    protected void saveMessageToCache(String dialogId, QBChatMessage qbChatMessage, State state, boolean notify) {
         DialogOccupant dialogOccupant;
         if (qbChatMessage.getSenderId() == null) {
-            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId,
-                    chatCreator.getId());
+            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, chatCreator.getId());
         } else {
-            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId,
-                    qbChatMessage.getSenderId());
+            dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         }
 
         boolean isDialogNotification = qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null;
         if (isDialogNotification) {
-            saveDialogNotificationToCache(dialogOccupant, qbChatMessage);
+            saveDialogNotificationToCache(dialogOccupant, qbChatMessage, notify);
         } else {
             Message message = ChatUtils.createLocalMessage(qbChatMessage, dialogOccupant, state);
             if (qbChatMessage.getAttachments() != null && !qbChatMessage.getAttachments().isEmpty()) {
-                ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(
-                        qbChatMessage.getAttachments());
+                ArrayList<QBAttachment> attachmentsList = new ArrayList<QBAttachment>(qbChatMessage.getAttachments());
                 Attachment attachment = ChatUtils.createLocalAttachment(attachmentsList.get(0));
                 message.setAttachment(attachment);
 
-                dataManager.getAttachmentDataManager().createOrUpdate(attachment);
+                dataManager.getAttachmentDataManager().createOrUpdate(attachment, notify);
             }
 
-            dataManager.getMessageDataManager().createOrUpdate(message);
+            dataManager.getMessageDataManager().createOrUpdate(message, notify);
         }
     }
 
-    protected void saveDialogNotificationToCache(DialogOccupant dialogOccupant,
-            QBChatMessage qbChatMessage) {
+    protected void saveDialogNotificationToCache(DialogOccupant dialogOccupant, QBChatMessage qbChatMessage, boolean notify) {
         DialogNotification dialogNotification = ChatUtils.createLocalDialogNotification(context, qbChatMessage, dialogOccupant);
-        saveDialogNotificationToCache(dialogNotification);
+        saveDialogNotificationToCache(dialogNotification, notify);
     }
 
-    protected void saveDialogNotificationToCache(DialogNotification dialogNotification) {
-        dataManager.getDialogNotificationDataManager().create(dialogNotification);
-    }
-
-    private void deleteMessagesByDialogId(String dialogId) {
-//        ChatDatabaseManager.deleteMessagesByDialogId(context, dialogId);
+    protected void saveDialogNotificationToCache(DialogNotification dialogNotification, boolean notify) {
+        dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
     }
 
     private void deleteDialogLocal(String dialogId) {
@@ -336,12 +325,17 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user, boolean isPrivateChat) {
+        String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        if (qbChatMessage.getId() == null || dialogId == null) {
+            return;
+        }
+
         if (currentDialog != null) {
-            if (!ownMessage && !currentDialog.getDialogId().equals(qbChatMessage.getDialogId())) {
-                notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), isPrivateChat);
+            if (!ownMessage && !currentDialog.getDialogId().equals(dialogId)) {
+                notifyMessageReceived(qbChatMessage, user, dialogId, isPrivateChat);
             }
         } else {
-            notifyMessageReceived(qbChatMessage, user, qbChatMessage.getDialogId(), isPrivateChat);
+            notifyMessageReceived(qbChatMessage, user, dialogId, isPrivateChat);
         }
     }
 
@@ -351,7 +345,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
 
-        if (!chatMessage.getAttachments().isEmpty()) {
+        if (chatMessage.getAttachments() != null && !chatMessage.getAttachments().isEmpty()) {
             extraChatMessage = context.getResources().getString(R.string.file_was_attached);
         } else {
             extraChatMessage = messageBody;
@@ -433,11 +427,11 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     public void updateStatusMessageLocal(Message message) {
-        dataManager.getMessageDataManager().update(message);
+        dataManager.getMessageDataManager().update(message, false);
     }
 
     public void updateStatusNotificationMessageLocal(DialogNotification dialogNotification) {
-        dataManager.getDialogNotificationDataManager().update(dialogNotification);
+        dataManager.getDialogNotificationDataManager().update(dialogNotification, false);
     }
 
     public void updateStatusMessageLocal(String messageId, State state) {
@@ -456,7 +450,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public interface QBNotificationChatListener {
 
-        public void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
+        void onReceivedNotification(String notificationType, QBChatMessage chatMessage);
     }
 
     private class GroupChatMessageListener implements QBMessageListener<QBGroupChat> {
@@ -497,8 +491,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         }
 
         @Override
-        public void processError(QBPrivateChat privateChat, QBChatException error,
-                QBChatMessage originMessage) {
+        public void processError(QBPrivateChat privateChat, QBChatException error, QBChatMessage originMessage) {
             // TODO: need to be implemented
         }
 

@@ -1,8 +1,9 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
-import android.content.Context;
+import android.app.Activity;
 import android.graphics.Bitmap;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -17,7 +18,9 @@ import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListene
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
+import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ColorUtils;
@@ -26,39 +29,63 @@ import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.users.model.QBUser;
 
 import java.io.File;
 import java.util.List;
 
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
-public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<CombinationMessage> implements
-        ReceiveFileFromBitmapTask.ReceiveFileListener, StickyListHeadersAdapter {
+import butterknife.Bind;
 
-    protected static int TYPE_REQUEST_MESSAGE = 0;
-    protected static int TYPE_OWN_MESSAGE = 1;
-    protected static int TYPE_OPPONENT_MESSAGE = 2;
-    protected static int COMMON_TYPE_COUNT = 3;
+public abstract class BaseDialogMessagesAdapter
+        extends BaseRecyclerViewAdapter<CombinationMessage, BaseClickListenerViewHolder<CombinationMessage>>
+        implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
+
+    protected static final int TYPE_REQUEST_MESSAGE = 0;
+    protected static final int TYPE_OWN_MESSAGE = 1;
+    protected static final int TYPE_OPPONENT_MESSAGE = 2;
 
     protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected Dialog dialog;
-
     protected ColorUtils colorUtils;
+    protected QBUser currentUser;
+
     private FileUtils fileUtils;
 
-    public BaseDialogMessagesAdapter(Context context, List<CombinationMessage> objectsList) {
-        super(context, objectsList);
-        imageUtils = new ImageUtils((android.app.Activity) context);
+    public BaseDialogMessagesAdapter(Activity activity, List<CombinationMessage> objectsList) {
+        super(activity, objectsList);
+        imageUtils = new ImageUtils(activity);
         colorUtils = new ColorUtils();
         fileUtils = new FileUtils();
+        currentUser = AppSession.getSession().getUser();
     }
 
-    protected boolean isOwnMessage(int senderId) {
-        return senderId == currentUser.getId();
+    @Override
+    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
+        View view = layoutInflater.inflate(R.layout.item_chat_sticky_header_date, parent, false);
+        return new RecyclerView.ViewHolder(view) {
+        };
+    }
+
+    @Override
+    public long getHeaderId(int position) {
+        CombinationMessage combinationMessage = getItem(position);
+        return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
+    }
+
+    @Override
+    public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder, int position) {
+        View view = holder.itemView;
+
+        TextView headerTextView = (TextView) view.findViewById(R.id.header_date_textview);
+        CombinationMessage combinationMessage = getItem(position);
+        headerTextView.setText(DateUtils.toTodayYesterdayFullMonthDate(combinationMessage.getCreatedDate()));
     }
 
     protected void displayAttachImage(String attachUrl, final ViewHolder viewHolder) {
@@ -83,6 +110,19 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
         imageView.setImageResource(getMessageStatusIconId(messageDelivered, messageRead));
     }
 
+    protected int getItemViewType(CombinationMessage combinationMessage) {
+        boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
+        if (combinationMessage.getNotificationType() == null) {
+            if (ownMessage) {
+                return TYPE_OWN_MESSAGE;
+            } else {
+                return TYPE_OPPONENT_MESSAGE;
+            }
+        } else {
+            return TYPE_REQUEST_MESSAGE;
+        }
+    }
+
     protected void resetUI(ViewHolder viewHolder) {
         setViewVisibility(viewHolder.attachMessageRelativeLayout, View.GONE);
         setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
@@ -103,50 +143,6 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
         if (view != null) {
             view.setVisibility(visibility);
         }
-    }
-
-    @Override
-    public View getHeaderView(int position, View convertView, ViewGroup parent) {
-        HeaderViewHolder holder;
-
-        CombinationMessage message = getItem(position);
-
-        if (convertView == null) {
-            holder = new HeaderViewHolder();
-            convertView = layoutInflater.inflate(R.layout.item_chat_sticky_header_date, parent, false);
-            holder.headerTextView = (TextView) convertView.findViewById(R.id.header_date_textview);
-            convertView.setTag(holder);
-        } else {
-            holder = (HeaderViewHolder) convertView.getTag();
-        }
-
-        if (message != null) {
-            long time = message.getCreatedDate();
-            holder.headerTextView.setText(DateUtils.longToMessageListHeaderDate(time));
-        }
-
-        return convertView;
-    }
-
-    @Override
-    public long getHeaderId(int position) {
-        String timeString;
-
-        CombinationMessage message = getItem(position);
-        long time = message.getCreatedDate();
-        timeString = DateUtils.longToMessageListHeaderDate(time);
-
-        if (!TextUtils.isEmpty(timeString)) {
-            return timeString.subSequence(ConstsCore.ZERO_INT_VALUE, timeString.length() - 1).charAt(
-                    ConstsCore.ZERO_INT_VALUE);
-        } else {
-            return ConstsCore.ZERO_INT_VALUE;
-        }
-    }
-
-    private class HeaderViewHolder {
-
-        TextView headerTextView;
     }
 
     public class ImageLoadingListener extends SimpleImageLoadingListener {
@@ -197,10 +193,8 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
 
                 @Override
                 public void onClick(View view) {
-                    view.startAnimation(AnimationUtils.loadAnimation(context,
-                            R.anim.chat_attached_file_click));
-                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils,
-                            loadedImageBitmap, false);
+                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
+                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils, loadedImageBitmap, false);
                 }
             };
         }
@@ -220,23 +214,74 @@ public abstract class BaseDialogMessagesAdapter extends BaseListAdapter<Combinat
         }
     }
 
-    public class ViewHolder {
+    protected static class ViewHolder extends BaseViewHolder<CombinationMessage> {
 
-        public RoundedImageView avatarImageView;
-        public TextView nameTextView;
-        public View textMessageView;
-        public ImageView messageDeliveryStatusImageView;
-        public ImageView attachDeliveryStatusImageView;
-        public RelativeLayout progressRelativeLayout;
-        public RelativeLayout attachMessageRelativeLayout;
-        public TextView messageTextView;
-        public MaskedImageView attachImageView;
-        public TextView timeTextMessageTextView;
-        public TextView timeAttachMessageTextView;
-        public ProgressBar verticalProgressBar;
-        public ProgressBar centeredProgressBar;
-        public ImageView acceptFriendImageView;
-        public View dividerView;
-        public ImageView rejectFriendImageView;
+        @Nullable
+        @Bind(R.id.avatar_imageview)
+        RoundedImageView avatarImageView;
+
+        @Nullable
+        @Bind(R.id.name_textview)
+        TextView nameTextView;
+
+        @Nullable
+        @Bind(R.id.text_message_view)
+        View textMessageView;
+
+        @Nullable
+        @Bind(R.id.text_message_delivery_status_imageview)
+        ImageView messageDeliveryStatusImageView;
+
+        @Nullable
+        @Bind(R.id.attach_message_delivery_status_imageview)
+        ImageView attachDeliveryStatusImageView;
+
+        @Nullable
+        @Bind(R.id.progress_relativelayout)
+        RelativeLayout progressRelativeLayout;
+
+        @Nullable
+        @Bind(R.id.attach_message_relativelayout)
+        RelativeLayout attachMessageRelativeLayout;
+
+        @Nullable
+        @Bind(R.id.message_textview)
+        TextView messageTextView;
+
+        @Nullable
+        @Bind(R.id.attach_imageview)
+        MaskedImageView attachImageView;
+
+        @Nullable
+        @Bind(R.id.time_text_message_textview)
+        TextView timeTextMessageTextView;
+
+        @Nullable
+        @Bind(R.id.time_attach_message_textview)
+        TextView timeAttachMessageTextView;
+
+        @Nullable
+        @Bind(R.id.vertical_progressbar)
+        ProgressBar verticalProgressBar;
+
+        @Nullable
+        @Bind(R.id.centered_progressbar)
+        ProgressBar centeredProgressBar;
+
+        @Nullable
+        @Bind(R.id.accept_friend_imagebutton)
+        ImageView acceptFriendImageView;
+
+        @Nullable
+        @Bind(R.id.divider_view)
+        View dividerView;
+
+        @Nullable
+        @Bind(R.id.reject_friend_imagebutton)
+        ImageView rejectFriendImageView;
+
+        public ViewHolder(BaseDialogMessagesAdapter adapter, View view) {
+            super(adapter, view);
+        }
     }
 }

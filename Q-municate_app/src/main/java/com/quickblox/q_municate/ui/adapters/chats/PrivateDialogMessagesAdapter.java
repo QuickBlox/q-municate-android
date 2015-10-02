@@ -1,18 +1,13 @@
 package com.quickblox.q_municate.ui.adapters.chats;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.core.listeners.FriendOperationListener;
 import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.ui.views.emoji.EmojiTextView;
-import com.quickblox.q_municate.ui.views.maskedimageview.MaskedImageView;
+import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
@@ -32,107 +27,56 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
     private int lastInfoRequestPosition = EMPTY_POSITION;
     private FriendOperationListener friendOperationListener;
 
-    public PrivateDialogMessagesAdapter(Context context,
+    public PrivateDialogMessagesAdapter(
+            Activity activity,
             FriendOperationListener friendOperationListener,
-            List<CombinationMessage> objectsList, ChatUIHelperListener chatUIHelperListener, Dialog dialog) {
-        super(context, objectsList);
+            List<CombinationMessage> objectsList,
+            ChatUIHelperListener chatUIHelperListener,
+            Dialog dialog) {
+        super(activity, objectsList);
         this.friendOperationListener = friendOperationListener;
         this.chatUIHelperListener = chatUIHelperListener;
         this.dialog = dialog;
     }
 
-    private int getItemViewType(CombinationMessage combinationMessage) {
-        boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
-        if (combinationMessage.getNotificationType() == null) {
-            if (ownMessage) {
-                return TYPE_OWN_MESSAGE;
-            } else {
-                return TYPE_OPPONENT_MESSAGE;
-            }
-        } else {
-            return TYPE_REQUEST_MESSAGE;
+    @Override
+    public PrivateDialogMessagesAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        switch (viewType) {
+            case TYPE_REQUEST_MESSAGE:
+                return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friends_notification_message, viewGroup, false));
+            case TYPE_OWN_MESSAGE:
+                return new ViewHolder(this, layoutInflater.inflate(R.layout.item_message_own, viewGroup, false));
+            case TYPE_OPPONENT_MESSAGE:
+                return new ViewHolder(this, layoutInflater.inflate(R.layout.item_private_message_opponent, viewGroup, false));
+            default:
+                return null;
         }
     }
 
     @Override
-    public int getItemViewType(int position) {
-        return getItemViewType(getItem(position));
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return COMMON_TYPE_COUNT;
-    }
-
-    @Override
-    public View getView(int position, View view, ViewGroup parent) {
-        ViewHolder viewHolder;
-
+    public void onBindViewHolder(BaseClickListenerViewHolder<CombinationMessage> baseClickListenerViewHolder, int position) {
         CombinationMessage combinationMessage = getItem(position);
         boolean ownMessage = !combinationMessage.isIncoming(currentUser.getId());
 
-        if (view == null) {
-            viewHolder = new ViewHolder();
-
-            if (combinationMessage.getNotificationType() == null) {
-                if (ownMessage) {
-                    view = layoutInflater.inflate(R.layout.item_message_own, null, true);
-                } else {
-                    view = layoutInflater.inflate(R.layout.item_private_message_opponent, null, true);
-            }
-
-            viewHolder.attachMessageRelativeLayout = (RelativeLayout) view.findViewById(
-                    R.id.attach_message_relativelayout);
-            viewHolder.timeAttachMessageTextView = (TextView) view.findViewById(
-                    R.id.time_attach_message_textview);
-            viewHolder.attachDeliveryStatusImageView = (ImageView) view.findViewById(R.id.attach_message_delivery_status_imageview);
-            viewHolder.progressRelativeLayout = (RelativeLayout) view.findViewById(
-                    R.id.progress_relativelayout);
-            viewHolder.textMessageView = view.findViewById(R.id.text_message_view);
-            viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
-            viewHolder.attachImageView = (MaskedImageView) view.findViewById(R.id.attach_imageview);
-            viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
-                    R.id.time_text_message_textview);
-            viewHolder.verticalProgressBar = (ProgressBar) view.findViewById(R.id.vertical_progressbar);
-            viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(
-                    R.drawable.vertical_progressbar));
-            viewHolder.centeredProgressBar = (ProgressBar) view.findViewById(R.id.centered_progressbar);
-            viewHolder.messageDeliveryStatusImageView = (ImageView) view.findViewById(R.id.text_message_delivery_status_imageview);
-
-            } else {
-                view = layoutInflater.inflate(R.layout.item_friends_notification_message, null, true);
-
-                viewHolder.messageTextView = (EmojiTextView) view.findViewById(R.id.message_textview);
-                viewHolder.timeTextMessageTextView = (TextView) view.findViewById(
-                        R.id.time_text_message_textview);
-                viewHolder.acceptFriendImageView = (ImageView) view.findViewById(
-                        R.id.accept_friend_imagebutton);
-                viewHolder.dividerView = view.findViewById(R.id.divider_view);
-                viewHolder.rejectFriendImageView = (ImageView) view.findViewById(
-                        R.id.reject_friend_imagebutton);
-            }
-
-            view.setTag(viewHolder);
-
-        } else {
-            viewHolder = (ViewHolder) view.getTag();
-        }
+        ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
         boolean friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
                 combinationMessage.getNotificationType());
         boolean friendsInfoRequestMessage = combinationMessage
                 .getNotificationType() != null && !friendsRequestMessage;
 
+        if (viewHolder.verticalProgressBar != null) {
+            viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+        }
+
         if (friendsRequestMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(
-                    combinationMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
         } else if (friendsInfoRequestMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
-            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(
-                    combinationMessage.getCreatedDate()));
+            viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             setVisibilityFriendsActions(viewHolder, View.GONE);
 
@@ -141,8 +85,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             resetUI(viewHolder);
 
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
-            viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(
-                    combinationMessage.getCreatedDate()));
+            viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
             if (ownMessage) {
                 setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
@@ -165,12 +108,11 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context,
-                    ChatUtils.createQBDialogFromLocalDialog(dialog), combinationMessage, true);
+            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dialog), combinationMessage, true);
         }
 
         // check if last messageCombination is request messageCombination
-        boolean lastRequestMessage = (position == objectsList.size() - 1 && friendsRequestMessage);
+        boolean lastRequestMessage = (position == getAllItems().size() - 1 && friendsRequestMessage);
         if (lastRequestMessage) {
             findLastFriendsRequest();
         }
@@ -180,10 +122,13 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             lastRequestPosition = EMPTY_POSITION;
         } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
             setVisibilityFriendsActions(viewHolder, View.VISIBLE);
-            initListeners(viewHolder, combinationMessage.getDialogOccupant().getUser().getUserId());
+            initListeners(viewHolder, position, combinationMessage.getDialogOccupant().getUser().getUserId());
         }
+    }
 
-        return view;
+    @Override
+    public int getItemViewType(int position) {
+        return getItemViewType(getItem(position));
     }
 
     public void clearLastRequestMessagePosition() {
@@ -200,25 +145,25 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         setViewVisibility(viewHolder.rejectFriendImageView, visibility);
     }
 
-    private void initListeners(ViewHolder viewHolder, final int userId) {
+    private void initListeners(ViewHolder viewHolder, final int position, final int userId) {
         viewHolder.acceptFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendOperationListener.onAcceptUserClicked(userId);
+                friendOperationListener.onAcceptUserClicked(position, userId);
             }
         });
 
         viewHolder.rejectFriendImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                friendOperationListener.onRejectUserClicked(userId);
+                friendOperationListener.onRejectUserClicked(position, userId);
             }
         });
     }
 
     private void findLastFriendsRequest() {
-        for (int i = 0; i < objectsList.size(); i++) {
-            findLastFriendsRequest(i, objectsList.get(i));
+        for (int i = 0; i < getAllItems().size(); i++) {
+            findLastFriendsRequest(i, getAllItems().get(i));
         }
     }
 
@@ -228,7 +173,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         boolean isFriend;
 
         if (combinationMessage.getNotificationType() != null) {
-            ownMessage = isOwnMessage(combinationMessage.getDialogOccupant().getUser().getUserId());
+            ownMessage = !combinationMessage.isIncoming(currentUser.getId());
             friendsRequestMessage = DialogNotification.Type.FRIENDS_REQUEST.equals(
                     combinationMessage.getNotificationType());
 

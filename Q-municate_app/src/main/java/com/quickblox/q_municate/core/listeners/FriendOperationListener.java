@@ -2,7 +2,7 @@ package com.quickblox.q_municate.core.listeners;
 
 public interface FriendOperationListener {
 
-    void onAcceptUserClicked(int userId);
+    void onAcceptUserClicked(int position, int userId);
 
-    void onRejectUserClicked(int userId);
+    void onRejectUserClicked(int position, int userId);
 }

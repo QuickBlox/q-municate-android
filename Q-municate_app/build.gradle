@@ -27,7 +27,6 @@ dependencies {
 
     compile project(':Q-municate_core')
     compile project(':cropper')
-    compile project(':stickyListHeaders')
 
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
     compile "com.android.support:appcompat-v7:${rootProject.appcompatVersion}"
@@ -43,6 +42,7 @@ dependencies {
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
     compile "com.afollestad:material-dialogs:${rootProject.materialDialogsVersion}"
     compile "com.github.orangegangsters:swipy:${rootProject.swipyVersion}@aar"
+    compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
 }
 
 android {

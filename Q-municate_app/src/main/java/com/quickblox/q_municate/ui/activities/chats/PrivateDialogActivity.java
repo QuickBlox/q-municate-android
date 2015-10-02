@@ -34,6 +34,8 @@ import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.User;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.io.File;
 import java.util.Collections;
@@ -41,14 +43,13 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
-
 public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
 
     private static final int LOADER_ID = PrivateDialogActivity.class.getSimpleName().hashCode();
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
+    private int operationItemPosition;
 
     public static void start(Context context, User opponent, Dialog dialog) {
         Intent intent = new Intent(context, PrivateDialogActivity.class);
@@ -72,9 +73,11 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         addObservers();
 
         fillActionBar();
-        initListView();
+        initMessagesRecyclerView();
 
         initDataLoader(LOADER_ID);
+
+        showActionBarProgress();
     }
 
     private void initFields() {
@@ -112,7 +115,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         super.onResume();
 
         if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollListView();
+            scrollMessagesToBottom();
         }
 
         startLoadDialogMessages();
@@ -155,7 +158,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             ErrorUtils.showError(this, exc);
         }
 
-        scrollListView();
+        scrollMessagesToBottom();
     }
 
     @Override
@@ -166,16 +169,19 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void initListView() {
+    protected void initMessagesRecyclerView() {
+        super.initMessagesRecyclerView();
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
+        messagesRecyclerView.addItemDecoration(new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
         findLastFriendsRequest();
 
-        scrollListView();
-        messagesListView.setAdapter((StickyListHeadersAdapter) messagesAdapter);
+        scrollMessagesToBottom();
+        messagesRecyclerView.setAdapter(messagesAdapter);
     }
 
     @Override
     protected void updateMessagesList() {
+        showActionBarProgress();
         onChangedData();
     }
 
@@ -266,8 +272,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(
-                opponentUser.getUserId()) != null;
+        boolean isFriend = DataManager.getInstance().getFriendDataManager().existsByUserId(opponentUser.getUserId());
         messageEditText.setEnabled(isFriend);
         smilePanelImageButton.setEnabled(isFriend);
     }
@@ -302,19 +307,23 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     @Override
     public void onLoadFinished(Loader<List<CombinationMessage>> loader, List<CombinationMessage> combinationMessagesList) {
         this.combinationMessagesList = combinationMessagesList;
-        messagesAdapter.setNewData(combinationMessagesList);
+        messagesAdapter.setList(combinationMessagesList);
         findLastFriendsRequest();
+        hideActionBarProgress();
+        scrollMessagesToBottom();
     }
 
     private class FriendOperationAction implements FriendOperationListener {
 
         @Override
-        public void onAcceptUserClicked(int userId) {
+        public void onAcceptUserClicked(int position, int userId) {
+            operationItemPosition = position;
             acceptUser(userId);
         }
 
         @Override
-        public void onRejectUserClicked(int userId) {
+        public void onRejectUserClicked(int position, int userId) {
+            operationItemPosition = position;
             rejectUser(userId);
         }
     }
@@ -324,6 +333,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         @Override
         public void execute(Bundle bundle) {
             ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            messagesAdapter.notifyItemChanged(operationItemPosition);
             startLoadDialogMessages();
             hideProgress();
         }
@@ -334,6 +344,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         @Override
         public void execute(Bundle bundle) {
             ((PrivateDialogMessagesAdapter) messagesAdapter).clearLastRequestMessagePosition();
+            messagesAdapter.notifyItemChanged(operationItemPosition);
             startLoadDialogMessages();
             hideProgress();
         }

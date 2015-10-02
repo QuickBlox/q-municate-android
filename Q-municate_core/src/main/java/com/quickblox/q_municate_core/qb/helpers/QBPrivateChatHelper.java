@@ -36,22 +36,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         addNotificationChatListener(notificationChatListener);
     }
 
-    public void sendPrivateMessage(String message, int userId) throws QBResponseException {
-        sendPrivateMessage(null, message, userId);
-    }
-
-    public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
-        sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
-    }
-
-    private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
-        QBChatMessage chatMessage;
-        chatMessage = getQBChatMessage(message, file);
-        String dialogId = null;
-        if (currentDialog != null) {
-            dialogId = currentDialog.getDialogId();
-        }
-        sendPrivateMessage(chatMessage, userId, dialogId);
+    public void init(QBUser user) {
+        super.init(user);
     }
 
     @Override
@@ -69,20 +55,31 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public void init(QBUser user) {
-        super.init(user);
+    public void sendPrivateMessage(String message, int userId) throws QBResponseException {
+        sendPrivateMessage(null, message, userId);
+    }
+
+    public void sendPrivateMessageWithAttachImage(QBFile file, int userId) throws QBResponseException {
+        sendPrivateMessage(file, context.getString(R.string.dlg_attached_last_message), userId);
+    }
+
+    private void sendPrivateMessage(QBFile file, String message, int userId) throws QBResponseException {
+        QBChatMessage qbChatMessage = getQBChatMessage(message, file);
+        String dialogId = null;
+        if (currentDialog != null) {
+            dialogId = currentDialog.getDialogId();
+        }
+        sendPrivateMessage(qbChatMessage, userId, dialogId);
     }
 
     public void onPrivateMessageReceived(QBChat chat, QBChatMessage qbChatMessage) {
-        if (qbChatMessage.getId() != null) {
+        String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
+        if (qbChatMessage.getId() != null && dialogId != null) {
             User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
-            saveMessageToCache(qbChatMessage.getDialogId(), qbChatMessage, State.DELIVERED);
+            saveMessageToCache(dialogId, qbChatMessage, State.DELIVERED, true);
 
             checkForSendingNotification(false, qbChatMessage, user, true);
         }
-    }
-
-    public void updateDialog(QBDialog dialog) {
     }
 
     public QBFile loadAttachFile(File inputFile) throws Exception {
@@ -97,25 +94,22 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         return file;
     }
 
-    private void friendRequestMessageReceived(QBChatMessage qbChatMessage,
-            DialogNotification.Type notificationType) {
+    private void friendRequestMessageReceived(QBChatMessage qbChatMessage, DialogNotification.Type notificationType) {
+        String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         Message message = parseReceivedMessage(qbChatMessage);
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(message);
         dialogNotification.setType(notificationType);
 
-        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(qbChatMessage.getDialogId());
+        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
         if (dialog == null) {
-            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage,
-                    QBDialogType.PRIVATE);
-            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(
-                    chatCreator.getId(), qbChatMessage.getSenderId());
+            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
+            ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(), qbChatMessage.getSenderId());
             qbDialog.setOccupantsIds(occupantsIdsList);
             saveDialogToCache(qbDialog);
         }
 
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbChatMessage.getDialogId(),
-                qbChatMessage.getSenderId());
-        saveDialogNotificationToCache(dialogOccupant, qbChatMessage);
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
+        saveDialogNotificationToCache(dialogOccupant, qbChatMessage, true);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {
