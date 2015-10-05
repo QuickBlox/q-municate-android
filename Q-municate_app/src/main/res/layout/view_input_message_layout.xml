@@ -25,7 +25,7 @@
         android:padding="5dp"
         android:src="@drawable/ic_send_message_dark" />
 
-    <com.quickblox.q_municate.ui.views.emoji.EmojiEditText
+    <com.rockerhieu.emojicon.EmojiconEditText
         android:id="@+id/message_edittext"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -40,7 +40,7 @@
                 android:textSize="@dimen/text_size"
                 android:maxLines="2" />
 
-            <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
+            <com.rockerhieu.emojicon.EmojiconTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

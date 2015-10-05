@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,9 +31,6 @@ import com.quickblox.q_municate.core.listeners.OnImageSourcePickedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
-import com.quickblox.q_municate.ui.fragments.chats.EmojiFragment;
-import com.quickblox.q_municate.ui.fragments.chats.EmojiGridFragment;
-import com.quickblox.q_municate.ui.views.emoji.emojiTypes.EmojiObject;
 import com.quickblox.q_municate.ui.fragments.dialogs.ImageSourcePickDialogFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
@@ -64,6 +58,9 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Message;
 import com.quickblox.q_municate_db.models.User;
+import com.rockerhieu.emojicon.EmojiconGridFragment;
+import com.rockerhieu.emojicon.EmojiconsFragment;
+import com.rockerhieu.emojicon.emoji.Emojicon;
 
 import java.io.File;
 import java.util.List;
@@ -75,35 +72,35 @@ import java.util.TimerTask;
 import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
+import butterknife.OnTouch;
 
 public abstract class BaseDialogActivity extends BaseLogeableActivity implements
-        ChatUIHelperListener, EmojiGridFragment.OnEmojiconClickedListener,
-        EmojiFragment.OnEmojiBackspaceClickedListener, OnImageSourcePickedListener {
+        EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
+        ChatUIHelperListener, OnImageSourcePickedListener {
 
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
+    private static final int DELAY_SHOWING_SMILE_PANEL = 200;
 
     private static Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
     @Bind(R.id.messages_recycleview)
-    protected RecyclerView messagesRecyclerView;
+    RecyclerView messagesRecyclerView;
 
     @Bind(R.id.message_edittext)
-    protected EditText messageEditText;
+    EditText messageEditText;
 
     @Bind(R.id.send_button)
-    protected ImageButton sendButton;
+    ImageButton sendButton;
 
     @Bind(R.id.message_typing_view)
-    protected View messageTypingView;
+    View messageTypingView;
 
     @Bind(R.id.smile_panel_imagebutton)
-    protected ImageButton smilePanelImageButton;
+    ImageButton smilePanelImageButton;
 
     @Bind(R.id.message_typing_box_imageview)
-    protected ImageView messageTypingBoxImageView;
-
-    protected View emojisFragment;
+    ImageView messageTypingBoxImageView;
 
     protected Dialog dialog;
     protected Resources resources;
@@ -115,9 +112,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
 
-    private View rootView;
-    private int keyboardHeight;
-    private boolean needToShowSmileLayout;
+    private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private LoadDialogMessagesFailAction loadDialogMessagesFailAction;
@@ -134,8 +129,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        rootView = getLayoutInflater().inflate(R.layout.activity_dialog, null);
-        setContentView(rootView);
+        setContentView(R.layout.activity_dialog);
 
         activateButterKnife();
 
@@ -143,11 +137,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
         initFields();
         initUI();
-        initListeners();
 
         addActions();
-        registerBroadcastReceivers();
         addObservers();
+        registerBroadcastReceivers();
+
         hideSmileLayout();
     }
 
@@ -172,7 +166,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     private void initUI() {
-        emojisFragment = _findViewById(R.id.emojicons_fragment);
+        emojiconsFragment = _findViewById(R.id.emojicon_fragment);
         sendButton.setEnabled(false);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
     }
@@ -180,20 +174,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected void initMessagesRecyclerView() {
         messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    }
-
-    private void initListeners() {
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-
-                    @Override
-                    public void onGlobalLayout() {
-                        initKeyboardHeight();
-                        if (needToShowSmileLayout) {
-                            showSmileLayout(keyboardHeight);
-                        }
-                    }
-                });
     }
 
     @OnTextChanged(R.id.message_edittext)
@@ -210,18 +190,15 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         }
     }
 
+    @OnTouch(R.id.message_edittext)
+    boolean touchMessageEdit() {
+        hideSmileLayout();
+        return false;
+    }
+
     @OnClick(R.id.smile_panel_imagebutton)
     void smilePanelImageButtonClicked() {
-        if (isSmilesLayoutShowing()) {
-            hideSmileLayout();
-            KeyboardUtils.showKeyboard(BaseDialogActivity.this);
-        } else {
-            KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
-            needToShowSmileLayout = true;
-            if (keyboardHeight == ConstsCore.ZERO_INT_VALUE) {
-                showSmileLayout(ConstsCore.ZERO_INT_VALUE);
-            }
-        }
+        visibleOrHideSmilePanel();
     }
 
     protected void addActions() {
@@ -337,13 +314,13 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     @Override
-    public void onEmojiconClicked(EmojiObject emojiObject) {
-        EmojiFragment.input(messageEditText, emojiObject);
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(messageEditText, emojicon);
     }
 
     @Override
-    public void onEmojiBackspaceClicked(View v) {
-        EmojiFragment.backspace(messageEditText);
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(messageEditText);
     }
 
     protected void updateData() {
@@ -398,19 +375,18 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     private void hideSmileLayout() {
-        emojisFragment.setVisibility(View.GONE);
+        emojiconsFragment.setVisibility(View.GONE);
         setSmilePanelIcon(R.drawable.ic_smile_dark);
     }
 
-    private void showSmileLayout(int keyboardHeight) {
-        needToShowSmileLayout = false;
-        emojisFragment.setVisibility(View.VISIBLE);
-        if (keyboardHeight != ConstsCore.ZERO_INT_VALUE) {
-            ViewGroup.LayoutParams params = emojisFragment.getLayoutParams();
-            params.height = keyboardHeight;
-            emojisFragment.setLayoutParams(params);
-        }
-        setSmilePanelIcon(R.drawable.ic_keyboard_dark);
+    private void showSmileLayout() {
+        mainThreadHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                emojiconsFragment.setVisibility(View.VISIBLE);
+                setSmilePanelIcon(R.drawable.ic_keyboard_dark);
+            }
+        }, DELAY_SHOWING_SMILE_PANEL);
     }
 
     private boolean isGalleryCalled(int requestCode) {
@@ -479,27 +455,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         baseChatHelper.sendTypingStatusToServer(opponentUser.getUserId(), isTypingNow);
     }
 
-    private void initKeyboardHeight() {
-        final int EXPECTED_HEIGHT = 100;
-        Rect r = new Rect();
-        rootView.getWindowVisibleDisplayFrame(r);
-        int screenHeight = rootView.getRootView().getHeight();
-        int heightDifference = screenHeight - (r.bottom - r.top);
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > ConstsCore.ZERO_INT_VALUE) {
-            heightDifference -= getResources().getDimensionPixelSize(resourceId);
-        }
-        if (heightDifference > EXPECTED_HEIGHT) {
-            keyboardHeight = heightDifference;
-        }
-    }
-
     private void setSmilePanelIcon(int resourceId) {
         smilePanelImageButton.setImageResource(resourceId);
     }
 
-    protected boolean isSmilesLayoutShowing() {
-        return emojisFragment.getVisibility() == View.VISIBLE;
+    private boolean isSmilesLayoutShowing() {
+        return emojiconsFragment.getVisibility() == View.VISIBLE;
     }
 
     protected void scrollMessagesToBottom() {
@@ -603,6 +564,16 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
         return ChatUtils.createCombinationMessagesList(messagesList, dialogNotificationsList);
+    }
+
+    private void visibleOrHideSmilePanel() {
+        if (isSmilesLayoutShowing()) {
+            hideSmileLayout();
+            KeyboardUtils.showKeyboard(BaseDialogActivity.this);
+        } else {
+            KeyboardUtils.hideKeyboard(BaseDialogActivity.this);
+            showSmileLayout();
+        }
     }
 
     protected abstract void updateActionBar();

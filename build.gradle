@@ -30,11 +30,11 @@ ext {
     recyclerViewVersion = '23.0.1'
     googlePlayServicesVersion = '8.1.0'
     universalImageLoaderVersion = '1.9.1'
-    nineoldandroidsVersion = '2.4.0'
     ormliteAndroidVersion = '4.48'
     ormliteCoreVersion = '4.48'
     butterknifeVersion = '7.0.1'
     materialDialogsVersion = '0.7.8.1'
-    swipyVersion = '1.2.0'
+    swipyRecyclerviewVersion = '1.2.0'
     stickylistheadersRecyclerViewVersion = '0.4.2'
+    emojiconVersion = '1.3.1'
 }

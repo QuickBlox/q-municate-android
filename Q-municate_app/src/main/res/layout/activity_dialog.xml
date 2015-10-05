@@ -20,8 +20,8 @@
     <include layout="@layout/view_input_message_layout" />
 
     <fragment
-        android:id="@+id/emojicons_fragment"
-        class="com.quickblox.q_municate.ui.fragments.chats.EmojiFragment"
+        android:id="@+id/emojicon_fragment"
+        class="com.rockerhieu.emojicon.EmojiconsFragment"
         android:layout_width="match_parent"
         android:layout_height="250dp" />
 

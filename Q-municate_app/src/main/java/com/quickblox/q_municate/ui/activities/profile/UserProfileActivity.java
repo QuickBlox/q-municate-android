@@ -41,15 +41,30 @@ import com.quickblox.q_municate_db.models.User;
 import java.util.Observable;
 import java.util.Observer;
 
+import butterknife.Bind;
+
 public class UserProfileActivity extends BaseLogeableActivity {
 
-    private RoundedImageView avatarImageView;
-    private TextView nameTextView;
-    private TextView statusTextView;
-    private ImageView onlineImageView;
-    private TextView onlineStatusTextView;
-    private TextView phoneTextView;
-    private View phoneView;
+    @Bind(R.id.avatar_imageview)
+    RoundedImageView avatarImageView;
+
+    @Bind(R.id.name_textview)
+    TextView nameTextView;
+
+    @Bind(R.id.status_textview)
+    TextView statusTextView;
+
+    @Bind(R.id.online_imageview)
+    ImageView onlineImageView;
+
+    @Bind(R.id.online_status_textview)
+    TextView onlineStatusTextView;
+
+    @Bind(R.id.phone_textview)
+    TextView phoneTextView;
+
+    @Bind(R.id.phone_relativelayout)
+    View phoneView;
 
     private DataManager dataManager;
     private int userId;
@@ -68,9 +83,10 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
         setContentView(R.layout.activity_friend_details);
 
+        activateButterKnife();
+
         initActionBar();
         initFields();
-        initUI();
         initUIWithUsersData();
         addActions();
     }
@@ -89,35 +105,6 @@ public class UserProfileActivity extends BaseLogeableActivity {
         userObserver = new UserObserver();
     }
 
-    private void initUI() {
-        avatarImageView = _findViewById(R.id.avatar_imageview);
-        nameTextView = _findViewById(R.id.name_textview);
-        statusTextView = _findViewById(R.id.status_textview);
-        onlineImageView = _findViewById(R.id.online_imageview);
-        onlineStatusTextView = _findViewById(R.id.online_status_textview);
-        phoneTextView = _findViewById(R.id.phone_textview);
-        phoneView = _findViewById(R.id.phone_relativelayout);
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
-
-        if (friendListHelper != null) {
-            setOnlineStatus(user);
-        }
-    }
-
-    private void addActions() {
-        addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
-        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
-
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreatePrivateChatSuccessAction());
-        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
-
-        updateBroadcastActionList();
-    }
-
     private void initUIWithUsersData() {
         loadAvatar();
         setName();
@@ -126,9 +113,12 @@ public class UserProfileActivity extends BaseLogeableActivity {
         setPhone();
     }
 
-    private void setStatus() {
-        if (!TextUtils.isEmpty(user.getStatus())) {
-            statusTextView.setText(user.getStatus());
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
+        if (friendListHelper != null) {
+            setOnlineStatus(user);
         }
     }
 
@@ -171,6 +161,24 @@ public class UserProfileActivity extends BaseLogeableActivity {
         return true;
     }
 
+    private void addObservers() {
+        dataManager.getUserDataManager().addObserver(userObserver);
+    }
+
+    private void deleteObservers() {
+        dataManager.getUserDataManager().deleteObserver(userObserver);
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
+        addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
+
+        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreatePrivateChatSuccessAction());
+        addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
+
+        updateBroadcastActionList();
+    }
+
     private void removeActions() {
         removeAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION);
         removeAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION);
@@ -181,12 +189,10 @@ public class UserProfileActivity extends BaseLogeableActivity {
         updateBroadcastActionList();
     }
 
-    private void addObservers() {
-        dataManager.getUserDataManager().addObserver(userObserver);
-    }
-
-    private void deleteObservers() {
-        dataManager.getUserDataManager().deleteObserver(userObserver);
+    private void setStatus() {
+        if (!TextUtils.isEmpty(user.getStatus())) {
+            statusTextView.setText(user.getStatus());
+        }
     }
 
     private void setName() {
@@ -223,7 +229,8 @@ public class UserProfileActivity extends BaseLogeableActivity {
     }
 
     private void showRemoveUserDialog() {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+        TwoButtonsDialogFragment.show(
+                getSupportFragmentManager(),
                 getString(R.string.frd_dlg_remove_friend, user.getFullName()),
                 new MaterialDialog.ButtonCallback() {
                     @Override
@@ -264,7 +271,11 @@ public class UserProfileActivity extends BaseLogeableActivity {
     }
 
     public void chatClickListener(View view) {
-        if (checkFriendStatus(user.getUserId())) {
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+        if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
+            PrivateDialogActivity.start(UserProfileActivity.this, user, dialogOccupant.getDialog());
+        } else {
+            showProgress();
             QBCreatePrivateChatCommand.start(this, user);
         }
     }
@@ -306,6 +317,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) throws Exception {
+            hideProgress();
             QBDialog qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
             PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
         }

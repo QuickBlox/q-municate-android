@@ -79,7 +79,7 @@
 
                 </LinearLayout>
 
-                <com.quickblox.q_municate.ui.views.emoji.EmojiTextView
+                <com.rockerhieu.emojicon.EmojiconTextView
                     android:id="@+id/message_textview"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
