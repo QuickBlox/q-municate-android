@@ -181,7 +181,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         setSendButtonVisibility(charSequence);
 
         // TODO: now it is possible only for Private chats
-        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+        if (dialog != null && Dialog.Type.PRIVATE.equals(dialog.getType())) {
             if (!isTypingNow) {
                 isTypingNow = true;
                 sendTypingStatus();
@@ -269,14 +269,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         super.onPause();
 
         hideSmileLayout();
-
-        // TODO: now it is possible only for Private chats
-        if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
-            if (isTypingNow) {
-                isTypingNow = false;
-                sendTypingStatus();
-            }
-        }
+        checkStartTyping();
     }
 
     @Override
@@ -449,6 +442,16 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         typingTimer.cancel();
         typingTimer = new Timer();
         typingTimer.schedule(new TypingTimerTask(), TYPING_DELAY);
+    }
+
+    private void checkStartTyping() {
+        // TODO: now it is possible only for Private chats
+        if (dialog != null && Dialog.Type.PRIVATE.equals(dialog.getType())) {
+            if (isTypingNow) {
+                isTypingNow = false;
+                sendTypingStatus();
+            }
+        }
     }
 
     private void sendTypingStatus() {
