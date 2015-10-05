@@ -55,6 +55,10 @@ public class GroupDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         String avatarUrl = null;
         String senderName;
 
+        if (viewHolder.verticalProgressBar != null) {
+            viewHolder.verticalProgressBar.setProgressDrawable(context.getResources().getDrawable(R.drawable.vertical_progressbar));
+        }
+
         if (notificationMessage) {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
             viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));

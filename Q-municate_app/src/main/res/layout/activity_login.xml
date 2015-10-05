@@ -15,26 +15,38 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <EditText
-            android:id="@+id/email_edittext"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/lgn_email_hint"
-            android:inputType="textEmailAddress"
-            android:maxLength="128"
-            android:text="sergey1@ser.com"
-            tools:text="sergey1@ser.com" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/password_edittext"
+            <EditText
+                android:id="@+id/email_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/lgn_email_hint"
+                android:inputType="textEmailAddress"
+                android:maxLength="128"
+                android:text="sergey1@ser.com"
+                tools:text="sergey1@ser.com" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="@string/lgn_password_hint"
-            android:inputType="textPassword"
-            android:maxLength="256"
-            android:text="serik111"
-            tools:text="serik111" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/password_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/lgn_password_hint"
+                android:inputType="textPassword"
+                android:maxLength="256"
+                android:text="serik111"
+                tools:text="serik111" />
+
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/remember_me_switch"

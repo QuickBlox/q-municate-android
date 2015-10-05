@@ -432,8 +432,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (LoginType.EMAIL.equals(AppSession.getSession().getLoginType())) {
             QBLoginRestCommand.start(this, AppSession.getSession().getUser());
         } else {
-            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(),
-                    null);
+            QBSocialLoginCommand.start(this, QBProvider.FACEBOOK, Session.getActiveSession().getAccessToken(), null);
         }
     }
 

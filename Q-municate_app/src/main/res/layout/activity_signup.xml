@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
 
@@ -14,31 +14,50 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <EditText
-            android:id="@+id/full_name_edittext"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/sup_fullname_hint"
-            android:inputType="textPersonName"
-            android:maxLength="128" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/email_edittext"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="@string/sup_email_hint"
-            android:inputType="textEmailAddress"
-            android:maxLength="128" />
+            <EditText
+                android:id="@+id/full_name_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/sup_fullname_hint"
+                android:inputType="textPersonName"
+                android:maxLength="128" />
 
-        <EditText
-            android:id="@+id/password_edittext"
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="@string/lgn_password_hint"
-            android:inputType="textPassword"
-            android:maxLength="256" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/email_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/sup_email_hint"
+                android:inputType="textEmailAddress"
+                android:maxLength="128" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/password_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="@string/lgn_password_hint"
+                android:inputType="textPassword"
+                android:maxLength="256" />
+
+        </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
             android:id="@+id/change_avatar_linearlayout"

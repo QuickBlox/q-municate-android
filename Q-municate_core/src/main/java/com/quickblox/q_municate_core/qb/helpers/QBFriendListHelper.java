@@ -305,6 +305,15 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
                 && isUserOnline(roster.getPresence(userId));
     }
 
+    private void notifyContactRequest() {
+        if (userLoadingIdsList != null) {
+            for (Integer id : userLoadingIdsList) {
+                notifyContactRequest(id);
+            }
+            userLoadingIdsList = null;
+        }
+    }
+
     private void notifyContactRequest(int userId) {
         Intent intent = new Intent(QBServiceConsts.GOT_CONTACT_REQUEST);
 
@@ -338,6 +347,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         public void run() {
             try {
                 loadAndSaveUsers(userLoadingIdsList, UserRequest.RequestStatus.INCOMING);
+                notifyContactRequest();
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
             }
@@ -385,7 +395,6 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         public void subscriptionRequested(int userId) {
             try {
                 createUserRequest(userId);
-                notifyContactRequest(userId);
             } catch (Exception e) {
                 Log.e(TAG, SUBSCRIPTION_ERROR, e);
             }
