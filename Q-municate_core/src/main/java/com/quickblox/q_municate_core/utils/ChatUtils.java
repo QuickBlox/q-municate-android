@@ -291,13 +291,7 @@ public class ChatUtils {
         message.setMessageId(qbChatMessage.getId());
         message.setDialogOccupant(dialogOccupant);
         message.setCreatedDate(dateSent);
-        if (!message.isIncoming(AppSession.getSession().getUser().getId())) {
-            message.setState(null);
-        } else if (state == null) {
-            message.setState(qbChatMessage.isRead() ? State.READ : State.DELIVERED);
-        } else {
-            message.setState(state);
-        }
+        message.setState(qbChatMessage.isRead() ? State.READ : state);
         message.setBody(qbChatMessage.getBody());
         return message;
     }

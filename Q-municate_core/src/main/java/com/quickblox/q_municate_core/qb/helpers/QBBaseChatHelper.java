@@ -202,7 +202,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         for (int i = 0; i < qbMessagesList.size(); i++) {
             QBChatMessage qbChatMessage = qbMessagesList.get(i);
             boolean notify = i == qbMessagesList.size() - 1;
-            saveMessageToCache(dialogId, qbChatMessage, State.READ, notify);
+            saveMessageToCache(dialogId, qbChatMessage, null, notify);
         }
     }
 
