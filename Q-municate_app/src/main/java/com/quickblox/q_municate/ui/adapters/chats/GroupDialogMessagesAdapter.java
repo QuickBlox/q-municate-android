@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.ChatUIHelperListener;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;

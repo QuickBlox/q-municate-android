@@ -4,7 +4,7 @@
     <string name="app_name">Q-municate</string>
 
 
-    // ActionBar
+    <!-- ActionBar -->
     <string name="action_bar_contacts">Contacts</string>
     <string name="action_bar_chats">Chats</string>
     <string name="action_bar_settings">Settings</string>
@@ -20,7 +20,7 @@
     <string name="action_bar_add_chat_attach">Add attach</string>
 
 
-    // Landing
+    <!-- Landing -->
     <string name="lnd_q_municate">Q-municate</string>
     <string name="lnd_your_own_chat">Your own chat</string>
     <string name="lnd_connect_with_facebook">Connect with Facebook</string>
@@ -29,7 +29,7 @@
     <string name="lnd_no_app_version">Couldn\'t get app version</string>
     <string name="lnd_version">v. %1$s</string>
 
-    // Login
+    <!-- Login -->
     <string name="lgn_forgot_password">Forgot password?</string>
     <string name="lgn_password_hint">Password</string>
     <string name="lgn_log_in_with_facebook">Log in with Facebook</string>
@@ -38,25 +38,25 @@
     <string name="lgn_remember_me">Remember Me</string>
     <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
 
-    // Forgot Password
+    <!-- Forgot Password -->
     <string name="fpw_forgot_password_title">Forgot Password</string>
     <string name="fpw_email">Email</string>
     <string name="fpw_not_email_field_entered">Please enter email</string>
     <string name="fpw_label">Enter your email and we\'ll send a link to reset your password</string>
     <string name="fpw_email_was_sent">Mail was sent to %1$s</string>
 
-    // Sing Up
+    <!-- Sing Up -->
     <string name="sup_fullname_hint">Full Name</string>
     <string name="sup_email_hint">Email</string>
     <string name="sup_choose_user_picture">Choose user picture</string>
     <string name="sup_sign_up">Sign Up</string>
 
-    // User Agreement
+    <!-- User Agreement -->
     <string name="uag_user_agreement_title">User Agreement</string>
     <string name="uag_user_agreement">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
     <string name="uag_policy_link">http://q-municate.com/agreement/</string>
 
-    // Friend List
+    <!-- Friend List -->
     <string name="frl_global_search">Global Search</string>
     <string name="frl_friends">Friends</string>
     <string name="frl_all_users">All Users</string>
@@ -71,7 +71,7 @@
     <string name="frl_local_list">Local</string>
     <string name="frl_global_list">Global</string>
 
-    // Friend Details
+    <!-- Friend Details -->
     <string name="frd_title">Details</string>
     <string name="frd_default_status">I enjoy using Q-municate!</string>
     <string name="frd_video_call">Video Call</string>
@@ -80,7 +80,7 @@
     <string name="frd_mobile">MOBILE</string>
     <string name="frd_dlg_remove_friend">Do you really want to delete %1$s from your contact list?</string>
 
-    // Dialog
+    <!-- Dialog -->
     <string name="dlg_message">Message</string>
     <string name="dlg_hint_message">Type a message</string>
     <string name="dlg_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
@@ -93,17 +93,17 @@
         <item>From Library</item>
     </string-array>
 
-    // Group Dialog
+    <!-- Group Dialog -->
     <string name="gdl_ctx_menu_reply">Reply</string>
     <string name="gdl_ctx_menu_prv_message">Private Message</string>
     <string name="gdl_ctx_menu_video_call">Video Call</string>
     <string name="gdl_ctx_menu_profile">View Profile</string>
 
-    // Dialogs
+    <!-- Dialogs -->
     <string name="dlgs_ctx_menu_remove">Delete dialog</string>
     <string name="dlgs_loading_dialogs">Loading dialogs… Please wait</string>
 
-    // Group Dialog Details
+    <!-- Group Dialog Details -->
     <string name="gdd_title">Group Details</string>
     <string name="gdd_leave_group">Leave group</string>
     <string name="gdd_participants">%1$d participants</string>
@@ -112,30 +112,30 @@
     <string name="gdd_all_friends_is_in_group">You can\'t add new friend, because all existing friends are added in this group chat</string>
     <string name="gdd_group_info_is_loading">Group info is loading, please wait…</string>
 
-    // Dialog messages
+    <!-- Dialog messages -->
     <string name="glgm_snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="glgm_snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
 
 
-    // New Dialog
+    <!-- New Dialog -->
     <string name="ndl_title">New Group Chat</string>
     <string name="ndl_ac_mode_title">Group chat participants:</string>
     <string name="ndl_no_friends_for_new_chat">You don\'t have any Friends for creating New Chat</string>
 
-    // Preferences
+    <!-- Preferences -->
     <string name="pref_title_profile_and_details">Profile and details</string>
     <string name="pref_title_presence">Presence</string>
     <string name="pref_title_push_notifications">Push Notifications</string>
     <string name="pref_title_media">Media</string>
 
-    // Settings
+    <!-- Settings -->
     <string name="stn_profile">Profile</string>
     <string name="stn_logout">Log Out</string>
     <string name="stn_change_password">Change Password</string>
     <string name="stn_push_notifivation">Push Notification</string>
     <string name="stn_version">Version %1$s</string>
 
-    // Change Password
+    <!-- Change Password -->
     <string name="cpw_change_password_title">Change Password</string>
     <string name="cpw_change">Change</string>
     <string name="cpw_old_password">Old Password</string>
@@ -143,7 +143,7 @@
     <string name="cpw_not_old_password_field_entered">Please enter old password</string>
     <string name="cpw_not_new_password_field_entered">Please enter new password</string>
 
-    // Profile
+    <!-- Profile -->
     <string name="prf_full_name">Full Name</string>
     <string name="prf_change">Change</string>
     <string name="prf_title">Profile</string>
@@ -152,10 +152,10 @@
     <string name="prf_status_message">Status Message</string>
     <string name="prf_done">Done</string>
 
-    // Add Friends To Group Dialog
+    <!-- Add Friends To Group Dialog -->
     <string name="afg_title">Add Friends</string>
 
-    // Invite Friends
+    <!-- Invite Friends -->
     <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>
     <string name="inf_select_from_facebook">From Facebook</string>
     <string name="inf_select_from_contacts">From Contacts</string>
@@ -173,7 +173,7 @@
     <string name="inf_fb_wall_param_place">155021662189</string>
     <string name="inf_fb_request_canceled">Request cancelled</string>
 
-    // Feedback
+    <!-- Feedback -->
     <string name="fdb_feedback_title">Feedback Description</string>
     <string name="fdb_feedback_label">
         In your email please provide the steps of bug/error reproduction. Let us know how often it occurs and if it gives any error code.
@@ -186,7 +186,7 @@
     <string name="fdb_choose_email_provider">Choose an email provider:</string>
     <string name="fdb_write_email">Write an Email</string>
 
-    // Dialog Messages
+    <!-- Dialog Messages -->
     <string name="dlg_select_image_from">Select image from…</string>
     <string name="dlg_wait_please">Please, wait</string>
     <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
@@ -231,14 +231,14 @@
         <item>Camera</item>
     </string-array>
 
-    // Facebook
+    <!-- Facebook -->
     <string name="facebook_exception">Facebook exception: </string>
 
-    //Calls
+    <!-- Calls -->
     <string name="cll_incoming_call_audio">Incoming Call</string>
     <string name="cll_incoming_call_video">Incoming Video Call</string>
 
-    // Other
+    <!-- Other -->
     <string name="comming_soon">Will be implemented soon</string>
     <string name="search_hint">Search</string>
     <string name="push_title">QMUN: Missed messages</string>

@@ -209,6 +209,8 @@ public class QBServiceConsts {
     public static final String EXTRA_PAGE = "load_elements";
     public static final String EXTRA_SKIP_ITEMS = "skip_items";
     public static final String EXTRA_USER_STATUS = "user_status";
+    public static final String EXTRA_REGISTRATION_ID = "registration_id";
+    public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";
 
     public static final String UPDATE_DIALOG = "update_dialog";
     public static final String UPDATE_DIALOG_DETAILS = "update_dialog_details";

@@ -13,10 +13,10 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
-import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -114,7 +114,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
                 viewHolder.onlineImageView.setVisibility(View.GONE);
             }
 
-            viewHolder.statusMessageTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
+            viewHolder.statusMessageTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
         }
     }
 

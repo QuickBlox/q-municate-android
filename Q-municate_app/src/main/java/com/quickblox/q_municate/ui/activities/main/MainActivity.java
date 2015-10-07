@@ -11,13 +11,12 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.gcm.GSMHelper;
+import com.quickblox.q_municate.gcm.GSMHelper;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -141,7 +140,7 @@ public class MainActivity extends BaseLogeableActivity {
 
     private void checkGCMRegistration() {
         if (gsmHelper.checkPlayServices()) {
-            if (!gsmHelper.isDeviceRegisteredWithUser(AppSession.getSession().getUser())) {
+            if (!gsmHelper.isDeviceRegisteredWithUser()) {
                 gsmHelper.registerInBackground();
             }
         } else {

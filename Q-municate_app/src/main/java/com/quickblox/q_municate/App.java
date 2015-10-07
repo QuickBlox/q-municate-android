@@ -10,7 +10,6 @@ import com.quickblox.q_municate.utils.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 
 public class App extends MultiDexApplication {
@@ -36,9 +35,6 @@ public class App extends MultiDexApplication {
         initQb(this);
         initDb();
         initImageLoader(this);
-
-        // TODO need to delete
-        new PrefsHelper(this);
     }
 
     private void initQb(Context context) {

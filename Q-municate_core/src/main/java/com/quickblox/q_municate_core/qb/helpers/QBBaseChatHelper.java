@@ -357,6 +357,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         intent.putExtra(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE, isPrivateMessage);
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        context.sendBroadcast(intent);
     }
 
     protected void notifyMessageTyping(int userId, boolean isTyping) {

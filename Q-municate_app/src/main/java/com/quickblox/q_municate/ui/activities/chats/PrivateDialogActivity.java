@@ -16,18 +16,18 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.FriendOperationListener;
+import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -186,8 +186,8 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         if (friend != null) {
             ActionBar actionBar = getActionBar();
             if (actionBar != null && friendListHelper != null) {
-                actionBar.setSubtitle(OnlineStatusHelper.getOnlineStatus(
-                        friendListHelper.isUserOnline(friend.getUserId())));
+                actionBar.setSubtitle(
+                        OnlineStatusUtils.getOnlineStatus(friendListHelper.isUserOnline(friend.getUserId())));
             }
         }
     }

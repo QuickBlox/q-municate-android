@@ -5,10 +5,8 @@ import android.text.TextUtils;
 import com.quickblox.core.exception.BaseServiceException;
 import com.quickblox.core.server.BaseService;
 import com.quickblox.auth.QBAuth;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.users.model.QBUser;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -17,14 +15,17 @@ public class AppSession implements Serializable {
 
     private static final Object lock = new Object();
     private static AppSession activeSession;
-    private final LoginType loginType;
-    private QBUser user;
-    private String sessionToken;
 
-    private AppSession(LoginType loginType, QBUser user, String sessionToken) {
+    private CoreSharedHelper coreSharedHelper;
+    private final LoginType loginType;
+    private QBUser qbUser;
+    private String qbToken;
+
+    private AppSession(LoginType loginType, QBUser qbUser, String qbToken) {
+        coreSharedHelper = CoreSharedHelper.getInstance();
         this.loginType = loginType;
-        this.user = user;
-        this.sessionToken = sessionToken;
+        this.qbUser = qbUser;
+        this.qbToken = qbToken;
         save();
     }
 
@@ -39,16 +40,19 @@ public class AppSession implements Serializable {
     }
 
     public static AppSession load() {
-        PrefsHelper helper = PrefsHelper.getPrefsHelper();
-        String loginTypeRaw = helper.getPref(PrefsHelper.PREF_LOGIN_TYPE, LoginType.EMAIL.toString());
-        int userId = helper.getPref(PrefsHelper.PREF_USER_ID, ConstsCore.NOT_INITIALIZED_VALUE);
-        String userFullName = helper.getPref(PrefsHelper.PREF_USER_FULL_NAME, ConstsCore.EMPTY_STRING);
-        String sessionToken = helper.getPref(PrefsHelper.PREF_SESSION_TOKEN, ConstsCore.EMPTY_STRING);
+        String loginTypeRaw = CoreSharedHelper.getInstance().getLoginType();
+        String qbToken = CoreSharedHelper.getInstance().getQBToken();
+
+        int userId = CoreSharedHelper.getInstance().getUserId();
+        String userFullName = CoreSharedHelper.getInstance().getUserFullName();
+
         QBUser qbUser = new QBUser();
         qbUser.setId(userId);
         qbUser.setFullName(userFullName);
+
         LoginType loginType = LoginType.valueOf(loginTypeRaw);
-        return new AppSession(loginType, qbUser, sessionToken);
+
+        return new AppSession(loginType, qbUser, qbToken);
     }
 
     public static boolean isSessionExistOrNotExpired(long expirationTime) {
@@ -62,7 +66,7 @@ public class AppSession implements Serializable {
             long tokenLiveOffset = tokenExpirationDate.getTime() - System.currentTimeMillis();
             return tokenLiveOffset > expirationTime;
         } catch (BaseServiceException e) {
-            ErrorUtils.logError(e);
+            // nothing by default
         }
         return false;
     }
@@ -76,43 +80,43 @@ public class AppSession implements Serializable {
     }
 
     public void closeAndClear() {
-        PrefsHelper helper = PrefsHelper.getPrefsHelper();
-        helper.delete(PrefsHelper.PREF_USER_EMAIL);
-        helper.delete(PrefsHelper.PREF_LOGIN_TYPE);
-        helper.delete(PrefsHelper.PREF_SESSION_TOKEN);
-        helper.delete(PrefsHelper.PREF_USER_ID);
+        coreSharedHelper.saveQBToken(null);
+        coreSharedHelper.saveLoginType(null);
+
+        coreSharedHelper.clearUserData();
+
         activeSession = null;
     }
 
     public QBUser getUser() {
-        return user;
+        return qbUser;
     }
 
     public void save() {
-        PrefsHelper prefsHelper = PrefsHelper.getPrefsHelper();
-        prefsHelper.savePref(PrefsHelper.PREF_LOGIN_TYPE, loginType.toString());
-        prefsHelper.savePref(PrefsHelper.PREF_SESSION_TOKEN, sessionToken);
-        saveUser(user, prefsHelper);
+        coreSharedHelper.saveQBToken(qbToken);
+        coreSharedHelper.saveLoginType(loginType.toString());
+
+        saveUser(qbUser);
     }
 
-    public void updateUser(QBUser user) {
-        this.user = user;
-        saveUser(this.user, PrefsHelper.getPrefsHelper());
+    public void updateUser(QBUser qbUser) {
+        this.qbUser = qbUser;
+        saveUser(this.qbUser);
     }
 
-    private void saveUser(QBUser user, PrefsHelper prefsHelper) {
-        prefsHelper.savePref(PrefsHelper.PREF_USER_ID, user.getId());
-        prefsHelper.savePref(PrefsHelper.PREF_USER_EMAIL, user.getEmail());
-        prefsHelper.savePref(PrefsHelper.PREF_USER_FULL_NAME, user.getFullName());
-        prefsHelper.savePref(PrefsHelper.PREF_USER_PASSWORD, user.getPassword());
+    private void saveUser(QBUser user) {
+        coreSharedHelper.saveUserId(user.getId());
+        coreSharedHelper.saveUserEmail(user.getEmail());
+        coreSharedHelper.saveUserPassword(user.getPassword());
+        coreSharedHelper.saveUserFullName(user.getFullName());
     }
 
     public boolean isLoggedIn() {
-        return user != null && !TextUtils.isEmpty(sessionToken);
+        return qbUser != null && !TextUtils.isEmpty(qbToken);
     }
 
     public boolean isSessionExist() {
-        return loginType != null && !TextUtils.isEmpty(sessionToken);
+        return loginType != null && !TextUtils.isEmpty(qbToken);
     }
 
     public LoginType getLoginType() {

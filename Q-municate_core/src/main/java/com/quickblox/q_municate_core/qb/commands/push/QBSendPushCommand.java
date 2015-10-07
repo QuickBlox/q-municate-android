@@ -8,11 +8,11 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.messages.QBMessages;
 import com.quickblox.messages.model.QBEvent;
 import com.quickblox.q_municate_core.core.command.ServiceCommand;
-import com.quickblox.q_municate_core.core.gcm.NotificationHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_core.utils.helpers.CoreNotificationHelper;
 
 import java.util.ArrayList;
 
@@ -45,7 +45,7 @@ public class QBSendPushCommand extends ServiceCommand {
         ArrayList<Integer> usersIdsList = (ArrayList<Integer>) extras.getSerializable(
                 QBServiceConsts.EXTRA_FRIENDS);
         String message = extras.getString(ConstsCore.PUSH_MESSAGE);
-        QBEvent pushEvent = NotificationHelper.createPushEvent(usersIdsList, message, null);
+        QBEvent pushEvent = CoreNotificationHelper.createPushEvent(usersIdsList, message, null);
 
         try {
             QBMessages.createEvent(pushEvent);

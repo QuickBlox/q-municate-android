@@ -26,12 +26,12 @@ import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.uihelpers.SimpleTextWatcher;
+import com.quickblox.q_municate.utils.simple.SimpleTextWatcher;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.image.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.utils.image.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;

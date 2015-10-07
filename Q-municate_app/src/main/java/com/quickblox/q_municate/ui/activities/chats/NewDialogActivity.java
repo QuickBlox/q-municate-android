@@ -7,7 +7,7 @@ import android.text.TextUtils;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;

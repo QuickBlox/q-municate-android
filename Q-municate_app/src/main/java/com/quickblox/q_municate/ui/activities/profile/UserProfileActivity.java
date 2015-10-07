@@ -31,7 +31,7 @@ import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -218,7 +218,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
                 onlineImageView.setVisibility(View.GONE);
             }
 
-            onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
+            onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
         }
     }
 

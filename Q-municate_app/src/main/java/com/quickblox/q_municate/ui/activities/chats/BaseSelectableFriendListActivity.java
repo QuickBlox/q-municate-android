@@ -8,10 +8,10 @@ import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.chats.DialogsSelectableFriendsAdapter;
-import com.quickblox.q_municate.ui.uihelpers.SimpleActionModeCallback;
+import com.quickblox.q_municate.utils.simple.SimpleActionModeCallback;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.models.User;

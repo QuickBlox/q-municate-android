@@ -5,9 +5,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.quickblox.q_municate.core.listeners.UserOperationListener;
+import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -90,7 +90,7 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
             online = true;
         }
 
-        viewHolder.onlineStatusTextView.setText(OnlineStatusHelper.getOnlineStatus(online));
+        viewHolder.onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
 
         if (online) {
             viewHolder.onlineImageView.setVisibility(View.VISIBLE);

@@ -14,7 +14,7 @@ import com.quickblox.core.helper.StringifyArrayList;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.models.UserCustomData;
-import com.quickblox.q_municate_core.utils.PrefsHelper;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -70,7 +70,7 @@ public class QBAuthHelper extends BaseHelper {
             qbUser = updateUser(qbUser);
         }
 
-        PrefsHelper.getPrefsHelper().savePref(PrefsHelper.PREF_SESSION_FB_TOKEN, accessToken);
+        CoreSharedHelper.getInstance().saveQBToken(accessToken);
 
         qbUser.setPassword(session.getToken());
         String token = QBAuth.getBaseService().getToken();

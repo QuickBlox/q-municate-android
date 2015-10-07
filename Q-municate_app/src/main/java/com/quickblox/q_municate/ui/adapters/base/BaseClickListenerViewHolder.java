@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.q_municate.core.listeners.OnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.listeners.OnRecycleItemClickListener;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 
 import butterknife.ButterKnife;

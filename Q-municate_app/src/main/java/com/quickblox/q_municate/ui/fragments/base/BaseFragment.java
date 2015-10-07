@@ -6,12 +6,12 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import com.quickblox.q_municate.App;
-import com.quickblox.q_municate.core.bridges.ActionBarBridge;
-import com.quickblox.q_municate.core.bridges.ConnectionBridge;
-import com.quickblox.q_municate.core.bridges.LoadingBridge;
-import com.quickblox.q_municate.core.bridges.SnackbarBridge;
-import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
-import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
+import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
+import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
+import com.quickblox.q_municate.utils.bridges.LoadingBridge;
+import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
+import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;

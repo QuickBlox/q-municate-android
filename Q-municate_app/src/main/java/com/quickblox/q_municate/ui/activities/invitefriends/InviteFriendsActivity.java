@@ -17,7 +17,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.listeners.CounterChangedListener;
+import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;

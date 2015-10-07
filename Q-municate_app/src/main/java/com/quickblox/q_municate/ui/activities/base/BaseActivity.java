@@ -31,19 +31,21 @@ import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.core.bridges.ActionBarBridge;
-import com.quickblox.q_municate.core.bridges.ConnectionBridge;
-import com.quickblox.q_municate.core.bridges.LoadingBridge;
-import com.quickblox.q_municate.core.bridges.SnackbarBridge;
-import com.quickblox.q_municate.core.gcm.GCMIntentService;
-import com.quickblox.q_municate.core.listeners.ServiceConnectionListener;
-import com.quickblox.q_municate.core.listeners.UserStatusChangingListener;
+import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
+import com.quickblox.q_municate.utils.bridges.ConnectionBridge;
+import com.quickblox.q_municate.utils.bridges.LoadingBridge;
+import com.quickblox.q_municate.utils.bridges.SnackbarBridge;
+import com.quickblox.q_municate.utils.listeners.ServiceConnectionListener;
+import com.quickblox.q_municate.utils.listeners.UserStatusChangingListener;
 import com.quickblox.q_municate.ui.activities.authorization.SplashActivity;
+import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
+import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.ProgressDialogFragment;
 import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.SharedHelper;
 import com.quickblox.q_municate.utils.helpers.ActivityUIHelper;
+import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHelper;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -55,6 +57,9 @@ import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.User;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -258,7 +263,9 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
         addAction(QBServiceConsts.LOGIN_REST_SUCCESS_ACTION, successAction);
 
-        GCMIntentService.clearNotificationEvent(this);
+        NotificationManagerHelper.clearNotificationEvent(this);
+
+        checkOpeningDialog();
     }
 
     @Override
@@ -510,6 +517,31 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         return failAction;
     }
 
+    private void checkOpeningDialog() {
+        if (appSharedHelper.needToOpenDialog()) {
+            Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
+            User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
+
+            if (dialog != null && user != null) {
+                if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
+                    startPrivateChatActivity(user, dialog);
+                } else {
+                    startGroupChatActivity(dialog);
+                }
+
+                appSharedHelper.saveNeedToOpenDialog(false);
+            }
+        }
+    }
+
+    public void startPrivateChatActivity(User user, Dialog dialog) {
+        PrivateDialogActivity.start(this, user, dialog);
+    }
+
+    public void startGroupChatActivity(Dialog dialog) {
+        GroupDialogActivity.start(this, dialog);
+    }
+
     protected void activateButterKnife() {
         ButterKnife.bind(this);
     }
@@ -568,8 +600,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
             getHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    Bundle extras = intent.getExtras();
-                    if (extras != null && QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+                    if (intent == null) {
+                        return;
+                    }
+
+                    if (QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
                         onReceiveChatMessageAction(intent.getExtras());
                     } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
                         onReceiveContactRequestAction(intent.getExtras());

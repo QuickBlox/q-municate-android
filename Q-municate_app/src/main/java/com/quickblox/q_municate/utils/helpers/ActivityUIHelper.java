@@ -7,8 +7,6 @@ import android.view.View;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.chats.BaseDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -94,18 +92,10 @@ public class ActivityUIHelper {
         }
 
         if (isPrivateMessage) {
-            startPrivateChatActivity();
+            baseActivity.startPrivateChatActivity(senderUser, messagesDialog);
         } else {
-            startGroupChatActivity();
+            baseActivity.startGroupChatActivity(messagesDialog);
         }
-    }
-
-    private void startPrivateChatActivity() {
-        PrivateDialogActivity.start(baseActivity, senderUser, messagesDialog);
-    }
-
-    private void startGroupChatActivity() {
-        GroupDialogActivity.start(baseActivity, messagesDialog);
     }
 
     private class ShowingNotificationTimerTask extends TimerTask {

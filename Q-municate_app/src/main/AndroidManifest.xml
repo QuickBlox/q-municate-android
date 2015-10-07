@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="com.quickblox.qmunicate.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -21,10 +20,6 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-
-    <permission
-        android:name="com.quickblox.q_municate.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
 
     <application
         android:name="com.quickblox.q_municate.App"
@@ -147,7 +142,7 @@
             android:value="@integer/google_play_services_version" />
 
         <receiver
-            android:name=".core.gcm.GcmBroadcastReceiver"
+            android:name=".gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -157,7 +152,16 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".core.gcm.GCMIntentService" />
+        <receiver
+            android:name=".utils.broadcasts.ChatMessageReceiver"
+            android:label="ConnectChatMessageReceiver">
+            <intent-filter>
+                <action android:name="got_chat_message" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".gcm.GCMIntentService" />
+
         <service
             android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />

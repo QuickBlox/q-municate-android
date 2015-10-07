@@ -12,12 +12,12 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.FilterAdapter;
-import com.quickblox.q_municate.core.listeners.UserOperationListener;
+import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
-import com.quickblox.q_municate_core.utils.OnlineStatusHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
@@ -127,7 +127,7 @@ public class GlobalSearchAdapter extends FilterAdapter<User, BaseClickListenerVi
             viewHolder.onlineImageView.setVisibility(View.GONE);
             status = resources.getString(R.string.frl_pending_request_status);
         } else {
-            status = resources.getString(OnlineStatusHelper.getOnlineStatus(online));
+            status = resources.getString(OnlineStatusUtils.getOnlineStatus(online));
         }
 
         viewHolder.addFriendImageView.setVisibility(View.GONE);

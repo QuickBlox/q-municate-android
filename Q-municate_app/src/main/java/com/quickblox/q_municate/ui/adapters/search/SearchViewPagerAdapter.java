@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.quickblox.q_municate.core.listeners.SearchListener;
+import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.fragments.search.GlobalSearchFragment;
 import com.quickblox.q_municate.ui.fragments.search.LocalSearchFragment;
 

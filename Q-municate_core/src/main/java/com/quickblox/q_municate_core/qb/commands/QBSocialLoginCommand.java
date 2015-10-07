@@ -11,7 +11,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBAuthHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.CoreSharedHelper;
+import com.quickblox.q_municate_core.utils.helpers.CoreSharedHelper;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 
@@ -43,11 +43,11 @@ public class QBSocialLoginCommand extends ServiceCommand {
         String accessTokenSecret = (String) extras.getSerializable(QBServiceConsts.EXTRA_ACCESS_TOKEN_SECRET);
         QBUser user = authHelper.login(socialProvider, accessToken, accessTokenSecret);
         if (user.getCustomData() == null) {
-            CoreSharedHelper.getSharedHelper().saveUsersImportInitialized(false);
+            CoreSharedHelper.getInstance().saveUsersImportInitialized(false);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_REGISTRATION);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, getUserWithAvatar(user));
         } else {
-            CoreSharedHelper.getSharedHelper().saveUsersImportInitialized(true);
+            CoreSharedHelper.getInstance().saveUsersImportInitialized(true);
             extras.putSerializable(QBServiceConsts.AUTH_ACTION_TYPE, QBServiceConsts.AUTH_TYPE_LOGIN);
             extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
         }
