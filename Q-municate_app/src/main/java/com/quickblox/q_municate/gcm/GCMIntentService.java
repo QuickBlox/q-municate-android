@@ -3,7 +3,6 @@ package com.quickblox.q_municate.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.quickblox.q_municate.utils.helpers.notification.ChatNotificationHelper;
@@ -18,8 +17,6 @@ public class GCMIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.v(TAG, "--- onHandleIntent() ---");
-
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging googleCloudMessaging = GoogleCloudMessaging.getInstance(this);
         String messageType = googleCloudMessaging.getMessageType(intent);

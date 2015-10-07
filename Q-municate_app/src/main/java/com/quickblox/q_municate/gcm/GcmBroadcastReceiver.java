@@ -15,9 +15,8 @@ public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "--- PUSH. onReceive ---");
-
         boolean enablePush = App.getInstance().getAppSharedHelper().isEnablePushNotifications();
+        Log.d(TAG, "--- PUSH. onReceive(), show notification = " + enablePush + " ---");
         if (!enablePush) {
             return;
         }

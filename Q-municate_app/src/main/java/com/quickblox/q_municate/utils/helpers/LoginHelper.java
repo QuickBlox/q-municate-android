@@ -84,13 +84,13 @@ public class LoginHelper {
                 ConstsCore.TOKEN_VALID_TIME_IN_MINUTES))) {
             existingQbSessionListener.onStartSessionSuccess();
         } else {
-            doAutoLogin();
+            login();
         }
     }
 
-    public void doAutoLogin() {
+    public void login() {
         if (LoginType.EMAIL.equals(getCurrentLoginType())) {
-            login();
+            loginQB();
         } else if (LoginType.FACEBOOK.equals(getCurrentLoginType())) {
             loginFB();
         }
@@ -102,7 +102,7 @@ public class LoginHelper {
         QBSocialLoginCommand.start(context, QBProvider.FACEBOOK, fbToken, null);
     }
 
-    public void login() {
+    public void loginQB() {
         appSharedHelper.saveUsersImportInitialized(true);
         QBUser user = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
@@ -157,17 +157,17 @@ public class LoginHelper {
                 return;
             }
 
-            if (intent.getAction().equals(QBServiceConsts.LOGIN_SUCCESS_ACTION)) {
+            if (intent.getAction().equals(QBServiceConsts.LOGIN_SUCCESS_ACTION)
+                    || intent.getAction().equals(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION)) {
                 loginChat();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION)) {
                 unregisterBroadcastReceiver();
-
                 globalLoginListener.onCompleteQbChatLogin();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_FAIL_ACTION)
-                            || intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION)) {
+                    || intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_FAIL_ACTION)
+                    || intent.getAction().equals(QBServiceConsts.SOCIAL_LOGIN_FAIL_ACTION)) {
                 unregisterBroadcastReceiver();
-
-                globalLoginListener.onCompleteWithError("QB login was finished with error!");
+                globalLoginListener.onCompleteWithError("Login was finished with error!");
             }
         }
     }

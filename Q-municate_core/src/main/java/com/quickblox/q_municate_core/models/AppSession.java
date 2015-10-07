@@ -29,8 +29,8 @@ public class AppSession implements Serializable {
         save();
     }
 
-    public static void startSession(LoginType loginType, QBUser user, String sessionToken) {
-        activeSession = new AppSession(loginType, user, sessionToken);
+    public static void startSession(LoginType loginType, QBUser user, String qbToken) {
+        activeSession = new AppSession(loginType, user, qbToken);
     }
 
     private static AppSession getActiveSession() {

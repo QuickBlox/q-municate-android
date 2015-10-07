@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="google_analytics_tracking_id">UA-26728270-9</string>
+
     <string name="push_registration_app_id">265299067289</string>
 
     // release
     <string name="facebook_app_id">605405446247805</string>
     // release web
     <!--<string name="facebook_app_id">1445555125707161</string>-->
+
 </resources>

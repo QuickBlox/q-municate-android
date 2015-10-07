@@ -34,7 +34,7 @@ public class SharedHelper extends CoreSharedHelper {
     }
 
     public boolean isEnablePushNotifications() {
-        return getPref(Constants.ENABLING_PUSH_NOTIFICATIONS, false);
+        return getPref(Constants.ENABLING_PUSH_NOTIFICATIONS, true);
     }
 
     public void saveEnablePushNotifications(boolean enable) {

@@ -1,19 +1,18 @@
-package com.quickblox.q_municate.utils;
+package com.quickblox.q_municate.utils.helpers;
 
 import android.content.Context;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.quickblox.q_municate.R;
 import com.quickblox.users.model.QBUser;
 
-public class AnalyticsUtils {
-
-    private static String GA_PROPERTY = "UA-26728270-9";
+public class GoogleAnalyticsHelper {
 
     public static void pushAnalyticsData(Context context, QBUser user, String action) {
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(context);
-        Tracker tracker = analytics.newTracker(GA_PROPERTY);
+        Tracker tracker = analytics.newTracker(context.getString(R.string.google_analytics_tracking_id));
 
         // You only need to set User ID on a tracker once. By setting it on the tracker, the ID will be
         // sent with all subsequent hits.

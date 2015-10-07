@@ -29,7 +29,6 @@ public class CoreSharedHelper {
         String PUSH_USER_ID = "push_user_id";
         String PUSH_REGISTRATION_ID = "push_registration_id";
         String PUSH_APP_VERSION = "push_app_version";
-        String PUSH_IS_SUBSCRIBED_ON_QB_SERVER = "push_subscribed_on_qb_server";
     }
 
     protected final SharedPreferences sharedPreferences;
@@ -205,13 +204,5 @@ public class CoreSharedHelper {
 
     public void savePushAppVersion(int appVersion) {
         savePref(Constants.PUSH_APP_VERSION, appVersion);
-    }
-
-    public boolean isSubscribedOnPush() {
-        return getPref(Constants.PUSH_IS_SUBSCRIBED_ON_QB_SERVER, false);
-    }
-
-    public void saveSubscribedOnPush(boolean subscribed) {
-        savePref(Constants.PUSH_IS_SUBSCRIBED_ON_QB_SERVER, subscribed);
     }
 }

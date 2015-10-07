@@ -216,6 +216,7 @@ public class QBServiceConsts {
     public static final String UPDATE_DIALOG_DETAILS = "update_dialog_details";
     public static final String TYPING_MESSAGE = "typing_message";
     public static final String GOT_CHAT_MESSAGE = "got_chat_message";
+    public static final String GOT_CHAT_MESSAGE_LOCAL = "got_chat_message_local";
     public static final String GOT_CONTACT_REQUEST = "got_contact_request";
     public static final String LOGIN_AND_JOIN_CHAT_ACTION = "login_and_join_chats";
     public static final String DESTROY_CHAT = "destroy_chat_after_logout";

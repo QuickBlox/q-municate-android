@@ -70,7 +70,7 @@ public class QBAuthHelper extends BaseHelper {
             qbUser = updateUser(qbUser);
         }
 
-        CoreSharedHelper.getInstance().saveQBToken(accessToken);
+        CoreSharedHelper.getInstance().saveFBToken(accessToken);
 
         qbUser.setPassword(session.getToken());
         String token = QBAuth.getBaseService().getToken();

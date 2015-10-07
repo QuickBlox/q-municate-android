@@ -14,6 +14,7 @@ public class GSMHelper {
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private final static String TAG = GSMHelper.class.getSimpleName();
+
     private Activity activity;
     private GoogleCloudMessaging googleCloudMessaging;
     private CoreSharedHelper coreSharedHelper;

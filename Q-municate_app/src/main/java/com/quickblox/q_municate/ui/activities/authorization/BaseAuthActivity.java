@@ -13,7 +13,7 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
-import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
@@ -179,7 +179,7 @@ public class BaseAuthActivity extends BaseActivity {
         startMainActivity(user);
 
         // send analytics data
-        AnalyticsUtils.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
+        GoogleAnalyticsHelper.pushAnalyticsData(BaseAuthActivity.this, user, "User Sign In");
     }
 
     protected boolean isLoggedInToServer() {

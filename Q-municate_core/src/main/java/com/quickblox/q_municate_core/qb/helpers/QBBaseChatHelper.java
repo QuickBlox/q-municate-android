@@ -113,7 +113,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         String error = null;
         try {
-            privateChat.sendMessage(qbChatMessage);
+            if (privateChat != null) {
+                privateChat.sendMessage(qbChatMessage);
+            }
         } catch (XMPPException | SmackException.NotConnectedException e) {
             error = context.getString(R.string.dlg_fail_connection);
         }
@@ -144,7 +146,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     private void saveTempMessages(List<QBDialog> qbDialogsList) {
-        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.createTempLocalMessagesList(qbDialogsList));
+        dataManager.getMessageDataManager().createOrUpdate(
+                ChatUtils.createTempLocalMessagesList(qbDialogsList));
     }
 
     protected void saveTempMessage(Message message) {
@@ -288,25 +291,30 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return attachment;
     }
 
-    public void sendTypingStatusToServer(int opponentId, boolean startTyping) {
-        QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
-
+    public void sendTypingStatusToServer(int opponentId, boolean startTyping)  {
         try {
+            QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
             if (startTyping) {
                 privateChat.sendIsTypingNotification();
             } else {
                 privateChat.sendStopTypingNotification();
             }
-        } catch (XMPPException | SmackException.NotConnectedException e) {
+        } catch (XMPPException | SmackException.NotConnectedException | QBResponseException e) {
             ErrorUtils.logError(e);
         }
     }
 
-    public QBPrivateChat createPrivateChatIfNotExist(int userId) {
+    public QBPrivateChat createPrivateChatIfNotExist(int userId) throws QBResponseException {
+        if (privateChatManager == null) {
+            ErrorUtils.logError(TAG, " private chat is NULL");
+            throw new QBResponseException(context.getString(R.string.dlg_fail_create_chat));
+        }
+
         QBPrivateChat privateChat = privateChatManager.getChat(userId);
         if (privateChat == null) {
             privateChat = privateChatManager.createChat(userId, null);
         }
+
         return privateChat;
     }
 
@@ -324,24 +332,27 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         return existingPrivateDialog;
     }
 
-    protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user, boolean isPrivateChat) {
+    protected void checkForSendingNotification(boolean ownMessage, QBChatMessage qbChatMessage, User user,
+            boolean isPrivateChat) {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() == null || dialogId == null) {
             return;
         }
 
+        sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE, qbChatMessage, user, dialogId, isPrivateChat);
+
         if (currentDialog != null) {
             if (!ownMessage && !currentDialog.getDialogId().equals(dialogId)) {
-                notifyMessageReceived(qbChatMessage, user, dialogId, isPrivateChat);
+                sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL, qbChatMessage, user, dialogId, isPrivateChat);
             }
         } else {
-            notifyMessageReceived(qbChatMessage, user, dialogId, isPrivateChat);
+            sendNotificationBroadcast(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL, qbChatMessage, user, dialogId, isPrivateChat);
         }
     }
 
-    protected void notifyMessageReceived(QBChatMessage chatMessage, User user, String dialogId,
+    private void sendNotificationBroadcast(String action, QBChatMessage chatMessage, User user, String dialogId,
             boolean isPrivateMessage) {
-        Intent intent = new Intent(QBServiceConsts.GOT_CHAT_MESSAGE);
+        Intent intent = new Intent(action);
         String messageBody = chatMessage.getBody();
         String extraChatMessage;
 
@@ -423,7 +434,9 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
-            privateChat.readMessage(combinationMessage.getMessageId());
+            if (privateChat != null) {
+                privateChat.readMessage(combinationMessage.getMessageId());
+            }
         }
     }
 

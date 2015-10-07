@@ -32,7 +32,9 @@ public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessagi
     @Override
     public void onResult(Bundle bundle) {
         if (!bundle.isEmpty()) {
-            storeRegistration(activityRef.get(), bundle);
+            if (bundle.getBoolean(QBServiceConsts.EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER)) {
+                storeRegistration(activityRef.get(), bundle);
+            }
         }
     }
 
@@ -86,6 +88,5 @@ public class QBGCMRegistrationTask extends BaseErrorAsyncTask<GoogleCloudMessagi
         CoreSharedHelper coreSharedHelper = CoreSharedHelper.getInstance();
         coreSharedHelper.savePushRegistrationId(registration.getString(QBServiceConsts.EXTRA_REGISTRATION_ID));
         coreSharedHelper.savePushAppVersion(Utils.getAppVersionCode(context));
-        coreSharedHelper.saveSubscribedOnPush(registration.getBoolean(QBServiceConsts.EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER));
     }
 }

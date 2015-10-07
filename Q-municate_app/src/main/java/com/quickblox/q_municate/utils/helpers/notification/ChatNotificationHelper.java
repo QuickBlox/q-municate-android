@@ -55,7 +55,7 @@ public class ChatNotificationHelper {
         boolean chatPush = userId != 0 && !TextUtils.isEmpty(dialogId);
 
         if (chatPush) {
-            saveOpeningDialogData(true, userId, dialogId);
+            saveOpeningDialogData(userId, dialogId);
             if (AppSession.getSession().getUser() != null && !isLoginNow) {
                 isLoginNow = true;
                 LoginHelper loginHelper = new LoginHelper(context);
@@ -64,7 +64,7 @@ public class ChatNotificationHelper {
             }
         }
 
-        saveOpeningDialogData(false);
+        saveOpeningDialog(false);
     }
 
     public void sendNotification(String message) {
@@ -76,13 +76,12 @@ public class ChatNotificationHelper {
         NotificationManagerHelper.sendNotificationEvent(context, notificationEvent);
     }
 
-    public void saveOpeningDialogData(boolean open, int userId, String dialogId) {
-        appSharedHelper.saveNeedToOpenDialog(open);
+    public void saveOpeningDialogData(int userId, String dialogId) {
         appSharedHelper.savePushUserId(userId);
         appSharedHelper.savePushDialogId(dialogId);
     }
 
-    public void saveOpeningDialogData(boolean open) {
+    public void saveOpeningDialog(boolean open) {
         appSharedHelper.saveNeedToOpenDialog(open);
     }
 
@@ -97,7 +96,7 @@ public class ChatNotificationHelper {
         public void onCompleteQbChatLogin() {
             isLoginNow = false;
 
-            saveOpeningDialogData(true);
+            saveOpeningDialog(true);
 
             Intent intent = SystemUtils.getPreviousIntent(context);
             if (!isPushForPrivateChat() || intent == null) {
@@ -109,7 +108,7 @@ public class ChatNotificationHelper {
         public void onCompleteWithError(String error) {
             isLoginNow = false;
 
-            saveOpeningDialogData(false);
+            saveOpeningDialog(false);
         }
     }
 }

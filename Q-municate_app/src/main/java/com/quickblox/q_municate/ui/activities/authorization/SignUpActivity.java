@@ -14,7 +14,7 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.AnalyticsUtils;
+import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
@@ -237,7 +237,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         startMainActivity(user);
 
         // send analytics data
-        AnalyticsUtils.pushAnalyticsData(SignUpActivity.this, user, "User Sign Up");
+        GoogleAnalyticsHelper.pushAnalyticsData(SignUpActivity.this, user, "User Sign Up");
     }
 
     private void performSignUpSuccessAction(Bundle bundle) {

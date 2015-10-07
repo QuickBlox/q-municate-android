@@ -29,6 +29,7 @@ import android.widget.ProgressBar;
 
 import com.facebook.Session;
 import com.quickblox.auth.model.QBProvider;
+import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.bridges.ActionBarBridge;
@@ -363,7 +364,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
 
     private void registerBroadcastReceivers() {
         IntentFilter globalActionsIntentFilter = new IntentFilter();
-        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE);
+        globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL);
         globalActionsIntentFilter.addAction(QBServiceConsts.GOT_CONTACT_REQUEST);
         globalActionsIntentFilter.addAction(QBServiceConsts.FORCE_RELOGIN);
         globalActionsIntentFilter.addAction(QBServiceConsts.REFRESH_SESSION);
@@ -518,7 +519,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     }
 
     private void checkOpeningDialog() {
-        if (appSharedHelper.needToOpenDialog()) {
+        if (appSharedHelper.needToOpenDialog() && isChatServiceInitialized()) {
             Dialog dialog = DataManager.getInstance().getDialogDataManager().getByDialogId(appSharedHelper.getPushDialogId());
             User user = DataManager.getInstance().getUserDataManager().get(appSharedHelper.getPushUserId());
 
@@ -532,6 +533,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                 appSharedHelper.saveNeedToOpenDialog(false);
             }
         }
+    }
+
+    protected boolean isChatServiceInitialized() {
+        return QBChatService.isInitialized() && AppSession.getSession().isSessionExist();
     }
 
     public void startPrivateChatActivity(User user, Dialog dialog) {
@@ -604,7 +609,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
                         return;
                     }
 
-                    if (QBServiceConsts.GOT_CHAT_MESSAGE.equals(intent.getAction())) {
+                    if (QBServiceConsts.GOT_CHAT_MESSAGE_LOCAL.equals(intent.getAction())) {
                         onReceiveChatMessageAction(intent.getExtras());
                     } else if (QBServiceConsts.GOT_CONTACT_REQUEST.equals(intent.getAction())) {
                         onReceiveContactRequestAction(intent.getExtras());

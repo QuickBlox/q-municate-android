@@ -44,8 +44,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
     public synchronized QBPrivateChat createChatLocally(QBDialog dialog, Bundle additional) throws QBResponseException {
         currentDialog = dialog;
         int opponentId = additional.getInt(QBServiceConsts.EXTRA_OPPONENT_ID);
-        QBPrivateChat privateChat = createPrivateChatIfNotExist(opponentId);
-        return privateChat;
+        return createPrivateChatIfNotExist(opponentId);
     }
 
     @Override
