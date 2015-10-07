@@ -44,15 +44,15 @@ public class FinderUnknownUsers {
 
     public void find() {
         if (dialogsList != null) {
-            findUserInDialogsList(dialogsList, currentUser.getId());
+            findUserInDialogsList(dialogsList);
         } else {
-            findUserInDialog(dialog, currentUser.getId());
+            findUserInDialog(dialog);
         }
     }
 
-    private void findUserInDialogsList(List<QBDialog> dialogsList, int currentUserId) {
+    private void findUserInDialogsList(List<QBDialog> dialogsList) {
         for (QBDialog dialog : dialogsList) {
-            findUserInDialog(dialog, currentUserId);
+            findUserInDialog(dialog);
         }
         if (!loadIdsSet.isEmpty()) {
             loadUsers();
@@ -79,11 +79,11 @@ public class FinderUnknownUsers {
         }
     }
 
-    private void findUserInDialog(QBDialog dialog, int currentUserId) {
+    private void findUserInDialog(QBDialog dialog) {
         List<Integer> occupantsList = dialog.getOccupants();
         for (int occupantId : occupantsList) {
-            boolean isUserInBase = dataManager.getUserDataManager().get(occupantId) != null;
-            if (!isUserInBase && currentUserId != occupantId) {
+            boolean isUserInBase = dataManager.getUserDataManager().exists(occupantId);
+            if (!isUserInBase && currentUser.getId() != occupantId) {
                 loadIdsSet.add(occupantId);
             }
         }

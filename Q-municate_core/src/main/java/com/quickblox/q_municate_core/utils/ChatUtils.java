@@ -420,6 +420,24 @@ public class ChatUtils {
         return lastMessage;
     }
 
+    public static long getDialogMessageCreatedDate(boolean lastMessage, Message message, DialogNotification dialogNotification) {
+        long createdDate = 0;
+
+        if (message == null && dialogNotification == null) {
+            createdDate = 0;
+        } else if (message != null && dialogNotification != null) {
+            createdDate = lastMessage
+                    ? (message.getCreatedDate() > dialogNotification.getCreatedDate() ? message.getCreatedDate() : dialogNotification.getCreatedDate())
+                    : (message.getCreatedDate() < dialogNotification.getCreatedDate() ? message.getCreatedDate() : dialogNotification.getCreatedDate());
+        } else if (message != null && dialogNotification == null) {
+            createdDate = message.getCreatedDate();
+        } else if (dialogNotification != null && message == null) {
+            createdDate = dialogNotification.getCreatedDate();
+        }
+
+        return createdDate;
+    }
+
     public static List<Dialog> fillTitleForPrivateDialogsList(String titleForDeletedUser, DataManager dataManager,
             List<Dialog> inputDialogsList) {
         List<Dialog> dialogsList = new ArrayList<>(inputDialogsList.size());

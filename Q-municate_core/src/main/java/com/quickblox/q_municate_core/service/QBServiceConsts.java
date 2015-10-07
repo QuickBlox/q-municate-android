@@ -196,6 +196,7 @@ public class QBServiceConsts {
     public static final String EXTRA_DIALOG_COUNT_UNREAD_MESSAGE = "dialog_count_unread_message";
     public static final String EXTRA_GROUP_NAME = "group_name";
     public static final String EXTRA_DATE_LAST_UPDATE_HISTORY = "last_update_history";
+    public static final String EXTRA_LOAD_MORE = "load_more";
     public static final String EXTRA_MESSAGE_ID = "message_id";
     public static final String EXTRA_STATUS_MESSAGE = "status_message";
     public static final String EXTRA_USER_ID = "user_id";
@@ -207,7 +208,6 @@ public class QBServiceConsts {
     public static final String EXTRA_IS_TYPING = "is_typing";
     public static final String EXTRA_CALL_ACTIVITY = "call_activity";
     public static final String EXTRA_PAGE = "load_elements";
-    public static final String EXTRA_SKIP_ITEMS = "skip_items";
     public static final String EXTRA_USER_STATUS = "user_status";
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
     public static final String EXTRA_IS_PUSH_SUBSCRIBED_ON_SERVER = "is_push_subscribed_on_server";

@@ -62,14 +62,14 @@ public class MessageDataManager extends BaseManager<Message> {
         return message;
     }
 
-    public Message getLastMessageByDialogId(List<Integer> dialogOccupantsList) {
+    public Message getMessageByDialogId(boolean firstMessage, List<Integer> dialogOccupantsList) {
         Message message = null;
 
         try {
             QueryBuilder<Message, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList)
                     .and().eq(Message.Column.STATE, State.READ);
-            queryBuilder.orderBy(Message.Column.CREATED_DATE, false);
+            queryBuilder.orderBy(Message.Column.CREATED_DATE, firstMessage);
             PreparedQuery<Message> preparedQuery = queryBuilder.prepare();
             message = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

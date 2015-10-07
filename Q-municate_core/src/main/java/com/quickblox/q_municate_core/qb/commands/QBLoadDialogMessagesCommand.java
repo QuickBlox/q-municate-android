@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.quickblox.chat.Consts;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.request.QBRequestGetBuilder;
@@ -25,12 +26,12 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
         this.baseChatHelper = baseChatHelper;
     }
 
-    public static void start(Context context, QBDialog dialog, long lastDateLoad, int skipMessages) {
+    public static void start(Context context, QBDialog dialog, long lastDateLoad, boolean loadMore) {
         Intent intent = new Intent(QBServiceConsts.LOAD_DIALOG_MESSAGES_ACTION, null, context,
                 QBService.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, dialog);
         intent.putExtra(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY, lastDateLoad);
-        intent.putExtra(QBServiceConsts.EXTRA_SKIP_ITEMS, skipMessages);
+        intent.putExtra(QBServiceConsts.EXTRA_LOAD_MORE, loadMore);
         context.startService(intent);
     }
 
@@ -38,21 +39,25 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
     public Bundle perform(Bundle extras) throws Exception {
         QBDialog dialog = (QBDialog) extras.getSerializable(QBServiceConsts.EXTRA_DIALOG);
         long lastDateLoad = extras.getLong(QBServiceConsts.EXTRA_DATE_LAST_UPDATE_HISTORY);
-        int skipMessages = extras.getInt(QBServiceConsts.EXTRA_SKIP_ITEMS);
+        boolean loadMore = extras.getBoolean(QBServiceConsts.EXTRA_LOAD_MORE);
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.setPagesSkip(skipMessages);
+        customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
         customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
+
+        if (loadMore) {
+            customObjectRequestBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+        } else {
+            customObjectRequestBuilder.gte(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+        }
 
         List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,
                 returnedBundle, dialog, lastDateLoad);
 
         Bundle bundleResult = new Bundle();
-        bundleResult.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES,
-                (java.io.Serializable) dialogMessagesList);
-        bundleResult.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES,
-                returnedBundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES));
+        bundleResult.putSerializable(QBServiceConsts.EXTRA_DIALOG_MESSAGES, (java.io.Serializable) dialogMessagesList);
+        bundleResult.putInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES, returnedBundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES));
 
         return bundleResult;
     }

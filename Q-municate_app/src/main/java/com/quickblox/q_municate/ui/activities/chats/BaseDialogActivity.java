@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +24,6 @@ import android.widget.ImageView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-import com.quickblox.chat.QBChatService;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
@@ -85,6 +85,9 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     private static Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
+    @Bind(R.id.messages_swiperefreshlayout)
+    SwipeRefreshLayout messageSwipeRefreshLayout;
+
     @Bind(R.id.messages_recycleview)
     RecyclerView messagesRecyclerView;
 
@@ -120,11 +123,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
-    private int skipMessages;
     private Observer messageObserver;
     private Observer dialogNotificationObserver;
     private BroadcastReceiver typingMessageBroadcastReceiver;
     private BroadcastReceiver updatingDialogBroadcastReceiver;
+    private boolean loadMore;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -137,13 +140,16 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         initActionBar();
 
         initFields();
-        initUI();
+        initCustomUI();
+        initCustomListeners();
 
         addActions();
         addObservers();
         registerBroadcastReceivers();
 
         hideSmileLayout();
+
+        appSharedHelper.saveNeedToOpenDialog(false);
     }
 
     @Override
@@ -166,10 +172,14 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
     }
 
-    private void initUI() {
+    private void initCustomUI() {
         emojiconsFragment = _findViewById(R.id.emojicon_fragment);
         sendButton.setEnabled(false);
         messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
+    }
+
+    private void initCustomListeners() {
+        messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
     }
 
     protected void initMessagesRecyclerView() {
@@ -416,9 +426,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog), lastDateLoad,
-                skipMessages);
-        skipMessages += ConstsCore.DIALOG_MESSAGES_PER_PAGE;
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog), lastDateLoad, loadMore);
     }
 
     private void setSendButtonVisibility(CharSequence charSequence) {
@@ -468,7 +476,9 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void scrollMessagesToBottom() {
-        scrollMessagesWithDelay();
+        if (!loadMore) {
+            scrollMessagesWithDelay();
+        }
     }
 
     private void scrollMessagesWithDelay() {
@@ -515,17 +525,26 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
         showActionBarProgress();
 
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
-        Message lastReadMessage = dataManager.getMessageDataManager().getLastMessageByDialogId(
-                dialogOccupantsIdsList);
-        if (lastReadMessage == null) {
-            startLoadDialogMessages(dialog, ConstsCore.ZERO_LONG_VALUE);
+
+        Message message;
+        DialogNotification dialogNotification;
+
+        long messageDateSent = 0;
+
+        if (loadMore) {
+            message = dataManager.getMessageDataManager().getMessageByDialogId(true, dialogOccupantsIdsList);
+            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(true, dialogOccupantsIdsList);
+            messageDateSent = ChatUtils.getDialogMessageCreatedDate(false, message, dialogNotification);
         } else {
-            long lastMessageDateSent = lastReadMessage.getCreatedDate();
-            startLoadDialogMessages(dialog, lastMessageDateSent);
+            message = dataManager.getMessageDataManager().getMessageByDialogId(false, dialogOccupantsIdsList);
+            dialogNotification = dataManager.getDialogNotificationDataManager().getDialogNotificationByDialogId(
+                    false, dialogOccupantsIdsList);
+            messageDateSent = ChatUtils.getDialogMessageCreatedDate(true, message, dialogNotification);
         }
+
+        startLoadDialogMessages(dialog, messageDateSent);
     }
 
     private void readAllMessages() {
@@ -659,9 +678,13 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            messageSwipeRefreshLayout.setRefreshing(false);
+
             if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
                 scrollMessagesToBottom();
             }
+
+            loadMore = false;
 
             hideActionBarProgress();
         }
@@ -671,6 +694,10 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
         @Override
         public void execute(Bundle bundle) {
+            messageSwipeRefreshLayout.setRefreshing(false);
+
+            loadMore = false;
+
             hideActionBarProgress();
         }
     }
@@ -701,6 +728,17 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(QBServiceConsts.UPDATE_DIALOG)) {
                 updateData();
+            }
+        }
+    }
+
+    private class RefreshLayoutListener implements SwipeRefreshLayout.OnRefreshListener {
+
+        @Override
+        public void onRefresh() {
+            if (!loadMore) {
+                loadMore = true;
+                startLoadDialogMessages();
             }
         }
     }

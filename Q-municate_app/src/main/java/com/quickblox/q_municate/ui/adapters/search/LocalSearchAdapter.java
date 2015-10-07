@@ -74,7 +74,7 @@ public class LocalSearchAdapter extends FilterAdapter<Dialog, BaseClickListenerV
             List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
             Message message = dataManager.getMessageDataManager().getLastMessageWithTempByDialogId(dialogOccupantsIdsList);
             DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager()
-                    .getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
+                    .getDialogNotificationByDialogId(false, dialogOccupantsIdsList);
             label = ChatUtils.getDialogLastMessage(
                     resources.getString(R.string.cht_notification_message),
                     message,

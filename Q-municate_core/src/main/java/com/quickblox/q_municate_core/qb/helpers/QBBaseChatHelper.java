@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.quickblox.chat.QBChat;
 import com.quickblox.chat.QBChatService;
@@ -186,11 +187,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     public List<QBChatMessage> getDialogMessages(QBRequestGetBuilder customObjectRequestBuilder,
                                                         Bundle returnedBundle, QBDialog qbDialog,
                                                         long lastDateLoad) throws QBResponseException {
-
-        if (lastDateLoad != ConstsCore.ZERO_LONG_VALUE) {
-            customObjectRequestBuilder.gt(com.quickblox.chat.Consts.MESSAGE_DATE_SENT, lastDateLoad);
-        }
-
         List<QBChatMessage> qbMessagesList = QBChatService.getDialogMessages(qbDialog,
                 customObjectRequestBuilder, returnedBundle);
 
