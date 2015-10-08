@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +71,7 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         inflater.inflate(R.menu.search_menu, menu);
 
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        final SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = null;
 
         if (searchMenuItem != null) {
@@ -129,7 +128,7 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     }
 
     private void search(String searchQuery) {
-        if (searchViewPagerAdapter != null && searchViewPager != null && !TextUtils.isEmpty(searchQuery)) {
+        if (searchViewPagerAdapter != null && searchViewPager != null) {
             searchViewPagerAdapter.search(searchViewPager.getCurrentItem(), searchQuery);
             searchRadioGroup.setVisibility(View.VISIBLE);
         }
