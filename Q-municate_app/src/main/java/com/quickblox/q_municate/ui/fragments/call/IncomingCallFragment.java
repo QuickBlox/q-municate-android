@@ -18,6 +18,8 @@ import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.models.User;
 
+// TODO need to refactor
+@Deprecated
 public class IncomingCallFragment extends BaseFragment implements View.OnClickListener {
 
     private static final String TAG = IncomingCallFragment.class.getSimpleName();

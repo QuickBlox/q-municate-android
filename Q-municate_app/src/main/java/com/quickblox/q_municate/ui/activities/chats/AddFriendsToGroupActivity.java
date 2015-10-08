@@ -16,6 +16,8 @@ import com.quickblox.q_municate_db.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO need to refactor
+@Deprecated
 public class AddFriendsToGroupActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
 
     private static final String EXTRA_GROUP_DIALOG = "extra_group_dialog";

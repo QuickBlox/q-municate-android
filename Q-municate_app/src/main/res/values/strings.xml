@@ -54,7 +54,6 @@
     <!-- User Agreement -->
     <string name="uag_user_agreement_title">User Agreement</string>
     <string name="uag_user_agreement">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
-    <string name="uag_policy_link">http://q-municate.com/agreement/</string>
 
     <!-- Friend List -->
     <string name="frl_global_search">Global Search</string>

@@ -28,6 +28,8 @@ import com.quickblox.videochat.webrtc.model.ConnectionConfig;
 import com.quickblox.videochat.webrtc.signaling.QBSignalingChannel;
 import com.quickblox.videochat.webrtc.signaling.SignalingIgnoreFilter;
 
+// TODO need to refactor
+@Deprecated
 public class CallActivity extends BaseLogeableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();

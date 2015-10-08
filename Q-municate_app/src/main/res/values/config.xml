@@ -5,6 +5,8 @@
 
     <string name="push_registration_app_id">265299067289</string>
 
+    <string name="app_policy_link">http://q-municate.com/agreement/</string>
+
     // release
     <string name="facebook_app_id">605405446247805</string>
     // release web

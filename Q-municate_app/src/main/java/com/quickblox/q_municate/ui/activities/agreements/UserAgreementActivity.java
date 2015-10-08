@@ -8,9 +8,12 @@ import android.webkit.WebView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 
+import butterknife.Bind;
+
 public class UserAgreementActivity extends BaseActivity {
 
-    private WebView userAgreementWebView;
+    @Bind(R.id.user_agreement_webview)
+    WebView userAgreementWebView;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, UserAgreementActivity.class);
@@ -20,6 +23,7 @@ public class UserAgreementActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        activateButterKnife();
         setContentView(R.layout.activity_user_agreement);
 
         initActionBar();
@@ -33,7 +37,6 @@ public class UserAgreementActivity extends BaseActivity {
     }
 
     private void initUserAgreementWebView() {
-        userAgreementWebView = (WebView) findViewById(R.id.user_agreement_webview);
         userAgreementWebView.getSettings().setJavaScriptEnabled(true);
         String policyLink = getString(R.string.uag_policy_link);
         userAgreementWebView.loadUrl(policyLink);

@@ -12,6 +12,8 @@ import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
+// TODO need to refactor
+@Deprecated
 public class VoiceCallFragment extends OutgoingCallFragment {
 
     private Handler handler;

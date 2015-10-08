@@ -63,6 +63,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO need to refactor
+@Deprecated
 public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener, AdapterView.OnItemClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;

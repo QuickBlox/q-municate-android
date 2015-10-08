@@ -42,6 +42,8 @@ import org.webrtc.SessionDescription;
 import java.util.Timer;
 import java.util.TimerTask;
 
+// TODO need to refactor
+@Deprecated
 public abstract class OutgoingCallFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = OutgoingCallFragment.class.getSimpleName();

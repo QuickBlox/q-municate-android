@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+// TODO need to refactor
+@Deprecated
 public abstract class BaseSelectableFriendListActivity extends BaseLogeableActivity implements NewDialogCounterFriendsListener {
 
     protected DialogsSelectableFriendsAdapter friendsAdapter;

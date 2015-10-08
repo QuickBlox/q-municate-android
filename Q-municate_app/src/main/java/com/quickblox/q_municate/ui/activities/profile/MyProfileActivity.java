@@ -36,6 +36,8 @@ import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
+// TODO need to refactor
+@Deprecated
 public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
         View.OnClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
