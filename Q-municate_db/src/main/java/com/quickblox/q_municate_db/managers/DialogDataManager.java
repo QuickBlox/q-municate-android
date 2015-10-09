@@ -9,6 +9,8 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.List;
 
 public class DialogDataManager extends BaseManager<Dialog> {
 
@@ -58,5 +60,21 @@ public class DialogDataManager extends BaseManager<Dialog> {
         }
 
         notifyObservers(OBSERVE_KEY);
+    }
+
+    @Override
+    public List<Dialog> getAll() {
+        List<Dialog> dialogsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<Dialog, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.orderBy(Dialog.Column.MODIFIED_DATE, false);
+            PreparedQuery<Dialog> preparedQuery = queryBuilder.prepare();
+            dialogsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogsList;
     }
 }

@@ -155,6 +155,7 @@ public class ChatUtils {
         dialog.setRoomJid(qbDialog.getRoomJid());
         dialog.setTitle(qbDialog.getName());
         dialog.setPhoto(qbDialog.getPhoto());
+        dialog.setModifiedDate(qbDialog.getLastMessageDateSent());
 
         if (QBDialogType.PRIVATE.equals(qbDialog.getType())) {
             dialog.setType(Dialog.Type.PRIVATE);

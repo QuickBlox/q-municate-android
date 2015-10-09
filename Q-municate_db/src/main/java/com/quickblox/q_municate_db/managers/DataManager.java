@@ -52,52 +52,58 @@ public class DataManager {
 
     public UserDataManager getUserDataManager() {
         if (userDataManager == null) {
-            userDataManager = new UserDataManager(getDataHelper().getDaoByClass(User.class));
+            userDataManager = new UserDataManager(
+                    getDataHelper().getDaoByClass(User.class));
         }
         return userDataManager;
     }
 
     public FriendDataManager getFriendDataManager() {
         if (friendDataManager == null) {
-            friendDataManager = new FriendDataManager(getDataHelper().getDaoByClass(Friend.class));
+            friendDataManager = new FriendDataManager(
+                    getDataHelper().getDaoByClass(Friend.class));
         }
         return friendDataManager;
     }
 
     public SocialDataManager getSocialDataManager() {
         if (socialDataManager == null) {
-            socialDataManager = new SocialDataManager(getDataHelper().getDaoByClass(Social.class));
+            socialDataManager = new SocialDataManager(
+                    getDataHelper().getDaoByClass(Social.class));
         }
         return socialDataManager;
     }
 
     public UserRequestDataManager getUserRequestDataManager() {
         if (userRequestDataManager == null) {
-            userRequestDataManager = new UserRequestDataManager(getDataHelper().getDaoByClass(
-                    UserRequest.class));
+            userRequestDataManager = new UserRequestDataManager(
+                    getDataHelper().getDaoByClass(UserRequest.class));
         }
         return userRequestDataManager;
     }
 
     public DialogDataManager getDialogDataManager() {
         if (dialogDataManager == null) {
-            dialogDataManager = new DialogDataManager(getDataHelper().getDaoByClass(Dialog.class));
+            dialogDataManager = new DialogDataManager(
+                    getDataHelper().getDaoByClass(Dialog.class));
         }
         return dialogDataManager;
     }
 
     public DialogOccupantDataManager getDialogOccupantDataManager() {
         if (dialogOccupantDataManager == null) {
-            dialogOccupantDataManager = new DialogOccupantDataManager(getDataHelper().getDaoByClass(
-                    DialogOccupant.class), getDataHelper().getDaoByClass(Dialog.class));
+            dialogOccupantDataManager = new DialogOccupantDataManager(
+                    getDataHelper().getDaoByClass(DialogOccupant.class),
+                    getDataHelper().getDaoByClass(Dialog.class));
         }
         return dialogOccupantDataManager;
     }
 
     public DialogNotificationDataManager getDialogNotificationDataManager() {
         if (dialogNotificationDataManager == null) {
-            dialogNotificationDataManager = new DialogNotificationDataManager(getDataHelper().getDaoByClass(
-                    DialogNotification.class), getDataHelper().getDaoByClass(Dialog.class),
+            dialogNotificationDataManager = new DialogNotificationDataManager(
+                    getDataHelper().getDaoByClass(DialogNotification.class),
+                    getDataHelper().getDaoByClass(Dialog.class),
                     getDataHelper().getDaoByClass(DialogOccupant.class));
         }
         return dialogNotificationDataManager;
@@ -105,17 +111,18 @@ public class DataManager {
 
     public AttachmentManager getAttachmentDataManager() {
         if (attachmentDataManager == null) {
-            attachmentDataManager = new AttachmentManager(getDataHelper().getDaoByClass(
-                    Attachment.class));
+            attachmentDataManager = new AttachmentManager(
+                    getDataHelper().getDaoByClass(Attachment.class));
         }
         return attachmentDataManager;
     }
 
     public MessageDataManager getMessageDataManager() {
         if (messageDataManager == null) {
-            messageDataManager = new MessageDataManager(getDataHelper().getDaoByClass(Message.class),
-                    getDataHelper().getDaoByClass(Dialog.class), getDataHelper().getDaoByClass(
-                    DialogOccupant.class));
+            messageDataManager = new MessageDataManager(
+                    getDataHelper().getDaoByClass(Message.class),
+                    getDataHelper().getDaoByClass(Dialog.class),
+                    getDataHelper().getDaoByClass(DialogOccupant.class));
         }
         return messageDataManager;
     }

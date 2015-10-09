@@ -6,6 +6,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import java.io.Serializable;
 
 import static com.quickblox.q_municate_db.models.Dialog.Column.ID;
+import static com.quickblox.q_municate_db.models.Dialog.Column.MODIFIED_DATE;
 import static com.quickblox.q_municate_db.models.Dialog.Column.PHOTO;
 import static com.quickblox.q_municate_db.models.Dialog.Column.ROOM_JID;
 import static com.quickblox.q_municate_db.models.Dialog.Column.TABLE_NAME;
@@ -36,6 +37,10 @@ public class Dialog implements Serializable {
     @DatabaseField(
             columnName = PHOTO)
     private String photo;
+
+    @DatabaseField(
+            columnName = MODIFIED_DATE)
+    private long modifiedDate;
 
     public Dialog() {
     }
@@ -80,6 +85,14 @@ public class Dialog implements Serializable {
         this.type = type;
     }
 
+    public long getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(long modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
     public enum Type {
 
         PRIVATE(0),
@@ -116,5 +129,6 @@ public class Dialog implements Serializable {
         String TITLE = "title";
         String PHOTO = "photo";
         String TYPE = "type";
+        String MODIFIED_DATE = "modified_date";
     }
 }

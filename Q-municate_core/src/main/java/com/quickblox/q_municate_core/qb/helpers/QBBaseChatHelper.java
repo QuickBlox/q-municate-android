@@ -153,6 +153,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     protected void saveTempMessage(Message message) {
         dataManager.getMessageDataManager().createOrUpdate(message);
+        updateDialogModifiedDate(message.getDialogOccupant().getDialog(), message.getCreatedDate(), false);
     }
 
     protected List<DialogOccupant> saveDialogsOccupants(QBDialog qbDialog) {
@@ -227,6 +228,14 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             }
 
             dataManager.getMessageDataManager().createOrUpdate(message, notify);
+            updateDialogModifiedDate(dialogOccupant.getDialog(), message.getCreatedDate(), notify);
+        }
+    }
+
+    protected void updateDialogModifiedDate(Dialog dialog, long modifiedDate, boolean notify) {
+        if (dialog != null) {
+            dialog.setModifiedDate(modifiedDate);
+            dataManager.getDialogDataManager().update(dialog, notify);
         }
     }
 
@@ -237,6 +246,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     protected void saveDialogNotificationToCache(DialogNotification dialogNotification, boolean notify) {
         dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
+        updateDialogModifiedDate(dialogNotification.getDialogOccupant().getDialog(), dialogNotification.getCreatedDate(), notify);
     }
 
     private void deleteDialogLocal(String dialogId) {
