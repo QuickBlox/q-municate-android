@@ -10,6 +10,7 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 public class FriendDataManager extends BaseManager<Friend> {
@@ -35,8 +36,8 @@ public class FriendDataManager extends BaseManager<Friend> {
         return friend;
     }
 
-    public List<Friend> getFriendsByIds(List<Integer> idsList) {
-        List<Friend> friendsList = null;
+    public List<Friend> getAllByIds(List<Integer> idsList) {
+        List<Friend> friendsList = Collections.emptyList();
 
         try {
             QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
@@ -64,5 +65,20 @@ public class FriendDataManager extends BaseManager<Friend> {
 
     public boolean existsByUserId(int userId) {
         return getByUserId(userId) != null;
+    }
+
+    public List<Friend> getAllWithoutTheseIds(List<Integer> idsList) {
+        List<Friend> friendsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.where().notIn(User.Column.ID, idsList);
+            PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
+            friendsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return friendsList;
     }
 }

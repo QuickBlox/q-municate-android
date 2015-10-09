@@ -11,6 +11,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -461,5 +462,17 @@ public class ChatUtils {
         }
 
         return dialogsList;
+    }
+
+    public static int getOnlineDialogOccupantsCount(QBFriendListHelper friendListHelper, List<Integer> occupantIdsList) {
+        int onlineOccupantsCount = 0;
+
+        for (int userId : occupantIdsList) {
+            if (userId == AppSession.getSession().getUser().getId() || friendListHelper.isUserOnline(userId)) {
+                onlineOccupantsCount++;
+            }
+        }
+
+        return onlineOccupantsCount;
     }
 }

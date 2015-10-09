@@ -10,6 +10,7 @@ import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 
 import java.io.File;
 
@@ -41,8 +42,12 @@ public class QBUpdateGroupDialogCommand extends ServiceCommand {
             dialog = multiChatHelper.updateDialog(dialog, file);
         }
 
+        if (dialog != null) {
+            DataManager.getInstance().getDialogDataManager().update(ChatUtils.createLocalDialog(dialog));
+        }
+
         Bundle bundle = new Bundle();
-        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, ChatUtils.createLocalDialog(dialog));
+        bundle.putSerializable(QBServiceConsts.EXTRA_DIALOG, dialog);
 
         return bundle;
     }
