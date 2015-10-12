@@ -30,9 +30,9 @@ public class QBLoginRestCommand extends ServiceCommand {
 
     @Override
     public Bundle perform(Bundle extras) throws Exception {
-        QBUser user = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
-        user = authHelper.login(user);
-        extras.putSerializable(QBServiceConsts.EXTRA_USER, user);
+        QBUser qbUser = (QBUser) extras.getSerializable(QBServiceConsts.EXTRA_USER);
+        qbUser = authHelper.login(qbUser);
+        extras.putSerializable(QBServiceConsts.EXTRA_USER, qbUser);
         return extras;
     }
 }

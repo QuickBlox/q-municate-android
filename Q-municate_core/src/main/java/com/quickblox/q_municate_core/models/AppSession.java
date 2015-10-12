@@ -48,6 +48,8 @@ public class AppSession implements Serializable {
 
         QBUser qbUser = new QBUser();
         qbUser.setId(userId);
+        qbUser.setEmail(CoreSharedHelper.getInstance().getUserEmail());
+        qbUser.setPassword(CoreSharedHelper.getInstance().getUserPassword());
         qbUser.setFullName(userFullName);
 
         LoginType loginType = LoginType.valueOf(loginTypeRaw);

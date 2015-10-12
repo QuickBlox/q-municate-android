@@ -26,6 +26,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.QBFindUsersCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.FriendDataManager;
 import com.quickblox.q_municate_db.managers.UserRequestDataManager;
@@ -62,6 +63,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     private GlobalSearchAdapter globalSearchAdapter;
     private List<User> usersList;
     private String searchQuery;
+    private boolean excludedMe;
 
     public static GlobalSearchFragment newInstance() {
         return new GlobalSearchFragment();
@@ -216,6 +218,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
     private void clearOldData() {
         usersList.clear();
         page = 1;
+        excludedMe = false;
     }
 
     private void startSearch() {
@@ -254,15 +257,30 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         String searchQuery = bundle.getString(QBServiceConsts.EXTRA_CONSTRAINT);
         totalEntries = bundle.getInt(QBServiceConsts.EXTRA_TOTAL_ENTRIES);
 
+        if (excludedMe) {
+            totalEntries--;
+        }
+
         if (GlobalSearchFragment.this.searchQuery.equals(searchQuery)) {
             Collection<User> newUsersCollection = (Collection<User>) bundle.getSerializable(QBServiceConsts.EXTRA_USERS);
             if (newUsersCollection != null && !newUsersCollection.isEmpty()) {
+                checkForExcludeMe(newUsersCollection);
+
                 usersList.addAll(newUsersCollection);
 
                 updateContactsList(usersList);
             }
         } else {
             search(GlobalSearchFragment.this.searchQuery);
+        }
+    }
+
+    private void checkForExcludeMe(Collection<User> usersCollection) {
+        User me = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+        if (usersCollection.contains(me)) {
+            usersCollection.remove(me);
+            excludedMe = true;
+            totalEntries--;
         }
     }
 

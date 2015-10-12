@@ -25,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 public class LoginHelper {
 
+    private static String TAG = LoginHelper.class.getSimpleName();
+
     private Context context;
     private SharedHelper appSharedHelper;
     private CommandBroadcastReceiver commandBroadcastReceiver;
@@ -104,9 +106,9 @@ public class LoginHelper {
 
     public void loginQB() {
         appSharedHelper.saveUsersImportInitialized(true);
-        QBUser user = new QBUser(null, userPassword, userEmail);
+        QBUser qbUser = new QBUser(null, userPassword, userEmail);
         AppSession.getSession().closeAndClear();
-        QBLoginCompositeCommand.start(context, user);
+        QBLoginCompositeCommand.start(context, qbUser);
     }
 
     public void loginChat() {
@@ -159,6 +161,8 @@ public class LoginHelper {
 
             if (intent.getAction().equals(QBServiceConsts.LOGIN_SUCCESS_ACTION)
                     || intent.getAction().equals(QBServiceConsts.SOCIAL_LOGIN_SUCCESS_ACTION)) {
+                QBUser qbUser = (QBUser) intent.getExtras().getSerializable(QBServiceConsts.EXTRA_USER);
+                AppSession.getSession().updateUser(qbUser);
                 loginChat();
             } else if (intent.getAction().equals(QBServiceConsts.LOGIN_CHAT_COMPOSITE_SUCCESS_ACTION)) {
                 unregisterBroadcastReceiver();
