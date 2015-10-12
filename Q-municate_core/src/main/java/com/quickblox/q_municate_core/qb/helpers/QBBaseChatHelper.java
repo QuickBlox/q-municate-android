@@ -3,6 +3,7 @@ package com.quickblox.q_municate_core.qb.helpers;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -148,7 +149,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     private void saveTempMessages(List<QBDialog> qbDialogsList) {
         dataManager.getMessageDataManager().createOrUpdate(
-                ChatUtils.createTempLocalMessagesList(qbDialogsList));
+                ChatUtils.createTempLocalMessagesList(context, dataManager, qbDialogsList));
     }
 
     protected void saveTempMessage(Message message) {
@@ -214,6 +215,11 @@ public abstract class QBBaseChatHelper extends BaseHelper {
             dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         }
 
+        if (dialogOccupant == null && qbChatMessage.getSenderId() != null) {
+            dialogOccupant = ChatUtils.saveDialogOccupantIfUserNotExists(context, dataManager, dialogId,
+                    qbChatMessage.getSenderId());
+        }
+
         boolean isDialogNotification = qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_NOTIFICATION_TYPE) != null;
         if (isDialogNotification) {
             saveDialogNotificationToCache(dialogOccupant, qbChatMessage, notify);
@@ -245,8 +251,10 @@ public abstract class QBBaseChatHelper extends BaseHelper {
     }
 
     protected void saveDialogNotificationToCache(DialogNotification dialogNotification, boolean notify) {
-        dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
-        updateDialogModifiedDate(dialogNotification.getDialogOccupant().getDialog(), dialogNotification.getCreatedDate(), notify);
+        if (dialogNotification.getDialogOccupant() != null) {
+            dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
+            updateDialogModifiedDate(dialogNotification.getDialogOccupant().getDialog(), dialogNotification.getCreatedDate(), notify);
+        }
     }
 
     private void deleteDialogLocal(String dialogId) {

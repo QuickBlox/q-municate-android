@@ -1,6 +1,7 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.quickblox.chat.model.QBAttachment;
@@ -12,6 +13,7 @@ import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.models.ParcelableQBDialog;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.qb.helpers.QBRestHelper;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Attachment;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -186,12 +188,18 @@ public class ChatUtils {
         return 0;
     }
 
-    public static List<Message> createTempLocalMessagesList(List<QBDialog> qbDialogsList) {
+    public static List<Message> createTempLocalMessagesList(Context context, DataManager dataManager, List<QBDialog> qbDialogsList) {
         List<Message> messagesList = new ArrayList<>();
 
         for (QBDialog qbDialog : qbDialogsList) {
-            DialogOccupant dialogOccupant = DataManager.getInstance().getDialogOccupantDataManager()
-                    .getDialogOccupant(qbDialog.getDialogId(), getRandomUserFromOccupantsList(qbDialog.getOccupants()));
+            int randomUserId = getRandomUserFromOccupantsList(qbDialog.getOccupants());
+            DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager()
+                    .getDialogOccupant(qbDialog.getDialogId(), randomUserId);
+
+            if (dialogOccupant == null && qbDialog.getOccupants().size() == 1) {
+                dialogOccupant = saveDialogOccupantIfUserNotExists(context, dataManager, qbDialog.getDialogId(), qbDialog.getLastMessageUserId());
+            }
+
             long tempMessageId = qbDialog.getDialogId().hashCode();
             Message message = createTempLocalMessage(tempMessageId, dialogOccupant, qbDialog.getLastMessage(), qbDialog.getLastMessageDateSent(), State.TEMP_LOCAL);
             messagesList.add(message);
@@ -474,5 +482,15 @@ public class ChatUtils {
         }
 
         return onlineOccupantsCount;
+    }
+
+    @NonNull
+    public static DialogOccupant saveDialogOccupantIfUserNotExists(Context context, DataManager dataManager, String dialogId, int userId) {
+        DialogOccupant dialogOccupant;User user = new QBRestHelper(context).loadUser(userId);
+        dialogOccupant = new DialogOccupant();
+        dialogOccupant.setUser(user);
+        dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));
+        dataManager.getDialogOccupantDataManager().createOrUpdate(dialogOccupant);
+        return dialogOccupant;
     }
 }

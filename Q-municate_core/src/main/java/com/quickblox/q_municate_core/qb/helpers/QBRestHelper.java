@@ -7,6 +7,7 @@ import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.core.request.QBPagedRequestBuilder;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
@@ -25,6 +26,20 @@ public class QBRestHelper extends BaseHelper {
         try {
             QBUser user = QBUsers.getUser(userId);
             resultUser = UserFriendUtils.createLocalUser(user);
+        } catch (QBResponseException e) {
+            // user not found
+        }
+
+        return resultUser;
+    }
+
+    public User loadAndSaveUser(int userId) {
+        User resultUser = null;
+
+        try {
+            QBUser user = QBUsers.getUser(userId);
+            resultUser = UserFriendUtils.createLocalUser(user);
+            DataManager.getInstance().getUserDataManager().create(user);
         } catch (QBResponseException e) {
             // user not found
         }
