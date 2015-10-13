@@ -21,12 +21,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// TODO need to refactor
-@Deprecated
+import butterknife.Bind;
+
 public abstract class BaseSelectableFriendListActivity extends BaseLogeableActivity implements NewDialogCounterFriendsListener {
 
+    @Bind(R.id.chat_friends_listview)
+    ListView friendsListView;
+
     protected DialogsSelectableFriendsAdapter friendsAdapter;
-    protected ListView friendsListView;
 
     private ActionMode actionMode;
 
@@ -39,8 +41,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         activateButterKnife();
 
         initActionBar();
-        initBase();
-        initUI();
         initListView();
     }
 
@@ -48,10 +48,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public void initActionBar() {
         super.initActionBar();
         setActionBarUpButtonEnabled(true);
-    }
-
-    private void initUI() {
-        friendsListView = _findViewById(R.id.chat_friends_listview);
     }
 
     protected abstract List<User> getFriends();
@@ -88,10 +84,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
 
     private void startAction() {
         actionMode = startSupportActionMode(new ActionModeCallback());
-    }
-
-    private void initBase() {
-        canPerformLogout.set(false);
     }
 
     @Override
