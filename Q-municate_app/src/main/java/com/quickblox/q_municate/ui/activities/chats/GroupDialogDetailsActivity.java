@@ -130,7 +130,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     private void initFields() {
         dataManager = DataManager.getInstance();
         String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(
+        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
         imageUtils = new ImageUtils(this);
         friendOperationAction = new UserOperationAction();
@@ -377,7 +377,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void updateCurrentData() {
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(
+        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
         occupantsList = dataManager.getUserDataManager().getAllByIds(qbDialog.getOccupants());
         groupNameCurrent = groupNameEditText.getText().toString();

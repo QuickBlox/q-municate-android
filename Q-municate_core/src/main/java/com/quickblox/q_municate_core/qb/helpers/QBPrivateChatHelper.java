@@ -75,7 +75,7 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
         String dialogId = (String) qbChatMessage.getProperty(ChatNotificationUtils.PROPERTY_DIALOG_ID);
         if (qbChatMessage.getId() != null && dialogId != null) {
             User user = dataManager.getUserDataManager().get(qbChatMessage.getSenderId());
-            saveMessageToCache(dialogId, qbChatMessage, State.DELIVERED, true);
+            ChatUtils.saveMessageToCache(context, dataManager, dialogId, qbChatMessage, State.DELIVERED, true);
 
             checkForSendingNotification(false, qbChatMessage, user, true);
         }
@@ -101,14 +101,14 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
         Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
         if (dialog == null) {
-            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, QBDialogType.PRIVATE);
+            QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, dataManager, qbChatMessage, QBDialogType.PRIVATE);
             ArrayList<Integer> occupantsIdsList = ChatUtils.createOccupantsIdsFromPrivateMessage(chatCreator.getId(), qbChatMessage.getSenderId());
             qbDialog.setOccupantsIds(occupantsIdsList);
-            saveDialogToCache(qbDialog);
+            ChatUtils.saveDialogToCache(dataManager, qbDialog);
         }
 
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
-        saveDialogNotificationToCache(dialogOccupant, qbChatMessage, true);
+        ChatUtils.saveDialogNotificationToCache(context, dataManager, dialogOccupant, qbChatMessage, true);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {

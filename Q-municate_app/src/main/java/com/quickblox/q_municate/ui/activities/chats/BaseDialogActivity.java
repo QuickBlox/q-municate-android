@@ -426,7 +426,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dialog), lastDateLoad, loadMore);
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), lastDateLoad, loadMore);
     }
 
     private void setSendButtonVisibility(CharSequence charSequence) {
@@ -564,7 +564,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
             baseChatHelper = (QBBaseChatHelper) service.getHelper(chatHelperIdentifier);
             if (baseChatHelper != null && dialog != null) {
                 try {
-                    baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dialog),
+                    baseChatHelper.createChatLocally(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                             generateBundleToInitDialog());
                 } catch (QBResponseException e) {
                     ErrorUtils.showError(this, e.getMessage());
@@ -576,7 +576,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     private void closeChatLocally() {
         if (baseChatHelper != null) {
-            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dialog),
+            baseChatHelper.closeChat(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
                     generateBundleToInitDialog());
         }
         dialog = null;
