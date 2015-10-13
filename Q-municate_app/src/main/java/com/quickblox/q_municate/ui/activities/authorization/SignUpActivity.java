@@ -174,7 +174,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
     private void startCropActivity(Uri originalUri) {
         outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        new Crop(originalUri).output(outputUri).asSquare().start(this);
+        Crop.of(originalUri, outputUri).asSquare().start(this);
     }
 
     @Override

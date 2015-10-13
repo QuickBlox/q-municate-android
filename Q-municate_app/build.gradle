@@ -73,13 +73,13 @@ dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
     compile project(':Q-municate_core')
-    compile project(':cropper')
 
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
     compile "com.android.support:appcompat-v7:${rootProject.appcompatVersion}"
     compile "com.android.support:design:${rootProject.supportDesignVersion}"
     compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
+
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile "com.jakewharton:butterknife:${rootProject.butterknifeVersion}"
@@ -87,6 +87,7 @@ dependencies {
     compile "com.github.orangegangsters:swipy:${rootProject.swipyRecyclerviewVersion}@aar"
     compile "com.timehop.stickyheadersrecyclerview:library:${rootProject.stickylistheadersRecyclerViewVersion}@aar"
     compile "com.rockerhieu.emojicon:library:${rootProject.emojiconVersion}"
+    compile "com.soundcloud.android:android-crop:${rootProject.cropVersion}@aar"
 }
 
 def changeApkFileName(variant) {

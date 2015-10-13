@@ -366,7 +366,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void startCropActivity(Uri originalUri) {
         outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        new Crop(originalUri).output(outputUri).asSquare().start(this);
+        Crop.of(originalUri, outputUri).asSquare().start(this);
     }
 
     private void startAction() {
