@@ -88,7 +88,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/TextViewLinkStyle"
+            style="@style/TextViewLinkStyle.Dark"
             android:id="@+id/user_agreement_textview"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"

@@ -21,13 +21,27 @@
 
 
     <!-- Landing -->
-    <string name="lnd_q_municate">Q-municate</string>
-    <string name="lnd_your_own_chat">Your own chat</string>
-    <string name="lnd_connect_with_facebook">Connect with Facebook</string>
-    <string name="lnd_have_account">Already have an account?</string>
-    <string name="lnd_sign_up">Sign Up with Email</string>
-    <string name="lnd_no_app_version">Couldn\'t get app version</string>
-    <string name="lnd_version">v. %1$s</string>
+    <string name="landing_label_1">Q-municate</string>
+    <string name="landing_label_2">Your own chat</string>
+    <string name="landing_connect_with_facebook">Connect with Facebook</string>
+    <string name="landing_already_have_account">Already have an account?</string>
+    <string name="landing_sign_up">Sign Up with Email</string>
+    <string name="landing_version">v. %1$s</string>
+
+
+    <!-- User profile -->
+    <string name="user_profile_title">Info</string>
+    <string name="user_profile_mobile">Mobile</string>
+    <string name="user_profile_send_message">Send Message</string>
+    <string name="user_profile_audio_call">Audio Call</string>
+    <string name="user_profile_video_call">Video Call</string>
+    <string name="user_delete_chat_history">Delete Chat History</string>
+    <string name="user_remove_contact_and_chat_history">Remove Contact and Chat</string>
+    <string name="user_profile_remove_contact_and_chat_history">Do you really want to delete %1$s from your contact list with his chat?</string>
+    <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
+
+
+    // NOT REFACTORED YET
 
     <!-- Login -->
     <string name="lgn_forgot_password">Forgot password?</string>
@@ -55,6 +69,7 @@
     <string name="uag_user_agreement_title">User Agreement</string>
     <string name="uag_user_agreement">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
 
+
     <!-- Friend List -->
     <string name="frl_global_search">Global Search</string>
     <string name="frl_friends">Friends</string>
@@ -69,15 +84,6 @@
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
     <string name="frl_local_list">Local</string>
     <string name="frl_global_list">Global</string>
-
-    <!-- Friend Details -->
-    <string name="frd_title">Details</string>
-    <string name="frd_default_status">I enjoy using Q-municate!</string>
-    <string name="frd_video_call">Video Call</string>
-    <string name="frd_audio_call">Audio Call</string>
-    <string name="frd_chat">Chat</string>
-    <string name="frd_mobile">MOBILE</string>
-    <string name="frd_dlg_remove_friend">Do you really want to delete %1$s from your contact list?</string>
 
     <!-- Dialog -->
     <string name="dlg_message">Message</string>

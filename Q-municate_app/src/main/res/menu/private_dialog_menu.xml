@@ -7,12 +7,12 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_audio_call"
-        android:icon="@drawable/ic_friend_call_dark"
-        android:title="@string/frd_audio_call"
+        android:icon="@drawable/ic_user_audio_call_dark"
+        android:title="@string/user_profile_audio_call"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_video_call"
-        android:icon="@drawable/ic_friend_video_dark"
-        android:title="@string/frd_video_call"
+        android:icon="@drawable/ic_user_video_call_dark"
+        android:title="@string/user_profile_video_call"
         app:showAsAction="ifRoom" />
 </menu>

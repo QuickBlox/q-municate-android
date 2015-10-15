@@ -4,11 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -18,20 +14,16 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
-import com.quickblox.q_municate.ui.activities.call.CallActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBDeleteChatCommand;
 import com.quickblox.q_municate_core.qb.commands.QBRemoveFriendCommand;
-import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
@@ -42,6 +34,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 
 public class UserProfileActivity extends BaseLogeableActivity {
 
@@ -51,20 +44,14 @@ public class UserProfileActivity extends BaseLogeableActivity {
     @Bind(R.id.name_textview)
     TextView nameTextView;
 
-    @Bind(R.id.status_textview)
-    TextView statusTextView;
+    @Bind(R.id.timestamp_textview)
+    TextView timestampTextView;
 
-    @Bind(R.id.online_imageview)
-    ImageView onlineImageView;
-
-    @Bind(R.id.online_status_textview)
-    TextView onlineStatusTextView;
+    @Bind(R.id.phone_view)
+    View phoneView;
 
     @Bind(R.id.phone_textview)
     TextView phoneTextView;
-
-    @Bind(R.id.phone_relativelayout)
-    View phoneView;
 
     private DataManager dataManager;
     private int userId;
@@ -81,7 +68,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_friend_details);
+        setContentView(R.layout.activity_user_profile);
 
         activateButterKnife();
 
@@ -108,26 +95,14 @@ public class UserProfileActivity extends BaseLogeableActivity {
     private void initUIWithUsersData() {
         loadAvatar();
         setName();
-        setOnlineStatus(user);
         setStatus();
         setPhone();
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
-
-        if (friendListHelper != null) {
-            setOnlineStatus(user);
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         addObservers();
-
-        setOnlineStatus(user);
     }
 
     @Override
@@ -142,23 +117,35 @@ public class UserProfileActivity extends BaseLogeableActivity {
         removeActions();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.friend_details_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+    @OnClick(R.id.send_message_button)
+    void sendMessage(View view) {
+        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
+        if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
+            PrivateDialogActivity.start(UserProfileActivity.this, user, dialogOccupant.getDialog());
+        } else {
+            showProgress();
+            QBCreatePrivateChatCommand.start(this, user);
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_delete:
-                showRemoveUserDialog();
-                break;
-            default:
-                super.onOptionsItemSelected(item);
-        }
-        return true;
+    @OnClick(R.id.audio_call_button)
+    void audioCall(View view) {
+        ErrorUtils.showError(this, getString(R.string.coming_soon));
+    }
+
+    @OnClick(R.id.video_call_button)
+    void videoCall(View view) {
+        ErrorUtils.showError(this, getString(R.string.coming_soon));
+    }
+
+    @OnClick(R.id.delete_chat_history_button)
+    void deleteChatHistory(View view) {
+        showRemoveChatHistoryDialog();
+    }
+
+    @OnClick(R.id.remove_contact_and_chat_history_button)
+    void removeContactAndChatHistory(View view) {
+        showRemoveContactAndChatHistoryDialog();
     }
 
     private void addObservers() {
@@ -191,7 +178,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
     private void setStatus() {
         if (!TextUtils.isEmpty(user.getStatus())) {
-            statusTextView.setText(user.getStatus());
+            timestampTextView.setText(user.getStatus());
         }
     }
 
@@ -208,30 +195,15 @@ public class UserProfileActivity extends BaseLogeableActivity {
         phoneTextView.setText(user.getPhone());
     }
 
-    private void setOnlineStatus(User user) {
-        if (user != null && friendListHelper != null) {
-            boolean online = friendListHelper.isUserOnline(user.getUserId());
-
-            if (online) {
-                onlineImageView.setVisibility(View.VISIBLE);
-            } else {
-                onlineImageView.setVisibility(View.GONE);
-            }
-
-            onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
-        }
-    }
-
     private void loadAvatar() {
         String url = user.getAvatar();
         ImageLoader.getInstance().displayImage(url, avatarImageView,
                 ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
-    private void showRemoveUserDialog() {
-        TwoButtonsDialogFragment.show(
-                getSupportFragmentManager(),
-                getString(R.string.frd_dlg_remove_friend, user.getFullName()),
+    private void showRemoveContactAndChatHistoryDialog() {
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(),
+                getString(R.string.user_profile_remove_contact_and_chat_history, user.getFullName()),
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
@@ -242,54 +214,23 @@ public class UserProfileActivity extends BaseLogeableActivity {
                 });
     }
 
-    public void videoCallClickListener(View view) {
-        ErrorUtils.showError(this, getString(R.string.coming_soon));
-//        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.VIDEO);
+    private void showRemoveChatHistoryDialog() {
+        TwoButtonsDialogFragment.show(
+                getSupportFragmentManager(),
+                getString(R.string.user_profile_delete_chat_history, user.getFullName()),
+                new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        super.onPositive(dialog);
+                        deleteChat();
+                    }
+                });
     }
 
-    private void callToUser(User friend, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM callType) {
-        if (friend.getUserId() != AppSession.getSession().getUser().getId()) {
-            if (checkFriendStatus(friend.getUserId())) {
-                CallActivity.start(UserProfileActivity.this, friend, callType);
-            }
-        }
-    }
-
-    public void voiceCallClickListener(View view) {
-        ErrorUtils.showError(this, getString(R.string.coming_soon));
-//        callToUser(user, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
-    }
-
-    private boolean checkFriendStatus(int userId) {
-        boolean isFriend = DataManager.getInstance().getFriendDataManager().getByUserId(userId) != null;
-        if (isFriend) {
-            return true;
-        } else {
-            ToastUtils.longToast(R.string.dlg_user_is_not_friend);
-            return false;
-        }
-    }
-
-    public void chatClickListener(View view) {
-        DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
-        if (dialogOccupant != null && dialogOccupant.getDialog() != null) {
-            PrivateDialogActivity.start(UserProfileActivity.this, user, dialogOccupant.getDialog());
-        } else {
-            showProgress();
-            QBCreatePrivateChatCommand.start(this, user);
-        }
-    }
-
-    private void deleteDialog() {
+    private void deleteChat() {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
         String dialogId = dialogOccupant.getDialog().getDialogId();
         QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
-    }
-
-    @Override
-    public void notifyChangedUserStatus(int userId, boolean online) {
-        super.notifyChangedUserStatus(userId, online);
-        setOnlineStatus(user);
     }
 
     private class UserObserver implements Observer {
@@ -307,7 +248,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
         @Override
         public void execute(Bundle bundle) {
-            deleteDialog();
+            deleteChat();
             ToastUtils.longToast(getString(R.string.dlg_friend_removed, user.getFullName()));
             finish();
         }

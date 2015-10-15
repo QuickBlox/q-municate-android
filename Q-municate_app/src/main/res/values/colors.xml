@@ -23,6 +23,7 @@
     <color name="text_white">@color/white</color>
     <color name="text_light_dark">#ff6c6c6c</color>
     <color name="text_dark">#343434</color>
+    <color name="text_red">#d00e2b</color>
 
     <color name="link_text_color">#0d70b3</color>
 

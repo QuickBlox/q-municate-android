@@ -23,8 +23,9 @@ public class UserAgreementActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activateButterKnife();
         setContentView(R.layout.activity_user_agreement);
+
+        activateButterKnife();
 
         initActionBar();
         initUserAgreementWebView();

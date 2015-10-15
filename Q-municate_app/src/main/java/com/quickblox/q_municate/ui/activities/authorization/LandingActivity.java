@@ -75,6 +75,6 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     private void initVersionName() {
-        appVersionTextView.setText(getString(R.string.lnd_version, Utils.getAppVersionName(this)));
+        appVersionTextView.setText(getString(R.string.landing_version, Utils.getAppVersionName(this)));
     }
 }

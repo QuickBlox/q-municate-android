@@ -81,7 +81,7 @@
         <activity
             android:name=".ui.activities.profile.UserProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/frd_title"
+            android:label="@string/user_profile_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.call.CallActivity"

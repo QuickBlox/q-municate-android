@@ -62,7 +62,7 @@
             android:textSize="@dimen/text_size" />
 
         <TextView
-            style="@style/TextViewLinkStyle"
+            style="@style/TextViewLinkStyle.Dark"
             android:id="@+id/forgot_password_textview"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="25dp"
