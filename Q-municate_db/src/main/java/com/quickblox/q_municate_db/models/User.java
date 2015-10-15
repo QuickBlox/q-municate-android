@@ -121,11 +121,6 @@ public class User implements Serializable {
         return userId;
     }
 
-    @Override
-    public String toString() {
-        return fullName;
-    }
-
     public String getAvatar() {
         return avatar;
     }
@@ -180,6 +175,13 @@ public class User implements Serializable {
 
     public void setLastLogin(long lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+    @Override
+    public String toString() {
+        return "User [userId='" + userId
+                + "', fullName='" + fullName + "'"
+                + "', email='" + email + "']";
     }
 
     public enum Role {

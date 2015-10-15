@@ -91,6 +91,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
 
         ChatUtils.saveMessageToCache(context, dataManager, dialogId, qbChatMessage, State.DELIVERED, true);
+        ChatUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
 
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);
     }
@@ -319,7 +320,6 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     }
 
     private void createDialogByNotification(QBChatMessage qbChatMessage, DialogNotification.Type notificationType) {
-
         QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, dataManager, qbChatMessage,
                 qbChatMessage.getBody(), QBDialogType.GROUP);
 

@@ -43,13 +43,13 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
         Bundle returnedBundle = new Bundle();
         QBRequestGetBuilder customObjectRequestBuilder = new QBRequestGetBuilder();
-        customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
         customObjectRequestBuilder.setPagesLimit(ConstsCore.DIALOG_MESSAGES_PER_PAGE);
 
         if (loadMore) {
             customObjectRequestBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
         } else {
-            customObjectRequestBuilder.gte(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            customObjectRequestBuilder.gt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            customObjectRequestBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
         }
 
         List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,

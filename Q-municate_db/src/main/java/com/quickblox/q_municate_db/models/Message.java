@@ -111,6 +111,14 @@ public class Message implements Serializable {
         return dialogOccupant != null && currentUserId != dialogOccupant.getUser().getUserId();
     }
 
+    @Override
+    public String toString() {
+        return "Message [messageId='" + messageId
+                + "', dialogOccupant='" + dialogOccupant
+                + "', body='" + body
+                + "', createdDate='" + createdDate + "']";
+    }
+
     public interface Column {
 
         String TABLE_NAME = "message";

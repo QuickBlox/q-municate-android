@@ -93,6 +93,13 @@ public class Dialog implements Serializable {
         this.modifiedDate = modifiedDate;
     }
 
+    @Override
+    public String toString() {
+        return "Dialog [dialogId='" + dialogId
+                + "', modifiedDate='" + modifiedDate
+                + "', title='" + title + "']";
+    }
+
     public enum Type {
 
         PRIVATE(0),

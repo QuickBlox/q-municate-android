@@ -61,6 +61,11 @@ public class Social implements Serializable {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "Social [socialId='" + socialId + "', user='" + user + "']";
+    }
+
     public enum Type {
         FACEBOOK(0),
         TWITTER(1);

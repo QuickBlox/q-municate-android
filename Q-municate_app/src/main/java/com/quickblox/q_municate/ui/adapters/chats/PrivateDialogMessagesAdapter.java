@@ -12,7 +12,6 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateStatusMessageCommand;
 import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.State;
@@ -108,7 +107,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
 
         if (!State.READ.equals(combinationMessage.getState()) && !ownMessage) {
             combinationMessage.setState(State.READ);
-            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(DataManager.getInstance(), dialog), combinationMessage, true);
+            QBUpdateStatusMessageCommand.start(context, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), combinationMessage, true);
         }
 
         // check if last messageCombination is request messageCombination
@@ -178,7 +177,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
                     combinationMessage.getNotificationType());
 
             if (friendsRequestMessage && !ownMessage) {
-                isFriend = DataManager.getInstance().getFriendDataManager().
+                isFriend = dataManager.getFriendDataManager().
                         getByUserId(combinationMessage.getDialogOccupant().getUser().getUserId()) != null;
                 if (!isFriend) {
                     lastRequestPosition = position;

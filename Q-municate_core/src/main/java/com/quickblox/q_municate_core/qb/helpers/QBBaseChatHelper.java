@@ -92,6 +92,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         privateChatManager = chatService.getPrivateChatManager();
         privateChatManager.addPrivateChatManagerListener(privateChatManagerListener);
+        chatService.getMessageStatusesManager().addMessageStatusListener(privateChatStatusListener);
 
         groupChatManager = chatService.getGroupChatManager();
     }
@@ -105,6 +106,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         sendPrivateMessage(qbChatMessage, opponentId);
         ChatUtils.saveMessageToCache(context, dataManager, dialogId, qbChatMessage, null, true);
+        ChatUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId) throws QBResponseException {
@@ -415,7 +417,6 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         public void chatCreated(QBPrivateChat privateChat, boolean b) {
             privateChat.addMessageListener(privateChatMessageListener);
             privateChat.addIsTypingListener(privateChatIsTypingListener);
-            chatService.getMessageStatusesManager().addMessageStatusListener(privateChatStatusListener);
         }
     }
 

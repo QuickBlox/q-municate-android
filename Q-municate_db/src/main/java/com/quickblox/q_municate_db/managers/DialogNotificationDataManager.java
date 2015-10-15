@@ -55,12 +55,33 @@ public class DialogNotificationDataManager extends BaseManager<DialogNotificatio
         return dialogNotificationsList;
     }
 
+    public DialogNotification getLastDialogNotificationByDialogId(List<Integer> dialogOccupantsList) {
+        DialogNotification dialogNotification = null;
+
+        try {
+            QueryBuilder<DialogNotification, Long> queryBuilder = dao.queryBuilder();
+            Where<DialogNotification, Long> where = queryBuilder.where();
+            where.in(DialogOccupant.Column.ID, dialogOccupantsList);
+            queryBuilder.orderBy(DialogNotification.Column.CREATED_DATE, false);
+            PreparedQuery<DialogNotification> preparedQuery = queryBuilder.prepare();
+            dialogNotification = dao.queryForFirst(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogNotification;
+    }
+
     public DialogNotification getDialogNotificationByDialogId(boolean firstMessage, List<Integer> dialogOccupantsList) {
         DialogNotification dialogNotification = null;
 
         try {
             QueryBuilder<DialogNotification, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().in(DialogOccupant.Column.ID, dialogOccupantsList);
+            Where<DialogNotification, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(DialogOccupant.Column.ID, dialogOccupantsList),
+                    where.eq(DialogNotification.Column.STATE, State.READ)
+            );
             queryBuilder.orderBy(DialogNotification.Column.CREATED_DATE, firstMessage);
             PreparedQuery<DialogNotification> preparedQuery = queryBuilder.prepare();
             dialogNotification = dao.queryForFirst(preparedQuery);

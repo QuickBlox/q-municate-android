@@ -104,6 +104,15 @@ public class DialogNotification implements Serializable {
         this.state = state;
     }
 
+    @Override
+    public String toString() {
+        return "DialogNotification [dialogNotificationId='" + dialogNotificationId
+                + "', dialogOccupant='" + dialogOccupant
+                + "', body='" + body
+                + "', createdDate='" + createdDate
+                + "', type='" + type + "']";
+    }
+
     public enum Type {
 
         FRIENDS_REQUEST(4), FRIENDS_ACCEPT(5), FRIENDS_REJECT(6), FRIENDS_REMOVE(7),

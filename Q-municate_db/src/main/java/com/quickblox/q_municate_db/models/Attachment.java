@@ -117,6 +117,11 @@ public class Attachment implements Serializable {
         this.additionalInfo = additionalInfo;
     }
 
+    @Override
+    public String toString() {
+        return "Attachment [attachmentId='" + attachmentId + "', remoteUrl='" + remoteUrl + "']";
+    }
+
     public enum Type {
 
         AUDIO(0),

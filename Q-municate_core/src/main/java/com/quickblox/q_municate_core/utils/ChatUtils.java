@@ -1,7 +1,6 @@
 package com.quickblox.q_municate_core.utils;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.quickblox.chat.model.QBAttachment;
@@ -43,6 +42,20 @@ public class ChatUtils {
         }
         return ConstsCore.EMPTY_STRING;
     }
+
+    public static String createChatName(ArrayList<User> usersList) {
+        String userFullName = AppSession.getSession().getUser().getFullName();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(userFullName).append(OCCUPANT_IDS_DIVIDER).append(" ");
+
+        for (User user : usersList) {
+            stringBuilder.append(user.getFullName()).append(OCCUPANT_IDS_DIVIDER).append(" ");
+        }
+
+        return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
+    }
+
 
     public static ArrayList<Integer> createOccupantsIdsFromPrivateMessage(int currentUserId, int senderId) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>(2);
@@ -145,7 +158,8 @@ public class ChatUtils {
 
     public static User getOpponentFromPrivateDialog(User currentUser, List<DialogOccupant> occupantsList) {
         for (DialogOccupant dialogOccupant : occupantsList) {
-            if (currentUser.getUserId() != dialogOccupant.getUser().getUserId()) {
+            if (dialogOccupant != null && dialogOccupant.getUser() != null
+                    && currentUser.getUserId() != dialogOccupant.getUser().getUserId()) {
                 return dialogOccupant.getUser();
             }
         }
@@ -483,7 +497,6 @@ public class ChatUtils {
         return onlineOccupantsCount;
     }
 
-    @NonNull
     public static DialogOccupant saveDialogOccupantIfUserNotExists(Context context, DataManager dataManager, String dialogId, int userId) {
         DialogOccupant dialogOccupant;User user = new QBRestHelper(context).loadUser(userId);
         dialogOccupant = new DialogOccupant();
@@ -515,7 +528,8 @@ public class ChatUtils {
 
     public static void saveTempMessage(DataManager dataManager, Message message) {
         dataManager.getMessageDataManager().createOrUpdate(message);
-        updateDialogModifiedDate(dataManager, message.getDialogOccupant().getDialog(), message.getCreatedDate(), false);
+        updateDialogModifiedDate(dataManager, message.getDialogOccupant().getDialog().getDialogId(),
+                message.getCreatedDate(), false);
     }
 
     public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBDialog qbDialog) {
@@ -551,10 +565,16 @@ public class ChatUtils {
     }
 
     public static void saveMessagesToCache(Context context, DataManager dataManager, List<QBChatMessage> qbMessagesList, String dialogId) {
+        QBChatMessage lastQbChatMessage = null;
+
         for (int i = 0; i < qbMessagesList.size(); i++) {
-            QBChatMessage qbChatMessage = qbMessagesList.get(i);
+            lastQbChatMessage = qbMessagesList.get(i);
             boolean notify = i == qbMessagesList.size() - 1;
-            saveMessageToCache(context, dataManager, dialogId, qbChatMessage, null, notify);
+            saveMessageToCache(context, dataManager, dialogId, lastQbChatMessage, null, notify);
+        }
+
+        if (lastQbChatMessage != null) {
+            updateDialogModifiedDate(dataManager, dialogId, getMessageDateSent(lastQbChatMessage), true);
         }
     }
 
@@ -586,8 +606,12 @@ public class ChatUtils {
             }
 
             dataManager.getMessageDataManager().createOrUpdate(message, notify);
-            updateDialogModifiedDate(dataManager, dialogOccupant.getDialog(), message.getCreatedDate(), notify);
         }
+    }
+
+    public static void updateDialogModifiedDate(DataManager dataManager, String dialogId, long modifiedDate, boolean notify) {
+        Dialog dialog = dataManager.getDialogDataManager().getByDialogId(dialogId);
+        updateDialogModifiedDate(dataManager, dialog, modifiedDate, notify);
     }
 
     public static void updateDialogModifiedDate(DataManager dataManager, Dialog dialog, long modifiedDate, boolean notify) {
@@ -606,7 +630,6 @@ public class ChatUtils {
     public static void saveDialogNotificationToCache(DataManager dataManager, DialogNotification dialogNotification, boolean notify) {
         if (dialogNotification.getDialogOccupant() != null) {
             dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
-            updateDialogModifiedDate(dataManager, dialogNotification.getDialogOccupant().getDialog(), dialogNotification.getCreatedDate(), notify);
         }
     }
 

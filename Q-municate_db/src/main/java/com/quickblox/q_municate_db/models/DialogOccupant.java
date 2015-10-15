@@ -88,6 +88,11 @@ public class DialogOccupant implements Serializable {
         this.dialogOccupantId = dialogOccupantId;
     }
 
+    @Override
+    public String toString() {
+        return "DialogOccupant [id='" + dialogOccupantId + "', dialog='" + dialog + "', user='" + user + "']";
+    }
+
     public interface Column {
 
         String TABLE_NAME = "dialog_occupant";

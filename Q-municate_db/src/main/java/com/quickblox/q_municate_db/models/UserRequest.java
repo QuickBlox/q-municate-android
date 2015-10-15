@@ -94,6 +94,11 @@ public class UserRequest implements Serializable {
         return user.getRole() != User.Role.OWNER;
     }
 
+    @Override
+    public String toString() {
+        return "UserRequest [requestId='" + requestId + "', user='" + user + "']";
+    }
+
     public enum RequestStatus {
 
         INCOMING(0),

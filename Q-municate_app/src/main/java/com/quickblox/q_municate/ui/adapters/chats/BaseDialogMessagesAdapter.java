@@ -32,6 +32,7 @@ import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.users.model.QBUser;
 
@@ -50,6 +51,7 @@ public abstract class BaseDialogMessagesAdapter
     protected static final int TYPE_OWN_MESSAGE = 1;
     protected static final int TYPE_OPPONENT_MESSAGE = 2;
 
+    protected DataManager dataManager;
     protected ChatUIHelperListener chatUIHelperListener;
     protected ImageUtils imageUtils;
     protected Dialog dialog;
@@ -60,6 +62,7 @@ public abstract class BaseDialogMessagesAdapter
 
     public BaseDialogMessagesAdapter(Activity activity, List<CombinationMessage> objectsList) {
         super(activity, objectsList);
+        dataManager = DataManager.getInstance();
         imageUtils = new ImageUtils(activity);
         colorUtils = new ColorUtils();
         fileUtils = new FileUtils();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -130,7 +131,7 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     private void search(String searchQuery) {
         if (searchViewPagerAdapter != null && searchViewPager != null) {
             searchViewPagerAdapter.search(searchViewPager.getCurrentItem(), searchQuery);
-            searchRadioGroup.setVisibility(View.VISIBLE);
+            searchRadioGroup.setVisibility(TextUtils.isEmpty(searchQuery) ? View.GONE : View.VISIBLE);
         }
     }
 

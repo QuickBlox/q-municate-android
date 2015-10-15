@@ -48,6 +48,11 @@ public class Friend implements Serializable {
         this.user = user;
     }
 
+    @Override
+    public String toString() {
+        return "Friend [friendId='" + friendId + "', user='" + user + "']";
+    }
+
     public interface Column {
 
         String TABLE_NAME = "friend";
