@@ -18,7 +18,7 @@ ext {
     buildToolsVersion = '23.0.1'
     minSdkVersion = 14
     targetSdkVersion = 23
-    versionName = '1.2.0.06'
+    versionName = '1.2.0.07'
     versionCode = 1
 
     prodDebug = true
