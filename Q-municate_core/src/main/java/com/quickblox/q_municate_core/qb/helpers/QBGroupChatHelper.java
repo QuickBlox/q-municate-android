@@ -90,7 +90,8 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
             }
         }
 
-        ChatUtils.saveMessageToCache(context, dataManager, dialogId, qbChatMessage, State.DELIVERED, true);
+        ChatUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage,
+                State.DELIVERED, true);
         ChatUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
 
         checkForSendingNotification(ownMessage, qbChatMessage, user, false);

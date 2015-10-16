@@ -105,7 +105,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         addNecessaryPropertyForQBChatMessage(qbChatMessage, dialogId);
 
         sendPrivateMessage(qbChatMessage, opponentId);
-        ChatUtils.saveMessageToCache(context, dataManager, dialogId, qbChatMessage, null, true);
+        ChatUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, true);
         ChatUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
     }
 

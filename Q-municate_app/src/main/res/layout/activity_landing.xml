@@ -8,30 +8,20 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/label_1_textview"
+        android:layout_above="@+id/labels_imageview"
         android:layout_centerInParent="true"
         android:layout_marginBottom="20dp"
         android:scaleType="fitCenter"
         android:src="@drawable/app_logo" />
 
-    <TextView
-        android:id="@+id/label_1_textview"
+    <ImageView
+        android:id="@+id/labels_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/landing_label_1"
-        android:textColor="@color/text_dark"
-        android:textSize="@dimen/text_size_xxxlarge" />
-
-    <TextView
-        android:id="@+id/label_2_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/label_1_textview"
-        android:layout_centerInParent="true"
-        android:text="@string/landing_label_2"
-        android:textColor="@color/accent"
-        android:textSize="@dimen/text_size_large" />
+        android:layout_marginTop="20dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/app_logo_label" />
 
     <RelativeLayout
         android:id="@+id/facebook_connect_button"

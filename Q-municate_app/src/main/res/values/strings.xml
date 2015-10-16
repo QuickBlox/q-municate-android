@@ -21,8 +21,6 @@
 
 
     <!-- Landing -->
-    <string name="landing_label_1">Q-municate</string>
-    <string name="landing_label_2">Your own chat</string>
     <string name="landing_connect_with_facebook">Connect with Facebook</string>
     <string name="landing_already_have_account">Already have an account?</string>
     <string name="landing_sign_up">Sign Up with Email</string>

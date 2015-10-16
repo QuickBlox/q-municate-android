@@ -570,20 +570,17 @@ public class ChatUtils {
     }
 
     public static void saveMessagesToCache(Context context, DataManager dataManager, List<QBChatMessage> qbMessagesList, String dialogId) {
-        QBChatMessage lastQbChatMessage = null;
-
         for (int i = 0; i < qbMessagesList.size(); i++) {
-            lastQbChatMessage = qbMessagesList.get(i);
+            QBChatMessage qbChatMessage = qbMessagesList.get(i);
             boolean notify = i == qbMessagesList.size() - 1;
-            saveMessageToCache(context, dataManager, dialogId, lastQbChatMessage, null, notify);
+            saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, notify);
         }
 
-        if (lastQbChatMessage != null) {
-            updateDialogModifiedDate(dataManager, dialogId, getMessageDateSent(lastQbChatMessage), true);
-        }
+        updateDialogModifiedDate(dataManager, dialogId, true);
     }
 
-    public static void saveMessageToCache(Context context, DataManager dataManager, String dialogId, QBChatMessage qbChatMessage, State state, boolean notify) {
+    public static void saveMessageOrNotificationToCache(Context context, DataManager dataManager,
+            String dialogId, QBChatMessage qbChatMessage, State state, boolean notify) {
         DialogOccupant dialogOccupant;
         if (qbChatMessage.getSenderId() == null) {
             dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId,
@@ -619,20 +616,34 @@ public class ChatUtils {
         updateDialogModifiedDate(dataManager, dialog, modifiedDate, notify);
     }
 
-    public static void updateDialogModifiedDate(DataManager dataManager, Dialog dialog, long modifiedDate, boolean notify) {
+    private static void updateDialogModifiedDate(DataManager dataManager, String dialogId, boolean notify) {
+        long modifiedDate = getDialogModifiedDate(dataManager, dialogId);
+        updateDialogModifiedDate(dataManager, dialogId, modifiedDate, notify);
+    }
+
+    private static void updateDialogModifiedDate(DataManager dataManager, Dialog dialog, long modifiedDate, boolean notify) {
         if (dialog != null) {
             dialog.setModifiedDate(modifiedDate);
             dataManager.getDialogDataManager().update(dialog, notify);
         }
     }
 
+    public static long getDialogModifiedDate(DataManager dataManager, String dialogId) {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager().getDialogOccupantsListByDialogId(dialogId);
+        List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
+
+        Message message = dataManager.getMessageDataManager().getLastMessageByDialogId(dialogOccupantsIdsList);
+        DialogNotification dialogNotification = dataManager.getDialogNotificationDataManager().getLastDialogNotificationByDialogId(dialogOccupantsIdsList);
+
+        return ChatUtils.getDialogMessageCreatedDate(true, message, dialogNotification);
+    }
+
     public static void saveDialogNotificationToCache(Context context, DataManager dataManager, DialogOccupant dialogOccupant, QBChatMessage qbChatMessage, boolean notify) {
-        DialogNotification dialogNotification = createLocalDialogNotification(context, dataManager, qbChatMessage,
-                dialogOccupant);
+        DialogNotification dialogNotification = createLocalDialogNotification(context, dataManager, qbChatMessage, dialogOccupant);
         saveDialogNotificationToCache(dataManager, dialogNotification, notify);
     }
 
-    public static void saveDialogNotificationToCache(DataManager dataManager, DialogNotification dialogNotification, boolean notify) {
+    private static void saveDialogNotificationToCache(DataManager dataManager, DialogNotification dialogNotification, boolean notify) {
         if (dialogNotification.getDialogOccupant() != null) {
             dataManager.getDialogNotificationDataManager().createOrUpdate(dialogNotification, notify);
         }

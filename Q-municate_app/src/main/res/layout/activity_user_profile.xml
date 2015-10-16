@@ -118,6 +118,7 @@
             android:id="@+id/audio_call_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:drawableLeft="@drawable/ic_user_audio_call_dark"
             android:gravity="left|center_vertical"
             android:text="@string/user_profile_audio_call" />
@@ -127,6 +128,7 @@
             android:id="@+id/video_call_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:drawableLeft="@drawable/ic_user_video_call_dark"
             android:gravity="left|center_vertical"
             android:text="@string/user_profile_video_call" />
