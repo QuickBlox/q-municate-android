@@ -66,7 +66,8 @@
             android:id="@+id/forgot_password_textview"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="25dp"
-            android:text="@string/lgn_forgot_password" />
+            android:text="@string/lgn_forgot_password"
+            android:textSize="@dimen/text_size_small" />
 
     </LinearLayout>
 

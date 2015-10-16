@@ -61,7 +61,8 @@
         android:layout_above="@+id/app_version_textview"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"
-        android:text="@string/landing_already_have_account" />
+        android:text="@string/landing_already_have_account"
+        android:textSize="@dimen/text_size_small" />
 
     <TextView
         android:id="@+id/app_version_textview"

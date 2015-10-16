@@ -92,7 +92,8 @@
             android:id="@+id/user_agreement_textview"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:text="@string/uag_user_agreement" />
+            android:text="@string/uag_user_agreement"
+            android:textSize="@dimen/text_size_small" />
 
     </LinearLayout>
 
