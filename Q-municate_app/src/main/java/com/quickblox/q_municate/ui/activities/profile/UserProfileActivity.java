@@ -3,7 +3,6 @@ package com.quickblox.q_municate.ui.activities.profile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,6 +14,7 @@ import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -57,6 +57,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
     private int userId;
     private User user;
     private Observer userObserver;
+    private boolean removeContactAndChatHistory;
 
     public static void start(Context context, int friendId) {
         Intent intent = new Intent(context, UserProfileActivity.class);
@@ -95,7 +96,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
     private void initUIWithUsersData() {
         loadAvatar();
         setName();
-        setStatus();
+        setTimestamp();
         setPhone();
     }
 
@@ -140,11 +141,13 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
     @OnClick(R.id.delete_chat_history_button)
     void deleteChatHistory(View view) {
+        removeContactAndChatHistory = false;
         showRemoveChatHistoryDialog();
     }
 
     @OnClick(R.id.remove_contact_and_chat_history_button)
     void removeContactAndChatHistory(View view) {
+        removeContactAndChatHistory = true;
         showRemoveContactAndChatHistoryDialog();
     }
 
@@ -160,6 +163,9 @@ public class UserProfileActivity extends BaseLogeableActivity {
         addAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION, new RemoveFriendSuccessAction());
         addAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION, failAction);
 
+        addAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION, new RemoveChatSuccessAction());
+        addAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION, failAction);
+
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreatePrivateChatSuccessAction());
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
 
@@ -170,15 +176,21 @@ public class UserProfileActivity extends BaseLogeableActivity {
         removeAction(QBServiceConsts.REMOVE_FRIEND_SUCCESS_ACTION);
         removeAction(QBServiceConsts.REMOVE_FRIEND_FAIL_ACTION);
 
+        removeAction(QBServiceConsts.DELETE_DIALOG_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.DELETE_DIALOG_FAIL_ACTION);
+
         removeAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION);
         removeAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION);
 
         updateBroadcastActionList();
     }
 
-    private void setStatus() {
-        if (!TextUtils.isEmpty(user.getStatus())) {
-            timestampTextView.setText(user.getStatus());
+    private void setTimestamp() {
+        if (user.getLastLogin() != 0) {
+            String timestamp = getString(R.string.last_seen,
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                    DateUtils.formatDateSimpleTime(user.getLastLogin()));
+            timestampTextView.setText(timestamp);
         }
     }
 
@@ -222,6 +234,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
+                        showProgress();
                         deleteChat();
                     }
                 });
@@ -231,6 +244,10 @@ public class UserProfileActivity extends BaseLogeableActivity {
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId());
         String dialogId = dialogOccupant.getDialog().getDialogId();
         QBDeleteChatCommand.start(this, dialogId, Dialog.Type.PRIVATE);
+    }
+
+    private void startPrivateChat(QBDialog qbDialog) {
+        PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
     }
 
     private class UserObserver implements Observer {
@@ -249,8 +266,21 @@ public class UserProfileActivity extends BaseLogeableActivity {
         @Override
         public void execute(Bundle bundle) {
             deleteChat();
-            ToastUtils.longToast(getString(R.string.dlg_friend_removed, user.getFullName()));
-            finish();
+        }
+    }
+
+    private class RemoveChatSuccessAction implements Command {
+
+        @Override
+        public void execute(Bundle bundle) {
+            hideProgress();
+
+            if (removeContactAndChatHistory) {
+                ToastUtils.longToast(getString(R.string.user_profile_success_contacts_deleting, user.getFullName()));
+                finish();
+            } else {
+                ToastUtils.longToast(getString(R.string.user_profile_success_chat_history_deleting, user.getFullName()));
+            }
         }
     }
 
@@ -260,7 +290,7 @@ public class UserProfileActivity extends BaseLogeableActivity {
         public void execute(Bundle bundle) throws Exception {
             hideProgress();
             QBDialog qbDialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-            PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
+            startPrivateChat(qbDialog);
         }
     }
 }

@@ -39,6 +39,8 @@
     <string name="user_remove_contact_and_chat_history">Remove Contact and Chat</string>
     <string name="user_profile_remove_contact_and_chat_history">Do you really want to delete %1$s from your contact list with his chat?</string>
     <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
+    <string name="user_profile_success_contacts_deleting">You have deleted %1$s from your contacts</string>
+    <string name="user_profile_success_chat_history_deleting">You have deleted chat history with %1$s</string>
 
 
     // NOT REFACTORED YET
@@ -213,7 +215,6 @@
     <string name="dlg_success_posted_to_facebook">Post was added to wall</string>
     <string name="dlg_success_request_facebook">Request sent</string>
     <string name="dlg_no_friends_selected">Please, select some Friends for invite!</string>
-    <string name="dlg_friend_removed">You have deleted %1$s from your contacts</string>
     <string name="dlg_get_file_failed">Failed to get file from gallery</string>
     <string name="dlg_no_friends_for_import">There are no friends in Q-municate app</string>
     <string name="dlg_wrong_signaling">Can\'t perform call. Problem with signaling</string>

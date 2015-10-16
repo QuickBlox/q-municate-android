@@ -109,8 +109,7 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
             @Override
             public void onItemClicked(View view, User user, int position) {
                 boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
-                boolean outgoingUser = dataManager.getUserRequestDataManager()
-                        .existsByUserId(user.getUserId());
+                boolean outgoingUser = dataManager.getUserRequestDataManager().existsByUserId(user.getUserId());
                 if (isFriend || outgoingUser) {
                     UserProfileActivity.start(baseActivity, user.getUserId());
                 }

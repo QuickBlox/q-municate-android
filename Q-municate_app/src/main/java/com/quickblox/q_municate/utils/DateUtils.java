@@ -271,28 +271,4 @@ public class DateUtils {
         Calendar calendar = getCalendar(seconds);
         return Long.parseLong(SHORT_DATE_WITHOUT_DIVIDERS_FORMAT.format(calendar.getTime()));
     }
-
-    public static String longToMessageListHeaderDate(long dateLong) {
-        String timeString;
-
-        Locale locale = new Locale("en");
-
-        Calendar calendar = Calendar.getInstance();
-        int currentDate = calendar.getTime().getDate();
-
-        calendar.setTimeInMillis(dateLong * SECOND_IN_MILLIS);
-        int inputDate = calendar.getTime().getDate();
-
-        if (inputDate == currentDate) {
-            timeString = App.getInstance().getString(R.string.today);
-        } else if (inputDate == currentDate - 1) {
-            timeString = App.getInstance().getString(R.string.yesterday);
-        } else {
-            Date time = calendar.getTime();
-            timeString = new SimpleDateFormat("EEEE", locale).format(time) + ", " + inputDate  + " " +
-                    new SimpleDateFormat("MMMM", locale).format(time);
-        }
-
-        return timeString;
-    }
 }
