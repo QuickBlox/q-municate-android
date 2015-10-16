@@ -47,9 +47,14 @@ public class QBLoadDialogMessagesCommand extends ServiceCommand {
 
         if (loadMore) {
             customObjectRequestBuilder.lt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
+            customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
         } else {
             customObjectRequestBuilder.gt(Consts.MESSAGE_DATE_SENT, lastDateLoad);
-            customObjectRequestBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
+            if (lastDateLoad > 0) {
+                customObjectRequestBuilder.sortAsc(QBServiceConsts.EXTRA_DATE_SENT);
+            } else {
+                customObjectRequestBuilder.sortDesc(QBServiceConsts.EXTRA_DATE_SENT);
+            }
         }
 
         List<QBChatMessage> dialogMessagesList = baseChatHelper.getDialogMessages(customObjectRequestBuilder,

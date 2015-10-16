@@ -3,6 +3,7 @@ package com.quickblox.q_municate_db.managers;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
@@ -65,7 +66,11 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
 
         try {
             QueryBuilder<DialogOccupant, Long> queryBuilder = dao.queryBuilder();
-            queryBuilder.where().eq(Dialog.Column.ID, dialogId).and().eq(User.Column.ID, userId);
+            Where<DialogOccupant, Long> where = queryBuilder.where();
+            where.and(
+                    where.eq(Dialog.Column.ID, dialogId),
+                    where.eq(User.Column.ID, userId)
+            );
             PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();
             dialogOccupant = dao.queryForFirst(preparedQuery);
         } catch (SQLException e) {

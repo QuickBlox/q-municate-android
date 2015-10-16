@@ -104,10 +104,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void onResume() {
         super.onResume();
 
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollMessagesToBottom();
-        }
-
         startLoadDialogMessages();
 
         checkMessageSendingPossibility();
@@ -147,8 +143,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         } catch (QBResponseException exc) {
             ErrorUtils.showError(this, exc);
         }
-
-        scrollMessagesToBottom();
     }
 
     @Override
@@ -162,19 +156,23 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     protected void initMessagesRecyclerView() {
         super.initMessagesRecyclerView();
         messagesAdapter = new PrivateDialogMessagesAdapter(this, friendOperationAction, combinationMessagesList, this, dialog);
-        messagesRecyclerView.addItemDecoration(new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
+        messagesRecyclerView.addItemDecoration(
+                new StickyRecyclerHeadersDecoration((StickyRecyclerHeadersAdapter) messagesAdapter));
         findLastFriendsRequest();
 
-        scrollMessagesToBottom();
         messagesRecyclerView.setAdapter(messagesAdapter);
+        scrollMessagesToBottom();
     }
 
     @Override
     protected void updateMessagesList() {
+        int oldMessagesCount = messagesAdapter.getAllItems().size();
+
         this.combinationMessagesList = createCombinationMessagesList();
         messagesAdapter.setList(combinationMessagesList);
         findLastFriendsRequest();
-        scrollMessagesToBottom();
+
+        checkForScrolling(oldMessagesCount);
     }
 
     private void findLastFriendsRequest() {

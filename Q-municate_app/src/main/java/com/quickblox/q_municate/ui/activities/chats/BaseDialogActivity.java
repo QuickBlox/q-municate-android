@@ -426,7 +426,8 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void startLoadDialogMessages(Dialog dialog, long lastDateLoad) {
-        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog), lastDateLoad, loadMore);
+        QBLoadDialogMessagesCommand.start(this, ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                lastDateLoad, loadMore);
     }
 
     private void setSendButtonVisibility(CharSequence charSequence) {
@@ -435,11 +436,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         } else {
             sendButton.setEnabled(true);
         }
-    }
-
-    @Override
-    public void onScrollMessagesToBottom() {
-        scrollMessagesToBottom();
     }
 
     @Override
@@ -473,6 +469,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     private boolean isSmilesLayoutShowing() {
         return emojiconsFragment.getVisibility() == View.VISIBLE;
+    }
+
+    protected void checkForScrolling(int oldMessagesCount) {
+        if (oldMessagesCount != messagesAdapter.getAllItems().size()) {
+            scrollMessagesToBottom();
+        }
     }
 
     protected void scrollMessagesToBottom() {

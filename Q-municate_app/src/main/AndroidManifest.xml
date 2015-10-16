@@ -156,7 +156,7 @@
             android:name=".utils.broadcasts.ChatMessageReceiver"
             android:label="ChatMessageReceiver">
             <intent-filter>
-                <action android:name="got_chat_message" />
+                <action android:name="q_municate.got_chat_message" />
             </intent-filter>
         </receiver>
 

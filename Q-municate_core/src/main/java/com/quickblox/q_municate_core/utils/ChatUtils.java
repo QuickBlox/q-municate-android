@@ -106,15 +106,19 @@ public class ChatUtils {
     }
 
     public static String getFullNameById(DataManager dataManager, int userId) {
-        QBUser qbUser = null;
-        try {
-            qbUser = QBUsers.getUser(userId);
-        } catch (QBResponseException e) {
-            ErrorUtils.logError(e);
+        User user = dataManager.getUserDataManager().get(userId);
+
+        if (user == null) {
+            try {
+                QBUser qbUser = QBUsers.getUser(userId);
+                user = UserFriendUtils.createLocalUser(qbUser);
+                dataManager.getUserDataManager().createOrUpdate(user);
+            } catch (QBResponseException e) {
+                ErrorUtils.logError(e);
+            }
         }
-        User user = UserFriendUtils.createLocalUser(qbUser);
-        dataManager.getUserDataManager().createOrUpdate(user);
-        return user.getFullName();
+
+        return user != null ? user.getFullName() : "";
     }
 
     public static String getFullNamesFromOpponentIds(DataManager dataManager, String occupantsIdsString) {
@@ -498,7 +502,8 @@ public class ChatUtils {
     }
 
     public static DialogOccupant saveDialogOccupantIfUserNotExists(Context context, DataManager dataManager, String dialogId, int userId) {
-        DialogOccupant dialogOccupant;User user = new QBRestHelper(context).loadUser(userId);
+        DialogOccupant dialogOccupant;
+        User user = new QBRestHelper(context).loadUser(userId);
         dialogOccupant = new DialogOccupant();
         dialogOccupant.setUser(user);
         dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));

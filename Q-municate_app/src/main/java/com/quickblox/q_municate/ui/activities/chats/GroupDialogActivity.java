@@ -80,10 +80,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         updateData();
-
-        if (messagesAdapter != null && !messagesAdapter.isEmpty()) {
-            scrollMessagesToBottom();
-        }
     }
 
     protected void updateActionBar() {
@@ -136,9 +132,12 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
 
     @Override
     protected void updateMessagesList() {
+        int oldMessagesCount = messagesAdapter.getAllItems().size();
+
         this.combinationMessagesList = createCombinationMessagesList();
         messagesAdapter.setList(combinationMessagesList);
-        scrollMessagesToBottom();
+
+        checkForScrolling(oldMessagesCount);
     }
 
     @Override
