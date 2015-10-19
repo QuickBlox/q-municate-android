@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
@@ -109,6 +111,22 @@ public abstract class BaseManager<T> extends Observable implements Manager {
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public List<T> getAllSorted(String sortedColumn, boolean ascending) {
+        List<T> objectsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<T, Long> queryBuilder = dao.queryBuilder();
+            queryBuilder.orderBy(sortedColumn, ascending);
+            PreparedQuery<T> preparedQuery = queryBuilder.prepare();
+            objectsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return objectsList;
     }
 
     @Override

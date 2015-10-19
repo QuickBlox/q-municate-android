@@ -6,29 +6,29 @@ import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.ui.activities.others.BaseSelectableUsersActivity;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewDialogActivity extends BaseSelectableFriendListActivity implements NewDialogCounterFriendsListener {
+public class NewGroupDialogActivity extends BaseSelectableUsersActivity {
 
     public static void start(Context context) {
-        Intent intent = new Intent(context, NewDialogActivity.class);
+        Intent intent = new Intent(context, NewGroupDialogActivity.class);
         context.startActivity(intent);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         addActions();
     }
 
@@ -39,13 +39,14 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     @Override
-    protected List<User> getFriends() {
-        return UserFriendUtils.getUsersFromFriends(DataManager.getInstance().getFriendDataManager().getAll());
+    protected List<User> getUsers() {
+        List<Friend> friendsList = dataManager.getFriendDataManager().getAllSorted();
+        return UserFriendUtils.getUsersFromFriends(friendsList);
     }
 
     @Override
-    protected void onFriendsSelected(ArrayList<User> selectedFriends) {
-        createChat(selectedFriends);
+    protected void onUsersSelected(ArrayList<User> selectedFriends) {
+        createGroupChat(selectedFriends);
     }
 
     protected void removeActions() {
@@ -56,28 +57,19 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
     }
 
     protected void addActions() {
-        addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateChatSuccessAction());
+        addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateGroupChatSuccessAction());
         addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
 
         updateBroadcastActionList();
     }
 
-    private void createChat(ArrayList<User> friendList) {
+    private void createGroupChat(ArrayList<User> friendList) {
         showProgress();
         String groupName = ChatUtils.createChatName(friendList);
         QBCreateGroupDialogCommand.start(this, groupName, friendList);
     }
 
-    //    private void sendNotificationToGroup(QBDialog dialog) {
-    //        try {
-    //            multiChatHelper.sendNotificationToFriends(dialog, MessagesNotificationType.CREATE_DIALOG,
-    //                    ChatUtils.getOccupantIdsWithoutUser(dialog.getOccupants()));
-    //        } catch (QBResponseException e) {
-    //            ErrorUtils.logError(e);
-    //        }
-    //    }
-
-    private class CreateChatSuccessAction implements Command {
+    private class CreateGroupChatSuccessAction implements Command {
 
         @Override
         public void execute(Bundle bundle) {
@@ -85,11 +77,10 @@ public class NewDialogActivity extends BaseSelectableFriendListActivity implemen
             QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
 
             if (dialog != null && dialog.getRoomJid() != null) {
-                GroupDialogActivity.start(NewDialogActivity.this, ChatUtils.createLocalDialog(dialog));
-                //                sendNotificationToGroup(dialog);
+                GroupDialogActivity.start(NewGroupDialogActivity.this, ChatUtils.createLocalDialog(dialog));
                 finish();
             } else {
-                ErrorUtils.showError(NewDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));
+                ErrorUtils.showError(NewGroupDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));
             }
         }
     }

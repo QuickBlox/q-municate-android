@@ -17,8 +17,11 @@ public class FriendDataManager extends BaseManager<Friend> {
 
     private static final String TAG = FriendDataManager.class.getSimpleName();
 
-    public FriendDataManager(Dao<Friend, Long> friendDao) {
+    private Dao<User, Long> userDao;
+
+    public FriendDataManager(Dao<Friend, Long> friendDao, Dao<User, Long> userDao) {
         super(friendDao, FriendDataManager.class.getSimpleName());
+        this.userDao = userDao;
     }
 
     public Friend getByUserId(int userId) {
@@ -74,6 +77,27 @@ public class FriendDataManager extends BaseManager<Friend> {
             QueryBuilder<Friend, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().notIn(User.Column.ID, idsList);
             PreparedQuery<Friend> preparedQuery = queryBuilder.prepare();
+            friendsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return friendsList;
+    }
+
+    public List<Friend> getAllSorted() {
+        List<Friend> friendsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<Friend, Long> friendQueryBuilder = dao.queryBuilder();
+
+            QueryBuilder<User, Long> userQueryBuilder = userDao.queryBuilder();
+            userQueryBuilder.orderBy(User.Column.FULL_NAME, true);
+
+            friendQueryBuilder.join(userQueryBuilder);
+
+            PreparedQuery<Friend> preparedQuery = friendQueryBuilder.prepare();
+
             friendsList = dao.query(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);

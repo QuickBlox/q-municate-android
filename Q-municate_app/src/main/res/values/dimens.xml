@@ -56,4 +56,6 @@
 
     <dimen name="contact_item_header_height">48dp</dimen>
 
+    <dimen name="friend_first_latter_width">53dp</dimen>
+
 </resources>

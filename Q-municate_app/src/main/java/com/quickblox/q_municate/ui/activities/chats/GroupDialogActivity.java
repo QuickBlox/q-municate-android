@@ -56,8 +56,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         startLoadDialogMessages();
 
         initMessagesRecyclerView();
-
-        //        registerForContextMenu(messagesRecyclerView);
     }
 
     private void initFields() {

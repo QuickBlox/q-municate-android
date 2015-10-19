@@ -199,7 +199,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         @Override
         protected List<Dialog> getItems() {
             return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
-                    dataManager, dataManager.getDialogDataManager().getAll());
+                    dataManager, dataManager.getDialogDataManager().getAllSorted());
         }
     }
 

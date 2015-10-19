@@ -63,11 +63,11 @@ public class BaseClickListenerViewHolder<V> extends RecyclerView.ViewHolder {
     }
 
     protected void onClickPerformed(View v, @Nullable V entity) {
-        // Nothing by default
+        // nothing by default
     }
 
     protected void onLongClickPerformed(View v, @Nullable V entity) {
-        // Nothing by default
+        // nothing by default
     }
 
     protected void displayAvatarImage(String uri, ImageView imageView) {

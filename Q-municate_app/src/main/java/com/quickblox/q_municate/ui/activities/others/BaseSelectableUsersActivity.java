@@ -1,19 +1,22 @@
-package com.quickblox.q_municate.ui.activities.chats;
+package com.quickblox.q_municate.ui.activities.others;
 
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate.ui.adapters.chats.DialogsSelectableFriendsAdapter;
+import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
+import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate.utils.simple.SimpleActionModeCallback;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.ArrayList;
@@ -23,25 +26,26 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public abstract class BaseSelectableFriendListActivity extends BaseLogeableActivity implements NewDialogCounterFriendsListener {
+public abstract class BaseSelectableUsersActivity extends BaseLogeableActivity implements SelectUsersListener {
 
-    @Bind(R.id.chat_friends_listview)
-    ListView friendsListView;
+    @Bind(R.id.users_recyclerview)
+    RecyclerView usersRecyclerView;
 
-    protected DialogsSelectableFriendsAdapter friendsAdapter;
+    protected SelectableFriendsAdapter selectableFriendsAdapter;
+    protected DataManager dataManager;
 
     private ActionMode actionMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_base_group_friendlist);
+        setContentView(R.layout.activity_users_list);
 
         activateButterKnife();
 
+        initFields();
         initActionBar();
-        initListView();
+        initRecyclerView();
     }
 
     @Override
@@ -50,14 +54,16 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         setActionBarUpButtonEnabled(true);
     }
 
-    protected abstract List<User> getFriends();
+    private void initFields() {
+        dataManager = DataManager.getInstance();
+    }
 
-    private void initListView() {
-        friendsAdapter = new DialogsSelectableFriendsAdapter(this, getFriends());
-        friendsAdapter.setCounterChangedListener(this);
-        friendsAdapter.setFriendListHelper(friendListHelper);
-        friendsListView.setAdapter(friendsAdapter);
-        friendsListView.setSelector(R.drawable.selector_list_item);
+    private void initRecyclerView() {
+        selectableFriendsAdapter = new SelectableFriendsAdapter(this, getUsers());
+        selectableFriendsAdapter.setCounterChangedListener(this);
+        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));;
+        usersRecyclerView.setAdapter(selectableFriendsAdapter);
     }
 
     @Override
@@ -65,12 +71,12 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         super.onConnectedToService(service);
 
         if (friendListHelper != null) {
-            friendsAdapter.setFriendListHelper(friendListHelper);
+            selectableFriendsAdapter.setFriendListHelper(friendListHelper);
         }
     }
 
     @Override
-    public void onCounterFriendsChanged(int valueCounter) {
+    public void onCounterUsersChanged(int valueCounter) {
         if (actionMode != null) {
             if (valueCounter == ConstsCore.ZERO_INT_VALUE) {
                 actionMode.finish();
@@ -82,10 +88,6 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         actionMode.setTitle(getString(R.string.ndl_ac_mode_title) + ConstsCore.SPACE + valueCounter);
     }
 
-    private void startAction() {
-        actionMode = startSupportActionMode(new ActionModeCallback());
-    }
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (actionMode != null && event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
@@ -95,7 +97,13 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
         return super.dispatchKeyEvent(event);
     }
 
-    protected abstract void onFriendsSelected(ArrayList<User> selectedFriends);
+    protected abstract List<User> getUsers();
+
+    private void startAction() {
+        actionMode = startSupportActionMode(new ActionModeCallback());
+    }
+
+    protected abstract void onUsersSelected(ArrayList<User> selectedFriends);
 
     public static class SimpleComparator implements Comparator<User> {
 
@@ -108,7 +116,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
     public void notifyChangedUserStatus(int userId, boolean online) {
         super.notifyChangedUserStatus(userId, online);
 
-        friendsAdapter.notifyDataSetChanged();
+        selectableFriendsAdapter.notifyDataSetChanged();
     }
 
     private class ActionModeCallback extends SimpleActionModeCallback {
@@ -124,9 +132,9 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
             switch (menuItem.getItemId()) {
                 case R.id.action_done:
                     ArrayList<User> selectedFriends = new ArrayList<User>(
-                            friendsAdapter.getSelectedFriends());
+                            selectableFriendsAdapter.getSelectedFriends());
                     Collections.sort(selectedFriends, new SimpleComparator());
-                    onFriendsSelected(selectedFriends);
+                    onUsersSelected(selectedFriends);
 
                     actionMode.finish();
                     return true;
@@ -137,7 +145,7 @@ public abstract class BaseSelectableFriendListActivity extends BaseLogeableActiv
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            friendsAdapter.clearSelectedFriends();
+            selectableFriendsAdapter.clearSelectedFriends();
             actionMode = null;
         }
     }

@@ -61,7 +61,8 @@ public class DataManager {
     public FriendDataManager getFriendDataManager() {
         if (friendDataManager == null) {
             friendDataManager = new FriendDataManager(
-                    getDataHelper().getDaoByClass(Friend.class));
+                    getDataHelper().getDaoByClass(Friend.class),
+                    getDataHelper().getDaoByClass(User.class));
         }
         return friendDataManager;
     }

@@ -17,6 +17,8 @@ public interface Manager<T> {
 
     List<T> getAll();
 
+    List<T> getAllSorted(String sortedColumn, boolean ascending);
+
     void update(T object);
 
     void update(T object, boolean notify);

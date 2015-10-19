@@ -19,9 +19,9 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
-import com.quickblox.q_municate.ui.activities.chats.NewDialogActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
 import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
@@ -130,7 +130,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
             case R.id.action_add_chat:
                 boolean isFriends = !dataManager.getFriendDataManager().getAll().isEmpty();
                 if (isFriends) {
-                    NewDialogActivity.start(getActivity());
+                    NewMessageActivity.start(getActivity());
                 } else {
                     ToastUtils.longToast(R.string.ndl_no_friends_for_new_chat);
                 }
@@ -300,7 +300,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         @Override
         protected List<Dialog> getItems() {
             return ChatUtils.fillTitleForPrivateDialogsList(getContext().getResources().getString(R.string.deleted_user),
-                    dataManager, dataManager.getDialogDataManager().getAll());
+                    dataManager, dataManager.getDialogDataManager().getAllSorted());
         }
     }
 

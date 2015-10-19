@@ -25,7 +25,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="15dp"
-        android:layout_toLeftOf="@+id/actions_friend_linearlayout"
         android:layout_toRightOf="@id/avatar_imageview"
         android:gravity="center"
         android:orientation="vertical">

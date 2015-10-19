@@ -6,10 +6,10 @@
 
     <include layout="@layout/toolbar" />
 
-    <ListView
-        android:id="@+id/chat_friends_listview"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/users_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null" />
+        android:scrollbars="vertical" />
 
 </LinearLayout>

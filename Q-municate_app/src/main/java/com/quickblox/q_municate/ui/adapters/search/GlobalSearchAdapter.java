@@ -48,7 +48,7 @@ public class GlobalSearchAdapter extends FilterAdapter<User, BaseClickListenerVi
 
     @Override
     public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend, parent, false));
+        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_user, parent, false));
     }
 
     @Override

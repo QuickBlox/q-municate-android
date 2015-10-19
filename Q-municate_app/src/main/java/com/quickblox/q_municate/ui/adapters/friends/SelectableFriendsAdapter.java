@@ -1,8 +1,6 @@
-package com.quickblox.q_municate.ui.adapters.chats;
+package com.quickblox.q_municate.ui.adapters.friends;
 
-import android.content.Context;
 import android.util.SparseBooleanArray;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -12,8 +10,10 @@ import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
-import com.quickblox.q_municate.ui.adapters.base.BaseListAdapter;
-import com.quickblox.q_municate.utils.listeners.NewDialogCounterFriendsListener;
+import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
+import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
+import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
@@ -22,23 +22,23 @@ import com.quickblox.q_municate_db.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
+import butterknife.Bind;
 
-    private LayoutInflater layoutInflater;
-    private NewDialogCounterFriendsListener counterChangedListener;
+public class SelectableFriendsAdapter extends BaseRecyclerViewAdapter<User, BaseClickListenerViewHolder<User>> {
+
+    private SelectUsersListener counterChangedListener;
     private int counterFriends;
     private List<User> selectedFriends;
     private SparseBooleanArray sparseArrayCheckBoxes;
     private QBFriendListHelper friendListHelper;
 
-    public DialogsSelectableFriendsAdapter(BaseActivity context, List<User> userList) {
-        super(context, userList);
+    public SelectableFriendsAdapter(BaseActivity baseActivity, List<User> userList) {
+        super(baseActivity, userList);
         selectedFriends = new ArrayList<User>();
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         sparseArrayCheckBoxes = new SparseBooleanArray(userList.size());
     }
 
-    public void setCounterChangedListener(NewDialogCounterFriendsListener listener) {
+    public void setCounterChangedListener(SelectUsersListener listener) {
         counterChangedListener = listener;
     }
 
@@ -48,29 +48,15 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        final ViewHolder viewHolder;
+    public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_chat_user_selectable, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(BaseClickListenerViewHolder<User> baseClickListenerViewHolder, final int position) {
         final User user = getItem(position);
+        final ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
-        if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.item_chat_friend_selectable, null);
-            viewHolder = new ViewHolder();
-
-            viewHolder.contentRelativeLayout = (RelativeLayout) convertView.findViewById(
-                    R.id.contentRelativeLayout);
-            viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
-            viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            viewHolder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
-            viewHolder.statusMessageTextView = (TextView) convertView.findViewById(R.id.status_textview);
-            viewHolder.selectFriendCheckBox = (CheckBox) convertView.findViewById(
-                    R.id.selected_friend_checkbox);
-
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-        viewHolder.nameTextView.setText(user.getFullName());
         viewHolder.nameTextView.setText(user.getFullName());
 
         checkUserOnlineStatus(viewHolder, user);
@@ -81,7 +67,6 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
             public void onClick(View view) {
                 CheckBox checkBox = (CheckBox) view;
                 sparseArrayCheckBoxes.put(position, checkBox.isChecked());
-                //                friend.setSelected(checkBox.isChecked());
                 notifyCounterChanged(checkBox.isChecked());
                 if (checkBox.isChecked()) {
                     selectedFriends.add(user);
@@ -100,8 +85,6 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
         viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checked));
-
-        return convertView;
     }
 
     private void checkUserOnlineStatus(ViewHolder viewHolder, User user) {
@@ -120,7 +103,7 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
 
     private void notifyCounterChanged(boolean isIncrease) {
         changeCounter(isIncrease);
-        counterChangedListener.onCounterFriendsChanged(counterFriends);
+        counterChangedListener.onCounterUsersChanged(counterFriends);
     }
 
     private int getBackgroundColorItem(boolean isSelect) {
@@ -147,13 +130,28 @@ public class DialogsSelectableFriendsAdapter extends BaseListAdapter<User> {
         return (ArrayList<User>) selectedFriends;
     }
 
-    private static class ViewHolder {
+    protected static class ViewHolder extends BaseViewHolder<User> {
 
+        @Bind(R.id.contentRelativeLayout)
         RelativeLayout contentRelativeLayout;
+
+        @Bind(R.id.avatar_imageview)
         RoundedImageView avatarImageView;
+
+        @Bind(R.id.name_textview)
         TextView nameTextView;
+
+        @Bind(R.id.online_imageview)
         ImageView onlineImageView;
+
+        @Bind(R.id.status_textview)
         TextView statusMessageTextView;
+
+        @Bind(R.id.selected_friend_checkbox)
         CheckBox selectFriendCheckBox;
+
+        public ViewHolder(BaseRecyclerViewAdapter adapter, View view) {
+            super(adapter, view);
+        }
     }
 }
