@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class FilterAdapter<T, VH extends BaseClickListenerViewHolder<T>> extends BaseRecyclerViewAdapter<T, VH> {
+public abstract class BaseFilterAdapter<T, VH extends BaseClickListenerViewHolder<T>> extends BaseRecyclerViewAdapter<T, VH> {
 
     private List<T> visibleList;
     protected String query;
 
-    public FilterAdapter(Activity activity) {
+    public BaseFilterAdapter(Activity activity) {
         super(activity);
     }
 
-    public FilterAdapter(Activity activity, List<T> list) {
+    public BaseFilterAdapter(Activity activity, List<T> list) {
         super(activity, list);
         visibleList = list;
     }

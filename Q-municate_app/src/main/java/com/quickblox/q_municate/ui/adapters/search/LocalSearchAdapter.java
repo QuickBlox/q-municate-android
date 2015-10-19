@@ -12,7 +12,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
-import com.quickblox.q_municate.ui.adapters.base.FilterAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
@@ -31,7 +31,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class LocalSearchAdapter extends FilterAdapter<Dialog, BaseClickListenerViewHolder<Dialog>> {
+public class LocalSearchAdapter extends BaseFilterAdapter<Dialog, BaseClickListenerViewHolder<Dialog>> {
 
     private Resources resources;
     private DataManager dataManager;

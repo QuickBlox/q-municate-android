@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
-import com.quickblox.q_municate.ui.adapters.base.FilterAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
@@ -26,7 +26,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class GlobalSearchAdapter extends FilterAdapter<User, BaseClickListenerViewHolder<User>> {
+public class GlobalSearchAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     private Resources resources;
     private DataManager dataManager;

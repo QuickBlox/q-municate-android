@@ -49,7 +49,7 @@ public class SelectableFriendsAdapter extends BaseRecyclerViewAdapter<User, Base
 
     @Override
     public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_chat_user_selectable, parent, false));
+        return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend_selectable, parent, false));
     }
 
     @Override

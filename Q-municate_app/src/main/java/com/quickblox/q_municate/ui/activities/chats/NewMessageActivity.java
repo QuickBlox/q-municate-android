@@ -1,10 +1,12 @@
 package com.quickblox.q_municate.ui.activities.chats;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +15,7 @@ import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
+import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBCreatePrivateChatCommand;
@@ -29,7 +32,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class NewMessageActivity extends BaseLogeableActivity {
+public class NewMessageActivity extends BaseLogeableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     @Bind(R.id.users_recyclerview)
     RecyclerView usersRecyclerView;
@@ -96,14 +99,27 @@ public class NewMessageActivity extends BaseLogeableActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.new_message_menu, menu);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = null;
+
+        if (searchMenuItem != null) {
+            searchView = (SearchView) searchMenuItem.getActionView();
+        }
+
+        if (searchView != null) {
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setOnQueryTextListener(this);
+            searchView.setOnCloseListener(this);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_search:
-                break;
             case R.id.action_create_group:
                 NewGroupDialogActivity.start(this);
                 break;
@@ -141,6 +157,37 @@ public class NewMessageActivity extends BaseLogeableActivity {
     private void startPrivateChat(Dialog dialog) {
         PrivateDialogActivity.start(this, selectedUser, dialog);
         finish();
+    }
+
+    @Override
+    public boolean onClose() {
+        cancelSearch();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String searchQuery) {
+        KeyboardUtils.hideKeyboard(this);
+        search(searchQuery);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String searchQuery) {
+        search(searchQuery);
+        return true;
+    }
+
+    private void search(String searchQuery) {
+        if (friendsAdapter != null) {
+            friendsAdapter.setFilter(searchQuery);
+        }
+    }
+
+    private void cancelSearch() {
+        if (friendsAdapter != null) {
+            friendsAdapter.flushFilter();
+        }
     }
 
     private class CreatePrivateChatSuccessAction implements Command {

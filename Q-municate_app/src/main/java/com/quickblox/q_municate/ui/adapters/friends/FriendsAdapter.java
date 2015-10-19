@@ -3,26 +3,31 @@ package com.quickblox.q_municate.ui.adapters.friends;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
-import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
+import com.quickblox.q_municate.ui.adapters.base.BaseFilterAdapter;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
+import com.quickblox.q_municate.utils.helpers.TextViewHelper;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
 
 import butterknife.Bind;
 
-public class FriendsAdapter extends BaseRecyclerViewAdapter<User, BaseClickListenerViewHolder<User>> {
+public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     public FriendsAdapter(BaseActivity baseActivity, List<User> usersList) {
         super(baseActivity, usersList);
+    }
+
+    @Override
+    protected boolean isMatch(User item, String query) {
+        return item.getFullName() != null && item.getFullName().toLowerCase().contains(query);
     }
 
     @Override
@@ -43,12 +48,18 @@ public class FriendsAdapter extends BaseRecyclerViewAdapter<User, BaseClickListe
                 DateUtils.formatDateSimpleTime(user.getLastLogin())));
 
         displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
+
+        if (!TextUtils.isEmpty(query)) {
+            TextViewHelper.changeTextColorView(context, viewHolder.nameTextView, query);
+        }
     }
 
     private void initFirstLetter(ViewHolder viewHolder, int position, User user) {
         if (TextUtils.isEmpty(user.getFullName())) {
             return;
         }
+
+        viewHolder.firstLatterTextView.setVisibility(View.INVISIBLE);
 
         Character firstLatter = user.getFullName().toUpperCase().charAt(0);
         if (position == 0) {

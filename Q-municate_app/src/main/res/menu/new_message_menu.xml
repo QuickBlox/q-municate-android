@@ -4,9 +4,10 @@
     <item
         android:id="@+id/action_search"
         android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_search"
         android:title="@string/action_bar_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/action_create_group"
