@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
+import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
+import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -36,6 +38,10 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_friends_list);
+
+        activateButterKnife();
+
         addActions();
     }
 
@@ -59,10 +65,14 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected void performDone() {
-        showProgress();
         List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
-        friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
-        QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(), (ArrayList<Integer>) friendIdsList);
+        if (!selectedFriendsList.isEmpty()) {
+            showProgress();
+            friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
+            QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(), (ArrayList<Integer>) friendIdsList);
+        } else {
+            ToastUtils.longToast(R.string.add_friends_to_group_no_friends_for_adding);
+        }
     }
 
     private void addActions() {

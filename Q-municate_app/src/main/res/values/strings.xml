@@ -59,6 +59,11 @@
     <string name="create_group_empty_group_name">Group name can not be empty</string>
 
 
+    <!-- Add Friends To Group Dialog -->
+    <string name="add_friends_to_group_title">Add Friends</string>
+    <string name="add_friends_to_group_no_friends_for_adding">No Friends for adding</string>
+
+
     // NOT REFACTORED YET
 
     <!-- Login -->
@@ -168,9 +173,6 @@
     <string name="prf_phone">Phone</string>
     <string name="prf_status_message">Status Message</string>
     <string name="prf_done">Done</string>
-
-    <!-- Add Friends To Group Dialog -->
-    <string name="afg_title">Add Friends</string>
 
     <!-- Invite Friends -->
     <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>

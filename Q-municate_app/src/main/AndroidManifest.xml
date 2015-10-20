@@ -132,7 +132,7 @@
         <activity
             android:name=".ui.activities.chats.AddFriendsToGroupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/afg_title"
+            android:label="@string/add_friends_to_group_no_friends_for_adding"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.changepassword.ChangePasswordActivity"
