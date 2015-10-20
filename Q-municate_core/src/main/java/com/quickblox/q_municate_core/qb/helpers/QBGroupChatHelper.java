@@ -162,13 +162,14 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public QBDialog createGroupChat(String name, List<Integer> friendIdsList) throws Exception {
+    public QBDialog createGroupChat(String name, List<Integer> friendIdsList, String photo) throws Exception {
         ArrayList<Integer> occupantIdsList = ChatUtils.getOccupantIdsWithUser(friendIdsList);
 
         QBDialog dialogToCreate = new QBDialog();
         dialogToCreate.setName(name);
         dialogToCreate.setType(QBDialogType.GROUP);
         dialogToCreate.setOccupantsIds(occupantIdsList);
+        dialogToCreate.setPhoto(photo);
 
         QBDialog dialog = groupChatManager.createDialog(dialogToCreate);
         ChatUtils.saveDialogToCache(dataManager, dialog);

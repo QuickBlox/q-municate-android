@@ -50,13 +50,14 @@
     <!-- New Group Dialog -->
     <string name="new_group_title">New Group</string>
     <string name="new_group_no_friends_for_creating_group">No friends for creating group</string>
-    <string name="new_group_selected_friends">Friends</string>
+    <string name="new_group_add_people">Add People</string>
 
 
     <!-- Create Group Dialog -->
     <string name="create_group_title">New Group</string>
     <string name="create_group_group_name">Group Name</string>
     <string name="create_group_empty_group_name">Group name can not be empty</string>
+    <string name="create_group_participants">%1d participants</string>
 
 
     <!-- Add Friends To Group Dialog -->

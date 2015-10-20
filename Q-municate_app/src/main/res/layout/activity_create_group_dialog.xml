@@ -17,6 +17,8 @@
         <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
             style="@style/AvatarImageViewStyle"
             android:id="@+id/photo_imageview"
+            android:layout_width="@dimen/image_view_small_avatar_layout_width"
+            android:layout_height="@dimen/image_view_small_avatar_layout_height"
             android:layout_gravity="top"
             android:background="@drawable/selector_button_general"
             android:src="@drawable/add_photo"
@@ -38,11 +40,20 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/participants_count_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="@string/create_group_participants"
+        android:textColor="@color/text_light_dark"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/friends_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
         android:scrollbars="vertical" />
 
 </LinearLayout>

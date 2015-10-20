@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:editable="false"
-        android:hint="@string/new_group_selected_friends"
+        android:hint="@string/new_group_add_people"
         android:maxLines="3"
         android:textColor="@color/text_dark"
         android:textSize="@dimen/text_size" />

@@ -14,11 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="5dp"
         android:gravity="center"
         android:textSize="@dimen/text_size_xlarge"
         android:visibility="invisible"
-        tools:visibility="visible"
-        tools:text="A" />
+        tools:text="A"
+        tools:visibility="visible" />
 
     <com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView
         style="@style/AvatarImageViewStyle"
@@ -26,7 +27,6 @@
         android:layout_width="@dimen/image_view_small_avatar_layout_width"
         android:layout_height="@dimen/image_view_small_avatar_layout_height"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
         android:layout_toRightOf="@id/first_latter_textview"
         app:border_color="@color/dark_gray"
         app:border_width="@dimen/avatar_border_width"

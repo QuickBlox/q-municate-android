@@ -60,7 +60,7 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     @Override
     protected FriendsAdapter getFriendsAdapter() {
-        return new SelectableFriendsAdapter(this, getFriendsList());
+        return new SelectableFriendsAdapter(this, getFriendsList(), true);
     }
 
     @Override

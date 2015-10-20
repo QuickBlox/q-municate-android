@@ -301,7 +301,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
-        if ((isGalleryCalled(requestCode) || isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
+        if ((imageUtils.isGalleryCalled(requestCode) || imageUtils.isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
             if (data.getData() == null) {
                 onFileSelected((Bitmap) data.getExtras().get("data"));
             } else {
@@ -391,14 +391,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 setSmilePanelIcon(R.drawable.ic_keyboard_dark);
             }
         }, DELAY_SHOWING_SMILE_PANEL);
-    }
-
-    private boolean isGalleryCalled(int requestCode) {
-        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
-    }
-
-    private boolean isCaptureCalled(int requestCode) {
-        return ImageUtils.CAPTURE_CALLED == requestCode;
     }
 
     protected void loadLogoActionBar(String logoUrl) {

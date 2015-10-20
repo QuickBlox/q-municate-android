@@ -109,7 +109,6 @@
             android:name=".ui.activities.chats.CreateGroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/create_group_title"
-            android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.chats.PrivateDialogActivity"
@@ -132,7 +131,7 @@
         <activity
             android:name=".ui.activities.chats.AddFriendsToGroupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/add_friends_to_group_no_friends_for_adding"
+            android:label="@string/add_friends_to_group_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.changepassword.ChangePasswordActivity"

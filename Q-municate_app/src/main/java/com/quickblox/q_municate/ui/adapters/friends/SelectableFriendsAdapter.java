@@ -25,8 +25,8 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
     private List<User> selectedFriendsList;
     private SparseBooleanArray sparseArrayCheckBoxes;
 
-    public SelectableFriendsAdapter(BaseActivity baseActivity, List<User> userList) {
-        super(baseActivity, userList);
+    public SelectableFriendsAdapter(BaseActivity baseActivity, List<User> userList, boolean withFirstLetter) {
+        super(baseActivity, userList, withFirstLetter);
         selectedFriendsList = new ArrayList<User>();
         sparseArrayCheckBoxes = new SparseBooleanArray(userList.size());
     }

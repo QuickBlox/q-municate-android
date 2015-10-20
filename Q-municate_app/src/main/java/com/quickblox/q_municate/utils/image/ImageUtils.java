@@ -75,6 +75,15 @@ public class ImageUtils {
         return imageLoaderConfiguration;
     }
 
+    public boolean isGalleryCalled(int requestCode) {
+        return ImageUtils.GALLERY_INTENT_CALLED == requestCode;
+    }
+
+    public boolean isCaptureCalled(int requestCode) {
+        return ImageUtils.CAPTURE_CALLED == requestCode;
+    }
+
+
     public static Bitmap getThumbnailFromVideo(String videoPath) {
         if (videoPath.contains("file://")) {
             videoPath = videoPath.replace("file://", "");

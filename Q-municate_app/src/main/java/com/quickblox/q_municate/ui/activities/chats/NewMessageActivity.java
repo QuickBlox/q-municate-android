@@ -73,7 +73,7 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
 
     private void initRecyclerView() {
         List<Friend> friendsList = dataManager.getFriendDataManager().getAllSorted();
-        friendsAdapter = new FriendsAdapter(this, UserFriendUtils.getUsersFromFriends(friendsList));
+        friendsAdapter = new FriendsAdapter(this, UserFriendUtils.getUsersFromFriends(friendsList), true);
         usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         usersRecyclerView.setAdapter(friendsAdapter);
     }

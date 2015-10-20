@@ -21,8 +21,11 @@ import butterknife.Bind;
 
 public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
-    public FriendsAdapter(BaseActivity baseActivity, List<User> usersList) {
+    private boolean withFirstLetter;
+
+    public FriendsAdapter(BaseActivity baseActivity, List<User> usersList, boolean withFirstLetter) {
         super(baseActivity, usersList);
+        this.withFirstLetter = withFirstLetter;
     }
 
     @Override
@@ -40,7 +43,11 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
         User user = getItem(position);
         ViewHolder viewHolder = (ViewHolder) baseClickListenerViewHolder;
 
-        initFirstLetter(viewHolder, position, user);
+        if (withFirstLetter) {
+            initFirstLetter(viewHolder, position, user);
+        } else {
+            viewHolder.firstLatterTextView.setVisibility(View.GONE);
+        }
 
         viewHolder.nameTextView.setText(user.getFullName());
         viewHolder.labelTextView.setText(context.getString(R.string.last_seen,

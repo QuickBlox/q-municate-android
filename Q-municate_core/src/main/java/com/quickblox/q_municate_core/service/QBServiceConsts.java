@@ -180,6 +180,7 @@ public class QBServiceConsts {
     public static final String EXTRA_STATUS = "status";
     public static final String EXTRA_CHATS_DIALOGS = "chats_dialogs";
     public static final String EXTRA_ROOM_NAME = "room_name";
+    public static final String EXTRA_ROOM_PHOTO_URL = "photo_url";
     public static final String EXTRA_ROOM_JID_LIST = "room_jid_list";
     public static final String EXTRA_LAST_CHAT_MESSAGE = "last_chat_message";
     public static final String EXTRA_OPPONENT_ID = "opponent_id";

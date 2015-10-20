@@ -45,7 +45,7 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
 
     @Override
     protected FriendsAdapter getFriendsAdapter() {
-        return new SelectableFriendsAdapter(this, getFriendsList());
+        return new SelectableFriendsAdapter(this, getFriendsList(), true);
     }
 
     @Override
