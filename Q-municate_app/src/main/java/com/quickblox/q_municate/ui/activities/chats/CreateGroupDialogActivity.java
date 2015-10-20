@@ -190,7 +190,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     private void startLoadAttachFile(final File file) {
         TwoButtonsDialogFragment.show(
                 getSupportFragmentManager(),
-                R.string.dlg_confirm_sending_attach,
+                R.string.create_group_confirm_selecting_photo,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
