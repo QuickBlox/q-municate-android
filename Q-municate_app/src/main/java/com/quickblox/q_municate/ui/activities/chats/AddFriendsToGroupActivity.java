@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.quickblox.chat.model.QBDialog;
-import com.quickblox.q_municate.ui.activities.others.BaseSelectableUsersActivity;
+import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
+import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
+import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -18,7 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddUsersToGroupActivity extends BaseSelectableUsersActivity {
+public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
 
     public static final int RESULT_ADDED_FRIENDS = 9123;
 
@@ -26,7 +28,7 @@ public class AddUsersToGroupActivity extends BaseSelectableUsersActivity {
     private List<Integer> friendIdsList;
 
     public static void start(Activity activity, QBDialog qbDialog) {
-        Intent intent = new Intent(activity, AddUsersToGroupActivity.class);
+        Intent intent = new Intent(activity, AddFriendsToGroupActivity.class);
         intent.putExtra(QBServiceConsts.EXTRA_DIALOG, qbDialog);
         activity.startActivityForResult(intent, RESULT_ADDED_FRIENDS);
     }
@@ -44,16 +46,22 @@ public class AddUsersToGroupActivity extends BaseSelectableUsersActivity {
     }
 
     @Override
-    protected List<User> getUsers() {
+    protected List<User> getFriendsList() {
         qbDialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
         List<Friend> friendsList = DataManager.getInstance().getFriendDataManager().getAllWithoutTheseIds(qbDialog.getOccupants());
         return UserFriendUtils.getUsersFromFriends(friendsList);
     }
 
     @Override
-    protected void onUsersSelected(ArrayList<User> selectedFriends) {
+    protected FriendsAdapter getFriendsAdapter() {
+        return new SelectableFriendsAdapter(this, getFriendsList());
+    }
+
+    @Override
+    protected void performDone() {
         showProgress();
-        friendIdsList = UserFriendUtils.getFriendIds(selectedFriends);
+        List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
+        friendIdsList = UserFriendUtils.getFriendIds(selectedFriendsList);
         QBAddFriendsToGroupCommand.start(this, qbDialog.getDialogId(), (ArrayList<Integer>) friendIdsList);
     }
 

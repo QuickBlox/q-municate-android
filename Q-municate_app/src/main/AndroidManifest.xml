@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.quickblox.q_municate"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:installLocation="preferExternal">
+    android:installLocation="preferExternal" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -22,153 +21,146 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
-        android:name="com.quickblox.q_municate.App"
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".ui.activities.authorization.SplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:launchMode="singleInstance">
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activities.authorization.LandingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
-
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.authorization.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/lgn_login"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.authorization.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/sup_sign_up"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
-
         <activity
             android:name="com.facebook.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.main.MainActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/action_bar_settings"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.invitefriends.InviteFriendsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/action_bar_invite_friends"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.feedback.FeedbackActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/action_bar_feedback"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.profile.UserProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/user_profile_title"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.call.CallActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.chats.NewMessageActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/new_message_title"
-            android:screenOrientation="portrait" />
-        
+            android:parentActivityName=".ui.activities.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.main.MainActivity" />
+        </activity>
         <activity
             android:name=".ui.activities.chats.NewGroupDialogActivity"
+            android:label="@string/new_group_title"
+            android:noHistory="true"
+            android:parentActivityName=".ui.activities.main.MainActivity"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.activities.main.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.activities.chats.CreateGroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/ndl_title"
+            android:label="@string/create_group_title"
+            android:noHistory="true"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.chats.PrivateDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.chats.GroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.chats.GroupDialogDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/gdd_title"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.profile.MyProfileActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/prf_title"
             android:screenOrientation="portrait" />
-
         <activity
-            android:name=".ui.activities.chats.AddUsersToGroupActivity"
+            android:name=".ui.activities.chats.AddFriendsToGroupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/afg_title"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.changepassword.ChangePasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/cpw_change_password_title"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.forgotpassword.ForgotPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/fpw_forgot_password_title"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.activities.agreements.UserAgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/uag_user_agreement_title"
             android:screenOrientation="portrait" />
-
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <receiver
             android:name=".gcm.GcmBroadcastReceiver"
-            android:permission="com.google.android.c2dm.permission.SEND">
+            android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
@@ -176,22 +168,22 @@
                 <category android:name="com.quickblox.qmunicate" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".utils.broadcasts.ChatMessageReceiver"
-            android:label="ChatMessageReceiver">
+            android:label="ChatMessageReceiver" >
             <intent-filter>
                 <action android:name="q_municate.got_chat_message" />
             </intent-filter>
         </receiver>
 
         <service android:name=".gcm.GCMIntentService" />
-
         <service
             android:name="com.quickblox.q_municate_core.service.QBService"
             android:icon="@drawable/ic_launcher" />
 
-        <meta-data android:name="com.crashlytics.ApiKey" android:value="7aea78439bec41a9005c7488bb6751c5e33fe270"/>
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="7aea78439bec41a9005c7488bb6751c5e33fe270" />
 
     </application>
 

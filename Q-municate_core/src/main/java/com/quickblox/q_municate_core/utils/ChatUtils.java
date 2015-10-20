@@ -43,11 +43,12 @@ public class ChatUtils {
         return ConstsCore.EMPTY_STRING;
     }
 
-    public static String createChatName(ArrayList<User> usersList) {
-        String userFullName = AppSession.getSession().getUser().getFullName();
+    public static String getSelectedFriendsFullNamesFromMap(List<User> usersList) {
+        if (usersList.isEmpty()) {
+            return "";
+        }
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(userFullName).append(OCCUPANT_IDS_DIVIDER).append(" ");
 
         for (User user : usersList) {
             stringBuilder.append(user.getFullName()).append(OCCUPANT_IDS_DIVIDER).append(" ");
@@ -55,7 +56,6 @@ public class ChatUtils {
 
         return stringBuilder.toString().substring(ConstsCore.ZERO_INT_VALUE, stringBuilder.length() - 2);
     }
-
 
     public static ArrayList<Integer> createOccupantsIdsFromPrivateMessage(int currentUserId, int senderId) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<Integer>(2);
@@ -527,8 +527,8 @@ public class ChatUtils {
     }
 
     public static void saveTempMessages(Context context, DataManager dataManager, List<QBDialog> qbDialogsList) {
-        dataManager.getMessageDataManager().createOrUpdate(
-                createTempLocalMessagesList(context, dataManager, qbDialogsList));
+        dataManager.getMessageDataManager()
+                .createOrUpdate(createTempLocalMessagesList(context, dataManager, qbDialogsList));
     }
 
     public static void saveTempMessage(DataManager dataManager, Message message) {
@@ -639,7 +639,8 @@ public class ChatUtils {
     }
 
     public static void saveDialogNotificationToCache(Context context, DataManager dataManager, DialogOccupant dialogOccupant, QBChatMessage qbChatMessage, boolean notify) {
-        DialogNotification dialogNotification = createLocalDialogNotification(context, dataManager, qbChatMessage, dialogOccupant);
+        DialogNotification dialogNotification = createLocalDialogNotification(context, dataManager,
+                qbChatMessage, dialogOccupant);
         saveDialogNotificationToCache(dataManager, dialogNotification, notify);
     }
 

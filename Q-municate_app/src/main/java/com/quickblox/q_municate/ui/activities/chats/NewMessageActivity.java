@@ -34,7 +34,7 @@ import butterknife.Bind;
 
 public class NewMessageActivity extends BaseLogeableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    @Bind(R.id.users_recyclerview)
+    @Bind(R.id.friends_recyclerview)
     RecyclerView usersRecyclerView;
 
     private DataManager dataManager;
@@ -49,7 +49,7 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_users_list);
+        setContentView(R.layout.activity_friends_list);
 
         activateButterKnife();
 

@@ -44,6 +44,19 @@
     <!-- New Message -->
     <string name="new_message_title">New Message</string>
     <string name="new_message_create_group">Create group</string>
+    <string name="new_message_no_friends_for_new_message">You don\'t have any Friends for creating New Chat</string>
+
+
+    <!-- New Group Dialog -->
+    <string name="new_group_title">New Group</string>
+    <string name="new_group_no_friends_for_creating_group">No friends for creating group</string>
+    <string name="new_group_selected_friends">Friends</string>
+
+
+    <!-- Create Group Dialog -->
+    <string name="create_group_title">New Group</string>
+    <string name="create_group_group_name">Group Name</string>
+    <string name="create_group_empty_group_name">Group name can not be empty</string>
 
 
     // NOT REFACTORED YET
@@ -125,13 +138,6 @@
     <!-- Dialog messages -->
     <string name="glgm_snackbar_new_message_title">%1$s\nMessage: %2$s</string>
     <string name="glgm_snackbar_new_contact_request_title">%1$s\nNew Contacts request</string>
-
-
-    <!-- New Dialog -->
-    <string name="ndl_title">New Group Chat</string>
-    <string name="ndl_ac_mode_title">Group chat participants:</string>
-    <string name="ndl_no_friends_for_new_chat">You don\'t have any Friends for creating New Chat</string>
-
 
     <!-- Preferences -->
     <string name="pref_title_profile_and_details">Profile and details</string>

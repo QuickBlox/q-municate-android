@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/action_reply"
         android:title="@string/gdl_ctx_menu_reply" />
@@ -14,4 +15,5 @@
     <item
         android:id="@+id/action_profile"
         android:title="@string/gdl_ctx_menu_profile"/>
+
 </menu>

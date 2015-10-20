@@ -3,23 +3,25 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 
-import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.others.BaseSelectableUsersActivity;
-import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBCreateGroupDialogCommand;
-import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate_core.utils.ChatUtils;
-import com.quickblox.q_municate_core.utils.ErrorUtils;
-import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.models.Friend;
+import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
+import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
+import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
+import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
+import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
 import com.quickblox.q_municate_db.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class NewGroupDialogActivity extends BaseSelectableUsersActivity {
+import butterknife.Bind;
+
+public class NewGroupDialogActivity extends BaseFriendsListActivity implements SelectUsersListener {
+
+    @Bind(R.id.members_edittext)
+    EditText membersEditText;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, NewGroupDialogActivity.class);
@@ -29,59 +31,36 @@ public class NewGroupDialogActivity extends BaseSelectableUsersActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addActions();
+        setContentView(R.layout.activity_new_group);
+
+        activateButterKnife();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeActions();
+    protected void initRecyclerView() {
+        super.initRecyclerView();
+        ((SelectableFriendsAdapter) friendsAdapter).setSelectUsersListener(this);
+        friendsRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));;
     }
 
     @Override
-    protected List<User> getUsers() {
-        List<Friend> friendsList = dataManager.getFriendDataManager().getAllSorted();
-        return UserFriendUtils.getUsersFromFriends(friendsList);
+    protected FriendsAdapter getFriendsAdapter() {
+        return new SelectableFriendsAdapter(this, getFriendsList());
     }
 
     @Override
-    protected void onUsersSelected(ArrayList<User> selectedFriends) {
-        createGroupChat(selectedFriends);
-    }
-
-    protected void removeActions() {
-        removeAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION);
-
-        updateBroadcastActionList();
-    }
-
-    protected void addActions() {
-        addAction(QBServiceConsts.CREATE_GROUP_CHAT_SUCCESS_ACTION, new CreateGroupChatSuccessAction());
-        addAction(QBServiceConsts.CREATE_GROUP_CHAT_FAIL_ACTION, failAction);
-
-        updateBroadcastActionList();
-    }
-
-    private void createGroupChat(ArrayList<User> friendList) {
-        showProgress();
-        String groupName = ChatUtils.createChatName(friendList);
-        QBCreateGroupDialogCommand.start(this, groupName, friendList);
-    }
-
-    private class CreateGroupChatSuccessAction implements Command {
-
-        @Override
-        public void execute(Bundle bundle) {
-            hideProgress();
-            QBDialog dialog = (QBDialog) bundle.getSerializable(QBServiceConsts.EXTRA_DIALOG);
-
-            if (dialog != null && dialog.getRoomJid() != null) {
-                GroupDialogActivity.start(NewGroupDialogActivity.this, ChatUtils.createLocalDialog(dialog));
-                finish();
-            } else {
-                ErrorUtils.showError(NewGroupDialogActivity.this, getString(R.string.dlg_fail_create_groupchat));
-            }
+    protected void performDone() {
+        List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
+        if (!selectedFriendsList.isEmpty()) {
+            CreateGroupDialogActivity.start(this, selectedFriendsList);
+            finish();
+        } else {
+            ToastUtils.longToast(R.string.new_group_no_friends_for_creating_group);
         }
+    }
+
+    @Override
+    public void onSelectedUsersChanged(int count, String fullNames) {
+        membersEditText.setText(fullNames);
     }
 }

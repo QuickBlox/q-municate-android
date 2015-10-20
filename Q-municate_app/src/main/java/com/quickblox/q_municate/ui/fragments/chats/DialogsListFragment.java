@@ -132,7 +132,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
                 if (isFriends) {
                     NewMessageActivity.start(getActivity());
                 } else {
-                    ToastUtils.longToast(R.string.ndl_no_friends_for_new_chat);
+                    ToastUtils.longToast(R.string.new_message_no_friends_for_new_message);
                 }
                 break;
             case R.id.action_start_invite_friends:

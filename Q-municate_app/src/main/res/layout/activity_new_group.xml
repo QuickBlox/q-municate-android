@@ -6,8 +6,19 @@
 
     <include layout="@layout/toolbar" />
 
+    <EditText
+        android:id="@+id/members_edittext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:editable="false"
+        android:hint="@string/new_group_selected_friends"
+        android:maxLines="3"
+        android:textColor="@color/text_dark"
+        android:textSize="@dimen/text_size" />
+
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/users_recyclerview"
+        android:id="@+id/friends_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
