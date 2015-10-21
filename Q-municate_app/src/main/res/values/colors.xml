@@ -27,10 +27,6 @@
 
     <color name="link_text_color">#0d70b3</color>
 
-    <color name="menu_item_pressed">#1cba48</color>
-    <color name="menu_item_longpressed">#ff9de8a2</color>
-    <color name="menu_item_activated">#1cba48</color>
-
     <color name="badge_unread_messages_counter">#d20000</color>
     <color name="badge_online">#1cba48</color>
 

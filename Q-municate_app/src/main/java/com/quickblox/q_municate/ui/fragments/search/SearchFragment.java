@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.fragments.search;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -21,7 +22,7 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 
 import butterknife.Bind;
 
-public class SearchFragment extends BaseFragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class SearchFragment extends BaseFragment implements SearchView.OnQueryTextListener, MenuItemCompat.OnActionExpandListener {
 
     @Bind(R.id.search_viewpager)
     ViewPager searchViewPager;
@@ -51,7 +52,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     public void initActionBar() {
         super.initActionBar();
         actionBarBridge.setActionBarUpButtonEnabled(true);
-        actionBarBridge.setActionBarTitle(R.string.action_bar_contacts);
     }
 
     private void initViewPagerAdapter() {
@@ -59,7 +59,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         searchViewPager.setAdapter(searchViewPagerAdapter);
         searchViewPager.setOnPageChangeListener(new PageChangeListener());
         searchRadioGroup.check(R.id.local_search_radiobutton);
-//        searchRadioGroup.setVisibility(View.GONE);
     }
 
     private void initCustomListeners() {
@@ -76,26 +75,14 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
 
         if (searchMenuItem != null) {
             searchView = (SearchView) searchMenuItem.getActionView();
+            MenuItemCompat.expandActionView(searchMenuItem);
+            MenuItemCompat.setOnActionExpandListener(searchMenuItem, this);
         }
 
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setOnQueryTextListener(this);
-            searchView.setOnCloseListener(this);
-            searchView.onActionViewExpanded();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                launchDialogsListFragment();
-                break;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-        return true;
     }
 
     @Override
@@ -112,12 +99,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     }
 
     @Override
-    public boolean onClose() {
-        cancelSearch();
-        return false;
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         KeyboardUtils.hideKeyboard(getActivity());
@@ -130,7 +111,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
     private void search(String searchQuery) {
         if (searchViewPagerAdapter != null && searchViewPager != null) {
             searchViewPagerAdapter.search(searchViewPager.getCurrentItem(), searchQuery);
-//            searchRadioGroup.setVisibility(TextUtils.isEmpty(searchQuery) ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -138,6 +118,18 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         if (searchViewPagerAdapter != null && searchViewPager != null) {
             searchViewPagerAdapter.cancelSearch(searchViewPager.getCurrentItem());
         }
+    }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        cancelSearch();
+        launchDialogsListFragment();
+        return true;
     }
 
     private class RadioGroupListener implements RadioGroup.OnCheckedChangeListener {
