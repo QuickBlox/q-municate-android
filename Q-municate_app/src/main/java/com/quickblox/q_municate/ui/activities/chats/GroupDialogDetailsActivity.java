@@ -131,7 +131,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         friendOperationAction = new UserOperationAction();
         currentNotificationTypeList = new ArrayList<>();
         updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getOccupants());
+        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
     }
 
     private void fillUIWithData() {

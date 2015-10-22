@@ -3,7 +3,9 @@ package com.quickblox.q_municate_db.managers;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.Where;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
@@ -68,7 +70,7 @@ public class UserDataManager extends BaseManager<User> {
         return usersList;
     }
 
-    public List<User> getUsersForGroupChat(List<Integer> idsList) {
+    public List<User> getUsersForGroupChat(String dialogId, List<Integer> idsList) {
         List<User> usersList  = Collections.emptyList();
 
         try {
@@ -76,7 +78,11 @@ public class UserDataManager extends BaseManager<User> {
             userQueryBuilder.where().in(User.Column.ID, idsList);
 
             QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
-            dialogOccupantQueryBuilder.where().eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL);
+            Where<DialogOccupant, Long> where = dialogOccupantQueryBuilder.where();
+            where.and(
+                    where.eq(Dialog.Column.ID, dialogId),
+                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL)
+            );
 
             userQueryBuilder.join(dialogOccupantQueryBuilder);
             userQueryBuilder.distinct();

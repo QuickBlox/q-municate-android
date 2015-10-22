@@ -275,11 +275,13 @@ public class ChatUtils {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
         for (Integer userId : qbDialog.getOccupants()) {
-            DialogOccupant dialogOccupant = new DialogOccupant();
-            dialogOccupant.setUser(dataManager.getUserDataManager().get(userId));
-            dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
-
-            dialogOccupantsList.add(dialogOccupant);
+            DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
+            if (dialogOccupant == null) {
+                dialogOccupant = new DialogOccupant();
+                dialogOccupant.setUser(dataManager.getUserDataManager().get(userId));
+                dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+                dialogOccupantsList.add(dialogOccupant);
+            }
         }
 
         return dialogOccupantsList;

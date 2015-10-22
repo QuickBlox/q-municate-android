@@ -64,7 +64,9 @@ public class DbUtils {
 
     public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBDialog qbDialog) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(dataManager, qbDialog);
-        dataManager.getDialogOccupantDataManager().createOrUpdateAll(dialogOccupantsList);
+        if (!dialogOccupantsList.isEmpty()) {
+            dataManager.getDialogOccupantDataManager().createOrUpdateAll(dialogOccupantsList);
+        }
         return dialogOccupantsList;
     }
 
