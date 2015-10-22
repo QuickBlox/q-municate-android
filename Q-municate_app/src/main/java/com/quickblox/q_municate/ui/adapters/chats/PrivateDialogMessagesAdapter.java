@@ -86,7 +86,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             setViewVisibility(viewHolder.progressRelativeLayout, View.VISIBLE);
             viewHolder.timeAttachMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
-            if (ownMessage) {
+            if (ownMessage && combinationMessage.getState() != null) {
                 setMessageStatus(viewHolder.attachDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }
@@ -99,7 +99,7 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             viewHolder.messageTextView.setText(combinationMessage.getBody());
             viewHolder.timeTextMessageTextView.setText(DateUtils.formatDateSimpleTime(combinationMessage.getCreatedDate()));
 
-            if (ownMessage) {
+            if (ownMessage && combinationMessage.getState() != null) {
                 setMessageStatus(viewHolder.messageDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
             }

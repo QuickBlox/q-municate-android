@@ -30,6 +30,7 @@ import com.quickblox.q_municate_core.utils.ChatNotificationUtils;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_core.utils.DateUtilsCore;
+import com.quickblox.q_municate_core.utils.DbUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.FinderUnknownUsers;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -105,8 +106,8 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         addNecessaryPropertyForQBChatMessage(qbChatMessage, dialogId);
 
         sendPrivateMessage(qbChatMessage, opponentId);
-        ChatUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, true);
-        ChatUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
+        DbUtils.saveMessageOrNotificationToCache(context, dataManager, dialogId, qbChatMessage, null, true);
+        DbUtils.updateDialogModifiedDate(dataManager, dialogId, ChatUtils.getMessageDateSent(qbChatMessage), true);
     }
 
     public void sendPrivateMessage(QBChatMessage qbChatMessage, int opponentId) throws QBResponseException {
@@ -141,7 +142,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         new FinderUnknownUsers(context, chatCreator, qbDialogsList).find();
 
-        ChatUtils.saveDialogsToCache(context, dataManager, qbDialogsList);
+        DbUtils.saveDialogsToCache(dataManager, qbDialogsList);
 
         return qbDialogsList;
     }
@@ -153,7 +154,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
                 customObjectRequestBuilder, returnedBundle);
 
         if (qbMessagesList != null && !qbMessagesList.isEmpty()) {
-            ChatUtils.saveMessagesToCache(context, dataManager, qbMessagesList, qbDialog.getDialogId());
+            DbUtils.saveMessagesToCache(context, dataManager, qbMessagesList, qbDialog.getDialogId());
         }
 
         return qbMessagesList;
@@ -169,7 +170,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         } catch (QBResponseException e) {
             ErrorUtils.logError(e);
         }
-        ChatUtils.deleteDialogLocal(dataManager, dialogId);
+        DbUtils.deleteDialogLocal(dataManager, dialogId);
     }
 
     protected QBChatMessage getQBChatMessage(String body, QBFile qbFile) {
@@ -239,7 +240,7 @@ public abstract class QBBaseChatHelper extends BaseHelper {
         QBDialog existingPrivateDialog = ChatUtils.getExistPrivateDialog(dataManager, userId);
         if (existingPrivateDialog == null) {
             existingPrivateDialog = createPrivateChatOnRest(userId);
-            ChatUtils.saveDialogToCache(dataManager, existingPrivateDialog);
+            DbUtils.saveDialogToCache(dataManager, existingPrivateDialog);
         }
         return existingPrivateDialog;
     }
@@ -331,13 +332,13 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public void updateStatusNotificationMessageRead(String dialogId, CombinationMessage combinationMessage) throws Exception {
         updateStatusMessageReadServer(dialogId, combinationMessage, false);
-        ChatUtils.updateStatusNotificationMessageLocal(dataManager, combinationMessage.toDialogNotification());
+        DbUtils.updateStatusNotificationMessageLocal(dataManager, combinationMessage.toDialogNotification());
     }
 
     public void updateStatusMessageRead(String dialogId, CombinationMessage combinationMessage,
             boolean forPrivate) throws Exception {
         updateStatusMessageReadServer(dialogId, combinationMessage, forPrivate);
-        ChatUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
+        DbUtils.updateStatusMessageLocal(dataManager, combinationMessage.toMessage());
     }
 
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
@@ -402,12 +403,12 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
         @Override
         public void processMessageDelivered(String messageId, String dialogId, Integer userId) {
-            ChatUtils.updateStatusMessageLocal(dataManager, messageId, State.DELIVERED);
+            DbUtils.updateStatusMessageLocal(dataManager, messageId, State.DELIVERED);
         }
 
         @Override
         public void processMessageRead(String messageId, String dialogId, Integer userId) {
-            ChatUtils.updateStatusMessageLocal(dataManager, messageId, State.READ);
+            DbUtils.updateStatusMessageLocal(dataManager, messageId, State.READ);
         }
     }
 

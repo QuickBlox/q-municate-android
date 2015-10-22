@@ -25,9 +25,7 @@ ext {
 
     // Dependencies versions
     multiDexVersion = '1.0.1'
-    appcompatVersion = '23.0.1'
-    supportDesignVersion = '23.0.1'
-    recyclerViewVersion = '23.0.1'
+    supportVersion = '23.1.0'
     googlePlayServicesVersion = '8.1.0'
     universalImageLoaderVersion = '1.9.1'
     ormliteAndroidVersion = '4.48'

@@ -71,7 +71,7 @@ public class FinderUnknownUsers {
             } else {
                 Collection<User> userCollection = restHelper.loadUsers(loadIdsSet);
                 if (userCollection != null) {
-                    dataManager.getUserDataManager().createOrUpdate(userCollection);
+                    dataManager.getUserDataManager().createOrUpdateAll(userCollection);
                 }
             }
         } catch (QBResponseException e) {

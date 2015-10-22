@@ -53,7 +53,8 @@ public class DataManager {
     public UserDataManager getUserDataManager() {
         if (userDataManager == null) {
             userDataManager = new UserDataManager(
-                    getDataHelper().getDaoByClass(User.class));
+                    getDataHelper().getDaoByClass(User.class),
+                    getDataHelper().getDaoByClass(DialogOccupant.class));
         }
         return userDataManager;
     }

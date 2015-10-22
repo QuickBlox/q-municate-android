@@ -42,6 +42,13 @@ public class DbHelperUtils {
         }
     }
 
+    public static void onOpen(SQLiteDatabase db) {
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON;");
+        }
+    }
+
     public static void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, Class<?>[] tablesClasses) {
         try {
             Cursor c = database.rawQuery(DbHelperUtils.TABLES_QUERY, null);

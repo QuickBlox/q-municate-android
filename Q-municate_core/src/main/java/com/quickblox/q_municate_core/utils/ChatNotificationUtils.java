@@ -14,6 +14,7 @@ import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -44,37 +45,29 @@ public class ChatNotificationUtils {
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REJECT = "6";
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE = "7";
 
-    public static QBDialog parseDialogFromQBMessage(Context context, DataManager dataManager, QBChatMessage chatMessage, QBDialogType dialogType) {
-        String dialogId = (String) chatMessage.getProperty(PROPERTY_DIALOG_ID);
-        String roomJid = (String) chatMessage.getProperty(PROPERTY_ROOM_JID);
-        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
-        long dateSent = ChatUtils.getMessageDateSent(chatMessage);
+    public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage qbChatMessage, QBDialogType qbDialogType) {
+        String dialogId = (String) qbChatMessage.getProperty(PROPERTY_DIALOG_ID);
+        String roomJid = (String) qbChatMessage.getProperty(PROPERTY_ROOM_JID);
+        String occupantsIds = (String) qbChatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
+        String dialogName = (String) qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) qbChatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        long dateSent = ChatUtils.getMessageDateSent(qbChatMessage);
 
         QBDialog dialog = new QBDialog(dialogId);
         dialog.setRoomJid(roomJid);
         dialog.setPhoto(photoUrl);
-        dialog.setType(dialogType);
+        dialog.setType(qbDialogType);
 
-        if (TextUtils.isEmpty(dialogName)) {
-            if (QBDialogType.PRIVATE.equals(dialogType)) {
-                dialog.setName(ChatUtils.getFullNameById(dataManager, chatMessage.getSenderId()));
-            } else {
-                dialog.setName(ChatUtils.getFullNamesFromOpponentIds(dataManager, occupantsIds));
-            }
-        } else {
-            dialog.setName(dialogName);
-        }
+        dialog.setName(dialogName);
 
         if (!TextUtils.isEmpty(occupantsIds)) {
-            dialog.setOccupantsIds(ChatUtils.getOccupantsIdsListFromString(occupantsIds));
+            dialog.setOccupantsIds((ArrayList<Integer>) ChatUtils.getOccupantsIdsListFromString(occupantsIds));
         }
 
-        if (!chatMessage.getAttachments().isEmpty()) {
+        if (!qbChatMessage.getAttachments().isEmpty()) {
             dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
-        } else if (!TextUtils.isEmpty(chatMessage.getBody())) {
-            dialog.setLastMessage(chatMessage.getBody());
+        } else if (!TextUtils.isEmpty(qbChatMessage.getBody())) {
+            dialog.setLastMessage(qbChatMessage.getBody());
         }
 
         dialog.setLastMessageDateSent(dateSent);
@@ -83,11 +76,11 @@ public class ChatNotificationUtils {
         return dialog;
     }
 
-    public static QBDialog parseDialogFromQBMessage(Context context, DataManager dataManager, QBChatMessage chatMessage,
-            String lastMessage, QBDialogType dialogType) {
-        QBDialog dialog = parseDialogFromQBMessage(context, dataManager, chatMessage, dialogType);
+    public static QBDialog parseDialogFromQBMessage(Context context, QBChatMessage qbChatMessage,
+            String lastMessage, QBDialogType qbDialogType) {
+        QBDialog dialog = parseDialogFromQBMessage(context, qbChatMessage, qbDialogType);
 
-        if (!chatMessage.getAttachments().isEmpty()) {
+        if (!qbChatMessage.getAttachments().isEmpty()) {
             dialog.setLastMessage(context.getString(R.string.dlg_attached_last_message));
         } else if (!TextUtils.isEmpty(lastMessage)) {
             dialog.setLastMessage(lastMessage);
@@ -96,35 +89,26 @@ public class ChatNotificationUtils {
         return dialog;
     }
 
-    public static void updateDialogFromQBMessage(Context context, DataManager dataManager, QBChatMessage chatMessage, QBDialog dialog) {
-        String lastMessage = getBodyForUpdateChatNotificationMessage(context, dataManager, chatMessage);
-        String occupantsIds = (String) chatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
-        String dialogName = (String) chatMessage.getProperty(PROPERTY_ROOM_NAME);
-        String photoUrl = (String) chatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+    public static void updateDialogFromQBMessage(Context context, DataManager dataManager, QBChatMessage qbChatMessage, QBDialog qbDialog) {
+        String lastMessage = getBodyForUpdateChatNotificationMessage(context, dataManager, qbChatMessage);
+        String dialogName = (String) qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
+        String photoUrl = (String) qbChatMessage.getProperty(PROPERTY_ROOM_PHOTO);
+        String leavedOccupants = (String) qbChatMessage.getProperty(PROPERTY_ROOM_LEAVE);
 
-        dialog.setLastMessage(lastMessage);
+        qbDialog.setLastMessage(lastMessage);
 
         if (!TextUtils.isEmpty(dialogName)) {
-            dialog.setName(dialogName);
+            qbDialog.setName(dialogName);
         }
 
-        if (!TextUtils.isEmpty(occupantsIds)) {
-            List<Integer> oldOccupantsList = dialog.getOccupants();
-            List<Integer> newOccupantsList = ChatUtils.getOccupantsIdsListFromString(occupantsIds);
-
-            if (oldOccupantsList.equals(newOccupantsList)) {
-                return;
-            }
-
-            if (oldOccupantsList.contains(newOccupantsList.get(0))) {
-                dialog.getOccupants().removeAll(newOccupantsList);
-            } else {
-                dialog.getOccupants().addAll(newOccupantsList);
-            }
+        if (!TextUtils.isEmpty(leavedOccupants)) {
+            List<Integer> leavedOccupantsList = ChatUtils.getOccupantsIdsListFromString(leavedOccupants);
+            qbDialog.getOccupants().removeAll(leavedOccupantsList);
+            DbUtils.updateDialogOccupants(dataManager, qbDialog.getDialogId(), leavedOccupantsList);
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {
-            dialog.setPhoto(photoUrl);
+            qbDialog.setPhoto(photoUrl);
         }
     }
 

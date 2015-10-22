@@ -25,6 +25,7 @@ public class DialogNotification implements Serializable {
             foreign = true,
             foreignAutoRefresh = true,
             canBeNull = false,
+            columnDefinition = "INTEGER REFERENCES " + DialogOccupant.Column.TABLE_NAME + "(" + DialogOccupant.Column.ID + ") ON DELETE CASCADE",
             columnName = DialogOccupant.Column.ID)
     private DialogOccupant dialogOccupant;
 

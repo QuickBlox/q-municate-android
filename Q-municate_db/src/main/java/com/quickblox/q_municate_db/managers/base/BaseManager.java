@@ -67,12 +67,12 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                 notifyObservers(OBSERVE_KEY);
             }
         } catch (SQLException e) {
-            ErrorUtils.logError(TAG, "createOrUpdate(Object) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdateAll(Object) - " + e.getMessage());
         }
     }
 
     @Override
-    public void createOrUpdate(final Collection objectsCollection) {
+    public void createOrUpdateAll(final Collection objectsCollection) {
         try {
             dao.callBatchTasks(new Callable() {
                 @Override
@@ -87,7 +87,7 @@ public abstract class BaseManager<T> extends Observable implements Manager {
                 }
             });
         } catch (Exception e) {
-            ErrorUtils.logError(TAG, "createOrUpdate(Collection) - " + e.getMessage());
+            ErrorUtils.logError(TAG, "createOrUpdateAll(Collection) - " + e.getMessage());
         }
     }
 
@@ -144,6 +144,26 @@ public abstract class BaseManager<T> extends Observable implements Manager {
             }
         } catch (SQLException e) {
             ErrorUtils.logError(e);
+        }
+    }
+
+    @Override
+    public void updateAll(final Collection objectsCollection) {
+        try {
+            dao.callBatchTasks(new Callable() {
+                @Override
+                public T call() throws Exception {
+                    for (Object object : objectsCollection) {
+                        update(object, false);
+                    }
+
+                    notifyObservers(OBSERVE_KEY);
+
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            ErrorUtils.logError(TAG, "updateAll(Collection) - " + e.getMessage());
         }
     }
 

@@ -11,7 +11,7 @@ public interface Manager<T> {
 
     void createOrUpdate(T object, boolean notify);
 
-    void createOrUpdate(Collection<T> objectsCollection);
+    void createOrUpdateAll(Collection<T> objectsCollection);
 
     T get(long id);
 
@@ -22,6 +22,8 @@ public interface Manager<T> {
     void update(T object);
 
     void update(T object, boolean notify);
+
+    void updateAll(Collection<T> objectsCollection);
 
     void delete(T object);
 

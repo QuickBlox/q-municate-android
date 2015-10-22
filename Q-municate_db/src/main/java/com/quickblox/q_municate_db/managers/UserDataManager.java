@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.quickblox.q_municate_db.managers.base.BaseManager;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
@@ -15,8 +16,11 @@ public class UserDataManager extends BaseManager<User> {
 
     private static final String TAG = UserDataManager.class.getSimpleName();
 
-    public UserDataManager(Dao<User, Long> userDao) {
+    private Dao<DialogOccupant, Long> dialogOccupantDao;
+
+    public UserDataManager(Dao<User, Long> userDao, Dao<DialogOccupant, Long> dialogOccupantDao) {
         super(userDao, UserDataManager.class.getSimpleName());
+        this.dialogOccupantDao = dialogOccupantDao;
     }
 
     public boolean isUserOwner(String email) {
@@ -56,6 +60,28 @@ public class UserDataManager extends BaseManager<User> {
             QueryBuilder<User, Long> queryBuilder = dao.queryBuilder();
             queryBuilder.where().in(User.Column.ID, idsList);
             PreparedQuery<User> preparedQuery = queryBuilder.prepare();
+            usersList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return usersList;
+    }
+
+    public List<User> getUsersForGroupChat(List<Integer> idsList) {
+        List<User> usersList  = Collections.emptyList();
+
+        try {
+            QueryBuilder<User, Long> userQueryBuilder = dao.queryBuilder();
+            userQueryBuilder.where().in(User.Column.ID, idsList);
+
+            QueryBuilder<DialogOccupant, Long> dialogOccupantQueryBuilder = dialogOccupantDao.queryBuilder();
+            dialogOccupantQueryBuilder.where().eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL);
+
+            userQueryBuilder.join(dialogOccupantQueryBuilder);
+            userQueryBuilder.distinct();
+
+            PreparedQuery<User> preparedQuery = userQueryBuilder.prepare();
             usersList = dao.query(preparedQuery);
         } catch (SQLException e) {
             ErrorUtils.logError(e);

@@ -75,9 +75,9 @@ dependencies {
     compile project(':Q-municate_core')
 
     compile "com.android.support:multidex:${rootProject.multiDexVersion}"
-    compile "com.android.support:appcompat-v7:${rootProject.appcompatVersion}"
-    compile "com.android.support:design:${rootProject.supportDesignVersion}"
-    compile "com.android.support:recyclerview-v7:${rootProject.recyclerViewVersion}"
+    compile "com.android.support:appcompat-v7:${rootProject.supportVersion}"
+    compile "com.android.support:design:${rootProject.supportVersion}"
+    compile "com.android.support:recyclerview-v7:${rootProject.supportVersion}"
     compile "com.google.android.gms:play-services:${rootProject.googlePlayServicesVersion}"
 
     compile "com.nostra13.universalimageloader:universal-image-loader:${rootProject.universalImageLoaderVersion}"

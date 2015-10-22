@@ -544,12 +544,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     private void readAllMessages() {
         List<Message> messagesList = dataManager.getMessageDataManager().getMessagesByDialogId(
                 dialog.getDialogId());
-        dataManager.getMessageDataManager().createOrUpdate(ChatUtils.readAllMessages(messagesList,
-                AppSession.getSession().getUser()));
+        dataManager.getMessageDataManager().createOrUpdateAll(
+                ChatUtils.readAllMessages(messagesList, AppSession.getSession().getUser()));
 
         List<DialogNotification> dialogNotificationsList = dataManager.getDialogNotificationDataManager()
                 .getDialogNotificationsByDialogId(dialog.getDialogId());
-        dataManager.getDialogNotificationDataManager().createOrUpdate(ChatUtils.readAllDialogNotification(
+        dataManager.getDialogNotificationDataManager().createOrUpdateAll(ChatUtils.readAllDialogNotification(
                 dialogNotificationsList, AppSession.getSession().getUser()));
     }
 

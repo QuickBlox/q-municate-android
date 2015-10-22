@@ -9,6 +9,7 @@ import java.io.Serializable;
 
 import static com.quickblox.q_municate_db.models.DialogOccupant.Column.ID;
 import static com.quickblox.q_municate_db.models.DialogOccupant.Column.TABLE_NAME;
+import static com.quickblox.q_municate_db.models.DialogOccupant.Column.STATUS;
 
 @DatabaseTable(tableName = TABLE_NAME)
 public class DialogOccupant implements Serializable {
@@ -24,6 +25,7 @@ public class DialogOccupant implements Serializable {
             foreignAutoRefresh = true,
             canBeNull = false,
             uniqueCombo = true,
+            columnDefinition = "INTEGER REFERENCES " + Dialog.Column.TABLE_NAME + "(" + Dialog.Column.ID + ") ON DELETE CASCADE",
             columnName = Dialog.Column.ID)
     private Dialog dialog;
 
@@ -39,7 +41,13 @@ public class DialogOccupant implements Serializable {
             eager = true)
     private ForeignCollection<Message> messageCollection;
 
+    @DatabaseField(
+            canBeNull = false,
+            columnName = STATUS)
+    private Status status;
+
     public DialogOccupant() {
+        status = Status.NORMAL;
     }
 
     public DialogOccupant(Dialog dialog, User user, ForeignCollection<Message> messageCollection) {
@@ -88,14 +96,51 @@ public class DialogOccupant implements Serializable {
         this.dialogOccupantId = dialogOccupantId;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "DialogOccupant [id='" + dialogOccupantId + "', dialog='" + dialog + "', user='" + user + "']";
+    }
+
+    public enum Status {
+
+        NORMAL(0),
+        LEAVED(1);
+
+        private int code;
+
+        Status(int code) {
+            this.code = code;
+        }
+
+        public static Status parseByCode(int code) {
+            Status[] valuesArray = Status.values();
+            Status result = null;
+            for (Status value : valuesArray) {
+                if (value.getCode() == code) {
+                    result = value;
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public int getCode() {
+            return code;
+        }
     }
 
     public interface Column {
 
         String TABLE_NAME = "dialog_occupant";
         String ID = "dialog_occupant_id";
+        String STATUS = "dialog_occupant_status";
     }
 }

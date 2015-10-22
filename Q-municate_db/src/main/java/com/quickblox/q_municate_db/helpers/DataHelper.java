@@ -49,6 +49,12 @@ public class DataHelper extends OrmLiteSqliteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        DbHelperUtils.onOpen(db);
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         DbHelperUtils.onUpgrade(database, connectionSource, TABLES);
     }
