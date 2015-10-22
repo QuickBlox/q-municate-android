@@ -131,7 +131,7 @@
 
     <!-- Dialogs -->
     <string name="dlgs_ctx_menu_remove">Delete dialog</string>
-    <string name="dlgs_loading_dialogs">Loading dialogs… Please wait</string>
+    <string name="dlgs_loading_dialogs">Updating dialogs… Please wait</string>
 
     <!-- Group Dialog Details -->
     <string name="gdd_title">Group Details</string>

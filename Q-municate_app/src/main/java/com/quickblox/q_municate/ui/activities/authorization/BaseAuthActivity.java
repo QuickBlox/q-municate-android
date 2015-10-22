@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.Session;
@@ -245,7 +246,10 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         @Override
         public void call(Session session, SessionState state, Exception exception) {
+            Log.d(TAG, "+++ FB StatusCallback call +++");
             if (session.isOpened() && loginType.equals(LoginType.FACEBOOK)) {
+                Log.d(TAG, "+++ FB StatusCallback - GO TO LOG IN +++");
+
                 QBSocialLoginCommand.start(BaseAuthActivity.this, QBProvider.FACEBOOK, session.getAccessToken(), null);
 
                 if (BaseAuthActivity.this instanceof SplashActivity) {
@@ -255,6 +259,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
                 }
 
             } else {
+                Log.d(TAG, "+++ FB StatusCallback - SESSION CLOSED +++");
                 hideProgress();
             }
         }
