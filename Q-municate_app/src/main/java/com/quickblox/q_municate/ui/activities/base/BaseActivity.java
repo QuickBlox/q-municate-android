@@ -50,8 +50,8 @@ import com.quickblox.q_municate.utils.helpers.notification.NotificationManagerHe
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
-import com.quickblox.q_municate_core.qb.commands.QBLoginRestCommand;
-import com.quickblox.q_municate_core.qb.commands.QBSocialLoginCommand;
+import com.quickblox.q_municate_core.qb.commands.rest.QBLoginRestCommand;
+import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.qb.helpers.QBPrivateChatHelper;

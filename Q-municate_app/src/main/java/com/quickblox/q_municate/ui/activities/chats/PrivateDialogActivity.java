@@ -22,8 +22,8 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
-import com.quickblox.q_municate_core.qb.commands.QBAcceptFriendCommand;
-import com.quickblox.q_municate_core.qb.commands.QBRejectFriendCommand;
+import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
+import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ErrorUtils;

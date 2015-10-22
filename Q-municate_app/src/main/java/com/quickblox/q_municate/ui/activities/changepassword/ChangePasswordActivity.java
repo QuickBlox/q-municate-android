@@ -9,14 +9,14 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.qb.commands.QBLoginChatCompositeCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
-import com.quickblox.q_municate_core.qb.commands.QBLogoutAndDestroyChatCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
 import com.quickblox.q_municate.utils.ValidationUtils;

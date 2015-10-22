@@ -7,7 +7,7 @@ import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.quickblox.q_municate_core.models.InviteFriend;
-import com.quickblox.q_municate_core.qb.commands.QBImportFriendsCommand;
+import com.quickblox.q_municate_core.qb.commands.friend.QBImportFriendsCommand;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 
 import java.util.ArrayList;
