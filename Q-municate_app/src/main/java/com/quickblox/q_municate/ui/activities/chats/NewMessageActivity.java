@@ -47,24 +47,20 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_friends_list;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friends_list);
 
-        activateButterKnife();
-
-        initActionBar();
+        setUpActionBarWithUpButton();
         initFields();
         initRecyclerView();
         initCustomListeners();
 
         addActions();
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields() {

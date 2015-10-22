@@ -26,20 +26,14 @@ public class FeedbackActivity extends BaseLogeableActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        setContentView(R.layout.activity_feedback);
-
-        activateButterKnife();
-
-        initActionBar();
+    protected int getContentResId() {
+        return R.layout.activity_feedback;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setUpActionBarWithUpButton();
     }
 
     @Override

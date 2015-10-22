@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.Session;
@@ -27,7 +26,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
-public class BaseAuthActivity extends BaseActivity {
+public abstract class BaseAuthActivity extends BaseActivity {
 
     private static String TAG = BaseAuthActivity.class.getSimpleName();
 

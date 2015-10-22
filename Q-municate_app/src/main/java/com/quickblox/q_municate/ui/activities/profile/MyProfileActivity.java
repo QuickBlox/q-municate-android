@@ -74,14 +74,19 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_profile;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+
+        setUpActionBarWithUpButton();
 
         user = AppSession.getSession().getUser();
         imageUtils = new ImageUtils(this);
 
-        initActionBar();
         initUI();
         initListeners();
         initUIWithUsersData();
@@ -89,12 +94,6 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
         initTextChangedListeners();
         updateOldUserData();
         hideAction();
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initUI() {

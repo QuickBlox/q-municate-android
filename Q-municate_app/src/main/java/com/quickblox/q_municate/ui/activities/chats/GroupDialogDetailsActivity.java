@@ -106,25 +106,20 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_group_dialog_details;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_group_dialog_details);
-
-        activateButterKnife();
-
-        initActionBar();
+        setUpActionBarWithUpButton();
         initFields();
         initListView();
 
         addActions();
         registerBroadcastManagers();
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields() {

@@ -22,15 +22,16 @@ public class SplashActivity extends BaseAuthActivity implements ExistingQbSessio
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_splash;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // TODO temp. ONLY FOR TEST WITHOUT TESTERS
         //        Crashlytics.start(this);
-
-        setContentView(R.layout.activity_splash);
-
-        activateButterKnife();
 
         LoginHelper loginHelper = new LoginHelper(this, this);
         loginHelper.checkStartExistSession();

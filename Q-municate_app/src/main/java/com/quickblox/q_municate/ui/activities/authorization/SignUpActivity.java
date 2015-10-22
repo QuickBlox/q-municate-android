@@ -65,21 +65,16 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_signup);
-
-        activateButterKnife();
-
-        initActionBar();
-        initFields(savedInstanceState);
+    protected int getContentResId() {
+        return R.layout.activity_signup;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setUpActionBarWithUpButton();
+        initFields(savedInstanceState);
     }
 
     private void initFields(Bundle bundle) {

@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
@@ -29,11 +28,8 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_group);
-
-        activateButterKnife();
+    protected int getContentResId() {
+        return R.layout.activity_new_group;
     }
 
     @Override

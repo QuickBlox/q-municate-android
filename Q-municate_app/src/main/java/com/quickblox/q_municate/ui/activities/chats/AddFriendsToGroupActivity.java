@@ -36,11 +36,13 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_friends_list;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friends_list);
-
-        activateButterKnife();
 
         addActions();
     }

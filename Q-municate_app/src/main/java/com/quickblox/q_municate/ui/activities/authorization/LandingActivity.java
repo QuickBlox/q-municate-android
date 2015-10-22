@@ -30,11 +30,13 @@ public class LandingActivity extends BaseAuthActivity {
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_landing;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_landing);
-
-        activateButterKnife();
 
         initVersionName();
     }

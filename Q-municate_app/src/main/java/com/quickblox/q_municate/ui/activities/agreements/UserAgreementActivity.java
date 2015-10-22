@@ -20,21 +20,16 @@ public class UserAgreementActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
+    @Override
+    protected int getContentResId() {
+        return R.layout.activity_user_agreement;
+    }
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_user_agreement);
-
-        activateButterKnife();
-
-        initActionBar();
+        setUpActionBarWithUpButton();
         initUserAgreementWebView();
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initUserAgreementWebView() {

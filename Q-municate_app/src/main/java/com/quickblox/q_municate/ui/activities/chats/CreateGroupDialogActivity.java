@@ -65,11 +65,13 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_create_group_dialog;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_group_dialog);
-
-        activateButterKnife();
 
         initFields();
 

@@ -32,23 +32,19 @@ public class ForgotPasswordActivity extends BaseActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_forgot_password);
-
-        activateButterKnife();
-
-        initActionBar();
-        iniFields();
-
-        addActions();
+    protected int getContentResId() {
+        return R.layout.activity_forgot_password;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setUpActionBarWithUpButton();
+
+        iniFields();
+
+        addActions();
     }
 
     private void iniFields() {

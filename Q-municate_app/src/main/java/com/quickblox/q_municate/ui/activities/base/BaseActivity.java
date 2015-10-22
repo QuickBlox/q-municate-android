@@ -99,9 +99,15 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
     private ServiceConnection serviceConnection;
     private ActivityUIHelper activityUIHelper;
 
+    protected abstract int getContentResId();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(getContentResId());
+
+        activateButterKnife();
+
         initFields();
     }
 
@@ -119,6 +125,11 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsServiceConnectionSet = new HashSet<>();
         serviceConnection = new QBChatServiceConnection();
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
+    }
+
+    protected void setUpActionBarWithUpButton() {
+        initActionBar();
+        setActionBarUpButtonEnabled(true);
     }
 
     @Override
@@ -547,7 +558,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         GroupDialogActivity.start(this, dialog);
     }
 
-    protected void activateButterKnife() {
+    private void activateButterKnife() {
         ButterKnife.bind(this);
     }
 

@@ -57,14 +57,16 @@ public class InviteFriendsActivity extends BaseLogeableActivity implements Count
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_invite_friends;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_invite_friends);
+        setUpActionBarWithUpButton();
 
-        activateButterKnife();
-
-        initActionBar();
         initFields(savedInstanceState);
         initCustomUI();
         initCustomListeners();
@@ -93,12 +95,6 @@ public class InviteFriendsActivity extends BaseLogeableActivity implements Count
                 checkAllContacts(isChecked);
             }
         });
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields(Bundle savedInstanceState) {

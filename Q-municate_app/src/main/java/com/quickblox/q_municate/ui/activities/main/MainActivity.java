@@ -39,14 +39,16 @@ public class MainActivity extends BaseLogeableActivity {
     }
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setUpActionBarWithUpButton();
 
-        activateButterKnife();
-
-        initActionBar();
         initFields(savedInstanceState);
 
         checkGCMRegistration();
@@ -56,12 +58,6 @@ public class MainActivity extends BaseLogeableActivity {
         }
 
         launchDialogsListFragment();
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields(Bundle savedInstanceState) {

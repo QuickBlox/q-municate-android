@@ -130,14 +130,15 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     private boolean loadMore;
 
     @Override
+    protected int getContentResId() {
+        return R.layout.activity_dialog;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_dialog);
-
-        activateButterKnife();
-
-        initActionBar();
+        setUpActionBarWithUpButton();
 
         initFields();
         initCustomUI();
@@ -150,12 +151,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         hideSmileLayout();
 
         appSharedHelper.saveNeedToOpenDialog(false);
-    }
-
-    @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
     }
 
     private void initFields() {

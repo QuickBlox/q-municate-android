@@ -44,23 +44,19 @@ public class SettingsActivity extends BaseLogeableActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_settings);
-
-        activateButterKnife();
-
-        initActionBar();
-        fillUI();
-
-        addActions();
+    protected int getContentResId() {
+        return R.layout.activity_settings;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setUpActionBarWithUpButton();
+
+        fillUI();
+
+        addActions();
     }
 
     private void fillUI() {

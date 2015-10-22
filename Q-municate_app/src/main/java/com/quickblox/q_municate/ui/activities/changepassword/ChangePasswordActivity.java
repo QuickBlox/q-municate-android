@@ -41,23 +41,18 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_change_password);
-
-        activateButterKnife();
-
-        initActionBar();
-        initFields();
-
-        addActions();
+    protected int getContentResId() {
+        return R.layout.activity_change_password;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setUpActionBarWithUpButton();
+        initFields();
+
+        addActions();
     }
 
     private void initFields() {

@@ -66,23 +66,19 @@ public class UserProfileActivity extends BaseLogeableActivity {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_user_profile);
-
-        activateButterKnife();
-
-        initActionBar();
-        initFields();
-        initUIWithUsersData();
-        addActions();
+    protected int getContentResId() {
+        return R.layout.activity_user_profile;
     }
 
     @Override
-    public void initActionBar() {
-        super.initActionBar();
-        setActionBarUpButtonEnabled(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setUpActionBarWithUpButton();
+
+        initFields();
+        initUIWithUsersData();
+        addActions();
     }
 
     private void initFields() {

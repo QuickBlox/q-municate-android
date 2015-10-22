@@ -6,7 +6,7 @@ import com.quickblox.q_municate.utils.QBLogeable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BaseLogeableActivity extends BaseActivity implements QBLogeable {
+public abstract class BaseLogeableActivity extends BaseActivity implements QBLogeable {
 
     protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
