@@ -132,7 +132,7 @@
 
     <!-- Dialogs -->
     <string name="dlgs_ctx_menu_remove">Delete dialog</string>
-    <string name="dlgs_loading_dialogs">Updating dialogs… Please wait</string>
+    <string name="dlgs_loading_dialogs">Checking dialogs… Please wait</string>
 
     <!-- Group Dialog Details -->
     <string name="gdd_title">Group Details</string>
@@ -244,6 +244,8 @@
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>
     <string name="error_bad_timestamp">base Bad timestamp</string>
     <string name="error_bad_timestamp_from_app">Please go to phone system settings, choose date and time and make sure, that auto synchronization is on.</string>
+    <string name="error_login_or_email_required">base Login or email required</string>
+    <string name="error_login_or_email_required_from_app">Login or email required, please make sure that your FB email is public (facebook.com/settings)</string>
     <string name="error_email_already_taken">email has already been taken</string>
     <string name="error_email_already_taken_from_app">Please go to Facebook app and make relogion. This email has already been taken</string>
     <string-array name="dlg_image_pick">

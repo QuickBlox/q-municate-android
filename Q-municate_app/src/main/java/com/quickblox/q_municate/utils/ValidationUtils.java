@@ -9,6 +9,8 @@ import com.quickblox.q_municate.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate.utils.simple.SimpleTextWatcher;
 
+// need to refactor, bad logic
+@Deprecated
 public class ValidationUtils extends SimpleTextWatcher {
 
     private final int UNAUTHORIZED_ERROR_CODE = 401;
@@ -105,8 +107,10 @@ public class ValidationUtils extends SimpleTextWatcher {
     }
 
     public void setError(String error) {
-        for (int i = 0; i < fieldsArray.length; i++) {
-            fieldsArray[i].setError(error);
+        if (fieldsArray != null) {
+            for (int i = 0; i < fieldsArray.length; i++) {
+                fieldsArray[i].setError(error);
+            }
         }
     }
 

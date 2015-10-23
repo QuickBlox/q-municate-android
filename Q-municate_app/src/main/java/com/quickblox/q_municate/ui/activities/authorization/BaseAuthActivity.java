@@ -15,7 +15,6 @@ import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
-import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -24,6 +23,7 @@ import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBLoginCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSocialLoginCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
@@ -145,21 +145,25 @@ public abstract class BaseAuthActivity extends BaseActivity {
     }
 
     protected void parseExceptionMessage(Exception exception) {
+        hideProgress();
+
         String errorMessage = exception.getMessage();
 
         // TODO: temp decision
         if (exception.getMessage().equals(getString(R.string.error_bad_timestamp))) {
             errorMessage = getString(R.string.error_bad_timestamp_from_app);
+        } else if (exception.getMessage().equals(getString(R.string.error_login_or_email_required))) {
+            errorMessage = getString(R.string.error_login_or_email_required_from_app);
         } else if (exception.getMessage().equals(getString(R.string.error_email_already_taken))
                 && loginType.equals(LoginType.FACEBOOK)) {
             errorMessage = getString(R.string.error_email_already_taken_from_app);
-            ToastUtils.longToast(errorMessage);
-            return;
         }
 
-        validationUtils.setError(errorMessage);
+        ErrorUtils.showError(this, errorMessage);
 
-        hideProgress();
+        if (validationUtils != null) {
+            validationUtils.setError(errorMessage);
+        }
     }
 
     protected void parseFailException(Bundle bundle) {
