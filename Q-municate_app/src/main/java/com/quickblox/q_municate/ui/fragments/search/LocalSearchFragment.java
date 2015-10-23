@@ -5,13 +5,14 @@ import android.support.v4.content.Loader;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
+import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.utils.listeners.SearchListener;
 import com.quickblox.q_municate.ui.activities.chats.GroupDialogActivity;
 import com.quickblox.q_municate.ui.adapters.search.LocalSearchAdapter;
@@ -90,7 +91,7 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
             @Override
             public void onItemClicked(View view, Dialog dialog, int position) {
                 if (dialog.getType() == Dialog.Type.PRIVATE) {
-                    startUserProfile(dialog);
+                    startPrivateChatActivity(dialog);
                 } else {
                     startGroupChatActivity(dialog);
                 }
@@ -98,12 +99,14 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         });
     }
 
-    private void startUserProfile(Dialog dialog) {
+    private void startPrivateChatActivity(Dialog dialog) {
         List<DialogOccupant> occupantsList = dataManager.getDialogOccupantDataManager()
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
-        User user = ChatUtils.getOpponentFromPrivateDialog(
+        User occupant = ChatUtils.getOpponentFromPrivateDialog(
                 UserFriendUtils.createLocalUser(AppSession.getSession().getUser()), occupantsList);
-        UserProfileActivity.start(getActivity(), user.getUserId());
+        if (!TextUtils.isEmpty(dialog.getDialogId())) {
+            PrivateDialogActivity.start(baseActivity, occupant, dialog);
+        }
     }
 
     @Override
