@@ -38,6 +38,7 @@
     <string name="user_profile_delete_chat_history">Do you really want to delete chat history with %1$s?</string>
     <string name="user_profile_success_contacts_deleting">You have deleted %1$s from your contacts</string>
     <string name="user_profile_success_chat_history_deleting">You have deleted chat history with %1$s</string>
+    <string name="user_profile_chat_does_not_exists">Chat does not exists</string>
 
 
     <!-- New Message -->

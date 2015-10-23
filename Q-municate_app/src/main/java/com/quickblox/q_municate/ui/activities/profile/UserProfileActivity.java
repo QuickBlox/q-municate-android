@@ -217,23 +217,31 @@ public class UserProfileActivity extends BaseLogeableActivity {
                     public void onPositive(MaterialDialog dialog) {
                         super.onPositive(dialog);
                         showProgress();
-                        QBRemoveFriendCommand.start(UserProfileActivity.this, user.getUserId());
+                        if (isUserFriendOrUserRequest()) {
+                            QBRemoveFriendCommand.start(UserProfileActivity.this, user.getUserId());
+                        } else {
+                            deleteChat();
+                        }
                     }
                 });
     }
 
     private void showRemoveChatHistoryDialog() {
-        TwoButtonsDialogFragment.show(
-                getSupportFragmentManager(),
-                getString(R.string.user_profile_delete_chat_history, user.getFullName()),
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        showProgress();
-                        deleteChat();
-                    }
-                });
+        if (isChatExists()) {
+            TwoButtonsDialogFragment.show(
+                    getSupportFragmentManager(),
+                    getString(R.string.user_profile_delete_chat_history, user.getFullName()),
+                    new MaterialDialog.ButtonCallback() {
+                        @Override
+                        public void onPositive(MaterialDialog dialog) {
+                            super.onPositive(dialog);
+                            showProgress();
+                            deleteChat();
+                        }
+                    });
+        } else {
+            ToastUtils.longToast(R.string.user_profile_chat_does_not_exists);
+        }
     }
 
     private void deleteChat() {
@@ -244,6 +252,16 @@ public class UserProfileActivity extends BaseLogeableActivity {
 
     private void startPrivateChat(QBDialog qbDialog) {
         PrivateDialogActivity.start(UserProfileActivity.this, user, ChatUtils.createLocalDialog(qbDialog));
+    }
+
+    private boolean isUserFriendOrUserRequest() {
+        boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
+        boolean isUserRequest = dataManager.getUserRequestDataManager().existsByUserId(user.getUserId());
+        return isFriend || isUserRequest;
+    }
+
+    private boolean isChatExists() {
+        return dataManager.getDialogOccupantDataManager().getDialogOccupantForPrivateChat(user.getUserId()) != null;
     }
 
     private class UserObserver implements Observer {

@@ -262,7 +262,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     private void checkMessageSendingPossibility() {
-        boolean isFriend = DataManager.getInstance().getFriendDataManager().existsByUserId(opponentUser.getUserId());
+        boolean isFriend = dataManager.getFriendDataManager().existsByUserId(opponentUser.getUserId());
         messageEditText.setEnabled(isFriend);
         smilePanelImageButton.setEnabled(isFriend);
     }
