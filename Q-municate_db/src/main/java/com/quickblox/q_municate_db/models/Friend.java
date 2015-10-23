@@ -49,6 +49,20 @@ public class Friend implements Serializable {
     }
 
     @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Friend)) {
+            return false;
+        }
+
+        Friend friend = (Friend) object;
+
+        return user.getUserId() == friend.getUser().getUserId();
+    }
+
+    @Override
     public String toString() {
         return "Friend [friendId='" + friendId + "', user='" + user + "']";
     }

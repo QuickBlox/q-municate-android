@@ -327,6 +327,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
     private void createDialogByNotification(QBChatMessage qbChatMessage, DialogNotification.Type notificationType) {
         QBDialog qbDialog = ChatNotificationUtils.parseDialogFromQBMessage(context, qbChatMessage, qbChatMessage.getBody(), QBDialogType.GROUP);
 
+        qbDialog.getOccupants().add(chatCreator.getId());
         DbUtils.saveDialogToCache(dataManager, qbDialog);
 
         DialogNotification dialogNotification = ChatUtils.convertMessageToDialogNotification(parseReceivedMessage(qbChatMessage));

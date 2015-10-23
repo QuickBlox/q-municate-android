@@ -14,7 +14,7 @@ import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
-import com.quickblox.q_municate_db.managers.DataManager;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 
@@ -43,7 +43,6 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         addActions();
     }
 
@@ -56,7 +55,15 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     @Override
     protected List<User> getFriendsList() {
         qbDialog = (QBDialog) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG);
-        List<Friend> friendsList = DataManager.getInstance().getFriendDataManager().getAllWithoutTheseIds(qbDialog.getOccupants());
+        List<Friend> friendsList = dataManager.getFriendDataManager().getAllForGroupDetails(qbDialog.getOccupants());
+        if (!friendsList.isEmpty()) {
+            List<Integer> actualFriendIdsList = UserFriendUtils.getFriendIdsListFromList(friendsList);
+            List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                    .getNormalDialogOccupantsByIds(qbDialog.getDialogId(), actualFriendIdsList);
+            if (!dialogOccupantsList.isEmpty()) {
+                friendsList.removeAll(UserFriendUtils.getFriendsListFromDialogOccupantsList(dialogOccupantsList));
+            }
+        }
         return UserFriendUtils.getUsersFromFriends(friendsList);
     }
 

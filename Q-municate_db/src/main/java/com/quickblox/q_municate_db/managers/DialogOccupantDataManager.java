@@ -11,6 +11,7 @@ import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.utils.ErrorUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
@@ -78,5 +79,25 @@ public class DialogOccupantDataManager extends BaseManager<DialogOccupant> {
         }
 
         return dialogOccupant;
+    }
+
+    public List<DialogOccupant> getNormalDialogOccupantsByIds(String dialogId, List<Integer> userIdsList) {
+        List<DialogOccupant> dialogOccupantsList = Collections.emptyList();
+
+        try {
+            QueryBuilder<DialogOccupant, Long> queryBuilder = dao.queryBuilder();
+            Where<DialogOccupant, Long> where = queryBuilder.where();
+            where.and(
+                    where.in(User.Column.ID, userIdsList),
+                    where.eq(DialogOccupant.Column.STATUS, DialogOccupant.Status.NORMAL),
+                    where.eq(Dialog.Column.ID, dialogId)
+            );
+            PreparedQuery<DialogOccupant> preparedQuery = queryBuilder.prepare();
+            dialogOccupantsList = dao.query(preparedQuery);
+        } catch (SQLException e) {
+            ErrorUtils.logError(e);
+        }
+
+        return dialogOccupantsList;
     }
 }

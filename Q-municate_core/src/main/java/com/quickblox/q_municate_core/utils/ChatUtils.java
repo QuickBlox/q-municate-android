@@ -271,16 +271,25 @@ public class ChatUtils {
         return qbDialogsList;
     }
 
-    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBDialog qbDialog) {
+    public static List<DialogOccupant> createDialogOccupantsList(DataManager dataManager, QBDialog qbDialog, boolean onlyNewOccupant) {
         List<DialogOccupant> dialogOccupantsList = new ArrayList<>(qbDialog.getOccupants().size());
 
         for (Integer userId : qbDialog.getOccupants()) {
-            DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
-            if (dialogOccupant == null) {
-                dialogOccupant = new DialogOccupant();
-                dialogOccupant.setUser(dataManager.getUserDataManager().get(userId));
-                dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(qbDialog.getDialogId()));
+            DialogOccupant dialogOccupant;
+            if (onlyNewOccupant) {
+                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
+                if (dialogOccupant == null) {
+                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), dataManager.getUserDataManager().get(userId));
+                } else {
+                    dialogOccupant.setStatus(DialogOccupant.Status.NORMAL);
+                }
                 dialogOccupantsList.add(dialogOccupant);
+            } else {
+                dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(qbDialog.getDialogId(), userId);
+                if (dialogOccupant == null) {
+                    dialogOccupant = createDialogOccupant(dataManager, qbDialog.getDialogId(), dataManager.getUserDataManager().get(userId));
+                    dialogOccupantsList.add(dialogOccupant);
+                }
             }
         }
 
@@ -298,24 +307,37 @@ public class ChatUtils {
     }
 
     public static QBDialog createQBDialogFromLocalDialog(DataManager dataManager, Dialog dialog) {
+        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
+                .getDialogOccupantsListByDialogId(dialog.getDialogId());
+        QBDialog qbDialog = createQBDialogFromLocalDialog(dialog, dialogOccupantsList);
+        return qbDialog;
+    }
+
+    private static QBDialog createQBDialogFromLocalDialog(Dialog dialog, List<DialogOccupant> dialogOccupantsList) {
         QBDialog qbDialog = new QBDialog();
         qbDialog.setDialogId(dialog.getDialogId());
         qbDialog.setRoomJid(dialog.getRoomJid());
         qbDialog.setPhoto(dialog.getPhoto());
         qbDialog.setName(dialog.getTitle());
-        List<DialogOccupant> dialogOccupantsList = dataManager.getDialogOccupantDataManager()
-                .getDialogOccupantsListByDialogId(dialog.getDialogId());
         qbDialog.setOccupantsIds(createOccupantsIdsFromDialogOccupantsList(dialogOccupantsList));
-        qbDialog.setType(
-                Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
+        qbDialog.setType(Dialog.Type.PRIVATE.equals(dialog.getType()) ? QBDialogType.PRIVATE : QBDialogType.GROUP);
         return qbDialog;
     }
 
-    private static ArrayList<Integer> createOccupantsIdsFromDialogOccupantsList(
+    public static ArrayList<Integer> createOccupantsIdsFromDialogOccupantsList(
             List<DialogOccupant> dialogOccupantsList) {
         ArrayList<Integer> occupantsIdsList = new ArrayList<>(dialogOccupantsList.size());
         for (DialogOccupant dialogOccupant : dialogOccupantsList) {
             occupantsIdsList.add(dialogOccupant.getUser().getUserId());
+        }
+        return occupantsIdsList;
+    }
+
+    public static ArrayList<Integer> createOccupantsIdsFromUsersList(
+            List<User> usersList) {
+        ArrayList<Integer> occupantsIdsList = new ArrayList<>(usersList.size());
+        for (User user : usersList) {
+            occupantsIdsList.add(user.getUserId());
         }
         return occupantsIdsList;
     }
@@ -508,13 +530,13 @@ public class ChatUtils {
         return onlineOccupantsCount;
     }
 
-    public static List<DialogOccupant> getUpdatedDialogOccupantsList(DataManager dataManager, String dialogId, List<Integer> dialogOccupantIdsList) {
+    public static List<DialogOccupant> getUpdatedDialogOccupantsList(DataManager dataManager, String dialogId, List<Integer> dialogOccupantIdsList, DialogOccupant.Status status) {
         List<DialogOccupant> updatedDialogOccupantsList = new ArrayList<>(dialogOccupantIdsList.size());
 
         for (Integer userId : dialogOccupantIdsList) {
             DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, userId);
             if (dialogOccupant != null) {
-                dialogOccupant.setStatus(DialogOccupant.Status.LEAVED);
+                dialogOccupant.setStatus(status);
                 updatedDialogOccupantsList.add(dialogOccupant);
             }
         }
@@ -523,8 +545,7 @@ public class ChatUtils {
     }
 
     public static DialogOccupant createDialogOccupant(DataManager dataManager, String dialogId, User user) {
-        DialogOccupant dialogOccupant;
-        dialogOccupant = new DialogOccupant();
+        DialogOccupant dialogOccupant = new DialogOccupant();
         dialogOccupant.setUser(user);
         dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));
         return dialogOccupant;

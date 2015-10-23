@@ -70,7 +70,7 @@ public class FriendDataManager extends BaseManager<Friend> {
         return getByUserId(userId) != null;
     }
 
-    public List<Friend> getAllWithoutTheseIds(List<Integer> idsList) {
+    public List<Friend> getAllForGroupDetails(List<Integer> idsList) {
         List<Friend> friendsList = Collections.emptyList();
 
         try {

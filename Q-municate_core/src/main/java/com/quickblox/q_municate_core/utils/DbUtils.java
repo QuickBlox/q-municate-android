@@ -39,7 +39,7 @@ public class DbUtils {
         dataManager.getDialogDataManager().createOrUpdate(dialog);
 
         if (qbDialog.getOccupants() != null && !qbDialog.getOccupants().isEmpty()) {
-            saveDialogsOccupants(dataManager, qbDialog);
+            saveDialogsOccupants(dataManager, qbDialog, false);
         }
     }
 
@@ -62,8 +62,8 @@ public class DbUtils {
                 message.getCreatedDate(), true);
     }
 
-    public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBDialog qbDialog) {
-        List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(dataManager, qbDialog);
+    public static List<DialogOccupant> saveDialogsOccupants(DataManager dataManager, QBDialog qbDialog, boolean onlyNewOccupant) {
+        List<DialogOccupant> dialogOccupantsList = ChatUtils.createDialogOccupantsList(dataManager, qbDialog, onlyNewOccupant);
         if (!dialogOccupantsList.isEmpty()) {
             dataManager.getDialogOccupantDataManager().createOrUpdateAll(dialogOccupantsList);
         }
@@ -76,7 +76,7 @@ public class DbUtils {
 
     public static void saveDialogsOccupants(DataManager dataManager, List<QBDialog> qbDialogsList) {
         for (QBDialog qbDialog : qbDialogsList) {
-            saveDialogsOccupants(dataManager, qbDialog);
+            saveDialogsOccupants(dataManager, qbDialog, false);
         }
     }
 
@@ -196,9 +196,9 @@ public class DbUtils {
     }
 
     public static void updateDialogOccupants(DataManager dataManager, String dialogId,
-            List<Integer> dialogOccupantIdsList) {
+            List<Integer> dialogOccupantIdsList, DialogOccupant.Status status) {
         List<DialogOccupant> dialogOccupantsList = ChatUtils.
-                getUpdatedDialogOccupantsList(dataManager, dialogId, dialogOccupantIdsList);
+                getUpdatedDialogOccupantsList(dataManager, dialogId, dialogOccupantIdsList, status);
         dataManager.getDialogOccupantDataManager().updateAll(dialogOccupantsList);
     }
 }

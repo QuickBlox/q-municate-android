@@ -11,6 +11,7 @@ import com.quickblox.q_municate_core.R;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.DialogNotification;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
 
@@ -94,6 +95,7 @@ public class ChatNotificationUtils {
         String dialogName = (String) qbChatMessage.getProperty(PROPERTY_ROOM_NAME);
         String photoUrl = (String) qbChatMessage.getProperty(PROPERTY_ROOM_PHOTO);
         String leavedOccupants = (String) qbChatMessage.getProperty(PROPERTY_ROOM_LEAVE);
+        String newOccupants = (String) qbChatMessage.getProperty(PROPERTY_OCCUPANTS_IDS);
 
         qbDialog.setLastMessage(lastMessage);
 
@@ -104,7 +106,13 @@ public class ChatNotificationUtils {
         if (!TextUtils.isEmpty(leavedOccupants)) {
             List<Integer> leavedOccupantsList = ChatUtils.getOccupantsIdsListFromString(leavedOccupants);
             qbDialog.getOccupants().removeAll(leavedOccupantsList);
-            DbUtils.updateDialogOccupants(dataManager, qbDialog.getDialogId(), leavedOccupantsList);
+            DbUtils.updateDialogOccupants(dataManager, qbDialog.getDialogId(), leavedOccupantsList, DialogOccupant.Status.LEAVED);
+        }
+
+        if (!TextUtils.isEmpty(newOccupants)) {
+            List<Integer> newOccupantsList = ChatUtils.getOccupantsIdsListFromString(newOccupants);
+            qbDialog.getOccupants().addAll(newOccupantsList);
+            DbUtils.updateDialogOccupants(dataManager, qbDialog.getDialogId(), newOccupantsList, DialogOccupant.Status.NORMAL);
         }
 
         if (!TextUtils.isEmpty(photoUrl)) {

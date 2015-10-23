@@ -2,6 +2,7 @@ package com.quickblox.q_municate_core.utils;
 
 import com.quickblox.chat.model.QBRosterEntry;
 import com.quickblox.q_municate_core.models.UserCustomData;
+import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.Friend;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.q_municate_db.models.UserRequest;
@@ -113,5 +114,21 @@ public class UserFriendUtils {
             friendIdsList.add(friend.getUserId());
         }
         return friendIdsList;
+    }
+
+    public static List<Integer> getFriendIdsListFromList(List<Friend> friendsList) {
+        List<Integer> friendIdsList = new ArrayList<Integer>();
+        for (Friend friend : friendsList) {
+            friendIdsList.add(friend.getUser().getUserId());
+        }
+        return friendIdsList;
+    }
+
+    public static List<Friend> getFriendsListFromDialogOccupantsList(List<DialogOccupant> dialogOccupantsList) {
+        List<Friend> friendsList = new ArrayList<>(dialogOccupantsList.size());
+        for (DialogOccupant dialogOccupant : dialogOccupantsList) {
+            friendsList.add(new Friend(dialogOccupant.getUser()));
+        }
+        return friendsList;
     }
 }
