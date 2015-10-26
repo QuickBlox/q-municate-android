@@ -84,9 +84,9 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         setActionBarTitle(dialog.getTitle());
 
         if (!TextUtils.isEmpty(dialog.getPhoto())) {
-            loadLogoActionBar(dialog.getPhoto());
+            loadActionBarLogo(dialog.getPhoto());
         } else {
-            setActionBarIcon(R.drawable.placeholder_group);
+            setDefaultActionBarLogo(R.drawable.placeholder_group);
         }
     }
 

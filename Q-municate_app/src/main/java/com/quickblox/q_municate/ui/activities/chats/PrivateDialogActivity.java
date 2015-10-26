@@ -192,12 +192,13 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
 
     private void fillActionBar() {
         setActionBarTitle(opponentUser.getFullName());
-        setActionBarIcon(R.drawable.placeholder_user);
 
         setOnlineStatus(opponentUser);
 
         if (!TextUtils.isEmpty(opponentUser.getAvatar())) {
-            loadLogoActionBar(opponentUser.getAvatar());
+            loadActionBarLogo(opponentUser.getAvatar());
+        } else {
+            setDefaultActionBarLogo(R.drawable.placeholder_user);
         }
     }
 

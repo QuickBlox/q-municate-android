@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.fragments.chats;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -211,11 +212,17 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         UserCustomData userCustomData = Utils.customDataToObject(qbUser.getCustomData());
         if (!TextUtils.isEmpty(userCustomData.getAvatar_url())) {
             loadLogoActionBar(userCustomData.getAvatar_url());
+        } else {
+            actionBarBridge.setActionBarIcon(
+                    ImageUtils.getRoundIconDrawable(getActivity(),
+                            BitmapFactory.decodeResource(getResources(), R.drawable.placeholder_user)));
         }
     }
 
     private void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(
+                logoUrl,
+                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override

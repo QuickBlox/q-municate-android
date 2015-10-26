@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
@@ -388,8 +389,10 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         }, DELAY_SHOWING_SMILE_PANEL);
     }
 
-    protected void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+    protected void loadActionBarLogo(String logoUrl) {
+        ImageLoader.getInstance().loadImage(
+                logoUrl,
+                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
@@ -400,8 +403,15 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 });
     }
 
+    protected void setDefaultActionBarLogo(int drawableResId) {
+        setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
+                        BitmapFactory.decodeResource(getResources(), drawableResId)));
+    }
+
     protected void startLoadAttachFile(final File file) {
-        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dlg_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(
+                getSupportFragmentManager(),
+                R.string.dlg_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
