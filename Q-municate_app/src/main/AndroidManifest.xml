@@ -113,11 +113,13 @@
         <activity
             android:name=".ui.activities.chats.PrivateDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.activities.chats.GroupDialogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.activities.chats.GroupDialogDetailsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
