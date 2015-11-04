@@ -78,6 +78,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     protected void onResume() {
         super.onResume();
         updateData();
+        startLoadDialogMessages();
     }
 
     protected void updateActionBar() {
