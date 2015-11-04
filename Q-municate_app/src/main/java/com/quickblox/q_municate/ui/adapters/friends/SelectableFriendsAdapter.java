@@ -4,7 +4,6 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.RelativeLayout;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
@@ -35,6 +34,14 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
         selectUsersListener = listener;
     }
 
+    public void selectFriend(int position) {
+        boolean checked = !sparseArrayCheckBoxes.get(position);
+        sparseArrayCheckBoxes.put(position, checked);
+        addOrRemoveSelectedFriend(checked, getItem(position));
+        notifyCounterChanged(checked);
+        notifyItemChanged(position);
+    }
+
     @Override
     public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend_selectable, parent, false));
@@ -53,23 +60,21 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
             public void onClick(View view) {
                 CheckBox checkBox = (CheckBox) view;
                 sparseArrayCheckBoxes.put(position, checkBox.isChecked());
-                if (checkBox.isChecked()) {
-                    selectedFriendsList.add(user);
-                } else if (selectedFriendsList.contains(user)) {
-                    selectedFriendsList.remove(user);
-                }
-
+                addOrRemoveSelectedFriend(checkBox.isChecked(), user);
                 notifyCounterChanged(checkBox.isChecked());
-
-                viewHolder.contentRelativeLayout.setBackgroundColor(
-                        getBackgroundColorItem(viewHolder.selectFriendCheckBox.isChecked()));
             }
         });
 
         boolean checked = sparseArrayCheckBoxes.get(position);
         viewHolder.selectFriendCheckBox.setChecked(checked);
+    }
 
-        viewHolder.contentRelativeLayout.setBackgroundColor(getBackgroundColorItem(checked));
+    private void addOrRemoveSelectedFriend(boolean checked, User user) {
+        if (checked) {
+            selectedFriendsList.add(user);
+        } else if (selectedFriendsList.contains(user)) {
+            selectedFriendsList.remove(user);
+        }
     }
 
     private void notifyCounterChanged(boolean isIncrease) {
@@ -78,10 +83,6 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
             String fullNames = ChatUtils.getSelectedFriendsFullNamesFromMap(selectedFriendsList);
             selectUsersListener.onSelectedUsersChanged(counterFriends, fullNames);
         }
-    }
-
-    private int getBackgroundColorItem(boolean isSelect) {
-        return isSelect ? resources.getColor(R.color.button_general_pressed) : resources.getColor(R.color.white);
     }
 
     private void changeCounter(boolean isIncrease) {
@@ -104,9 +105,6 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
     }
 
     protected static class ViewHolder extends FriendsAdapter.ViewHolder {
-
-        @Bind(R.id.contentRelativeLayout)
-        RelativeLayout contentRelativeLayout;
 
         @Bind(R.id.selected_friend_checkbox)
         CheckBox selectFriendCheckBox;

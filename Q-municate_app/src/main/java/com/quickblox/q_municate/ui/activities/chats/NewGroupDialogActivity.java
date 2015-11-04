@@ -2,6 +2,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
@@ -11,6 +12,7 @@ import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate.ui.views.recyclerview.SimpleDividerItemDecoration;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.listeners.SelectUsersListener;
+import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_db.models.User;
 
 import java.util.List;
@@ -30,6 +32,22 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
     @Override
     protected int getContentResId() {
         return R.layout.activity_new_group;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initCustomListeners();
+    }
+
+    private void initCustomListeners() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User entity, int position) {
+                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
+            }
+        });
     }
 
     @Override

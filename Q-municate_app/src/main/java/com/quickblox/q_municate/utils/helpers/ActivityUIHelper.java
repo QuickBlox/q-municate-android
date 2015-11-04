@@ -68,7 +68,7 @@ public class ActivityUIHelper {
         baseActivity.showSnackbar(
                 message,
                 Snackbar.LENGTH_LONG,
-                R.string.dlg_reply,
+                R.string.dialog_reply,
                 new View.OnClickListener() {
 
                     @Override

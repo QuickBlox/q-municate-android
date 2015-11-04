@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
@@ -10,6 +11,8 @@ import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.adapters.friends.SelectableFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.listeners.OnRecycleItemClickListener;
+import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBAddFriendsToGroupCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -44,6 +47,22 @@ public class AddFriendsToGroupActivity extends BaseFriendsListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addActions();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initCustomListeners();
+    }
+
+    private void initCustomListeners() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User entity, int position) {
+                ((SelectableFriendsAdapter) friendsAdapter).selectFriend(position);
+            }
+        });
     }
 
     @Override

@@ -3,6 +3,7 @@
     android:id="@+id/contentRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/selector_button_general"
     android:orientation="horizontal">
 
     <CheckBox

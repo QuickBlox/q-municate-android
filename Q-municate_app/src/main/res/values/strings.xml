@@ -66,6 +66,20 @@
     <string name="add_friends_to_group_no_friends_for_adding">No Friends for adding</string>
 
 
+    <!-- Dialog -->
+    <string name="dialog_hint_message">Message</string>
+    <string name="dialog_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
+    <string name="dialog_reply">Reply</string>
+    <string name="dialog_user_is_not_friend">User is not your friend</string>
+    <string name="dialog_confirm_sending_attach">Do you really want to send attachment?</string>
+    <string name="dialog_now_typing">Typing…</string>
+
+    <string-array name="dialog_attach_types_array">
+        <item>Take Photo</item>
+        <item>From Library</item>
+    </string-array>
+
+
     // NOT REFACTORED YET
 
     <!-- Login -->
@@ -109,21 +123,6 @@
     <string name="frl_dlg_reject_friend">Do you really want to reject contact  request from %1$s?</string>
     <string name="frl_local_list">Local</string>
     <string name="frl_global_list">Global</string>
-
-
-    <!-- Dialog -->
-    <string name="dlg_message">Message</string>
-    <string name="dlg_hint_message">Type a message</string>
-    <string name="dlg_no_chats">Oops…\nYou don\'t have any chats,\n tap \'+\' icon to create new group chat \nor go in private chat \nvia Friends Details page"</string>
-    <string name="dlg_reply">Reply</string>
-    <string name="dlg_user_is_not_friend">User is not your friend</string>
-    <string name="dlg_confirm_sending_attach">Do you really want to send attachment?</string>
-    <string name="dlg_typing">Typing…</string>
-
-    <string-array name="dlg_attach_types_array">
-        <item>Take Photo</item>
-        <item>From Library</item>
-    </string-array>
 
     <!-- Group Dialog -->
     <string name="gdl_ctx_menu_reply">Reply</string>

@@ -46,7 +46,7 @@
         android:clickable="true"
         android:focusable="true"
         android:gravity="center_vertical|right|left"
-        android:hint="@string/dlg_hint_message"
+        android:hint="@string/dialog_hint_message"
         android:maxLines="5"
         android:textColor="@color/black"
         emojicon:emojiconSize="@dimen/chat_emoji_item_preview_size" />

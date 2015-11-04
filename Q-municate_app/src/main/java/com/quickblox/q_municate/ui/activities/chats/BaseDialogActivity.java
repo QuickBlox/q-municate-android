@@ -191,6 +191,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @OnTouch(R.id.message_edittext)
     boolean touchMessageEdit() {
         hideSmileLayout();
+        scrollMessagesWithDelay();
         return false;
     }
 
@@ -333,7 +334,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     private void showTypingStatus() {
-        setActionBarSubtitle(R.string.dlg_typing);
+        setActionBarSubtitle(R.string.dialog_now_typing);
     }
 
     private void hideTypingStatus() {
@@ -401,7 +402,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected void startLoadAttachFile(final File file) {
         TwoButtonsDialogFragment.show(
                 getSupportFragmentManager(),
-                R.string.dlg_confirm_sending_attach,
+                R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
