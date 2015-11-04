@@ -147,7 +147,7 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
-    public void sendMessageOnClick(View view) {
+    public void sendMessage(View view) {
         sendMessage(false);
     }
 
@@ -161,9 +161,6 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_attach:
-                attachButtonOnClick();
-                break;
             case R.id.action_group_details:
                 GroupDialogDetailsActivity.start(this, dialog.getDialogId());
                 break;

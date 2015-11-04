@@ -340,13 +340,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void startAddFriendsActivity() {
-//        int countUnselectedFriendsInChat = dataManager.getFriendDataManager().getAllByIds(
-//                qbDialog.getOccupants()).size();
-//        if (countUnselectedFriendsInChat != ConstsCore.ZERO_INT_VALUE) {
-            AddFriendsToGroupActivity.start(this, qbDialog);
-//        } else {
-//            ToastUtils.longToast(R.string.gdd_all_friends_is_in_group);
-//        }
+        AddFriendsToGroupActivity.start(this, qbDialog);
     }
 
     private void handleCrop(int resultCode, Intent result) {

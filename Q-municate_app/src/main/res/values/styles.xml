@@ -125,4 +125,14 @@
         <item name="android:textColor">@color/text_red</item>
     </style>
 
+    <style name="ChatActionButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">@dimen/chat_input_message_height</item>
+        <item name="android:background">@drawable/selector_button_general</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
 </resources>

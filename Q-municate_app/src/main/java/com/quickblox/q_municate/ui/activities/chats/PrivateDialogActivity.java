@@ -220,7 +220,7 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
-    public void sendMessageOnClick(View view) {
+    public void sendMessage(View view) {
         sendMessage(true);
     }
 
@@ -240,9 +240,6 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
             return true;
         }
         switch (item.getItemId()) {
-            case R.id.action_attach:
-                attachButtonOnClick();
-                break;
             case R.id.action_audio_call:
                 callToUser(opponentUser, com.quickblox.videochat.webrtc.Consts.MEDIA_STREAM.AUDIO);
                 break;

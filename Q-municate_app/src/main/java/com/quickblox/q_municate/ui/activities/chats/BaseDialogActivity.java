@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,7 +19,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -84,8 +82,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     private static final int DELAY_SCROLLING_LIST = 300;
     private static final int DELAY_SHOWING_SMILE_PANEL = 200;
 
-    private static Handler mainThreadHandler = new Handler(Looper.getMainLooper());
-
     @Bind(R.id.messages_swiperefreshlayout)
     SwipeRefreshLayout messageSwipeRefreshLayout;
 
@@ -95,17 +91,14 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @Bind(R.id.message_edittext)
     EditText messageEditText;
 
+    @Bind(R.id.attach_button)
+    ImageButton attachButton;
+
     @Bind(R.id.send_button)
     ImageButton sendButton;
 
-    @Bind(R.id.message_typing_view)
-    View messageTypingView;
-
     @Bind(R.id.smile_panel_imagebutton)
     ImageButton smilePanelImageButton;
-
-    @Bind(R.id.message_typing_box_imageview)
-    ImageView messageTypingBoxImageView;
 
     protected Dialog dialog;
     protected Resources resources;
@@ -117,11 +110,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
 
+    private Handler mainThreadHandler;
     private View emojiconsFragment;
     private LoadAttachFileSuccessAction loadAttachFileSuccessAction;
     private LoadDialogMessagesSuccessAction loadDialogMessagesSuccessAction;
     private LoadDialogMessagesFailAction loadDialogMessagesFailAction;
-    private AnimationDrawable messageTypingAnimationDrawable;
     private Timer typingTimer;
     private boolean isTypingNow;
     private Observer messageObserver;
@@ -150,11 +143,10 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         registerBroadcastReceivers();
 
         hideSmileLayout();
-
-        appSharedHelper.saveNeedToOpenDialog(false);
     }
 
     private void initFields() {
+        mainThreadHandler = new Handler(Looper.getMainLooper());
         resources = getResources();
         dataManager = DataManager.getInstance();
         imageUtils = new ImageUtils(this);
@@ -166,12 +158,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         dialogNotificationObserver = new DialogNotificationObserver();
         typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
         updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+        appSharedHelper.saveNeedToOpenDialog(false);
     }
 
     private void initCustomUI() {
         emojiconsFragment = _findViewById(R.id.emojicon_fragment);
-        sendButton.setEnabled(false);
-        messageTypingAnimationDrawable = (AnimationDrawable) messageTypingBoxImageView.getDrawable();
     }
 
     private void initCustomListeners() {
@@ -185,7 +176,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     @OnTextChanged(R.id.message_edittext)
     void messageEditTextChanged(CharSequence charSequence) {
-        setSendButtonVisibility(charSequence);
+        setActionButtonVisibility(charSequence);
 
         // TODO: now it is possible only for Private chats
         if (dialog != null && Dialog.Type.PRIVATE.equals(dialog.getType())) {
@@ -206,6 +197,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @OnClick(R.id.smile_panel_imagebutton)
     void smilePanelImageButtonClicked() {
         visibleOrHideSmilePanel();
+    }
+
+    @OnClick(R.id.attach_button)
+    void attachFile(View view) {
+        canPerformLogout.set(false);
+        ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
     }
 
     protected void addActions() {
@@ -335,19 +332,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         createChatLocally();
     }
 
-    protected void startMessageTypingAnimation() {
-        messageTypingView.setVisibility(View.VISIBLE);
-        messageTypingAnimationDrawable.start();
+    private void showTypingStatus() {
+        setActionBarSubtitle(R.string.dlg_typing);
     }
 
-    protected void stopMessageTypingAnimation() {
-        messageTypingView.setVisibility(View.GONE);
-        messageTypingAnimationDrawable.stop();
-    }
-
-    protected void attachButtonOnClick() {
-        canPerformLogout.set(false);
-        ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
+    private void hideTypingStatus() {
+        setActionBarSubtitle(null);
     }
 
     protected void deleteTempMessages() {
@@ -427,11 +417,13 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 lastDateLoad, loadMore);
     }
 
-    private void setSendButtonVisibility(CharSequence charSequence) {
+    private void setActionButtonVisibility(CharSequence charSequence) {
         if (TextUtils.isEmpty(charSequence) || TextUtils.isEmpty(charSequence.toString().trim())) {
-            sendButton.setEnabled(false);
+            sendButton.setVisibility(View.GONE);
+            attachButton.setVisibility(View.VISIBLE);
         } else {
-            sendButton.setEnabled(true);
+            sendButton.setVisibility(View.VISIBLE);
+            attachButton.setVisibility(View.GONE);
         }
     }
 
@@ -712,9 +704,9 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 if (Dialog.Type.PRIVATE.equals(dialog.getType())) {
                     boolean isTyping = extras.getBoolean(QBServiceConsts.EXTRA_IS_TYPING);
                     if (isTyping) {
-                        startMessageTypingAnimation();
+                        showTypingStatus();
                     } else {
-                        stopMessageTypingAnimation();
+                        hideTypingStatus();
                     }
                 }
             }
