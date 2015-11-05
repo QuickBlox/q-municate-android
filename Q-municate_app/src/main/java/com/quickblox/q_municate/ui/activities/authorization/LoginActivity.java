@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
 
@@ -50,7 +50,7 @@ public class LoginActivity extends BaseAuthActivity {
     }
 
     private void initFields(Bundle bundle) {
-        validationUtils = new ValidationUtils(LoginActivity.this,
+        validationUtilsOLD = new ValidationUtils_OLD(LoginActivity.this,
                 new EditText[]{emailEditText, passwordEditText},
                 new String[]{
                 getString(R.string.dlg_not_email_field_entered),
@@ -101,7 +101,7 @@ public class LoginActivity extends BaseAuthActivity {
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        if (validationUtils.isValidUserDate(userEmail, userPassword)) {
+        if (validationUtilsOLD.isValidUserDate(userEmail, userPassword)) {
             showProgress();
 
             boolean ownerUser = DataManager.getInstance().getUserDataManager().isUserOwner(userEmail);

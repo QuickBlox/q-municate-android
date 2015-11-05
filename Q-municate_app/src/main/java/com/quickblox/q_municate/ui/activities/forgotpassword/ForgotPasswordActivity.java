@@ -15,7 +15,7 @@ import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 
 import butterknife.Bind;
 
@@ -24,7 +24,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Bind(R.id.email_edittext)
     EditText emailEditText;
 
-    private ValidationUtils validationUtils;
+    private ValidationUtils_OLD validationUtilsOLD;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ForgotPasswordActivity.class);
@@ -48,7 +48,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     }
 
     private void iniFields() {
-        validationUtils = new ValidationUtils(this, new EditText[]{emailEditText},
+        validationUtilsOLD = new ValidationUtils_OLD(this, new EditText[]{emailEditText},
                 new String[]{getString(R.string.fpw_not_email_field_entered)});
     }
 
@@ -80,7 +80,7 @@ public class ForgotPasswordActivity extends BaseActivity {
     private void forgotPassword() {
         KeyboardUtils.hideKeyboard(this);
         String emailText = emailEditText.getText().toString();
-        if (validationUtils.isValidForgotPasswordData(emailText)) {
+        if (validationUtilsOLD.isValidForgotPasswordData(emailText)) {
             showProgress();
             QBResetPasswordCommand.start(this, emailText);
         }

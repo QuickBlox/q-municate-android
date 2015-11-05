@@ -9,6 +9,10 @@
     <dimen name="button_text_size">18sp</dimen>
     <dimen name="button_icon_margin">10dp</dimen>
 
+    <dimen name="padding_small">5dp</dimen>
+    <dimen name="padding_medium">10dp</dimen>
+    <dimen name="padding_large">15dp</dimen>
+
     <dimen name="landing_button_height">42dp</dimen>
     <dimen name="landing_button_width">300dp</dimen>
 

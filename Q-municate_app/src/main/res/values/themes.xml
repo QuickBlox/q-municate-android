@@ -8,7 +8,7 @@
 
         <item name="windowActionModeOverlay">true</item>
 
-        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowBackground">@color/bg_main</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>

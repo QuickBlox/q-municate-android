@@ -3,36 +3,43 @@ package com.quickblox.q_municate.ui.activities.changepassword;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.QBChangePasswordCommand;
+import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLogoutAndDestroyChatCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate_core.utils.ConstsCore;
+import com.quickblox.users.model.QBUser;
 
 import butterknife.Bind;
+import butterknife.OnTextChanged;
 
 public class ChangePasswordActivity extends BaseLogeableActivity {
+
+    @Bind(R.id.old_password_textinputlayout)
+    TextInputLayout oldPasswordTextInputLayout;
 
     @Bind(R.id.old_password_edittext)
     EditText oldPasswordEditText;
 
+    @Bind(R.id.new_password_textinputlayout)
+    TextInputLayout newPasswordTextInputLayout;
+
     @Bind(R.id.new_password_edittext)
     EditText newPasswordEditText;
 
-    private ValidationUtils validationUtils;
-    private QBUser user;
+    private QBUser qbUser;
     private String oldPasswordText;
 
     public static void start(Context context) {
@@ -57,12 +64,17 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
 
     private void initFields() {
         canPerformLogout.set(false);
-        user = AppSession.getSession().getUser();
-        validationUtils = new ValidationUtils(this, new EditText[]{oldPasswordEditText, newPasswordEditText},
-                new String[]{
-                        getString(R.string.cpw_not_old_password_field_entered),
-                        getString(R.string.cpw_not_new_password_field_entered)}
-        );
+        qbUser = AppSession.getSession().getUser();
+    }
+
+    @OnTextChanged(R.id.old_password_edittext)
+    void onTextChangedOldPassword(CharSequence text) {
+        oldPasswordTextInputLayout.setError(null);
+    }
+
+    @OnTextChanged(R.id.new_password_edittext)
+    void onTextChangedNewPassword(CharSequence text) {
+        newPasswordTextInputLayout.setError(null);
     }
 
     @Override
@@ -119,16 +131,18 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private void changePassword() {
         oldPasswordText = oldPasswordEditText.getText().toString();
         String newPasswordText = newPasswordEditText.getText().toString();
-        if (validationUtils.isValidChangePasswordData(oldPasswordText, newPasswordText)) {
+        if (new ValidationUtils(this)
+                .isValidChangePasswordData(oldPasswordTextInputLayout, newPasswordTextInputLayout,
+                        oldPasswordText, newPasswordText)) {
             updatePasswords(oldPasswordText, newPasswordText);
             showProgress();
-            QBChangePasswordCommand.start(this, user);
+            QBChangePasswordCommand.start(this, qbUser);
         }
     }
 
     private void updatePasswords(String oldPasswordText, String newPasswordText) {
-        user.setOldPassword(oldPasswordText);
-        user.setPassword(newPasswordText);
+        qbUser.setOldPassword(oldPasswordText);
+        qbUser.setPassword(newPasswordText);
     }
 
     private void clearFields() {

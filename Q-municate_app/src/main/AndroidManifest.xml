@@ -138,7 +138,7 @@
         <activity
             android:name=".ui.activities.changepassword.ChangePasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/cpw_change_password_title"
+            android:label="@string/change_password_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.forgotpassword.ForgotPasswordActivity"

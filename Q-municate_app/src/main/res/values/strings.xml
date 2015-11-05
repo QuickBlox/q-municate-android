@@ -80,6 +80,26 @@
     </string-array>
 
 
+    <!-- Settings -->
+    <string name="settings_profile">Profile</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_change_password">Change Password</string>
+    <string name="settings_push_notifications">Push Notifications</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_invite_friends">Invite Friends</string>
+    <string name="settings_give_feedback">Give Feedback</string>
+    <string name="settings_delete_my_account">Delete My Account</string>
+
+
+    <!-- Change Password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_change">Change</string>
+    <string name="change_password_hint_old_password">Old Password</string>
+    <string name="change_password_hint_new_password">New Password</string>
+    <string name="change_password_not_old_password_field_entered">Please enter old password</string>
+    <string name="change_password_not_new_password_field_entered">Please enter new password</string>
+
+
     // NOT REFACTORED YET
 
     <!-- Login -->
@@ -151,21 +171,6 @@
     <string name="pref_title_presence">Presence</string>
     <string name="pref_title_push_notifications">Push Notifications</string>
     <string name="pref_title_media">Media</string>
-
-    <!-- Settings -->
-    <string name="stn_profile">Profile</string>
-    <string name="stn_logout">Log Out</string>
-    <string name="stn_change_password">Change Password</string>
-    <string name="stn_push_notifivation">Push Notification</string>
-    <string name="stn_version">Version %1$s</string>
-
-    <!-- Change Password -->
-    <string name="cpw_change_password_title">Change Password</string>
-    <string name="cpw_change">Change</string>
-    <string name="cpw_old_password">Old Password</string>
-    <string name="cpw_new_password">New Password</string>
-    <string name="cpw_not_old_password_field_entered">Please enter old password</string>
-    <string name="cpw_not_new_password_field_entered">Please enter new password</string>
 
     <!-- Profile -->
     <string name="prf_full_name">Full Name</string>

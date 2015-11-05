@@ -16,7 +16,7 @@ import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -35,7 +35,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
     protected FacebookHelper facebookHelper;
     protected LoginType loginType = LoginType.EMAIL;
-    protected ValidationUtils validationUtils;
+    protected ValidationUtils_OLD validationUtilsOLD;
     protected Resources resources;
 
     protected LoginSuccessAction loginSuccessAction;
@@ -161,8 +161,8 @@ public abstract class BaseAuthActivity extends BaseActivity {
 
         ErrorUtils.showError(this, errorMessage);
 
-        if (validationUtils != null) {
-            validationUtils.setError(errorMessage);
+        if (validationUtilsOLD != null) {
+            validationUtilsOLD.setError(errorMessage);
         }
     }
 

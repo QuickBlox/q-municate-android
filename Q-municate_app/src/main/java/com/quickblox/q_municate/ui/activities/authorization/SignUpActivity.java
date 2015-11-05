@@ -19,7 +19,7 @@ import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
-import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -80,7 +80,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     private void initFields(Bundle bundle) {
         qbUser = new QBUser();
         imageUtils = new ImageUtils(this);
-        validationUtils = new ValidationUtils(SignUpActivity.this,
+        validationUtilsOLD = new ValidationUtils_OLD(SignUpActivity.this,
                 new EditText[]{ fullNameEditText, emailEditText, passwordEditText },
                 new String[]{
                         getString(R.string.dlg_not_fullname_field_entered),
@@ -190,7 +190,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         String emailText = emailEditText.getText().toString();
         String passwordText = passwordEditText.getText().toString();
 
-        if (validationUtils.isValidUserDate(fullNameText, emailText, passwordText)) {
+        if (validationUtilsOLD.isValidUserDate(fullNameText, emailText, passwordText)) {
             qbUser.setFullName(fullNameText);
             qbUser.setEmail(emailText);
             qbUser.setPassword(passwordText);
