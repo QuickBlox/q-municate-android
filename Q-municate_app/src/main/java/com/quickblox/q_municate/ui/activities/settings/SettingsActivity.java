@@ -66,45 +66,25 @@ public class SettingsActivity extends BaseLogeableActivity {
         setUpActionBarWithUpButton();
 
         initFields();
-        fillUI();
-        showUserAvatar();
 
         addActions();
     }
 
-    private void initFields() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUIData();
+    }
+
+    private void updateUIData() {
         user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
-    }
-
-    private void fillUI() {
-        pushNotificationSwitch.setChecked(appSharedHelper.isEnablePushNotifications());
-        changePasswordView.setVisibility(
-                LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType()) ? View.GONE : View.VISIBLE);
-        fullNameTextView.setText(user.getFullName());
-    }
-
-    private void showUserAvatar() {
-        ImageLoader.getInstance().displayImage(user.getAvatar(), avatarImageView);
+        fillUI();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         removeActions();
-    }
-
-    private void addActions() {
-        addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
-        addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
-
-        updateBroadcastActionList();
-    }
-
-    private void removeActions() {
-        removeAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION);
-        removeAction(QBServiceConsts.LOGOUT_FAIL_ACTION);
-
-        updateBroadcastActionList();
     }
 
     @OnClick(R.id.edit_profile_imagebutton)
@@ -149,6 +129,37 @@ public class SettingsActivity extends BaseLogeableActivity {
     @OnClick(R.id.delete_my_account_button)
     void deleteAccount() {
         ToastUtils.longToast(R.string.coming_soon);
+    }
+
+    private void initFields() {
+        user = UserFriendUtils.createLocalUser(AppSession.getSession().getUser());
+    }
+
+    private void fillUI() {
+        pushNotificationSwitch.setChecked(appSharedHelper.isEnablePushNotifications());
+        changePasswordView.setVisibility(
+                LoginType.FACEBOOK.equals(AppSession.getSession().getLoginType()) ? View.GONE : View.VISIBLE);
+        fullNameTextView.setText(user.getFullName());
+
+        showUserAvatar();
+    }
+
+    private void showUserAvatar() {
+        ImageLoader.getInstance().displayImage(user.getAvatar(), avatarImageView);
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION, new LogoutSuccessAction());
+        addAction(QBServiceConsts.LOGOUT_FAIL_ACTION, failAction);
+
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.LOGOUT_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.LOGOUT_FAIL_ACTION);
+
+        updateBroadcastActionList();
     }
 
     private void startLandingScreen() {

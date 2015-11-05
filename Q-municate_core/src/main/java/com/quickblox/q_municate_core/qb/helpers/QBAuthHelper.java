@@ -151,6 +151,7 @@ public class QBAuthHelper extends BaseHelper {
         newUser.setId(user.getId());
         newUser.setPassword(user.getPassword());
         newUser.setFileId(qbFile.getId());
+        newUser.setFullName(user.getFullName());
 
         UserCustomData userCustomData = getUserCustomData(user);
         userCustomData.setAvatar_url(qbFile.getPublicUrl());

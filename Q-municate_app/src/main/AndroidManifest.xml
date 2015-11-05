@@ -127,8 +127,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.profile.MyProfileActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/prf_title"
+            android:label="@string/profile_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.chats.AddFriendsToGroupActivity"

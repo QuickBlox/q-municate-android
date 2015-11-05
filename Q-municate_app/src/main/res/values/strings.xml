@@ -96,8 +96,19 @@
     <string name="change_password_change">Change</string>
     <string name="change_password_hint_old_password">Old Password</string>
     <string name="change_password_hint_new_password">New Password</string>
-    <string name="change_password_not_old_password_field_entered">Please enter old password</string>
-    <string name="change_password_not_new_password_field_entered">Please enter new password</string>
+    <string name="change_password_all_fields_not_entered">Please fill all empty input fields</string>
+    <string name="change_password_old_password_not_entered">Please enter old password</string>
+    <string name="change_password_new_password_not_entered">Please enter new password</string>
+    <string name="change_password_old_password_wrong">Wrong old password</string>
+
+
+    <!-- Profile -->
+    <string name="profile_title">Edit</string>
+    <string name="profile_full_name">Full Name</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_full_name_not_entered">Please enter Full Name</string>
+    <string name="profile_full_name_not_changed">Full Name must be different</string>
+    <string name="profile_full_name_and_photo_not_changed">Full Name or Photo must be changed</string>
 
 
     // NOT REFACTORED YET
@@ -171,15 +182,6 @@
     <string name="pref_title_presence">Presence</string>
     <string name="pref_title_push_notifications">Push Notifications</string>
     <string name="pref_title_media">Media</string>
-
-    <!-- Profile -->
-    <string name="prf_full_name">Full Name</string>
-    <string name="prf_change">Change</string>
-    <string name="prf_title">Profile</string>
-    <string name="prf_email">Email</string>
-    <string name="prf_phone">Phone</string>
-    <string name="prf_status_message">Status Message</string>
-    <string name="prf_done">Done</string>
 
     <!-- Invite Friends -->
     <string name="inf_header_label">Let your other friends know about \n Q-municate by sending them private invitations</string>

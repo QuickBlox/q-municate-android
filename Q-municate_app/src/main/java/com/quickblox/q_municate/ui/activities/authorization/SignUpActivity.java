@@ -178,7 +178,7 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         startCropActivity(originalUri);
     }
 
-    @OnClick(R.id.change_avatar_linearlayout)
+    @OnClick(R.id.change_avatar_view)
     void selectAvatar(View view) {
         imageUtils.getImage();
     }

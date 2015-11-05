@@ -5,68 +5,61 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate_core.utils.ConstsCore;
-import com.quickblox.q_municate_core.utils.Utils;
-import com.quickblox.users.model.QBUser;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
+import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
-import com.quickblox.q_municate.utils.simple.SimpleTextWatcher;
-import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate_core.utils.Utils;
+import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
-// TODO need to refactor
-@Deprecated
-public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
-        View.OnClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
+import butterknife.Bind;
+import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
-    private LinearLayout changeAvatarLinearLayout;
-    private RoundedImageView avatarImageView;
-    private LinearLayout emailLinearLayout;
-    private RelativeLayout changeFullNameRelativeLayout;
-    private RelativeLayout changePhoneRelativeLayout;
-    private RelativeLayout changeStatusRelativeLayout;
-    private TextView emailTextView;
-    private EditText fullNameEditText;
-    private EditText phoneEditText;
-    private EditText statusEditText;
-    private View actionView;
-    private View actionCancelView;
-    private View actionDoneView;
+public class MyProfileActivity extends BaseLogeableActivity
+        implements ReceiveFileFromBitmapTask.ReceiveFileListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener{
 
-    private ImageUtils imageUtils;
-    private Bitmap avatarBitmapCurrent;
-    private String fullNameCurrent;
-    private String phoneCurrent;
-    private String statusCurrent;
-    private String fullNameOld;
-    private String phoneOld;
-    private String statusOld;
-    private QBUser user;
-    private boolean isNeedUpdateAvatar;
+    private static String TAG = MyProfileActivity.class.getSimpleName();
+
+    @Bind(R.id.photo_imageview)
+    RoundedImageView photoImageView;
+
+    @Bind(R.id.full_name_textinputlayout)
+    TextInputLayout fullNameTextInputLayout;
+
+    @Bind(R.id.full_name_edittext)
+    EditText fullNameEditText;
+
+    private QBUser qbUser;
+    private boolean isNeedUpdatePhoto;
     private Uri outputUri;
     private UserCustomData userCustomData;
+    private ImageUtils imageUtils;
+    private Bitmap currentPhotoBitmap;
+    private String currentFullName;
+    private String oldFullName;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MyProfileActivity.class);
@@ -75,131 +68,18 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
 
     @Override
     protected int getContentResId() {
-        return R.layout.activity_profile;
+        return R.layout.activity_my_profile;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setUpActionBarWithUpButton();
 
-        user = AppSession.getSession().getUser();
-        imageUtils = new ImageUtils(this);
-
-        initUI();
-        initListeners();
-        initUIWithUsersData();
-        initBroadcastActionList();
-        initTextChangedListeners();
-        updateOldUserData();
-        hideAction();
-    }
-
-    private void initUI() {
-        actionView = _findViewById(R.id.action_view);
-        actionCancelView = _findViewById(R.id.action_cancel_view);
-        actionDoneView = _findViewById(R.id.action_done_view);
-        changeAvatarLinearLayout = _findViewById(R.id.change_avatar_linearlayout);
-        avatarImageView = _findViewById(R.id.avatar_imageview);
-        emailLinearLayout = _findViewById(R.id.email_linearlayout);
-        changeFullNameRelativeLayout = _findViewById(R.id.change_fullname_relativelayout);
-        changePhoneRelativeLayout = _findViewById(R.id.change_phone_relativelayout);
-        changeStatusRelativeLayout = _findViewById(R.id.change_status_relativelayout);
-        emailTextView = _findViewById(R.id.email_textview);
-        fullNameEditText = _findViewById(R.id.full_name_edittext);
-        phoneEditText = _findViewById(R.id.phone_edittext);
-        statusEditText = _findViewById(R.id.status_edittext);
-    }
-
-    private void initListeners() {
-        changeAvatarLinearLayout.setOnClickListener(this);
-        avatarImageView.setOnClickListener(this);
-        changeFullNameRelativeLayout.setOnClickListener(this);
-        changePhoneRelativeLayout.setOnClickListener(this);
-        changeStatusRelativeLayout.setOnClickListener(this);
-
-        actionCancelView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                resetUserData();
-                initUIWithUsersData();
-                hideAction();
-            }
-        });
-
-        actionDoneView.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                updateUserData();
-            }
-        });
-    }
-
-    private void initCustomData() {
-        userCustomData = Utils.customDataToObject(user.getCustomData());
-
-        if (userCustomData == null) {
-            userCustomData = new UserCustomData();
-        }
-    }
-
-    private void initUIWithUsersData() {
-        initCustomData();
-
-        loadAvatar();
-        fullNameOld = user.getFullName();
-        fullNameEditText.setText(fullNameOld);
-
-        if (TextUtils.isEmpty(user.getEmail())) {
-            emailLinearLayout.setVisibility(View.GONE);
-        } else {
-            emailLinearLayout.setVisibility(View.VISIBLE);
-            emailTextView.setText(user.getEmail());
-        }
-
-        phoneOld = user.getPhone();
-        phoneEditText.setText(phoneOld);
-
-        statusOld = userCustomData.getStatus();
-
-        statusEditText.setText(statusOld);
-    }
-
-    private void initBroadcastActionList() {
-        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
-        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
-    }
-
-    private void loadAvatar() {
-        if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatar_url())) {
-            ImageLoader.getInstance().displayImage(userCustomData.getAvatar_url(),
-                    avatarImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
-        }
-    }
-
-    private void initTextChangedListeners() {
-        TextWatcher textWatcherListener = new TextWatcherListener();
-        fullNameEditText.addTextChangedListener(textWatcherListener);
-        phoneEditText.addTextChangedListener(textWatcherListener);
-        statusEditText.addTextChangedListener(textWatcherListener);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.avatar_imageview:
-            case R.id.change_avatar_linearlayout:
-                changeAvatarOnClick();
-                break;
-            case R.id.change_fullname_relativelayout:
-                changeFullNameOnClick();
-                break;
-            case R.id.change_phone_relativelayout:
-                changePhoneOnClick();
-                break;
-            case R.id.change_status_relativelayout:
-                changeStatusOnClick();
-                break;
-        }
+        initFields();
+        initData();
+        addActions();
+        updateOldData();
     }
 
     @Override
@@ -216,55 +96,47 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void handleCrop(int resultCode, Intent result) {
-        if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
-            showAction();
-        } else if (resultCode == Crop.RESULT_ERROR) {
-            ToastUtils.longToast(Crop.getError(result).getMessage());
-        }
-        canPerformLogout.set(true);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.done_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
-    private void startCropActivity(Uri originalUri) {
-        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        Crop.of(originalUri, outputUri).asSquare().start(this);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_done:
+                updateUser();
+                break;
+            default:
+                super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
+    }
+
+    @OnTextChanged(R.id.full_name_edittext)
+    void onTextChangedFullName(CharSequence text) {
+        fullNameTextInputLayout.setError(null);
+    }
+
+    @OnClick(R.id.change_photo_view)
+    void changePhoto(View view) {
+        fullNameTextInputLayout.setError(null);
+        canPerformLogout.set(false);
+        imageUtils.getImage();
     }
 
     @Override
     public void onUriScaledBitmapReceived(Uri originalUri) {
         hideProgress();
         startCropActivity(originalUri);
-    }
-
-    public void changeAvatarOnClick() {
-        canPerformLogout.set(false);
-        imageUtils.getImage();
-    }
-
-    public void changeFullNameOnClick() {
-        initChangingEditText(fullNameEditText);
-    }
-
-    private void initChangingEditText(EditText editText) {
-        editText.setEnabled(true);
-        editText.requestFocus();
-        KeyboardUtils.showKeyboard(this);
-    }
-
-    private void stopChangingEditText(EditText editText) {
-        editText.setEnabled(false);
-        KeyboardUtils.hideKeyboard(this);
-    }
-
-    public void changePhoneOnClick() {
-        initChangingEditText(phoneEditText);
-    }
-
-    public void changeStatusOnClick() {
-        initChangingEditText(statusEditText);
     }
 
     @Override
@@ -277,112 +149,119 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
     public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
-    private void updateCurrentUserData() {
-        fullNameCurrent = fullNameEditText.getText().toString();
-        phoneCurrent = phoneEditText.getText().toString();
-        statusCurrent = statusEditText.getText().toString();
+    private void initFields() {
+        imageUtils = new ImageUtils(this);
+        qbUser = AppSession.getSession().getUser();
     }
 
-    private void updateUserData() {
-        updateCurrentUserData();
-        if (isUserDataChanged()) {
-            saveChanges();
+    private void initData() {
+        currentFullName = qbUser.getFullName();
+        initCustomData();
+        loadAvatar();
+        fullNameEditText.setText(currentFullName);
+    }
+
+    private void initCurrentData() {
+        currentFullName = fullNameEditText.getText().toString();
+        initCustomData();
+    }
+
+    private void initCustomData() {
+        userCustomData = Utils.customDataToObject(qbUser.getCustomData());
+        if (userCustomData == null) {
+            userCustomData = new UserCustomData();
         }
     }
 
-    private boolean isUserDataChanged() {
-        return isNeedUpdateAvatar || !fullNameCurrent.equals(fullNameOld) || !phoneCurrent.equals(
-                phoneOld) || !statusCurrent.equals(statusOld);
+    private void loadAvatar() {
+        if (userCustomData != null && !TextUtils.isEmpty(userCustomData.getAvatar_url())) {
+            ImageLoader.getInstance().displayImage(userCustomData.getAvatar_url(),
+                    photoImageView, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
+        }
     }
 
-    private void saveChanges() {
-        if (!isUserDataCorrect()) {
-            ToastUtils.longToast(R.string.dlg_not_all_fields_entered);
-            return;
+    private void updateOldData() {
+        oldFullName = fullNameEditText.getText().toString();
+        isNeedUpdatePhoto = false;
+    }
+
+    private void resetUserData() {
+        qbUser.setFullName(oldFullName);
+        isNeedUpdatePhoto = false;
+        initCurrentData();
+    }
+
+    private void addActions() {
+        addAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION, new UpdateUserSuccessAction());
+        addAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION, new UpdateUserFailAction());
+
+        updateBroadcastActionList();
+    }
+
+    private void removeActions() {
+        removeAction(QBServiceConsts.UPDATE_USER_SUCCESS_ACTION);
+        removeAction(QBServiceConsts.UPDATE_USER_FAIL_ACTION);
+
+        updateBroadcastActionList();
+    }
+
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            isNeedUpdatePhoto = true;
+            currentPhotoBitmap = imageUtils.getBitmap(outputUri);
+            photoImageView.setImageBitmap(currentPhotoBitmap);
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            ToastUtils.longToast(Crop.getError(result).getMessage());
         }
+        canPerformLogout.set(true);
+    }
 
-        showProgress();
-
-        if (isNeedUpdateAvatar) {
-            new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
-        } else {
-            QBUser newUser = createUserForUpdating();
-            QBUpdateUserCommand.start(this, newUser, null);
-        }
-
-        stopChangingEditText(fullNameEditText);
-        stopChangingEditText(phoneEditText);
-        stopChangingEditText(statusEditText);
+    private void startCropActivity(Uri originalUri) {
+        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, outputUri).asSquare().start(this);
     }
 
     private QBUser createUserForUpdating() {
         QBUser newUser = new QBUser();
-        newUser.setId(user.getId());
-        newUser.setPassword(user.getPassword());
-        newUser.setOldPassword(user.getOldPassword());
-
-        if (isFieldValueChanged(fullNameCurrent, fullNameOld)) {
-            user.setFullName(fullNameCurrent);
-            newUser.setFullName(fullNameCurrent);
-        }
-
-        if (isFieldValueChanged(phoneCurrent, phoneOld)) {
-            user.setPhone(phoneCurrent);
-            newUser.setPhone(phoneCurrent);
-        }
-
-        if (isFieldValueChanged(statusCurrent, statusOld) || isNeedUpdateAvatar) {
-            userCustomData.setStatus(statusCurrent);
-            user.setCustomData(Utils.customDataToString(userCustomData));
-        }
-
+        newUser.setId(qbUser.getId());
+        newUser.setPassword(qbUser.getPassword());
+        newUser.setOldPassword(qbUser.getOldPassword());
+        qbUser.setFullName(currentFullName);
+        newUser.setFullName(currentFullName);
         newUser.setCustomData(Utils.customDataToString(userCustomData));
-
         return newUser;
     }
 
-    private boolean isFieldValueChanged(String fieldValue, String oldFieldValue) {
-        return !fieldValue.equals(oldFieldValue);
+    private boolean isDataChanged() {
+        return isNeedUpdatePhoto || !oldFullName.equals(currentFullName);
     }
 
-    private boolean isUserDataCorrect() {
-        return fullNameCurrent.length() > ConstsCore.ZERO_INT_VALUE;
+    private boolean isFullNameNotEmpty() {
+        return !TextUtils.isEmpty(currentFullName.trim());
     }
 
-    private void updateOldUserData() {
-        fullNameOld = fullNameEditText.getText().toString();
-        phoneOld = phoneEditText.getText().toString();
-        statusOld = statusEditText.getText().toString();
-        isNeedUpdateAvatar = false;
+    private void updateUser() {
+        initCurrentData();
+
+        if (isDataChanged()) {
+            saveChanges();
+        } else {
+            fullNameTextInputLayout.setError(getString(R.string.profile_full_name_and_photo_not_changed));
+        }
     }
 
-    private void resetUserData() {
-        user.setFullName(fullNameOld);
-        user.setPhone(phoneOld);
-        initCustomData();
+    private void saveChanges() {
+        if (isFullNameNotEmpty()) {
+            showProgress();
 
-        isNeedUpdateAvatar = false;
-    }
-
-    private boolean isActionViewVisible() {
-        return actionView.getVisibility() == View.VISIBLE;
-    }
-
-    private void showAction() {
-        actionView.setVisibility(View.VISIBLE);
-    }
-
-    private void hideAction() {
-        actionView.setVisibility(View.GONE);
-    }
-
-    private class TextWatcherListener extends SimpleTextWatcher {
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (!isActionViewVisible()) {
-                showAction();
+            if (isNeedUpdatePhoto) {
+                new ReceiveFileFromBitmapTask(this).execute(imageUtils, currentPhotoBitmap, true);
+            } else {
+                QBUser newUser = createUserForUpdating();
+                QBUpdateUserCommand.start(this, newUser, null);
             }
+        } else {
+            new ValidationUtils(this).isValidFullName(fullNameTextInputLayout, oldFullName, currentFullName);
         }
     }
 
@@ -390,13 +269,14 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
 
         @Override
         public void execute(Bundle bundle) {
+            hideProgress();
+
             Exception exception = (Exception) bundle.getSerializable(QBServiceConsts.EXTRA_ERROR);
             if (exception != null) {
                 ToastUtils.longToast(exception.getMessage());
             }
 
             resetUserData();
-            hideProgress();
         }
     }
 
@@ -404,11 +284,11 @@ public class MyProfileActivity extends BaseLogeableActivity implements ReceiveFi
 
         @Override
         public void execute(Bundle bundle) {
+            hideProgress();
+
             QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
             AppSession.getSession().updateUser(user);
-            updateOldUserData();
-            hideAction();
-            hideProgress();
+            updateOldData();
         }
     }
 }

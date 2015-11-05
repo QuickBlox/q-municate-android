@@ -51,11 +51,6 @@
     <color name="call_background">#333333</color>
     <color name="call_timer_text">#999999</color>
 
-    <color name="static_action_mode_background">#f3f3f3</color>
-    <color name="static_action_mode_button_text">#666666</color>
-    <color name="static_action_mode_button_pressed">#1a000000</color>
-    <color name="static_action_mode_button_focused">#77000000</color>
-
     <color name="invite_friends_item">#f8f8f8</color>
 
 </resources>

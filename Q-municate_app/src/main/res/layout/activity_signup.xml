@@ -60,7 +60,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
-            android:id="@+id/change_avatar_linearlayout"
+            android:id="@+id/change_avatar_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"

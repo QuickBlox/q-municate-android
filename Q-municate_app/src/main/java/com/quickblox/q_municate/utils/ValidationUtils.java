@@ -25,22 +25,39 @@ public class ValidationUtils {
 
         if (isOldPasswordEntered && isNewPasswordEntered) {
             if (!qbUser.getPassword().equals(oldPasswordText)) {
-                oldPasswordTextInputLayout.setError(context.getString(R.string.dlg_old_password_wrong));
+                oldPasswordTextInputLayout.setError(context.getString(R.string.change_password_old_password_wrong));
             } else {
                 return true;
             }
         } else if (!isOldPasswordEntered && !isNewPasswordEntered) {
-            oldPasswordTextInputLayout.setError(context.getString(R.string.dlg_not_all_fields_entered));
-            newPasswordTextInputLayout.setError(context.getString(R.string.dlg_not_all_fields_entered));
+            oldPasswordTextInputLayout.setError(context.getString(R.string.change_password_all_fields_not_entered));
+            newPasswordTextInputLayout.setError(context.getString(R.string.change_password_all_fields_not_entered));
         } else {
             if (!isOldPasswordEntered) {
                 oldPasswordTextInputLayout
-                        .setError(context.getString(R.string.change_password_not_old_password_field_entered));
+                        .setError(context.getString(R.string.change_password_old_password_not_entered));
             }
             if (!isNewPasswordEntered) {
                 newPasswordTextInputLayout
-                        .setError(context.getString(R.string.change_password_not_new_password_field_entered));
+                        .setError(context.getString(R.string.change_password_new_password_not_entered));
             }
+        }
+
+        return false;
+    }
+
+    public boolean isValidFullName(TextInputLayout fullNameTextInputLayout, String oldFullName,
+            String newFullName) {
+        boolean fullNameEntered = !TextUtils.isEmpty(newFullName);
+
+        if (fullNameEntered) {
+            if (newFullName.equals(oldFullName)) {
+                fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_changed));
+            } else {
+                return true;
+            }
+        } else {
+            fullNameTextInputLayout.setError(context.getString(R.string.profile_full_name_not_entered));
         }
 
         return false;
