@@ -72,6 +72,64 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        localSearchAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        deleteObservers();
+    }
+
+    @OnTouch(R.id.dialogs_recyclerview)
+    boolean touchList(View view, MotionEvent event) {
+        KeyboardUtils.hideKeyboard(baseActivity);
+        return false;
+    }
+
+    @Override
+    public void prepareSearch() {
+        if (localSearchAdapter != null) {
+            localSearchAdapter.flushFilter();
+        }
+    }
+
+    @Override
+    public void search(String searchQuery) {
+        if (localSearchAdapter != null) {
+            localSearchAdapter.setFilter(searchQuery);
+        }
+    }
+
+    @Override
+    public void cancelSearch() {
+        searchQuery = null;
+
+        if (localSearchAdapter != null) {
+            localSearchAdapter.flushFilter();
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        localSearchAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected Loader<List<Dialog>> createDataLoader() {
+        return new DialogsListLoader(getActivity(), dataManager);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
+        this.dialogsList = dialogsList;
+        updateLocal();
+    }
+
     private void initFields() {
         dataManager = DataManager.getInstance();
         commonObserver = new CommonObserver();
@@ -109,53 +167,6 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        localSearchAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        deleteObservers();
-    }
-
-    @Override
-    public void prepareSearch() {
-        if (localSearchAdapter != null) {
-            localSearchAdapter.flushFilter();
-        }
-    }
-
-    @Override
-    public void search(String searchQuery) {
-        if (localSearchAdapter != null) {
-            localSearchAdapter.setFilter(searchQuery);
-        }
-    }
-
-    @Override
-    public void cancelSearch() {
-        searchQuery = null;
-
-        if (localSearchAdapter != null) {
-            localSearchAdapter.flushFilter();
-        }
-    }
-
-    @OnTouch(R.id.dialogs_recyclerview)
-    public boolean touchList(View view, MotionEvent event) {
-        KeyboardUtils.hideKeyboard(baseActivity);
-        return false;
-    }
-
-    @Override
-    public void onChangedUserStatus(int userId, boolean online) {
-        super.onChangedUserStatus(userId, online);
-        localSearchAdapter.notifyDataSetChanged();
-    }
-
     private void addObservers() {
         dataManager.getUserRequestDataManager().addObserver(commonObserver);
         dataManager.getFriendDataManager().addObserver(commonObserver);
@@ -176,17 +187,6 @@ public class LocalSearchFragment extends BaseLoaderFragment<List<Dialog>> implem
         if (searchQuery != null) {
             search(searchQuery);
         }
-    }
-
-    @Override
-    protected Loader<List<Dialog>> createDataLoader() {
-        return new DialogsListLoader(getActivity(), dataManager);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Dialog>> loader, List<Dialog> dialogsList) {
-        this.dialogsList = dialogsList;
-        updateLocal();
     }
 
     private void startGroupChatActivity(Dialog dialog) {

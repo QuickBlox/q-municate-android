@@ -54,17 +54,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         actionBarBridge.setActionBarUpButtonEnabled(true);
     }
 
-    private void initViewPagerAdapter() {
-        searchViewPagerAdapter = new SearchViewPagerAdapter(getChildFragmentManager());
-        searchViewPager.setAdapter(searchViewPagerAdapter);
-        searchViewPager.setOnPageChangeListener(new PageChangeListener());
-        searchRadioGroup.check(R.id.local_search_radiobutton);
-    }
-
-    private void initCustomListeners() {
-        searchRadioGroup.setOnCheckedChangeListener(new RadioGroupListener());
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.search_menu, menu);
@@ -104,6 +93,29 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         KeyboardUtils.hideKeyboard(getActivity());
     }
 
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        cancelSearch();
+        launchDialogsListFragment();
+        return true;
+    }
+
+    private void initViewPagerAdapter() {
+        searchViewPagerAdapter = new SearchViewPagerAdapter(getChildFragmentManager());
+        searchViewPager.setAdapter(searchViewPagerAdapter);
+        searchViewPager.setOnPageChangeListener(new PageChangeListener());
+        searchRadioGroup.check(R.id.local_search_radiobutton);
+    }
+
+    private void initCustomListeners() {
+        searchRadioGroup.setOnCheckedChangeListener(new RadioGroupListener());
+    }
+
     private void launchDialogsListFragment() {
         baseActivity.setCurrentFragment(DialogsListFragment.newInstance());
     }
@@ -118,18 +130,6 @@ public class SearchFragment extends BaseFragment implements SearchView.OnQueryTe
         if (searchViewPagerAdapter != null && searchViewPager != null) {
             searchViewPagerAdapter.cancelSearch(searchViewPager.getCurrentItem());
         }
-    }
-
-    @Override
-    public boolean onMenuItemActionExpand(MenuItem item) {
-        return true;
-    }
-
-    @Override
-    public boolean onMenuItemActionCollapse(MenuItem item) {
-        cancelSearch();
-        launchDialogsListFragment();
-        return true;
     }
 
     private class RadioGroupListener implements RadioGroup.OnCheckedChangeListener {

@@ -85,6 +85,64 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        globalSearchAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        removeActions();
+        deleteObservers();
+    }
+
+    @OnTouch(R.id.contacts_recyclerview)
+    boolean touchContactsList(View view, MotionEvent event) {
+        KeyboardUtils.hideKeyboard(baseActivity);
+        return false;
+    }
+
+    @Override
+    public void prepareSearch() {
+        clearOldData();
+
+        if (globalSearchAdapter != null) {
+            globalSearchAdapter.setUserType(GlobalSearchAdapter.UserType.GLOBAL);
+            updateList();
+        }
+    }
+
+    @Override
+    public void search(String searchQuery) {
+        this.searchQuery = searchQuery;
+        clearOldData();
+        startSearch();
+        if (globalSearchAdapter != null && !globalSearchAdapter.getAllItems().isEmpty()) {
+            globalSearchAdapter.setFilter(searchQuery);
+        }
+    }
+
+    @Override
+    public void cancelSearch() {
+        searchQuery = null;
+        searchTimer.cancel();
+        clearOldData();
+
+        if (globalSearchAdapter != null) {
+            updateList();
+        }
+    }
+
+    @Override
+    public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
+        if (!usersList.isEmpty() && usersList.size() < totalEntries) {
+            page++;
+            searchUsers();
+        }
+    }
+
     private void initFields() {
         dataManager = DataManager.getInstance();
         searchTimer = new Timer();
@@ -109,7 +167,8 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
             @Override
             public void onItemClicked(View view, User user, int position) {
                 boolean isFriend = dataManager.getFriendDataManager().existsByUserId(user.getUserId());
-                boolean outgoingUser = dataManager.getUserRequestDataManager().existsByUserId(user.getUserId());
+                boolean outgoingUser = dataManager.getUserRequestDataManager()
+                        .existsByUserId(user.getUserId());
                 if (isFriend || outgoingUser) {
                     UserProfileActivity.start(baseActivity, user.getUserId());
                 }
@@ -119,63 +178,8 @@ public class GlobalSearchFragment extends BaseFragment implements SearchListener
         swipyRefreshLayout.setOnRefreshListener(this);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        globalSearchAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        removeActions();
-        deleteObservers();
-    }
-
     private void updateList() {
         globalSearchAdapter.setList(usersList);
-    }
-
-    @Override
-    public void prepareSearch() {
-        clearOldData();
-
-        if (globalSearchAdapter != null) {
-            globalSearchAdapter.setUserType(GlobalSearchAdapter.UserType.GLOBAL);
-            updateList();
-        }
-    }
-
-    @Override
-    public void search(String searchQuery) {
-        this.searchQuery = searchQuery;
-        clearOldData();
-        startSearch();
-    }
-
-    @Override
-    public void cancelSearch() {
-        searchQuery = null;
-        searchTimer.cancel();
-        clearOldData();
-
-        if (globalSearchAdapter != null) {
-            updateList();
-        }
-    }
-
-    @Override
-    public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
-        if (!usersList.isEmpty() && usersList.size() < totalEntries) {
-            page++;
-            searchUsers();
-        }
-    }
-
-    @OnTouch(R.id.contacts_recyclerview)
-    public boolean touchContactsList(View view, MotionEvent event) {
-        KeyboardUtils.hideKeyboard(baseActivity);
-        return false;
     }
 
     private void updateContactsList(List<User> usersList) {
