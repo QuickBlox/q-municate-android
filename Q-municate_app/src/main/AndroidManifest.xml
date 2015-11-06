@@ -89,21 +89,13 @@
         <activity
             android:name=".ui.activities.chats.NewMessageActivity"
             android:label="@string/new_message_title"
-            android:parentActivityName=".ui.activities.main.MainActivity"
             android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.main.MainActivity" />
         </activity>
         <activity
             android:name=".ui.activities.chats.NewGroupDialogActivity"
             android:label="@string/new_group_title"
             android:noHistory="true"
-            android:parentActivityName=".ui.activities.main.MainActivity"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.main.MainActivity" />
+            android:screenOrientation="portrait">/>
         </activity>
         <activity
             android:name=".ui.activities.chats.CreateGroupDialogActivity"

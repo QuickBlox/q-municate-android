@@ -397,8 +397,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         if (intent == null) {
             finish();
         } else {
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            NavUtils.navigateUpTo(this, intent);
+            NavUtils.navigateUpFromSameTask(this);
         }
     }
 

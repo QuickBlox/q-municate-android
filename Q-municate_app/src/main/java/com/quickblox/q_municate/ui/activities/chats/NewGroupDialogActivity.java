@@ -67,7 +67,6 @@ public class NewGroupDialogActivity extends BaseFriendsListActivity implements S
         List<User> selectedFriendsList = ((SelectableFriendsAdapter) friendsAdapter).getSelectedFriendsList();
         if (!selectedFriendsList.isEmpty()) {
             CreateGroupDialogActivity.start(this, selectedFriendsList);
-            finish();
         } else {
             ToastUtils.longToast(R.string.new_group_no_friends_for_creating_group);
         }
