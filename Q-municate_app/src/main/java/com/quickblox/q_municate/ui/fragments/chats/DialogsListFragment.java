@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
+import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.chats.NewMessageActivity;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
@@ -37,7 +38,11 @@ import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.chat.QBDeleteChatCommand;
+import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.ChatUtils;
+import com.quickblox.q_municate_core.utils.DbUtils;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -46,6 +51,7 @@ import com.quickblox.q_municate_db.managers.DialogOccupantDataManager;
 import com.quickblox.q_municate_db.managers.MessageDataManager;
 import com.quickblox.q_municate_db.managers.UserDataManager;
 import com.quickblox.q_municate_db.models.Dialog;
+import com.quickblox.q_municate_db.models.DialogNotification;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 import com.quickblox.users.model.QBUser;
@@ -204,6 +210,15 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
         }
     }
 
+    @Override
+    public void onConnectedToService(QBService service) {
+        if (groupChatHelper == null) {
+            if (service != null) {
+                groupChatHelper = (QBGroupChatHelper) service.getHelper(QBService.GROUP_CHAT_HELPER);
+            }
+        }
+    }
+
     private void checkVisibilityEmptyLabel() {
         emptyListTextView.setVisibility(dialogsListAdapter.isEmpty() ? View.VISIBLE : View.GONE);
     }
@@ -220,9 +235,7 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     private void loadLogoActionBar(String logoUrl) {
-        ImageLoader.getInstance().loadImage(
-                logoUrl,
-                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
@@ -271,6 +284,17 @@ public class DialogsListFragment extends BaseLoaderFragment<List<Dialog>> {
     }
 
     private void deleteDialog(Dialog dialog) {
+        if (Dialog.Type.GROUP.equals(dialog.getType())) {
+            if (groupChatHelper != null) {
+                try {
+                    groupChatHelper.sendNotificationToFriends(ChatUtils.createQBDialogFromLocalDialog(dataManager, dialog),
+                            DialogNotification.Type.LEAVE_DIALOG, null);
+                    DbUtils.deleteDialogLocal(dataManager, dialog.getDialogId());
+                } catch (QBResponseException e) {
+                    ErrorUtils.logError(e);
+                }
+            }
+        }
         QBDeleteChatCommand.start(baseActivity, dialog.getDialogId(), dialog.getType());
     }
 

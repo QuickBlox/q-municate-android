@@ -550,4 +550,10 @@ public class ChatUtils {
         dialogOccupant.setDialog(dataManager.getDialogDataManager().getByDialogId(dialogId));
         return dialogOccupant;
     }
+
+    public static void addOccupantsToQBDialog(QBDialog qbDialog, QBChatMessage qbChatMessage) {
+        qbDialog.setOccupantsIds(new ArrayList<Integer>(2));
+        qbDialog.getOccupants().add(qbChatMessage.getSenderId());
+        qbDialog.getOccupants().add(qbChatMessage.getRecipientId());
+    }
 }
