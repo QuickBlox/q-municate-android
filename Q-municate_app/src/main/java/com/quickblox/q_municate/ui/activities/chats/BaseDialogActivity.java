@@ -198,6 +198,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @OnClick(R.id.smile_panel_imagebutton)
     void smilePanelImageButtonClicked() {
         visibleOrHideSmilePanel();
+        scrollMessagesWithDelay();
     }
 
     @OnClick(R.id.attach_button)
@@ -233,10 +234,8 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     private void registerBroadcastReceivers() {
-        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
-        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver,
-                new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
+        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver, new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver, new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
     private void unregisterBroadcastReceivers() {
@@ -381,9 +380,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void loadActionBarLogo(String logoUrl) {
-        ImageLoader.getInstance().loadImage(
-                logoUrl,
-                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
+        ImageLoader.getInstance().loadImage(logoUrl, ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS,
                 new SimpleImageLoadingListener() {
 
                     @Override
@@ -395,14 +392,11 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void setDefaultActionBarLogo(int drawableResId) {
-        setActionBarIcon(ImageUtils.getRoundIconDrawable(this,
-                        BitmapFactory.decodeResource(getResources(), drawableResId)));
+        setActionBarIcon(ImageUtils.getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
     protected void startLoadAttachFile(final File file) {
-        TwoButtonsDialogFragment.show(
-                getSupportFragmentManager(),
-                R.string.dialog_confirm_sending_attach,
+        TwoButtonsDialogFragment.show(getSupportFragmentManager(), R.string.dialog_confirm_sending_attach,
                 new MaterialDialog.ButtonCallback() {
                     @Override
                     public void onPositive(MaterialDialog dialog) {
