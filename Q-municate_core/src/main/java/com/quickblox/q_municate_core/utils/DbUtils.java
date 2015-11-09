@@ -91,7 +91,7 @@ public class DbUtils {
 
     public static void updateStatusMessageLocal(DataManager dataManager, String messageId, State state) {
         Message message = dataManager.getMessageDataManager().getByMessageId(messageId);
-        if (message != null) {
+        if (message != null && !state.equals(message.getState())) {
             message.setState(state);
             dataManager.getMessageDataManager().update(message);
         }

@@ -343,15 +343,19 @@ public abstract class QBBaseChatHelper extends BaseHelper {
 
     public void updateStatusMessageReadServer(String dialogId, CombinationMessage combinationMessage,
             boolean fromPrivate) throws Exception {
-        StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
-        messagesIdsList.add(combinationMessage.getMessageId());
-        QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
-
         if (fromPrivate) {
             QBPrivateChat privateChat = createPrivateChatIfNotExist(combinationMessage.getDialogOccupant().getUser().getUserId());
             if (privateChat != null) {
-                privateChat.readMessage(combinationMessage.getMessageId());
+                QBChatMessage qbChatMessage = new QBChatMessage();
+                qbChatMessage.setId(combinationMessage.getMessageId());
+                qbChatMessage.setDialogId(dialogId);
+                qbChatMessage.setSenderId(combinationMessage.getDialogOccupant().getUser().getUserId());
+                privateChat.readMessage(qbChatMessage);
             }
+        } else {
+            StringifyArrayList<String> messagesIdsList = new StringifyArrayList<String>();
+            messagesIdsList.add(combinationMessage.getMessageId());
+            QBChatService.markMessagesAsRead(dialogId, messagesIdsList);
         }
     }
 

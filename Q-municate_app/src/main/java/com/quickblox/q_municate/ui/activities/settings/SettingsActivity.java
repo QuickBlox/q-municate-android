@@ -21,6 +21,7 @@ import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragme
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -145,7 +146,10 @@ public class SettingsActivity extends BaseLogeableActivity {
     }
 
     private void showUserAvatar() {
-        ImageLoader.getInstance().displayImage(user.getAvatar(), avatarImageView);
+        ImageLoader.getInstance().displayImage(
+                user.getAvatar(),
+                avatarImageView,
+                ImageLoaderUtils.UIL_USER_AVATAR_DISPLAY_OPTIONS);
     }
 
     private void addActions() {

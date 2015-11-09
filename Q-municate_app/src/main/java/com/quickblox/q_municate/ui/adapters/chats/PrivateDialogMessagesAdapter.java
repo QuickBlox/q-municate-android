@@ -102,6 +102,8 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
             if (ownMessage && combinationMessage.getState() != null) {
                 setMessageStatus(viewHolder.messageDeliveryStatusImageView, State.DELIVERED.equals(
                         combinationMessage.getState()), State.READ.equals(combinationMessage.getState()));
+            } else if (ownMessage && combinationMessage.getState() == null) {
+                viewHolder.messageDeliveryStatusImageView.setImageResource(android.R.color.transparent);
             }
         }
 
