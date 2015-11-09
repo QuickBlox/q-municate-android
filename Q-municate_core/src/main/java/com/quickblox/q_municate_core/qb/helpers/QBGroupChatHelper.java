@@ -163,14 +163,14 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
         }
     }
 
-    public QBDialog createGroupChat(String name, List<Integer> friendIdsList, String photo) throws Exception {
+    public QBDialog createGroupChat(String name, List<Integer> friendIdsList, String photoUrl) throws Exception {
         ArrayList<Integer> occupantIdsList = (ArrayList<Integer>) ChatUtils.getOccupantIdsWithUser(friendIdsList);
 
         QBDialog dialogToCreate = new QBDialog();
         dialogToCreate.setName(name);
         dialogToCreate.setType(QBDialogType.GROUP);
         dialogToCreate.setOccupantsIds(occupantIdsList);
-        dialogToCreate.setPhoto(photo);
+        dialogToCreate.setPhoto(photoUrl);
 
         QBDialog dialog = groupChatManager.createDialog(dialogToCreate);
         DbUtils.saveDialogToCache(dataManager, dialog);
@@ -179,7 +179,7 @@ public class QBGroupChatHelper extends QBBaseChatHelper {
 
         sendNotificationToPrivateChatAboutCreatingGroupChat(dialog, friendIdsList);
 
-        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForCreateGroupChat(context, dialog.getOccupants());
+        QBChatMessage chatMessage = ChatNotificationUtils.createNotificationMessageForCreateGroupChat(context, dialog.getOccupants(), photoUrl);
         sendGroupMessage(chatMessage, dialog.getRoomJid(), dialog.getDialogId());
 
         return dialog;

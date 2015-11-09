@@ -35,11 +35,6 @@ public class ChatNotificationUtils {
 
     public static final String PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE = "1";
     public static final String PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_UPDATE = "2";
-    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__ADDED_FRIENDS = "21";
-    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__NAME = "22";
-    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__PHOTO = "23";
-    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__LEAVE = "24";
-    public static final String PROPERTY_TYPE_TO_GROUP_CHAT__CREATE = "25";
 
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REQUEST = "4";
     public static final String PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_ACCEPT = "5";
@@ -129,6 +124,7 @@ public class ChatNotificationUtils {
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
         chatMessage.setProperty(PROPERTY_ROOM_JID, dialog.getRoomJid());
         chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
+        chatMessage.setProperty(PROPERTY_ROOM_PHOTO, dialog.getPhoto());
 
         return chatMessage;
     }
@@ -239,13 +235,14 @@ public class ChatNotificationUtils {
     }
 
     public static QBChatMessage createNotificationMessageForCreateGroupChat(Context context,
-            Collection<Integer> addedFriendIdsList) {
+            Collection<Integer> addedFriendIdsList, String photoUrl) {
         QBChatMessage chatMessage = new QBChatMessage();
         chatMessage.setProperty(PROPERTY_SAVE_TO_HISTORY, VALUE_SAVE_TO_HISTORY);
         chatMessage.setProperty(PROPERTY_NOTIFICATION_TYPE, PROPERTY_TYPE_TO_GROUP_CHAT__GROUP_CHAT_CREATE);
         chatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 addedFriendIdsList));
+        chatMessage.setProperty(PROPERTY_ROOM_PHOTO, photoUrl);
         return chatMessage;
     }
 
@@ -374,14 +371,5 @@ public class ChatNotificationUtils {
         }
 
         return resultMessage;
-    }
-
-    public static boolean isUpdateChatNotificationMessage(int messagesNotificationTypeCode) {
-        return PROPERTY_TYPE_TO_GROUP_CHAT__CREATE.equals(
-                messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__ADDED_FRIENDS
-                .equals(messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__NAME
-                .equals(messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__PHOTO
-                .equals(messagesNotificationTypeCode + ConstsCore.EMPTY_STRING) || PROPERTY_TYPE_TO_GROUP_CHAT__LEAVE
-                .equals(messagesNotificationTypeCode + ConstsCore.EMPTY_STRING);
     }
 }
