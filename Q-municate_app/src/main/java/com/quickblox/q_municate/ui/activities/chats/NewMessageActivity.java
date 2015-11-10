@@ -19,6 +19,7 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreatePrivateChatCommand;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
@@ -35,7 +36,7 @@ import butterknife.Bind;
 public class NewMessageActivity extends BaseLogeableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     @Bind(R.id.friends_recyclerview)
-    RecyclerView usersRecyclerView;
+    RecyclerView friendsRecyclerView;
 
     private DataManager dataManager;
     private FriendsAdapter friendsAdapter;
@@ -61,29 +62,6 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
         initCustomListeners();
 
         addActions();
-    }
-
-    private void initFields() {
-        dataManager = DataManager.getInstance();
-    }
-
-    private void initRecyclerView() {
-        List<Friend> friendsList = dataManager.getFriendDataManager().getAllSorted();
-        friendsAdapter = new FriendsAdapter(this, UserFriendUtils.getUsersFromFriends(friendsList), true);
-        usersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        usersRecyclerView.setAdapter(friendsAdapter);
-    }
-
-    private void initCustomListeners() {
-        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
-
-            @Override
-            public void onItemClicked(View view, User user, int position) {
-                super.onItemClicked(view, user, position);
-                selectedUser = user;
-                checkForOpenChat(user);
-            }
-        });
     }
 
     @Override
@@ -125,6 +103,63 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
         return true;
     }
 
+    @Override
+    public boolean onClose() {
+        cancelSearch();
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String searchQuery) {
+        KeyboardUtils.hideKeyboard(this);
+        search(searchQuery);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String searchQuery) {
+        search(searchQuery);
+        return true;
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        if (friendListHelper != null) {
+            friendsAdapter.setFriendListHelper(friendListHelper);
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        friendsAdapter.notifyDataSetChanged();
+    }
+
+    private void initFields() {
+        dataManager = DataManager.getInstance();
+    }
+
+    private void initRecyclerView() {
+        List<Friend> friendsList = dataManager.getFriendDataManager().getAllSorted();
+        friendsAdapter = new FriendsAdapter(this, UserFriendUtils.getUsersFromFriends(friendsList), true);
+        friendsAdapter.setFriendListHelper(friendListHelper);
+        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        friendsRecyclerView.setAdapter(friendsAdapter);
+    }
+
+    private void initCustomListeners() {
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User user, int position) {
+                super.onItemClicked(view, user, position);
+                selectedUser = user;
+                checkForOpenChat(user);
+            }
+        });
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_SUCCESS_ACTION, new CreatePrivateChatSuccessAction());
         addAction(QBServiceConsts.CREATE_PRIVATE_CHAT_FAIL_ACTION, failAction);
@@ -153,25 +188,6 @@ public class NewMessageActivity extends BaseLogeableActivity implements SearchVi
     private void startPrivateChat(Dialog dialog) {
         PrivateDialogActivity.start(this, selectedUser, dialog);
         finish();
-    }
-
-    @Override
-    public boolean onClose() {
-        cancelSearch();
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String searchQuery) {
-        KeyboardUtils.hideKeyboard(this);
-        search(searchQuery);
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String searchQuery) {
-        search(searchQuery);
-        return true;
     }
 
     private void search(String searchQuery) {

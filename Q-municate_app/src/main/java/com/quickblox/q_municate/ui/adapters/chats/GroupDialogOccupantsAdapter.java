@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
 import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
@@ -22,16 +23,11 @@ import java.util.List;
 public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
     private UserOperationListener userOperationListener;
-    private QBFriendListHelper friendListHelper;
+    private QBFriendListHelper qbFriendListHelper;
 
     public GroupDialogOccupantsAdapter(BaseActivity baseActivity, UserOperationListener userOperationListener, List<User> objectsList) {
         super(baseActivity, objectsList);
         this.userOperationListener = userOperationListener;
-    }
-
-    public void setFriendListHelper(QBFriendListHelper friendListHelper) {
-        this.friendListHelper = friendListHelper;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -45,7 +41,6 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
 
             viewHolder.avatarImageView = (RoundedImageView) convertView.findViewById(R.id.avatar_imageview);
             viewHolder.nameTextView = (TextView) convertView.findViewById(R.id.name_textview);
-            viewHolder.onlineImageView = (ImageView) convertView.findViewById(R.id.online_imageview);
             viewHolder.onlineStatusTextView = (TextView) convertView.findViewById(R.id.status_textview);
             viewHolder.addFriendImageView = (ImageView) convertView.findViewById(R.id.add_friend_imagebutton);
 
@@ -57,14 +52,12 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         String fullName;
         if (isFriendValid(user)) {
             fullName = user.getFullName();
-            viewHolder.onlineStatusTextView.setVisibility(View.VISIBLE);
         } else {
             fullName = String.valueOf(user.getUserId());
-            viewHolder.onlineStatusTextView.setVisibility(View.GONE);
         }
         viewHolder.nameTextView.setText(fullName);
 
-        setOnlineStatusVisibility(viewHolder, user);
+        setStatus(viewHolder, user);
         viewHolder.addFriendImageView.setVisibility(isFriend(user) ? View.GONE : View.VISIBLE);
 
         initListeners(viewHolder, user.getUserId());
@@ -83,20 +76,27 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         });
     }
 
-    private void setOnlineStatusVisibility(ViewHolder viewHolder, User user) {
-        boolean online = friendListHelper != null && friendListHelper.isUserOnline(user.getUserId());
+    private void setStatus(ViewHolder viewHolder, User user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
 
         if (isMe(user)) {
             online = true;
         }
 
-        viewHolder.onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
-
         if (online) {
-            viewHolder.onlineImageView.setVisibility(View.VISIBLE);
+            viewHolder.onlineStatusTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
+            viewHolder.onlineStatusTextView.setTextColor(context.getResources().getColor(R.color.green));
         } else {
-            viewHolder.onlineImageView.setVisibility(View.GONE);
+            viewHolder.onlineStatusTextView.setText(context.getString(R.string.last_seen,
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+            viewHolder.onlineStatusTextView.setTextColor(context.getResources().getColor(R.color.dark_gray));
         }
+    }
+
+    public void setFriendListHelper(QBFriendListHelper qbFriendListHelper) {
+        this.qbFriendListHelper = qbFriendListHelper;
+        notifyDataSetChanged();
     }
 
     private boolean isFriendValid(User user) {
@@ -123,7 +123,6 @@ public class GroupDialogOccupantsAdapter extends BaseListAdapter<User> {
         RoundedImageView avatarImageView;
         TextView nameTextView;
         ImageView addFriendImageView;
-        ImageView onlineImageView;
         TextView onlineStatusTextView;
     }
 }

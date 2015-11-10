@@ -328,6 +328,10 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         fragmentsServiceConnectionSet.remove(fragmentServiceConnectionListener);
     }
 
+    public void onChangedUserStatus(int userId, boolean online) {
+        notifyChangedUserStatus(userId, online);
+    }
+
     public void notifyChangedUserStatus(int userId, boolean online) {
         if (!fragmentsStatusChangingSet.isEmpty()) {
             Iterator<UserStatusChangingListener> iterator = fragmentsStatusChangingSet.iterator();
@@ -639,7 +643,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ActionBa
         public void onReceive(Context context, Intent intent) {
             int userId = intent.getIntExtra(QBServiceConsts.EXTRA_USER_ID, 0);
             boolean status = intent.getBooleanExtra(QBServiceConsts.EXTRA_USER_STATUS, false);
-            notifyChangedUserStatus(userId, status);
+            onChangedUserStatus(userId, status);
         }
     }
 

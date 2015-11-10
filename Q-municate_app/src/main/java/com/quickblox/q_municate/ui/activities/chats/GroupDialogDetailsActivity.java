@@ -122,52 +122,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         registerBroadcastManagers();
     }
 
-    private void initFields() {
-        dataManager = DataManager.getInstance();
-        String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
-        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
-                dataManager.getDialogDataManager().getByDialogId(dialogId));
-        imageUtils = new ImageUtils(this);
-        friendOperationAction = new UserOperationAction();
-        currentNotificationTypeList = new ArrayList<>();
-        updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
-        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
-        qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
-    }
-
-    private void fillUIWithData() {
-        groupNameEditText.setText(qbDialog.getName());
-
-        updateCountOnlineFriends();
-
-        occupantsTextView.setText(getString(R.string.gdd_participants, qbDialog.getOccupants().size()));
-
-        if (!isNeedUpdateAvatar) {
-            loadAvatar(qbDialog.getPhoto());
-        }
-
-        updateOldGroupData();
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
-
-        if (friendListHelper != null && groupDialogOccupantsAdapter != null) {
-            groupDialogOccupantsAdapter.setFriendListHelper(friendListHelper);
-            updateCountOnlineFriends();
-        }
-    }
-
-    @OnTextChanged(R.id.name_textview)
-    void onGroupNameTextChanged(CharSequence s) {
-        if (groupNameOld != null) {
-            if (!s.toString().equals(groupNameOld)) {
-                startAction();
-            }
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -237,6 +191,77 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         hideProgress();
         canPerformLogout.set(false);
         startCropActivity(originalUri);
+    }
+
+    @OnTextChanged(R.id.name_textview)
+    void onGroupNameTextChanged(CharSequence s) {
+        if (groupNameOld != null) {
+            if (!s.toString().equals(groupNameOld)) {
+                startAction();
+            }
+        }
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+
+        if (friendListHelper != null && groupDialogOccupantsAdapter != null) {
+            groupDialogOccupantsAdapter.setFriendListHelper(friendListHelper);
+            updateCountOnlineFriends();
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        groupDialogOccupantsAdapter.notifyDataSetChanged();
+        updateCountOnlineFriends();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
+        if (selectedFriend != null) {
+            startFriendProfile(selectedFriend);
+        }
+    }
+
+    @Override
+    public void onCachedImageFileReceived(File imageFile) {
+        updateGroupDialog(imageFile);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
+
+    }
+
+    private void initFields() {
+        dataManager = DataManager.getInstance();
+        String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
+        qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
+                dataManager.getDialogDataManager().getByDialogId(dialogId));
+        imageUtils = new ImageUtils(this);
+        friendOperationAction = new UserOperationAction();
+        currentNotificationTypeList = new ArrayList<>();
+        updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
+        occupantsList = dataManager.getUserDataManager().getUsersForGroupChat(qbDialog.getDialogId(), qbDialog.getOccupants());
+        qbDialog.setOccupantsIds(ChatUtils.createOccupantsIdsFromUsersList(occupantsList));
+    }
+
+    private void fillUIWithData() {
+        groupNameEditText.setText(qbDialog.getName());
+
+        updateCountOnlineFriends();
+
+        occupantsTextView.setText(getString(R.string.gdd_participants, qbDialog.getOccupants().size()));
+
+        if (!isNeedUpdateAvatar) {
+            loadAvatar(qbDialog.getPhoto());
+        }
+
+        updateOldGroupData();
     }
 
     private void registerBroadcastManagers() {
@@ -428,14 +453,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         photoUrlOld = qbDialog.getPhoto();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-        User selectedFriend = groupDialogOccupantsAdapter.getItem(position);
-        if (selectedFriend != null) {
-            startFriendProfile(selectedFriend);
-        }
-    }
-
     private void startFriendProfile(User selectedFriend) {
         QBUser currentUser = AppSession.getSession().getUser();
         if (currentUser.getId() == selectedFriend.getUserId()) {
@@ -453,16 +470,6 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void updateGroupDialog(File imageFile) {
         QBUpdateGroupDialogCommand.start(this, qbDialog, imageFile);
-    }
-
-    @Override
-    public void onCachedImageFileReceived(File imageFile) {
-        updateGroupDialog(imageFile);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-
     }
 
     private void addToFriendList(final int userId) {

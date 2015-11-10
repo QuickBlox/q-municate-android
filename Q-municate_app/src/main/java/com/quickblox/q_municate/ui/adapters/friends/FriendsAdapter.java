@@ -13,7 +13,11 @@ import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.helpers.TextViewHelper;
+import com.quickblox.q_municate_core.models.AppSession;
+import com.quickblox.q_municate_core.qb.helpers.QBFriendListHelper;
+import com.quickblox.q_municate_core.utils.OnlineStatusUtils;
 import com.quickblox.q_municate_db.models.User;
+import com.quickblox.users.model.QBUser;
 
 import java.util.List;
 
@@ -22,6 +26,7 @@ import butterknife.Bind;
 public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerViewHolder<User>> {
 
     private boolean withFirstLetter;
+    private QBFriendListHelper qbFriendListHelper;
 
     public FriendsAdapter(BaseActivity baseActivity, List<User> usersList, boolean withFirstLetter) {
         super(baseActivity, usersList);
@@ -50,15 +55,19 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
         }
 
         viewHolder.nameTextView.setText(user.getFullName());
-        viewHolder.labelTextView.setText(context.getString(R.string.last_seen,
-                DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
-                DateUtils.formatDateSimpleTime(user.getLastLogin())));
 
         displayAvatarImage(user.getAvatar(), viewHolder.avatarImageView);
 
         if (!TextUtils.isEmpty(query)) {
             TextViewHelper.changeTextColorView(context, viewHolder.nameTextView, query);
         }
+
+        setLabel(viewHolder, user);
+    }
+
+    public void setFriendListHelper(QBFriendListHelper qbFriendListHelper) {
+        this.qbFriendListHelper = qbFriendListHelper;
+        notifyDataSetChanged();
     }
 
     private void initFirstLetter(ViewHolder viewHolder, int position, User user) {
@@ -87,6 +96,29 @@ public class FriendsAdapter extends BaseFilterAdapter<User, BaseClickListenerVie
     private void setLetterVisible(ViewHolder viewHolder, Character character) {
         viewHolder.firstLatterTextView.setText(String.valueOf(character));
         viewHolder.firstLatterTextView.setVisibility(View.VISIBLE);
+    }
+
+    private void setLabel(ViewHolder viewHolder, User user) {
+        boolean online = qbFriendListHelper != null && qbFriendListHelper.isUserOnline(user.getUserId());
+
+        if (isMe(user)) {
+            online = true;
+        }
+
+        if (online) {
+            viewHolder.labelTextView.setText(OnlineStatusUtils.getOnlineStatus(online));
+            viewHolder.labelTextView.setTextColor(context.getResources().getColor(R.color.green));
+        } else {
+            viewHolder.labelTextView.setText(context.getString(R.string.last_seen,
+                    DateUtils.toTodayYesterdayShortDateWithoutYear2(user.getLastLogin()),
+                    DateUtils.formatDateSimpleTime(user.getLastLogin())));
+            viewHolder.labelTextView.setTextColor(context.getResources().getColor(R.color.dark_gray));
+        }
+    }
+
+    private boolean isMe(User inputUser) {
+        QBUser currentUser = AppSession.getSession().getUser();
+        return currentUser.getId() == inputUser.getUserId();
     }
 
     protected static class ViewHolder extends BaseViewHolder<User> {

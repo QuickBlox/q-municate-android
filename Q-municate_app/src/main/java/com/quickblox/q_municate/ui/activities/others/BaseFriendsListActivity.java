@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Friend;
@@ -33,16 +34,6 @@ public abstract class BaseFriendsListActivity extends BaseLogeableActivity {
         initRecyclerView();
     }
 
-    private void initFields() {
-        dataManager = DataManager.getInstance();
-    }
-
-    protected void initRecyclerView() {
-        friendsAdapter = getFriendsAdapter();
-        friendsRecyclerView.setAdapter(friendsAdapter);
-        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.done_menu, menu);
@@ -59,6 +50,31 @@ public abstract class BaseFriendsListActivity extends BaseLogeableActivity {
                 super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        if (friendListHelper != null) {
+            friendsAdapter.setFriendListHelper(friendListHelper);
+        }
+    }
+
+    @Override
+    public void onChangedUserStatus(int userId, boolean online) {
+        super.onChangedUserStatus(userId, online);
+        friendsAdapter.notifyDataSetChanged();
+    }
+
+    private void initFields() {
+        dataManager = DataManager.getInstance();
+    }
+
+    protected void initRecyclerView() {
+        friendsAdapter = getFriendsAdapter();
+        friendsAdapter.setFriendListHelper(friendListHelper);
+        friendsRecyclerView.setAdapter(friendsAdapter);
+        friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     protected List<User> getFriendsList() {

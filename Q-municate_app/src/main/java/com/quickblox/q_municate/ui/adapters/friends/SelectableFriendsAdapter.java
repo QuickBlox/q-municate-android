@@ -30,18 +30,6 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
         sparseArrayCheckBoxes = new SparseBooleanArray(userList.size());
     }
 
-    public void setSelectUsersListener(SelectUsersListener listener) {
-        selectUsersListener = listener;
-    }
-
-    public void selectFriend(int position) {
-        boolean checked = !sparseArrayCheckBoxes.get(position);
-        sparseArrayCheckBoxes.put(position, checked);
-        addOrRemoveSelectedFriend(checked, getItem(position));
-        notifyCounterChanged(checked);
-        notifyItemChanged(position);
-    }
-
     @Override
     public BaseClickListenerViewHolder<User> onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(this, layoutInflater.inflate(R.layout.item_friend_selectable, parent, false));
@@ -67,6 +55,18 @@ public class SelectableFriendsAdapter extends FriendsAdapter {
 
         boolean checked = sparseArrayCheckBoxes.get(position);
         viewHolder.selectFriendCheckBox.setChecked(checked);
+    }
+
+    public void setSelectUsersListener(SelectUsersListener listener) {
+        selectUsersListener = listener;
+    }
+
+    public void selectFriend(int position) {
+        boolean checked = !sparseArrayCheckBoxes.get(position);
+        sparseArrayCheckBoxes.put(position, checked);
+        addOrRemoveSelectedFriend(checked, getItem(position));
+        notifyCounterChanged(checked);
+        notifyItemChanged(position);
     }
 
     private void addOrRemoveSelectedFriend(boolean checked, User user) {
