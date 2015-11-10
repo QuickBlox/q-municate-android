@@ -92,7 +92,7 @@ public class FriendDataManager extends BaseManager<Friend> {
             QueryBuilder<Friend, Long> friendQueryBuilder = dao.queryBuilder();
 
             QueryBuilder<User, Long> userQueryBuilder = userDao.queryBuilder();
-            userQueryBuilder.orderBy(User.Column.FULL_NAME, true);
+            userQueryBuilder.orderByRaw(User.Column.FULL_NAME + " COLLATE NOCASE");
 
             friendQueryBuilder.join(userQueryBuilder);
 

@@ -16,6 +16,7 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
+import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.ImageSourcePickDialogFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
@@ -23,6 +24,7 @@ import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.image.ImageSource;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.listeners.OnImageSourcePickedListener;
+import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
 import com.quickblox.q_municate_core.qb.commands.QBLoadAttachFileCommand;
@@ -89,6 +91,18 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         return new FriendsAdapter(this, friendsList, false);
     }
 
+    @Override
+    protected void initRecyclerView() {
+        super.initRecyclerView();
+        friendsAdapter.setOnRecycleItemClickListener(new SimpleOnRecycleItemClickListener<User>() {
+
+            @Override
+            public void onItemClicked(View view, User entity, int position) {
+                UserProfileActivity.start(CreateGroupDialogActivity.this, entity.getUserId());
+            }
+        });
+    }
+
     @OnClick(R.id.photo_imageview)
     void selectPhoto(View view) {
         canPerformLogout.set(false);
@@ -123,6 +137,32 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onImageSourcePicked(ImageSource source) {
+        switch (source) {
+            case GALLERY:
+                imageUtils.getImage();
+                break;
+            case CAMERA:
+                imageUtils.getCaptureImage();
+                break;
+        }
+    }
+
+    @Override
+    public void onImageSourceClosed() {
+        canPerformLogout.set(true);
+    }
+
+    @Override
+    public void onCachedImageFileReceived(File imageFile) {
+        startLoadAttachFile(imageFile);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void onFileSelected(Uri originalUri) {
@@ -161,32 +201,6 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
             String photoUrl = qbFile != null ? qbFile.getPublicUrl() : null;
             QBCreateGroupDialogCommand.start(this, groupNameEditText.getText().toString(), (ArrayList<User>) friendsList, photoUrl);
         }
-    }
-
-    @Override
-    public void onImageSourcePicked(ImageSource source) {
-        switch (source) {
-            case GALLERY:
-                imageUtils.getImage();
-                break;
-            case CAMERA:
-                imageUtils.getCaptureImage();
-                break;
-        }
-    }
-
-    @Override
-    public void onImageSourceClosed() {
-        canPerformLogout.set(true);
-    }
-
-    @Override
-    public void onCachedImageFileReceived(File imageFile) {
-        startLoadAttachFile(imageFile);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void startLoadAttachFile(final File file) {
