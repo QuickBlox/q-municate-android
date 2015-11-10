@@ -117,6 +117,8 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
 
         DialogOccupant dialogOccupant = dataManager.getDialogOccupantDataManager().getDialogOccupant(dialogId, qbChatMessage.getSenderId());
         DbUtils.saveDialogNotificationToCache(context, dataManager, dialogOccupant, qbChatMessage, true);
+
+        checkForSendingNotification(false, qbChatMessage, dialogOccupant.getUser(), true);
     }
 
     private class PrivateChatNotificationListener implements QBNotificationChatListener {

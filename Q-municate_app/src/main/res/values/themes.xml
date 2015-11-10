@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     // About Properties
     // https://gist.github.com/seanKenkeremath/c945c39cdf92af138395
@@ -14,6 +14,7 @@
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
         <item name="colorControlNormal">@color/dark_gray</item>
+        <item name="android:colorControlNormal" tools:ignore="NewApi">@color/dark_gray</item>
 
         <item name="android:textColorPrimary">@color/black</item>
 
@@ -34,6 +35,11 @@
 
     <style name="ToolbarTheme">
         <item name="colorControlNormal">@color/dark_gray</item>
+        <item name="android:colorControlNormal" tools:ignore="NewApi">@color/dark_gray</item>
+
+        <!-- Hack! -->
+        <item name="homeAsUpIndicator">@drawable/abc_ic_ab_back_mtrl_am_alpha</item>
+        <!-- ! -->
     </style>
 
 </resources>
