@@ -124,7 +124,9 @@ public class ChatNotificationUtils {
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, occupantsIds);
         chatMessage.setProperty(PROPERTY_ROOM_JID, dialog.getRoomJid());
         chatMessage.setProperty(PROPERTY_ROOM_NAME, dialog.getName());
-        chatMessage.setProperty(PROPERTY_ROOM_PHOTO, dialog.getPhoto());
+        if (dialog.getPhoto() != null) {
+            chatMessage.setProperty(PROPERTY_ROOM_PHOTO, dialog.getPhoto());
+        }
 
         return chatMessage;
     }
@@ -242,7 +244,9 @@ public class ChatNotificationUtils {
         chatMessage.setBody(context.getResources().getString(R.string.cht_notification_message));
         chatMessage.setProperty(PROPERTY_OCCUPANTS_IDS, ChatUtils.getOccupantsIdsStringFromList(
                 addedFriendIdsList));
-        chatMessage.setProperty(PROPERTY_ROOM_PHOTO, photoUrl);
+        if (photoUrl != null) {
+            chatMessage.setProperty(PROPERTY_ROOM_PHOTO, photoUrl);
+        }
         return chatMessage;
     }
 
