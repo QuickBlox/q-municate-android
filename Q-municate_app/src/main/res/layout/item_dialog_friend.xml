@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/contentRelativeLayout"
+<RelativeLayout
+    android:id="@+id/contentRelativeLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,7 +21,7 @@
         app:border_width="@dimen/avatar_border_width"
         app:oval="true" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -33,6 +34,7 @@
             android:id="@+id/name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="fill"
             android:singleLine="true"
             android:textColor="@color/text_dark"
             android:textSize="@dimen/text_size"
@@ -42,12 +44,13 @@
             android:id="@+id/status_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_below="@id/name_textview"
+            android:layout_gravity="fill"
             android:textColor="@color/gray"
             android:textSize="@dimen/text_size_small"
             tools:text="Subtitle" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <ImageButton
         android:id="@+id/add_friend_imagebutton"

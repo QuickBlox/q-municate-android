@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout android:id="@+id/contentRelativeLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/contentRelativeLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -18,7 +18,7 @@
         app:border_width="@dimen/avatar_border_width"
         app:oval="true" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -31,7 +31,7 @@
             android:id="@+id/name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="fill"
             android:singleLine="true"
             android:textSize="@dimen/text_size" />
 
@@ -39,18 +39,20 @@
             android:id="@+id/via_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/name_textview"
             android:layout_gravity="center_vertical"
             android:singleLine="true"
             android:textColor="@color/gray"
             android:textSize="@dimen/text_size_small" />
-    </LinearLayout>
+
+    </RelativeLayout>
 
     <CheckBox
         android:id="@+id/select_user_checkbox"
-        android:button="@drawable/abc_btn_check_material"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:button="@drawable/abc_btn_check_material" />
 
 </RelativeLayout>
