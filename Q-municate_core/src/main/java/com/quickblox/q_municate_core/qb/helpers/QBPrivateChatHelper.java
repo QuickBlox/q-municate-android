@@ -133,6 +133,17 @@ public class QBPrivateChatHelper extends QBBaseChatHelper {
                 friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REJECT);
             } else if (ChatNotificationUtils.PROPERTY_TYPE_TO_PRIVATE_CHAT__FRIENDS_REMOVE.equals(notificationType)) {
                 friendRequestMessageReceived(chatMessage, DialogNotification.Type.FRIENDS_REMOVE);
+                clearFriendOrUserRequestLocal(chatMessage.getSenderId());
+            }
+        }
+
+        private void clearFriendOrUserRequestLocal(int userId) {
+            boolean friend = dataManager.getFriendDataManager().getByUserId(userId) != null;
+            boolean outgoingUserRequest = dataManager.getUserRequestDataManager().existsByUserId(userId);
+            if (friend) {
+                dataManager.getFriendDataManager().deleteByUserId(userId);
+            } else if (outgoingUserRequest) {
+                dataManager.getUserRequestDataManager().deleteByUserId(userId);
             }
         }
     }

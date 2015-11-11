@@ -121,7 +121,8 @@ public class PrivateDialogMessagesAdapter extends BaseDialogMessagesAdapter {
         // check if friend was rejected/deleted.
         if (lastRequestPosition != EMPTY_POSITION && lastRequestPosition < lastInfoRequestPosition) {
             lastRequestPosition = EMPTY_POSITION;
-        } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)) { // set visible friends actions
+        } else if ((lastRequestPosition != EMPTY_POSITION && lastRequestPosition == position)
+                && dataManager.getUserRequestDataManager().existsByUserId(combinationMessage.getDialogOccupant().getUser().getUserId())) { // set visible friends actions
             setVisibilityFriendsActions(viewHolder, View.VISIBLE);
             initListeners(viewHolder, position, combinationMessage.getDialogOccupant().getUser().getUserId());
         }
