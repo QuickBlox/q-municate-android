@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/selector_list_item"
@@ -23,7 +24,7 @@
             app:border_width="@dimen/avatar_border_width"
             app:oval="true" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -36,19 +37,23 @@
                 android:id="@+id/name_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="fill"
+                android:maxLines="2"
                 android:textSize="@dimen/text_size"
-                android:maxLines="2" />
+                tools:text="Nabe dsjkd sdldjscljkd dsclk" />
 
             <com.rockerhieu.emojicon.EmojiconTextView
                 android:id="@+id/last_message_textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/name_textview"
                 android:layout_gravity="center_vertical"
+                android:singleLine="true"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="@dimen/text_size_small"
-                android:singleLine="true" />
-        </LinearLayout>
+                tools:text="1111111 sclk" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/unread_messages_textview"

@@ -32,7 +32,7 @@
         app:border_width="@dimen/avatar_border_width"
         app:oval="true" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -45,7 +45,7 @@
             android:id="@+id/name_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="fill"
             android:ellipsize="end"
             android:singleLine="true"
             android:textSize="@dimen/text_size"
@@ -55,12 +55,13 @@
             android:id="@+id/label_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_below="@id/name_textview"
+            android:layout_gravity="fill"
             android:singleLine="true"
             android:textColor="@color/dark_gray"
             android:textSize="@dimen/text_size_small"
             tools:text="Subtitle" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
