@@ -2,6 +2,7 @@ package com.quickblox.q_municate.utils.helpers;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.quickblox.q_municate.R;
@@ -13,19 +14,13 @@ import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.q_municate_db.models.DialogOccupant;
 import com.quickblox.q_municate_db.models.User;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class ActivityUIHelper {
-
-    private static final int SHOWING_NOTIFICATION_DELAY = 500;
 
     private BaseActivity baseActivity;
     private User senderUser;
     private Dialog messagesDialog;
     private String message;
     private boolean isPrivateMessage;
-    private Timer notificationTimer;
 
     public ActivityUIHelper(BaseActivity baseActivity) {
         this.baseActivity = baseActivity;
@@ -38,7 +33,9 @@ public class ActivityUIHelper {
         isPrivateMessage = extras.getBoolean(QBServiceConsts.EXTRA_IS_PRIVATE_MESSAGE);
         if (isMessagesDialogCorrect(dialogId) && senderUser != null) {
             message = baseActivity.getString(R.string.glgm_snackbar_new_message_title, senderUser.getFullName(), message);
-            checkShowingNotification();
+            if (!TextUtils.isEmpty(message)) {
+                showNewNotification();
+            }
         }
     }
 
@@ -58,17 +55,16 @@ public class ActivityUIHelper {
             isPrivateMessage = true;
             if (isMessagesDialogCorrect(dialogId)) {
                 message = baseActivity.getString(R.string.glgm_snackbar_new_contact_request_title, senderUser.getFullName());
-                checkShowingNotification();
+                if (!TextUtils.isEmpty(message)) {
+                    showNewNotification();
+                }
             }
         }
     }
 
     public void showNewNotification() {
         baseActivity.hideSnackBar();
-        baseActivity.showSnackbar(
-                message,
-                Snackbar.LENGTH_LONG,
-                R.string.dialog_reply,
+        baseActivity.showSnackbar(message, Snackbar.LENGTH_LONG, R.string.dialog_reply,
                 new View.OnClickListener() {
 
                     @Override
@@ -76,14 +72,6 @@ public class ActivityUIHelper {
                         showDialog();
                     }
                 });
-    }
-
-    private void checkShowingNotification() {
-        if (notificationTimer != null) {
-            notificationTimer.cancel();
-        }
-        notificationTimer = new Timer();
-        notificationTimer.schedule(new ShowingNotificationTimerTask(), SHOWING_NOTIFICATION_DELAY);
     }
 
     private void showDialog() {
@@ -95,19 +83,6 @@ public class ActivityUIHelper {
             baseActivity.startPrivateChatActivity(senderUser, messagesDialog);
         } else {
             baseActivity.startGroupChatActivity(messagesDialog);
-        }
-    }
-
-    private class ShowingNotificationTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            baseActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    showNewNotification();
-                }
-            });
         }
     }
 }

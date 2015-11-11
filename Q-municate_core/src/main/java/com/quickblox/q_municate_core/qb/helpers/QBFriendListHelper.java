@@ -347,7 +347,7 @@ public class QBFriendListHelper extends BaseHelper implements Serializable {
         public void run() {
             try {
                 loadAndSaveUsers(userLoadingIdsList, UserRequest.RequestStatus.INCOMING);
-                notifyContactRequest();
+                //                notifyContactRequest();
             } catch (QBResponseException e) {
                 ErrorUtils.logError(e);
             }
