@@ -16,6 +16,7 @@
         android:padding="20dp">
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/email_textinputlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -23,7 +24,7 @@
                 android:id="@+id/email_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/lgn_email_hint"
+                android:hint="@string/auth_hint_email"
                 android:inputType="textEmailAddress"
                 android:maxLength="128"
                 android:text="sergey1@ser.com"
@@ -32,6 +33,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
+            android:id="@+id/password_textinputlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -40,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="@string/lgn_password_hint"
+                android:hint="@string/auth_hint_password"
                 android:inputType="textPassword"
                 android:maxLength="256"
                 android:text="serik111"
@@ -57,7 +59,7 @@
             android:layout_marginTop="10dp"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:text="@string/lgn_remember_me"
+            android:text="@string/auth_remember_me"
             android:textColor="@color/text_dark"
             android:textSize="@dimen/text_size" />
 
@@ -66,7 +68,7 @@
             android:id="@+id/forgot_password_textview"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="25dp"
-            android:text="@string/lgn_forgot_password"
+            android:text="@string/auth_forgot_password"
             android:textSize="@dimen/text_size_small" />
 
     </LinearLayout>

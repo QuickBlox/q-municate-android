@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.util.Log;
+import android.widget.EditText;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.Session;
@@ -16,7 +19,6 @@ import com.quickblox.q_municate.ui.activities.main.MainActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.UserAgreementDialogFragment;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
-import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -27,15 +29,33 @@ import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 
+import butterknife.Bind;
+import butterknife.OnTextChanged;
+
 public abstract class BaseAuthActivity extends BaseActivity {
 
     private static String TAG = BaseAuthActivity.class.getSimpleName();
 
     protected static final String STARTED_LOGIN_TYPE = "started_login_type";
 
+    @Nullable
+    @Bind(R.id.email_textinputlayout)
+    protected TextInputLayout emailTextInputLayout;
+
+    @Nullable
+    @Bind(R.id.email_edittext)
+    protected EditText emailEditText;
+
+    @Nullable
+    @Bind(R.id.password_textinputlayout)
+    protected TextInputLayout passwordTextInputLayout;
+
+    @Nullable
+    @Bind(R.id.password_edittext)
+    protected EditText passwordEditText;
+
     protected FacebookHelper facebookHelper;
     protected LoginType loginType = LoginType.EMAIL;
-    protected ValidationUtils_OLD validationUtilsOLD;
     protected Resources resources;
 
     protected LoginSuccessAction loginSuccessAction;
@@ -50,19 +70,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initFields(savedInstanceState);
-    }
-
-    private void initFields(Bundle savedInstanceState) {
-        resources = getResources();
-        if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
-            loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
-        }
-        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-        loginSuccessAction = new LoginSuccessAction();
-        socialLoginSuccessAction = new SocialLoginSuccessAction();
-        failAction = new FailAction();
     }
 
     @Override
@@ -100,6 +108,29 @@ public abstract class BaseAuthActivity extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         facebookHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Nullable
+    @OnTextChanged(R.id.email_edittext)
+    void onTextChangedEmail(CharSequence text) {
+        emailTextInputLayout.setError(null);
+    }
+
+    @Nullable
+    @OnTextChanged(R.id.password_edittext)
+    void onTextChangedPassword(CharSequence text) {
+        passwordTextInputLayout.setError(null);
+    }
+
+    private void initFields(Bundle savedInstanceState) {
+        resources = getResources();
+        if (savedInstanceState != null && savedInstanceState.containsKey(STARTED_LOGIN_TYPE)) {
+            loginType = (LoginType) savedInstanceState.getSerializable(STARTED_LOGIN_TYPE);
+        }
+        facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+        loginSuccessAction = new LoginSuccessAction();
+        socialLoginSuccessAction = new SocialLoginSuccessAction();
+        failAction = new FailAction();
     }
 
     protected void facebookConnect() {
@@ -160,10 +191,6 @@ public abstract class BaseAuthActivity extends BaseActivity {
         }
 
         ErrorUtils.showError(this, errorMessage);
-
-        if (validationUtilsOLD != null) {
-            validationUtilsOLD.setError(errorMessage);
-        }
     }
 
     protected void parseFailException(Bundle bundle) {

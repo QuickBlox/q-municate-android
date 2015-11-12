@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -14,12 +17,13 @@ import android.widget.EditText;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.agreements.UserAgreementActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
-import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
@@ -34,15 +38,15 @@ import java.io.File;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
 
 public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
         ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
 
-    @Bind(R.id.email_edittext)
-    EditText emailEditText;
+    private static final String FULL_NAME_BLOCKED_CHARACTERS = "<>;";
 
-    @Bind(R.id.password_edittext)
-    EditText passwordEditText;
+    @Bind(R.id.full_name_textinputlayout)
+    TextInputLayout fullNameInputLayout;
 
     @Bind(R.id.full_name_edittext)
     EditText fullNameEditText;
@@ -75,19 +79,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
         setUpActionBarWithUpButton();
         initFields(savedInstanceState);
-    }
-
-    private void initFields(Bundle bundle) {
-        qbUser = new QBUser();
-        imageUtils = new ImageUtils(this);
-        validationUtilsOLD = new ValidationUtils_OLD(SignUpActivity.this,
-                new EditText[]{ fullNameEditText, emailEditText, passwordEditText },
-                new String[]{
-                        getString(R.string.dlg_not_fullname_field_entered),
-                        getString(R.string.dlg_not_email_field_entered),
-                        getString(R.string.dlg_not_password_field_entered) });
-        signUpSuccessAction = new SignUpSuccessAction();
-        updateUserSuccessAction = new UpdateUserSuccessAction();
     }
 
     @Override
@@ -138,6 +129,49 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void onBackPressed() {
+        startLandingScreen();
+    }
+
+    @Override
+    public void onUriScaledBitmapReceived(Uri originalUri) {
+        hideProgress();
+        startCropActivity(originalUri);
+    }
+
+    @OnClick(R.id.change_avatar_view)
+    void selectAvatar(View view) {
+        imageUtils.getImage();
+    }
+
+    @OnTextChanged(R.id.full_name_edittext)
+    void onTextChangedFullName(CharSequence text) {
+        fullNameInputLayout.setError(null);
+    }
+
+    @OnClick(R.id.user_agreement_textview)
+    void openUserAgreement(View view) {
+        UserAgreementActivity.start(SignUpActivity.this);
+    }
+
+    @Override
+    public void onAbsolutePathExtFileReceived(String absolutePath) {
+    }
+
+    private void initFields(Bundle bundle) {
+        qbUser = new QBUser();
+        imageUtils = new ImageUtils(this);
+        signUpSuccessAction = new SignUpSuccessAction();
+        updateUserSuccessAction = new UpdateUserSuccessAction();
+        fullNameEditText.setFilters(new InputFilter[]{ fullNameFilter });
+    }
+
+    private void startCropActivity(Uri originalUri) {
+        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, outputUri).asSquare().start(this);
+    }
+
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
             isNeedUpdateAvatar = true;
@@ -162,35 +196,17 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         updateBroadcastActionList();
     }
 
-    @Override
-    public void onBackPressed() {
-        startLandingScreen();
-    }
-
-    private void startCropActivity(Uri originalUri) {
-        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        Crop.of(originalUri, outputUri).asSquare().start(this);
-    }
-
-    @Override
-    public void onUriScaledBitmapReceived(Uri originalUri) {
-        hideProgress();
-        startCropActivity(originalUri);
-    }
-
-    @OnClick(R.id.change_avatar_view)
-    void selectAvatar(View view) {
-        imageUtils.getImage();
-    }
-
     private void signUp() {
+        KeyboardUtils.hideKeyboard(this);
+
         loginType = LoginType.EMAIL;
 
         String fullNameText = fullNameEditText.getText().toString();
         String emailText = emailEditText.getText().toString();
         String passwordText = passwordEditText.getText().toString();
 
-        if (validationUtilsOLD.isValidUserDate(fullNameText, emailText, passwordText)) {
+        if (new ValidationUtils(this).isSignUpDataValid(fullNameInputLayout, emailTextInputLayout,
+                passwordTextInputLayout, fullNameText, emailText, passwordText)) {
             qbUser.setFullName(fullNameText);
             qbUser.setEmail(emailText);
             qbUser.setPassword(passwordText);
@@ -206,17 +222,8 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         }
     }
 
-    @OnClick(R.id.user_agreement_textview)
-    void openUserAgreement(View view) {
-        UserAgreementActivity.start(SignUpActivity.this);
-    }
-
     public void onCachedImageFileReceived(File imageFile) {
         startSignUp(imageFile);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
     }
 
     private void startSignUp(File imageFile) {
@@ -240,6 +247,17 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         QBUser user = (QBUser) bundle.getSerializable(QBServiceConsts.EXTRA_USER);
         QBUpdateUserCommand.start(SignUpActivity.this, user, image);
     }
+
+    private InputFilter fullNameFilter = new InputFilter() {
+
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            if (source != null && FULL_NAME_BLOCKED_CHARACTERS.contains(("" + source))) {
+                return "";
+            }
+            return null;
+        }
+    };
 
     private class SignUpSuccessAction implements Command {
 

@@ -45,13 +45,13 @@
         <activity
             android:name=".ui.activities.authorization.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/lgn_login"
+            android:label="@string/auth_login_title"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.authorization.SignUpActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/sup_sign_up"
+            android:label="@string/auth_sign_up_title"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
@@ -134,12 +134,12 @@
         <activity
             android:name=".ui.activities.forgotpassword.ForgotPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/fpw_forgot_password_title"
+            android:label="@string/forgot_password_title"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activities.agreements.UserAgreementActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/uag_user_agreement_title"
+            android:label="@string/user_agreement_title"
             android:screenOrientation="portrait" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 

@@ -3,6 +3,7 @@ package com.quickblox.q_municate.ui.activities.forgotpassword;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,21 +11,23 @@ import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.QBResetPasswordCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate.ui.activities.base.BaseActivity;
 import com.quickblox.q_municate.utils.KeyboardUtils;
-import com.quickblox.q_municate.utils.ValidationUtils_OLD;
 
 import butterknife.Bind;
+import butterknife.OnTextChanged;
 
 public class ForgotPasswordActivity extends BaseActivity {
 
+    @Bind(R.id.email_textinputlayout)
+    TextInputLayout emailTextInputLayout;
+
     @Bind(R.id.email_edittext)
     EditText emailEditText;
-
-    private ValidationUtils_OLD validationUtilsOLD;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, ForgotPasswordActivity.class);
@@ -39,17 +42,8 @@ public class ForgotPasswordActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setUpActionBarWithUpButton();
-
-        iniFields();
-
         addActions();
-    }
-
-    private void iniFields() {
-        validationUtilsOLD = new ValidationUtils_OLD(this, new EditText[]{emailEditText},
-                new String[]{getString(R.string.fpw_not_email_field_entered)});
     }
 
     @Override
@@ -77,10 +71,15 @@ public class ForgotPasswordActivity extends BaseActivity {
         removeActions();
     }
 
+    @OnTextChanged(R.id.email_edittext)
+    void onTextChangedEmail(CharSequence text) {
+        emailTextInputLayout.setError(null);
+    }
+
     private void forgotPassword() {
         KeyboardUtils.hideKeyboard(this);
         String emailText = emailEditText.getText().toString();
-        if (validationUtilsOLD.isValidForgotPasswordData(emailText)) {
+        if (new ValidationUtils(this).isForgotPasswordDataValid(emailTextInputLayout, emailText)) {
             showProgress();
             QBResetPasswordCommand.start(this, emailText);
         }
@@ -106,7 +105,7 @@ public class ForgotPasswordActivity extends BaseActivity {
         public void execute(Bundle bundle) {
             hideProgress();
             String emailText = bundle.getString(QBServiceConsts.EXTRA_EMAIL);
-            ToastUtils.longToast(getString(R.string.fpw_email_was_sent, emailText));
+            ToastUtils.longToast(getString(R.string.forgot_password_massage_email_was_sent, emailText));
         }
     }
 

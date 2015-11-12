@@ -26,6 +26,42 @@
     <string name="landing_version">v. %1$s</string>
 
 
+    <!-- Authorization -->
+    <string name="auth_sign_up_title">Sign Up</string>
+    <string name="auth_login_title">Log In</string>
+    <string name="auth_forgot_password">Forgot password?</string>
+    <string name="auth_hint_password">Password</string>
+    <string name="auth_log_in_with_facebook">Log in with Facebook</string>
+    <string name="auth_hint_email">Email</string>
+    <string name="auth_remember_me">Remember Me</string>
+    <string name="auth_username_error">This username has not authenticated yet, please check your credentials</string>
+    <string name="auth_not_all_fields_entered">Please fill all empty input fields</string>
+    <string name="auth_email_field_is_incorrect">Please enter a valid email</string>
+    <string name="auth_email_field_not_entered">Please enter email</string>
+    <string name="auth_password_field_not_entered">Please enter password</string>
+    <string name="auth_password_field_is_too_short">Password is too short (minimum is 8 characters)</string>
+    <string name="auth_full_name_field_not_entered">Please enter Full Name</string>
+    <string name="auth_full_name_field_is_too_short">Full Name is too short (minimum is 3 characters)</string>
+    <string name="auth_full_name_field_is_too_long">Full Name is too long (maximum is 50 characters)</string>
+    <string name="auth_full_name_has_impossible_characters">Full Name has impossible characters (not allowed: \'&gt;\', \'&lt;\', \';\')</string>
+    <string name="auth_hint_full_name">Full Name</string>
+    <string name="auth_choose_user_picture">Choose user picture</string>
+
+
+    <!-- User Agreement -->
+    <string name="user_agreement_title">User Agreement</string>
+    <string name="user_agreement_label">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
+
+
+    <!-- Forgot Password -->
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="forgot_password_email">Email</string>
+    <string name="forgot_password_email_field_not_entered">Please enter email</string>
+    <string name="forgot_password_email_field_is_incorrect">Please enter a valid email</string>
+    <string name="forgot_password_label">Enter your email and we\'ll send a link to reset your password</string>
+    <string name="forgot_password_massage_email_was_sent">Mail was sent to %1$s</string>
+
+
     <!-- User profile -->
     <string name="user_profile_title">Info</string>
     <string name="user_profile_mobile">Mobile</string>
@@ -113,33 +149,6 @@
 
     // NOT REFACTORED YET
 
-    <!-- Login -->
-    <string name="lgn_forgot_password">Forgot password?</string>
-    <string name="lgn_password_hint">Password</string>
-    <string name="lgn_log_in_with_facebook">Log in with Facebook</string>
-    <string name="lgn_login">Log In</string>
-    <string name="lgn_email_hint">Email</string>
-    <string name="lgn_remember_me">Remember Me</string>
-    <string name="lgn_error">This username has not authenticated yet, please check your credentials</string>
-
-    <!-- Forgot Password -->
-    <string name="fpw_forgot_password_title">Forgot Password</string>
-    <string name="fpw_email">Email</string>
-    <string name="fpw_not_email_field_entered">Please enter email</string>
-    <string name="fpw_label">Enter your email and we\'ll send a link to reset your password</string>
-    <string name="fpw_email_was_sent">Mail was sent to %1$s</string>
-
-    <!-- Sing Up -->
-    <string name="sup_fullname_hint">Full Name</string>
-    <string name="sup_email_hint">Email</string>
-    <string name="sup_choose_user_picture">Choose user picture</string>
-    <string name="sup_sign_up">Sign Up</string>
-
-    <!-- User Agreement -->
-    <string name="uag_user_agreement_title">User Agreement</string>
-    <string name="uag_user_agreement">By clicking Tick, you agree to Q-municate\n<b><u>User Agreement</u></b></string>
-
-
     <!-- Friend List -->
     <string name="frl_global_search">Global Search</string>
     <string name="frl_friends">Friends</string>
@@ -217,10 +226,6 @@
     <!-- Dialog Messages -->
     <string name="dlg_select_image_from">Select image from…</string>
     <string name="dlg_wait_please">Please, wait</string>
-    <string name="dlg_not_all_fields_entered">Please fill all empty input fields</string>
-    <string name="dlg_not_fullname_field_entered">Please enter fullName</string>
-    <string name="dlg_not_email_field_entered">Please enter email</string>
-    <string name="dlg_not_password_field_entered">Please enter password</string>
     <string name="dlg_passwords_not_equal">New password and confirmation are not equal</string>
     <string name="dlg_old_password_wrong">Wrong old password</string>
     <string name="dlg_empty_email">Email can\'t be empty</string>
@@ -245,7 +250,7 @@
     <string name="dlg_attached_last_message">Attachment</string>
     <string name="dlg_no_message_yet">No message yet</string>
     <string name="dlg_fail_rest_login">Couldn\'t authorize on server. Please check your credentials</string>
-    <string name="dlg_force_relogin_on_token_required">Token error is occured in application. Relogin will be executed now</string>
+    <string name="dlg_force_relogin_on_token_required">Token error is occurred in application. Relogin will be executed now</string>
     <string name="dlg_refresh_session">QB Session expired. Update session will be executed now</string>
     <string name="videochat_init_fail">Unfortunately, call was closed! It is impossible to initialize multimedia resources on your device</string>
     <string name="dlg_microphone_muted">Please, pay attention microphone is muted now</string>

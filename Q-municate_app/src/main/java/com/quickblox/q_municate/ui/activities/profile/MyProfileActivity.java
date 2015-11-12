@@ -261,7 +261,7 @@ public class MyProfileActivity extends BaseLogeableActivity
                 QBUpdateUserCommand.start(this, newUser, null);
             }
         } else {
-            new ValidationUtils(this).isValidFullName(fullNameTextInputLayout, oldFullName, currentFullName);
+            new ValidationUtils(this).isFullNameValid(fullNameTextInputLayout, oldFullName, currentFullName);
         }
     }
 

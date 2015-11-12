@@ -8,11 +8,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.forgotpassword.ForgotPasswordActivity;
-import com.quickblox.q_municate.utils.ValidationUtils_OLD;
+import com.quickblox.q_municate.utils.KeyboardUtils;
+import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_db.managers.DataManager;
 
@@ -21,12 +21,6 @@ import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 public class LoginActivity extends BaseAuthActivity {
-
-    @Bind(R.id.email_edittext)
-    EditText emailEditText;
-
-    @Bind(R.id.password_edittext)
-    EditText passwordEditText;
 
     @Bind(R.id.remember_me_switch)
     SwitchCompat rememberMeSwitch;
@@ -47,15 +41,6 @@ public class LoginActivity extends BaseAuthActivity {
 
         setUpActionBarWithUpButton();
         initFields(savedInstanceState);
-    }
-
-    private void initFields(Bundle bundle) {
-        validationUtilsOLD = new ValidationUtils_OLD(LoginActivity.this,
-                new EditText[]{emailEditText, passwordEditText},
-                new String[]{
-                getString(R.string.dlg_not_email_field_entered),
-                getString(R.string.dlg_not_password_field_entered)});
-        rememberMeSwitch.setChecked(true);
     }
 
     @Override
@@ -95,13 +80,21 @@ public class LoginActivity extends BaseAuthActivity {
         ForgotPasswordActivity.start(this);
     }
 
+    private void initFields(Bundle bundle) {
+        rememberMeSwitch.setChecked(true);
+    }
+
     private void login() {
+        KeyboardUtils.hideKeyboard(this);
+
         loginType = LoginType.EMAIL;
 
         String userEmail = emailEditText.getText().toString();
         String userPassword = passwordEditText.getText().toString();
 
-        if (validationUtilsOLD.isValidUserDate(userEmail, userPassword)) {
+        if (new ValidationUtils(this).isLoginDataValid(emailTextInputLayout, passwordTextInputLayout,
+                userEmail, userPassword)) {
+
             showProgress();
 
             boolean ownerUser = DataManager.getInstance().getUserDataManager().isUserOwner(userEmail);

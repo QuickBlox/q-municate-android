@@ -62,9 +62,10 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         addActions();
     }
 
-    private void initFields() {
-        canPerformLogout.set(false);
-        qbUser = AppSession.getSession().getUser();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeActions();
     }
 
     @OnTextChanged(R.id.old_password_edittext)
@@ -96,6 +97,20 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         return true;
     }
 
+    @Override
+    protected void onFailAction(String action) {
+        super.onFailAction(action);
+        if (QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION.equals(action) || QBServiceConsts.LOGIN_FAIL_ACTION.equals(action)) {
+            hideProgress();
+            finish();
+        }
+    }
+
+    private void initFields() {
+        canPerformLogout.set(false);
+        qbUser = AppSession.getSession().getUser();
+    }
+
     private void addActions() {
         addAction(QBServiceConsts.CHANGE_PASSWORD_SUCCESS_ACTION, new ChangePasswordSuccessAction());
         addAction(QBServiceConsts.CHANGE_PASSWORD_FAIL_ACTION, new ChangePasswordFailAction());
@@ -122,17 +137,11 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
         updateBroadcastActionList();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeActions();
-    }
-
     private void changePassword() {
         oldPasswordText = oldPasswordEditText.getText().toString();
         String newPasswordText = newPasswordEditText.getText().toString();
         if (new ValidationUtils(this)
-                .isValidChangePasswordData(oldPasswordTextInputLayout, newPasswordTextInputLayout,
+                .isChangePasswordDataValid(oldPasswordTextInputLayout, newPasswordTextInputLayout,
                         oldPasswordText, newPasswordText)) {
             updatePasswords(oldPasswordText, newPasswordText);
             showProgress();
@@ -162,15 +171,6 @@ public class ChangePasswordActivity extends BaseLogeableActivity {
     private void logoutChat(){
         showProgress();
         QBLogoutAndDestroyChatCommand.start(this, true);
-    }
-
-    @Override
-    protected void onFailAction(String action) {
-        super.onFailAction(action);
-        if (QBServiceConsts.LOGOUT_CHAT_FAIL_ACTION.equals(action) || QBServiceConsts.LOGIN_FAIL_ACTION.equals(action)) {
-            hideProgress();
-            finish();
-        }
     }
 
     private class LogoutChatSuccessAction implements Command {
