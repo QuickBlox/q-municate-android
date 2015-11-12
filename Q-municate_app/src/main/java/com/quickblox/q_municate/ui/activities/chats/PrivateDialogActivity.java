@@ -126,14 +126,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
     }
 
     @Override
-    protected void onFileSelected(Uri originalUri) {
+    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
         Bitmap bitmap = imageUtils.getBitmap(originalUri);
-        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
+        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
     }
 
     @Override
-    protected void onFileSelected(Bitmap bitmap) {
-        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true);
+    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
+        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
     }
 
     @Override

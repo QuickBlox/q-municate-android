@@ -36,10 +36,15 @@ public class ReceiveFileFromBitmapTask extends BaseAsyncTask {
         ImageUtils imageUtils = (ImageUtils) params[0];
         Bitmap bitmap = (Bitmap) params[1];
         boolean isGettingFile = (Boolean) params[2];
+        boolean fromCamera = params.length > 3 ? (Boolean) params[3] : false;
 
         try {
             if (isGettingFile) {
-                imageFile = imageUtils.getFileFromBitmap(bitmap);
+                if (fromCamera) {
+                    imageFile = imageUtils.getFileFromBitmapCamera(bitmap);
+                } else {
+                    imageFile = imageUtils.getFileFromBitmap(bitmap);
+                }
                 return imageFile;
             } else {
                 absolutePath = imageUtils.getAbsolutePathByBitmap(bitmap);

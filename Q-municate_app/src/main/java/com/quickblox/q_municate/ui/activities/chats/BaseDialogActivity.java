@@ -234,8 +234,10 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     private void registerBroadcastReceivers() {
-        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver, new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
-        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver, new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
+        localBroadcastManager.registerReceiver(typingMessageBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.TYPING_MESSAGE));
+        localBroadcastManager.registerReceiver(updatingDialogBroadcastReceiver,
+                new IntentFilter(QBServiceConsts.UPDATE_DIALOG));
     }
 
     private void unregisterBroadcastReceivers() {
@@ -294,11 +296,12 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         canPerformLogout.set(true);
-        if ((imageUtils.isGalleryCalled(requestCode) || imageUtils.isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
+        boolean fromCamera = imageUtils.isCaptureCalled(requestCode);
+        if ((imageUtils.isGalleryCalled(requestCode) || fromCamera) && resultCode == RESULT_OK) {
             if (data.getData() == null) {
-                onFileSelected((Bitmap) data.getExtras().get("data"));
+                onFileSelected((Bitmap) data.getExtras().get("data"), fromCamera);
             } else {
-                onFileSelected(data.getData());
+                onFileSelected(data.getData(), fromCamera);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -318,6 +321,28 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     @Override
     public void onEmojiconBackspaceClicked(View v) {
         EmojiconsFragment.backspace(messageEditText);
+    }
+
+    @Override
+    public void onImageSourcePicked(ImageSource source) {
+        switch (source) {
+            case GALLERY:
+                imageUtils.getImage();
+                break;
+            case CAMERA:
+                imageUtils.getCaptureImage();
+                break;
+        }
+    }
+
+    @Override
+    public void onImageSourceClosed() {
+        canPerformLogout.set(true);
+    }
+
+    @Override
+    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
+        this.canPerformLogout.set(canPerformLogout);
     }
 
     protected void updateData() {
@@ -345,23 +370,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
                 .getDialogOccupantsListByDialogId(dialog.getDialogId());
         List<Integer> dialogOccupantsIdsList = ChatUtils.getIdsFromDialogOccupantsList(dialogOccupantsList);
         dataManager.getMessageDataManager().deleteTempMessages(dialogOccupantsIdsList);
-    }
-
-    @Override
-    public void onImageSourcePicked(ImageSource source) {
-        switch (source) {
-            case GALLERY:
-                imageUtils.getImage();
-                break;
-            case CAMERA:
-                imageUtils.getCaptureImage();
-                break;
-        }
-    }
-
-    @Override
-    public void onImageSourceClosed() {
-        canPerformLogout.set(true);
     }
 
     private void hideSmileLayout() {
@@ -392,7 +400,8 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     }
 
     protected void setDefaultActionBarLogo(int drawableResId) {
-        setActionBarIcon(ImageUtils.getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
+        setActionBarIcon(ImageUtils
+                .getRoundIconDrawable(this, BitmapFactory.decodeResource(getResources(), drawableResId)));
     }
 
     protected void startLoadAttachFile(final File file) {
@@ -420,11 +429,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
             sendButton.setVisibility(View.VISIBLE);
             attachButton.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
-        this.canPerformLogout.set(canPerformLogout);
     }
 
     private void checkStopTyping() {
@@ -589,9 +593,9 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     protected abstract void onConnectServiceLocally(QBService service);
 
-    protected abstract void onFileSelected(Uri originalUri);
+    protected abstract void onFileSelected(Uri originalUri, boolean fromCamera);
 
-    protected abstract void onFileSelected(Bitmap bitmap);
+    protected abstract void onFileSelected(Bitmap bitmap, boolean fromCamera);
 
     protected abstract Bundle generateBundleToInitDialog();
 

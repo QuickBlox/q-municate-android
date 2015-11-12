@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -238,6 +239,12 @@ public class ImageUtils {
         return tempFile.getAbsolutePath();
     }
 
+    public File getFileFromBitmapCamera(Bitmap origBitmap) throws IOException {
+        origBitmap = checkForRotation(origBitmap);
+        File tempFile = getFileFromBitmap(origBitmap);
+        return tempFile;
+    }
+
     public File getFileFromBitmap(Bitmap origBitmap) throws IOException {
         int width = SizeUtility.dipToPixels(activity, ConstsCore.CHAT_ATTACH_WIDTH);
         int height = SizeUtility.dipToPixels(activity, ConstsCore.CHAT_ATTACH_HEIGHT);
@@ -245,6 +252,15 @@ public class ImageUtils {
         byte[] bitmapData = getBytesBitmap(bitmap);
         File tempFile = createFile(bitmapData);
         return tempFile;
+    }
+
+    private Bitmap checkForRotation(Bitmap origBitmap) {
+        if (origBitmap.getWidth() > origBitmap.getHeight()) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            origBitmap = Bitmap.createBitmap(origBitmap , 0, 0, origBitmap.getWidth(), origBitmap.getHeight(), matrix, true);
+        }
+        return origBitmap;
     }
 
     public File createFile(byte[] bitmapData) throws IOException {
