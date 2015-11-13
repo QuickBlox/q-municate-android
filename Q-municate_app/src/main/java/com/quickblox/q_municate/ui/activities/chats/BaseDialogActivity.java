@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,15 +25,14 @@ import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
-import com.quickblox.q_municate.utils.listeners.OnImageSourcePickedListener;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate_core.core.loader.BaseLoader;
-import com.quickblox.q_municate.ui.fragments.dialogs.ImageSourcePickDialogFragment;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
-import com.quickblox.q_municate.utils.image.ImageSource;
 import com.quickblox.q_municate.utils.image.ImageUtils;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -74,9 +72,9 @@ import butterknife.OnClick;
 import butterknife.OnTextChanged;
 import butterknife.OnTouch;
 
-public abstract class BaseDialogActivity extends BaseLogeableActivity implements
+public abstract class BaseDialogActivity extends BaseLoggableActivity implements
         EmojiconGridFragment.OnEmojiconClickedListener, EmojiconsFragment.OnEmojiconBackspaceClickedListener,
-        ChatUIHelperListener, OnImageSourcePickedListener {
+        ChatUIHelperListener, OnImagePickedListener {
 
     private static final int TYPING_DELAY = 1000;
     private static final int DELAY_SCROLLING_LIST = 300;
@@ -109,6 +107,7 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     protected QBBaseChatHelper baseChatHelper;
     protected List<CombinationMessage> combinationMessagesList;
     protected int chatHelperIdentifier;
+    protected ImagePickHelper imagePickHelper;
 
     private Handler mainThreadHandler;
     private View emojiconsFragment;
@@ -145,35 +144,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
         hideSmileLayout();
     }
 
-    private void initFields() {
-        mainThreadHandler = new Handler(Looper.getMainLooper());
-        resources = getResources();
-        dataManager = DataManager.getInstance();
-        imageUtils = new ImageUtils(this);
-        loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
-        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
-        loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
-        typingTimer = new Timer();
-        messageObserver = new MessageObserver();
-        dialogNotificationObserver = new DialogNotificationObserver();
-        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
-        updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
-        appSharedHelper.saveNeedToOpenDialog(false);
-    }
-
-    private void initCustomUI() {
-        emojiconsFragment = _findViewById(R.id.emojicon_fragment);
-    }
-
-    private void initCustomListeners() {
-        messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
-    }
-
-    protected void initMessagesRecyclerView() {
-        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-    }
-
     @OnTextChanged(R.id.message_edittext)
     void messageEditTextChanged(CharSequence charSequence) {
         setActionButtonVisibility(charSequence);
@@ -203,8 +173,113 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     @OnClick(R.id.attach_button)
     void attachFile(View view) {
-        canPerformLogout.set(false);
-        ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isSmilesLayoutShowing()) {
+            hideSmileLayout();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        createChatLocally();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        hideSmileLayout();
+        checkStartTyping();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        readAllMessages();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeChatLocally();
+        removeActions();
+        deleteObservers();
+        unregisterBroadcastReceivers();
+    }
+
+    @Override
+    public void onConnectedToService(QBService service) {
+        super.onConnectedToService(service);
+        onConnectServiceLocally(service);
+    }
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(messageEditText, emojicon);
+    }
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(messageEditText);
+    }
+
+    @Override
+    public void onImagePicked(int requestCode, File file) {
+        canPerformLogout.set(true);
+        startLoadAttachFile(file);
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+        canPerformLogout.set(true);
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+        canPerformLogout.set(true);
+        ErrorUtils.logError(e);
+    }
+
+    @Override
+    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
+        this.canPerformLogout.set(canPerformLogout);
+    }
+
+    private void initFields() {
+        mainThreadHandler = new Handler(Looper.getMainLooper());
+        resources = getResources();
+        dataManager = DataManager.getInstance();
+        imageUtils = new ImageUtils(this);
+        loadAttachFileSuccessAction = new LoadAttachFileSuccessAction();
+        loadDialogMessagesSuccessAction = new LoadDialogMessagesSuccessAction();
+        loadDialogMessagesFailAction = new LoadDialogMessagesFailAction();
+        typingTimer = new Timer();
+        messageObserver = new MessageObserver();
+        dialogNotificationObserver = new DialogNotificationObserver();
+        typingMessageBroadcastReceiver = new TypingStatusBroadcastReceiver();
+        updatingDialogBroadcastReceiver = new UpdatingDialogBroadcastReceiver();
+        appSharedHelper.saveNeedToOpenDialog(false);
+        imagePickHelper = new ImagePickHelper();
+    }
+
+    private void initCustomUI() {
+        emojiconsFragment = _findViewById(R.id.emojicon_fragment);
+    }
+
+    private void initCustomListeners() {
+        messageSwipeRefreshLayout.setOnRefreshListener(new RefreshLayoutListener());
+    }
+
+    protected void initMessagesRecyclerView() {
+        messagesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     protected void addActions() {
@@ -253,96 +328,6 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
     private void deleteObservers() {
         dataManager.getMessageDataManager().deleteObserver(messageObserver);
         dataManager.getDialogNotificationDataManager().deleteObserver(dialogNotificationObserver);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isSmilesLayoutShowing()) {
-            hideSmileLayout();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        createChatLocally();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        hideSmileLayout();
-        checkStartTyping();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        readAllMessages();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        closeChatLocally();
-        removeActions();
-        deleteObservers();
-        unregisterBroadcastReceivers();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        canPerformLogout.set(true);
-        boolean fromCamera = imageUtils.isCaptureCalled(requestCode);
-        if ((imageUtils.isGalleryCalled(requestCode) || fromCamera) && resultCode == RESULT_OK) {
-            if (data.getData() == null) {
-                onFileSelected((Bitmap) data.getExtras().get("data"), fromCamera);
-            } else {
-                onFileSelected(data.getData(), fromCamera);
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onConnectedToService(QBService service) {
-        super.onConnectedToService(service);
-        onConnectServiceLocally(service);
-    }
-
-    @Override
-    public void onEmojiconClicked(Emojicon emojicon) {
-        EmojiconsFragment.input(messageEditText, emojicon);
-    }
-
-    @Override
-    public void onEmojiconBackspaceClicked(View v) {
-        EmojiconsFragment.backspace(messageEditText);
-    }
-
-    @Override
-    public void onImageSourcePicked(ImageSource source) {
-        switch (source) {
-            case GALLERY:
-                imageUtils.getImage();
-                break;
-            case CAMERA:
-                imageUtils.getCaptureImage();
-                break;
-        }
-    }
-
-    @Override
-    public void onImageSourceClosed() {
-        canPerformLogout.set(true);
-    }
-
-    @Override
-    public void onScreenResetPossibilityPerformLogout(boolean canPerformLogout) {
-        this.canPerformLogout.set(canPerformLogout);
     }
 
     protected void updateData() {
@@ -593,9 +578,9 @@ public abstract class BaseDialogActivity extends BaseLogeableActivity implements
 
     protected abstract void onConnectServiceLocally(QBService service);
 
-    protected abstract void onFileSelected(Uri originalUri, boolean fromCamera);
-
-    protected abstract void onFileSelected(Bitmap bitmap, boolean fromCamera);
+//    protected abstract void onFileSelected(Uri originalUri, boolean fromCamera);
+//
+//    protected abstract void onFileSelected(Bitmap bitmap, boolean fromCamera);
 
     protected abstract Bundle generateBundleToInitDialog();
 

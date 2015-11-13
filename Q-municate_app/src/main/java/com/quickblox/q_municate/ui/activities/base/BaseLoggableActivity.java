@@ -2,13 +2,13 @@ package com.quickblox.q_municate.ui.activities.base;
 
 import android.os.Bundle;
 
-import com.quickblox.q_municate.utils.QBLogeable;
+import com.quickblox.q_municate.utils.Loggable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class BaseLogeableActivity extends BaseActivity implements QBLogeable {
+public abstract class BaseLoggableActivity extends BaseActivity implements Loggable {
 
-    protected AtomicBoolean canPerformLogout = new AtomicBoolean(true);
+    public AtomicBoolean canPerformLogout = new AtomicBoolean(true);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public abstract class BaseLogeableActivity extends BaseActivity implements QBLog
         super.onSaveInstanceState(outState);
     }
 
-    //This method is used for logout action when Actvity is going to background
+    //This method is used for logout action when Activity is going to background
     @Override
     public boolean isCanPerformLogoutInOnStop() {
         return canPerformLogout.get();

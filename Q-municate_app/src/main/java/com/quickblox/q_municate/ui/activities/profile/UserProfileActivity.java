@@ -10,7 +10,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.chats.PrivateDialogActivity;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
@@ -36,7 +36,7 @@ import java.util.Observer;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class UserProfileActivity extends BaseLogeableActivity {
+public class UserProfileActivity extends BaseLoggableActivity {
 
     @Bind(R.id.avatar_imageview)
     RoundedImageView avatarImageView;

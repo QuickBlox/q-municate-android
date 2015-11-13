@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.activities.authorization;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -21,15 +20,16 @@ import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate.utils.helpers.GoogleAnalyticsHelper;
 import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.LoginType;
 import com.quickblox.q_municate_core.qb.commands.rest.QBSignUpCommand;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -40,8 +40,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener,
-        ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
+public class SignUpActivity extends BaseAuthActivity implements OnImagePickedListener {
 
     private static final String FULL_NAME_BLOCKED_CHARACTERS = "<>;";
 
@@ -54,11 +53,10 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     @Bind(R.id.avatar_imageview)
     RoundedImageView avatarImageView;
 
-    private ImageUtils imageUtils;
-    private boolean isNeedUpdateAvatar;
-    private Bitmap avatarBitmapCurrent;
+    private boolean isNeedUpdateImage;
     private QBUser qbUser;
-    private Uri outputUri;
+    private Uri imageUri;
+    private ImagePickHelper imagePickHelper;
 
     private SignUpSuccessAction signUpSuccessAction;
     private UpdateUserSuccessAction updateUserSuccessAction;
@@ -119,12 +117,6 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, data);
-        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
-            Uri originalUri = data.getData();
-            if (originalUri != null) {
-                showProgress();
-                new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
-            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -134,15 +126,9 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         startLandingScreen();
     }
 
-    @Override
-    public void onUriScaledBitmapReceived(Uri originalUri) {
-        hideProgress();
-        startCropActivity(originalUri);
-    }
-
     @OnClick(R.id.change_avatar_view)
     void selectAvatar(View view) {
-        imageUtils.getImage();
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
 
     @OnTextChanged(R.id.full_name_edittext)
@@ -155,28 +141,23 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
         UserAgreementActivity.start(SignUpActivity.this);
     }
 
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-    }
-
     private void initFields(Bundle bundle) {
         qbUser = new QBUser();
-        imageUtils = new ImageUtils(this);
         signUpSuccessAction = new SignUpSuccessAction();
         updateUserSuccessAction = new UpdateUserSuccessAction();
         fullNameEditText.setFilters(new InputFilter[]{ fullNameFilter });
+        imagePickHelper = new ImagePickHelper();
     }
 
     private void startCropActivity(Uri originalUri) {
-        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        Crop.of(originalUri, outputUri).asSquare().start(this);
+        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            isNeedUpdateImage = true;
+            avatarImageView.setImageURI(imageUri);
         } else if (resultCode == Crop.RESULT_ERROR) {
             ToastUtils.longToast(Crop.getError(result).getMessage());
         }
@@ -213,17 +194,13 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
 
             showProgress();
 
-            if (isNeedUpdateAvatar) {
-                new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
+            if (isNeedUpdateImage && imageUri != null) {
+                startSignUp(ImageUtils.getCreatedFileFromUri(imageUri));
             } else {
                 appSharedHelper.saveUsersImportInitialized(false);
                 startSignUp(null);
             }
         }
-    }
-
-    public void onCachedImageFileReceived(File imageFile) {
-        startSignUp(imageFile);
     }
 
     private void startSignUp(File imageFile) {
@@ -258,6 +235,20 @@ public class SignUpActivity extends BaseAuthActivity implements ReceiveFileFromB
             return null;
         }
     };
+
+    @Override
+    public void onImagePicked(int requestCode, File file) {
+        startCropActivity(Uri.fromFile(file));
+    }
+
+    @Override
+    public void onImagePickError(int requestCode, Exception e) {
+        ErrorUtils.showError(this, e);
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
+    }
 
     private class SignUpSuccessAction implements Command {
 

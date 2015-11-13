@@ -15,7 +15,6 @@ import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogMessagesAdapter;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate_core.qb.helpers.QBGroupChatHelper;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
@@ -28,7 +27,7 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import java.io.File;
 import java.util.ArrayList;
 
-public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
+public class GroupDialogActivity extends BaseDialogActivity /*implements ReceiveFileFromBitmapTask.ReceiveFileListener*/ {
 
     public static void start(Context context, ArrayList<User> friends) {
         Intent intent = new Intent(context, GroupDialogActivity.class);
@@ -104,16 +103,16 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @Override
-    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
-        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-    }
-
-    @Override
-    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
-        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-    }
+//    @Override
+//    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
+//        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+//        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
+//    }
+//
+//    @Override
+//    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
+//        new ReceiveFileFromBitmapTask(GroupDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
+//    }
 
     @Override
     protected void onFileLoaded(QBFile file) {
@@ -139,14 +138,14 @@ public class GroupDialogActivity extends BaseDialogActivity implements ReceiveFi
         checkForScrolling(oldMessagesCount);
     }
 
-    @Override
-    public void onCachedImageFileReceived(File file) {
-        startLoadAttachFile(file);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-    }
+//    @Override
+//    public void onCachedImageFileReceived(File file) {
+//        startLoadAttachFile(file);
+//    }
+//
+//    @Override
+//    public void onAbsolutePathExtFileReceived(String absolutePath) {
+//    }
 
     public void sendMessage(View view) {
         sendMessage(false);

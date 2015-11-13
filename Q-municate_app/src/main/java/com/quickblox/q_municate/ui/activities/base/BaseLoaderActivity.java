@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-public abstract class BaseLoaderActivity<T> extends BaseLogeableActivity implements LoaderManager.LoaderCallbacks<T> {
+public abstract class BaseLoaderActivity<T> extends BaseLoggableActivity implements LoaderManager.LoaderCallbacks<T> {
 
     private Loader<T> loader;
 

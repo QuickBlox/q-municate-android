@@ -10,12 +10,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
 
 import butterknife.Bind;
 
-public class FeedbackActivity extends BaseLogeableActivity {
+public class FeedbackActivity extends BaseLoggableActivity {
 
     @Bind(R.id.feedback_types_radiogroup)
     RadioGroup feedbackTypesRadioGroup;

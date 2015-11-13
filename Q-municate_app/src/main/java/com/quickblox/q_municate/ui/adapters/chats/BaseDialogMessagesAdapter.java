@@ -17,7 +17,6 @@ import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.ImageLoadingProgressListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate.ui.adapters.base.BaseClickListenerViewHolder;
 import com.quickblox.q_municate.ui.adapters.base.BaseRecyclerViewAdapter;
 import com.quickblox.q_municate.ui.adapters.base.BaseViewHolder;
@@ -28,24 +27,21 @@ import com.quickblox.q_municate.utils.DateUtils;
 import com.quickblox.q_municate.utils.FileUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.listeners.ChatUIHelperListener;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.CombinationMessage;
 import com.quickblox.q_municate_core.utils.ConstsCore;
 import com.quickblox.q_municate_db.managers.DataManager;
 import com.quickblox.q_municate_db.models.Dialog;
 import com.quickblox.users.model.QBUser;
-
-import java.io.File;
-import java.util.List;
-
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
+
+import java.util.List;
 
 import butterknife.Bind;
 
 public abstract class BaseDialogMessagesAdapter
-        extends BaseRecyclerViewAdapter<CombinationMessage, BaseClickListenerViewHolder<CombinationMessage>>
-        implements ReceiveFileFromBitmapTask.ReceiveFileListener, StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
+        extends BaseRecyclerViewAdapter<CombinationMessage, BaseClickListenerViewHolder<CombinationMessage>> implements StickyRecyclerHeadersAdapter<RecyclerView.ViewHolder> {
 
     protected static final int TYPE_REQUEST_MESSAGE = 0;
     protected static final int TYPE_OWN_MESSAGE = 1;
@@ -70,16 +66,16 @@ public abstract class BaseDialogMessagesAdapter
     }
 
     @Override
+    public long getHeaderId(int position) {
+        CombinationMessage combinationMessage = getItem(position);
+        return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
+    }
+
+    @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
         View view = layoutInflater.inflate(R.layout.item_chat_sticky_header_date, parent, false);
         return new RecyclerView.ViewHolder(view) {
         };
-    }
-
-    @Override
-    public long getHeaderId(int position) {
-        CombinationMessage combinationMessage = getItem(position);
-        return DateUtils.toShortDateLong(combinationMessage.getCreatedDate());
     }
 
     @Override
@@ -132,88 +128,15 @@ public abstract class BaseDialogMessagesAdapter
         setViewVisibility(viewHolder.textMessageView, View.GONE);
     }
 
-    @Override
-    public void onCachedImageFileReceived(File imageFile) {
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-        chatUIHelperListener.onScreenResetPossibilityPerformLogout(false);
-        imageUtils.showFullImage((android.app.Activity) context, absolutePath);
-    }
+    //    @Override
+    //    public void onAbsolutePathExtFileReceived(String absolutePath) {
+    //        chatUIHelperListener.onScreenResetPossibilityPerformLogout(false);
+    //        imageUtils.showFullImage((android.app.Activity) context, absolutePath);
+    //    }
 
     protected void setViewVisibility(View view, int visibility) {
         if (view != null) {
             view.setVisibility(visibility);
-        }
-    }
-
-    public class ImageLoadingListener extends SimpleImageLoadingListener {
-
-        private ViewHolder viewHolder;
-        private Bitmap loadedImageBitmap;
-
-        public ImageLoadingListener(ViewHolder viewHolder) {
-            this.viewHolder = viewHolder;
-        }
-
-        @Override
-        public void onLoadingStarted(String imageUri, View view) {
-            super.onLoadingStarted(imageUri, view);
-            viewHolder.verticalProgressBar.setProgress(ConstsCore.ZERO_INT_VALUE);
-            viewHolder.centeredProgressBar.setProgress(ConstsCore.ZERO_INT_VALUE);
-        }
-
-        @Override
-        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-            updateUIAfterLoading();
-        }
-
-        @Override
-        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
-            initMaskedImageView(loadedBitmap);
-            fileUtils.checkExsistFile(imageUri, loadedBitmap);
-        }
-
-        private void initMaskedImageView(Bitmap loadedBitmap) {
-            loadedImageBitmap = loadedBitmap;
-            viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
-            viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
-            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
-            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
-
-            updateUIAfterLoading();
-        }
-
-        private void updateUIAfterLoading() {
-            if (viewHolder.progressRelativeLayout != null) {
-                setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
-            }
-        }
-
-        private View.OnClickListener receiveImageFileOnClickListener() {
-            return new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    view.startAnimation(AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
-                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils, loadedImageBitmap, false);
-                }
-            };
-        }
-    }
-
-    public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {
-
-        private ViewHolder viewHolder;
-
-        public SimpleImageLoadingProgressListener(ViewHolder viewHolder) {
-            this.viewHolder = viewHolder;
-        }
-
-        @Override
-        public void onProgressUpdate(String imageUri, View view, int current, int total) {
-            viewHolder.verticalProgressBar.setProgress(Math.round(100.0f * current / total));
         }
     }
 
@@ -285,6 +208,76 @@ public abstract class BaseDialogMessagesAdapter
 
         public ViewHolder(BaseDialogMessagesAdapter adapter, View view) {
             super(adapter, view);
+        }
+    }
+
+    public class ImageLoadingListener extends SimpleImageLoadingListener {
+
+        private ViewHolder viewHolder;
+        private Bitmap loadedImageBitmap;
+
+        public ImageLoadingListener(ViewHolder viewHolder) {
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public void onLoadingStarted(String imageUri, View view) {
+            super.onLoadingStarted(imageUri, view);
+            viewHolder.verticalProgressBar.setProgress(ConstsCore.ZERO_INT_VALUE);
+            viewHolder.centeredProgressBar.setProgress(ConstsCore.ZERO_INT_VALUE);
+        }
+
+        @Override
+        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+            updateUIAfterLoading();
+        }
+
+        @Override
+        public void onLoadingComplete(String imageUri, View view, final Bitmap loadedBitmap) {
+            initMaskedImageView(loadedBitmap);
+            fileUtils.checkExsistFile(imageUri, loadedBitmap);
+        }
+
+        private void initMaskedImageView(Bitmap loadedBitmap) {
+            loadedImageBitmap = loadedBitmap;
+            viewHolder.attachImageView.setOnClickListener(receiveImageFileOnClickListener());
+            viewHolder.attachImageView.setImageBitmap(loadedImageBitmap);
+            setViewVisibility(viewHolder.attachMessageRelativeLayout, View.VISIBLE);
+            setViewVisibility(viewHolder.attachImageView, View.VISIBLE);
+
+            updateUIAfterLoading();
+        }
+
+        private void updateUIAfterLoading() {
+            if (viewHolder.progressRelativeLayout != null) {
+                setViewVisibility(viewHolder.progressRelativeLayout, View.GONE);
+            }
+        }
+
+        private View.OnClickListener receiveImageFileOnClickListener() {
+            return new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    view.startAnimation(
+                            AnimationUtils.loadAnimation(context, R.anim.chat_attached_file_click));
+                    //                    new ReceiveFileFromBitmapTask(BaseDialogMessagesAdapter.this).execute(imageUtils, loadedImageBitmap, false);
+                }
+            };
+        }
+    }
+
+    public class SimpleImageLoadingProgressListener implements ImageLoadingProgressListener {
+
+        private ViewHolder viewHolder;
+
+        public SimpleImageLoadingProgressListener(ViewHolder viewHolder) {
+            this.viewHolder = viewHolder;
+        }
+
+        @Override
+        public void onProgressUpdate(String imageUri, View view, int current, int total) {
+            viewHolder.verticalProgressBar.setProgress(Math.round(100.0f * current / total));
         }
     }
 }

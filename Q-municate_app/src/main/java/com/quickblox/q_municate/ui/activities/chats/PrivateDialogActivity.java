@@ -3,8 +3,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -16,11 +14,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate.ui.adapters.chats.PrivateDialogMessagesAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
+import com.quickblox.q_municate.utils.listeners.FriendOperationListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAcceptFriendCommand;
 import com.quickblox.q_municate_core.qb.commands.friend.QBRejectFriendCommand;
@@ -39,7 +36,7 @@ import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
-public class PrivateDialogActivity extends BaseDialogActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener {
+public class PrivateDialogActivity extends BaseDialogActivity /*implements ReceiveFileFromBitmapTask.ReceiveFileListener*/ {
 
     private FriendOperationAction friendOperationAction;
     private FriendObserver friendObserver;
@@ -125,16 +122,16 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         setOnlineStatus(opponentUser);
     }
 
-    @Override
-    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
-        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-    }
-
-    @Override
-    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
-        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
-    }
+//    @Override
+//    protected void onFileSelected(Uri originalUri, boolean fromCamera) {
+//        Bitmap bitmap = imageUtils.getBitmap(originalUri);
+//        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
+//    }
+//
+//    @Override
+//    protected void onFileSelected(Bitmap bitmap, boolean fromCamera) {
+//        new ReceiveFileFromBitmapTask(PrivateDialogActivity.this).execute(imageUtils, bitmap, true, fromCamera);
+//    }
 
     @Override
     protected void onFileLoaded(QBFile file) {
@@ -211,14 +208,14 @@ public class PrivateDialogActivity extends BaseDialogActivity implements Receive
         }
     }
 
-    @Override
-    public void onCachedImageFileReceived(File file) {
-        startLoadAttachFile(file);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-    }
+//    @Override
+//    public void onCachedImageFileReceived(File file) {
+//        startLoadAttachFile(file);
+//    }
+//
+//    @Override
+//    public void onAbsolutePathExtFileReceived(String absolutePath) {
+//    }
 
     public void sendMessage(View view) {
         sendMessage(true);

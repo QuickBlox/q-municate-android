@@ -12,7 +12,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.activities.authorization.LandingActivity;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.changepassword.ChangePasswordActivity;
 import com.quickblox.q_municate.ui.activities.feedback.FeedbackActivity;
 import com.quickblox.q_municate.ui.activities.invitefriends.InviteFriendsActivity;
@@ -34,7 +34,7 @@ import butterknife.Bind;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
-public class SettingsActivity extends BaseLogeableActivity {
+public class SettingsActivity extends BaseLoggableActivity {
 
     @Bind(R.id.avatar_imageview)
     RoundedImageView avatarImageView;

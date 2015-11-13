@@ -6,6 +6,7 @@ import android.support.multidex.MultiDexApplication;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.core.QBSettings;
+import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.media.MediaPlayerManager;
 import com.quickblox.q_municate.utils.ActivityLifecycleHandler;
 import com.quickblox.q_municate.utils.image.ImageUtils;
@@ -48,7 +49,7 @@ public class App extends MultiDexApplication {
     }
 
     private void initImageLoader(Context context) {
-        ImageLoader.getInstance().init(ImageUtils.getImageLoaderConfiguration(context));
+        ImageLoader.getInstance().init(ImageLoaderUtils.getImageLoaderConfiguration(context));
     }
 
     public synchronized MediaPlayerManager getMediaPlayer() {

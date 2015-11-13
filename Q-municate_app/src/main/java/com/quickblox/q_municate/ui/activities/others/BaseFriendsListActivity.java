@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate_core.service.QBService;
 import com.quickblox.q_municate_core.utils.UserFriendUtils;
 import com.quickblox.q_municate_db.managers.DataManager;
@@ -18,7 +18,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public abstract class BaseFriendsListActivity extends BaseLogeableActivity {
+public abstract class BaseFriendsListActivity extends BaseLoggableActivity {
 
     @Bind(R.id.friends_recyclerview)
     protected RecyclerView friendsRecyclerView;

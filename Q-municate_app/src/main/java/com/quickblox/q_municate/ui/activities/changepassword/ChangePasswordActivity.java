@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
 import com.quickblox.q_municate_core.core.command.Command;
@@ -25,7 +25,7 @@ import com.quickblox.users.model.QBUser;
 import butterknife.Bind;
 import butterknife.OnTextChanged;
 
-public class ChangePasswordActivity extends BaseLogeableActivity {
+public class ChangePasswordActivity extends BaseLoggableActivity {
 
     @Bind(R.id.old_password_textinputlayout)
     TextInputLayout oldPasswordTextInputLayout;

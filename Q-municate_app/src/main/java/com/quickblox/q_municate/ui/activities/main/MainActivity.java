@@ -12,7 +12,7 @@ import com.facebook.SessionState;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.gcm.GSMHelper;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.chats.DialogsListFragment;
 import com.quickblox.q_municate.utils.helpers.FacebookHelper;
 import com.quickblox.q_municate.utils.helpers.ImportFriendsHelper;
@@ -21,7 +21,7 @@ import com.quickblox.q_municate_core.qb.commands.chat.QBLoadDialogsCommand;
 import com.quickblox.q_municate_core.qb.commands.chat.QBLoginChatCompositeCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
 
-public class MainActivity extends BaseLogeableActivity {
+public class MainActivity extends BaseLoggableActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -67,9 +67,9 @@ public class MainActivity extends BaseLogeableActivity {
         importFriendsFailAction = new ImportFriendsFailAction();
 
         if (!appSharedHelper.isUsersImportInitialized()) {
-            showProgress();
-            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
-            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
+//            showProgress();
+//            facebookHelper = new FacebookHelper(this, savedInstanceState, new FacebookSessionStatusCallback());
+//            importFriendsHelper = new ImportFriendsHelper(MainActivity.this, facebookHelper);
         }
     }
 

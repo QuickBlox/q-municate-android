@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
@@ -25,19 +24,19 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.activities.profile.MyProfileActivity;
 import com.quickblox.q_municate.ui.adapters.chats.GroupDialogOccupantsAdapter;
 import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.utils.listeners.UserOperationListener;
 import com.quickblox.q_municate.utils.simple.SimpleActionModeCallback;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.qb.commands.friend.QBAddFriendCommand;
@@ -61,7 +60,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnTextChanged;
 
-public class GroupDialogDetailsActivity extends BaseLogeableActivity implements ReceiveFileFromBitmapTask.ReceiveFileListener, AdapterView.OnItemClickListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener {
+public class GroupDialogDetailsActivity extends BaseLoggableActivity implements AdapterView.OnItemClickListener, OnImagePickedListener {
 
     public static final int UPDATE_DIALOG_REQUEST_CODE = 100;
     public static final int RESULT_LEAVE_GROUP = 2;
@@ -79,17 +78,16 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     TextView onlineOccupantsTextView;
 
     @Bind(R.id.avatar_imageview)
-    RoundedImageView avatarImageView;
+    RoundedImageView photoImageView;
 
     private Object actionMode;
-    private boolean isNeedUpdateAvatar;
-    private Uri outputUri;
-    private Bitmap avatarBitmapCurrent;
+    private boolean isNeedUpdateImage;
+    private Uri imageUri;
     private QBDialog qbDialog;
     private String groupNameCurrent;
     private String photoUrlOld;
     private String groupNameOld;
-    private ImageUtils imageUtils;
+    private ImagePickHelper imagePickHelper;
     private GroupDialogOccupantsAdapter groupDialogOccupantsAdapter;
     private List<DialogNotification.Type> currentNotificationTypeList;
     private ArrayList<Integer> addedFriendIdsList;
@@ -175,22 +173,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             if (data != null) {
                 handleAddedFriends(data);
             }
-        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
-            Uri originalUri = data.getData();
-            if (originalUri != null) {
-                showProgress();
-                new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
-            }
         }
         canPerformLogout.set(true);
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onUriScaledBitmapReceived(Uri originalUri) {
-        hideProgress();
-        canPerformLogout.set(false);
-        startCropActivity(originalUri);
     }
 
     @OnTextChanged(R.id.name_textview)
@@ -228,13 +213,20 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     @Override
-    public void onCachedImageFileReceived(File imageFile) {
-        updateGroupDialog(imageFile);
+    public void onImagePicked(int requestCode, File file) {
+        canPerformLogout.set(true);
+        startCropActivity(Uri.fromFile(file));
     }
 
     @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
+    public void onImagePickError(int requestCode, Exception e) {
+        canPerformLogout.set(true);
+        ErrorUtils.showError(this, e);
+    }
 
+    @Override
+    public void onImagePickClosed(int requestCode) {
+        canPerformLogout.set(true);
     }
 
     private void initFields() {
@@ -242,7 +234,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
         String dialogId = (String) getIntent().getExtras().getSerializable(QBServiceConsts.EXTRA_DIALOG_ID);
         qbDialog = ChatUtils.createQBDialogFromLocalDialog(dataManager,
                 dataManager.getDialogDataManager().getByDialogId(dialogId));
-        imageUtils = new ImageUtils(this);
+        imagePickHelper = new ImagePickHelper();
         friendOperationAction = new UserOperationAction();
         currentNotificationTypeList = new ArrayList<>();
         updatingDialogDetailsBroadcastReceiver = new UpdatingDialogDetailsBroadcastReceiver();
@@ -257,7 +249,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
         occupantsTextView.setText(getString(R.string.gdd_participants, qbDialog.getOccupants().size()));
 
-        if (!isNeedUpdateAvatar) {
+        if (!isNeedUpdateImage) {
             loadAvatar(qbDialog.getPhoto());
         }
 
@@ -300,8 +292,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     public void changeAvatarOnClick(View view) {
-        canPerformLogout.set(false);
-        imageUtils.getImage();
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
 
     private void updateCountOnlineFriends() {
@@ -313,7 +304,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void loadAvatar(String photoUrl) {
-        ImageLoader.getInstance().displayImage(photoUrl, avatarImageView,
+        ImageLoader.getInstance().displayImage(photoUrl, photoImageView,
                 ImageLoaderUtils.UIL_GROUP_AVATAR_DISPLAY_OPTIONS);
     }
 
@@ -370,9 +361,10 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
-            isNeedUpdateAvatar = true;
-            avatarBitmapCurrent = imageUtils.getBitmap(outputUri);
-            avatarImageView.setImageBitmap(avatarBitmapCurrent);
+            isNeedUpdateImage = true;
+            if (imageUri != null) {
+                photoImageView.setImageURI(imageUri);
+            }
             startAction();
         } else if (resultCode == Crop.RESULT_ERROR) {
             ToastUtils.longToast(Crop.getError(result).getMessage());
@@ -380,8 +372,8 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private void startCropActivity(Uri originalUri) {
-        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        Crop.of(originalUri, outputUri).asSquare().start(this);
+        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
     private void startAction() {
@@ -406,7 +398,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
     }
 
     private boolean isGroupDataChanged() {
-        return !groupNameCurrent.equals(groupNameOld) || isNeedUpdateAvatar;
+        return !groupNameCurrent.equals(groupNameOld) || isNeedUpdateImage;
     }
 
     private void saveChanges() {
@@ -421,10 +413,9 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
             currentNotificationTypeList.add(DialogNotification.Type.NAME_DIALOG);
         }
 
-        if (isNeedUpdateAvatar) {
-            new ReceiveFileFromBitmapTask(this).execute(imageUtils, avatarBitmapCurrent, true);
-
+        if (isNeedUpdateImage) {
             currentNotificationTypeList.add(DialogNotification.Type.PHOTO_DIALOG);
+            updateGroupDialog(ImageUtils.getCreatedFileFromUri(imageUri));
         } else {
             updateGroupDialog(null);
         }
@@ -464,7 +455,7 @@ public class GroupDialogDetailsActivity extends BaseLogeableActivity implements 
 
     private void resetGroupData() {
         groupNameEditText.setText(groupNameOld);
-        isNeedUpdateAvatar = false;
+        isNeedUpdateImage = false;
         loadAvatar(photoUrlOld);
     }
 

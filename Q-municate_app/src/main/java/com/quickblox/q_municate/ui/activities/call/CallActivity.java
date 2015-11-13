@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.quickblox.q_municate.App;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.fragments.call.IncomingCallFragment;
 import com.quickblox.q_municate.ui.fragments.call.OutgoingCallFragment;
 import com.quickblox.q_municate.utils.ToastUtils;
@@ -30,7 +30,7 @@ import com.quickblox.videochat.webrtc.signaling.SignalingIgnoreFilter;
 
 // TODO need to refactor
 @Deprecated
-public class CallActivity extends BaseLogeableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
+public class CallActivity extends BaseLoggableActivity implements IncomingCallFragment.IncomingCallClickListener, OutgoingCallFragment.OutgoingCallListener {
 
     private static final String TAG = CallActivity.class.getSimpleName();
 

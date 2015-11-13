@@ -13,7 +13,7 @@ import android.view.View;
 
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
 import com.quickblox.q_municate.utils.KeyboardUtils;
 import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
@@ -33,7 +33,7 @@ import java.util.List;
 
 import butterknife.Bind;
 
-public class NewMessageActivity extends BaseLogeableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+public class NewMessageActivity extends BaseLoggableActivity implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     @Bind(R.id.friends_recyclerview)
     RecyclerView friendsRecyclerView;

@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.activities.profile;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -15,19 +14,20 @@ import android.widget.EditText;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
-import com.quickblox.q_municate.tasks.ReceiveUriScaledBitmapTask;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.ValidationUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageLoaderUtils;
 import com.quickblox.q_municate.utils.image.ImageUtils;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.models.AppSession;
 import com.quickblox.q_municate_core.models.UserCustomData;
 import com.quickblox.q_municate_core.qb.commands.QBUpdateUserCommand;
 import com.quickblox.q_municate_core.service.QBServiceConsts;
+import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_core.utils.Utils;
 import com.quickblox.users.model.QBUser;
 import com.soundcloud.android.crop.Crop;
@@ -38,8 +38,7 @@ import butterknife.Bind;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
 
-public class MyProfileActivity extends BaseLogeableActivity
-        implements ReceiveFileFromBitmapTask.ReceiveFileListener, ReceiveUriScaledBitmapTask.ReceiveUriScaledBitmapListener{
+public class MyProfileActivity extends BaseLoggableActivity implements OnImagePickedListener {
 
     private static String TAG = MyProfileActivity.class.getSimpleName();
 
@@ -53,13 +52,12 @@ public class MyProfileActivity extends BaseLogeableActivity
     EditText fullNameEditText;
 
     private QBUser qbUser;
-    private boolean isNeedUpdatePhoto;
-    private Uri outputUri;
+    private boolean isNeedUpdateImage;
     private UserCustomData userCustomData;
-    private ImageUtils imageUtils;
-    private Bitmap currentPhotoBitmap;
     private String currentFullName;
     private String oldFullName;
+    private ImagePickHelper imagePickHelper;
+    private Uri imageUri;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, MyProfileActivity.class);
@@ -86,12 +84,6 @@ public class MyProfileActivity extends BaseLogeableActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Crop.REQUEST_CROP) {
             handleCrop(resultCode, data);
-        } else if (requestCode == ImageUtils.GALLERY_INTENT_CALLED && resultCode == RESULT_OK) {
-            Uri originalUri = data.getData();
-            if (originalUri != null) {
-                showProgress();
-                new ReceiveUriScaledBitmapTask(this).execute(imageUtils, originalUri);
-            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -129,28 +121,28 @@ public class MyProfileActivity extends BaseLogeableActivity
     @OnClick(R.id.change_photo_view)
     void changePhoto(View view) {
         fullNameTextInputLayout.setError(null);
-        canPerformLogout.set(false);
-        imageUtils.getImage();
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
 
     @Override
-    public void onUriScaledBitmapReceived(Uri originalUri) {
-        hideProgress();
-        startCropActivity(originalUri);
+    public void onImagePicked(int requestCode, File file) {
+        canPerformLogout.set(true);
+        startCropActivity(Uri.fromFile(file));
     }
 
     @Override
-    public void onCachedImageFileReceived(File imageFile) {
-        QBUser newUser = createUserForUpdating();
-        QBUpdateUserCommand.start(this, newUser, imageFile);
+    public void onImagePickError(int requestCode, Exception e) {
+        canPerformLogout.set(true);
+        ErrorUtils.showError(this, e);
     }
 
     @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
+    public void onImagePickClosed(int requestCode) {
+        canPerformLogout.set(true);
     }
 
     private void initFields() {
-        imageUtils = new ImageUtils(this);
+        imagePickHelper = new ImagePickHelper();
         qbUser = AppSession.getSession().getUser();
     }
 
@@ -182,12 +174,12 @@ public class MyProfileActivity extends BaseLogeableActivity
 
     private void updateOldData() {
         oldFullName = fullNameEditText.getText().toString();
-        isNeedUpdatePhoto = false;
+        isNeedUpdateImage = false;
     }
 
     private void resetUserData() {
         qbUser.setFullName(oldFullName);
-        isNeedUpdatePhoto = false;
+        isNeedUpdateImage = false;
         initCurrentData();
     }
 
@@ -207,9 +199,8 @@ public class MyProfileActivity extends BaseLogeableActivity
 
     private void handleCrop(int resultCode, Intent result) {
         if (resultCode == RESULT_OK) {
-            isNeedUpdatePhoto = true;
-            currentPhotoBitmap = imageUtils.getBitmap(outputUri);
-            photoImageView.setImageBitmap(currentPhotoBitmap);
+            isNeedUpdateImage = true;
+            photoImageView.setImageURI(imageUri);
         } else if (resultCode == Crop.RESULT_ERROR) {
             ToastUtils.longToast(Crop.getError(result).getMessage());
         }
@@ -217,8 +208,9 @@ public class MyProfileActivity extends BaseLogeableActivity
     }
 
     private void startCropActivity(Uri originalUri) {
-        outputUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
-        Crop.of(originalUri, outputUri).asSquare().start(this);
+        canPerformLogout.set(false);
+        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, imageUri).asSquare().start(this);
     }
 
     private QBUser createUserForUpdating() {
@@ -233,7 +225,7 @@ public class MyProfileActivity extends BaseLogeableActivity
     }
 
     private boolean isDataChanged() {
-        return isNeedUpdatePhoto || !oldFullName.equals(currentFullName);
+        return isNeedUpdateImage || !oldFullName.equals(currentFullName);
     }
 
     private boolean isFullNameNotEmpty() {
@@ -254,8 +246,9 @@ public class MyProfileActivity extends BaseLogeableActivity
         if (isFullNameNotEmpty()) {
             showProgress();
 
-            if (isNeedUpdatePhoto) {
-                new ReceiveFileFromBitmapTask(this).execute(imageUtils, currentPhotoBitmap, true);
+            if (isNeedUpdateImage && imageUri != null) {
+                QBUser newUser = createUserForUpdating();
+                QBUpdateUserCommand.start(this, newUser, ImageUtils.getCreatedFileFromUri(imageUri));
             } else {
                 QBUser newUser = createUserForUpdating();
                 QBUpdateUserCommand.start(this, newUser, null);

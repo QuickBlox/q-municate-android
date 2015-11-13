@@ -2,7 +2,6 @@ package com.quickblox.q_municate.ui.activities.chats;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,20 +9,17 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.quickblox.chat.model.QBDialog;
 import com.quickblox.content.model.QBFile;
 import com.quickblox.q_municate.R;
-import com.quickblox.q_municate.tasks.ReceiveFileFromBitmapTask;
 import com.quickblox.q_municate.ui.activities.others.BaseFriendsListActivity;
 import com.quickblox.q_municate.ui.activities.profile.UserProfileActivity;
 import com.quickblox.q_municate.ui.adapters.friends.FriendsAdapter;
-import com.quickblox.q_municate.ui.fragments.dialogs.ImageSourcePickDialogFragment;
-import com.quickblox.q_municate.ui.fragments.dialogs.base.TwoButtonsDialogFragment;
 import com.quickblox.q_municate.ui.views.roundedimageview.RoundedImageView;
-import com.quickblox.q_municate.utils.image.ImageSource;
+import com.quickblox.q_municate.utils.ToastUtils;
+import com.quickblox.q_municate.utils.helpers.ImagePickHelper;
 import com.quickblox.q_municate.utils.image.ImageUtils;
-import com.quickblox.q_municate.utils.listeners.OnImageSourcePickedListener;
+import com.quickblox.q_municate.utils.listeners.OnImagePickedListener;
 import com.quickblox.q_municate.utils.simple.SimpleOnRecycleItemClickListener;
 import com.quickblox.q_municate_core.core.command.Command;
 import com.quickblox.q_municate_core.qb.commands.chat.QBCreateGroupDialogCommand;
@@ -32,6 +28,7 @@ import com.quickblox.q_municate_core.service.QBServiceConsts;
 import com.quickblox.q_municate_core.utils.ChatUtils;
 import com.quickblox.q_municate_core.utils.ErrorUtils;
 import com.quickblox.q_municate_db.models.User;
+import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.io.Serializable;
@@ -41,8 +38,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-public class CreateGroupDialogActivity extends BaseFriendsListActivity implements OnImageSourcePickedListener,
-        ReceiveFileFromBitmapTask.ReceiveFileListener {
+public class CreateGroupDialogActivity extends BaseFriendsListActivity implements OnImagePickedListener {
 
     private static final String EXTRA_FRIENDS_LIST = "friends_list";
 
@@ -57,8 +53,8 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     private QBFile qbFile;
     private List<User> friendsList;
-    private ImageUtils imageUtils;
-    private Bitmap photoBitmap;
+    private ImagePickHelper imagePickHelper;
+    private Uri imageUri;
 
     public static void start(Context context, List<User> selectedFriendsList) {
         Intent intent = new Intent(context, CreateGroupDialogActivity.class);
@@ -74,16 +70,8 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initFields();
-
         addActions();
-    }
-
-    private void initFields() {
-        friendsList = (List<User>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
-        participantsCountTextView.setText(getString(R.string.create_group_participants, friendsList.size()));
-        imageUtils = new ImageUtils(this);
     }
 
     @Override
@@ -105,8 +93,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
 
     @OnClick(R.id.photo_imageview)
     void selectPhoto(View view) {
-        canPerformLogout.set(false);
-        ImageSourcePickDialogFragment.show(getSupportFragmentManager(), this);
+        imagePickHelper.pickAnImage(this, ImageUtils.IMAGE_REQUEST_CODE);
     }
 
     @Override
@@ -120,59 +107,41 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         groupNameEditText.setError(null);
 
         if (!TextUtils.isEmpty(groupNameEditText.getText())) {
-            createGroupChat();
+            checkForCreatingGroupChat();
         } else {
             groupNameEditText.setError(getString(R.string.create_group_empty_group_name));
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        canPerformLogout.set(true);
-        if ((imageUtils.isGalleryCalled(requestCode) || imageUtils.isCaptureCalled(requestCode)) && resultCode == RESULT_OK) {
-            if (data.getData() == null) {
-                onFileSelected((Bitmap) data.getExtras().get("data"));
-            } else {
-                onFileSelected(data.getData());
-            }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Crop.REQUEST_CROP) {
+            handleCrop(resultCode, data);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
-    public void onImageSourcePicked(ImageSource source) {
-        switch (source) {
-            case GALLERY:
-                imageUtils.getImage();
-                break;
-            case CAMERA:
-                imageUtils.getCaptureImage();
-                break;
-        }
+    public void onImagePicked(int requestCode, File file) {
+        canPerformLogout.set(true);
+        startCropActivity(Uri.fromFile(file));
     }
 
     @Override
-    public void onImageSourceClosed() {
+    public void onImagePickError(int requestCode, Exception e) {
+        canPerformLogout.set(true);
+        ErrorUtils.showError(this, e);
+    }
+
+    @Override
+    public void onImagePickClosed(int requestCode) {
         canPerformLogout.set(true);
     }
 
-    @Override
-    public void onCachedImageFileReceived(File imageFile) {
-        startLoadAttachFile(imageFile);
-    }
-
-    @Override
-    public void onAbsolutePathExtFileReceived(String absolutePath) {
-    }
-
-    private void onFileSelected(Uri originalUri) {
-        Bitmap bitmap = imageUtils.getBitmap(originalUri);
-        onFileSelected(bitmap);
-    }
-
-    private void onFileSelected(Bitmap bitmap) {
-        photoBitmap = bitmap;
-        new ReceiveFileFromBitmapTask(this).execute(imageUtils, bitmap, true);
+    private void initFields() {
+        friendsList = (List<User>) getIntent().getExtras().getSerializable(EXTRA_FRIENDS_LIST);
+        participantsCountTextView.setText(getString(R.string.create_group_participants, friendsList.size()));
+        imagePickHelper = new ImagePickHelper();
     }
 
     private void addActions() {
@@ -195,26 +164,38 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         updateBroadcastActionList();
     }
 
-    private void createGroupChat() {
+    private void checkForCreatingGroupChat() {
         if (friendsList != null && !friendsList.isEmpty()) {
             showProgress();
-            String photoUrl = qbFile != null ? qbFile.getPublicUrl() : null;
-            QBCreateGroupDialogCommand.start(this, groupNameEditText.getText().toString(), (ArrayList<User>) friendsList, photoUrl);
+
+            if (imageUri != null) {
+                QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, ImageUtils.getCreatedFileFromUri(imageUri));
+            } else {
+                createGroupChat();
+            }
         }
     }
 
-    private void startLoadAttachFile(final File file) {
-        TwoButtonsDialogFragment.show(
-                getSupportFragmentManager(),
-                R.string.create_group_confirm_selecting_photo,
-                new MaterialDialog.ButtonCallback() {
-                    @Override
-                    public void onPositive(MaterialDialog dialog) {
-                        super.onPositive(dialog);
-                        showProgress();
-                        QBLoadAttachFileCommand.start(CreateGroupDialogActivity.this, file);
-                    }
-                });
+    private void createGroupChat() {
+        String photoUrl = qbFile != null ? qbFile.getPublicUrl() : null;
+        QBCreateGroupDialogCommand.start(this, groupNameEditText.getText().toString(), (ArrayList<User>) friendsList, photoUrl);
+    }
+
+    private void startCropActivity(Uri originalUri) {
+        canPerformLogout.set(false);
+        imageUri = Uri.fromFile(new File(getCacheDir(), Crop.class.getName()));
+        Crop.of(originalUri, imageUri).asSquare().start(this);
+    }
+
+    private void handleCrop(int resultCode, Intent result) {
+        if (resultCode == RESULT_OK) {
+            if (imageUri != null) {
+                photoImageView.setImageURI(imageUri);
+            }
+        } else if (resultCode == Crop.RESULT_ERROR) {
+            ToastUtils.longToast(Crop.getError(result).getMessage());
+        }
+        canPerformLogout.set(true);
     }
 
     private class LoadAttachFileSuccessAction implements Command {
@@ -222,8 +203,7 @@ public class CreateGroupDialogActivity extends BaseFriendsListActivity implement
         @Override
         public void execute(Bundle bundle) {
             qbFile = (QBFile) bundle.getSerializable(QBServiceConsts.EXTRA_ATTACH_FILE);
-            photoImageView.setImageBitmap(photoBitmap);
-            hideProgress();
+            createGroupChat();
         }
     }
 

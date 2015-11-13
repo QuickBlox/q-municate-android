@@ -18,7 +18,7 @@ import com.facebook.SessionState;
 import com.facebook.widget.WebDialog;
 import com.quickblox.q_municate.R;
 import com.quickblox.q_municate.utils.listeners.CounterChangedListener;
-import com.quickblox.q_municate.ui.activities.base.BaseLogeableActivity;
+import com.quickblox.q_municate.ui.activities.base.BaseLoggableActivity;
 import com.quickblox.q_municate.ui.adapters.invitefriends.InviteFriendsAdapter;
 import com.quickblox.q_municate.utils.ToastUtils;
 import com.quickblox.q_municate.utils.helpers.EmailHelper;
@@ -35,7 +35,7 @@ import butterknife.Bind;
 
 import static butterknife.ButterKnife.findById;
 
-public class InviteFriendsActivity extends BaseLogeableActivity implements CounterChangedListener {
+public class InviteFriendsActivity extends BaseLoggableActivity implements CounterChangedListener {
 
     @Bind(R.id.friends_listview)
     ListView friendsListView;

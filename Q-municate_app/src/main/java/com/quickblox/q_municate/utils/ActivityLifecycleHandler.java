@@ -38,7 +38,7 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
     }
 
     public boolean isActivityLogeable(Activity activity) {
-        return (activity instanceof QBLogeable);
+        return (activity instanceof Loggable);
     }
 
     public void onActivityPaused(Activity activity) {
@@ -46,17 +46,17 @@ public class ActivityLifecycleHandler implements Application.ActivityLifecycleCa
 
     public void onActivityStopped(Activity activity) {
         //Count only our app logeable activity
-        if (activity instanceof QBLogeable) {
+        if (activity instanceof Loggable) {
             --numberOfActivitiesInForeground;
         }
         Lo.g("onActivityStopped" + numberOfActivitiesInForeground);
 
-        if (numberOfActivitiesInForeground == 0 && activity instanceof QBLogeable) {
+        if (numberOfActivitiesInForeground == 0 && activity instanceof Loggable) {
             boolean isLogedIn = isLoggedIn();
             if (!isLogedIn) {
                 return;
             }
-            chatDestroyed = ((QBLogeable) activity).isCanPerformLogoutInOnStop();
+            chatDestroyed = ((Loggable) activity).isCanPerformLogoutInOnStop();
             if (chatDestroyed) {
                 QBLogoutAndDestroyChatCommand.start(activity, true);
             }
